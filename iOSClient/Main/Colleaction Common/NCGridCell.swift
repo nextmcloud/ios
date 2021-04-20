@@ -53,10 +53,10 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        imageItem.layer.cornerRadius = 6
+        imageItem.layer.cornerRadius = 4
         imageItem.layer.masksToBounds = true
         
-        imageVisualEffect.layer.cornerRadius = 6
+        imageVisualEffect.layer.cornerRadius = 4
         imageVisualEffect.clipsToBounds = true
         
         progressView.tintColor = NCBrandColor.shared.brandElement
@@ -115,9 +115,10 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         if status {
             imageSelect.image = NCCollectionCommon.images.cellCheckedYes
             imageVisualEffect.isHidden = false
-            imageVisualEffect.alpha = 0.4
+            imageVisualEffect.alpha = 0.7
         } else {
-            imageSelect.isHidden = true
+//            imageSelect.image = NCCollectionCommon.images.cellCheckedNo
+            imageSelect.isHidden = false
             imageVisualEffect.isHidden = true
         }
     }

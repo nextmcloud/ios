@@ -69,7 +69,8 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
         
         images.cellSharedImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.graySoft, size: 50)
         images.cellCanShareImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.graySoft, size: 50)
-        images.cellShareByLinkImage = UIImage(named: "sharebylink")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+//        images.cellShareByLinkImage = UIImage(named: "sharebylink")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+        images.cellShareByLinkImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.graySoft, size: 50)
         
         images.cellFavouriteImage = UIImage(named: "favorite")!.image(color: NCBrandColor.shared.yellowFavorite, size: 50)
         images.cellCommentImage = UIImage(named: "comment")!.image(color: NCBrandColor.shared.graySoft, size: 50)
@@ -78,16 +79,18 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
         images.cellLocal = UIImage.init(named: "local")!
             
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
-        images.cellFolderEncryptedImage = UIImage(named: "folderEncrypted")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderSharedWithMeImage = UIImage(named: "folder_shared_with_me")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderPublicImage = UIImage(named: "folder_public")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderGroupImage = UIImage(named: "folder_group")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderExternalImage = UIImage(named: "folder_external")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderAutomaticUploadImage = UIImage(named: "folderAutomaticUpload")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderImage =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
+        images.cellFolderEncryptedImage = UIImage(named: "folderEncrypted")!
+        images.cellFolderSharedWithMeImage = UIImage(named: "folder_shared_with_me")!
+        images.cellFolderPublicImage = UIImage(named: "folder_public")!
+        images.cellFolderGroupImage = UIImage(named: "folder_group")!
+        images.cellFolderExternalImage = UIImage(named: "folder_external")!
+//        images.cellFolderAutomaticUploadImage = UIImage(named: "folderAutomaticUpload")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
+        images.cellFolderAutomaticUploadImage = UIImage(named: "folderAutomaticUpload")!
+        images.cellFolderImage =  UIImage(named: "folder")!
         
-        images.cellCheckedYes = UIImage(named: "checkedYes")!.image(color: .darkGray, size: 50)
-        images.cellCheckedNo = UIImage(named: "checkedNo")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+        images.cellCheckedYes = UIImage(named: "checkedYes")!
+//        images.cellCheckedNo = UIImage(named: "checkedNo")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+        images.cellCheckedNo = UIImage(named: "checkedNo")!.image(color: .darkGray, size: 50)
         
         images.cellButtonMore = UIImage(named: "more")!.image(color: NCBrandColor.shared.graySoft, size: 50)
         images.cellButtonStop = UIImage(named: "stop")!.image(color: NCBrandColor.shared.graySoft, size: 50)

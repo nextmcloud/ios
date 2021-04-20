@@ -41,6 +41,9 @@ class NCMainMenuTableViewController: UITableViewController {
             self.dismiss(animated: true, completion: nil)
             action(menuAction)
         }
+//        let cell = tableView.cellForRow(at: indexPath)
+//        cell?.accessoryView = UIImageView(image: UIImage(named: "share"))
+//        tableView.reloadRows(at: NSArray(objects: indexPath) as! [IndexPath], with: .none)
     }
 
     // MARK: - Table view data source
@@ -72,7 +75,9 @@ class NCMainMenuTableViewController: UITableViewController {
             actionNameLabel.text = action.title
         }
 
+        let checkImage = UIImageView(image: UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0))
         cell.accessoryType = action.selectable && action.selected ? .checkmark : .none
+        cell.accessoryView = action.selectable && action.selected ? checkImage : .none
 
         return cell
     }

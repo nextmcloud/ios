@@ -223,7 +223,16 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         } else {
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_select_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(tapSelect(sender:)))
             navigationItem.leftBarButtonItem = nil
+            
+            let attributedText = NSMutableAttributedString(string: titleCurrentFolder, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 15)])
+
+            attributedText.append(NSAttributedString(string: titleCurrentFolder, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15), NSAttributedString.Key.foregroundColor: UIColor.blue]))
+            let titleLabel = UILabel()
+            titleLabel.attributedText = attributedText
+            
             navigationItem.title = titleCurrentFolder
+            
+//            navigationItem.title = titleLabel
         }
     }
     

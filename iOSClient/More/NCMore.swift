@@ -97,18 +97,18 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         functionMenu.append(item)
         
         // ITEM : Notification
-        item = NCCommunicationExternalSite()
-        item.name = "_notification_"
-        item.icon = "notification"
-        item.url = "segueNotification"
-        functionMenu.append(item)
+//        item = NCCommunicationExternalSite()
+//        item.name = "_notification_"
+//        item.icon = "notification"
+//        item.url = "segueNotification"
+//        functionMenu.append(item)
 
         // ITEM : Activity
-        item = NCCommunicationExternalSite()
-        item.name = "_activity_"
-        item.icon = "activity"
-        item.url = "segueActivity"
-        functionMenu.append(item)
+//        item = NCCommunicationExternalSite()
+//        item.name = "_activity_"
+//        item.icon = "activity"
+//        item.url = "segueActivity"
+//        functionMenu.append(item)
 
         // ITEM : Shares
         let isFilesSharingEnabled = NCManageDatabase.shared.getCapabilitiesServerBool(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesFileSharingApiEnabled, exists: false)
@@ -291,7 +291,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         // change color selection and disclosure indicator
         let selectionColor: UIView = UIView()
-        selectionColor.backgroundColor = NCBrandColor.shared.select
+        selectionColor.backgroundColor = NCBrandColor.shared.cellSelection
 
         if (indexPath.section == 0) {
             
@@ -318,7 +318,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
             cell.selectedBackgroundView = selectionColor
             cell.backgroundColor = NCBrandColor.shared.backgroundCell
-            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+//            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            cell.accessoryType = UITableViewCell.AccessoryType.none
             
             if NCManageDatabase.shared.getCapabilitiesServerBool(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesUserStatusEnabled, exists: false) {
                 if let account = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", appDelegate.account)) {
@@ -367,7 +368,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         var item = NCCommunicationExternalSite()
 
         if indexPath.section == 0 {
-            tapImageLogoManageAccount()
+            tableView.deselectRow(at: indexPath, animated: false)
+//            tapImageLogoManageAccount()
             return
         }
 

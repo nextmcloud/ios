@@ -80,17 +80,17 @@
     
     // Disable Local Cache After Upload
     
-    section = [XLFormSectionDescriptor formSection];
-    [form addFormSection:section];
-    section.footerTitle = NSLocalizedString(@"_disableLocalCacheAfterUpload_footer_", nil);
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disableLocalCacheAfterUpload" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_disableLocalCacheAfterUpload_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
-    if ([CCUtility getDisableLocalCacheAfterUpload]) row.value = @"1";
-    else row.value = @"0";
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
-    [section addFormRow:row];
+//    section = [XLFormSectionDescriptor formSection];
+//    [form addFormSection:section];
+//    section.footerTitle = NSLocalizedString(@"_disableLocalCacheAfterUpload_footer_", nil);
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disableLocalCacheAfterUpload" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_disableLocalCacheAfterUpload_", nil)];
+//    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+//    if ([CCUtility getDisableLocalCacheAfterUpload]) row.value = @"1";
+//    else row.value = @"0";
+//    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+//    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+//    [section addFormRow:row];
     
     // Automatic download image
     

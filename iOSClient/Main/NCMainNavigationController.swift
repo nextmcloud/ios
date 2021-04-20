@@ -65,6 +65,12 @@ class NCMainNavigationController: UINavigationController {
             
             navBarAppearance.configureWithOpaqueBackground()
             navBarAppearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor : NCBrandColor.shared.textView]
+//            let attributedText = NSMutableAttributedString(string: heading, attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 20)])
+//
+//            attributedText.append(NSAttributedString(string: content, attributes: [NSAttributedStringKey.font: UIFont.SystemFont(ofSize: 15), NSAttributedStringKey.foregroundColor: UIColor.blue]))
+//
+//            navBarAppearance.titleTextAttributes.attributedText = attributedText
+            
             navBarAppearance.backgroundColor = NCBrandColor.shared.tabBar
 
             navigationBar.scrollEdgeAppearance = navBarAppearance

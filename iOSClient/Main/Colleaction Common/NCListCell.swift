@@ -62,7 +62,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     override func awakeFromNib() {
         super.awakeFromNib()
                
-        imageItem.layer.cornerRadius = 6
+        imageItem.layer.cornerRadius = 4
         imageItem.layer.masksToBounds = true
         
         progressView.tintColor = NCBrandColor.shared.brandElement
@@ -137,7 +137,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
             let blurEffectView = UIVisualEffectView(effect: blurEffect)
             blurEffectView.frame = self.bounds
             blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            blurEffectView.backgroundColor = NCBrandColor.shared.brandElement.withAlphaComponent(0.2)
+            blurEffectView.backgroundColor = NCBrandColor.shared.cellSelection
             backgroundView = blurEffectView
             
             separator.isHidden = true
