@@ -79,6 +79,9 @@
 + (BOOL)getOriginalFileName:(NSString *)key;
 + (void)setOriginalFileName:(BOOL)value key:(NSString *)key;
 
++ (void)setOriginalFileNamePrefsChanged:(BOOL)value key:(NSString *)key;
++ (BOOL)getOriginalFileNamePrefsChanged:(NSString *)key;
+
 + (NSString *)getFileNameMask:(NSString *)key;
 + (void)setFileNameMask:(NSString *)mask key:(NSString *)key;
 
