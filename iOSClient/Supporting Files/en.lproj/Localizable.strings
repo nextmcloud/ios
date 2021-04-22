@@ -202,7 +202,7 @@
 "_acknowledgements_"            = "Acknowledgements";
 "_settings_"                    = "Settings";
 "_passcode_"                    = "Password";
-"_lock_"                        = "Lock";
+"_lock_"                        = "Security";//"Lock";
 "_lock_active_"                 = "Lock: On";
 "_lock_not_active_"             = "Lock: Off";
 "_lock_protection_no_screen_"        = "Do not ask at startup";
