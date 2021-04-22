@@ -108,7 +108,7 @@
 "_error_parameter_schema_"  = "Wrong parameters, impossible to continue";
 "_comments_"                = "Comments";
 "_sharing_"                 = "Sharing";
-"_details_"                 = "Details";
+"_details_"                 = "Share";
 "_dark_mode_"               = "Dark mode";
 "_dark_mode_detect_"        = "Detect iOS dark mode";
 "_screen_"                  = "Screen";
@@ -496,7 +496,7 @@
 
 "_file_del_only_local_"         = "File not present on server";
 
-"_copy_file_"                   = "Copy";
+"_copy_file_"                   = "Copy to clipboard";//Copy";
 "_paste_file_"                  = "Paste";
 "_open_quicklook_"              = "Open with Quick Look";
 
