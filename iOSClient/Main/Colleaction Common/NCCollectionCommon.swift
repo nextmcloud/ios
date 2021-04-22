@@ -308,7 +308,8 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
             self.copyPasteboard()
         }
         
-        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(systemName: "info") ) { action in
+//        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(systemName: "share") ) { action in
+        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(named: "share") ) { action in
             NCNetworkingNotificationCenter.shared.openShare(ViewController: viewController, metadata: metadata, indexPage: 0)
         }
         
