@@ -287,8 +287,6 @@ class NCManageDatabase: NSObject {
                     addObject.autoUploadImage = true
                     addObject.autoUploadVideo = true
                     addObject.autoUploadWWAnVideo = true
-                    //maintain original file
-                    addObject.maintainOriginalFileName = true
                 }
                 
                 CCUtility.setPassword(account, password: password)
