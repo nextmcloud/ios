@@ -34,35 +34,40 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="un8-Xf-9Fb">
                                 <rect key="frame" x="0.0" y="796" width="414" height="100"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QFB-w0-4Kc">
-                                        <rect key="frame" x="15" y="50" width="120" height="30"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QFB-w0-4Kc">
+                                        <rect key="frame" x="15" y="40" width="150" height="40"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="30" id="E2W-Hd-QqN"/>
-                                            <constraint firstAttribute="width" constant="120" id="Nyx-sm-Sr7"/>
+                                            <constraint firstAttribute="height" constant="40" id="E2W-Hd-QqN"/>
+                                            <constraint firstAttribute="width" constant="150" id="Nyx-sm-Sr7"/>
                                         </constraints>
-                                        <state key="normal" title="Create folder"/>
+                                        <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                        <state key="normal" title="Create folder" image="addFolder"/>
                                         <connections>
                                             <action selector="actionCreateFolder:" destination="VYq-xA-D35" eventType="touchUpInside" id="1Ux-GA-UVs"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gUK-Yw-aVP">
-                                        <rect key="frame" x="279" y="50" width="120" height="30"/>
+                                        <rect key="frame" x="249" y="40" width="150" height="40"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="120" id="fDv-lp-fXV"/>
-                                            <constraint firstAttribute="height" constant="30" id="jeT-Z9-lQr"/>
+                                            <constraint firstAttribute="width" constant="150" id="fDv-lp-fXV"/>
+                                            <constraint firstAttribute="height" constant="40" id="jeT-Z9-lQr"/>
                                         </constraints>
                                         <state key="normal" title="Done"/>
                                         <connections>
                                             <action selector="actionDone:" destination="VYq-xA-D35" eventType="touchUpInside" id="LJA-b3-BI4"/>
                                         </connections>
                                     </button>
-                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kze-s7-kTI">
-                                        <rect key="frame" x="279" y="10" width="120" height="30"/>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kze-s7-kTI">
+                                        <rect key="frame" x="249" y="10" width="150" height="40"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="30" id="Hfn-8s-27i"/>
-                                            <constraint firstAttribute="width" constant="120" id="S9y-Wh-wjq"/>
+                                            <constraint firstAttribute="height" constant="40" id="Hfn-8s-27i"/>
+                                            <constraint firstAttribute="width" constant="150" id="S9y-Wh-wjq"/>
                                         </constraints>
-                                        <state key="normal" title="Done"/>
+                                        <state key="normal" title="Done" image="fold"/>
                                         <connections>
                                             <action selector="actionDone1:" destination="VYq-xA-D35" eventType="touchUpInside" id="pjY-Y0-8GF"/>
                                         </connections>
@@ -174,6 +179,8 @@
         </scene>
     </scenes>
     <resources>
+        <image name="addFolder" width="25" height="25"/>
+        <image name="fold" width="128" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

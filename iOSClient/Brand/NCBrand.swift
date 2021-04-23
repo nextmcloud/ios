@@ -70,7 +70,7 @@ import UIKit
     
     // Options
     @objc public var use_login_web_personalized:        Bool = false                                                // Don't touch me !!
-    @objc public var use_default_auto_upload:           Bool = true
+    @objc public var use_default_auto_upload:           Bool = false
     @objc public var use_themingColor:                  Bool = true
     //@objc public var use_themingBackground:             Bool = true                                               // Deprecated
     @objc public var use_themingLogo:                   Bool = false
@@ -130,6 +130,8 @@ class NCBrandColor: NSObject {
     @objc public let textInfo:              UIColor = UIColor(red: 153.0/255.0, green: 153.0/255.0, blue: 153.0/255.0, alpha: 1.0)
     @objc public var select:                UIColor = .white
     @objc public var avatarBorder:          UIColor = .white
+    @objc public let progressColorGreen60:              UIColor = UIColor(red: 115.0/255.0, green: 195.0/255.0, blue: 84.0/255.0, alpha: 1.0)
+    @objc public let customerDarkGrey:              UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
 
     override init() {
         self.brand = self.customer
@@ -493,6 +495,18 @@ class NCBrandColor: NSObject {
     
     @objc let notificationCenterChangedLocation                 = "changedLocation"
     @objc let notificationStatusAuthorizationChangedLocation    = "statusAuthorizationChangedLocation"
+}
+
+extension UIButton {
+
+  func setBackgroundColor(_ color: UIColor, for forState: UIControl.State) {
+    UIGraphicsBeginImageContext(CGSize(width: 1, height: 1))
+    UIGraphicsGetCurrentContext()!.setFillColor(color.cgColor)
+    UIGraphicsGetCurrentContext()!.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+    let colorImage = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+    self.setBackgroundImage(colorImage, for: forState)
+  }
 }
 
 //DispatchQueue.main.async
