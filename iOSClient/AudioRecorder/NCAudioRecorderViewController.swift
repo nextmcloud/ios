@@ -57,7 +57,7 @@ class NCAudioRecorderViewController: UIViewController , NCAudioRecorderDelegate 
         
         contentContainerView.backgroundColor = UIColor.lightGray
         voiceRecordHUD.update(0.0)
-        voiceRecordHUD.fillColor = UIColor.green
+        voiceRecordHUD.fillColor = NCBrandColor.shared.customer //UIColor.green
         durationLabel.text = ""
         startStopLabel.text = NSLocalizedString("_voice_memo_start_", comment: "")
     }
@@ -129,7 +129,7 @@ class NCAudioRecorderViewController: UIViewController , NCAudioRecorderDelegate 
         }
         
         voiceRecordHUD.update(CGFloat(rate))
-        voiceRecordHUD.fillColor = UIColor.green
+        voiceRecordHUD.fillColor = NCBrandColor.shared.customer //UIColor.green
         recordDuration += 1
         durationLabel.text =  String.init().formatSecondsToString(recordDuration/60)
     }

@@ -58,6 +58,7 @@
                             </label>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="6HO-NK-obf">
                                 <rect key="frame" x="100" y="301.5" width="175" height="8"/>
+                                <color key="tintColor" red="0.8862745098" green="0.0" blue="0.4549019608" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="8" id="1Mm-gF-8RV"/>
                                 </constraints>
