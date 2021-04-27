@@ -115,7 +115,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         if status {
             imageSelect.image = NCCollectionCommon.images.cellCheckedYes
             imageVisualEffect.isHidden = false
-            imageVisualEffect.alpha = 0.3
+            imageVisualEffect.alpha = 0.4
         } else {
 //            imageSelect.image = NCCollectionCommon.images.cellCheckedNo
             imageSelect.isHidden = false

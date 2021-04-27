@@ -84,9 +84,12 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         
         // Progress view
         progressView.progress = 0
+        progressView.layer.borderWidth = 1
+        progressView.layer.cornerRadius = 5.0
+        progressView.layer.borderColor = NCBrandColor.shared.customer.cgColor
         progressView.progressTintColor = NCBrandColor.shared.customer
 //        progressView.trackTintColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
-        progressView.trackTintColor = NCBrandColor.shared.customer
+//        progressView.trackTintColor = NCBrandColor.shared.customer
         
         
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)

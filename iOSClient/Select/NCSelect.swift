@@ -105,6 +105,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationController?.presentationController?.delegate = self
+        self.navigationController!.navigationBar.tintColor = NCBrandColor.shared.customer
         
         // Cell
         collectionView.register(UINib.init(nibName: "NCListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
@@ -136,19 +137,23 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         overwriteLabel.text = NSLocalizedString("_overwrite_", comment: "")
         
         // button
-        buttonCreateFolder.layer.cornerRadius = 15
+        buttonCreateFolder.layer.cornerRadius = 10
         buttonCreateFolder.layer.masksToBounds = true
-        buttonCreateFolder.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
+        buttonCreateFolder.layer.borderWidth = 1
+        buttonCreateFolder.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
         buttonCreateFolder.setTitleColor(.black, for: .normal)
 
-        buttonDone.layer.cornerRadius = 15
+        buttonDone.layer.cornerRadius = 10
         buttonDone.layer.masksToBounds = true
-        buttonDone.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
-        buttonDone.setTitleColor(.black, for: .normal)
+        buttonDone.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
+        buttonDone.setTitleColor(.white, for: .normal)
+        buttonDone.setTitleColor(.white, for: .highlighted)
         
-        buttonDone1.layer.cornerRadius = 15
+        buttonDone1.layer.cornerRadius = 10
         buttonDone1.layer.masksToBounds = true
-        buttonDone1.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
+        buttonDone1.layer.borderWidth = 2
+        buttonDone1.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
+//        buttonDone1.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
         buttonDone1.setTitleColor(.black, for: .normal)
                 
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)

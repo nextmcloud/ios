@@ -123,7 +123,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : Offline
         item = NCCommunicationExternalSite()
         item.name = "_manage_file_offline_"
-        item.icon = "offline"
+        item.icon = "offlineMenu"
         item.url = "segueOffline"
         functionMenu.append(item)
 
@@ -196,7 +196,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         tableView.reloadData()
         
         viewQuota.backgroundColor = NCBrandColor.shared.backgroundForm
-        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
+//        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
+        progressQuota.progressTintColor = NCBrandColor.shared.customer
     }
 
     @objc func changeUserProfile() {
