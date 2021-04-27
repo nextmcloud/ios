@@ -20,6 +20,8 @@
 		3757A35523D9D76300EC369E /* NCMenuPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3757A35423D9D76300EC369E /* NCMenuPanelController.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
 		37ECC83B23D0C7410082EFA2 /* NCMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37ECC83A23D0C7400082EFA2 /* NCMenuAction.swift */; };
+		958C87F22636D7E7006C8923 /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958C87F02636D7E7006C8923 /* TextTableViewCell.swift */; };
+		958C87F32636D7E7006C8923 /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 958C87F12636D7E7006C8923 /* TextTableViewCell.xib */; };
 		C0A2797D25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2797E25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2797F25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
@@ -372,6 +374,8 @@
 		3757A35423D9D76300EC369E /* NCMenuPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuPanelController.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
 		37ECC83A23D0C7400082EFA2 /* NCMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuAction.swift; sourceTree = "<group>"; };
+		958C87F02636D7E7006C8923 /* TextTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
+		958C87F12636D7E7006C8923 /* TextTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
 		C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F700222B1EC479840080073F /* Custom.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Custom.xcassets; sourceTree = "<group>"; };
 		F700510022DF63AC003A3356 /* NCShare.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCShare.storyboard; sourceTree = "<group>"; };
@@ -810,6 +814,15 @@
 				3757A35423D9D76300EC369E /* NCMenuPanelController.swift */,
 			);
 			path = Menu;
+			sourceTree = "<group>";
+		};
+		958C87EF2636D7C7006C8923 /* NMC CustomViews */ = {
+			isa = PBXGroup;
+			children = (
+				958C87F02636D7E7006C8923 /* TextTableViewCell.swift */,
+				958C87F12636D7E7006C8923 /* TextTableViewCell.xib */,
+			);
+			path = "NMC CustomViews";
 			sourceTree = "<group>";
 		};
 		F70211F31BAC56E9003FC03E /* Main */ = {
@@ -1437,6 +1450,7 @@
 		F7F67BAA1A24D27800EE80DA /* iOSClient */ = {
 			isa = PBXGroup;
 			children = (
+				958C87EF2636D7C7006C8923 /* NMC CustomViews */,
 				F70F02A81C889183008DAB36 /* Libraries external */,
 				F7C1CDD91E6DFC6F005D92BE /* Brand */,
 				F70211F31BAC56E9003FC03E /* Main */,
@@ -1852,6 +1866,7 @@
 				F76032A0252F0F8E0015A421 /* NCTransferCell.xib in Resources */,
 				F74C0437253F1CDC009762AB /* NCShares.storyboard in Resources */,
 				F7381EE5218218C9000B1560 /* NCOffline.storyboard in Resources */,
+				958C87F32636D7E7006C8923 /* TextTableViewCell.xib in Resources */,
 				F76D3CF32428B94E005DFA87 /* NCViewerPDFSearchCell.xib in Resources */,
 				C0A2797D25FB509D0015F3DC /* GoogleService-Info.plist in Resources */,
 				F769453E22E9E97E000A798A /* NCShareUserMenuView.xib in Resources */,
@@ -2066,6 +2081,7 @@
 				F78ACD4A21903F850088454D /* NCTrashListCell.swift in Sources */,
 				F760329F252F0F8E0015A421 /* NCTransferCell.swift in Sources */,
 				F7682FE023C36B0500983A04 /* NCMainTabBar.swift in Sources */,
+				958C87F22636D7E7006C8923 /* TextTableViewCell.swift in Sources */,
 				F7A0D1352591FBC5008F8A13 /* String+Extensions.swift in Sources */,
 				F77B0E5F1D118A16002130FE /* NCSettings.m in Sources */,
 				F7F9D1BB25397CE000D9BFF5 /* NCViewer.swift in Sources */,
