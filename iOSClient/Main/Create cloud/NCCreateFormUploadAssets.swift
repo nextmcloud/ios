@@ -77,6 +77,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancel))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_save_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(save))
+        self.navigationController!.navigationBar.tintColor = NCBrandColor.shared.customer
         
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         
@@ -155,6 +156,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+//        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"useFolderAutoUpload" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_lock_protection_no_screen_", nil)];
         
         section.addFormRow(row)
 

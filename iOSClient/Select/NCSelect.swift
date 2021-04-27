@@ -105,6 +105,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationController?.presentationController?.delegate = self
+        self.navigationController!.navigationBar.tintColor = NCBrandColor.shared.customer
         
         // Cell
         collectionView.register(UINib.init(nibName: "NCListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
@@ -138,32 +139,22 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         // button
         buttonCreateFolder.layer.cornerRadius = 10
         buttonCreateFolder.layer.masksToBounds = true
-        buttonCreateFolder.layer.borderWidth = 2
+        buttonCreateFolder.layer.borderWidth = 1
         buttonCreateFolder.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
-        
-//        buttonCreateFolder.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
-//        buttonCreateFolder.backgroundColor = NCBrandColor.shared.select
-        buttonCreateFolder.setBackgroundColor(NCBrandColor.shared.customer, for: .highlighted)
         buttonCreateFolder.setTitleColor(.black, for: .normal)
-        buttonCreateFolder.setTitleColor(.white, for: .highlighted)
 
         buttonDone.layer.cornerRadius = 10
         buttonDone.layer.masksToBounds = true
-        buttonDone.layer.borderWidth = 2
-        buttonDone.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
-        buttonDone.setBackgroundColor(NCBrandColor.shared.customer, for: .highlighted)
-//        buttonDone.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
-        buttonDone.setTitleColor(.black, for: .normal)
+        buttonDone.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
+        buttonDone.setTitleColor(.white, for: .normal)
         buttonDone.setTitleColor(.white, for: .highlighted)
         
         buttonDone1.layer.cornerRadius = 10
         buttonDone1.layer.masksToBounds = true
         buttonDone1.layer.borderWidth = 2
         buttonDone1.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
-        buttonDone1.setBackgroundColor(NCBrandColor.shared.customer, for: .highlighted)
 //        buttonDone1.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
         buttonDone1.setTitleColor(.black, for: .normal)
-        buttonDone1.setTitleColor(.white, for: .highlighted)
                 
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reloadDataSource), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterReloadDataSource), object: nil)

@@ -103,7 +103,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: titleOffline,
-                    icon: UIImage(named: "offline")!.image(color: NCBrandColor.shared.icon, size: 50),
+                    icon: UIImage(named: "offlineMenu")!.image(color: NCBrandColor.shared.icon, size: 50),
                     action: { menuAction in
                         if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
                             
