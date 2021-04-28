@@ -35,7 +35,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vr6-IX-Yee" customClass="VoiceRecordHUD" customModule="Nextcloud" customModuleProvider="target">
-                                        <rect key="frame" x="20" y="47" width="160" height="158"/>
+                                        <rect key="frame" x="20" y="49" width="160" height="154"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="number" keyPath="rate">
@@ -68,12 +68,12 @@
                                     <constraint firstItem="yIp-rq-klm" firstAttribute="top" secondItem="Ztv-M0-yUI" secondAttribute="top" constant="10" id="1S8-2v-d7k"/>
                                     <constraint firstItem="3Wm-qO-FzJ" firstAttribute="centerX" secondItem="Lnv-LR-qq5" secondAttribute="centerX" id="2UV-Gt-2oO"/>
                                     <constraint firstAttribute="height" constant="250" id="G5W-ie-MCH"/>
-                                    <constraint firstItem="vr6-IX-Yee" firstAttribute="top" secondItem="yIp-rq-klm" secondAttribute="bottom" constant="20" id="Jk5-Y9-bYd"/>
+                                    <constraint firstItem="vr6-IX-Yee" firstAttribute="top" secondItem="yIp-rq-klm" secondAttribute="bottom" constant="22" id="Jk5-Y9-bYd"/>
                                     <constraint firstItem="Lnv-LR-qq5" firstAttribute="leading" secondItem="Ztv-M0-yUI" secondAttribute="leading" id="JlM-Ww-iut"/>
                                     <constraint firstAttribute="bottom" secondItem="Lnv-LR-qq5" secondAttribute="bottom" id="Kzr-BQ-zK4"/>
                                     <constraint firstAttribute="trailing" secondItem="Lnv-LR-qq5" secondAttribute="trailing" id="NNn-Ce-Y8V"/>
                                     <constraint firstAttribute="width" constant="200" id="Qu2-eD-5VF"/>
-                                    <constraint firstItem="3Wm-qO-FzJ" firstAttribute="top" secondItem="vr6-IX-Yee" secondAttribute="bottom" constant="20" id="XTW-u6-ISy"/>
+                                    <constraint firstItem="3Wm-qO-FzJ" firstAttribute="top" secondItem="vr6-IX-Yee" secondAttribute="bottom" constant="22" id="XTW-u6-ISy"/>
                                     <constraint firstItem="3Wm-qO-FzJ" firstAttribute="top" secondItem="Lnv-LR-qq5" secondAttribute="bottom" constant="-25" id="a8Q-Z1-NFp"/>
                                     <constraint firstAttribute="centerX" secondItem="yIp-rq-klm" secondAttribute="centerX" id="hwa-S6-oPz"/>
                                     <constraint firstItem="Lnv-LR-qq5" firstAttribute="top" secondItem="Ztv-M0-yUI" secondAttribute="top" id="mrG-va-2Su"/>

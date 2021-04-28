@@ -455,9 +455,9 @@ class NCViewerImage: UIViewController {
             itemPlay = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.play, target: self, action: #selector(playerPlay))
         }
         if mute {
-            itemMute = UIBarButtonItem(image: UIImage(named: "audioOff"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(SetMute))
+            itemMute = UIBarButtonItem(image: UIImage(named: "audioOffsmall"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(SetMute))
         } else {
-            itemMute = UIBarButtonItem(image: UIImage(named: "audioOn"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(SetMute))
+            itemMute = UIBarButtonItem(image: UIImage(named: "audioOnsmall"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(SetMute))
         }
         
         toolBar.setItems([itemPlay, itemFlexibleSpace, itemMute], animated: true)
