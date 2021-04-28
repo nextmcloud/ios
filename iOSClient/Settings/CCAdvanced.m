@@ -114,14 +114,31 @@
         [form addFormSection:section];
         section.footerTitle = NSLocalizedString(@"_disable_files_app_footer_", nil);
 
+        
         // Disable Files App
-        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disablefilesapp" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_disable_files_app_", nil)];
+
+        //custom cell
+        
+        [[XLFormViewController cellClassesForRowDescriptorTypes] setObject:[ToggleButtonViewCell class] forKey:@"kNMCCustomCellType"];
+
+        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disablefilesapp" rowType:@"kNMCCustomCellType" title:NSLocalizedString(@"_disable_files_app_", nil)];
+
         row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
-        if ([CCUtility getDisableFilesApp]) row.value = @"1";
-        else row.value = @"0";
-        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+        row.cellConfigAtConfigure[@"cellLabel.text"] = NSLocalizedString(@"_disable_files_app_", nil);
+        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"cellLabel.font"];
+        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"cellLabel.textColor"];
+
+        if ([CCUtility getDisableFilesApp]){
+            row.cellConfigAtConfigure[@"switchControl.on"] = @"1";
+        }else {
+            row.cellConfigAtConfigure[@"switchControl.on"] = @"0";
+        }
+        
+        if (NSLocalizedString(@"_disable_files_app_", nil).length > 30 ){
+            row.height = 65;
+        }
         [section addFormRow:row];
+
     }
     
     // Section : Privacy --------------------------------------------------------------

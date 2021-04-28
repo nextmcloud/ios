@@ -17,7 +17,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="NY9-7g-aGK">
+                    <textField opaque="NO" contentMode="left" contentHorizontalAlignment="leading" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="NY9-7g-aGK">
                         <rect key="frame" x="107.5" y="5" width="196.5" height="34"/>
                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                         <textInputTraits key="textInputTraits"/>
@@ -46,7 +46,7 @@
                 <outlet property="fileNameTextField" destination="NY9-7g-aGK" id="Qsb-6b-HK6"/>
                 <outlet property="labelFileName" destination="eUY-js-tTf" id="OsT-KM-ckd"/>
             </connections>
-            <point key="canvasLocation" x="141" y="123"/>
+            <point key="canvasLocation" x="140.57971014492756" y="122.54464285714285"/>
         </tableViewCell>
     </objects>
 </document>

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TextTableViewCell: XLFormBaseCell {
+class TextTableViewCell: XLFormBaseCell,UITextFieldDelegate {
 
     @IBOutlet weak var labelFileName: UILabel!
     @IBOutlet weak var fileNameTextField: UITextField!
@@ -16,6 +16,9 @@ class TextTableViewCell: XLFormBaseCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        
+        fileNameTextField.delegate = self
+        
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -31,4 +34,33 @@ class TextTableViewCell: XLFormBaseCell {
     override func update() {
         super.update()
     }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+
+        if fileNameTextField == textField {
+            if let rowDescriptor = rowDescriptor, let text = self.fileNameTextField.text {
+
+                if (text + " ").isEmpty == false {
+                    rowDescriptor.value = self.fileNameTextField.text! + string
+                } else {
+                    rowDescriptor.value = nil
+                }
+            }
+        }
+
+         self.formViewController().textField(textField, shouldChangeCharactersIn: range, replacementString: string)
+        
+        return true
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.formViewController()?.textFieldShouldReturn(fileNameTextField)
+        return true
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        self.formViewController()?.textFieldShouldClear(fileNameTextField)
+        return true
+    }
+    
 }
