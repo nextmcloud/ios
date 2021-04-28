@@ -5,48 +5,54 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="KGk-i7-Jjw" customClass="TextTableViewCell" customModule="Nextcloud" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+            <rect key="frame" x="0.0" y="0.0" width="320" height="70"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="70"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <textField opaque="NO" contentMode="left" contentHorizontalAlignment="leading" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="NY9-7g-aGK">
-                        <rect key="frame" x="107.5" y="5" width="196.5" height="34"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                        <textInputTraits key="textInputTraits"/>
-                    </textField>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="File Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eUY-js-tTf">
-                        <rect key="frame" x="16" y="12" width="75.5" height="20.5"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4Eb-B6-8Yt">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="70"/>
+                        <subviews>
+                            <textField opaque="NO" contentMode="left" contentHorizontalAlignment="leading" contentVerticalAlignment="center" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="NY9-7g-aGK">
+                                <rect key="frame" x="20" y="8" width="280" height="54"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="75.5" id="Djc-iM-6YK"/>
+                            <constraint firstItem="NY9-7g-aGK" firstAttribute="leading" secondItem="4Eb-B6-8Yt" secondAttribute="leading" constant="20" id="0cw-xE-O2D"/>
+                            <constraint firstAttribute="bottom" secondItem="NY9-7g-aGK" secondAttribute="bottom" constant="8" id="E9s-uT-Dyb"/>
+                            <constraint firstItem="NY9-7g-aGK" firstAttribute="top" secondItem="4Eb-B6-8Yt" secondAttribute="top" constant="8" id="Z8g-Xg-e8q"/>
+                            <constraint firstAttribute="trailing" secondItem="NY9-7g-aGK" secondAttribute="trailing" constant="20" id="xLE-gj-nVw"/>
                         </constraints>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
+                    </view>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="NY9-7g-aGK" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="FHr-90-Y5F"/>
-                    <constraint firstItem="eUY-js-tTf" firstAttribute="centerY" secondItem="NY9-7g-aGK" secondAttribute="centerY" id="GUM-J2-wic"/>
-                    <constraint firstAttribute="bottom" secondItem="NY9-7g-aGK" secondAttribute="bottom" constant="5" id="HOB-Eb-a9K"/>
-                    <constraint firstItem="NY9-7g-aGK" firstAttribute="leading" secondItem="eUY-js-tTf" secondAttribute="trailing" constant="16" id="Suh-1Q-aVc"/>
-                    <constraint firstAttribute="trailing" secondItem="NY9-7g-aGK" secondAttribute="trailing" constant="16" id="VEe-XO-N1e"/>
-                    <constraint firstItem="eUY-js-tTf" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="YpU-UE-szg"/>
+                    <constraint firstItem="4Eb-B6-8Yt" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="8oD-4Q-9Lv"/>
+                    <constraint firstItem="4Eb-B6-8Yt" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="LJ2-xa-ush"/>
+                    <constraint firstAttribute="trailing" secondItem="4Eb-B6-8Yt" secondAttribute="trailing" id="MKq-FX-Ppc"/>
+                    <constraint firstAttribute="bottom" secondItem="4Eb-B6-8Yt" secondAttribute="bottom" id="nya-m9-crw"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="fileNameTextField" destination="NY9-7g-aGK" id="Qsb-6b-HK6"/>
-                <outlet property="labelFileName" destination="eUY-js-tTf" id="OsT-KM-ckd"/>
             </connections>
             <point key="canvasLocation" x="140.57971014492756" y="122.54464285714285"/>
         </tableViewCell>
     </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>
