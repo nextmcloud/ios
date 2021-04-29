@@ -1,5 +1,5 @@
 //
-//  PhotosPathCustomCell.swift
+//  FolderPathCustomCell.swift
 //  Nextcloud
 //
 //  Created by Sumit on 28/04/21.
@@ -8,14 +8,14 @@
 
 import Foundation
 
-class PhotosPathCustomCell: XLFormButtonCell{
+class FolderPathCustomCell: XLFormButtonCell{
     
-    @IBOutlet weak var folderImage: UIImageView!
     @IBOutlet weak var photoLabel: UILabel!
+    @IBOutlet weak var folderImage: UIImageView!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-                
     }
     
     override func configure() {
@@ -25,5 +25,5 @@ class PhotosPathCustomCell: XLFormButtonCell{
     override func update() {
         super.update()
     }
-    
+   
 }

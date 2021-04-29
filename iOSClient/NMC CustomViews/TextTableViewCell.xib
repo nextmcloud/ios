@@ -19,10 +19,10 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4Eb-B6-8Yt">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="70"/>
+                        <rect key="frame" x="0.0" y="2" width="320" height="66"/>
                         <subviews>
                             <textField opaque="NO" contentMode="left" contentHorizontalAlignment="leading" contentVerticalAlignment="center" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="NY9-7g-aGK">
-                                <rect key="frame" x="20" y="8" width="280" height="54"/>
+                                <rect key="frame" x="20" y="8" width="280" height="50"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
@@ -35,12 +35,32 @@
                             <constraint firstAttribute="trailing" secondItem="NY9-7g-aGK" secondAttribute="trailing" constant="20" id="xLE-gj-nVw"/>
                         </constraints>
                     </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bax-p8-r04" userLabel="topline">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="1"/>
+                        <color key="backgroundColor" systemColor="systemGray5Color"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="1" id="Ul0-Uv-2Fe"/>
+                        </constraints>
+                    </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uy1-3e-xJA" userLabel="bottomline">
+                        <rect key="frame" x="0.0" y="69" width="320" height="1"/>
+                        <color key="backgroundColor" systemColor="systemGray5Color"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="1" id="tav-LJ-rbl"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="4Eb-B6-8Yt" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="8oD-4Q-9Lv"/>
+                    <constraint firstItem="4Eb-B6-8Yt" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="2" id="8oD-4Q-9Lv"/>
+                    <constraint firstItem="bax-p8-r04" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="E08-zj-INd"/>
                     <constraint firstItem="4Eb-B6-8Yt" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="LJ2-xa-ush"/>
                     <constraint firstAttribute="trailing" secondItem="4Eb-B6-8Yt" secondAttribute="trailing" id="MKq-FX-Ppc"/>
-                    <constraint firstAttribute="bottom" secondItem="4Eb-B6-8Yt" secondAttribute="bottom" id="nya-m9-crw"/>
+                    <constraint firstItem="uy1-3e-xJA" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="UDd-c7-O7q"/>
+                    <constraint firstAttribute="bottom" secondItem="uy1-3e-xJA" secondAttribute="bottom" id="UF8-0W-qyN"/>
+                    <constraint firstAttribute="trailing" secondItem="bax-p8-r04" secondAttribute="trailing" id="dv0-GX-sqw"/>
+                    <constraint firstAttribute="trailing" secondItem="uy1-3e-xJA" secondAttribute="trailing" id="dxV-ZQ-1JA"/>
+                    <constraint firstAttribute="bottom" secondItem="4Eb-B6-8Yt" secondAttribute="bottom" constant="2" id="nya-m9-crw"/>
+                    <constraint firstItem="bax-p8-r04" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="oHk-ms-OCu"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
@@ -53,6 +73,9 @@
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray5Color">
+            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

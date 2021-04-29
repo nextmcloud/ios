@@ -24,8 +24,8 @@
 		958C87F32636D7E7006C8923 /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 958C87F12636D7E7006C8923 /* TextTableViewCell.xib */; };
 		958C87F926382B6C006C8923 /* ToggleButtonViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958C87F826382B6C006C8923 /* ToggleButtonViewCell.swift */; };
 		958C87FF26382B7F006C8923 /* ToggleButtonViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 958C87FE26382B7F006C8923 /* ToggleButtonViewCell.xib */; };
-		958C880526394FEE006C8923 /* PhotosPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958C880426394FEE006C8923 /* PhotosPathCustomCell.swift */; };
-		958C880B26394FFA006C8923 /* PhotosPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 958C880A26394FF9006C8923 /* PhotosPathCustomCell.xib */; };
+		958C881126399033006C8923 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 958C881026399033006C8923 /* FolderPathCustomCell.xib */; };
+		958C8817263990D6006C8923 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958C8816263990D6006C8923 /* FolderPathCustomCell.swift */; };
 		C0A2797D25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2797E25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2797F25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
@@ -382,8 +382,8 @@
 		958C87F12636D7E7006C8923 /* TextTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
 		958C87F826382B6C006C8923 /* ToggleButtonViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButtonViewCell.swift; sourceTree = "<group>"; };
 		958C87FE26382B7F006C8923 /* ToggleButtonViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ToggleButtonViewCell.xib; sourceTree = "<group>"; };
-		958C880426394FEE006C8923 /* PhotosPathCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosPathCustomCell.swift; sourceTree = "<group>"; };
-		958C880A26394FF9006C8923 /* PhotosPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PhotosPathCustomCell.xib; sourceTree = "<group>"; };
+		958C881026399033006C8923 /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
+		958C8816263990D6006C8923 /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
 		C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F700222B1EC479840080073F /* Custom.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Custom.xcassets; sourceTree = "<group>"; };
 		F700510022DF63AC003A3356 /* NCShare.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCShare.storyboard; sourceTree = "<group>"; };
@@ -831,8 +831,8 @@
 				958C87F12636D7E7006C8923 /* TextTableViewCell.xib */,
 				958C87F826382B6C006C8923 /* ToggleButtonViewCell.swift */,
 				958C87FE26382B7F006C8923 /* ToggleButtonViewCell.xib */,
-				958C880426394FEE006C8923 /* PhotosPathCustomCell.swift */,
-				958C880A26394FF9006C8923 /* PhotosPathCustomCell.xib */,
+				958C881026399033006C8923 /* FolderPathCustomCell.xib */,
+				958C8816263990D6006C8923 /* FolderPathCustomCell.swift */,
 			);
 			path = "NMC CustomViews";
 			sourceTree = "<group>";
@@ -1855,7 +1855,6 @@
 				F79728D422F96F2E003CACA7 /* NCShareLinkFolderMenuView.xib in Resources */,
 				F7362A1F220C853A005101B5 /* LaunchScreen.storyboard in Resources */,
 				F75ADF451DC75FFE008A7347 /* CCLogin.storyboard in Resources */,
-				958C880B26394FFA006C8923 /* PhotosPathCustomCell.xib in Resources */,
 				F77444F622281649000D5EB0 /* NCGridMediaCell.xib in Resources */,
 				F78ACD4421903CF20088454D /* NCListCell.xib in Resources */,
 				F78ACD4621903D010088454D /* NCGridCell.xib in Resources */,
@@ -1867,6 +1866,7 @@
 				F723985C253C95CE00257F49 /* NCViewerRichdocument.storyboard in Resources */,
 				F758B45A212C564000515F55 /* Scan.storyboard in Resources */,
 				F765F73225237E3F00391DBE /* NCRecent.storyboard in Resources */,
+				958C881126399033006C8923 /* FolderPathCustomCell.xib in Resources */,
 				F78F74342163757000C2ADAD /* NCTrash.storyboard in Resources */,
 				F79A65C32191D90F00FF6DCC /* NCSelect.storyboard in Resources */,
 				F7226EDC1EE4089300EBECB1 /* Main.storyboard in Resources */,
@@ -2089,7 +2089,6 @@
 				F785EE9D246196DF00B3F945 /* NCNetworkingE2EE.swift in Sources */,
 				F77B0E301D118A16002130FE /* CCHud.m in Sources */,
 				F76673ED22C901F6007ED366 /* FileProviderDomain.swift in Sources */,
-				958C880526394FEE006C8923 /* PhotosPathCustomCell.swift in Sources */,
 				F7A321AD1E9E6AD50069AD1B /* CCAdvanced.m in Sources */,
 				F77B0E4F1D118A16002130FE /* CCManageAutoUpload.m in Sources */,
 				F7BAADC81ED5A87C00B7EAD4 /* NCDatabase.swift in Sources */,
@@ -2130,6 +2129,7 @@
 				F7EFA47825ADBA500083159A /* NCViewerProviderContextMenu.swift in Sources */,
 				F755BD9B20594AC7008C5FBB /* NCService.swift in Sources */,
 				F7B7504B2397D38F004E13EC /* UIImage+Extensions.swift in Sources */,
+				958C8817263990D6006C8923 /* FolderPathCustomCell.swift in Sources */,
 				F7EFC0CD256BF8DD00461AAD /* NCUserStatus.swift in Sources */,
 				F7DFB7F4219C5CA800680748 /* NCCreateFormUploadScanDocument.swift in Sources */,
 				F710D1FF24057E5E00A6033D /* NCActionSheetHeaderView.swift in Sources */,
