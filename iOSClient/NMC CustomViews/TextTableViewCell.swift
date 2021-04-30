@@ -63,4 +63,7 @@ class TextTableViewCell: XLFormBaseCell,UITextFieldDelegate {
         return true
     }
     
+    override class func formDescriptorCellHeight(for rowDescriptor: XLFormRowDescriptor!) -> CGFloat {
+        return 45
+    }
 }

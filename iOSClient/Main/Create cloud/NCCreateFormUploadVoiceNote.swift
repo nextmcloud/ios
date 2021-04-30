@@ -128,17 +128,33 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
         form.addFormSection(section)
+//
+//        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: self.titleServerUrl)
+//        row.action.formSelector = #selector(changeDestinationFolder(_:))
+//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+//
+//        row.cellConfig["imageView.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
+//        
+//        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
+//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
         
-        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: self.titleServerUrl)
+        
+        //custom cell
+        
+        
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
+        
+        
+        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-
-        row.cellConfig["imageView.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
         
-        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
-        
+        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
+        row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView //photos
+        row.cellConfig["photoLabel.text"] = NSLocalizedString("_photos_", comment: "")
+        row.cellConfig["textLabel.text"] = ""
         section.addFormRow(row)
         
         // Section: File Name
@@ -152,8 +168,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
         row.cellClass = TextTableViewCell.self
 
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-
+        //row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+        row.cellConfigAtConfigure["backgroundColor"] = NCBrandColor.shared.backgroundForm;
         row.cellConfig["labelFileName.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["labelFileName.textColor"] = NCBrandColor.shared.textView
         row.cellConfig["labelFileName.text"] = NSLocalizedString("_filename_", comment: "")
@@ -161,7 +177,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.textView
-        row.cellConfig["fileNameTextField.text"] = self.fileName
+        row.cellConfig["fileNameTextField.placeholder"] = self.fileName
+        
         section.addFormRow(row)
 
         self.form = form
@@ -195,6 +212,21 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         header.tintColor = NCBrandColor.shared.backgroundForm
     }
     
+//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = UITableViewCell();
+//
+//        if (cell == tableView.dequeueReusableCell(withIdentifier: "folderCustomCell")){
+//            if (cell.isSelected){
+//                cell.backgroundColor = NCBrandColor.shared.backgroundForm
+//
+//                return cell
+//            }else{
+//                return cell
+//            }
+//        }
+//
+//        return cell
+//    }
     // MARK: - Action
     
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], buttonType: String, overwrite: Bool) {

@@ -681,6 +681,7 @@
 "photos"                            = "photos";
 "of"                                = "of";
 "%i of %i"                          = "%1$i of %2$i";
+"_photos_"                            = "Photos";
 
 // Manage Auto Upload FileName
 
