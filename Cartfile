@@ -19,3 +19,4 @@ binary "https://dl.google.com/dl/firebase/ios/carthage/FirebaseAnalyticsBinary.j
 github "https://github.com/marinofaggiana/KTVHTTPCache" "2.0.2"
 github "https://github.com/marinofaggiana/TOPasscodeViewController" "0.0.7"
 github "https://github.com/marinofaggiana/OpenSSL" "master"
+github "adjust/ios_sdk"
