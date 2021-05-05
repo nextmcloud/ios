@@ -196,7 +196,9 @@
 "_logout_"                      = "Log out";
 "_quota_space_unlimited_"       = "Unlimited";
 "_quota_space_unknown_"         = "Unknown";
-"_quota_using_"                 = "Memory used up to %@ of %@";//You are using %@ of %@";
+"_quota_using_"                 = "%@ ";//"Memory used up to %@ of %@";//You are using %@ of %@";
+"_quota_using_of_"              = "of %@";
+"_quota_using_percentage_"      = "Memory to %.2f %% occupied";
 
 // Settings
 

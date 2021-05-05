@@ -32,6 +32,9 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var labelQuotaExternalSite: UILabel!
     @IBOutlet weak var progressQuota: UIProgressView!
     @IBOutlet weak var viewQuota: UIView!
+    @IBOutlet weak var quotaLabel1: UILabel!
+    @IBOutlet weak var quotalabel2: UILabel!
+    
 
     var functionMenu: [NCCommunicationExternalSite] = []
     var externalSiteMenu: [NCCommunicationExternalSite] = []
@@ -227,8 +230,14 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         }
 
         let quotaUsed: String = CCUtility.transformedSize(tabAccount.quotaUsed)
+        let quota2: String = CCUtility.transformedSize(tabAccount.quotaTotal)
 
-        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed, quota)
+//        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed, quota)
+        quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
+        quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
+//        let percentageUsed: String = CCUtility.transformedSize((tabAccount.quotaUsed / tabAccount.quotaTotal) * 100)
+        let percentageUsed = "\((tabAccount.quotaUsed / tabAccount.quotaTotal) / (1024*1024))"
+        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsed)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.tableView.reloadData()

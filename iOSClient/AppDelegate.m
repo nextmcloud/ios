@@ -26,6 +26,7 @@
 #import "NSNotificationCenter+MainThread.h"
 #import "NCPushNotification.h"
 #import <QuartzCore/QuartzCore.h>
+//#import "Adjust.h"
 
 @import Firebase;
 
@@ -179,6 +180,13 @@
         // Background Fetch
         [application setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
     }
+    // sdk Adjust
+//    NSString *yourAppToken = @"{YourAppToken}";
+//    NSString *environment = ADJEnvironmentSandbox;
+//    ADJConfig *adjustConfig = [ADJConfig configWithAppToken:yourAppToken
+//                                                environment:environment];
+//
+//    [Adjust appDidLaunch:adjustConfig];
     
     return YES;
 }
