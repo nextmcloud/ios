@@ -1,17 +1,17 @@
 //
-//  ToggleButtonViewCell.swift
+//  TypeInFileNameCustomSwitchCell.swift
 //  Nextcloud
 //
-//  Created by Sumit on 27/04/21.
+//  Created by Sumit on 29/04/21.
 //  Copyright © 2021 Marino Faggiana. All rights reserved.
 //
 
 import Foundation
 
-class ToggleButtonViewCell: XLFormBaseCell{
-    
+class TypeInFileNameCustomSwitchCell: XLFormBaseCell{
     @IBOutlet weak var cellLabel: UILabel!
     @IBOutlet weak var switchControl: UISwitch!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -42,4 +42,3 @@ class ToggleButtonViewCell: XLFormBaseCell{
         }
     }
 }
-

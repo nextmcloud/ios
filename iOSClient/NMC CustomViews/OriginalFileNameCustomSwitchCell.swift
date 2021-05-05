@@ -1,26 +1,29 @@
 //
-//  ToggleButtonViewCell.swift
+//  OriginalFileNameCustomSwitchCell.swift
 //  Nextcloud
 //
-//  Created by Sumit on 27/04/21.
+//  Created by Sumit on 30/04/21.
 //  Copyright © 2021 Marino Faggiana. All rights reserved.
 //
 
 import Foundation
 
-class ToggleButtonViewCell: XLFormBaseCell{
+
+class OriginalFileNameCustomSwitchCell: XLFormBaseCell{
+    @IBOutlet weak var originalFileNameSwitch: UISwitch!
     
-    @IBOutlet weak var cellLabel: UILabel!
-    @IBOutlet weak var switchControl: UISwitch!
+    @IBOutlet weak var originalFileNameTitle: UILabel!
+    
+    
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
-        switchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
         
+        originalFileNameSwitch.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
     }
     
     override func configure() {
         super.configure()
+        
     }
     
     override func update() {
@@ -31,9 +34,7 @@ class ToggleButtonViewCell: XLFormBaseCell{
     }
     
     @objc func switchChanged(mySwitch: UISwitch) {
-        let value = mySwitch.isOn
-        // Do something
-        
+        let value = mySwitch.isOn        
         if value {
             //on
             self.rowDescriptor.value = value
@@ -41,5 +42,5 @@ class ToggleButtonViewCell: XLFormBaseCell{
             self.rowDescriptor.value = value
         }
     }
-}
 
+}

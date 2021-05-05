@@ -120,93 +120,216 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         // Section: Destination Folder
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: ""))
+        section.footerTitle = NSLocalizedString("_auto_upload_help_text_", comment: "")
         form.addFormSection(section)
         
-        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: self.titleServerUrl)
+//        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: self.titleServerUrl)
+//        row.action.formSelector = #selector(changeDestinationFolder(_:))
+//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+//
+////       row.cellConfig["imageView.image"] = UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
+//        row.cellConfig["imageView.image"] = UIImage(named: "folder")!.image(color: NCBrandColor.shared.customerDefault, size: 25)
+//        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
+//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        
+        //custom folder upload
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
+        
+        
+        row = XLFormRowDescriptor(tag: "PhotoButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-
-//        row.cellConfig["imageView.image"] = UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
-        row.cellConfig["imageView.image"] = UIImage(named: "folder")!.image(color: NCBrandColor.shared.customerDefault, size: 25)
-        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
+        
+        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
+        row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView //photos
+        row.cellConfig["photoLabel.text"] = NSLocalizedString("_photos_", comment: "")
+        row.cellConfig["textLabel.text"] = ""//topLineView.isHidden
         
         section.addFormRow(row)
         
-        // User folder Autoupload
-        row = XLFormRowDescriptor(tag: "useFolderAutoUpload", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_use_folder_auto_upload_", comment: ""))
-        row.value = 0
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+         //User folder Autoupload
+//        row = XLFormRowDescriptor(tag: "useFolderAutoUpload", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_use_folder_auto_upload_", comment: ""))
+//        row.value = 0
+//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+//
+//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+//        //row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand
+        
+        
+        //custom autouload cell
+    
+        
+        XLFormViewController.cellClassesForRowDescriptorTypes()["NMCCustomSwitchCellAutoUpload"] = AutoUploadFolderCustomCell.self
 
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+
+        row = XLFormRowDescriptor(tag: "useFolderAutoUpload", rowType: "NMCCustomSwitchCellAutoUpload", title: self.titleServerUrl)
+        row.cellConfig["cellLabel.text"] = NSLocalizedString("_use_folder_auto_upload_", comment: "")
+        row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfigAtConfigure["autoUploadSwitchControl.on"] = 0 //onTintColor
+        //row.cellConfig["autoUploadSwitchControl.onTintColor"] = NCBrandColor.shared.brand
+        row.value = 0
+        if (NSLocalizedString("_use_folder_auto_upload_", comment: "").count > 44 ){
+            row.height = 65;
+        }
+        //end of custom autoupload cell
+        
         
         section.addFormRow(row)
         
         // Use Sub folder
-        row = XLFormRowDescriptor(tag: "useSubFolder", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_autoupload_create_subfolder_", comment: ""))
-        let tableAccount = NCManageDatabase.shared.getAccountActive()
-        if tableAccount?.autoUploadCreateSubfolder == true {
-            row.value = 1
-        } else {
-            row.value = 0
-        }
-        row.hidden = "$\("useFolderAutoUpload") == 0"
+//        row = XLFormRowDescriptor(tag: "useSubFolder", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_autoupload_create_subfolder_", comment: ""))
+//        let tableAccount = NCManageDatabase.shared.getAccountActive()
+//        if tableAccount?.autoUploadCreateSubfolder == true {
+//            row.value = 1
+//        } else {
+//            row.value = 0
+//        }
+//        row.hidden = "$\("useFolderAutoUpload") == 0"
+//
+//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
         
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
 //        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"useFolderAutoUpload" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_lock_protection_no_screen_", nil)];
         
+        
+        //custom subfolder row
+        XLFormViewController.cellClassesForRowDescriptorTypes()["NMCCustomSwitchCellsubFolderUpload"] = SubFolderCustomCell.self
+
+
+        row = XLFormRowDescriptor(tag: "useSubFolder", rowType: "NMCCustomSwitchCellsubFolderUpload", title: self.titleServerUrl)
+        row.cellConfig["subFolderLabel.text"] = NSLocalizedString("_autoupload_create_subfolder_", comment: "")
+        let tableAccount = NCManageDatabase.shared.getAccountActive()
+        if tableAccount?.autoUploadCreateSubfolder == true {
+            row.cellConfigAtConfigure["subFolderSwitch.on"] = 1
+            row.value = 1
+            row.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.textView
+        } else {
+            row.cellConfigAtConfigure["subFolderSwitch.on"] = 0
+            row.value = 0
+            row.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.graySoft//disableSwitch
+        }
+        //row.hidden = "$\("useFolderAutoUpload") == 0"
+        row.cellConfig["subFolderLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        //end of custom subfolder row
         section.addFormRow(row)
 
         // Section Mode filename
         
-        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_mode_filename_", comment: ""))
-        form.addFormSection(section)
+//        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_mode_filename_", comment: ""))
+//        form.addFormSection(section)
         
         // Maintain the original fileName
         
-        row = XLFormRowDescriptor(tag: "maintainOriginalFileName", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_maintain_original_filename_", comment: ""))
-        row.value = CCUtility.getOriginalFileName(NCBrandGlobal.shared.keyFileNameOriginal)
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
-        
-        section.addFormRow(row)
+      
         
         // Add File Name Type
         
-        row = XLFormRowDescriptor(tag: "addFileNameType", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_add_filenametype_", comment: ""))
-        row.value = CCUtility.getFileNameType(NCBrandGlobal.shared.keyFileNameType)
-        row.hidden = "$\("maintainOriginalFileName") == 1"
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
         
-        section.addFormRow(row)
         
         // Section: Rename File Name
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: ""))
         form.addFormSection(section)
         
-        row = XLFormRowDescriptor(tag: "maskFileName", rowType: XLFormRowDescriptorTypeAccount, title: (NSLocalizedString("_filename_", comment: "")))
+        // Maintain the original fileName
+        
+//        row = XLFormRowDescriptor(tag: "maintainOriginalFileName", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_maintain_original_filename_", comment: ""))
+//        row.value = CCUtility.getOriginalFileName(NCBrandGlobal.shared.keyFileNameOriginal)
+//        //row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+//
+//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        
+        //######## custom row maintain original filename
+        
+        XLFormViewController.cellClassesForRowDescriptorTypes()["NMCCustomSwitchCellMaintainOriginalFileName"] = OriginalFileNameCustomSwitchCell.self
+
+
+        row = XLFormRowDescriptor(tag: "maintainOriginalFileName", rowType: "NMCCustomSwitchCellMaintainOriginalFileName", title: NSLocalizedString("_maintain_original_filename_", comment: ""))
+        row.cellConfig["originalFileNameTitle.text"] = NSLocalizedString("_maintain_original_filename_", comment: "")
+        
+        if(CCUtility.getOriginalFileName(NCBrandGlobal.shared.keyFileNameOriginal)){
+            
+            row.cellConfigAtConfigure["originalFileNameSwitch.on"] = 1
+        }else {
+            row.cellConfigAtConfigure["originalFileNameSwitch.on"] = 0
+        }
+//        row.cellConfig["originalFileNameSwitch.on"] = CCUtility.getOriginalFileName(NCBrandGlobal.shared.keyFileNameOriginal)
+        row.cellConfig["originalFileNameTitle.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["originalFileNameTitle.textColor"] = NCBrandColor.shared.textView
+        //#######end of custom row maintain original filename
+        
+        section.addFormRow(row)
+        
+        //Add File Name Type
+//
+//        row = XLFormRowDescriptor(tag: "addFileNameType", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_add_filenametype_", comment: ""))
+//        row.value = CCUtility.getFileNameType(NCBrandGlobal.shared.keyFileNameType)
+//        row.hidden = "$\("maintainOriginalFileName") == 1"
+//        //row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+//
+//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        
+        //###### custom row Add File Name Type
+        XLFormViewController.cellClassesForRowDescriptorTypes()["NMCCustomSwitchCellTypeInFileName"] = TypeInFileNameCustomSwitchCell.self
+
+
+        row = XLFormRowDescriptor(tag: "addFileNameType", rowType: "NMCCustomSwitchCellTypeInFileName", title: self.titleServerUrl)
+        row.cellConfig["cellLabel.text"] = NSLocalizedString("_add_filenametype_", comment: "")
+        row.cellConfigAtConfigure["switchControl.on"] = CCUtility.getFileNameType(NCBrandGlobal.shared.keyFileNameType)
+        row.hidden = "$\("maintainOriginalFileName") == 1"
+       // row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+
+        row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
+        //#######end of custom row Add File Name Type
+        
+        section.addFormRow(row)
+        
+//        row = XLFormRowDescriptor(tag: "maskFileName", rowType: XLFormRowDescriptorTypeAccount, title: (NSLocalizedString("_filename_", comment: "")))
+//        let fileNameMask : String = CCUtility.getFileNameMask(NCBrandGlobal.shared.keyFileNameMask)
+//        if fileNameMask.count > 0 {
+//            row.value = fileNameMask
+//        }
+//        row.hidden = "$\("maintainOriginalFileName") == 1"
+//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+//
+//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+//
+//        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
+//        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textField.textColor"] = NCBrandColor.shared.textView
+        
+        //custom row mask file name
+        row = XLFormRowDescriptor(tag: "maskFileName", rowType: "NMCCustomInputFieldFileName", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = TextTableViewCell.self
         let fileNameMask : String = CCUtility.getFileNameMask(NCBrandGlobal.shared.keyFileNameMask)
+
         if fileNameMask.count > 0 {
-            row.value = fileNameMask
+            //row.value = fileNameMask
+            row.cellConfig["fileNameTextField.text"] = fileNameMask
+        }else{
+            let asset = assets[0]
+            let  placeHolderString =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal)
+            row.cellConfig["fileNameTextField.placeholder"] = placeHolderString
         }
         row.hidden = "$\("maintainOriginalFileName") == 1"
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+       // row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
 
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
-        
-        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textField.textColor"] = NCBrandColor.shared.textView
+        //row.cellConfig["labelFileName.font"] = UIFont.systemFont(ofSize: 15.0)
+        //row.cellConfig["labelFileName.textColor"] = NCBrandColor.shared.textView
+
+        row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.textView
+
+        //end of custom row mask file name
 
         section.addFormRow(row)
         
@@ -234,21 +357,39 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
             
             if (formRow.value! as AnyObject).boolValue  == true {
                 
-                let buttonDestinationFolder : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
-                buttonDestinationFolder.hidden = true
+                //Hide folder selection option
+                let buttonDestinationFolder : XLFormRowDescriptor  = self.form.formRow(withTag: "PhotoButtonDestinationFolder")!
+                buttonDestinationFolder.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.graySoft
                 
+                //enable subfolder selection option
+                let subfolderSwitchOption : XLFormRowDescriptor  = self.form.formRow(withTag: "useSubFolder")!
+                subfolderSwitchOption.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.textView//isEnabled
+                subfolderSwitchOption.value = "enable_switch"
+                self.reloadForm()
+
             } else{
                 
-                let buttonDestinationFolder : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
-                buttonDestinationFolder.hidden = false
+                //enable folder selection option
+                let buttonDestinationFolder : XLFormRowDescriptor  = self.form.formRow(withTag: "PhotoButtonDestinationFolder")!
+                buttonDestinationFolder.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView
+                
+                //hide subfolder selection option
+                let subfolderSwitchOption : XLFormRowDescriptor  = self.form.formRow(withTag: "useSubFolder")!
+                subfolderSwitchOption.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.graySoft
+                subfolderSwitchOption.disabled = true
+                subfolderSwitchOption.value = "disable_switch"
+                self.reloadForm()
+
             }
         }
         else if formRow.tag == "useSubFolder" {
             
             if (formRow.value! as AnyObject).boolValue  == true {
+                print("switch on subfolder")
                 
             } else{
-                
+                print("switch off subfolder")
+
             }
         }
         else if formRow.tag == "maintainOriginalFileName" {
@@ -283,6 +424,9 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                     
                     NCContentPresenter.shared.messageNotification("_info_", description: "_forbidden_characters_", delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCBrandGlobal.shared.ErrorCharactersForbidden, forced: true)
                 }
+            }else{
+                let asset = assets[0]
+                formRow.cellConfig["fileNameTextField.placeholder"] =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal)
             }
             
             self.reloadFormRow(previewFileName)
@@ -293,7 +437,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         
         self.form.delegate = nil
         
-        let buttonDestinationFolder : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
+        let buttonDestinationFolder : XLFormRowDescriptor  = self.form.formRow(withTag: "PhotoButtonDestinationFolder")!
         buttonDestinationFolder.title = self.titleServerUrl
         
         let maskFileName : XLFormRowDescriptor = self.form.formRow(withTag: "maskFileName")!
@@ -324,7 +468,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
             }
             
             // Update
-            let row : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
+            let row : XLFormRowDescriptor  = self.form.formRow(withTag: "PhotoButtonDestinationFolder")!
             row.title = self.titleServerUrl
             self.updateFormRow(row)
         }
@@ -519,8 +663,12 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
     }
     
     @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {
-        
+        let useFolderPhotoRow: XLFormRowDescriptor  = self.form.formRow(withTag: "useFolderAutoUpload")!
         self.deselectFormRow(sender)
+        
+        if (useFolderPhotoRow.value! as AnyObject).boolValue == true{
+            return
+        }
         
         let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
         let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController

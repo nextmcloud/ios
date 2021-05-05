@@ -60,6 +60,7 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="bottomLineView" destination="hsG-y9-Vyh" id="ei7-ki-fst"/>
                 <outlet property="folderImage" destination="l63-AG-MTN" id="xBU-BZ-SxM"/>
                 <outlet property="photoLabel" destination="GB7-Lu-frs" id="GjI-eQ-w8z"/>
             </connections>

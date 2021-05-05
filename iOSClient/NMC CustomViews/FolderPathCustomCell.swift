@@ -12,18 +12,26 @@ class FolderPathCustomCell: XLFormButtonCell{
     
     @IBOutlet weak var photoLabel: UILabel!
     @IBOutlet weak var folderImage: UIImageView!
+    @IBOutlet weak var bottomLineView: UIView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        
+        
     }
     
     override func configure() {
         super.configure()
+        
+        
     }
     
     override func update() {
         super.update()
+        if (rowDescriptor.tag == "PhotoButtonDestinationFolder"){
+            bottomLineView.isHidden = true
+        }
     }
    
 }
