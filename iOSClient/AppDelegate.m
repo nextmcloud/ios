@@ -27,6 +27,12 @@
 #import "NCPushNotification.h"
 #import <QuartzCore/QuartzCore.h>
 #import "Adjust.h"
+#import <MOAnalytics/MOAnalytics.h>
+//#import <SEGMoEngageIntegrationFactory.h>
+#import <MoEngage/MoEngage.h>
+//#import <SEGAnalytics.h>
+#import <MOAnalytics/MOAnalytics.h>
+
 
 @import Firebase;
 

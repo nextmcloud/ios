@@ -137,7 +137,7 @@ extension AppDelegate: NCAudioRecorderViewControllerDelegate {
 
         actions.append(
             NCMenuAction(title: NSLocalizedString("_create_folder_", comment: ""),
-                icon: UIImage(named: "addFolder")!, action: { menuAction in
+                icon: UIImage(named: "addFolder")!.image(color: NCBrandColor.shared.icon, size: 50), action: { menuAction in
                     
                      guard let serverUrl = appDelegate.activeServerUrl else { return }
                     

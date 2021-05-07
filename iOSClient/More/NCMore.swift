@@ -198,9 +198,14 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         tableView.separatorColor = NCBrandColor.shared.separator
         tableView.reloadData()
         
-        viewQuota.backgroundColor = NCBrandColor.shared.backgroundForm
-//        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
+        viewQuota.backgroundColor = NCBrandColor.shared.memoryConsuptionBackground
+        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
+        progressQuota.trackTintColor = NCBrandColor.shared.systemGrayAndGray66
         progressQuota.progressTintColor = NCBrandColor.shared.customer
+        quotaLabel1.textColor = NCBrandColor.shared.gray26AndGrayf2
+        quotalabel2.textColor = NCBrandColor.shared.gray26AndGrayf2
+        labelQuota.textColor = NCBrandColor.shared.gray26AndGrayf2
+        labelQuotaExternalSite.textColor = NCBrandColor.shared.gray26AndGrayf2
     }
 
     @objc func changeUserProfile() {
@@ -236,7 +241,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
         quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
 //        let percentageUsed: String = CCUtility.transformedSize((tabAccount.quotaUsed / tabAccount.quotaTotal) * 100)
-        let percentageUsed = "\((tabAccount.quotaUsed / tabAccount.quotaTotal) / (1024*1024))"
+//        let percentageUsed = "\((tabAccount.quotaUsed / tabAccount.quotaTotal) / (1024*1024))"
+        let percentageUsed = "kajdfnajsdfas;dkfjksajdfn;sadjf"
         labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsed)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
