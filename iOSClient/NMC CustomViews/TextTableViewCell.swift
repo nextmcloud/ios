@@ -10,8 +10,8 @@ import UIKit
 
 class TextTableViewCell: XLFormBaseCell,UITextFieldDelegate {
 
-    @IBOutlet weak var labelFileName: UILabel!
     @IBOutlet weak var fileNameTextField: UITextField!
+    @IBOutlet weak var topLineView: UIView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -33,6 +33,9 @@ class TextTableViewCell: XLFormBaseCell,UITextFieldDelegate {
     
     override func update() {
         super.update()
+        if (rowDescriptor.tag == "maskFileName"){
+            topLineView.isHidden = true
+        }
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {

@@ -62,10 +62,16 @@
                     <constraint firstAttribute="bottom" secondItem="4Eb-B6-8Yt" secondAttribute="bottom" constant="2" id="nya-m9-crw"/>
                     <constraint firstItem="bax-p8-r04" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="oHk-ms-OCu"/>
                 </constraints>
+                <variation key="default">
+                    <mask key="subviews">
+                        <exclude reference="bax-p8-r04"/>
+                    </mask>
+                </variation>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="fileNameTextField" destination="NY9-7g-aGK" id="Qsb-6b-HK6"/>
+                <outlet property="topLineView" destination="bax-p8-r04" id="v8o-Ax-DJL"/>
             </connections>
             <point key="canvasLocation" x="140.57971014492756" y="122.54464285714285"/>
         </tableViewCell>

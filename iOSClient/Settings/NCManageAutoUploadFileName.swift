@@ -79,6 +79,7 @@ class NCManageAutoUploadFileName: XLFormViewController {
         // Maintain the original fileName
         
         row = XLFormRowDescriptor(tag: "maintainOriginalFileName", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_maintain_original_filename_", comment: ""))
+        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand;
         var isOrignaleFilenamePrfesChanges : Bool?
 
         isOrignaleFilenamePrfesChanges = CCUtility.getOriginalFileNamePrefsChanged(NCBrandGlobal.shared.keyFileNameOriginalAutoUploadPrefs)
@@ -106,7 +107,7 @@ class NCManageAutoUploadFileName: XLFormViewController {
 
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
-
+        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand;
         section.addFormRow(row)
                 
         // Section: Rename File Name

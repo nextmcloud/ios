@@ -153,6 +153,7 @@
 "_model_"                   = "Model";
 "_set_user_status_"         = "Set user status";
 "_open_settings_"           = "Open settings";
+"_auto_upload_help_text_"   = "With this option, you upload your photos or videos to the same folder that you selected for \"Automatic upload.\"";
 
 /* User status */
 "_online_"                  = "Online";

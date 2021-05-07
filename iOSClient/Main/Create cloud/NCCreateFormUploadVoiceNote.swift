@@ -170,9 +170,9 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
         //row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
         row.cellConfigAtConfigure["backgroundColor"] = NCBrandColor.shared.backgroundForm;
-        row.cellConfig["labelFileName.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["labelFileName.textColor"] = NCBrandColor.shared.textView
-        row.cellConfig["labelFileName.text"] = NSLocalizedString("_filename_", comment: "")
+        //row.cellConfig["labelFileName.font"] = UIFont.systemFont(ofSize: 15.0)
+        //row.cellConfig["labelFileName.textColor"] = NCBrandColor.shared.textView
+        //row.cellConfig["labelFileName.text"] = NSLocalizedString("_filename_", comment: "")
         
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
