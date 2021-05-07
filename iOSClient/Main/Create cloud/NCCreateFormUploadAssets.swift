@@ -170,7 +170,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
         row.cellConfigAtConfigure["autoUploadSwitchControl.on"] = 0 //onTintColor
-        //row.cellConfig["autoUploadSwitchControl.onTintColor"] = NCBrandColor.shared.brand
+        row.cellConfig["autoUploadSwitchControl.onTintColor"] = NCBrandColor.shared.brand
         row.value = 0
         if (NSLocalizedString("_use_folder_auto_upload_", comment: "").count > 44 ){
             row.height = 65;
@@ -210,10 +210,11 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         } else {
             row.cellConfigAtConfigure["subFolderSwitch.on"] = 0
             row.value = 0
-            row.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.graySoft//disableSwitch
+            row.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.graySoft
         }
         //row.hidden = "$\("useFolderAutoUpload") == 0"
         row.cellConfig["subFolderLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["subFolderSwitch.onTintColor"] = NCBrandColor.shared.brand
         //end of custom subfolder row
         section.addFormRow(row)
 
@@ -261,6 +262,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 //        row.cellConfig["originalFileNameSwitch.on"] = CCUtility.getOriginalFileName(NCBrandGlobal.shared.keyFileNameOriginal)
         row.cellConfig["originalFileNameTitle.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["originalFileNameTitle.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["originalFileNameSwitch.onTintColor"] = NCBrandColor.shared.brand
+
         //#######end of custom row maintain original filename
         
         section.addFormRow(row)
@@ -287,6 +290,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand
+
         //#######end of custom row Add File Name Type
         
         section.addFormRow(row)
