@@ -63,7 +63,8 @@ import UIKit
     @objc public var folderDefaultAutoUpload:           String = "Photos"
     
     // Capabilities Group
-    @objc public var capabilitiesGroups:                String = "group.in.t-systems.com"
+//    @objc public var capabilitiesGroups:                String = "group.in.t-systems.com"
+    @objc public var capabilitiesGroups:                String = "group.com.t-systems.pu-ds.magentacloud.dev"
     
     // User Agent
     @objc public var userAgent:                         String = "Nextcloud-iOS"                                    // Don't touch me !!
@@ -137,6 +138,7 @@ class NCBrandColor: NSObject {
     @objc public var searchImageColor:              UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
     @objc public var memoryConsuptionBackground:        UIColor = UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
     @objc public var systemGrayAndGray66:        UIColor = .gray
+    @objc public var commonViewInfoText:        UIColor = .gray
 
     override init() {
         self.brand = self.customer
@@ -164,6 +166,7 @@ class NCBrandColor: NSObject {
             searchImageColor = icon
             memoryConsuptionBackground = backgroundCell
             systemGrayAndGray66 = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+            commonViewInfoText = UIColor(displayP3Red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
         } else {
             tabBar = .white
             backgroundView = .white
@@ -174,6 +177,13 @@ class NCBrandColor: NSObject {
             separator = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
             select = self.brandElement.withAlphaComponent(0.1)
             avatarBorder = .white
+            // reassign default color
+            icon = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+            actionCellBackgroundColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
+            gray26AndGrayf2 = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+            searchImageColor = icon
+            memoryConsuptionBackground = backgroundCell
+            systemGrayAndGray66 = .gray
         }
     }
     
