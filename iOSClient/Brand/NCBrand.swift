@@ -138,7 +138,7 @@ class NCBrandColor: NSObject {
     @objc public var searchImageColor:              UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
     @objc public var memoryConsuptionBackground:        UIColor = UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
     @objc public var systemGrayAndGray66:        UIColor = .gray
-    @objc public var commonViewInfoText:        UIColor = .gray
+    @objc public var commonViewInfoText:        UIColor = UIColor(displayP3Red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
 
     override init() {
         self.brand = self.customer
@@ -166,7 +166,6 @@ class NCBrandColor: NSObject {
             searchImageColor = icon
             memoryConsuptionBackground = backgroundCell
             systemGrayAndGray66 = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
-            commonViewInfoText = UIColor(displayP3Red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
         } else {
             tabBar = .white
             backgroundView = .white

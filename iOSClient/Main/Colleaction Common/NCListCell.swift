@@ -82,6 +82,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         buttonMore.addGestureRecognizer(longPressedGestureMore)
         
         separator.backgroundColor = NCBrandColor.shared.separator
+        self.labelInfo.textColor = NCBrandColor.shared.commonViewInfoText
     }
     
     override func prepareForReuse() {

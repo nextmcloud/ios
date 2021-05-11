@@ -67,10 +67,10 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
         
         images.cellFileImage = UIImage.init(named: "file")!
         
-        images.cellSharedImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.graySoft, size: 50)
-        images.cellCanShareImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+        images.cellSharedImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.commonViewInfoText, size: 50)
+        images.cellCanShareImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.commonViewInfoText, size: 50)
 //        images.cellShareByLinkImage = UIImage(named: "sharebylink")!.image(color: NCBrandColor.shared.graySoft, size: 50)
-        images.cellShareByLinkImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+        images.cellShareByLinkImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.commonViewInfoText, size: 50)
         
         images.cellFavouriteImage = UIImage(named: "favorite")!.image(color: NCBrandColor.shared.yellowFavorite, size: 50)
         images.cellCommentImage = UIImage(named: "comment")!.image(color: NCBrandColor.shared.graySoft, size: 50)
@@ -92,7 +92,7 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
 //        images.cellCheckedNo = UIImage(named: "checkedNo")!.image(color: NCBrandColor.shared.graySoft, size: 50)
         images.cellCheckedNo = UIImage(named: "checkedNo")!.image(color: .darkGray, size: 50)
         
-        images.cellButtonMore = UIImage(named: "more")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+        images.cellButtonMore = UIImage(named: "more")!.image(color: NCBrandColor.shared.commonViewInfoText, size: 50)
         images.cellButtonStop = UIImage(named: "stop")!.image(color: NCBrandColor.shared.graySoft, size: 50)
     }
     
