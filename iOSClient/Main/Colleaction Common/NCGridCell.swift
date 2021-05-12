@@ -73,7 +73,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         longPressedGestureMore.minimumPressDuration = 0.5
         longPressedGestureMore.delegate = self
         longPressedGestureMore.delaysTouchesBegan = true
-        buttonMore.addGestureRecognizer(longPressedGestureMore)        
+        buttonMore.addGestureRecognizer(longPressedGestureMore)
     }
     
     override func prepareForReuse() {
@@ -115,7 +115,12 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         if status {
             imageSelect.image = NCCollectionCommon.images.cellCheckedYes
             imageVisualEffect.isHidden = false
-            imageVisualEffect.alpha = 0.4
+            
+            if self.imageVisualEffect.backgroundColor == .white {
+                imageVisualEffect.alpha = 0.4
+            } else {
+                imageVisualEffect.alpha = 0.5
+            }
         } else {
 //            imageSelect.image = NCCollectionCommon.images.cellCheckedNo
             imageSelect.isHidden = false

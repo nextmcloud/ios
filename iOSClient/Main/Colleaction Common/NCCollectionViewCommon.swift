@@ -1396,6 +1396,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.imageItem.backgroundColor = nil
             
             cell.progressView.progress = 0.0
+            cell.imageVisualEffect.backgroundColor = NCBrandColor.shared.tileSelectionImageColor
 
             if metadata.directory {
                 
