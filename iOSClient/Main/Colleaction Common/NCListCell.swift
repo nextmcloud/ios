@@ -58,6 +58,8 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     var objectId = ""
     var indexPath = IndexPath()
     var namedButtonMore = ""
+    @IBOutlet weak var btnMoreRightConstraint: NSLayoutConstraint!
+    
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -125,16 +127,18 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         if status {
             imageItemLeftConstraint.constant = 45
             imageSelect.isHidden = false
+            btnMoreRightConstraint.constant = -40
         } else {
             imageItemLeftConstraint.constant = 10
             imageSelect.isHidden = true
             backgroundView = nil
+            btnMoreRightConstraint.constant = 0
         }
     }
     
     func selected(_ status: Bool) {
         if status {
-            imageSelect.image = NCCollectionCommon.images.cellCheckedYes
+            imageSelect.image = NCCollectionCommon.images.cellCheckedYes //NCCollectionCommon.images.cellCheckedYes
             
             let blurEffect = UIBlurEffect(style: .extraLight)
             let blurEffectView = UIVisualEffectView(effect: blurEffect)
@@ -145,7 +149,8 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
             
             separator.isHidden = true
         } else {
-            imageSelect.image = NCCollectionCommon.images.cellCheckedNo
+//            imageSelect.image = NCCollectionCommon.images.cellCheckedNo
+            imageSelect.image = NCCollectionCommon.images.cellCheckedNo.image(color: UIColor(hex: "#b2b2b2")!, size: 20.0)
             backgroundView = nil
             separator.isHidden = false
         }

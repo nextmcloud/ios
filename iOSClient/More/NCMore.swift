@@ -241,9 +241,12 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
         quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
 //        let percentageUsed: String = CCUtility.transformedSize((tabAccount.quotaUsed / tabAccount.quotaTotal) * 100)
-        let percentageUsed = "\((tabAccount.quotaUsed / tabAccount.quotaTotal) / (1024*1024))"
+//        let percentageUsed = "\((tabAccount.quotaUsed / tabAccount.quotaTotal) / (1024*1024))"
+        let used = Double(tabAccount.quotaUsed)
+        let allot = Double(tabAccount.quotaTotal)
+        let percentageUsed = String(format: "%.2f%%", (used * 100/allot) * 100)
 
-        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsed)
+        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), (used * 100/allot) * 100)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.tableView.reloadData()
