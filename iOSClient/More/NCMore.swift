@@ -62,9 +62,9 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         tableView.register(UINib.init(nibName: "NCMoreUserCell", bundle: nil), forCellReuseIdentifier: "userCell")
         
         // create tap gesture recognizer
-        let tapQuota = UITapGestureRecognizer(target: self, action: #selector(tapLabelQuotaExternalSite))
-        labelQuotaExternalSite.isUserInteractionEnabled = true
-        labelQuotaExternalSite.addGestureRecognizer(tapQuota)
+//        let tapQuota = UITapGestureRecognizer(target: self, action: #selector(tapLabelQuotaExternalSite))
+//        labelQuotaExternalSite.isUserInteractionEnabled = true
+//        labelQuotaExternalSite.addGestureRecognizer(tapQuota)
 
         // Notification
         NotificationCenter.default.addObserver(self, selector: #selector(changeUserProfile), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeUserProfile), object: nil)

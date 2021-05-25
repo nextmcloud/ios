@@ -204,11 +204,13 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        
+//        self.collectionView?.reloadData()
         coordinator.animate(alongsideTransition: nil) { _ in
-            self.collectionView?.collectionViewLayout.invalidateLayout()
+//            self.collectionView?.collectionViewLayout.invalidateLayout()
         }
     }
+    
+    
     
     override var canBecomeFirstResponder: Bool {
         return true
@@ -1195,6 +1197,9 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.labelTitle.text = metadata.fileNameView
             cell.labelTitle.textColor = NCBrandColor.shared.textView
             cell.separator.backgroundColor = NCBrandColor.shared.separator
+            if (UIApplication.shared.statusBarOrientation.isPortrait && UIDevice.current.model.hasPrefix("iPhone")) {
+                cell.separator.backgroundColor = .clear
+            }
             
             cell.imageSelect.image = nil
             cell.imageStatus.image = nil
