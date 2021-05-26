@@ -3,6 +3,16 @@
     {
       "filename" : "green@svg.svg",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "green-Gray90-filled@svg.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {

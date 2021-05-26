@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/new-icons/offline-avaiable/green-Gray90-filled@svg</title>
+    <defs>
+        <polygon id="path-1" points="1 1.0003 22.9999 1.0003 22.9999 23 1 23"></polygon>
+    </defs>
+    <g id="icon/new-icons/offline-avaiable/green-Gray90-filled" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="Clip-2"></g>
+        <circle id="Oval" fill="#191919" mask="url(#mask-2)" cx="12" cy="12" r="11"></circle>
+        <path d="M12,1 C18.0751322,1 23,5.92486775 23,12 C23,18.0751322 18.0751322,23 12,23 C5.92486775,23 1,18.0751322 1,12 C1,5.92486775 5.92486775,1 12,1 Z M17.2500001,16.5000001 L6.75,16.5000001 L6.65121528,16.5071181 C6.29409722,16.5586806 6,16.8833334 6,17.2500001 C6,17.6500001 6.35,18.0000001 6.75,18.0000001 L6.75,18.0000001 L17.2500001,18.0000001 L17.3487848,17.992882 C17.7059028,17.9413195 18,17.6166667 18,17.2500001 C18,16.8500001 17.6500001,16.5000001 17.2500001,16.5000001 L17.2500001,16.5000001 Z M12,5 C11.6,5 11.25,5.35 11.25,5.75 L11.25,5.75 L11.25,10.5 L9.40000002,10.5 L12,14.5 L14.6000001,10.5 L12.75,10.5 L12.75,5.75 L12.742882,5.65121528 C12.6913195,5.29409722 12.3666667,5 12,5 Z" id="Combined-Shape-Copy" fill="#73C354" mask="url(#mask-2)"></path>
+    </g>
+</svg>

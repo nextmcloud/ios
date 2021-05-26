@@ -99,22 +99,22 @@ extension NCViewer {
         //
         // OFFLINE
         //
-        if metadata.session == "" && !webView {
-            actions.append(
-                NCMenuAction(
-                    title: titleOffline,
-                    icon: UIImage(named: "offlineMenu")!.image(color: NCBrandColor.shared.icon, size: 50),
-                    action: { menuAction in
-                        if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
-                            
-                            NCNetworking.shared.download(metadata: metadata, selector: NCBrandGlobal.shared.selectorLoadOffline) { (_) in }
-                        } else {
-                            NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: !localFile!.offline)
-                        }
-                    }
-                )
-            )
-        }
+//        if metadata.session == "" && !webView {
+//            actions.append(
+//                NCMenuAction(
+//                    title: titleOffline,
+//                    icon: UIImage(named: "offlineMenu")!.image(color: NCBrandColor.shared.icon, size: 50),
+//                    action: { menuAction in
+//                        if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
+//
+//                            NCNetworking.shared.download(metadata: metadata, selector: NCBrandGlobal.shared.selectorLoadOffline) { (_) in }
+//                        } else {
+//                            NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: !localFile!.offline)
+//                        }
+//                    }
+//                )
+//            )
+//        }
         
         //
         // OPEN IN
@@ -192,49 +192,49 @@ extension NCViewer {
         //
         // COPY - MOVE
         //
-        if !webView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_move_or_copy_", comment: ""),
-                    icon: UIImage(named: "move")!.image(color: NCBrandColor.shared.icon, size: 50),
-                    action: { menuAction in
-                        
-                        let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
-                        let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
-                        let viewController = navigationController.topViewController as! NCSelect
-                        
-                        viewController.delegate = NCViewer.shared
-                        viewController.hideButtonCreateFolder = false
-                        viewController.items = [metadata]
-                        viewController.selectFile = false
-                        viewController.includeDirectoryE2EEncryption = false
-                        viewController.includeImages = false
-                        viewController.type = ""
-                        viewController.titleButtonDone = NSLocalizedString("_move_", comment: "")
-                        viewController.titleButtonDone1 = NSLocalizedString("_copy_", comment: "")
-                        viewController.isButtonDone1Hide = false
-                        viewController.isOverwriteHide = false
-                        
-                        navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-                        self.appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
-                    }
-                )
-            )
-        }
+//        if !webView {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_move_or_copy_", comment: ""),
+//                    icon: UIImage(named: "move")!.image(color: NCBrandColor.shared.icon, size: 50),
+//                    action: { menuAction in
+//
+//                        let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
+//                        let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
+//                        let viewController = navigationController.topViewController as! NCSelect
+//
+//                        viewController.delegate = NCViewer.shared
+//                        viewController.hideButtonCreateFolder = false
+//                        viewController.items = [metadata]
+//                        viewController.selectFile = false
+//                        viewController.includeDirectoryE2EEncryption = false
+//                        viewController.includeImages = false
+//                        viewController.type = ""
+//                        viewController.titleButtonDone = NSLocalizedString("_move_", comment: "")
+//                        viewController.titleButtonDone1 = NSLocalizedString("_copy_", comment: "")
+//                        viewController.isButtonDone1Hide = false
+//                        viewController.isOverwriteHide = false
+//
+//                        navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+//                        self.appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+//                    }
+//                )
+//            )
+//        }
         
         //
         // COPY
         //
-        actions.append(
-            NCMenuAction(
-                title: NSLocalizedString("_copy_file_", comment: ""),
-                icon: UIImage(named: "copy")!.image(color: NCBrandColor.shared.icon, size: 50),
-                action: { menuAction in
-                    self.appDelegate.pasteboardOcIds = [metadata.ocId];
-                    NCCollectionCommon.shared.copyPasteboard()
-                }
-            )
-        )
+//        actions.append(
+//            NCMenuAction(
+//                title: NSLocalizedString("_copy_file_", comment: ""),
+//                icon: UIImage(named: "copy")!.image(color: NCBrandColor.shared.icon, size: 50),
+//                action: { menuAction in
+//                    self.appDelegate.pasteboardOcIds = [metadata.ocId];
+//                    NCCollectionCommon.shared.copyPasteboard()
+//                }
+//            )
+//        )
         
         //
         // VIEW IN FOLDER
