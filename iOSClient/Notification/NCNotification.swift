@@ -44,13 +44,14 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         // Empty
         emptyDataSet = NCEmptyDataSet.init(view: tableView, offset: 0, delegate: self)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         
         changeTheming()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        appDelegate.activeViewController = self
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -73,7 +74,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
     
     func emptyDataSetView(_ view: NCEmptyView) {
         
-        view.emptyImage.image = UIImage.init(named: "notification")?.image(color: .gray, size: UIScreen.main.bounds.width)
+        view.emptyImage.image = UIImage.init(named: "bell")?.image(color: .gray, size: UIScreen.main.bounds.width)
         view.emptyTitle.text = NSLocalizedString("_no_notification_", comment: "")
         view.emptyDescription.text = ""
     }
@@ -99,14 +100,14 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         var image : UIImage?
         
         if let urlIcon = urlIcon {
-            let pathFileName = CCUtility.getDirectoryUserData() + "/" + urlIcon.deletingPathExtension().lastPathComponent + ".png"
+            let pathFileName = String(CCUtility.getDirectoryUserData()) + "/" + urlIcon.deletingPathExtension().lastPathComponent + ".png"
             image = UIImage(contentsOfFile: pathFileName)
         }
         
         if let image = image {
             cell.icon.image = image.image(color:  NCBrandColor.shared.brandElement, size: 25)
         } else {
-            cell.icon.image = #imageLiteral(resourceName: "notification").image(color: NCBrandColor.shared.brandElement, size: 25)
+            cell.icon.image = NCUtility.shared.loadImage(named: "bell", color: NCBrandColor.shared.brandElement)
         }
         
         // Avatar
@@ -131,7 +132,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
                         }
                     } else {
                         DispatchQueue.global().async {
-                            NCCommunication.shared.downloadAvatar(userID: name, fileNameLocalPath: fileNameLocalPath, size: Int(k_avatar_size), customUserAgent: nil, addCustomHeaders: nil, account: self.appDelegate.account) { (account, data, errorCode, errorMessage) in
+                            NCCommunication.shared.downloadAvatar(userId: name, fileNameLocalPath: fileNameLocalPath, size: Int(k_avatar_size), customUserAgent: nil, addCustomHeaders: nil, account: self.appDelegate.account) { (account, data, errorCode, errorMessage) in
                                 if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
                                     if let image = UIImage(contentsOfFile: fileNameLocalPath) {
                                         cell.avatar.isHidden = false
@@ -243,7 +244,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
                 self.reloadDatasource()
                 
             } else if errorCode != 0 {
-                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
             } else {
                 print("[LOG] It has been changed user during networking process, error.")
             }
@@ -270,7 +271,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
                                 self.reloadDatasource()
                                 
                             } else if errorCode != 0 {
-                                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
                             } else {
                                 print("[LOG] It has been changed user during networking process, error.")
                             }
@@ -285,7 +286,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
     
     func getNetwokingNotification() {
     
-        NCUtility.shared.startActivityIndicator(view: self.navigationController?.view)
+        NCUtility.shared.startActivityIndicator(backgroundView: self.navigationController?.view, blurEffect: true)
 
         NCCommunication.shared.getNotifications() { (account, notifications, errorCode, errorDescription) in
          

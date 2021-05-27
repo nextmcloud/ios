@@ -48,7 +48,7 @@ import MarkdownKit
         let editItem = UIBarButtonItem(image: UIImage(named: "actionSheetModify"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(editItemAction(_:)))
         self.navigationItem.rightBarButtonItem = editItem
 
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         
         changeTheming()
     }
@@ -62,7 +62,7 @@ import MarkdownKit
                 guard let metadata = metadata else { return }
                 NCManageDatabase.shared.setDirectory(richWorkspace: metadata.richWorkspace, serverUrl: self.serverUrl, account: account)
                 if self.richWorkspaceText != metadata.richWorkspace && metadata.richWorkspace != nil {
-                    self.appDelegate.activeFiles.richWorkspaceText = self.richWorkspaceText
+                    self.appDelegate.activeFiles?.richWorkspaceText = self.richWorkspaceText
                     self.richWorkspaceText = metadata.richWorkspace!
                     self.textView.attributedText = self.markdownParser.parse(metadata.richWorkspace!)
                 }

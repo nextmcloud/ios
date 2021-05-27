@@ -77,13 +77,13 @@ class NCViewerRichWorkspaceWebView: UIViewController, WKNavigationDelegate, WKSc
                 }
                 
                 dismiss(animated: true) {
-                    NotificationCenter.default.postOnMainThread(name: NCBrandGlobal.shared.notificationCenterCloseRichWorkspaceWebView, userInfo: nil)
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCloseRichWorkspaceWebView, userInfo: nil)
                 }
             }
             
             if message.body as? String == "share" {
                 if (metadata != nil) {
-                    NCNetworkingNotificationCenter.shared.openShare(ViewController: self, metadata: metadata!, indexPage: 2)
+                    NCFunctionCenter.shared.openShare(ViewController: self, metadata: metadata!, indexPage: 2)
                 }
             }
             

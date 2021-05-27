@@ -21,14 +21,15 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
+import AVKit
 
 protocol NCViewerVideoDelegate {
     func startPictureInPicture(metadata: tableMetadata)
     func stopPictureInPicture(metadata: tableMetadata, playing: Bool)
 }
 
-@objc class NCViewerVideo: AVPlayerViewController {
+class NCViewerVideo: AVPlayerViewController {
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var metadata = tableMetadata()

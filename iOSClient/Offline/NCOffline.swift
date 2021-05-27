@@ -29,9 +29,8 @@ class NCOffline: NCCollectionViewCommon  {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
-        appDelegate.activeOffline = self
         titleCurrentFolder = NSLocalizedString("_manage_file_offline_", comment: "")
-        layoutKey = NCBrandGlobal.shared.layoutViewOffline
+        layoutKey = NCGlobal.shared.layoutViewOffline
         enableSearchBar = true
         emptyImage = UIImage.init(named: "folder")?.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width)
         emptyTitle = "_files_no_files_"
@@ -101,7 +100,7 @@ class NCOffline: NCCollectionViewCommon  {
                     for metadata in metadatas ?? [] {
                         if !metadata.directory {
                             if NCManageDatabase.shared.isDownloadMetadata(metadata, download: true) {
-                                NCOperationQueue.shared.download(metadata: metadata, selector: NCBrandGlobal.shared.selectorDownloadFile)
+                                NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorDownloadFile)
                             }
                         }
                     }

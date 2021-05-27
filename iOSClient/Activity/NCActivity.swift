@@ -60,14 +60,15 @@ class NCActivity: UIViewController, NCEmptyDataSetDelegate {
         tableView.tableFooterView = UIView()
         tableView.contentInset = insets
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         
         changeTheming()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        appDelegate.activeViewController = self
+
         loadDataSource()
     }
     
@@ -94,7 +95,7 @@ class NCActivity: UIViewController, NCEmptyDataSetDelegate {
     
     func emptyDataSetView(_ view: NCEmptyView) {
         
-        view.emptyImage.image = UIImage.init(named: "activity")?.image(color: .gray, size: UIScreen.main.bounds.width)
+        view.emptyImage.image = UIImage.init(named: "bolt")?.image(color: .gray, size: UIScreen.main.bounds.width)
         view.emptyTitle.text = NSLocalizedString("_no_activity_", comment: "")
         view.emptyDescription.text = ""
     }
@@ -216,22 +217,20 @@ extension NCActivity: UITableViewDataSource {
             }
             
             // avatar
-            if activity.user.count > 0 && activity.user != appDelegate.userID {
+            if activity.user.count > 0 && activity.user != appDelegate.userId {
                 
                 cell.subjectTrailingConstraint.constant = 50
                 cell.avatar.isHidden = false
                 
-                let fileNameLocalPath = CCUtility.getDirectoryUserData() + "/" + CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase) + "-" + activity.user + ".png"
+                let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + activity.user + ".png"
                 if FileManager.default.fileExists(atPath: fileNameLocalPath) {
                     if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-                        cell.avatar.image = image
+                        cell.avatar.image = NCUtility.shared.createAvatar(image: image, size: 30) 
                     }
                 } else {
-                    DispatchQueue.global().async {
-                        NCCommunication.shared.downloadAvatar(userID: activity.user, fileNameLocalPath: fileNameLocalPath, size: NCBrandGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
-                            if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
-                                cell.avatar.image = UIImage(data: data!)
-                            }
+                    NCCommunication.shared.downloadAvatar(userId: activity.user, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
+                        if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
+                            cell.avatar.image = NCUtility.shared.createAvatar(image: UIImage(data: data!)!, size: 30)
                         }
                     }
                 }
@@ -348,7 +347,7 @@ extension activityTableViewCell: UICollectionViewDelegate {
                         viewController.trashPath = result.filePath
                         (responder as? UIViewController)!.navigationController?.pushViewController(viewController, animated: true)
                     } else {
-                        NCContentPresenter.shared.messageNotification("_error_", description: "_trash_file_not_found_", delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCBrandGlobal.shared.ErrorInternalError)
+                        NCContentPresenter.shared.messageNotification("_error_", description: "_trash_file_not_found_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.ErrorInternalError)
                     }
                 }
             }
@@ -386,7 +385,7 @@ extension activityTableViewCell: UICollectionViewDelegate {
             
             let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(activitySubjectRich.id, fileNameView: activitySubjectRich.name)!
             
-            NCUtility.shared.startActivityIndicator(view: (appDelegate.window.rootViewController?.view)!)
+            NCUtility.shared.startActivityIndicator(backgroundView: (appDelegate.window?.rootViewController?.view)!, blurEffect: true)
             
             NCCommunication.shared.download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, requestHandler: { (_) in
                 
@@ -573,7 +572,7 @@ extension NCActivity {
         canFetchActivity = false
         
         if idActivity > 0 {
-            NCUtility.shared.startActivityIndicator(view: self.view, bottom: 50)
+            NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: false, bottom: 50)
         }
         
         NCCommunication.shared.getActivity(since: idActivity, limit: 200, objectId: filterFileId, objectType: objectType, previews: true) { (account, activities, errorCode, errorDescription) in

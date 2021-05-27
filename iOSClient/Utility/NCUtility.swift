@@ -34,8 +34,10 @@ class NCUtility: NSObject {
         return instance
     }()
     
-    let activityIndicator = UIActivityIndicatorView(style: .whiteLarge)
-    
+    private let activityIndicator = UIActivityIndicatorView(style: .whiteLarge)
+    private var viewActivityIndicator: UIView?
+    private var viewBackgroundActivityIndicator: UIView?
+
     func setLayoutForView(key: String, serverUrl: String, layout: String, sort: String, ascending: Bool, groupBy: String, directoryOnTop: Bool, titleButton: String, itemForLine: Int) {
         
         let string =  layout + "|" + sort + "|" + "\(ascending)" + "|" + groupBy + "|" + "\(directoryOnTop)" + "|" + titleButton + "|" + "\(itemForLine)"
@@ -45,7 +47,7 @@ class NCUtility: NSObject {
             keyStore = serverUrl
         }
         
-        UICKeyChainStore.setString(string, forKey: keyStore, service: NCBrandGlobal.shared.serviceShareKeyChain)
+        UICKeyChainStore.setString(string, forKey: keyStore, service: NCGlobal.shared.serviceShareKeyChain)
     }
     
     func setLayoutForView(key: String, serverUrl: String, layout: String) {
@@ -57,7 +59,7 @@ class NCUtility: NSObject {
         var titleButton: String
         var itemForLine: Int
 
-        (_, sort, ascending, groupBy, directoryOnTop, titleButton, itemForLine) = NCUtility.shared.getLayoutForView(key: NCBrandGlobal.shared.layoutViewFavorite, serverUrl: serverUrl)
+        (_, sort, ascending, groupBy, directoryOnTop, titleButton, itemForLine) = NCUtility.shared.getLayoutForView(key: NCGlobal.shared.layoutViewFavorite, serverUrl: serverUrl)
 
         setLayoutForView(key: key, serverUrl: serverUrl, layout: layout, sort: sort, ascending: ascending, groupBy: groupBy, directoryOnTop: directoryOnTop, titleButton: titleButton, itemForLine: itemForLine)
     }
@@ -91,9 +93,9 @@ class NCUtility: NSObject {
             keyStore = serverUrl
         }
         
-        guard let string = UICKeyChainStore.string(forKey: keyStore, service: NCBrandGlobal.shared.serviceShareKeyChain) else {
-            setLayoutForView(key: key, serverUrl: serverUrl, layout: NCBrandGlobal.shared.layoutList, sort: "fileName", ascending: true, groupBy: "none", directoryOnTop: true, titleButton: "_sorted_by_name_a_z_", itemForLine: 3)
-            return (NCBrandGlobal.shared.layoutList, "fileName", true, "none", true, "_sorted_by_name_a_z_", 3)
+        guard let string = UICKeyChainStore.string(forKey: keyStore, service: NCGlobal.shared.serviceShareKeyChain) else {
+            setLayoutForView(key: key, serverUrl: serverUrl, layout: NCGlobal.shared.layoutList, sort: "fileName", ascending: true, groupBy: "none", directoryOnTop: true, titleButton: "_sorted_by_name_a_z_", itemForLine: 3)
+            return (NCGlobal.shared.layoutList, "fileName", true, "none", true, "_sorted_by_name_a_z_", 3)
         }
 
         let array = string.components(separatedBy: "|")
@@ -105,9 +107,9 @@ class NCUtility: NSObject {
             return (array[0], array[1], sort.boolValue, array[3], directoryOnTop.boolValue, array[5], Int(itemForLine.intValue))
         }
         
-        setLayoutForView(key: key, serverUrl: serverUrl, layout: NCBrandGlobal.shared.layoutList, sort: "fileName", ascending: true, groupBy: "none", directoryOnTop: true, titleButton: "_sorted_by_name_a_z_", itemForLine: 3)
+        setLayoutForView(key: key, serverUrl: serverUrl, layout: NCGlobal.shared.layoutList, sort: "fileName", ascending: true, groupBy: "none", directoryOnTop: true, titleButton: "_sorted_by_name_a_z_", itemForLine: 3)
         
-        return (NCBrandGlobal.shared.layoutList, "fileName", true, "none", true, "_sorted_by_name_a_z_", 3)
+        return (NCGlobal.shared.layoutList, "fileName", true, "none", true, "_sorted_by_name_a_z_", 3)
     }
         
     func convertSVGtoPNGWriteToUserData(svgUrlString: String, fileName: String?, width: CGFloat?, rewrite: Bool, account: String, closure: @escaping (String?) -> ()) {
@@ -193,36 +195,6 @@ class NCUtility: NSObject {
         }
     }
     
-    @objc func startActivityIndicator(view: UIView?, bottom: CGFloat = 0) {
-    
-        guard let view = view else { return }
-        
-        activityIndicator.color = NCBrandColor.shared.brand
-        activityIndicator.hidesWhenStopped = true
-            
-        view.addSubview(activityIndicator)
-            
-        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-            
-        let horizontalConstraint = NSLayoutConstraint(item: activityIndicator, attribute: NSLayoutConstraint.Attribute.centerX, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerX, multiplier: 1, constant: 0)
-        view.addConstraint(horizontalConstraint)
-        
-        var verticalConstant: CGFloat = 0
-        if bottom > 0 {
-            verticalConstant = (view.frame.size.height / 2) - bottom
-        }
-        
-        let verticalConstraint = NSLayoutConstraint(item: activityIndicator, attribute: NSLayoutConstraint.Attribute.centerY, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.centerY, multiplier: 1, constant: verticalConstant)
-        view.addConstraint(verticalConstraint)
-
-        activityIndicator.startAnimating()
-    }
-    
-    @objc func stopActivityIndicator() {
-        activityIndicator.stopAnimating()
-        activityIndicator.removeFromSuperview()
-    }
-    
     @objc func isSimulatorOrTestFlight() -> Bool {
         guard let path = Bundle.main.appStoreReceiptURL?.path else {
             return false
@@ -283,7 +255,7 @@ class NCUtility: NSObject {
         
         // HARDCODE
         if editor == "" {
-            editor = NCBrandGlobal.shared.editorText
+            editor = NCGlobal.shared.editorText
         }
         
         return editor
@@ -425,19 +397,19 @@ class NCUtility: NSObject {
         
         if FileManager().fileExists(atPath: fileNamePathPreview) && FileManager().fileExists(atPath: fileNamePathIcon) { return }
         if !CCUtility.fileProviderStorageExists(ocId, fileNameView: fileName) { return }
-        if typeFile != NCBrandGlobal.shared.metadataTypeFileImage && typeFile != NCBrandGlobal.shared.metadataTypeFileVideo { return }
+        if typeFile != NCGlobal.shared.metadataTypeFileImage && typeFile != NCGlobal.shared.metadataTypeFileVideo { return }
         
-        if typeFile == NCBrandGlobal.shared.metadataTypeFileImage {
+        if typeFile == NCGlobal.shared.metadataTypeFileImage {
             
             originalImage = UIImage.init(contentsOfFile: fileNamePath)
             
-            scaleImagePreview = originalImage?.resizeImage(size: CGSize(width: NCBrandGlobal.shared.sizePreview, height: NCBrandGlobal.shared.sizePreview), isAspectRation: false)
-            scaleImageIcon = originalImage?.resizeImage(size: CGSize(width: NCBrandGlobal.shared.sizeIcon, height: NCBrandGlobal.shared.sizeIcon), isAspectRation: false)
+            scaleImagePreview = originalImage?.resizeImage(size: CGSize(width: NCGlobal.shared.sizePreview, height: NCGlobal.shared.sizePreview), isAspectRation: false)
+            scaleImageIcon = originalImage?.resizeImage(size: CGSize(width: NCGlobal.shared.sizeIcon, height: NCGlobal.shared.sizeIcon), isAspectRation: false)
             
             try? scaleImagePreview?.jpegData(compressionQuality: 0.7)?.write(to: URL(fileURLWithPath: fileNamePathPreview))
             try? scaleImageIcon?.jpegData(compressionQuality: 0.7)?.write(to: URL(fileURLWithPath: fileNamePathIcon))
             
-        } else if typeFile == NCBrandGlobal.shared.metadataTypeFileVideo {
+        } else if typeFile == NCGlobal.shared.metadataTypeFileVideo {
             
             let videoPath = NSTemporaryDirectory()+"tempvideo.mp4"
             NCUtilityFileSystem.shared.linkItem(atPath: fileNamePath, toPath: videoPath)
@@ -457,5 +429,138 @@ class NCUtility: NSObject {
         }
         return ""
     }
+    
+    func loadImage(named: String, color: UIColor = NCBrandColor.shared.icon, size: CGFloat = 50, symbolConfiguration: Any? = nil) -> UIImage {
+        
+        var image: UIImage?
+        
+        if #available(iOS 13.0, *) {
+            if let symbolConfiguration = symbolConfiguration {
+                image = UIImage(systemName: named, withConfiguration: symbolConfiguration as? UIImage.Configuration)?.imageColor(color)
+            } else {
+                image = UIImage(systemName: named)?.imageColor(color)
+            }
+            if image == nil {
+                image = UIImage(named: named)?.image(color: color, size: size)
+            }
+        } else {
+            image = UIImage(named: named)?.image(color: color, size: size)
+        }
+        
+        if image != nil {
+            return image!
+        }
+        
+        return  UIImage(named: "file")!.image(color: color, size: size)
+    }
+    
+    @objc func createAvatar(image: UIImage, size: CGFloat) -> UIImage {
+        
+        var avatarImage = image
+        let rect = CGRect(x: 0, y: 0, width: size, height: size)
+        
+        UIGraphicsBeginImageContextWithOptions(rect.size, false, 3.0)
+        UIBezierPath.init(roundedRect: rect, cornerRadius: rect.size.height).addClip()
+        avatarImage.draw(in: rect)
+        avatarImage = UIGraphicsGetImageFromCurrentImageContext() ?? image
+        UIGraphicsEndImageContext()
+        
+        return avatarImage
+    }
+    
+    // MARK: -
+
+    @objc func startActivityIndicator(backgroundView: UIView?, blurEffect: Bool, bottom: CGFloat = 0) {
+        
+        if viewBackgroundActivityIndicator != nil { return }
+        
+        activityIndicator.color = NCBrandColor.shared.textView
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+
+        let sizeActivityIndicator = activityIndicator.frame.height + 50
+        
+        viewActivityIndicator = UIView.init(frame: CGRect(x: 0, y: 0, width: sizeActivityIndicator, height: sizeActivityIndicator))
+        viewActivityIndicator?.translatesAutoresizingMaskIntoConstraints = false
+        viewActivityIndicator?.layer.cornerRadius = 10
+        viewActivityIndicator?.layer.masksToBounds = true
+        viewActivityIndicator?.backgroundColor = .clear
+
+        if backgroundView == nil {
+            if let window = UIApplication.shared.keyWindow {
+                viewBackgroundActivityIndicator?.removeFromSuperview()
+                viewBackgroundActivityIndicator = NCViewActivityIndicator(frame: window.bounds)
+                window.addSubview(viewBackgroundActivityIndicator!)
+                viewBackgroundActivityIndicator?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                viewBackgroundActivityIndicator?.backgroundColor = .clear
+            }
+        } else {
+            viewBackgroundActivityIndicator = backgroundView
+        }
+        
+        // VIEW ACTIVITY INDICATOR
+        
+        guard let viewActivityIndicator = self.viewActivityIndicator else { return }
+        viewActivityIndicator.addSubview(activityIndicator)
+        
+        if blurEffect {
+            let blurEffect = UIBlurEffect(style: .regular)
+            let blurEffectView = UIVisualEffectView(effect: blurEffect)
+            blurEffectView.frame = viewActivityIndicator.frame
+            viewActivityIndicator.insertSubview(blurEffectView, at: 0)
+        }
+            
+        NSLayoutConstraint.activate([
+            viewActivityIndicator.widthAnchor.constraint(equalToConstant: sizeActivityIndicator),
+            viewActivityIndicator.heightAnchor.constraint(equalToConstant: sizeActivityIndicator),
+            activityIndicator.centerXAnchor.constraint(equalTo: viewActivityIndicator.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: viewActivityIndicator.centerYAnchor)
+        ])
+        
+        // BACKGROUD VIEW ACTIVITY INDICATOR
+        
+        guard let viewBackgroundActivityIndicator = self.viewBackgroundActivityIndicator else { return }
+        viewBackgroundActivityIndicator.addSubview(viewActivityIndicator)
+            
+        var verticalConstant: CGFloat = 0
+        if bottom > 0 {
+            verticalConstant = (viewBackgroundActivityIndicator.frame.size.height / 2) - bottom
+        }
+        
+        NSLayoutConstraint.activate([
+            viewActivityIndicator.centerXAnchor.constraint(equalTo: viewBackgroundActivityIndicator.centerXAnchor),
+            viewActivityIndicator.centerYAnchor.constraint(equalTo: viewBackgroundActivityIndicator.centerYAnchor, constant: verticalConstant)
+        ])
+        
+        activityIndicator.startAnimating()
+    }
+    
+    @objc func stopActivityIndicator() {
+                    
+        activityIndicator.stopAnimating()
+        activityIndicator.removeFromSuperview()
+        
+        viewActivityIndicator?.removeFromSuperview()
+        viewActivityIndicator = nil
+        
+        if viewBackgroundActivityIndicator is NCViewActivityIndicator {
+            viewBackgroundActivityIndicator?.removeFromSuperview()
+        }
+        viewBackgroundActivityIndicator = nil
+    }
 }
+
+// MARK: -
+
+class NCViewActivityIndicator: UIView {
+ 
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
 

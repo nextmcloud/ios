@@ -35,6 +35,8 @@
 "_delete_"                  = "Delete";
 "_delete_file_n_"           = "Delete file %i of %i";
 "_rename_"                  = "Rename";
+"_rename_file_"             = "Rename file";
+"_rename_folder_"           = "Rename folder";
 "_move_"                    = "Move";
 "_move_file_n_"             = "Move file %i of %i";
 "_creating_sharing_"        = "Creating share";
@@ -53,6 +55,8 @@
 "_select_all_"              = "Select all";
 "_upload_"                  = "Upload";
 "_home_"                    = "Files";
+"_files_"                   = "Files";
+"_home_dir_"                = "Home";
 "_file_to_upload_"          = "File to upload";
 "_destination_"             = "Destination";
 "_ok_"                      = "OK";
@@ -153,6 +157,15 @@
 "_model_"                   = "Model";
 "_set_user_status_"         = "Set user status";
 "_open_settings_"           = "Open settings";
+"_rename_ext_title_"        = "Change file type?";
+"_rename_ext_message_"      = "This file may behave differently if you change it from .%@ to %@";
+"_use_"                     = "Use";
+"_keep_"                    = "Keep";
+"_account_request_"         = "Request account";
+"_settings_account_request_" = "Request account at startup";
+"_print_"                   = "Print";
+"_alias_"                   = "Alias";
+"_alias_footer_"            = "Give your account names a descriptive name such as Home, Office, School …";
 
 /* User status */
 "_online_"                  = "Online";
@@ -349,6 +362,7 @@
 "_traditional_login_"           = "Revert to old login method";
 "_web_login_"                   = "Revert to web login method";
 "_login_url_error_"             = "URL error, please verify your server URL";
+"_webflow_not_available_"       = "Web login not available, use the old login method";
 
 // Favorite
 

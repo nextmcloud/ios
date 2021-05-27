@@ -75,7 +75,7 @@
         [[NCCommunicationCommon shared] writeLog:[NSString stringWithFormat:@"Start session with level %lu %@", (unsigned long)levelLog, versionNextcloudiOS]];
         
         // Networking
-        [[NCCommunicationCommon shared] setupWithAccount:tableAccount.account user:tableAccount.user userId:tableAccount.userID password:[CCUtility getPassword:tableAccount.account] urlBase:tableAccount.urlBase userAgent:[CCUtility getUserAgent] webDav:webDav dav:nil nextcloudVersion:serverVersionMajor delegate:[NCNetworking shared]];
+        [[NCCommunicationCommon shared] setupWithAccount:tableAccount.account user:tableAccount.user userId:tableAccount.userId password:[CCUtility getPassword:tableAccount.account] urlBase:tableAccount.urlBase userAgent:[CCUtility getUserAgent] webDav:webDav dav:nil nextcloudVersion:serverVersionMajor delegate:[NCNetworking shared]];
        
         _account = tableAccount.account;
         _urlBase = tableAccount.urlBase;
@@ -103,9 +103,7 @@
     }
     
     self.filesName = [[NSMutableArray alloc] init];
-    
-    self.hud = [[CCHud alloc] initWithView:self.navigationController.view];
-    
+        
     [self.shareTable registerNib:[UINib nibWithNibName:@"CCCellShareExt" bundle:nil] forCellReuseIdentifier:@"ShareExtCell"];
     
     [self navigationBarToolBar];
@@ -258,7 +256,7 @@
 {
     if ([self.filesName count] > 0) {
     
-        [self.hud visibleHudTitle:NSLocalizedString(@"_uploading_", nil) mode:MBProgressHUDModeDeterminate color:NCBrandColor.shared.brandElement];
+        [[NCUtility shared] startActivityIndicatorWithBackgroundView:nil blurEffect:true bottom:0];
         
         NSString *fileName = [self.filesName objectAtIndex:0];
         NSString *fileNameLocal = [NSTemporaryDirectory() stringByAppendingString:fileName];
@@ -287,18 +285,17 @@
                         
         } progressHandler:^(NSProgress *progress) {
             
-            [self.hud progress:progress.fractionCompleted];
             
         } completionHandler:^(NSString *account, NSString *ocId, NSString *etag, NSDate *date, int64_t size, NSDictionary *allHeaderFields, NSInteger errorCode, NSString *errorDescription) {
             
-            [self.hud hideHud];
+            [[NCUtility shared] stopActivityIndicator];
             [self.filesName removeObject:fileName];
            
             if (errorCode == 0) {
                
                 [CCUtility copyFileAtPath:fileNameLocal toPath:[CCUtility getDirectoryProviderStorageOcId:ocId fileNameView:fileNameForUpload]];
                
-                tableMetadata *metadata = [[NCManageDatabase shared] createMetadataWithAccount:self.account fileName:fileNameForUpload ocId:ocId serverUrl:self.serverUrl urlBase:self.urlBase url:@"" contentType:@"" livePhoto:false];
+                tableMetadata *metadata = [[NCManageDatabase shared] createMetadataWithAccount:self.account fileName:fileNameForUpload fileNameView:fileNameForUpload ocId:ocId serverUrl:self.serverUrl urlBase:self.urlBase url:@"" contentType:@"" livePhoto:false chunk:false];
                                
                 metadata.date = date;
                 metadata.etag = etag;

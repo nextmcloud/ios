@@ -59,11 +59,11 @@ class NCTrashListCell: UICollectionViewCell {
     }
     
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        delegate?.tapMoreListItem(with: objectId, sender: sender)
+        delegate?.tapMoreListItem(with: objectId, image: imageItem.image, sender: sender)
     }
     
     @IBAction func touchUpInsideRestore(_ sender: Any) {
-        delegate?.tapRestoreListItem(with: objectId, sender: sender)
+        delegate?.tapRestoreListItem(with: objectId, image: imageItem.image, sender: sender)
     }
     
     func selectMode(_ status: Bool) {
@@ -79,7 +79,7 @@ class NCTrashListCell: UICollectionViewCell {
     
     func selected(_ status: Bool) {
         if status {
-            imageSelect.image = NCCollectionCommon.images.cellCheckedYes
+            imageSelect.image = NCBrandColor.cacheImages.checkedYes
             
             let blurEffect = UIBlurEffect(style: .extraLight)
             let blurEffectView = UIVisualEffectView(effect: blurEffect)
@@ -89,13 +89,13 @@ class NCTrashListCell: UICollectionViewCell {
             backgroundView = blurEffectView
             
         } else {
-            imageSelect.image = NCCollectionCommon.images.cellCheckedNo
+            imageSelect.image = NCBrandColor.cacheImages.checkedNo
             backgroundView = nil
         }
     }
 }
 
 protocol NCTrashListCellDelegate {
-    func tapRestoreListItem(with objectId: String, sender: Any)
-    func tapMoreListItem(with objectId: String, sender: Any)
+    func tapRestoreListItem(with objectId: String, image: UIImage?, sender: Any)
+    func tapMoreListItem(with objectId: String, image: UIImage?, sender: Any)
 }
