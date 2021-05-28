@@ -25,29 +25,56 @@ import Foundation
 
 class NCMainNavigationController: UINavigationController {
     
+    var isPushing = false
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
         
         changeTheming()
     }
 
+    /*
+    // https://stackoverflow.com/questions/37829721/pushing-view-controller-twice
+    override func pushViewController(_ viewController: UIViewController, animated: Bool) {
+        
+        if !isPushing {
+            isPushing = true
+            CATransaction.begin()
+            CATransaction.setCompletionBlock {
+                self.isPushing = false
+            }
+            super.pushViewController(viewController, animated: animated)
+            CATransaction.commit()
+        }
+    }
+    */
+    
     @objc func changeTheming() {
                   
         if #available(iOS 13.0, *) {
             
-            let appearance = UINavigationBarAppearance()
+            var navBarAppearance = UINavigationBarAppearance()
             
-            appearance.configureWithOpaqueBackground()
-            appearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : NCBrandColor.shared.textView]
-            appearance.backgroundColor = NCBrandColor.shared.backgroundView
-            appearance.configureWithOpaqueBackground()
-            appearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor : NCBrandColor.shared.textView]
-            appearance.backgroundColor = NCBrandColor.shared.tabBar
+            navBarAppearance.configureWithOpaqueBackground()
+            navBarAppearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : NCBrandColor.shared.textView]
+            navBarAppearance.backgroundColor = NCBrandColor.shared.backgroundView
+            
+            navBarAppearance = UINavigationBarAppearance()
+            
+            navBarAppearance.configureWithOpaqueBackground()
+            navBarAppearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor : NCBrandColor.shared.textView]
+//            let attributedText = NSMutableAttributedString(string: heading, attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 20)])
+//
+//            attributedText.append(NSAttributedString(string: content, attributes: [NSAttributedStringKey.font: UIFont.SystemFont(ofSize: 15), NSAttributedStringKey.foregroundColor: UIColor.blue]))
+//
+//            navBarAppearance.titleTextAttributes.attributedText = attributedText
+            
+            navBarAppearance.backgroundColor = NCBrandColor.shared.tabBar
 
-            navigationBar.scrollEdgeAppearance = appearance
-            navigationBar.standardAppearance = appearance
+            navigationBar.scrollEdgeAppearance = navBarAppearance
+            navigationBar.standardAppearance = navBarAppearance
             
         } else {
             
@@ -57,7 +84,7 @@ class NCMainNavigationController: UINavigationController {
             navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor:NCBrandColor.shared.textView]
         }
         
-        navigationBar.tintColor = .systemBlue
+        navigationBar.tintColor = NCBrandColor.shared.brandElement
         navigationBar.setNeedsLayout()
     }
 }

@@ -94,7 +94,7 @@
 "_experimental_"            = "Experimental";
 "_select_dir_media_tab_"    = "Select as folder \"Media\"";
 "_error_creation_file_"     = "Ops! Could not create the file";
-"_save_path_"               = "Save path";
+"_save_path_"               = "Storage path";//"Save path";
 "_save_settings_"           = "Save settings";
 "_mode_filename_"           = "Filename mode";
 "_warning_owncloud_"        = "You are connected to an ownCloud server. This is untested and unsupported, use at your own risk. To upgrade to Nextcloud, see https://nextcloud.com/migration";
@@ -112,7 +112,7 @@
 "_error_parameter_schema_"  = "Wrong parameters, impossible to continue";
 "_comments_"                = "Comments";
 "_sharing_"                 = "Sharing";
-"_details_"                 = "Details";
+"_details_"                 = "Share";
 "_dark_mode_"               = "Dark mode";
 "_dark_mode_detect_"        = "Detect iOS dark mode";
 "_screen_"                  = "Screen";
@@ -166,6 +166,7 @@
 "_print_"                   = "Print";
 "_alias_"                   = "Alias";
 "_alias_footer_"            = "Give your account names a descriptive name such as Home, Office, School …";
+"_auto_upload_help_text_"   = "With this option, you upload your photos or videos to the same folder that you selected for \"Automatic upload.\"";
 
 /* User status */
 "_online_"                  = "Online";
@@ -208,14 +209,16 @@
 "_logout_"                      = "Log out";
 "_quota_space_unlimited_"       = "Unlimited";
 "_quota_space_unknown_"         = "Unknown";
-"_quota_using_"                 = "You are using %@ of %@";
+"_quota_using_"                 = "%@ ";//"Memory used up to %@ of %@";//You are using %@ of %@";
+"_quota_using_of_"              = "of %@";
+"_quota_using_percentage_"      = "Memory to %.2f %% occupied";
 
 // Settings
 
 "_acknowledgements_"            = "Acknowledgements";
 "_settings_"                    = "Settings";
 "_passcode_"                    = "Password";
-"_lock_"                        = "Lock";
+"_lock_"                        = "Security";//"Lock";
 "_lock_active_"                 = "Lock: On";
 "_lock_not_active_"             = "Lock: Off";
 "_lock_protection_no_screen_"        = "Do not ask at startup";
@@ -510,7 +513,7 @@
 
 "_file_del_only_local_"         = "File not present on server";
 
-"_copy_file_"                   = "Copy";
+"_copy_file_"                   = "Copy to clipboard";//Copy";
 "_paste_file_"                  = "Paste";
 "_open_quicklook_"              = "Open with Quick Look";
 
@@ -672,7 +675,8 @@
 "_use_folder_auto_upload_"          = "Use the \"Auto upload\" folder as destination";
 "_rename_filename_"                 = "Rename";
 "_filename_"                        = "Filename";
-"_preview_filename_"                = "Example preview of filename. You can use the mask %@ for date/time";
+"_preview_filename_"                = "You can use the following scheme for date / time
+\n MM, MMM, DD, YY, YYYY, HH, hh, mm, ss, ampm";//Example preview of filename. You can use the mask %@ for date/time";
 "_forbidden_characters_"            = "Invalid character in filename";
 "_add_filenametype_"                = "Specify type in filename";
 "_filenametype_photo_video_"        = "Photo/Video";
@@ -692,6 +696,7 @@
 "photos"                            = "photos";
 "of"                                = "of";
 "%i of %i"                          = "%1$i of %2$i";
+"_photos_"                            = "Photos";
 
 // Manage Auto Upload FileName
 

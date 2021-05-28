@@ -38,7 +38,7 @@ class NCActionSheetHeader: NSObject {
         
         // Header
         if isDirectory {
-            image = UIImage.init(named: "folder")?.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width)
+            image = UIImage.init(named: "folder")?.image(color: NCBrandColor.shared.customerDefault, size: UIScreen.main.bounds.width)
         } else if iconName.count > 0 {
             image = UIImage.init(named: iconName)
         } else {

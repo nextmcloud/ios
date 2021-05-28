@@ -229,6 +229,17 @@
     [UICKeyChainStore setString:sValue forKey:key service:NCGlobal.shared.serviceShareKeyChain];
 }
 
++ (void)setOriginalFileNamePrefsChanged:(BOOL)value key:(NSString *)key
+{
+    NSString *sValue = (value) ? @"true" : @"false";
+    [UICKeyChainStore setString:sValue forKey:key service:NCGlobal.shared.serviceShareKeyChain];
+}
+
++ (BOOL)getOriginalFileNamePrefsChanged:(NSString *)key
+{
+    return [[UICKeyChainStore stringForKey:key service:NCGlobal.shared.serviceShareKeyChain] boolValue];
+}
+
 + (NSString *)getFileNameMask:(NSString *)key
 {
     NSString *mask = [UICKeyChainStore stringForKey:key service:NCGlobal.shared.serviceShareKeyChain];

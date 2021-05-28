@@ -39,9 +39,8 @@ class NCMainTabBar: UITabBar {
         
         timer = Timer.scheduledTimer(timeInterval: 3, target: self, selector: (#selector(updateBadgeNumber)), userInfo: nil, repeats: true)
             
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(updateBadgeNumber), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUpdateBadgeNumber), object: nil)
-
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
+        
         changeTheming()
     }
     
@@ -150,7 +149,7 @@ class NCMainTabBar: UITabBar {
         // Favorite
         if let item = items?[1] {
             item.title = NSLocalizedString("_favorites_", comment: "")
-            item.image = UIImage(named: "tabBarFavorites")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+            item.image = UIImage(named: "favorite")?.image(color: NCBrandColor.shared.brandElement, size: 25)
             item.selectedImage = item.image
         }
         
@@ -164,7 +163,7 @@ class NCMainTabBar: UITabBar {
         // Media
         if let item = items?[3] {
             item.title = NSLocalizedString("_media_", comment: "")
-            item.image = UIImage(named: "tabBarMedia")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+            item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.brandElement, size: 25)
             item.selectedImage = item.image
         }
         
@@ -208,7 +207,7 @@ class NCMainTabBar: UITabBar {
         if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, appDelegate.activeServerUrl)) {
             
             if !directory.permissions.contains("CK") {
-                NCContentPresenter.shared.messageNotification("_warning_", description: "_no_permission_add_file_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.ErrorInternalError)
+                NCContentPresenter.shared.messageNotification("_warning_", description: "_no_permission_add_file_", delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCBrandGlobal.shared.ErrorInternalError)
                 return
             }
         }
@@ -220,10 +219,10 @@ class NCMainTabBar: UITabBar {
     
     @objc func updateBadgeNumber() {
         
-        if appDelegate.account == "" { return }
+        if appDelegate.account == nil || appDelegate.account.count == 0 { return }
         
         let counterDownload = NCOperationQueue.shared.downloadCount()
-        let counterUpload = NCManageDatabase.shared.getMetadatas(predicate: NSPredicate(format: "status == %d OR status == %d OR status == %d", NCGlobal.shared.metadataStatusWaitUpload, NCGlobal.shared.metadataStatusInUpload, NCGlobal.shared.metadataStatusUploading)).count
+        let counterUpload = NCManageDatabase.shared.getMetadatas(predicate: NSPredicate(format: "status == %d OR status == %d OR status == %d", NCBrandGlobal.shared.metadataStatusWaitUpload, NCBrandGlobal.shared.metadataStatusInUpload, NCBrandGlobal.shared.metadataStatusUploading)).count
         let total = counterDownload + counterUpload
         
         UIApplication.shared.applicationIconBadgeNumber = total

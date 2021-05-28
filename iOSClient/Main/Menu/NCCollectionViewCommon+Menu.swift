@@ -143,7 +143,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: ""),
-                    icon: UIImage(named: "offline")!.image(color: NCBrandColor.shared.icon, size: 50),
+                    icon: UIImage(named: "offlineMenu")!.image(color: NCBrandColor.shared.icon, size: 50),
                     action: { menuAction in
                         if isOffline {
                             if metadata.directory {
@@ -188,7 +188,7 @@ extension NCCollectionViewCommon {
         //
         if metadata.typeFile == NCBrandGlobal.shared.metadataTypeFileImage || metadata.typeFile == NCBrandGlobal.shared.metadataTypeFileVideo {
             var title: String = NSLocalizedString("_save_selected_files_", comment: "")
-            var icon = UIImage(named: "saveSelectedFiles")!.image(color: NCBrandColor.shared.icon, size: 50)
+            var icon = UIImage(named: "file_photo_full")!.image(color: NCBrandColor.shared.icon, size: 50)
             let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
             if metadataMOV != nil {
                 title = NSLocalizedString("_livephoto_save_", comment: "")

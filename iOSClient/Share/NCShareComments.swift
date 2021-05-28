@@ -187,7 +187,7 @@ extension NCShareComments: UITableViewDataSource {
                     cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
                 }
             } else {
-                NCCommunication.shared.downloadAvatar(userId: tableComments.actorId, fileNameLocalPath: fileNameLocalPath, size: 128) { (account, data, errorCode, errorMessage) in
+                NCCommunication.shared.downloadAvatar(userID: tableComments.actorId, fileNameLocalPath: fileNameLocalPath, size: 128) { (account, data, errorCode, errorMessage) in
                     if errorCode == 0 && UIImage(data: data!) != nil {
                         if let image = UIImage(data: data!) {
                             cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)

@@ -85,7 +85,7 @@ import Foundation
                                 
                             } else {
                                 
-                                NCViewer.shared.view(viewController: self.appDelegate.activeViewController, metadata: metadata, metadatas: [metadata])
+                                NCViewer.shared.view(viewController: self.appDelegate.activeViewController!, metadata: metadata, metadatas: [metadata])
                             }
                         }
                         
@@ -125,7 +125,7 @@ import Foundation
                         }
                             
                         if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
-                            NCCollectionCommon.shared.saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV, progressView: nil, viewActivity: self.appDelegate.window.rootViewController?.view)
+                            NCCollectionCommon.shared.saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV, progressView: nil, viewActivity: self.appDelegate.window!.rootViewController?.view)
                         }
                         
                     default:
@@ -174,7 +174,7 @@ import Foundation
                                     
         } else {
             
-            NCNetworking.shared.download(metadata: metadata, selector: selector) { (_) in }
+            NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: selector) { (_) in }
         }
     }
     
