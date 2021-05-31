@@ -49,7 +49,7 @@ class NCViewerProviderContextMenu: UIViewController  {
         
         if metadata.directory {
 
-            let image = UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width / 2)
+            let image = UIImage(named: "folder_nmcloud")!.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width / 2)
             imageView.image = image
             imageView.frame = resize(image.size)
 

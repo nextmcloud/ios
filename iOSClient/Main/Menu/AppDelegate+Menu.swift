@@ -107,7 +107,7 @@ extension AppDelegate: NCAudioRecorderViewControllerDelegate {
         if #available(iOS 13.0, *) {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_scans_document_", comment: ""), icon: UIImage(named: "scanMenu")!.image(color: NCBrandColor.shared.icon, size: 50), action: { menuAction in
+                    title: NSLocalizedString("_scans_document_", comment: ""), icon: UIImage(named: "scan")!.image(color: NCBrandColor.shared.icon, size: 50), action: { menuAction in
                         NCCreateScanDocument.shared.openScannerDocument(viewController: appDelegate.window.rootViewController!)
                     }
                 )

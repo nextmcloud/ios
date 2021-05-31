@@ -35,6 +35,8 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var fileNameWithoutExtTrailingContraint: NSLayoutConstraint!
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var renameButton: UIButton!
+    @IBOutlet weak var seperator: UIView!
+    
 
     var metadata: tableMetadata?
     var imagePreview: UIImage?
@@ -56,6 +58,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             
             fileNameWithoutExt.text = metadata.fileNameWithoutExt
             fileNameWithoutExt.delegate = self
+            fileNameWithoutExt.layer.borderColor = NCBrandColor.shared.icon.cgColor
             fileNameWithoutExt.becomeFirstResponder()
             
             ext.text = metadata.ext
@@ -71,9 +74,9 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 
             if metadata.directory {
                 
-                if imagePreview == nil {
+//                if imagePreview == nil {
                     previewFile.image = NCBrandColor.cacheImages.folder
-                }
+//                }
                 
                 ext.isHidden = true
                 point.isHidden = true
@@ -81,8 +84,11 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
                 
             } else {
                 
-                if imagePreview == nil {
-                    previewFile.image = NCBrandColor.cacheImages.file
+//                if imagePreview == nil {
+//                    previewFile.image = NCBrandColor.cacheImages.file
+//                }
+                if let icon = UIImage(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)) {
+                    previewFile.image = icon
                 }
                 
                 fileNameWithoutExtTrailingContraint.constant = 90
@@ -91,15 +97,15 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
         
         cancelButton.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         cancelButton.setTitleColor(.gray, for: .normal)
-        cancelButton.layer.cornerRadius = 15
+        cancelButton.layer.cornerRadius = 5
         cancelButton.layer.masksToBounds = true
-        cancelButton.layer.backgroundColor =  NCBrandColor.shared.graySoft.withAlphaComponent(0.2).cgColor
+//        cancelButton.layer.backgroundColor =  NCBrandColor.shared.graySoft.withAlphaComponent(0.2).cgColor
         cancelButton.layer.borderWidth = 0.3
-        cancelButton.layer.borderColor = UIColor.gray.cgColor
+        cancelButton.layer.borderColor = NCBrandColor.shared.icon.cgColor
         
         renameButton.setTitle(NSLocalizedString("_rename_", comment: ""), for: .normal)
         renameButton.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
-        renameButton.layer.cornerRadius = 15
+        renameButton.layer.cornerRadius = 5
         renameButton.layer.masksToBounds = true
         renameButton.layer.backgroundColor = NCBrandColor.shared.brand.cgColor
         
@@ -133,7 +139,9 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     // MARK: - NotificationCenter
 
     @objc func changeTheming() {
-        view.backgroundColor = NCBrandColor.shared.backgroundForm
+        view.backgroundColor = NCBrandColor.shared.backgroundFormRename
+//        view.layer.opacity = 0.9
+        seperator.backgroundColor = NCBrandColor.shared.seperatorRename
     }
     
     // MARK: - Action

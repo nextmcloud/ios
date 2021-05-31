@@ -68,8 +68,11 @@ extension NCCollectionViewCommon {
             
         var iconHeader: UIImage!
         
-        if image != nil {
-            iconHeader = image!
+//        if image != nil {
+//            iconHeader = image!
+//        }
+        if let icon = UIImage(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)) {
+            iconHeader = icon
         } else {
             if metadata.directory {
                 iconHeader = NCBrandColor.cacheImages.folder
@@ -106,17 +109,17 @@ extension NCCollectionViewCommon {
         //
         // DETAIL
         //
-        if !isFolderEncrypted && !appDelegate.disableSharesView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_details_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "info"),
-                    action: { menuAction in
-                        NCFunctionCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 0)
-                    }
-                )
-            )
-        }
+//        if !isFolderEncrypted && !appDelegate.disableSharesView {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_details_", comment: ""),
+//                    icon: NCUtility.shared.loadImage(named: "share"),
+//                    action: { menuAction in
+//                        NCFunctionCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 0)
+//                    }
+//                )
+//            )
+//        }
         
         //
         // OFFLINE
@@ -125,7 +128,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "tray.and.arrow.down"),
+                    icon: NCUtility.shared.loadImage(named: "offlineMenu"),
                     action: { menuAction in
                         if isOffline {
                             if metadata.directory {
@@ -157,7 +160,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_open_in_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "square.and.arrow.up"),
+                    icon: NCUtility.shared.loadImage(named: "open_file"),
                     action: { menuAction in
                         NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorOpenIn)
                     }
@@ -168,24 +171,24 @@ extension NCCollectionViewCommon {
         //
         // PRINT
         //
-        if !metadata.directory && (metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.contentType == "application/pdf") {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_print_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "printer"),
-                    action: { menuAction in
-                        NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint)
-                    }
-                )
-            )
-        }
+//        if !metadata.directory && (metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.contentType == "application/pdf") {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_print_", comment: ""),
+//                    icon: NCUtility.shared.loadImage(named: "printer"),
+//                    action: { menuAction in
+//                        NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint)
+//                    }
+//                )
+//            )
+//        }
         
         //
         // SAVE
         //
         if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo {
             var title: String = NSLocalizedString("_save_selected_files_", comment: "")
-            var icon = NCUtility.shared.loadImage(named: "square.and.arrow.down")
+            var icon = NCUtility.shared.loadImage(named: "save_files")
             let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
             if metadataMOV != nil {
                 title = NSLocalizedString("_livephoto_save_", comment: "")
@@ -218,7 +221,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "pencil"),
+                    icon: NCUtility.shared.loadImage(named: "rename"),
                     action: { menuAction in
                         
                         if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
@@ -242,7 +245,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_move_or_copy_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "arrow.up.right.square"),
+                    icon: NCUtility.shared.loadImage(named: "move"),
                     action: { menuAction in
                         NCFunctionCenter.shared.openSelectView(items: [metadata], viewController: self)
                     }
@@ -257,7 +260,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_copy_file_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "doc.on.doc"),
+                    icon: NCUtility.shared.loadImage(named: "copy"),
                     action: { menuAction in
                         self.appDelegate.pasteboardOcIds = [metadata.ocId];
                         NCFunctionCenter.shared.copyPasteboard()
@@ -374,7 +377,7 @@ extension NCCollectionViewCommon {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_select_all_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "checkmark.circle.fill"),
+                icon: NCUtility.shared.loadImage(named: "selectAll"),
                 action: { menuAction in
                     self.collectionViewSelectAll()
                 }
@@ -387,7 +390,7 @@ extension NCCollectionViewCommon {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_save_selected_files_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "square.and.arrow.down"),
+                icon: NCUtility.shared.loadImage(named: "save_files"),
                 action: { menuAction in
                     for ocId in selectOcId {
                         if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
@@ -415,7 +418,7 @@ extension NCCollectionViewCommon {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_move_or_copy_selected_files_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "arrow.up.right.square"),
+                icon: NCUtility.shared.loadImage(named: "move"),
                 action: { menuAction in
                     var meradatasSelect = [tableMetadata]()
                     for ocId in selectOcId {
@@ -437,7 +440,7 @@ extension NCCollectionViewCommon {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_copy_file_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "doc.on.doc"),
+                icon: NCUtility.shared.loadImage(named: "copy"),
                 action: { menuAction in
                     self.appDelegate.pasteboardOcIds.removeAll()
                     for ocId in selectOcId {

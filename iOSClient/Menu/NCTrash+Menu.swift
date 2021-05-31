@@ -95,7 +95,7 @@ extension NCTrash {
             iconHeader = icon
         } else {
             if(tableTrash.directory) {
-                iconHeader = UIImage(named: "folder")!.image(color: NCBrandColor.shared.icon, size: 50)
+                iconHeader = UIImage(named: "folder_nmcloud")
             } else {
                 iconHeader = UIImage(named: tableTrash.iconName)
             }
@@ -144,7 +144,7 @@ extension NCTrash {
             iconHeader = icon
         } else {
             if(tableTrash.directory) {
-                iconHeader = UIImage(named: "folder")!.image(color: NCBrandColor.shared.icon, size: 50)
+                iconHeader = UIImage(named: "folder_nmcloud")!.image(color: NCBrandColor.shared.icon, size: 50)
             } else {
                 iconHeader = UIImage(named: tableTrash.iconName)
             }

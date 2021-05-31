@@ -58,11 +58,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     var objectId = ""
     var indexPath = IndexPath()
     var namedButtonMore = ""
+    @IBOutlet weak var btnMoreRightConstraint: NSLayoutConstraint!
+    
 
     override func awakeFromNib() {
         super.awakeFromNib()
                
-        imageItem.layer.cornerRadius = 6
+        imageItem.layer.cornerRadius = 4
         imageItem.layer.masksToBounds = true
         
         progressView.tintColor = NCBrandColor.shared.brandElement
@@ -80,6 +82,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         longPressedGestureMore.delegate = self
         longPressedGestureMore.delaysTouchesBegan = true
         buttonMore.addGestureRecognizer(longPressedGestureMore)
+        
+        separator.backgroundColor = NCBrandColor.shared.separator
+        self.labelInfo.textColor = NCBrandColor.shared.commonViewInfoText
     }
     
     override func prepareForReuse() {
@@ -92,7 +97,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     }
     
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        delegate?.tapMoreListItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
+        delegate?.tapMoreListItem(with: objectId, namedButtonMore: namedButtonMore, image: UIImage(named: NCGlobal.shared.buttonMoreMore), sender: sender)
     }
     
     @objc func longPressInsideMore(gestureRecognizer: UILongPressGestureRecognizer) {
@@ -122,10 +127,12 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         if status {
             imageItemLeftConstraint.constant = 45
             imageSelect.isHidden = false
+            btnMoreRightConstraint.constant = -40
         } else {
             imageItemLeftConstraint.constant = 10
             imageSelect.isHidden = true
             backgroundView = nil
+            btnMoreRightConstraint.constant = 0
         }
     }
     
@@ -137,7 +144,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
             let blurEffectView = UIVisualEffectView(effect: blurEffect)
             blurEffectView.frame = self.bounds
             blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            blurEffectView.backgroundColor = NCBrandColor.shared.brandElement.withAlphaComponent(0.2)
+            blurEffectView.backgroundColor = NCBrandColor.shared.cellSelection
             backgroundView = blurEffectView
             
             separator.isHidden = true

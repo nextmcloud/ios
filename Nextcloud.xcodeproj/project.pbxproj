@@ -2450,12 +2450,12 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/Notification_Service_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Distribution: T- SYSTEMS INFORMATION AND COMMUNICATION TECHNOLOGY INDIA PRIVATE LIMITED (K2GH358D95)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: T- SYSTEMS INFORMATION AND COMMUNICATION TECHNOLOGY INDIA PRIVATE LIMITED (K2GH358D95)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = K2GH358D95;
+				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -2480,9 +2480,9 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "in.t-system.Nextcloud.Notification-Service-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "Next Cloud Notification Service AdHoc";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud Notification Service";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_OBJC_BRIDGING_HEADER = "Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
@@ -2535,9 +2535,9 @@
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.dev.Notification-Service-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud dev notificationService";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud Notification Service";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_OBJC_BRIDGING_HEADER = "Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
@@ -2555,12 +2555,12 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/Share.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Distribution: T- SYSTEMS INFORMATION AND COMMUNICATION TECHNOLOGY INDIA PRIVATE LIMITED (K2GH358D95)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: T- SYSTEMS INFORMATION AND COMMUNICATION TECHNOLOGY INDIA PRIVATE LIMITED (K2GH358D95)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = K2GH358D95;
+				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -2583,9 +2583,9 @@
 				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "in.t-system.Nextcloud.Share";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "NextCloud Share AdHoc";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "Share/Share-Bridging-Header.h";
@@ -2610,7 +2610,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = K2GH358D95;
+				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -2633,9 +2633,9 @@
 				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "in.t-system.Nextcloud.Share";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "NextCloud Share Development";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "Share/Share-Bridging-Header.h";
@@ -2660,12 +2660,12 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Distribution: T- SYSTEMS INFORMATION AND COMMUNICATION TECHNOLOGY INDIA PRIVATE LIMITED (K2GH358D95)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: T- SYSTEMS INFORMATION AND COMMUNICATION TECHNOLOGY INDIA PRIVATE LIMITED (K2GH358D95)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = K2GH358D95;
+				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -2688,9 +2688,9 @@
 				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "in.t-system.Nextcloud.File-Provider-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "Next Cloud File Provider AdHoc";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "File Provider Extension/FileProviderExtension-Bridging-Header.h";
@@ -2743,9 +2743,9 @@
 				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.dev.File-Provider-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud dev fileProvider";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "File Provider Extension/FileProviderExtension-Bridging-Header.h";
@@ -2764,11 +2764,11 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/iOSClient.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Distribution: T- SYSTEMS INFORMATION AND COMMUNICATION TECHNOLOGY INDIA PRIVATE LIMITED (K2GH358D95)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: T- SYSTEMS INFORMATION AND COMMUNICATION TECHNOLOGY INDIA PRIVATE LIMITED (K2GH358D95)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = K2GH358D95;
+				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
 				"EXCLUDED_ARCHS[sdk=*]" = "";
@@ -2799,10 +2799,10 @@
 					"$(inherited)",
 				);
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "in.t-system.Nextcloud";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "Next Cloud AdHoc";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -2829,7 +2829,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = K2GH358D95;
+				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2857,10 +2857,10 @@
 					"-ObjC",
 					"$(inherited)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "in.t-system.Nextcloud";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "Next Cloud AdHoc";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;

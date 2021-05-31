@@ -204,9 +204,9 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        
+//        self.collectionView?.reloadData()
         coordinator.animate(alongsideTransition: nil) { _ in
-            self.collectionView?.collectionViewLayout.invalidateLayout()
+//            self.collectionView?.collectionViewLayout.invalidateLayout()
         }
     }
     
@@ -226,6 +226,13 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_select_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(tapSelect(sender:)))
             navigationItem.leftBarButtonItem = nil
+            
+            let attributedText = NSMutableAttributedString(string: titleCurrentFolder, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 15)])
+
+            attributedText.append(NSAttributedString(string: titleCurrentFolder, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15), NSAttributedString.Key.foregroundColor: UIColor.blue]))
+            let titleLabel = UILabel()
+            titleLabel.attributedText = attributedText
+            
             navigationItem.title = titleCurrentFolder
             
             // PROFILE BUTTON
@@ -1251,6 +1258,9 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.labelTitle.text = metadata.fileNameView
             cell.labelTitle.textColor = NCBrandColor.shared.textView
             cell.separator.backgroundColor = NCBrandColor.shared.separator
+            if (UIApplication.shared.statusBarOrientation.isPortrait && UIDevice.current.model.hasPrefix("iPhone")) {
+                cell.separator.backgroundColor = .clear
+            }
             
             cell.imageSelect.image = nil
             cell.imageStatus.image = nil

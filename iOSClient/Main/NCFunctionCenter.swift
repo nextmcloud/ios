@@ -507,16 +507,16 @@ import NCCommunication
             titleSave = NSLocalizedString("_livephoto_save_", comment: "")
         }
         
-        let copy = UIAction(title: NSLocalizedString("_copy_file_", comment: ""), image: UIImage(systemName: "doc.on.doc") ) { action in
+        let copy = UIAction(title: NSLocalizedString("_copy_file_", comment: ""), image: UIImage(systemName: "copy") ) { action in
             self.appDelegate.pasteboardOcIds = [metadata.ocId]
             self.copyPasteboard()
         }
         
-        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(systemName: "info") ) { action in
+        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(systemName: "share") ) { action in
             self.openShare(ViewController: viewController, metadata: metadata, indexPage: 0)
         }
         
-        let save = UIAction(title: titleSave, image: UIImage(systemName: "square.and.arrow.down")) { action in
+        let save = UIAction(title: titleSave, image: UIImage(systemName: "save_files")) { action in
             if metadataMOV != nil {
                 self.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV!)
             } else {
@@ -532,7 +532,7 @@ import NCCommunication
             self.openFileViewInFolder(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
         }
         
-        let openIn = UIAction(title: NSLocalizedString("_open_in_", comment: ""), image: UIImage(systemName: "square.and.arrow.up") ) { action in
+        let openIn = UIAction(title: NSLocalizedString("_open_in_", comment: ""), image: UIImage(systemName: "open_file") ) { action in
             self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorOpenIn)
         }
         
@@ -546,7 +546,7 @@ import NCCommunication
         
         let open = UIMenu(title: NSLocalizedString("_open_", comment: ""), image: UIImage(systemName: "square.and.arrow.up"), children: [openIn, openQuickLook])
         
-        let moveCopy = UIAction(title: NSLocalizedString("_move_or_copy_", comment: ""), image: UIImage(systemName: "arrow.up.right.square")) { action in
+        let moveCopy = UIAction(title: NSLocalizedString("_move_or_copy_", comment: ""), image: UIImage(systemName: "move")) { action in
             self.openSelectView(items: [metadata], viewController: viewController)
         }
         

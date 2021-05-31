@@ -48,7 +48,7 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
         buttonSwitch.setImage(UIImage.init(named: "switchList")!.image(color: NCBrandColor.shared.icon, size: 25), for: .normal)
         
         buttonOrder.setTitle("", for: .normal)
-        buttonOrder.setTitleColor(.systemBlue, for: .normal)
+        buttonOrder.setTitleColor(NCBrandColor.shared.brandElement, for: .normal)
         
         buttonMore.setImage(UIImage.init(named: "more")!.image(color:  NCBrandColor.shared.icon, size: 25), for: .normal)
                 

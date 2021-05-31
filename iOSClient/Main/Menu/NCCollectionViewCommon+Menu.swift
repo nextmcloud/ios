@@ -124,17 +124,17 @@ extension NCCollectionViewCommon {
         //
         // DETAIL
         //
-        if !isFolderEncrypted && !appDelegate.disableSharesView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_details_", comment: ""),
-                    icon: UIImage(named: "details")!.image(color: NCBrandColor.shared.icon, size: 50),
-                    action: { menuAction in
-                        NCNetworkingNotificationCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 0)
-                    }
-                )
-            )
-        }
+//        if !isFolderEncrypted && !appDelegate.disableSharesView {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_details_", comment: ""),
+//                    icon: UIImage(named: "details")!.image(color: NCBrandColor.shared.icon, size: 50),
+//                    action: { menuAction in
+//                        NCNetworkingNotificationCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 0)
+//                    }
+//                )
+//            )
+//        }
         
         //
         // OFFLINE
@@ -175,7 +175,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_open_in_", comment: ""),
-                    icon: UIImage(named: "openFile")!.image(color: NCBrandColor.shared.icon, size: 50),
+                    icon: UIImage(named: "open_file")!.image(color: NCBrandColor.shared.icon, size: 50),
                     action: { menuAction in
                         NCNetworkingNotificationCenter.shared.downloadOpen(metadata: metadata, selector: NCBrandGlobal.shared.selectorOpenIn)
                     }
@@ -393,7 +393,7 @@ extension NCCollectionViewCommon {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_select_all_", comment: ""),
-                icon: UIImage(named: "selectFull")!.image(color: NCBrandColor.shared.icon, size: 50),
+                icon: UIImage(named: "selectAll")!.image(color: NCBrandColor.shared.icon, size: 50),
                 action: { menuAction in
                     self.collectionViewSelectAll()
                 }

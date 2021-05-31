@@ -71,17 +71,17 @@ extension NCViewer {
         //
         // DETAIL
         //
-        if !appDelegate.disableSharesView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_details_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "info"),
-                    action: { menuAction in
-                        NCFunctionCenter.shared.openShare(ViewController: viewController, metadata: metadata, indexPage: 0)
-                    }
-                )
-            )
-        }
+//        if !appDelegate.disableSharesView {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_details_", comment: ""),
+//                    icon: NCUtility.shared.loadImage(named: "share"),
+//                    action: { menuAction in
+//                        NCFunctionCenter.shared.openShare(ViewController: viewController, metadata: metadata, indexPage: 0)
+//                    }
+//                )
+//            )
+//        }
         
         //
         // OFFLINE
@@ -90,7 +90,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: titleOffline,
-                    icon: NCUtility.shared.loadImage(named: "tray.and.arrow.down"),
+                    icon: NCUtility.shared.loadImage(named: "offlineMenu"),
                     action: { menuAction in
                         if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
                             
@@ -110,7 +110,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_open_in_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "square.and.arrow.up"),
+                    icon: NCUtility.shared.loadImage(named: "open_file"),
                     action: { menuAction in
                         NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorOpenIn)
                     }
@@ -139,7 +139,7 @@ extension NCViewer {
         if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo {
             
             var title: String = NSLocalizedString("_save_selected_files_", comment: "")
-            var icon = NCUtility.shared.loadImage(named: "square.and.arrow.down")
+            var icon = NCUtility.shared.loadImage(named: "save_files")
             let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
             if metadataMOV != nil {
                 title = NSLocalizedString("_livephoto_save_", comment: "")
@@ -168,7 +168,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "pencil"),
+                    icon: NCUtility.shared.loadImage(named: "rename"),
                     action: { menuAction in
                         
                         if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
@@ -188,49 +188,49 @@ extension NCViewer {
         //
         // COPY - MOVE
         //
-        if !webView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_move_or_copy_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "arrow.up.right.square"),
-                    action: { menuAction in
-                        
-                        let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
-                        let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
-                        let viewController = navigationController.topViewController as! NCSelect
-                        
-                        viewController.delegate = NCViewer.shared
-                        viewController.hideButtonCreateFolder = false
-                        viewController.items = [metadata]
-                        viewController.selectFile = false
-                        viewController.includeDirectoryE2EEncryption = false
-                        viewController.includeImages = false
-                        viewController.type = ""
-                        viewController.titleButtonDone = NSLocalizedString("_move_", comment: "")
-                        viewController.titleButtonDone1 = NSLocalizedString("_copy_", comment: "")
-                        viewController.isButtonDone1Hide = false
-                        viewController.isOverwriteHide = false
-                        
-                        navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-                        self.appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
-                    }
-                )
-            )
-        }
+//        if !webView {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_move_or_copy_", comment: ""),
+//                    icon: NCUtility.shared.loadImage(named: "move"),
+//                    action: { menuAction in
+//                        
+//                        let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
+//                        let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
+//                        let viewController = navigationController.topViewController as! NCSelect
+//                        
+//                        viewController.delegate = NCViewer.shared
+//                        viewController.hideButtonCreateFolder = false
+//                        viewController.items = [metadata]
+//                        viewController.selectFile = false
+//                        viewController.includeDirectoryE2EEncryption = false
+//                        viewController.includeImages = false
+//                        viewController.type = ""
+//                        viewController.titleButtonDone = NSLocalizedString("_move_", comment: "")
+//                        viewController.titleButtonDone1 = NSLocalizedString("_copy_", comment: "")
+//                        viewController.isButtonDone1Hide = false
+//                        viewController.isOverwriteHide = false
+//                        
+//                        navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+//                        self.appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+//                    }
+//                )
+//            )
+//        }
         
         //
         // COPY
         //
-        actions.append(
-            NCMenuAction(
-                title: NSLocalizedString("_copy_file_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "doc.on.doc"),
-                action: { menuAction in
-                    self.appDelegate.pasteboardOcIds = [metadata.ocId];
-                    NCFunctionCenter.shared.copyPasteboard()
-                }
-            )
-        )
+//        actions.append(
+//            NCMenuAction(
+//                title: NSLocalizedString("_copy_file_", comment: ""),
+//                icon: NCUtility.shared.loadImage(named: "copy"),
+//                action: { menuAction in
+//                    self.appDelegate.pasteboardOcIds = [metadata.ocId];
+//                    NCFunctionCenter.shared.copyPasteboard()
+//                }
+//            )
+//        )
         
         //
         // VIEW IN FOLDER
@@ -257,7 +257,7 @@ extension NCViewer {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_download_image_max_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "square.and.arrow.down"),
+                        icon: NCUtility.shared.loadImage(named: "cloudDownload"),
                         action: { menuAction in
                             NCNetworking.shared.download(metadata: metadata, activityIndicator: false, selector: "") { (_) in }
                         }

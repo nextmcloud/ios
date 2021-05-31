@@ -131,7 +131,7 @@
                                     <constraint firstItem="bQh-Wj-Ce9" firstAttribute="leading" secondItem="k7x-dP-izb" secondAttribute="trailing" constant="5" id="uc7-LI-6il"/>
                                     <constraint firstItem="L6G-p7-PdL" firstAttribute="top" secondItem="4TU-gr-dbP" secondAttribute="top" constant="10" id="wJs-8F-2X6"/>
                                     <constraint firstItem="L6G-p7-PdL" firstAttribute="leading" secondItem="4TU-gr-dbP" secondAttribute="leading" constant="35" id="wx7-Zr-59d"/>
-                                    <constraint firstAttribute="height" constant="130" id="xWW-QX-DBs"/>
+                                    <constraint firstAttribute="height" constant="146" id="xWW-QX-DBs"/>
                                     <constraint firstAttribute="trailing" secondItem="NSn-Xf-dwd" secondAttribute="trailing" constant="35" id="ztv-tW-d6s"/>
                                 </constraints>
                             </view>

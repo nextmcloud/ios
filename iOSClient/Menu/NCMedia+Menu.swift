@@ -35,7 +35,7 @@ extension NCMedia {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_select_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "checkmark.circle.fill"),
+                        icon: NCUtility.shared.loadImage(named: "selectFull"),
                         action: { menuAction in
                             self.isEditMode = true
                         }
@@ -46,7 +46,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString(filterTypeFileImage ? "_media_viewimage_show_" : "_media_viewimage_hide_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "photo"),
+                    icon: NCUtility.shared.loadImage(named: "file_photo_menu"),
                     selected: filterTypeFileImage,
                     on: true,
                     action: { menuAction in
@@ -60,7 +60,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString(filterTypeFileVideo ? "_media_viewvideo_show_" : "_media_viewvideo_hide_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "video"),
+                    icon: NCUtility.shared.loadImage(named: "videoyes"),
                     selected: filterTypeFileVideo,
                     on: true,
                     action: { menuAction in
@@ -74,7 +74,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_select_media_folder_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "folder"),
+                    icon: NCUtility.shared.loadImage(named: "mediaFolder"),
                     action: { menuAction in
                         let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as! UINavigationController
                         let viewController = navigationController.topViewController as! NCSelect
@@ -96,7 +96,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_modified_date_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "circle.grid.cross.up.fill"),
+                    icon: NCUtility.shared.loadImage(named: "sortFileNameAZ"),
                     selected: CCUtility.getMediaSortDate() == "date",
                     on: true,
                     action: { menuAction in
@@ -109,7 +109,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_created_date_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "circle.grid.cross.down.fill"),
+                    icon: NCUtility.shared.loadImage(named: "sortFileNameAZ"),
                     selected: CCUtility.getMediaSortDate() == "creationDate",
                     on: true,
                     action: { menuAction in
@@ -122,7 +122,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_upload_date_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "circle.grid.cross.right.fill"),
+                    icon: NCUtility.shared.loadImage(named: "sortFileNameAZ"),
                     selected: CCUtility.getMediaSortDate() == "uploadDate",
                     on: true,
                     action: { menuAction in
@@ -155,7 +155,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_move_or_copy_selected_files_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "arrow.up.right.square"),
+                    icon: NCUtility.shared.loadImage(named: "move"),
                     action: { menuAction in
                         self.isEditMode = false
                         var meradatasSelect = [tableMetadata]()

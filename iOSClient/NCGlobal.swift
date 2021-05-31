@@ -174,7 +174,7 @@ class NCGlobal: NSObject {
     @objc let permissionDefaultFolderRemoteShareNoSupportShareOption: Int   = 15
     
     // Metadata : FileType
-    @objc let metadataTypeFileAudio                 = "audio"
+    @objc let metadataTypeFileAudio                 = "audio_file"
     @objc let metadataTypeFileCompress              = "compress"
     @objc let metadataTypeFileDirectory             = "directory"
     @objc let metadataTypeFileDocument              = "document"

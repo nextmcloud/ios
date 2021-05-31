@@ -87,7 +87,7 @@ extension AppDelegate {
         if #available(iOS 13.0, *) {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility.shared.loadImage(named: "doc.text.viewfinder"), action: { menuAction in
+                    title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility.shared.loadImage(named: "scan"), action: { menuAction in
                         if let viewController = appDelegate.window?.rootViewController {
                             NCCreateScanDocument.shared.openScannerDocument(viewController: viewController)
                         }
@@ -98,7 +98,7 @@ extension AppDelegate {
         
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_create_voice_memo_", comment: ""), icon: UIImage(named: "microphone")!.image(color: NCBrandColor.shared.icon, size: 50), action: { menuAction in
+                title: NSLocalizedString("_create_voice_memo_", comment: ""), icon: UIImage(named: "microphoneMenu")!.image(color: NCBrandColor.shared.icon, size: 50), action: { menuAction in
                     
                     NCAskAuthorization.shared.askAuthorizationAudioRecord(viewController: viewController) { (hasPermission) in
                         if hasPermission {
@@ -119,7 +119,7 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(title: NSLocalizedString("_create_folder_", comment: ""),
-                icon: UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 50), action: { menuAction in
+                icon: UIImage(named: "addFolder")!.image(color: NCBrandColor.shared.icon, size: 50), action: { menuAction in
                     
                     if appDelegate.activeServerUrl == "" { return }
                     

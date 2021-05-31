@@ -50,7 +50,7 @@ import UIKit
     @objc public var mailMe:                            String = "ios@nextcloud.com"
     @objc public var textCopyrightNextcloudiOS:         String = "Nextcloud Coherence for iOS %@ © 2021"
     @objc public var textCopyrightNextcloudServer:      String = "Nextcloud Server %@"
-    @objc public var loginBaseUrl:                      String = "https://cloud.nextcloud.com"
+    @objc public var loginBaseUrl:                      String = "https://dev2.next.magentacloud.de/"
     @objc public var pushNotificationServerProxy:       String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost:                     String = "https://nextcloud.com/install"
     @objc public var linkloginPreferredProviders:       String = "https://nextcloud.com/signup-ios";
@@ -173,6 +173,8 @@ class NCBrandColor: NSObject {
     @objc public var commonViewInfoText:        UIColor = UIColor(displayP3Red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
     @objc public var tileSelectionImageColor:        UIColor = .white
     @objc public var backgroundCell:        UIColor = .white
+    @objc public var seperatorRename:             UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
+    @objc public var backgroundFormRename:        UIColor = .white
 
 
     override init() {
@@ -198,14 +200,14 @@ class NCBrandColor: NSObject {
             
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
         cacheImages.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
         cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folder =  UIImage(named: "folder")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folder =  UIImage(named: "folder_nmcloud")!
         
-        cacheImages.checkedYes = NCUtility.shared.loadImage(named: "checkmark.circle.fill", color: .darkGray)
+        cacheImages.checkedYes = UIImage(named: "checkedYes")!
         cacheImages.checkedNo = NCUtility.shared.loadImage(named: "circle", color: graySoft)
         
         cacheImages.buttonMore = UIImage(named: "more")!.image(color: graySoft, size: 50)
@@ -218,7 +220,8 @@ class NCBrandColor: NSObject {
 //            tabBar = UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
             tabBar = UIColor(red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
             backgroundView = .black
-            backgroundForm = UIColor(red: 32.0/255.0, green: 32.0/255.0, blue: 32.0/255.0, alpha: 1.0)
+            backgroundCell = UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
+            backgroundForm = .black
             textView = .white
 //            separator = UIColor(red: 60.0/255.0, green: 60.0/255.0, blue: 60.0/255.0, alpha: 1.0)
             separator = UIColor(red: 76.0/255.0, green: 76.0/255.0, blue: 76.0/255.0, alpha: 1.0)
@@ -228,14 +231,15 @@ class NCBrandColor: NSObject {
             actionCellBackgroundColor = UIColor(displayP3Red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
             gray26AndGrayf2 = UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
             searchImageColor = icon
-            //TODO
-            //memoryConsuptionBackground = backgroundCell
+            memoryConsuptionBackground = backgroundCell
             systemGrayAndGray66 = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
             tileSelectionImageColor = .black
+            seperatorRename = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
         } else {
             tabBar = .white
             backgroundView = .white
-            backgroundForm = UIColor(red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+            backgroundCell = .white
+            backgroundForm = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
             textView = .black
 //            separator = UIColor(red: 208.0/255.0, green: 209.0/255.0, blue: 212.0/255.0, alpha: 1.0)
             separator = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
@@ -246,10 +250,10 @@ class NCBrandColor: NSObject {
             actionCellBackgroundColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
             gray26AndGrayf2 = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
             searchImageColor = icon
-            //TODO
-            //memoryConsuptionBackground = backgroundCell
+            memoryConsuptionBackground = backgroundCell
             systemGrayAndGray66 = .gray
             tileSelectionImageColor = .white
+            seperatorRename = UIColor(red: 76.0/255.0, green: 76.0/255.0, blue: 76.0/255.0, alpha: 1.0)
         }
     }
     
@@ -486,7 +490,7 @@ class NCBrandColor: NSObject {
     @objc let permissionDefaultFolderRemoteShareNoSupportShareOption: Int   = 15
     
     // Metadata : FileType
-    @objc let metadataTypeFileAudio                 = "audio"
+    @objc let metadataTypeFileAudio                 = "audio_file"
     @objc let metadataTypeFileCompress              = "compress"
     @objc let metadataTypeFileDirectory             = "directory"
     @objc let metadataTypeFileDocument              = "document"

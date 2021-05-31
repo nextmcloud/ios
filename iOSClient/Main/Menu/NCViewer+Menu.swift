@@ -123,7 +123,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_open_in_", comment: ""),
-                    icon: UIImage(named: "openFile")!.image(color: NCBrandColor.shared.icon, size: 50),
+                    icon: UIImage(named: "open_file")!.image(color: NCBrandColor.shared.icon, size: 50),
                     action: { menuAction in
                         NCNetworkingNotificationCenter.shared.downloadOpen(metadata: metadata, selector: NCBrandGlobal.shared.selectorOpenIn)
                     }
@@ -261,7 +261,7 @@ extension NCViewer {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_download_image_max_", comment: ""),
-                        icon: UIImage(named: "downloadImageFullRes")!.image(color: NCBrandColor.shared.icon, size: 50),
+                        icon: UIImage(named: "cloudDownload")!.image(color: NCBrandColor.shared.icon, size: 50),
                         action: { menuAction in
                             NCNetworking.shared.download(metadata: metadata, selector: "") { (_) in }
                         }

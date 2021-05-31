@@ -58,11 +58,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     var objectId = ""
     var indexPath = IndexPath()
     var namedButtonMore = ""
+    @IBOutlet weak var btnMoreRightConstraint: NSLayoutConstraint!
+    
 
     override func awakeFromNib() {
         super.awakeFromNib()
                
-        imageItem.layer.cornerRadius = 6
+        imageItem.layer.cornerRadius = 4
         imageItem.layer.masksToBounds = true
         
         progressView.tintColor = NCBrandColor.shared.brandElement
@@ -79,7 +81,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         longPressedGestureMore.minimumPressDuration = 0.5
         longPressedGestureMore.delegate = self
         longPressedGestureMore.delaysTouchesBegan = true
-        buttonMore.addGestureRecognizer(longPressedGestureMore)        
+        buttonMore.addGestureRecognizer(longPressedGestureMore)
+        
+        separator.backgroundColor = NCBrandColor.shared.separator
+        self.labelInfo.textColor = NCBrandColor.shared.commonViewInfoText
     }
     
     override func prepareForReuse() {
@@ -122,10 +127,12 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         if status {
             imageItemLeftConstraint.constant = 45
             imageSelect.isHidden = false
+            btnMoreRightConstraint.constant = -40
         } else {
             imageItemLeftConstraint.constant = 10
             imageSelect.isHidden = true
             backgroundView = nil
+            btnMoreRightConstraint.constant = 0
         }
     }
     
