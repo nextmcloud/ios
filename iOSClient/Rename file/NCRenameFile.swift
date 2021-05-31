@@ -74,9 +74,9 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 
             if metadata.directory {
                 
-//                if imagePreview == nil {
+                if imagePreview == nil {
                     previewFile.image = NCBrandColor.cacheImages.folder
-//                }
+                }
                 
                 ext.isHidden = true
                 point.isHidden = true
@@ -84,12 +84,12 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
                 
             } else {
                 
-//                if imagePreview == nil {
-//                    previewFile.image = NCBrandColor.cacheImages.file
-//                }
-                if let icon = UIImage(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)) {
-                    previewFile.image = icon
+                if imagePreview == nil {
+                    previewFile.image = NCBrandColor.cacheImages.file
                 }
+//                if let icon = UIImage(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)) {
+//                    previewFile.image = icon
+//                }
                 
                 fileNameWithoutExtTrailingContraint.constant = 90
             }

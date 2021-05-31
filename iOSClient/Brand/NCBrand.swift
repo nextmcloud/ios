@@ -66,7 +66,7 @@ import UIKit
     // Capabilities Group
 
 //    @objc public var capabilitiesGroups:                String = "group.in.t-systems.com"
-    @objc public var capabilitiesGroups:                String = "group.com.t-systems.pu-ds.magentacloud.dev"
+    @objc public var capabilitiesGroups:                String = "group.com.t-systems.pu-ds.magentacloud.qa"
     
     // User Agent
     @objc public var userAgent:                         String = "Nextcloud-iOS"                                    // Don't touch me !!

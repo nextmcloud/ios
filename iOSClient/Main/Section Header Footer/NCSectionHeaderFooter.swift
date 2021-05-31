@@ -75,7 +75,7 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
         
         backgroundColor = NCBrandColor.shared.backgroundView
         separator.backgroundColor = NCBrandColor.shared.separator
-        buttonOrder.setTitleColor(.systemBlue, for: .normal)
+        buttonOrder.setTitleColor(NCBrandColor.shared.brandElement, for: .normal)
         
         if textViewColor != NCBrandColor.shared.textView {
             markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: 15), color: NCBrandColor.shared.textView)
