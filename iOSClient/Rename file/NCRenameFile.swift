@@ -101,7 +101,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
         cancelButton.layer.masksToBounds = true
 //        cancelButton.layer.backgroundColor =  NCBrandColor.shared.graySoft.withAlphaComponent(0.2).cgColor
         cancelButton.layer.borderWidth = 0.3
-        cancelButton.layer.borderColor = NCBrandColor.shared.icon.cgColor
+        cancelButton.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
         
         renameButton.setTitle(NSLocalizedString("_rename_", comment: ""), for: .normal)
         renameButton.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
@@ -139,9 +139,10 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     // MARK: - NotificationCenter
 
     @objc func changeTheming() {
-        view.backgroundColor = NCBrandColor.shared.backgroundFormRename
-//        view.layer.opacity = 0.9
+        view.backgroundColor = NCBrandColor.shared.tabBar
         seperator.backgroundColor = NCBrandColor.shared.seperatorRename
+        fileNameWithoutExt.backgroundColor = NCBrandColor.shared.backgroundCell
+        ext.backgroundColor = NCBrandColor.shared.backgroundCell
     }
     
     // MARK: - Action

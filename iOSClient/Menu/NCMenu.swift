@@ -71,7 +71,10 @@ class NCMenu: UITableViewController {
             actionNameLabel.text = action.title
         }
 
+        let checkImage = UIImageView(image: UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0))
         cell.accessoryType = action.selectable && action.selected ? .checkmark : .none
+        cell.accessoryView = action.selectable && action.selected ? checkImage : .none
+//        cell.accessoryType = action.selectable && action.selected ? .checkmark : .none
 
         return cell
     }

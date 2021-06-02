@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "green@svg.svg",
+      "filename" : "green-white-filled@500w.pdf",
       "idiom" : "universal"
     },
     {
@@ -11,15 +11,12 @@
           "value" : "dark"
         }
       ],
-      "filename" : "green-Gray90-filled@svg.svg",
+      "filename" : "green-Gray90-filled@500w.pdf",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true
   }
 }

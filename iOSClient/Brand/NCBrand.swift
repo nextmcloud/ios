@@ -174,7 +174,6 @@ class NCBrandColor: NSObject {
     @objc public var tileSelectionImageColor:        UIColor = .white
     @objc public var backgroundCell:        UIColor = .white
     @objc public var seperatorRename:             UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
-    @objc public var backgroundFormRename:        UIColor = .white
 
 
     override init() {
