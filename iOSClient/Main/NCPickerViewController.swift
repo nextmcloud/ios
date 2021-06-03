@@ -50,6 +50,7 @@ class NCPhotosPickerViewController: NSObject {
                 let navigationController = UINavigationController.init(rootViewController: form)
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    navigationController.modalPresentationStyle = .formSheet
                     viewController.present(navigationController, animated: true, completion: nil)
                 }
             }
