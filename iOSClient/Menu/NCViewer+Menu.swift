@@ -71,37 +71,52 @@ extension NCViewer {
         //
         // DETAIL
         //
-//        if !appDelegate.disableSharesView {
-//            actions.append(
-//                NCMenuAction(
-//                    title: NSLocalizedString("_details_", comment: ""),
-//                    icon: NCUtility.shared.loadImage(named: "share"),
-//                    action: { menuAction in
-//                        NCFunctionCenter.shared.openShare(ViewController: viewController, metadata: metadata, indexPage: 0)
-//                    }
-//                )
-//            )
-//        }
-        
-        //
-        // OFFLINE
-        //
-        if metadata.session == "" && !webView {
+        if !appDelegate.disableSharesView {
             actions.append(
                 NCMenuAction(
-                    title: titleOffline,
-                    icon: NCUtility.shared.loadImage(named: "offlineMenu"),
+                    title: NSLocalizedString("_details_", comment: ""),
+                    icon: NCUtility.shared.loadImage(named: "share"),
                     action: { menuAction in
-                        if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
-                            
-                            NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
-                        } else {
-                            NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: !localFile!.offline)
-                        }
+                        NCFunctionCenter.shared.openShare(ViewController: viewController, metadata: metadata, indexPage: 0)
                     }
                 )
             )
         }
+        
+        //
+        // ROTATE
+        //
+        if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_rotate_", comment: ""),
+                    icon: NCUtility.shared.loadImage(named: "rotate"),
+                    action: { menuAction in
+                        NotificationCenter.default.postOnMainThread(name: NCBrandGlobal.shared.notificationImagePreviewRotateImage)
+                    }
+                )
+            )
+        }
+        
+        //
+        // OFFLINE
+        //
+//        if metadata.session == "" && !webView {
+//            actions.append(
+//                NCMenuAction(
+//                    title: titleOffline,
+//                    icon: NCUtility.shared.loadImage(named: "offlineMenu"),
+//                    action: { menuAction in
+//                        if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
+//
+//                            NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
+//                        } else {
+//                            NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: !localFile!.offline)
+//                        }
+//                    }
+//                )
+//            )
+//        }
         
         //
         // OPEN IN

@@ -234,7 +234,7 @@
 "_contact_by_email_"            = "Contact us by email";
 "_clear_cache_"                 = "Clear cache";
 "_clear_cache_footer_"          = "Clear downloaded and offline files from the app";
-"_exit_"                        = "Reset application";
+"_exit_"                        = "Logout";
 "_exit_footer_"                 = "Remove all accounts and local data from the app";
 "_funct_not_enabled_"           = "Functionality not enabled";
 "_passcode_activate_"           = "Password lock on";
@@ -449,6 +449,7 @@
 "_remove_favorites_"            = "Remove from favorites";
 "_remove_offline_"              = "Remove from offline";
 "_add_favorites_"               = "Add to favorites";
+"_rotate_"                      = "Rotate right";
 "_add_offline_"                 = "Add to offline";
 "_remove_passcode_"             = "Remove password protection";
 "_protect_passcode_"            = "Protect with password";

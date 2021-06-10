@@ -153,7 +153,8 @@ public class NCPopupViewController: UIViewController {
         if shadowEnabled {
             containerView.layer.shadowOpacity = 0.5
             containerView.layer.shadowColor = UIColor.black.cgColor
-            containerView.layer.shadowOffset = CGSize(width: 5, height: 5)
+//            containerView.layer.shadowOffset = CGSize(width: -10, height: 20)
+            containerView.layer.shadowOffset = CGSize.zero
             containerView.layer.shadowRadius = 5
         }
         
