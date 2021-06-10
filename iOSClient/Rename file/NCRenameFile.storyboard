@@ -56,7 +56,10 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Q9G-gl-Fkc">
-                                <rect key="frame" x="354" y="268" width="40" height="40"/>
+                                <rect key="frame" x="354" y="268" width="60" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="60" id="6ga-cj-dYT"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
@@ -100,7 +103,6 @@
                             <constraint firstItem="t26-3S-4T4" firstAttribute="centerX" secondItem="1c1-7Q-WMG" secondAttribute="centerX" id="gjy-i8-K5B"/>
                             <constraint firstItem="1c1-7Q-WMG" firstAttribute="trailing" secondItem="hcV-V0-eZB" secondAttribute="trailing" constant="20" id="heW-2p-hLJ"/>
                             <constraint firstItem="W5y-aT-UlI" firstAttribute="leading" secondItem="1c1-7Q-WMG" secondAttribute="leading" constant="20" id="kw6-l5-CAR"/>
-                            <constraint firstItem="1c1-7Q-WMG" firstAttribute="trailing" secondItem="Q9G-gl-Fkc" secondAttribute="trailing" constant="20" id="lBr-x0-Gg2"/>
                             <constraint firstItem="nZr-nE-ths" firstAttribute="top" secondItem="1c1-7Q-WMG" secondAttribute="top" constant="20" id="oyJ-sj-j5N"/>
                             <constraint firstItem="1c1-7Q-WMG" firstAttribute="trailing" secondItem="ouH-gK-Guv" secondAttribute="trailing" id="r1N-R6-iZg"/>
                             <constraint firstItem="ouH-gK-Guv" firstAttribute="top" secondItem="nZr-nE-ths" secondAttribute="bottom" constant="20" id="yuT-iN-zVv"/>
