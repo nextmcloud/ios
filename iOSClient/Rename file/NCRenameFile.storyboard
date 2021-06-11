@@ -56,10 +56,7 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Q9G-gl-Fkc">
-                                <rect key="frame" x="354" y="268" width="60" height="40"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="60" id="6ga-cj-dYT"/>
-                                </constraints>
+                                <rect key="frame" x="354" y="268" width="40" height="40"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
@@ -88,6 +85,7 @@
                         <constraints>
                             <constraint firstItem="Ny2-wR-rxo" firstAttribute="leading" secondItem="1c1-7Q-WMG" secondAttribute="leading" constant="20" id="0xL-8c-oLT"/>
                             <constraint firstItem="hcV-V0-eZB" firstAttribute="centerY" secondItem="W5y-aT-UlI" secondAttribute="centerY" id="4qW-lM-DgW"/>
+                            <constraint firstItem="1c1-7Q-WMG" firstAttribute="trailing" secondItem="Q9G-gl-Fkc" secondAttribute="trailing" constant="20" id="4ws-zW-K4K"/>
                             <constraint firstItem="hcV-V0-eZB" firstAttribute="height" secondItem="W5y-aT-UlI" secondAttribute="height" id="5ob-86-nT8"/>
                             <constraint firstItem="W5y-aT-UlI" firstAttribute="top" secondItem="Ny2-wR-rxo" secondAttribute="bottom" constant="30" id="96v-2U-wZv"/>
                             <constraint firstItem="Q9G-gl-Fkc" firstAttribute="leading" secondItem="FOZ-fs-k7i" secondAttribute="trailing" constant="10" id="9XT-FO-xYu"/>

@@ -241,7 +241,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 image = NCUtility.shared.createAvatar(image: image, size: 30)
                 
                 let button = UIButton(type: .custom)
-                button.setImage(image, for: .normal)
+//                button.setImage(image, for: .normal)
                 
                 if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account) {
                  
@@ -253,13 +253,13 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                         title = title + (account?.alias ?? "")
                     }
                     
-                    button.setTitle(title, for: .normal)
-                    button.setTitleColor(.systemBlue, for: .normal)
+//                    button.setTitle(title, for: .normal)
+//                    button.setTitleColor(.systemBlue, for: .normal)
                 }
                 
                 button.semanticContentAttribute = .forceLeftToRight
                 button.sizeToFit()
-                button.addTarget(self, action: #selector(profileButtonTapped(sender:)), for: .touchUpInside)
+//                button.addTarget(self, action: #selector(profileButtonTapped(sender:)), for: .touchUpInside)
                        
                 navigationItem.setLeftBarButton(UIBarButtonItem(customView: button), animated: true)
                 navigationItem.leftItemsSupplementBackButton = true
@@ -1263,6 +1263,10 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.imageItem.backgroundColor = nil
             
             cell.progressView.progress = 0.0
+            if UIDevice.current.orientation.isPortrait && UIDevice.current.model.hasPrefix("iPhone") {
+                cell.separator.backgroundColor = .clear
+            }
+
             
             if metadata.directory {
                 

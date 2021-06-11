@@ -218,7 +218,7 @@
         </view>
     </objects>
     <resources>
-        <image name="file_txt" width="300" height="300"/>
-        <image name="trash" width="512" height="512"/>
+        <image name="file_txt" width="500" height="500"/>
+        <image name="trash" width="500" height="500"/>
     </resources>
 </document>
