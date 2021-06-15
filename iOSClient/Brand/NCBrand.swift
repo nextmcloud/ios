@@ -50,7 +50,7 @@ import UIKit
     @objc public var mailMe:                            String = "ios@nextcloud.com"
     @objc public var textCopyrightNextcloudiOS:         String = "Nextcloud Coherence for iOS %@ © 2021"
     @objc public var textCopyrightNextcloudServer:      String = "Nextcloud Server %@"
-    @objc public var loginBaseUrl:                      String = "https://dev2.next.magentacloud.de/"
+    @objc public var loginBaseUrl:                      String = "https://nextcloud.indemo.t-systems.net/"
     @objc public var pushNotificationServerProxy:       String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost:                     String = "https://nextcloud.com/install"
     @objc public var linkloginPreferredProviders:       String = "https://nextcloud.com/signup-ios";
@@ -200,7 +200,7 @@ class NCBrandColor: NSObject {
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
         cacheImages.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
-        cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: customerDefault, size: folderWidth)
         cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
@@ -588,6 +588,7 @@ class NCBrandColor: NSObject {
     
     @objc let notificationCenterChangedLocation                 = "changedLocation"
     @objc let notificationStatusAuthorizationChangedLocation    = "statusAuthorizationChangedLocation"
+    @objc let notificationImagePreviewRotateImage    = "imagePreviewRotateImage"
 }
 
 extension UIButton {
