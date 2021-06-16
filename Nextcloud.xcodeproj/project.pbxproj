@@ -72,8 +72,6 @@
 		95BB20FA2660E2C600AF4344 /* NCAccountRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20F82660E2C600AF4344 /* NCAccountRequest.swift */; };
 		95BB20FB2660E2C600AF4344 /* NCAccountRequest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB20F92660E2C600AF4344 /* NCAccountRequest.storyboard */; };
 		95BB21172660F55900AF4344 /* NCLogin.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB21162660F55900AF4344 /* NCLogin.storyboard */; };
-		95BB213C2667AAB700AF4344 /* img0.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 95BB213A2667AAB700AF4344 /* img0.jpg */; };
-		95BB213D2667AAB700AF4344 /* img1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 95BB213B2667AAB700AF4344 /* img1.jpg */; };
 		C0072DF0263C35C6001496A0 /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = C0072DEF263C35C5001496A0 /* Adjust */; };
 		C0A2797D25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2797E25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
@@ -474,8 +472,6 @@
 		95BB20F82660E2C600AF4344 /* NCAccountRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCAccountRequest.swift; sourceTree = "<group>"; };
 		95BB20F92660E2C600AF4344 /* NCAccountRequest.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCAccountRequest.storyboard; sourceTree = "<group>"; };
 		95BB21162660F55900AF4344 /* NCLogin.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCLogin.storyboard; sourceTree = "<group>"; };
-		95BB213A2667AAB700AF4344 /* img0.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = img0.jpg; sourceTree = "<group>"; };
-		95BB213B2667AAB700AF4344 /* img1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = img1.jpg; sourceTree = "<group>"; };
 		C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F700222B1EC479840080073F /* Custom.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Custom.xcassets; sourceTree = "<group>"; };
 		F700510022DF63AC003A3356 /* NCShare.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCShare.storyboard; sourceTree = "<group>"; };
@@ -998,15 +994,6 @@
 				95BB20F92660E2C600AF4344 /* NCAccountRequest.storyboard */,
 			);
 			path = "Account Request";
-			sourceTree = "<group>";
-		};
-		95BB21392667AAB700AF4344 /* SampleImages */ = {
-			isa = PBXGroup;
-			children = (
-				95BB213A2667AAB700AF4344 /* img0.jpg */,
-				95BB213B2667AAB700AF4344 /* img1.jpg */,
-			);
-			path = SampleImages;
 			sourceTree = "<group>";
 		};
 		F70211F31BAC56E9003FC03E /* Main */ = {
@@ -1641,7 +1628,6 @@
 		F7F67BAA1A24D27800EE80DA /* iOSClient */ = {
 			isa = PBXGroup;
 			children = (
-				95BB21392667AAB700AF4344 /* SampleImages */,
 				95BB20F72660E2C600AF4344 /* Account Request */,
 				95BB20E82660DFA200AF4344 /* Rename file */,
 				95BB2078265FEF3F00AF4344 /* Menu */,
@@ -2053,7 +2039,6 @@
 			files = (
 				F79728D422F96F2E003CACA7 /* NCShareLinkFolderMenuView.xib in Resources */,
 				F7362A1F220C853A005101B5 /* LaunchScreen.storyboard in Resources */,
-				95BB213D2667AAB700AF4344 /* img1.jpg in Resources */,
 				F77444F622281649000D5EB0 /* NCGridMediaCell.xib in Resources */,
 				F78ACD4421903CF20088454D /* NCListCell.xib in Resources */,
 				F78ACD4621903D010088454D /* NCGridCell.xib in Resources */,
@@ -2125,7 +2110,6 @@
 				950A6482264AACF4006ADE0E /* AutoUploadFolderCustomCell.xib in Resources */,
 				F774264A22EB4D0000B23912 /* NCShareUserDropDownCell.xib in Resources */,
 				F722814323C8C34500C41898 /* NCRichWorkspace.xib in Resources */,
-				95BB213C2667AAB700AF4344 /* img0.jpg in Resources */,
 				F7CB689A2541676B0050EC94 /* NCMore.storyboard in Resources */,
 				95BB20EB2660DFA200AF4344 /* NCRenameFile.storyboard in Resources */,
 				F77B0F7D1D118A16002130FE /* Images.xcassets in Resources */,
