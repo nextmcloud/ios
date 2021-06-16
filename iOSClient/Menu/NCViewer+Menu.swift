@@ -84,24 +84,47 @@ extension NCViewer {
 //        }
         
         //
+        // ROTATE
         // OFFLINE
         //
-        if metadata.session == "" && !webView {
-            actions.append(
-                NCMenuAction(
-                    title: titleOffline,
-                    icon: NCUtility.shared.loadImage(named: "offlineMenu"),
-                    action: { menuAction in
-                        if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
-                            
-                            NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
-                        } else {
-                            NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: !localFile!.offline)
+        if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage {
+                actions.append(
+                    NCMenuAction(
+                        title: NSLocalizedString("_rotate_", comment: ""),
+                        icon: NCUtility.shared.loadImage(named: "rotate"),
+                        action: { menuAction in
+                            NotificationCenter.default.postOnMainThread(name: NCBrandGlobal.shared.notificationImagePreviewRotateImage)
+                            if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
+                                
+                                NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
+                            } else {
+                                NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: !localFile!.offline)
+                            }
                         }
-                    }
+                    )
                 )
-            )
-        }
+            }
+
+        
+//        //
+//        // OFFLINE
+//        //
+//        if metadata.session == "" && !webView {
+//            actions.append(
+//                NCMenuAction(
+//                    title: titleOffline,
+//                    icon: NCUtility.shared.loadImage(named: "offlineMenu"),
+//                    action: { menuAction in
+//                        if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
+//
+//                            NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
+//                        } else {
+//                            NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: !localFile!.offline)
+//                        }
+//                    }
+//                )
+//            )
+//        }
         
         //
         // OPEN IN
