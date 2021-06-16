@@ -1554,7 +1554,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegateFlowLayout {
         if let richWorkspaceText = richWorkspaceText {
             let trimmed = richWorkspaceText.trimmingCharacters(in: .whitespaces)
             if trimmed.count > 0 && !isSearching {
-                headerRichWorkspaceHeight = UIScreen.main.bounds.size.height / 4
+                headerRichWorkspaceHeight = UIScreen.main.bounds.size.height / 21
             }
         }
         

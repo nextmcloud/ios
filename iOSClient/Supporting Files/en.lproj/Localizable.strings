@@ -757,10 +757,22 @@
 "_quality_medium_"                  = "Average file size of medium quality";
 "_quality_low_"                     = "Small file size of low quality";
 "_file_type_"                       = "File type";
-"_pdf_password_"                    = "PDF Password";
+//"_pdf_password_"                    = "PDF Password";
 "_file_creation_"                   = "File creation";
 "_delete_all_scanned_images_"       = "Do you want to delete all scanned images?";
 "_text_recognition_"                = "Text recognition";
+"_location_"                        = "LOCATION";
+"_save_with_text_recognition_"      = "SAVE WITH TEXT RECOGNITION (OCR)";
+"_pdf_with_ocr_"                    = "PDF (OCR)";
+"_text_file_ocr_"                   = "Textfile (txt)";
+"_save_without_text_recognition_"   = "SAVE WITHOUT TEXT RECOGNITION";
+"_pdf_"                             = "PDF";
+"_jpg_"                             = "JPG";
+"_png_"                             = "PNG";
+"_pdf_password_"                    = "PDF-PASSWORT";
+"_set_password_"                    = "Set password";
+"_no_password_warn_"                 = "Please enter a password for the PDF you want to create or disable the function.";
+
 
 /* The title on the navigation bar of the Scanning screen. */
 "wescan.scanning.title"             = "Scanning";

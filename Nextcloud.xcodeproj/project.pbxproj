@@ -24,6 +24,24 @@
 		950A6483264AACF4006ADE0E /* SubFolderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950A647B264AACF4006ADE0E /* SubFolderCustomCell.swift */; };
 		950A6484264AACF4006ADE0E /* AutoUploadFolderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950A647C264AACF4006ADE0E /* AutoUploadFolderCustomCell.swift */; };
 		950A6485264AACF4006ADE0E /* OriginalFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950A647D264AACF4006ADE0E /* OriginalFileNameCustomSwitchCell.swift */; };
+		95353B85267137F400E5F8B0 /* PNGImageSaveSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95353B84267137F400E5F8B0 /* PNGImageSaveSwitchView.swift */; };
+		95353B8B2671380100E5F8B0 /* PNGImageSaveSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 95353B8A2671380100E5F8B0 /* PNGImageSaveSwitchView.xib */; };
+		95353B912672303A00E5F8B0 /* SetPDFPasswordSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95353B902672303A00E5F8B0 /* SetPDFPasswordSwitchView.swift */; };
+		95353B972672304700E5F8B0 /* SetPDFPasswordSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 95353B962672304700E5F8B0 /* SetPDFPasswordSwitchView.xib */; };
+		95353B9D2672328600E5F8B0 /* PasswordInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95353B9C2672328600E5F8B0 /* PasswordInputField.swift */; };
+		95353BA3267232A100E5F8B0 /* PasswordInputField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 95353BA2267232A100E5F8B0 /* PasswordInputField.xib */; };
+		956E0D5D26691F5E00DA4F91 /* FileNameInputTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956E0D5C26691F5E00DA4F91 /* FileNameInputTextField.swift */; };
+		956E0D6326691F6F00DA4F91 /* FileNameInputTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 956E0D6226691F6F00DA4F91 /* FileNameInputTextField.xib */; };
+		956E0D69266942E100DA4F91 /* ScanDocumentPathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956E0D68266942E100DA4F91 /* ScanDocumentPathView.swift */; };
+		956E0D6F266942F700DA4F91 /* ScanDocumentPathView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 956E0D6E266942F700DA4F91 /* ScanDocumentPathView.xib */; };
+		956E0D75266A494000DA4F91 /* PdfWithOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956E0D74266A494000DA4F91 /* PdfWithOcrSwitchView.swift */; };
+		956E0D7B266A495500DA4F91 /* PdfWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 956E0D7A266A495500DA4F91 /* PdfWithOcrSwitchView.xib */; };
+		956E0D81266A4C7F00DA4F91 /* TextFileWithOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956E0D80266A4C7F00DA4F91 /* TextFileWithOcrSwitchView.swift */; };
+		956E0D87266A4C8B00DA4F91 /* TextFileWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 956E0D86266A4C8B00DA4F91 /* TextFileWithOcrSwitchView.xib */; };
+		956E0D8D266A4FEB00DA4F91 /* PdfWithoutOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956E0D8C266A4FEB00DA4F91 /* PdfWithoutOcrSwitchView.swift */; };
+		956E0D93266A4FF600DA4F91 /* PdfWithoutOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 956E0D92266A4FF600DA4F91 /* PdfWithoutOcrSwitchView.xib */; };
+		956E0D99266A516D00DA4F91 /* JPGImageSaveSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 956E0D98266A516D00DA4F91 /* JPGImageSaveSwitchView.swift */; };
+		956E0D9F266A517700DA4F91 /* JPGImageSaveSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 956E0D9E266A517700DA4F91 /* JPGImageSaveSwitchView.xib */; };
 		958C87F22636D7E7006C8923 /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958C87F02636D7E7006C8923 /* TextTableViewCell.swift */; };
 		958C87F32636D7E7006C8923 /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 958C87F12636D7E7006C8923 /* TextTableViewCell.xib */; };
 		958C87F926382B6C006C8923 /* ToggleButtonViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 958C87F826382B6C006C8923 /* ToggleButtonViewCell.swift */; };
@@ -54,6 +72,8 @@
 		95BB20FA2660E2C600AF4344 /* NCAccountRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20F82660E2C600AF4344 /* NCAccountRequest.swift */; };
 		95BB20FB2660E2C600AF4344 /* NCAccountRequest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB20F92660E2C600AF4344 /* NCAccountRequest.storyboard */; };
 		95BB21172660F55900AF4344 /* NCLogin.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB21162660F55900AF4344 /* NCLogin.storyboard */; };
+		95BB213C2667AAB700AF4344 /* img0.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 95BB213A2667AAB700AF4344 /* img0.jpg */; };
+		95BB213D2667AAB700AF4344 /* img1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 95BB213B2667AAB700AF4344 /* img1.jpg */; };
 		C0072DF0263C35C6001496A0 /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = C0072DEF263C35C5001496A0 /* Adjust */; };
 		C0A2797D25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2797E25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
@@ -409,6 +429,24 @@
 		950A647B264AACF4006ADE0E /* SubFolderCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubFolderCustomCell.swift; sourceTree = "<group>"; };
 		950A647C264AACF4006ADE0E /* AutoUploadFolderCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoUploadFolderCustomCell.swift; sourceTree = "<group>"; };
 		950A647D264AACF4006ADE0E /* OriginalFileNameCustomSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OriginalFileNameCustomSwitchCell.swift; sourceTree = "<group>"; };
+		95353B84267137F400E5F8B0 /* PNGImageSaveSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PNGImageSaveSwitchView.swift; sourceTree = "<group>"; };
+		95353B8A2671380100E5F8B0 /* PNGImageSaveSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PNGImageSaveSwitchView.xib; sourceTree = "<group>"; };
+		95353B902672303A00E5F8B0 /* SetPDFPasswordSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPDFPasswordSwitchView.swift; sourceTree = "<group>"; };
+		95353B962672304700E5F8B0 /* SetPDFPasswordSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SetPDFPasswordSwitchView.xib; sourceTree = "<group>"; };
+		95353B9C2672328600E5F8B0 /* PasswordInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordInputField.swift; sourceTree = "<group>"; };
+		95353BA2267232A100E5F8B0 /* PasswordInputField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PasswordInputField.xib; sourceTree = "<group>"; };
+		956E0D5C26691F5E00DA4F91 /* FileNameInputTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileNameInputTextField.swift; sourceTree = "<group>"; };
+		956E0D6226691F6F00DA4F91 /* FileNameInputTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FileNameInputTextField.xib; sourceTree = "<group>"; };
+		956E0D68266942E100DA4F91 /* ScanDocumentPathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDocumentPathView.swift; sourceTree = "<group>"; };
+		956E0D6E266942F700DA4F91 /* ScanDocumentPathView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ScanDocumentPathView.xib; sourceTree = "<group>"; };
+		956E0D74266A494000DA4F91 /* PdfWithOcrSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PdfWithOcrSwitchView.swift; sourceTree = "<group>"; };
+		956E0D7A266A495500DA4F91 /* PdfWithOcrSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PdfWithOcrSwitchView.xib; sourceTree = "<group>"; };
+		956E0D80266A4C7F00DA4F91 /* TextFileWithOcrSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFileWithOcrSwitchView.swift; sourceTree = "<group>"; };
+		956E0D86266A4C8B00DA4F91 /* TextFileWithOcrSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFileWithOcrSwitchView.xib; sourceTree = "<group>"; };
+		956E0D8C266A4FEB00DA4F91 /* PdfWithoutOcrSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PdfWithoutOcrSwitchView.swift; sourceTree = "<group>"; };
+		956E0D92266A4FF600DA4F91 /* PdfWithoutOcrSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PdfWithoutOcrSwitchView.xib; sourceTree = "<group>"; };
+		956E0D98266A516D00DA4F91 /* JPGImageSaveSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JPGImageSaveSwitchView.swift; sourceTree = "<group>"; };
+		956E0D9E266A517700DA4F91 /* JPGImageSaveSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = JPGImageSaveSwitchView.xib; sourceTree = "<group>"; };
 		958C87F02636D7E7006C8923 /* TextTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
 		958C87F12636D7E7006C8923 /* TextTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
 		958C87F826382B6C006C8923 /* ToggleButtonViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleButtonViewCell.swift; sourceTree = "<group>"; };
@@ -436,6 +474,8 @@
 		95BB20F82660E2C600AF4344 /* NCAccountRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCAccountRequest.swift; sourceTree = "<group>"; };
 		95BB20F92660E2C600AF4344 /* NCAccountRequest.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCAccountRequest.storyboard; sourceTree = "<group>"; };
 		95BB21162660F55900AF4344 /* NCLogin.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCLogin.storyboard; sourceTree = "<group>"; };
+		95BB213A2667AAB700AF4344 /* img0.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = img0.jpg; sourceTree = "<group>"; };
+		95BB213B2667AAB700AF4344 /* img1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = img1.jpg; sourceTree = "<group>"; };
 		C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F700222B1EC479840080073F /* Custom.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Custom.xcassets; sourceTree = "<group>"; };
 		F700510022DF63AC003A3356 /* NCShare.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCShare.storyboard; sourceTree = "<group>"; };
@@ -879,6 +919,31 @@
 			path = Menu;
 			sourceTree = "<group>";
 		};
+		956E0D5B26691EA700DA4F91 /* NMCViews */ = {
+			isa = PBXGroup;
+			children = (
+				956E0D5C26691F5E00DA4F91 /* FileNameInputTextField.swift */,
+				956E0D6226691F6F00DA4F91 /* FileNameInputTextField.xib */,
+				956E0D68266942E100DA4F91 /* ScanDocumentPathView.swift */,
+				956E0D6E266942F700DA4F91 /* ScanDocumentPathView.xib */,
+				956E0D74266A494000DA4F91 /* PdfWithOcrSwitchView.swift */,
+				956E0D7A266A495500DA4F91 /* PdfWithOcrSwitchView.xib */,
+				956E0D80266A4C7F00DA4F91 /* TextFileWithOcrSwitchView.swift */,
+				956E0D86266A4C8B00DA4F91 /* TextFileWithOcrSwitchView.xib */,
+				956E0D8C266A4FEB00DA4F91 /* PdfWithoutOcrSwitchView.swift */,
+				956E0D92266A4FF600DA4F91 /* PdfWithoutOcrSwitchView.xib */,
+				956E0D98266A516D00DA4F91 /* JPGImageSaveSwitchView.swift */,
+				956E0D9E266A517700DA4F91 /* JPGImageSaveSwitchView.xib */,
+				95353B84267137F400E5F8B0 /* PNGImageSaveSwitchView.swift */,
+				95353B8A2671380100E5F8B0 /* PNGImageSaveSwitchView.xib */,
+				95353B902672303A00E5F8B0 /* SetPDFPasswordSwitchView.swift */,
+				95353B962672304700E5F8B0 /* SetPDFPasswordSwitchView.xib */,
+				95353B9C2672328600E5F8B0 /* PasswordInputField.swift */,
+				95353BA2267232A100E5F8B0 /* PasswordInputField.xib */,
+			);
+			path = NMCViews;
+			sourceTree = "<group>";
+		};
 		958C87EF2636D7C7006C8923 /* NMC CustomViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -933,6 +998,15 @@
 				95BB20F92660E2C600AF4344 /* NCAccountRequest.storyboard */,
 			);
 			path = "Account Request";
+			sourceTree = "<group>";
+		};
+		95BB21392667AAB700AF4344 /* SampleImages */ = {
+			isa = PBXGroup;
+			children = (
+				95BB213A2667AAB700AF4344 /* img0.jpg */,
+				95BB213B2667AAB700AF4344 /* img1.jpg */,
+			);
+			path = SampleImages;
 			sourceTree = "<group>";
 		};
 		F70211F31BAC56E9003FC03E /* Main */ = {
@@ -1123,6 +1197,7 @@
 		F758B41E212C516300515F55 /* ScanDocument */ = {
 			isa = PBXGroup;
 			children = (
+				956E0D5B26691EA700DA4F91 /* NMCViews */,
 				F758B457212C564000515F55 /* Scan.storyboard */,
 				F758B45D212C569C00515F55 /* ScanCell.swift */,
 				F758B45F212C56A400515F55 /* ScanCollectionView.swift */,
@@ -1566,6 +1641,7 @@
 		F7F67BAA1A24D27800EE80DA /* iOSClient */ = {
 			isa = PBXGroup;
 			children = (
+				95BB21392667AAB700AF4344 /* SampleImages */,
 				95BB20F72660E2C600AF4344 /* Account Request */,
 				95BB20E82660DFA200AF4344 /* Rename file */,
 				95BB2078265FEF3F00AF4344 /* Menu */,
@@ -1977,10 +2053,12 @@
 			files = (
 				F79728D422F96F2E003CACA7 /* NCShareLinkFolderMenuView.xib in Resources */,
 				F7362A1F220C853A005101B5 /* LaunchScreen.storyboard in Resources */,
+				95BB213D2667AAB700AF4344 /* img1.jpg in Resources */,
 				F77444F622281649000D5EB0 /* NCGridMediaCell.xib in Resources */,
 				F78ACD4421903CF20088454D /* NCListCell.xib in Resources */,
 				F78ACD4621903D010088454D /* NCGridCell.xib in Resources */,
 				F769453C22E9CFFF000A798A /* NCShareUserCell.xib in Resources */,
+				95353B8B2671380100E5F8B0 /* PNGImageSaveSwitchView.xib in Resources */,
 				F7A80BCA252624C100C7CD01 /* NCFileViewInFolder.storyboard in Resources */,
 				F76D3CF52428D0C1005DFA87 /* NCViewerPDF.storyboard in Resources */,
 				F700222C1EC479840080073F /* Custom.xcassets in Resources */,
@@ -1999,12 +2077,16 @@
 				F7E0E1DE22327DBA006B0911 /* NCAudioRecorderViewController.storyboard in Resources */,
 				F7F1E54C2492369A00E42386 /* NCMediaCommandView.xib in Resources */,
 				F710E8111EF95C9C00DC2427 /* ImagesIntro.xcassets in Resources */,
+				95353BA3267232A100E5F8B0 /* PasswordInputField.xib in Resources */,
 				F76032A0252F0F8E0015A421 /* NCTransferCell.xib in Resources */,
 				F74C0437253F1CDC009762AB /* NCShares.storyboard in Resources */,
 				F7381EE5218218C9000B1560 /* NCOffline.storyboard in Resources */,
+				956E0D87266A4C8B00DA4F91 /* TextFileWithOcrSwitchView.xib in Resources */,
+				956E0D93266A4FF600DA4F91 /* PdfWithoutOcrSwitchView.xib in Resources */,
 				958C87F32636D7E7006C8923 /* TextTableViewCell.xib in Resources */,
 				F76D3CF32428B94E005DFA87 /* NCViewerPDFSearchCell.xib in Resources */,
 				C0A2797D25FB509D0015F3DC /* GoogleService-Info.plist in Resources */,
+				95353B972672304700E5F8B0 /* SetPDFPasswordSwitchView.xib in Resources */,
 				F769453E22E9E97E000A798A /* NCShareUserMenuView.xib in Resources */,
 				F749C10E23C4A5340027D966 /* NCIntroCollectionViewCell.xib in Resources */,
 				F717402D24F699A5000C87D5 /* NCFavorite.storyboard in Resources */,
@@ -2014,11 +2096,14 @@
 				F700510122DF63AC003A3356 /* NCShare.storyboard in Resources */,
 				F787704F22E7019900F287A9 /* NCShareLinkCell.xib in Resources */,
 				F70753F72542A9C000972D44 /* NCViewerImage.storyboard in Resources */,
+				956E0D6F266942F700DA4F91 /* ScanDocumentPathView.xib in Resources */,
 				958C87FF26382B7F006C8923 /* ToggleButtonViewCell.xib in Resources */,
+				956E0D6326691F6F00DA4F91 /* FileNameInputTextField.xib in Resources */,
 				F70A58C024D0545100DED00D /* NCCapabilitiesViewController.storyboard in Resources */,
 				F749C10D23C4A5340027D966 /* NCIntro.storyboard in Resources */,
 				F7239877253D86D300257F49 /* NCEmptyView.xib in Resources */,
 				F747BA1F22354D2000971601 /* NCCreateFormUploadVoiceNote.storyboard in Resources */,
+				956E0D9F266A517700DA4F91 /* JPGImageSaveSwitchView.xib in Resources */,
 				F7B2DEF11F976859007CF4D2 /* english.txt in Resources */,
 				F7651A8A23A2A3F2001403D2 /* NCCreateFormUploadDocuments.storyboard in Resources */,
 				F704B5E72430C06700632F5F /* NCCreateFormUploadConflictCell.xib in Resources */,
@@ -2036,9 +2121,11 @@
 				F7D1612023CF19E30039EBBF /* NCViewerRichWorkspace.storyboard in Resources */,
 				F77B0F631D118A16002130FE /* Localizable.strings in Resources */,
 				F7632FC1218353AA00721B71 /* NCTrashSectionFooter.xib in Resources */,
+				956E0D7B266A495500DA4F91 /* PdfWithOcrSwitchView.xib in Resources */,
 				950A6482264AACF4006ADE0E /* AutoUploadFolderCustomCell.xib in Resources */,
 				F774264A22EB4D0000B23912 /* NCShareUserDropDownCell.xib in Resources */,
 				F722814323C8C34500C41898 /* NCRichWorkspace.xib in Resources */,
+				95BB213C2667AAB700AF4344 /* img0.jpg in Resources */,
 				F7CB689A2541676B0050EC94 /* NCMore.storyboard in Resources */,
 				95BB20EB2660DFA200AF4344 /* NCRenameFile.storyboard in Resources */,
 				F77B0F7D1D118A16002130FE /* Images.xcassets in Resources */,
@@ -2241,6 +2328,7 @@
 				F72CD63A25C19EBF00F46F9A /* NCAutoUpload.swift in Sources */,
 				F7DFB7F0219C5B8000680748 /* NCCreateFormUploadAssets.swift in Sources */,
 				F73B422C2476764F00A30FD3 /* NCNotification.swift in Sources */,
+				956E0D81266A4C7F00DA4F91 /* TextFileWithOcrSwitchView.swift in Sources */,
 				371B5A2E23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift in Sources */,
 				F77444F8222816D5000D5EB0 /* NCPickerViewController.swift in Sources */,
 				F72A47EC2487B06B005AD489 /* NCOperationQueue.swift in Sources */,
@@ -2254,9 +2342,11 @@
 				F78A18B623CDD07D00F681F3 /* NCViewerRichWorkspaceWebView.swift in Sources */,
 				F75A9EE623796C6F0044CFCE /* NCNetworking.swift in Sources */,
 				F758B460212C56A400515F55 /* ScanCollectionView.swift in Sources */,
+				956E0D5D26691F5E00DA4F91 /* FileNameInputTextField.swift in Sources */,
 				F78ACD52219046DC0088454D /* NCSectionHeaderFooter.swift in Sources */,
 				F749C10C23C4A5340027D966 /* NCIntroViewController.swift in Sources */,
 				950A6480264AACF4006ADE0E /* TypeInFileNameCustomSwitchCell.swift in Sources */,
+				956E0D99266A516D00DA4F91 /* JPGImageSaveSwitchView.swift in Sources */,
 				F72928A0253B0937009CA4FD /* NCMainNavigationController.swift in Sources */,
 				F704B5E92430C0B800632F5F /* NCCreateFormUploadConflictCell.swift in Sources */,
 				F72D404923D2082500A97FD0 /* NCViewerNextcloudText.swift in Sources */,
@@ -2279,6 +2369,7 @@
 				F7682FE023C36B0500983A04 /* NCMainTabBar.swift in Sources */,
 				95BB208B265FEF3F00AF4344 /* NCCollectionViewCommon+Menu.swift in Sources */,
 				958C87F22636D7E7006C8923 /* TextTableViewCell.swift in Sources */,
+				95353B912672303A00E5F8B0 /* SetPDFPasswordSwitchView.swift in Sources */,
 				F7A0D1352591FBC5008F8A13 /* String+Extensions.swift in Sources */,
 				F77B0E5F1D118A16002130FE /* NCSettings.m in Sources */,
 				F7F9D1BB25397CE000D9BFF5 /* NCViewer.swift in Sources */,
@@ -2309,11 +2400,13 @@
 				F77B0E981D118A16002130FE /* CCManageAccount.m in Sources */,
 				F7EFA47825ADBA500083159A /* NCViewerProviderContextMenu.swift in Sources */,
 				F755BD9B20594AC7008C5FBB /* NCService.swift in Sources */,
+				95353B85267137F400E5F8B0 /* PNGImageSaveSwitchView.swift in Sources */,
 				F7B7504B2397D38F004E13EC /* UIImage+Extensions.swift in Sources */,
 				958C8817263990D6006C8923 /* FolderPathCustomCell.swift in Sources */,
 				95BB20EC2660DFA200AF4344 /* NCRenameFile.swift in Sources */,
 				F7EFC0CD256BF8DD00461AAD /* NCUserStatus.swift in Sources */,
 				F7DFB7F4219C5CA800680748 /* NCCreateFormUploadScanDocument.swift in Sources */,
+				956E0D69266942E100DA4F91 /* ScanDocumentPathView.swift in Sources */,
 				F710D1FF24057E5E00A6033D /* NCActionSheetHeaderView.swift in Sources */,
 				F7020FCE2233D7F700B7297D /* NCCreateFormUploadVoiceNote.swift in Sources */,
 				F7134186259747BA00768D21 /* NCPushNotification.m in Sources */,
@@ -2341,6 +2434,7 @@
 				95BB206E265FEE2F00AF4344 /* AppDelegate.swift in Sources */,
 				F7725A60251F33BB00D125E0 /* NCFiles.swift in Sources */,
 				F704B5E52430AA8000632F5F /* NCCreateFormUploadConflict.swift in Sources */,
+				95353B9D2672328600E5F8B0 /* PasswordInputField.swift in Sources */,
 				F765608F23BF813600765969 /* NCContentPresenter.swift in Sources */,
 				950A6483264AACF4006ADE0E /* SubFolderCustomCell.swift in Sources */,
 				F70CEF5623E9C7E50007035B /* UIColor+Extensions.swift in Sources */,
@@ -2355,7 +2449,9 @@
 				F717402E24F699A5000C87D5 /* NCFavorite.swift in Sources */,
 				F74DE14325135B6800917068 /* NCTransfers.swift in Sources */,
 				F755E6462525946C008DAB45 /* NCCollectionViewCommon.swift in Sources */,
+				956E0D75266A494000DA4F91 /* PdfWithOcrSwitchView.swift in Sources */,
 				95BB20F22660E25200AF4344 /* NCPopupViewController.swift in Sources */,
+				956E0D8D266A4FEB00DA4F91 /* PdfWithoutOcrSwitchView.swift in Sources */,
 				95BB2083265FEF3F00AF4344 /* NCShareComments+Menu.swift in Sources */,
 				95BB20D326600FB900AF4344 /* NCNetworkingProcessUpload.swift in Sources */,
 			);
@@ -2450,8 +2546,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/Notification_Service_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2482,7 +2578,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud Notification Service";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_OBJC_BRIDGING_HEADER = "Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
@@ -2506,8 +2602,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/Notification_Service_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2537,7 +2633,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud Notification Service";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_OBJC_BRIDGING_HEADER = "Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
@@ -2555,8 +2651,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/Share.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2585,7 +2681,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
+				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "Share/Share-Bridging-Header.h";
@@ -2605,8 +2701,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/Share.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2635,7 +2731,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
+				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "Share/Share-Bridging-Header.h";
@@ -2660,8 +2756,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2690,7 +2786,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "File Provider Extension/FileProviderExtension-Bridging-Header.h";
@@ -2715,8 +2811,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2745,7 +2841,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "File Provider Extension/FileProviderExtension-Bridging-Header.h";
@@ -2764,8 +2860,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/iOSClient.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
@@ -2802,7 +2898,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -2824,8 +2920,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/iOSClient.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -2860,7 +2956,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
