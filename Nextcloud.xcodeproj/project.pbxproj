@@ -55,6 +55,9 @@
 		95BB20FB2660E2C600AF4344 /* NCAccountRequest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB20F92660E2C600AF4344 /* NCAccountRequest.storyboard */; };
 		95BB21172660F55900AF4344 /* NCLogin.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB21162660F55900AF4344 /* NCLogin.storyboard */; };
 		C0072DF0263C35C6001496A0 /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = C0072DEF263C35C5001496A0 /* Adjust */; };
+		C07020E5267B459500E094AD /* NCPermissionMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07020E4267B459500E094AD /* NCPermissionMenuView.swift */; };
+		C07020EC267B45AE00E094AD /* NCPermissionMenuView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C07020EA267B45AE00E094AD /* NCPermissionMenuView.xib */; };
+		C07020ED267B45AE00E094AD /* NCPermissionFolderMenuView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C07020EB267B45AE00E094AD /* NCPermissionFolderMenuView.xib */; };
 		C0A2797D25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2797E25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2797F25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
@@ -436,6 +439,9 @@
 		95BB20F82660E2C600AF4344 /* NCAccountRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCAccountRequest.swift; sourceTree = "<group>"; };
 		95BB20F92660E2C600AF4344 /* NCAccountRequest.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCAccountRequest.storyboard; sourceTree = "<group>"; };
 		95BB21162660F55900AF4344 /* NCLogin.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCLogin.storyboard; sourceTree = "<group>"; };
+		C07020E4267B459500E094AD /* NCPermissionMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCPermissionMenuView.swift; sourceTree = "<group>"; };
+		C07020EA267B45AE00E094AD /* NCPermissionMenuView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCPermissionMenuView.xib; sourceTree = "<group>"; };
+		C07020EB267B45AE00E094AD /* NCPermissionFolderMenuView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCPermissionFolderMenuView.xib; sourceTree = "<group>"; };
 		C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F700222B1EC479840080073F /* Custom.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Custom.xcassets; sourceTree = "<group>"; };
 		F700510022DF63AC003A3356 /* NCShare.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCShare.storyboard; sourceTree = "<group>"; };
@@ -1058,6 +1064,8 @@
 				F79728D522F9A0B0003CACA7 /* NCShareUserFolderMenuView.xib */,
 				F774264822EB4D0000B23912 /* NCShareUserDropDownCell.xib */,
 				F723B3DC22FC6D1C00301EFE /* NCShareCommentsCell.xib */,
+				C07020EB267B45AE00E094AD /* NCPermissionFolderMenuView.xib */,
+				C07020EA267B45AE00E094AD /* NCPermissionMenuView.xib */,
 				F769453F22E9F077000A798A /* NCSharePaging.swift */,
 				F700510422DF6A89003A3356 /* NCShare.swift */,
 				F7E4D9C322ED929B003675FD /* NCShareComments.swift */,
@@ -1065,6 +1073,7 @@
 				F769454322E9F142000A798A /* NCShareUserMenuView.swift */,
 				F769454722E9F20D000A798A /* NCShareNetworking.swift */,
 				F769454522E9F1B0000A798A /* NCShareCommon.swift */,
+				C07020E4267B459500E094AD /* NCPermissionMenuView.swift */,
 			);
 			path = Share;
 			sourceTree = "<group>";
@@ -2042,10 +2051,12 @@
 				F7CB689A2541676B0050EC94 /* NCMore.storyboard in Resources */,
 				95BB20EB2660DFA200AF4344 /* NCRenameFile.storyboard in Resources */,
 				F77B0F7D1D118A16002130FE /* Images.xcassets in Resources */,
+				C07020ED267B45AE00E094AD /* NCPermissionFolderMenuView.xib in Resources */,
 				F73CB3B222E072A000AD728E /* NCShareHeaderView.xib in Resources */,
 				F7AE00FA230E81EB007ACF8A /* NCBrowserWeb.storyboard in Resources */,
 				F78ACD58219048040088454D /* NCSectionHeaderMenu.xib in Resources */,
 				F7501C322212E57500FB1415 /* NCMedia.storyboard in Resources */,
+				C07020EC267B45AE00E094AD /* NCPermissionMenuView.xib in Resources */,
 				F74DE14425135B6800917068 /* NCTransfers.storyboard in Resources */,
 				F77910A525DD517B00CEDB9E /* Settings.bundle in Resources */,
 				F7CB68A0254169530050EC94 /* NCSettings.storyboard in Resources */,
@@ -2284,6 +2295,7 @@
 				F7F9D1BB25397CE000D9BFF5 /* NCViewer.swift in Sources */,
 				F70460522499061800BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
 				F78F74362163781100C2ADAD /* NCTrash.swift in Sources */,
+				C07020E5267B459500E094AD /* NCPermissionMenuView.swift in Sources */,
 				F7651A8B23A2A3F2001403D2 /* NCCreateFormUploadDocuments.swift in Sources */,
 				F74AF3A4247FB6AE00AC767B /* NCUtilityFileSystem.swift in Sources */,
 				F7417DB3216CE925007D05F5 /* NCTrashSectionHeaderFooter.swift in Sources */,
