@@ -58,10 +58,12 @@
 		C07020E5267B459500E094AD /* NCPermissionMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07020E4267B459500E094AD /* NCPermissionMenuView.swift */; };
 		C07020EC267B45AE00E094AD /* NCPermissionMenuView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C07020EA267B45AE00E094AD /* NCPermissionMenuView.xib */; };
 		C07020ED267B45AE00E094AD /* NCPermissionFolderMenuView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C07020EB267B45AE00E094AD /* NCPermissionFolderMenuView.xib */; };
+		C07020FD267F7B8900E094AD /* NCShareNewUserPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07020FC267F7B8900E094AD /* NCShareNewUserPermission.swift */; };
 		C0A2797D25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2797E25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2797F25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2798025FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
+		C0D7889026809F9800B876BB /* NCShareNewUserAddComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D7888F26809F9800B876BB /* NCShareNewUserAddComment.swift */; };
 		C48BD5098411F9C26AC8E684 /* Pods_Nextcloud.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14D3CA9207D116AA28A58F65 /* Pods_Nextcloud.framework */; };
 		F700222C1EC479840080073F /* Custom.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F700222B1EC479840080073F /* Custom.xcassets */; };
 		F700222D1EC479840080073F /* Custom.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F700222B1EC479840080073F /* Custom.xcassets */; };
@@ -442,7 +444,9 @@
 		C07020E4267B459500E094AD /* NCPermissionMenuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCPermissionMenuView.swift; sourceTree = "<group>"; };
 		C07020EA267B45AE00E094AD /* NCPermissionMenuView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCPermissionMenuView.xib; sourceTree = "<group>"; };
 		C07020EB267B45AE00E094AD /* NCPermissionFolderMenuView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCPermissionFolderMenuView.xib; sourceTree = "<group>"; };
+		C07020FC267F7B8900E094AD /* NCShareNewUserPermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareNewUserPermission.swift; sourceTree = "<group>"; };
 		C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		C0D7888F26809F9800B876BB /* NCShareNewUserAddComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareNewUserAddComment.swift; sourceTree = "<group>"; };
 		F700222B1EC479840080073F /* Custom.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Custom.xcassets; sourceTree = "<group>"; };
 		F700510022DF63AC003A3356 /* NCShare.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCShare.storyboard; sourceTree = "<group>"; };
 		F700510222DF6897003A3356 /* Parchment.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Parchment.framework; path = Carthage/Build/iOS/Parchment.framework; sourceTree = "<group>"; };
@@ -1074,6 +1078,8 @@
 				F769454722E9F20D000A798A /* NCShareNetworking.swift */,
 				F769454522E9F1B0000A798A /* NCShareCommon.swift */,
 				C07020E4267B459500E094AD /* NCPermissionMenuView.swift */,
+				C07020FC267F7B8900E094AD /* NCShareNewUserPermission.swift */,
+				C0D7888F26809F9800B876BB /* NCShareNewUserAddComment.swift */,
 			);
 			path = Share;
 			sourceTree = "<group>";
@@ -2234,6 +2240,7 @@
 			files = (
 				F77444F522281649000D5EB0 /* NCGridMediaCell.swift in Sources */,
 				F7AE00F8230E81CB007ACF8A /* NCBrowserWeb.swift in Sources */,
+				C0D7889026809F9800B876BB /* NCShareNewUserAddComment.swift in Sources */,
 				F70A58BE24D0349500DED00D /* NCCapabilitiesViewController.swift in Sources */,
 				F752011D25480387000BF3A7 /* NCViewerVideo.swift in Sources */,
 				F733598125C1C188002ABA72 /* NCAskAuthorization.swift in Sources */,
@@ -2370,6 +2377,7 @@
 				95BB20F22660E25200AF4344 /* NCPopupViewController.swift in Sources */,
 				95BB2083265FEF3F00AF4344 /* NCShareComments+Menu.swift in Sources */,
 				95BB20D326600FB900AF4344 /* NCNetworkingProcessUpload.swift in Sources */,
+				C07020FD267F7B8900E094AD /* NCShareNewUserPermission.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

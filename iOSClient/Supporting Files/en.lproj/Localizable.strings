@@ -89,6 +89,7 @@
 "_audio_"                   = "Audio";
 "_unknown_"                 = "Unknown";
 "_next_"                    = "Next";
+"_send_share_"              = "Send share";
 "_success_"                 = "Success";
 "_initialization_"          = "Initialization";
 "_experimental_"            = "Experimental";
@@ -211,7 +212,7 @@
 "_quota_space_unknown_"         = "Unknown";
 "_quota_using_"                 = "%@ ";//"Memory used up to %@ of %@";//You are using %@ of %@";
 "_quota_using_of_"              = "of %@";
-"_quota_using_percentage_"      = "Memory to %.2f %% occupied";
+"_quota_using_percentage_"      = "Memory to %.0f %% occupied";
 
 // Settings
 
@@ -597,6 +598,8 @@
 "_share_unshare_"               = "Unshare";
 "_share_internal_link_"         = "Internal link";
 "_share_internal_link_des_"     = "Only works for users with access to this folder";
+"_permissions_"                 = "Permissions";
+"_advance_permissions_"         = "Advance permissions";
 
 // Share Permission
 

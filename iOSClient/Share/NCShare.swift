@@ -351,7 +351,23 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         dropDown.selectionAction = { [weak self] (index, item) in
             let sharee = sharees[index]
-            self!.networking?.createShare(shareWith: sharee.shareWith, shareType: sharee.shareType, metadata: self!.metadata!)
+            let directory = self!.metadata?.directory
+            let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+            DispatchQueue.main.async() { [self] in
+                var viewNewUserPermission: NCShareNewUserPermission
+                if directory! {
+//                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFolderPermission") as! NCShareNewUserPermission
+                } else {
+//                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
+                }
+                
+                viewNewUserPermission.metadata = self!.metadata
+                viewNewUserPermission.sharee = sharee
+                self?.navigationController!.pushViewController(viewNewUserPermission, animated: true)
+            }
+//            self!.networking?.createShare(shareWith: sharee.shareWith, shareType: sharee.shareType, metadata: self!.metadata!)
         }
         
         dropDown.show()
@@ -547,6 +563,7 @@ class NCShareUserCell: UITableViewCell {
         switchCanEdit.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         switchCanEdit.onTintColor = NCBrandColor.shared.brandElement
         buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: .gray, size: 50), for: .normal)
+        labelQuickStatus.textColor = NCBrandColor.shared.customerDefault
     }
     
     @IBAction func switchCanEditChanged(sender: UISwitch) {
