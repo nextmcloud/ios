@@ -194,10 +194,9 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         viewQuota.backgroundColor = NCBrandColor.shared.memoryConsuptionBackground
         progressQuota.progressTintColor = NCBrandColor.shared.brandElement
-        progressQuota.trackTintColor = NCBrandColor.shared.systemGrayAndGray66
-        progressQuota.progressTintColor = NCBrandColor.shared.customer
+        progressQuota.trackTintColor = .lightGray
         progressQuota.layer.borderWidth = 2
-        progressQuota.layer.borderColor = NCBrandColor.shared.backgroundForm.cgColor
+        progressQuota.layer.borderColor = UIColor(hex: "#CCCCCC")?.cgColor
         quotaLabel1.textColor = NCBrandColor.shared.gray26AndGrayf2
         quotalabel2.textColor = NCBrandColor.shared.gray26AndGrayf2
         labelQuota.textColor = NCBrandColor.shared.gray26AndGrayf2

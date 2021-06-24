@@ -18,6 +18,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     public var metadata: tableMetadata?
     public var sharee: NCCommunicationSharee?
     private var networking: NCShareNetworking?
+    private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,6 +42,8 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         btnSendShare.layer.masksToBounds = true
         btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         btnSendShare.setTitleColor(.white, for: .normal)
+        
+        networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
         // Do any additional setup after loading the view.
     }
     
@@ -50,17 +53,17 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     
     @IBAction func sendShareClicked(_ sender: Any) {
         let message = commentTextView.text.trimmingCharacters(in: .whitespaces)
-//        if message.count > 0 {
-//            NCCommunication.shared.putComments(fileId: metadata!.fileId, message: message) { (account, errorCode, errorDescription) in
-//                if errorCode == 0 {
-//                    self.commentTextView.text = ""
-//                } else {
-//                    NCContentPresenter.shared.messageNotification("_share_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
-//                }
-//            }
-//        }
+        if message.count > 0 {
+            NCCommunication.shared.putComments(fileId: metadata!.fileId, message: message) { (account, errorCode, errorDescription) in
+                if errorCode == 0 {
+                    self.commentTextView.text = ""
+                } else {
+                    NCContentPresenter.shared.messageNotification("_share_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                }
+            }
+        }
         
-//        self.networking?.createShare(shareWith: sharee!.shareWith, shareType: sharee!.shareType, metadata: self.metadata!)
+        self.networking?.createShare(shareWith: sharee!.shareWith, shareType: sharee!.shareType, metadata: self.metadata!)
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
