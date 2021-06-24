@@ -564,6 +564,7 @@ class NCShareUserCell: UITableViewCell {
         switchCanEdit.onTintColor = NCBrandColor.shared.brandElement
         buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: .gray, size: 50), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customerDefault
+        imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customerDefault)
     }
     
     @IBAction func switchCanEditChanged(sender: UISwitch) {
