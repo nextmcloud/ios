@@ -19,6 +19,8 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     public var sharee: NCCommunicationSharee?
     private var networking: NCShareNetworking?
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    var permission: Int = 0
+    var hideDownload: Bool?
     
     override func viewDidLoad() {
         super.viewDidLoad()

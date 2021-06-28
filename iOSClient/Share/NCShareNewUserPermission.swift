@@ -42,6 +42,8 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
     private var calendar: FSCalendar?
     var width: CGFloat = 0
     var height: CGFloat = 0
+    var permission: Int = 0
+    var hideDownload: Bool?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -174,56 +176,58 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
     
     @IBAction func readOnlyValueChanged(sender: UISwitch) {
 //        guard let tableShare = self.tableShare else { return }
-//        guard let metadata = self.metadata else { return }
-//        let permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata.directory)
+        guard let metadata = self.metadata else { return }
+        permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata.directory)
 
 //        if sender.isOn && permission != tableShare.permissions {
         if sender.isOn {
-            if metadata!.directory {
+            if metadata.directory {
                 switchAllowUploadAndEditing.setOn(false, animated: false)
                 if self.metadata!.directory {
                     switchFileDrop.setOn(false, animated: false)
                 }
-                metadata?.permissions = "RDNVCK"
+                metadata.permissions = "RDNVCK"
             }
 //            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
-            metadata?.permissions = "RDNVW"
+            metadata.permissions = "RDNVW"
             sender.setOn(true, animated: false)
         }
     }
     
     @IBAction func allowUploadEditingValueChanged(sender: UISwitch) {
 //        guard let tableShare = self.tableShare else { return }
-//        guard let metadata = self.metadata else { return }
-//        let permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata.directory)
+        guard let metadata = self.metadata else { return }
+        permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata.directory)
 
 //        if sender.isOn && permission != tableShare.permissions {
         if sender.isOn {
             switchReadOnly.setOn(false, animated: false)
-            if metadata!.directory {
+            if metadata.directory {
                 switchFileDrop.setOn(false, animated: false)
             }
-            metadata?.permissions = "RGDNV"
+            metadata.permissions = "RGDNV"
 //            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
-            metadata?.permissions = "RDNVW"
+            metadata.permissions = "RDNVW"
             sender.setOn(true, animated: false)
         }
     }
     
     @IBAction func fileDropValueChanged(sender: UISwitch) {
 //        guard let tableShare = self.tableShare else { return }
-//        let permission = NCGlobal.shared.permissionCreateShare
+
+        guard let metadata = self.metadata else { return }
+        permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata.directory)
 
 //        if sender.isOn && permission != tableShare.permissions {
         if sender.isOn {
             switchReadOnly.setOn(false, animated: false)
             switchAllowUploadAndEditing.setOn(false, animated: false)
-            metadata?.permissions = "RGDNVCK"
+            metadata.permissions = "RGDNVCK"
 //            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
-            metadata?.permissions = "RGD"
+            metadata.permissions = "RGD"
             sender.setOn(true, animated: false)
         }
     }
@@ -257,15 +261,16 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
             }
         }
         if sender.isOn {
-            metadata.permissions = "SRGD"
+//            metadata.permissions = "SRGD"
         }
         
 //        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
     
     @IBAction func hideDownloadValueChanged(sender: UISwitch) {
-        guard let tableShare = self.tableShare else { return }
+//        guard let tableShare = self.tableShare else { return }
         
+        hideDownload = sender.isOn
 //        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, expirationDate: nil, hideDownload: sender.isOn)
     }
     
