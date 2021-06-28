@@ -125,13 +125,13 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         functionMenu.append(item)
 
         // ITEM : Scan
-        if #available(iOS 13.0, *) {
-            item = NCCommunicationExternalSite()
-            item.name = "_scanned_images_"
-            item.icon = "scan"
-            item.url = "openStoryboardScan"
-            functionMenu.append(item)
-        }
+//        if #available(iOS 13.0, *) {
+//            item = NCCommunicationExternalSite()
+//            item.name = "_scanned_images_"
+//            item.icon = "scan"
+//            item.url = "openStoryboardScan"
+//            functionMenu.append(item)
+//        }
         
         // ITEM : Trash
         let serverVersionMajor = NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesVersionMajor)

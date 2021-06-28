@@ -265,9 +265,9 @@
         </scene>
     </scenes>
     <resources>
-        <image name="add" width="25" height="25"/>
+        <image name="add" width="24" height="24"/>
         <image name="deleteScan" width="25" height="25"/>
-        <image name="rotate" width="25" height="25"/>
+        <image name="rotate" width="36" height="36"/>
         <image name="transferDown" width="330" height="330"/>
     </resources>
 </document>
