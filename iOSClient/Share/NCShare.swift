@@ -56,6 +56,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var shareMenuViewWindow: UIView?
     private var dropDown = DropDown()
     private var networking: NCShareNetworking?
+    private var quickStatusTableShare: tableShare!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -116,6 +117,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         // changeTheming
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(statusReadOnlyClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusReadOnly), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(statusEditingClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusEditing), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(statusFileDropClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusFileDrop), object: nil)
         
         changeTheming()
     }
@@ -262,13 +267,17 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let tableShare = tableShare else { return }
 
         if tableShare.shareType != 3 {
-            let views = NCShareCommon.shared.openQuickShare(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-            sharePermissionMenuView = views.sharePermissionMenuView
-            shareMenuViewWindow = views.viewWindow
+//            let views = NCShareCommon.shared.openQuickShare(shareViewController: self, tableShare: tableShare, metadata: metadata!)
+//            sharePermissionMenuView = views.sharePermissionMenuView
+//            shareMenuViewWindow = views.viewWindow
+//
+//            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
+//            tap.delegate = self
+//            shareMenuViewWindow?.addGestureRecognizer(tap)
             
-            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-            tap.delegate = self
-            shareMenuViewWindow?.addGestureRecognizer(tap)
+            self.quickStatusTableShare = tableShare
+            let quickStatusMenu = NCShareQuickStatusMenu()
+            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
         }
     }
     
@@ -284,7 +293,9 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     func unShareCompleted() { }
     
-    func updateShareWithError(idShare: Int) { }
+    func updateShareWithError(idShare: Int) {
+        self.reloadData()
+    }
     
     func getSharees(sharees: [NCCommunicationSharee]?) {
         
@@ -371,6 +382,25 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         }
         
         dropDown.show()
+    }
+    
+    // MARK: -StatusChangeNotification
+    @objc func statusReadOnlyClicked() {
+        let permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata!.directory)
+        
+        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
+    }
+    
+    @objc func statusEditingClicked() {
+        let permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata!.directory)
+
+        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
+    }
+    
+    @objc func statusFileDropClicked() {
+        let permission = NCGlobal.shared.permissionCreateShare
+
+        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
     }
 }
 

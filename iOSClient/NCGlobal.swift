@@ -273,6 +273,9 @@ class NCGlobal: NSObject {
     
     let notificationCenterChangedLocation                       = "changedLocation"
     let notificationStatusAuthorizationChangedLocation          = "statusAuthorizationChangedLocation"
+    let notificationCenterStatusReadOnly                        = "statusReadOnly"
+    let notificationCenterStatusEditing                         = "statusEditing"
+    let notificationCenterStatusFileDrop                        = "statusFileDrop"
 }
 
 //let rootView = UIApplication.shared.keyWindow?.rootViewController?.view
