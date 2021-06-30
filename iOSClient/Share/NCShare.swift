@@ -117,6 +117,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         // changeTheming
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(shareMenuViewInClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareViewIn), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(shareMenuAdvancePermissionClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareAdvancePermission), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(shareMenuSendEmailClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareSendEmail), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(shareMenuUnshareClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareUnshare), object: nil)
         changeTheming()
     }
     
@@ -243,14 +247,18 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             let views = NCShareCommon.shared.openViewMenuShareLink(shareViewController: self, tableShare: tableShare, metadata: metadata!)
             shareLinkMenuView = views.shareLinkMenuView
             shareMenuViewWindow = views.viewWindow
+//            let shareMenu = NCShareMenu()
+//            shareMenu.toggleMenu(viewController: self)
             
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
             tap.delegate = self
             shareMenuViewWindow?.addGestureRecognizer(tap)
         } else {
-            let views = NCShareCommon.shared.openViewMenuUser(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-            shareUserMenuView = views.shareUserMenuView
-            shareMenuViewWindow = views.viewWindow
+//            let views = NCShareCommon.shared.openViewMenuUser(shareViewController: self, tableShare: tableShare, metadata: metadata!)
+//            shareUserMenuView = views.shareUserMenuView
+//            shareMenuViewWindow = views.viewWindow
+            let shareMenu = NCShareMenu()
+            shareMenu.toggleMenu(viewController: self)
             
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
             tap.delegate = self
@@ -371,6 +379,23 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         }
         
         dropDown.show()
+    }
+    
+    // MARK: -NCShareMenuOptions
+    @objc func shareMenuViewInClicked() {
+        
+    }
+    
+    @objc func shareMenuAdvancePermissionClicked() {
+        
+    }
+    
+    @objc func shareMenuSendEmailClicked() {
+        
+    }
+    
+    @objc func shareMenuUnshareClicked() {
+        
     }
 }
 
@@ -578,7 +603,6 @@ class NCShareUserCell: UITableViewCell {
     @IBAction func quickStatusClicked(_ sender: Any) {
         delegate?.quickStatus(with: tableShare, sender: sender)
     }
-    
 }
 
 protocol NCShareUserCellDelegate {

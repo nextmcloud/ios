@@ -273,6 +273,10 @@ class NCGlobal: NSObject {
     
     let notificationCenterChangedLocation                       = "changedLocation"
     let notificationStatusAuthorizationChangedLocation          = "statusAuthorizationChangedLocation"
+    let notificationCenterShareViewIn                           = "ShareViewIn"
+    let notificationCenterShareAdvancePermission                = "ShareAdvancePermission"
+    let notificationCenterShareSendEmail                        = "ShareSendEmail"
+    let notificationCenterShareUnshare                          = "ShareUnshare"
 }
 
 //let rootView = UIApplication.shared.keyWindow?.rootViewController?.view

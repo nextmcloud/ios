@@ -90,6 +90,7 @@
 "_unknown_"                 = "Unknown";
 "_next_"                    = "Next";
 "_send_share_"              = "Send share";
+"_send_new_email_"          = "Send new email";
 "_success_"                 = "Success";
 "_initialization_"          = "Initialization";
 "_experimental_"            = "Experimental";
