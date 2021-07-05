@@ -30,8 +30,6 @@ class NCShareMenu: NSObject {
             NCMenuAction(
                 title: NSLocalizedString("_advance_permissions_", comment: ""),
                 icon: NCUtility.shared.loadImage(named: "pencil").imageColor(NCBrandColor.shared.brandElement),
-                selected: CCUtility.getMediaSortDate() == "date",
-                on: true,
                 action: { menuAction in
                     NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareAdvancePermission)
                     //                    self.reloadDataSource()
@@ -43,8 +41,6 @@ class NCShareMenu: NSObject {
             NCMenuAction(
                 title: NSLocalizedString("_send_new_email_", comment: ""),
                 icon: NCUtility.shared.loadImage(named: "shareTypeEmail").imageColor(NCBrandColor.shared.brandElement),
-                selected: CCUtility.getMediaSortDate() == "creationDate",
-                on: true,
                 action: { menuAction in
                     NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareSendEmail)
                     //                    self.reloadDataSource()
@@ -56,8 +52,6 @@ class NCShareMenu: NSObject {
             NCMenuAction(
                 title: NSLocalizedString("_share_unshare_", comment: ""),
                 icon: NCUtility.shared.loadImage(named: "delete").imageColor(NCBrandColor.shared.brandElement),
-                selected: CCUtility.getMediaSortDate() == "uploadDate",
-                on: true,
                 action: { menuAction in
                     NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareUnshare)
                     //                    self.reloadDataSource()

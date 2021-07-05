@@ -43,6 +43,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     @IBOutlet weak var buttonCopy: UIButton!
     @IBOutlet weak var buttonMenu: UIButton!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var btnCreateLink: UIButton!
+    
     
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
@@ -56,6 +58,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var shareMenuViewWindow: UIView?
     private var dropDown = DropDown()
     private var networking: NCShareNetworking?
+    private var shareeSelected: NCCommunicationSharee?
+    public var tableShareSelected: tableShare?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,6 +69,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                 
         searchField.placeholder = NSLocalizedString("_shareLinksearch_placeholder_", comment: "")
         
+        self.btnCreateLink.setTitle(NSLocalizedString("_create_link_", comment: ""), for: .normal)
         shareLinkImage.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
         shareLinkLabel.text = NSLocalizedString("_share_link_", comment: "")
         buttonCopy.setImage(UIImage.init(named: "shareCopy")?.image(color: .gray, size: 50), for: .normal)
@@ -243,13 +248,14 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         guard let tableShare = tableShare else { return }
 
+        self.tableShareSelected = tableShare
         if tableShare.shareType == 3 {
             let views = NCShareCommon.shared.openViewMenuShareLink(shareViewController: self, tableShare: tableShare, metadata: metadata!)
             shareLinkMenuView = views.shareLinkMenuView
             shareMenuViewWindow = views.viewWindow
 //            let shareMenu = NCShareMenu()
 //            shareMenu.toggleMenu(viewController: self)
-            
+        
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
             tap.delegate = self
             shareMenuViewWindow?.addGestureRecognizer(tap)
@@ -381,13 +387,32 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         dropDown.show()
     }
     
+    @IBAction func createLinkClicked(_ sender: Any) {
+        networking?.createShareLink(password: "")
+    }
+    
+    
     // MARK: -NCShareMenuOptions
     @objc func shareMenuViewInClicked() {
         
     }
     
     @objc func shareMenuAdvancePermissionClicked() {
-        
+        let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+        let directory = self.metadata?.directory
+        if directory! {
+            let shareFolderOptions = storyboard.instantiateViewController(withIdentifier: "NCShareFolderOptions") as! NCShareFolderOptions
+            shareFolderOptions.metadata = self.metadata
+            shareFolderOptions.tableShare = self.tableShareSelected
+    //        shareFolderOptions.sharee = sharee
+            self.navigationController!.pushViewController(shareFolderOptions, animated: true)
+        } else {
+            let shareFileOptions = storyboard.instantiateViewController(withIdentifier: "NCShareFileOptions") as! NCShareFileOptions
+            shareFileOptions.metadata = self.metadata
+            shareFileOptions.tableShare = self.tableShareSelected
+    //        shareFolderOptions.sharee = sharee
+            self.navigationController!.pushViewController(shareFileOptions, animated: true)
+        }
     }
     
     @objc func shareMenuSendEmailClicked() {
@@ -395,7 +420,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     @objc func shareMenuUnshareClicked() {
-        
+        guard let tableShare = self.tableShareSelected else { return }
+        networking?.unShare(idShare: tableShare.idShare)
     }
 }
 
@@ -588,8 +614,8 @@ class NCShareUserCell: UITableViewCell {
         switchCanEdit.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         switchCanEdit.onTintColor = NCBrandColor.shared.brandElement
         buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: .gray, size: 50), for: .normal)
-        labelQuickStatus.textColor = NCBrandColor.shared.customerDefault
-        imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customerDefault)
+        labelQuickStatus.textColor = NCBrandColor.shared.customer
+        imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
     }
     
     @IBAction func switchCanEditChanged(sender: UISwitch) {

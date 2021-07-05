@@ -25,6 +25,7 @@
 import Foundation
 import Parchment
 import NCCommunication
+import SVGKit
 
 class NCSharePaging: UIViewController {
     
@@ -254,7 +255,8 @@ class NCShareHeaderViewController: PagingViewController {
 
 class NCSharePagingView: PagingView {
     
-    static let HeaderHeight: CGFloat = 250
+//    static let HeaderHeight: CGFloat = 250
+    static let HeaderHeight: CGFloat = 350
     var metadata: tableMetadata?
     
     var headerHeightConstraint: NSLayoutConstraint?
@@ -276,11 +278,13 @@ class NCSharePagingView: PagingView {
         headerView.ocId = metadata!.ocId
         
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
-            headerView.imageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
+//            headerView.imageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
+//            headerView.fullWidthImageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
+            headerView.fullWidthImageView.image = getImage(metadata: metadata!)
         } else {
             if metadata!.directory {
                 let image = UIImage.init(named: "folder")!
-                headerView.imageView.image = image.image(color: NCBrandColor.shared.brandElement, size: image.size.width)
+                headerView.imageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
             } else if metadata!.iconName.count > 0 {
                 headerView.imageView.image = UIImage.init(named: metadata!.iconName)
             } else {
@@ -301,9 +305,13 @@ class NCSharePagingView: PagingView {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         headerView.translatesAutoresizingMaskIntoConstraints = false
         
+//        headerHeightConstraint = headerView.heightAnchor.constraint(
+//            equalToConstant: NCSharePagingView.HeaderHeight
+//        )
         headerHeightConstraint = headerView.heightAnchor.constraint(
-            equalToConstant: NCSharePagingView.HeaderHeight
+            equalToConstant: metadata!.directory ? 350 : 370
         )
+        
         headerHeightConstraint?.isActive = true
         
         NSLayoutConstraint.activate([
@@ -322,6 +330,47 @@ class NCSharePagingView: PagingView {
             pageView.topAnchor.constraint(equalTo: topAnchor, constant: 10)
         ])
     }
+    
+    private func getImage(metadata: tableMetadata) -> UIImage? {
+        
+        let ext = CCUtility.getExtension(metadata.fileNameView)
+        var image: UIImage?
+        
+        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.typeFile == NCGlobal.shared.metadataTypeFileImage {
+           
+            let previewPath = CCUtility.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)!
+            let imagePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
+            
+            if ext == "GIF" {
+                if !FileManager().fileExists(atPath: previewPath) {
+                    NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+                }
+                image = UIImage.animatedImage(withAnimatedGIFURL: URL(fileURLWithPath: imagePath))
+            } else if ext == "SVG" {
+                if let svgImage = SVGKImage(contentsOfFile: imagePath) {
+                    let scale = svgImage.size.height / svgImage.size.width
+                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * scale))
+                    if let image = svgImage.uiImage {
+                        if !FileManager().fileExists(atPath: previewPath) {
+                            do {
+                                try image.pngData()?.write(to: URL(fileURLWithPath: previewPath), options: .atomic)
+                            } catch { }
+                        }
+                        return image
+                    } else {
+                        return nil
+                    }
+                } else {
+                    return nil
+                }
+            } else {
+                NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+                image = UIImage.init(contentsOfFile: imagePath)
+            }
+        }
+        
+        return image
+    }
 }
 
 class NCShareHeaderView: UIView {
@@ -330,6 +379,10 @@ class NCShareHeaderView: UIView {
     @IBOutlet weak var fileName: UILabel!
     @IBOutlet weak var info: UILabel!
     @IBOutlet weak var favorite: UIButton!
+    @IBOutlet weak var labelSharing: UILabel!
+    @IBOutlet weak var labelSharingInfo: UILabel!
+    @IBOutlet weak var fullWidthImageView: UIImageView!
+    
     
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var ocId = ""
