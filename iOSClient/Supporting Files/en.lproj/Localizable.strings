@@ -142,7 +142,7 @@
 "_now_"                     = "Now";
 "_wait_"                    = "Please wait …";
 "_attention_"               = "Attention";
-"_recent_"                  = "Recent";
+"_recent_"                  = "Recent files";
 "_view_in_folder_"          = "View in folder";
 "_leave_share_"             = "Leave this share";
 "_delete_file_"             = "Delete file";
@@ -297,6 +297,15 @@
 "_trial_expired_day_"           = "Days remaining";
 "_disableLocalCacheAfterUpload_footer_" = "After uploading the file, do not keep it in the local cache";
 "_disableLocalCacheAfterUpload_"        = "Disable local cache";
+"_data_protection_" = "Data protection";
+"_privacy_settings_" = "Privacy Settings";
+"_privacy_policy_" = "Privacy Policy";
+"_used_opensource_software_" = "Used OpenSource Software";
+"_service_" = "Service";
+"_imprint_" = "Imprint";
+"_info_" = "Info";
+"_magentacloud_version_" = "MagentaCLOUD Version";
+
 
 // Manage AutoUpload
 
@@ -798,7 +807,7 @@
 
 // Offline
 
-"_manage_file_offline_"             = "Manage offline files";
+"_manage_file_offline_"             = "Offline files";
 "_set_available_offline_"           = "Set as available offline";
 "_remove_available_offline_"        = "Remove as available offline";
 

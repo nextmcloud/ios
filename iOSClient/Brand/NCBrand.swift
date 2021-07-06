@@ -386,7 +386,7 @@ class NCBrandColor: NSObject {
     // Avatar & Preview
     let avatarSize: CGFloat                         = 512
     @objc let sizePreview: CGFloat                  = 1024
-    @objc let sizeIcon: CGFloat                     = 512
+    @objc let sizeIcon: CGFloat                     = 1024
     
     // E2EE
     let e2eeMaxFileSize: UInt64                     = 524288000   // 500 MB

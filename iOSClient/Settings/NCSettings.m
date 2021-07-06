@@ -157,22 +157,102 @@
     row.action.viewControllerClass = [CCAdvanced class];
     [section addFormRow:row];
 
+    
     // Section : INFORMATION ------------------------------------------------
 
-    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_information_", nil)];
+    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_data_protection_", nil)];
     [form addFormSection:section];
     
-    // Acknowledgements
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"buttonLeftAligned" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_acknowledgements_", nil)];
+    //privacy settings
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"advanced" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_privacy_settings_", nil)];
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    //[row.cellConfig setObject:[[UIImage imageNamed:@"gear"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
+    row.action.viewControllerClass = [CCAdvanced class];
+    [section addFormRow:row];
+    
+    //privacy policy
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"advanced" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_privacy_policy_", nil)];
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    //[row.cellConfig setObject:[[UIImage imageNamed:@"gear"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
+    row.action.viewControllerClass = [PrivacyPolicyViewController class];
+    [section addFormRow:row];
+    
+    // Used OpenSource Software
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"buttonLeftAligned" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_used_opensource_software_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
     [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
-    [row.cellConfig setObject:[[UIImage imageNamed:@"acknowledgements"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
-    row.action.formBlock = ^(XLFormRowDescriptor * sender){
-        [self performSegueWithIdentifier:@"AcknowledgementsSegue" sender:sender];
-        [self deselectFormRow:sender];
-    };
+  
+   
+    row.action.viewControllerClass = [OpenSourceSoftwareViewController class];
+    [section addFormRow:row];
+    
+    // Section : SERVICE ------------------------------------------------
+
+    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_service_", nil)];
+    [form addFormSection:section];
+    
+    // HELP
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"buttonLeftAligned" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_help_", nil)];
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
+    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+  
+   
+    row.action.viewControllerClass = [HelpViewController class];
+    [section addFormRow:row];
+    
+    // Imprint
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"buttonLeftAligned" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_imprint_", nil)];
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
+    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+  
+   
+    row.action.viewControllerClass = [ImprintViewController class];
+    [section addFormRow:row];
+    
+    // Section : INFO ------------------------------------------------
+
+    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_info_", nil)];
+    [form addFormSection:section];
+    
+    //MagentaCloud Version
+    
+    //custom cell
+    
+    [[XLFormViewController cellClassesForRowDescriptorTypes] setObject:[MagentaCloudVersionView class] forKey:@"kNMCCustomCellType"];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disablefilesapp" rowType:@"kNMCCustomCellType" title:NSLocalizedString(@"_magentacloud_version_", nil)];
+
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+    row.cellConfigAtConfigure[@"cellLabel.text"] = NSLocalizedString(@"_magentacloud_version_", nil);
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"cellLabel.font"];
+    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"cellLabel.textColor"];
+    
+    row.cellConfigAtConfigure[@"versionLabel.text"] = @"6.5.0";
+    
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"versionLabel.font"];
+    [row.cellConfig setObject:NCBrandColor.shared.graySoft forKey:@"versionLabel.textColor"];
+
+//    if ([CCUtility getDisableFilesApp]){
+//        row.cellConfigAtConfigure[@"switchControl.on"] = @"1";
+//    }else {
+//        row.cellConfigAtConfigure[@"switchControl.on"] = @"0";
+//    }
+//
+//    if (NSLocalizedString(@"_disable_files_app_", nil).length > 30 ){
+//        row.height = 65;
+//    }
+    //row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
+
     [section addFormRow:row];
     
     self.tableView.showsVerticalScrollIndicator = NO;
@@ -418,32 +498,32 @@
 
 #pragma mark -
 
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
-{
-    NSString *sectionName;
-    
-    switch (section)
-    {
-        case 1: {
-            sectionName = NSLocalizedString(@"_lock_protection_no_screen_footer_", nil);
-        }
-        break;
-        case 5: {
-                                
-            NSString *versionServer = [[NCManageDatabase shared] getCapabilitiesServerStringWithAccount:appDelegate.account elements:NCElementsJSON.shared.capabilitiesVersionString];
-            NSString *themingName = [[NCManageDatabase shared] getCapabilitiesServerStringWithAccount:appDelegate.account elements:NCElementsJSON.shared.capabilitiesThemingName];
-            NSString *themingSlogan = [[NCManageDatabase shared] getCapabilitiesServerStringWithAccount:appDelegate.account elements:NCElementsJSON.shared.capabilitiesThemingSlogan];
-
-            NSString *versionNextcloud = [NSString stringWithFormat:[NCBrandOptions shared].textCopyrightNextcloudServer, versionServer];
-            NSString *versionNextcloudiOS = [NSString stringWithFormat:[NCBrandOptions shared].textCopyrightNextcloudiOS, NCUtility.shared.getVersionApp];
-            
-            NSString *nameSlogan = [NSString stringWithFormat:@"%@ - %@", themingName, themingSlogan];
-            
-            sectionName = [NSString stringWithFormat:@"\n%@\n\n%@\n%@", versionNextcloudiOS, versionNextcloud, nameSlogan];
-        }
-        break;
-    }
-    return sectionName;
-}
+//- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
+//{
+//    NSString *sectionName;
+//
+//    switch (section)
+//    {
+//        case 1: {
+//            sectionName = NSLocalizedString(@"_lock_protection_no_screen_footer_", nil);
+//        }
+//        break;
+//        case 5: {
+//
+//            NSString *versionServer = [[NCManageDatabase shared] getCapabilitiesServerStringWithAccount:appDelegate.account elements:NCElementsJSON.shared.capabilitiesVersionString];
+//            NSString *themingName = [[NCManageDatabase shared] getCapabilitiesServerStringWithAccount:appDelegate.account elements:NCElementsJSON.shared.capabilitiesThemingName];
+//            NSString *themingSlogan = [[NCManageDatabase shared] getCapabilitiesServerStringWithAccount:appDelegate.account elements:NCElementsJSON.shared.capabilitiesThemingSlogan];
+//
+//            NSString *versionNextcloud = [NSString stringWithFormat:[NCBrandOptions shared].textCopyrightNextcloudServer, versionServer];
+//            NSString *versionNextcloudiOS = [NSString stringWithFormat:[NCBrandOptions shared].textCopyrightNextcloudiOS, NCUtility.shared.getVersionApp];
+//
+//            NSString *nameSlogan = [NSString stringWithFormat:@"%@ - %@", themingName, themingSlogan];
+//
+//            sectionName = [NSString stringWithFormat:@"\n%@\n\n%@\n%@", versionNextcloudiOS, versionNextcloud, nameSlogan];
+//        }
+//        break;
+//    }
+//    return sectionName;
+//}
 
 @end

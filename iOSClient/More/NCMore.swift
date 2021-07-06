@@ -80,11 +80,11 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         labelQuotaExternalSite.text = ""
         
         // ITEM : Transfer
-        item = NCCommunicationExternalSite()
-        item.name = "_transfers_"
-        item.icon = "load"
-        item.url = "segueTransfers"
-        functionMenu.append(item)
+//        item = NCCommunicationExternalSite()
+//        item.name = "_transfers_"
+//        item.icon = "load"
+//        item.url = "segueTransfers"
+//        functionMenu.append(item)
 
         // ITEM : Recent
         item = NCCommunicationExternalSite()
