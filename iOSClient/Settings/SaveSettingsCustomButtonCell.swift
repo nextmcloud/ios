@@ -9,7 +9,7 @@
 import Foundation
 
 
-class SaveSettingsCustomButtonCell: XLFormBaseCell {
+class SaveSettingsCustomButtonCell: XLFormButtonCell {
                 
     @IBOutlet weak var saveSettingsButton: UIButton!
     
@@ -17,12 +17,19 @@ class SaveSettingsCustomButtonCell: XLFormBaseCell {
             super.awakeFromNib()
             // Initialization code
             self.backgroundColor = NCBrandColor.shared.backgroundForm
+            self.selectionStyle = .none
             
+            saveSettingsButton.addTarget(self, action: #selector(saveButtonClicked), for: .touchUpInside)
 
         }
         
         override func configure() {
             super.configure()
+            saveSettingsButton.backgroundColor = NCBrandColor.shared.brand
+            saveSettingsButton.tintColor = UIColor.white
+            saveSettingsButton.layer.cornerRadius = 5
+            saveSettingsButton.layer.borderWidth = 1
+            saveSettingsButton.layer.borderColor = NCBrandColor.shared.brand.cgColor
 
         }
         
@@ -30,8 +37,13 @@ class SaveSettingsCustomButtonCell: XLFormBaseCell {
             super.update()
             
             let backgroundView = UIView()
-            backgroundView.backgroundColor = UIColor.white
+            backgroundView.backgroundColor = NCBrandColor.shared.backgroundForm
             self.selectedBackgroundView = backgroundView
         }
+    
+    @objc func saveButtonClicked(sender: UIButton) {
+        self.rowDescriptor.value = sender
+    
+    }
   
 }

@@ -11,7 +11,7 @@ import Foundation
 
 class PrivacySettingsViewController: XLFormViewController{
     
-   @objc public var isShowSettingsButton: Bool = false
+   @objc public var isShowSettingsButton: Bool = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -102,7 +102,8 @@ class PrivacySettingsViewController: XLFormViewController{
         form.addFormSection(section)
         
         
-        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "SaveSettingsButton", title: "")
+        row = XLFormRowDescriptor(tag: "SaveSettingsButton", rowType: "SaveSettingsButton", title: "")
+
 //        row.cellConfig["analysisDataCollectionSwitchControl.onTintColor"] = NCBrandColor.shared.brand
 //        row.cellConfig["cellLabel.textAlignment"] = NSTextAlignment.left.rawValue
 //        row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -117,8 +118,14 @@ class PrivacySettingsViewController: XLFormViewController{
         self.form = form
     }
     
+    
     override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
-        //
+        super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)
+        
+        if formRow.tag == "SaveSettingsButton" {
+            print("save settings clicked")
+        }
+    
     }
     
 //

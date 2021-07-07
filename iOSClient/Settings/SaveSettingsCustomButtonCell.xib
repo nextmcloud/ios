@@ -15,8 +15,12 @@
             <rect key="frame" x="0.0" y="0.0" width="150" height="59"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mib-yl-GN9">
-                    <rect key="frame" x="16" y="12" width="118" height="30"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mib-yl-GN9">
+                    <rect key="frame" x="15" y="9.5" width="120" height="40"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="120" id="4H2-Wh-jg4"/>
+                        <constraint firstAttribute="height" constant="40" id="4qY-bq-bad"/>
+                    </constraints>
                     <state key="normal" title="Save Settings"/>
                 </button>
             </subviews>
@@ -24,8 +28,8 @@
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <accessibility key="accessibilityConfiguration" identifier="CustomSectionHeader"/>
             <constraints>
-                <constraint firstItem="Mib-yl-GN9" firstAttribute="leading" secondItem="tKC-8s-7v7" secondAttribute="leading" constant="16" id="tDi-8Z-7qP"/>
-                <constraint firstItem="tKC-8s-7v7" firstAttribute="trailing" secondItem="Mib-yl-GN9" secondAttribute="trailing" constant="16" id="thr-gB-ysa"/>
+                <constraint firstItem="Mib-yl-GN9" firstAttribute="centerX" secondItem="Rqu-SE-4zQ" secondAttribute="centerX" id="9XL-lQ-flo"/>
+                <constraint firstItem="Mib-yl-GN9" firstAttribute="centerY" secondItem="Rqu-SE-4zQ" secondAttribute="centerY" id="shU-5X-np4"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>

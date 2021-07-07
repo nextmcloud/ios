@@ -16,9 +16,6 @@ class FolderPathCustomCell: XLFormButtonCell{
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
-        
-        
     }
     
     override func configure() {
