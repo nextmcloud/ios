@@ -30,6 +30,7 @@
 #import "NSNotificationCenter+MainThread.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import <TOPasscodeViewController/TOPasscodeViewController.h>
+#import "Nextcloud-Bridging-Header.h"
 
 #define alertViewEsci 1
 #define alertViewAzzeraCache 2
@@ -96,6 +97,17 @@
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
     
+    // EndToEnd Encryption
+    NSString *title = [NSString stringWithFormat:@"%@ (%@)",NSLocalizedString(@"_e2e_settings_", nil), NSLocalizedString(@"_experimental_", nil)];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"e2eEncryption" rowType:XLFormRowDescriptorTypeButton title:title];
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
+    row.action.viewControllerClass = [NCManageEndToEndEncryption class];
+    
+    [section addFormRow:row];
+    
     // Section : Screen --------------------------------------------------------------
     
     section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_screen_", nil)];
@@ -129,19 +141,10 @@
     
     // Section : E2EEncryption --------------------------------------------------------------
         
-    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_e2e_settings_title_", nil)];
-    [form addFormSection:section];
+//    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_e2e_settings_title_", nil)];
+//    [form addFormSection:section];
     
-    // EndToEnd Encryption
-    NSString *title = [NSString stringWithFormat:@"%@ (%@)",NSLocalizedString(@"_e2e_settings_", nil), NSLocalizedString(@"_experimental_", nil)];
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"e2eEncryption" rowType:XLFormRowDescriptorTypeButton title:title];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
-    [row.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
-    row.action.viewControllerClass = [NCManageEndToEndEncryption class];
-    
-    [section addFormRow:row];
+   
     
     // Section Advanced -------------------------------------------------
     
@@ -163,14 +166,20 @@
     section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_data_protection_", nil)];
     [form addFormSection:section];
     
+    PrivacySettingsViewController *privacySettingsViewController = [[PrivacySettingsViewController alloc] init];
+    
+    privacySettingsViewController.isShowSettingsButton = true;
+    
+    
     //privacy settings
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"advanced" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_privacy_settings_", nil)];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"privacySettings" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_privacy_settings_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
     //[row.cellConfig setObject:[[UIImage imageNamed:@"gear"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
-    row.action.viewControllerClass = [CCAdvanced class];
+    row.action.viewControllerClass = [privacySettingsViewController class];
     [section addFormRow:row];
+    
     
     //privacy policy
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"advanced" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_privacy_policy_", nil)];
@@ -231,13 +240,14 @@
     [[XLFormViewController cellClassesForRowDescriptorTypes] setObject:[MagentaCloudVersionView class] forKey:@"kNMCCustomCellType"];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disablefilesapp" rowType:@"kNMCCustomCellType" title:NSLocalizedString(@"_magentacloud_version_", nil)];
+    NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleInfoDictionaryVersion"];
 
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
     row.cellConfigAtConfigure[@"cellLabel.text"] = NSLocalizedString(@"_magentacloud_version_", nil);
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"cellLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"cellLabel.textColor"];
     
-    row.cellConfigAtConfigure[@"versionLabel.text"] = @"6.5.0";
+    row.cellConfigAtConfigure[@"versionLabel.text"] = appVersion;
     
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"versionLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.graySoft forKey:@"versionLabel.textColor"];
@@ -397,6 +407,9 @@
         }
         
         [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterChangeTheming object:nil];
+    }
+    if ([rowDescriptor.tag isEqualToString:@"privacySettings"]){
+        
     }
 }
 
