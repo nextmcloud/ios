@@ -170,6 +170,8 @@
     
     privacySettingsViewController.isShowSettingsButton = true;
     
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showSettingsButton"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     //privacy settings
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"privacySettings" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_privacy_settings_", nil)];
