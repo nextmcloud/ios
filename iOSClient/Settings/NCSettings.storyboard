@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="P4P-kP-0dM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="P4P-kP-0dM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -85,6 +86,59 @@
             </objects>
             <point key="canvasLocation" x="12655" y="607"/>
         </scene>
+        <!--Initial Privacy Settings View Controller-->
+        <scene sceneID="Ly5-dm-LTN">
+            <objects>
+                <viewController storyboardIdentifier="privacyPolicyViewController" id="PY5-f7-e4T" customClass="InitialPrivacySettingsViewController" customModule="Nextcloud" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="hni-Ja-wnk">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Privacy Settings" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8xu-Ne-bL3">
+                                <rect key="frame" x="20" y="194" width="374" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="nie-WT-tde" userLabel="privacy help text">
+                                <rect key="frame" x="20" y="235" width="374" height="426"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ctD-ho-2Qo" userLabel="AcceptButton">
+                                <rect key="frame" x="20" y="681" width="374" height="30"/>
+                                <state key="normal" title="Accept"/>
+                            </button>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="90K-Ak-MHR"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="ctD-ho-2Qo" firstAttribute="top" secondItem="nie-WT-tde" secondAttribute="bottom" constant="20" id="1sa-S3-6zn"/>
+                            <constraint firstItem="ctD-ho-2Qo" firstAttribute="leading" secondItem="90K-Ak-MHR" secondAttribute="leading" constant="20" id="5se-7r-B5n"/>
+                            <constraint firstItem="nie-WT-tde" firstAttribute="top" secondItem="8xu-Ne-bL3" secondAttribute="bottom" constant="20" id="Pie-1h-nKH"/>
+                            <constraint firstItem="8xu-Ne-bL3" firstAttribute="centerX" secondItem="hni-Ja-wnk" secondAttribute="centerX" id="RiV-JI-KId"/>
+                            <constraint firstItem="90K-Ak-MHR" firstAttribute="trailing" secondItem="nie-WT-tde" secondAttribute="trailing" constant="20" id="UB1-ec-ihk"/>
+                            <constraint firstItem="nie-WT-tde" firstAttribute="centerY" secondItem="hni-Ja-wnk" secondAttribute="centerY" id="WWb-wX-etf"/>
+                            <constraint firstItem="90K-Ak-MHR" firstAttribute="trailing" secondItem="8xu-Ne-bL3" secondAttribute="trailing" constant="20" id="bwo-Kj-pft"/>
+                            <constraint firstItem="8xu-Ne-bL3" firstAttribute="top" secondItem="90K-Ak-MHR" secondAttribute="top" constant="150" id="ogJ-wG-ggL"/>
+                            <constraint firstItem="8xu-Ne-bL3" firstAttribute="leading" secondItem="90K-Ak-MHR" secondAttribute="leading" constant="20" id="qaB-VF-cAb"/>
+                            <constraint firstItem="nie-WT-tde" firstAttribute="leading" secondItem="90K-Ak-MHR" secondAttribute="leading" constant="20" id="tmH-lk-MvH"/>
+                            <constraint firstItem="90K-Ak-MHR" firstAttribute="trailing" secondItem="ctD-ho-2Qo" secondAttribute="trailing" constant="20" id="uN4-CA-ke1"/>
+                            <constraint firstItem="nie-WT-tde" firstAttribute="centerX" secondItem="hni-Ja-wnk" secondAttribute="centerX" id="y7T-3Z-KyD"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="acceptButton" destination="ctD-ho-2Qo" id="b7I-4d-syL"/>
+                        <outlet property="privacySettingsHelpText" destination="nie-WT-tde" id="Qm7-cB-NLs"/>
+                        <outlet property="privacySettingsTitle" destination="8xu-Ne-bL3" id="0j2-qh-qKS"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dpo-CR-pW3" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="13404" y="609"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="Zwa-9g-1qn">
             <objects>
@@ -105,4 +159,12 @@
             <point key="canvasLocation" x="11762" y="607"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>
