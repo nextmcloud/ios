@@ -591,6 +591,7 @@
 "_share_note_recipient_"        = "Note to recipient";
 "_share_delete_sharelink_"      = "Delete share link";
 "_share_add_sharelink_"         = "Add another link";
+"_create_link_"                 = "Create link";
 "_share_can_reshare_"           = "Can reshare";
 "_share_can_create_"            = "Can create";
 "_share_can_change_"            = "Can change";
@@ -600,6 +601,7 @@
 "_share_internal_link_des_"     = "Only works for users with access to this folder";
 "_permissions_"                 = "Permissions";
 "_advance_permissions_"         = "Advance permissions";
+"_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCloud users, you have more opportunities for collaboration.";
 
 // Share Permission
 
@@ -630,6 +632,16 @@
 "_share_link_upload_"               = "File drop (upload only)";
 "_share_link_upload_modify_"        = "Allow upload and editing";
 "_share_link_hide_download_"        = "Hide download";
+"_PERMISSION_"                      = "PERMISSION";
+"_advance_permissions_"             = "Advance permissions";
+"_PASSWORD_PROTECTION_"             = "PASSWORD PROTECTION";
+"_EXPIRATION_DATE_"                 = "EXPIRATION DATE";
+"_file_drop_message_"               = "With File drop, only uploading is allowed. Only you can see files and folders that have been uploaded.";
+"_apply_changes_"                   = "Apply changes";
+"_LINK_LABEL_"                      = "LINK LABEL";
+"_HIDE_DOWNLOAD_"                   = "HIDE DOWNLOAD";
+"_custom_link_label"                = "Your custom link label";
+
 
 // ShareInfoCMOC
 

@@ -366,13 +366,13 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
             DispatchQueue.main.async() { [self] in
                 var viewNewUserPermission: NCShareNewUserPermission
-                if directory! {
+//                if directory! {
 //                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFolderPermission") as! NCShareNewUserPermission
-                } else {
-//                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
-                }
+                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserPermission") as! NCShareNewUserPermission
+//                } else {
+////                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+//                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
+//                }
                 
                 viewNewUserPermission.metadata = self!.metadata
                 viewNewUserPermission.sharee = sharee
