@@ -2,8 +2,9 @@
 //  NCShareQuickStatusMenu.swift
 //  Nextcloud
 //
-//  Created by T-systems on 30/06/21.
+//  Created by TSI-mc on 30/06/21.
 //  Copyright © 2021 Marino Faggiana. All rights reserved.
+//  Copyright © 2021 TSI-mc. All rights reserved.
 //
 
 import UIKit

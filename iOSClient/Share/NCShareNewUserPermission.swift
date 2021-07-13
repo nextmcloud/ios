@@ -14,25 +14,6 @@ import SVGKit
 
 class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, NCShareNetworkingDelegate, FSCalendarDelegate, FSCalendarDelegateAppearance, CellPermissionEditDelegate {
         
-    @IBOutlet weak var labelPermission: UILabel!
-    @IBOutlet weak var switchReadOnly: UISwitch!
-    @IBOutlet weak var labelReadOnly: UILabel!
-    @IBOutlet weak var switchAllowUploadAndEditing: UISwitch!
-    @IBOutlet weak var labelAllowUploadAndEditing: UILabel!
-    @IBOutlet weak var switchFileDrop: UISwitch!
-    @IBOutlet weak var labelFileDrop: UILabel!
-    @IBOutlet weak var switchCanReshare: UISwitch!
-    @IBOutlet weak var labelCanReshare: UILabel!
-    @IBOutlet weak var labelAdvancePermission: UILabel!
-    @IBOutlet weak var switchHideDownload: UISwitch!
-    @IBOutlet weak var labelHideDownload: UILabel!
-    @IBOutlet weak var switchPasswordProtect: UISwitch!
-    @IBOutlet weak var labelPasswordProtect: UILabel!
-    @IBOutlet weak var fieldPasswordProtect: UITextField!
-    @IBOutlet weak var switchSetExpirationDate: UISwitch!
-    @IBOutlet weak var labelSetExpirationDate: UILabel!
-    @IBOutlet weak var fieldSetExpirationDate: UITextField!
-    
     
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var folderImageView: UIImageView!
@@ -57,21 +38,24 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
     var width: CGFloat = 0
     var height: CGFloat = 0
     var permission: Int = 0
-    var hideDownload: Bool?
+    var hideDownload = false
     var filePermissionCount = 0
     var password: String!
-    var linkLabel: String!
+    var linkLabel = ""
     var expirationDateText: String!
     var expirationDate: Date!
     @IBOutlet weak var headerImageViewSpaceFavorite: NSLayoutConstraint!
     var permissionIndex = 0
+    var permissions = "RDNVCK"
+    var passwordProtected = false
+    var setExpiration = false
+    var shareeEmail: String?
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.favorite.translatesAutoresizingMaskIntoConstraints = false
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
-//            headerView.imageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
             self.imageView.image = getImageMetadata(metadata!)
             self.imageView.contentMode = .scaleToFill
             self.folderImageView.isHidden = true
@@ -99,37 +83,12 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
         }
         self.labelDescription.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
         
-//        switchAllowUploadAndEditing.onTintColor = NCBrandColor.shared.brandElement
-//        switchReadOnly.onTintColor = NCBrandColor.shared.brandElement
-//        switchCanReshare.onTintColor = NCBrandColor.shared.brandElement
-//        switchPasswordProtect.onTintColor = NCBrandColor.shared.brandElement
-//        switchHideDownload.onTintColor = NCBrandColor.shared.brandElement
-//        switchSetExpirationDate.onTintColor = NCBrandColor.shared.brandElement
-//
-//        labelCanReshare?.text = NSLocalizedString("_share_can_reshare_", comment: "")
-//        labelCanReshare?.textColor = NCBrandColor.shared.textView
-//        labelReadOnly?.text = NSLocalizedString("_share_read_only_", comment: "")
-//        labelReadOnly?.textColor = NCBrandColor.shared.icon
-//        labelAllowUploadAndEditing?.text = NSLocalizedString("_share_allow_upload_", comment: "")
-//        labelAllowUploadAndEditing?.textColor = NCBrandColor.shared.icon
-//        labelHideDownload?.text = NSLocalizedString("_share_hide_download_", comment: "")
-//        labelHideDownload?.textColor = NCBrandColor.shared.icon
-//        labelPasswordProtect?.text = NSLocalizedString("_share_password_protect_", comment: "")
-//        labelPasswordProtect?.textColor = NCBrandColor.shared.icon
-//        labelSetExpirationDate?.text = NSLocalizedString("_share_expiration_date_", comment: "")
-//        labelSetExpirationDate?.textColor = NCBrandColor.shared.icon
-//
-//        labelPermission?.text = NSLocalizedString("_permissions_", comment: "")
-//        labelPermission?.textColor = NCBrandColor.shared.commonViewInfoText
-//        labelAdvancePermission?.text = NSLocalizedString("_share_expiration_date_", comment: "")
-//        labelAdvancePermission?.textColor = NCBrandColor.shared.commonViewInfoText
-//
         btnCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         btnCancel.layer.cornerRadius = 10
         btnCancel.layer.masksToBounds = true
         btnCancel.layer.borderWidth = 1
         btnCancel.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
-        btnCancel.setTitleColor(NCBrandColor.shared.icon, for: .normal)
+        btnCancel.setTitleColor(UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0), for: .normal)
         btnCancel.backgroundColor = .white
 
         btnNext.setTitle(NSLocalizedString("_next_", comment: ""), for: .normal)
@@ -138,83 +97,16 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
         btnNext.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         btnNext.setTitleColor(.white, for: .normal)
 
-//        fieldPasswordProtect.isEnabled = false
-//
-//        if self.metadata!.directory {
-//            switchFileDrop.onTintColor = NCBrandColor.shared.brandElement
-//            labelFileDrop?.text = NSLocalizedString("_share_file_drop_", comment: "")
-//            labelFileDrop?.textColor = NCBrandColor.shared.icon
-//        }
+        self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.icon
+        self.title = self.shareeEmail
+        UserDefaults.standard.setValue(self.linkLabel, forKey: "_share_link_")
+        
+        let dummyViewHeight = CGFloat(40)
+        self.tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: self.tableView.bounds.size.width, height: dummyViewHeight))
+        self.tableView.contentInset = UIEdgeInsets(top: -dummyViewHeight, left: 0, bottom: 0, right: 0)
+        self.metadata?.permissions = self.permissions
+        
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase,  view: self.view, delegate: self)
-    }
-    
-    func reloadData(idShare: Int) {
-//        guard let metadata = self.metadata else { return }
-//        tableShare = NCManageDatabase.shared.getTableShare(account: metadata.account, idShare: idShare)
-//        guard let tableShare = self.tableShare else { return }
-//
-//        guard let sharee = self.sharee else { return }
-//
-//        if metadata.directory {
-//            // File Drop
-//            if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
-//                switchReadOnly.setOn(false, animated: false)
-//                switchAllowUploadAndEditing.setOn(false, animated: false)
-//                switchFileDrop.setOn(true, animated: false)
-//            } else {
-//                // Read Only
-//                if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
-//                    switchReadOnly.setOn(false, animated: false)
-//                    switchAllowUploadAndEditing.setOn(true, animated: false)
-//                } else {
-//                    switchReadOnly.setOn(true, animated: false)
-//                    switchAllowUploadAndEditing.setOn(false, animated: false)
-//                }
-//                switchFileDrop.setOn(false, animated: false)
-//            }
-//        } else {
-//            // Allow editing
-//            if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
-//                switchAllowUploadAndEditing.setOn(true, animated: false)
-//                switchReadOnly.setOn(false, animated: false)
-//            } else {
-//                switchAllowUploadAndEditing.setOn(false, animated: false)
-//                switchReadOnly.setOn(true, animated: false)
-//            }
-//        }
-//
-//        // Hide download
-//        if tableShare.hideDownload {
-//            switchHideDownload.setOn(true, animated: false)
-//        } else {
-//            switchHideDownload.setOn(false, animated: false)
-//        }
-//
-//        // Password protect
-//        if tableShare.shareWith.count > 0 {
-//            switchPasswordProtect.setOn(true, animated: false)
-//            fieldPasswordProtect.isEnabled = true
-//            fieldPasswordProtect.text = tableShare.shareWith
-//        } else {
-//            switchPasswordProtect.setOn(false, animated: false)
-//            fieldPasswordProtect.isEnabled = false
-//            fieldPasswordProtect.text = ""
-//        }
-//
-//        // Set expiration date
-//        if tableShare.expirationDate != nil {
-//            switchSetExpirationDate.setOn(true, animated: false)
-//            fieldSetExpirationDate.isEnabled = true
-//
-//            let dateFormatter = DateFormatter()
-//            dateFormatter.formatterBehavior = .behavior10_4
-//            dateFormatter.dateStyle = .medium
-//            fieldSetExpirationDate.text = dateFormatter.string(from: tableShare.expirationDate! as Date)
-//        } else {
-//            switchSetExpirationDate.setOn(false, animated: false)
-//            fieldSetExpirationDate.isEnabled = false
-//            fieldSetExpirationDate.text = ""
-//        }
     }
     
     func unLoad() {
@@ -227,61 +119,49 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
     
     // MARK: - Switch actions
     
-//    @IBAction func readOnlyValueChanged(sender: UISwitch) {
     func readOnlyValueChanged(sender: UISwitch) {
-//        guard let tableShare = self.tableShare else { return }
         guard let metadata = self.metadata else { return }
         permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata.directory)
 
-//        if sender.isOn && permission != tableShare.permissions {
         if sender.isOn {
             if metadata.directory {
-                switchAllowUploadAndEditing.setOn(false, animated: false)
+//                switchAllowUploadAndEditing.setOn(false, animated: false)
                 if self.metadata!.directory {
-                    switchFileDrop.setOn(false, animated: false)
+//                    switchFileDrop.setOn(false, animated: false)
                 }
                 metadata.permissions = "RDNVCK"
             }
-//            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
             metadata.permissions = "RDNVW"
             sender.setOn(true, animated: false)
         }
     }
     
-//    @IBAction func allowUploadEditingValueChanged(sender: UISwitch) {
     func allowUploadEditingValueChanged(sender: UISwitch) {
-//        guard let tableShare = self.tableShare else { return }
         guard let metadata = self.metadata else { return }
         permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata.directory)
 
-//        if sender.isOn && permission != tableShare.permissions {
         if sender.isOn {
-            switchReadOnly.setOn(false, animated: false)
+//            switchReadOnly.setOn(false, animated: false)
             if metadata.directory {
-                switchFileDrop.setOn(false, animated: false)
+//                switchFileDrop.setOn(false, animated: false)
             }
             metadata.permissions = "RGDNV"
-//            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
             metadata.permissions = "RDNVW"
             sender.setOn(true, animated: false)
         }
     }
     
-//    @IBAction func fileDropValueChanged(sender: UISwitch) {
     func fileDropValueChanged(sender: UISwitch) {
-//        guard let tableShare = self.tableShare else { return }
 
         guard let metadata = self.metadata else { return }
         permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata.directory)
 
-//        if sender.isOn && permission != tableShare.permissions {
         if sender.isOn {
-            switchReadOnly.setOn(false, animated: false)
-            switchAllowUploadAndEditing.setOn(false, animated: false)
+//            switchReadOnly.setOn(false, animated: false)
+//            switchAllowUploadAndEditing.setOn(false, animated: false)
             metadata.permissions = "RGDNVCK"
-//            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
             metadata.permissions = "RGD"
             sender.setOn(true, animated: false)
@@ -318,47 +198,38 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
             }
         }
         if sender.isOn {
-//            metadata.permissions = "SRGD"
+            
         }
-        
-//        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
     
-//    @IBAction func hideDownloadValueChanged(sender: UISwitch) {
     func hideDownloadValueChanged(sender: UISwitch) {
-//        guard let tableShare = self.tableShare else { return }
         
         hideDownload = sender.isOn
-//        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, expirationDate: nil, hideDownload: sender.isOn)
     }
     
-//    @IBAction func setPasswordValueChanged(sender: UISwitch) {
     func setPasswordValueChanged(sender: UISwitch) {
-//        guard let tableShare = self.tableShare else { return }
         
         if sender.isOn {
-            fieldPasswordProtect.isEnabled = true
-            fieldPasswordProtect.text = ""
-            fieldPasswordProtect.becomeFirstResponder()
+            self.passwordProtected = true
         } else {
-            fieldPasswordProtect.isEnabled = false
-//            networking?.updateShare(idShare: tableShare.idShare, password: "", permission: tableShare.permissions, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+            self.passwordProtected = false
         }
+        self.tableView.beginUpdates()
+        self.tableView.reloadRows(at: [IndexPath(row: 0, section: 3)], with: .none)
+        self.tableView.endUpdates()
     }
     
-//    @IBAction func setExpirationValueChanged(sender: UISwitch) {
     @IBAction func setExpirationValueChanged(sender: UISwitch) {
-//        guard let tableShare = self.tableShare else { return }
-
         if sender.isOn {
-            fieldSetExpirationDate.isEnabled = true
-            fieldSetExpirationDate(sender: fieldSetExpirationDate)
+            self.setExpiration = true
         } else {
-//            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, expirationDate: "", hideDownload: tableShare.hideDownload)
+            self.setExpiration = false
         }
+        self.tableView.beginUpdates()
+        self.tableView.reloadRows(at: [IndexPath(row: 0, section: 4)], with: .none)
+        self.tableView.endUpdates()
     }
     
-//    @IBAction func fieldSetExpirationDate(sender: UITextField) {
     func fieldSetExpirationDate(sender: UITextField) {
         width = self.view.frame.width
         height = self.view.frame.height
@@ -378,6 +249,9 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
     }
     
     @IBAction func nextClicked(_ sender: Any) {
+        if self.linkLabel != "" {
+            UserDefaults.standard.setValue(self.linkLabel, forKey: "_share_link_")
+        }
         
         let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
         let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
@@ -388,7 +262,6 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
     }
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
-//        if let metadata = NCManageDatabase.shared.getMetadataFromOcId("") {
         if let metadata = self.metadata {
             NCNetworking.shared.favoriteMetadata(metadata, urlBase: appDelegate.urlBase) { (errorCode, errorDescription) in
                 if errorCode == 0 {
@@ -409,21 +282,17 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
     // MARK: - Delegate networking
     
     func readShareCompleted() {
-//        reloadData(idShare: tableShare?.idShare ?? 0)
     }
     
     func shareCompleted() {
         unLoad()
-//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
     }
     
     func unShareCompleted() {
         unLoad()
-//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
     }
     
     func updateShareWithError(idShare: Int) {
-//        reloadData(idShare: idShare)
     }
     
     func getSharees(sharees: [NCCommunicationSharee]?) { }
@@ -438,14 +307,9 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
             let dateFormatter = DateFormatter()
             dateFormatter.formatterBehavior = .behavior10_4
             dateFormatter.dateStyle = .medium
-//            fieldSetExpirationDate.text = dateFormatter.string(from:date)
-//            fieldSetExpirationDate.endEditing(true)
-            
             
             self.expirationDateText = dateFormatter.string(from:date)
-//            let cell = self.tableView.cellForRow(at: IndexPath(row: 0, section: 4)) as! CellPermissionEdit
             self.tableView.beginUpdates()
-//            cell.textField.text = dateFormatter.string(from:date)
             self.tableView.reloadRows(at: [IndexPath(row: 0, section: 4)], with: .none)
             self.tableView.endUpdates()
             
@@ -457,7 +321,6 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
             let expirationDate = dateFormatter.string(from: date)
             
             metadata?.trashbinDeletionTime = date as NSDate
-//            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, expirationDate: expirationDate, hideDownload: tableShare.hideDownload)
         }
     }
     
@@ -481,7 +344,7 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
         calendar = nil
         viewWindowCalendar = nil
         
-        reloadData(idShare: tableShare?.idShare ?? 0)
+//        reloadData(idShare: tableShare?.idShare ?? 0)
     }
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
@@ -527,10 +390,22 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
     }
     
     func textFieldTextChanged(_ textField: UITextField) {
-//        swwi
-        
-        self.password = textField.text
-        self.expirationDateText = textField.text
+        let value = textField.tag
+        let text = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        switch value {
+        case 1:
+            self.linkLabel = text ?? ""
+            break
+        case 3:
+            self.password = text
+            break
+        case 4:
+//            fieldSetExpirationDate(sender: textField)
+            textField.text = ""
+            break
+        default:
+            break
+        }
     }
     
     //MARK: - Image
@@ -599,7 +474,6 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
 extension NCShareNewUserPermission: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let section = indexPath.section
-        let row = indexPath.row
         var height: CGFloat = 44
         
         switch section {
@@ -625,6 +499,17 @@ extension NCShareNewUserPermission: UITableViewDelegate {
                     let cell = tableView.cellForRow(at: IndexPath(row: i, section: 0)) as! CellPermission
                     cell.accessoryView = nil
                 }
+            }
+            switch indexPath.row {
+            case 1:
+                self.permissions = "RGDNV"
+                break
+            case 2:
+                self.permissions = "RGDNVCK"
+                break
+            default:
+                self.permissions = "RDNVCK"
+                break
             }
         }
     }
@@ -657,8 +542,6 @@ extension NCShareNewUserPermission: UITableViewDataSource {
         
         switch section {
         case 0:
-//            if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermission", for: indexPath) as? CellPermission {
-//                cell.seperator.isHidden = false
             switch row {
             case 0:
                 if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermission", for: indexPath) as? CellPermission {
@@ -721,23 +604,15 @@ extension NCShareNewUserPermission: UITableViewDataSource {
             default:
                 break
             }
-//            } else {
-//                if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEdit", for: indexPath) as? CellPermissionEdit {
-//                    cell.seperator.isHidden = false
-//                    cell.seperatorBottom.isHidden = true
-//                    cell.title.text = NSLocalizedString("_share_can_reshare_", comment: "")
-//                    cell.switchCell.tag = 1
-//                    return cell
-//                }
-//            }
             break
         case 1:
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEdit", for: indexPath) as? CellPermissionEdit {
                 cell.delegate = self
-//                cell.title.text = NSLocalizedString("_custom_link_label", comment: "")
+                cell.title.text = NSLocalizedString("_LINK_LABEL_", comment: "")
                 cell.switchCell.isHidden = true
                 cell.seperator.isHidden = false
                 cell.seperatorBottom.isHidden = true
+                cell.textField.placeholder = NSLocalizedString("_custom_link_label", comment: "")
                 cell.textField.tag = 1
                 let button = UIButton()
                 button.sizeThatFits(CGSize(width: 100, height: cell.textField.layer.frame.height))
@@ -766,6 +641,13 @@ extension NCShareNewUserPermission: UITableViewDataSource {
                 cell.switchCell.tag = 3
                 cell.textField.isSecureTextEntry = true
                 cell.textField.tag = cell.switchCell.tag
+                if self.passwordProtected {
+                    cell.switchCell.isOn = true
+                    cell.textField.isEnabled = cell.switchCell.isOn
+                } else {
+                    cell.switchCell.isOn = false
+                    cell.textField.isEnabled = cell.switchCell.isOn
+                }
                 return cell
             }
             break
@@ -777,6 +659,11 @@ extension NCShareNewUserPermission: UITableViewDataSource {
                 cell.seperatorBottom.isHidden = true
                 cell.switchCell.tag = 4
                 cell.textField.tag = cell.switchCell.tag
+                if self.setExpiration {
+                    cell.textField.isEnabled = true
+                } else {
+                    cell.textField.isEnabled = false
+                }
                 if let expire = self.expirationDateText {
                     cell.textField.text = expire
                     cell.textField.endEditing(true)
@@ -827,7 +714,25 @@ extension NCShareNewUserPermission: UITableViewDataSource {
 
 
         var view: UIView!
-        if section == 0 || section == 1 {
+//        switch section {
+//        case 0:
+////            if self.metadata?.directory {
+////                let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: 120))
+////                let favorite = UIButton(frame: CGRect(x: 15, y: imageView.frame.height + 5, width: 24, height: 24))
+////
+////                view = UIView(frame: CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: 40))
+////            } else {
+////
+////            }
+//            break
+//        case 0:
+//            break
+//        default:
+//            break
+//        }
+        
+//        if section == 0 || section == 1 {
+        if section == 0 {
             view = UIView(frame: CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: 40))
             let headerLable = UILabel(frame: CGRect(x: 15, y: 0, width: view.frame.width, height: 15))
             headerLable.textColor = .black
@@ -836,8 +741,8 @@ extension NCShareNewUserPermission: UITableViewDataSource {
                 headerLable.text = NSLocalizedString("_sharing_", comment: "")
                 headerSectionLabel.text = NSLocalizedString("_PERMISSION_", comment: "")
             } else {
-                headerLable.text = NSLocalizedString("_advance_permissions_", comment: "")
-                headerSectionLabel.text = NSLocalizedString("_LINK_LABEL_", comment: "")
+//                headerLable.text = NSLocalizedString("_advance_permissions_", comment: "")
+//                headerSectionLabel.text = NSLocalizedString("_LINK_LABEL_", comment: "")
             }
             
             headerSectionLabel.textColor = NCBrandColor.shared.textInfo
@@ -852,6 +757,10 @@ extension NCShareNewUserPermission: UITableViewDataSource {
         headerSectionLabel.textColor = NCBrandColor.shared.textInfo
         
         switch section {
+        case 1:
+            headerSectionLabel.text = NSLocalizedString("_advance_permissions_", comment: "")
+            headerSectionLabel.textColor = .black
+            break
         case 2:
             headerSectionLabel.text = NSLocalizedString("_HIDE_DOWNLOAD_", comment: "")
             break
@@ -892,8 +801,13 @@ class CellPermissionEdit: UITableViewCell, UITextFieldDelegate {
         delegate?.textFieldSelected(textField)
     }
     
-    func textFieldDidEndEditing(_ textField: UITextField) {
+//    func textFieldDidEndEditing(_ textField: UITextField) {
+//        delegate?.textFieldTextChanged(textField)
+//    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         delegate?.textFieldTextChanged(textField)
+        return true
     }
 }
 

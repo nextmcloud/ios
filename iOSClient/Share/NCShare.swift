@@ -4,6 +4,7 @@
 //
 //  Created by Marino Faggiana on 17/07/2019.
 //  Copyright © 2019 Marino Faggiana. All rights reserved.
+//  Copyright © 2021 TSI-mc. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
@@ -57,6 +58,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var dropDown = DropDown()
     private var networking: NCShareNetworking?
     private var quickStatusTableShare: tableShare!
+    private var shareeEmail: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -151,6 +153,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let searchString = textField.text else { return }
 
         networking?.getSharees(searchString: searchString)
+        self.shareeEmail = searchString
     }
     
     @IBAction func touchUpInsideButtonCopy(_ sender: Any) {
@@ -376,6 +379,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                 
                 viewNewUserPermission.metadata = self!.metadata
                 viewNewUserPermission.sharee = sharee
+                viewNewUserPermission.shareeEmail = self?.shareeEmail
                 self?.navigationController!.pushViewController(viewNewUserPermission, animated: true)
             }
 //            self!.networking?.createShare(shareWith: sharee.shareWith, shareType: sharee.shareType, metadata: self!.metadata!)
@@ -443,7 +447,12 @@ extension NCShare: UITableViewDataSource {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell {
                 cell.tableShare = tableShare
                 cell.delegate = self
-                cell.labelTitle.text = NSLocalizedString("_share_link_", comment: "")
+                let linkText = UserDefaults.standard.value(forKey: "_share_link_") as! String
+                if linkText != "" {
+                    cell.labelTitle.text = linkText
+                } else {
+                    cell.labelTitle.text = NSLocalizedString("_share_link_", comment: "")
+                }
                 cell.labelTitle.textColor = NCBrandColor.shared.textView
                 return cell
             }

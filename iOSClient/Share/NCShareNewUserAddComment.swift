@@ -2,8 +2,9 @@
 //  NCShareNewUserAddComment.swift
 //  Nextcloud
 //
-//  Created by T-systems on 21/06/21.
+//  Created by TSI-mc on 21/06/21.
 //  Copyright © 2021 Marino Faggiana. All rights reserved.
+//  Copyright © 2021 TSI-mc. All rights reserved.
 //
 
 import UIKit
@@ -32,11 +33,11 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     @IBOutlet weak var headerImageViewSpaceFavorite: NSLayoutConstraint!
     var creatingShare = false
     var note = ""
+    var shareeEmail: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
-//            headerView.imageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
             self.imageView.image = getImageMetadata(metadata!)
             self.folderImageView.isHidden = true
             self.headerImageViewSpaceFavorite.constant = 5.0
@@ -64,16 +65,15 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         labelNote.text = NSLocalizedString("_share_note_recipient_", comment: "")
         
         commentTextView.layer.borderWidth = 1
-        commentTextView.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
-//        commentTextView.text = "Note"
-        commentTextView.textColor = .lightGray
+        commentTextView.layer.borderColor = NCBrandColor.shared.icon.cgColor
+        commentTextView.textColor = NCBrandColor.shared.icon
         
         btnCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         btnCancel.layer.cornerRadius = 10
         btnCancel.layer.masksToBounds = true
         btnCancel.layer.borderWidth = 1
         btnCancel.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
-        btnCancel.setTitleColor(NCBrandColor.shared.icon, for: .normal)
+        btnCancel.setTitleColor(UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0), for: .normal)
         btnCancel.backgroundColor = .white
         
         btnSendShare.setTitle(NSLocalizedString("_send_share_", comment: ""), for: .normal)
@@ -82,8 +82,10 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         btnSendShare.setTitleColor(.white, for: .normal)
         
+        self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.icon
+        self.title = self.shareeEmail
+        
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
-        // Do any additional setup after loading the view.
     }
     
     @IBAction func cancelClicked(_ sender: Any) {
@@ -227,14 +229,4 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     
     func getSharees(sharees: [NCCommunicationSharee]?) {}
     
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
