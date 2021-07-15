@@ -18,6 +18,7 @@ class HelpViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        self.title = NSLocalizedString("_help_", comment: "")
         let myWebView:WKWebView = WKWebView(frame: CGRect(x:0, y:0, width: UIScreen.main.bounds.width, height:UIScreen.main.bounds.height))
         myWebView.uiDelegate = self
         myWebView.navigationDelegate = self

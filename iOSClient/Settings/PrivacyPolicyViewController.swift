@@ -14,6 +14,9 @@ class PrivacyPolicyViewController: UIViewController, WKNavigationDelegate, WKUID
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.title = NSLocalizedString("_privacy_policy_", comment: "")
+        
         // Do any additional setup after loading the view, typically from a nib.
         
         let myWebView:WKWebView = WKWebView(frame: CGRect(x:0, y:0, width: UIScreen.main.bounds.width, height:UIScreen.main.bounds.height))

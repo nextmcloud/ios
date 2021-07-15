@@ -15,7 +15,8 @@ class ImprintViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
+        self.title = NSLocalizedString("_imprint_", comment: "")
+
         let myWebView:WKWebView = WKWebView(frame: CGRect(x:0, y:0, width: UIScreen.main.bounds.width, height:UIScreen.main.bounds.height))
         myWebView.uiDelegate = self
         myWebView.navigationDelegate = self
@@ -37,5 +38,18 @@ class ImprintViewController: UIViewController, WKNavigationDelegate, WKUIDelegat
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         NCUtility.shared.stopActivityIndicator()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        if UIDevice.current.orientation.isLandscape {
+            print("Landscape")
+        }
+        if UIDevice.current.orientation.isFlat {
+            print("Flat")
+        } else {
+            print("Portrait")
+        }
     }
 }

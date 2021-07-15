@@ -27,6 +27,7 @@ import NCCommunication
 import TOPasscodeViewController
 import LocalAuthentication
 import Firebase
+import AppAuth
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, TOPasscodeViewControllerDelegate {
@@ -63,6 +64,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var shares: [tableShare] = []
     var timerErrorNetworking: Timer?
 
+    var currentAuthorizationFlow: OIDExternalUserAgentSession?
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         let userAgent = CCUtility.getUserAgent() as String
@@ -722,6 +725,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // MARK: - Open URL
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        
+        // Sends the URL to the current authorization flow (if any) which will
+         // process it if it relates to an authorization response.
+         if let authorizationFlow = self.currentAuthorizationFlow,
+                                    authorizationFlow.resumeExternalUserAgentFlow(with: url) {
+            
+           return true
+         }
+
         
         if account == "" { return false }
         

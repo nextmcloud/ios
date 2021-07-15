@@ -11,6 +11,8 @@ import Foundation
 
 class InitialPrivacySettingsViewController: UIViewController {
     
+    
+    @IBOutlet weak var dataPrivacyImage: UIImageView!
     @IBOutlet weak var acceptButton: UIButton!
     @IBOutlet weak var privacySettingsHelpText: UITextView!
     @IBOutlet weak var privacySettingsTitle: UILabel!
@@ -24,6 +26,10 @@ class InitialPrivacySettingsViewController: UIViewController {
         
         privacySettingsHelpText.text = privacyHelpText
         
+        //UIImage(named: "cancel")!.image(color: NCBrandColor.shared.icon, size: 50)
+        //let dataImage
+        //dataPrivacyImage!.image(color: NCBrandColor.shared.icon, size: 60)
+        dataPrivacyImage.image = UIImage(named: "dataPrivacy")!.image(color: NCBrandColor.shared.brand, size: 60)
         privacySettingsHelpText.delegate = self
         privacySettingsHelpText.hyperLink(originalText: privacyHelpText,
                                          linkTextsAndTypes: [NSLocalizedString("_key_privacy_help_", comment: ""): LinkType.privacyPolicy.rawValue,
@@ -42,7 +48,28 @@ extension InitialPrivacySettingsViewController: UITextViewDelegate {
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool {
         if let linkType = LinkType(rawValue: URL.absoluteString) {
             // TODO: handle linktype here with switch or similar.
-            
+            switch linkType {
+            case LinkType.privacyPolicy:
+                let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+
+               let privacyViewController = PrivacyPolicyViewController()
+//                let privacyView = storyboard?.instantiateViewController(withIdentifier: "NCSettings.storyboard") as! NCSettings
+                //let vc = storyboard!.instantiateInitialViewController() as! PrivacyPolicyViewController
+                //self.navigationController?.show(privacyViewController, sender: nil)
+                //self.navigationController?.pushViewController(privacyViewController, animated: true)
+            self.present(privacyViewController, animated: true, completion: nil)
+                
+            case LinkType.reject:
+                let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+                let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacyPolicyViewController") as! InitialPrivacySettingsViewController
+                self.navigationController?.pushViewController(newViewController, animated: true)
+            case LinkType.settings:
+                let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+                let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacyPolicyViewController") as! InitialPrivacySettingsViewController
+                self.present(newViewController, animated: true, completion: nil)
+            default:
+                break
+            }
             print("handle link:: \(linkType)")
         }
         return false
