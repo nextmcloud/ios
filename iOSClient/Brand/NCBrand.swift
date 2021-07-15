@@ -45,15 +45,17 @@ import UIKit
         return instance
     }()
     
-    @objc public var brand:                             String = "Nextcloud"
+    @objc public var brand:                             String = "MagentaCLOUD"//"Nextcloud"
+    @objc public var brandCloud:                             String = "CLOUD"//"Nextcloud"
     @objc public var mailMe:                            String = "ios@nextcloud.com"
     @objc public var textCopyrightNextcloudiOS:         String = "Nextcloud Coherence for iOS %@ © 2021"
     @objc public var textCopyrightNextcloudServer:      String = "Nextcloud Server %@"
-    @objc public var loginBaseUrl:                      String = "https://cloud.nextcloud.com"
+    @objc public var loginBaseUrl:                      String = "https://nextcloud.indemo.t-systems.net/"
     @objc public var pushNotificationServerProxy:       String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost:                     String = "https://nextcloud.com/install"
-    @objc public var linkloginPreferredProviders:       String = "https://nextcloud.com/signup";
+    @objc public var linkloginPreferredProviders:       String = "https://nextcloud.com/signup-ios";
     @objc public var webLoginAutenticationProtocol:     String = "nc://"                                            // example "abc://"
+    
     // Personalized
     @objc public var webCloseViewProtocolPersonalized:  String = ""                                                 // example "abc://change/plan"      Don't touch me !!
     @objc public var folderBrandAutoUpload:             String = ""                                                 // example "_auto_upload_folder_"   Don't touch me !!
@@ -62,7 +64,9 @@ import UIKit
     @objc public var folderDefaultAutoUpload:           String = "Photos"
     
     // Capabilities Group
-    @objc public var capabilitiesGroups:                String = "group.it.twsweb.Crypto-Cloud"
+
+//    @objc public var capabilitiesGroups:                String = "group.in.t-systems.com"
+    @objc public var capabilitiesGroups:                String = "group.com.t-systems.pu-ds.magentacloud.qa"
     
     // User Agent
     @objc public var userAgent:                         String = "Nextcloud-iOS"                                    // Don't touch me !!
@@ -70,21 +74,22 @@ import UIKit
     // Options
     @objc public var use_login_web_personalized:        Bool = false                                                // Don't touch me !!
     @objc public var use_default_auto_upload:           Bool = false
-    @objc public var use_themingColor:                  Bool = true
-    //@objc public var use_themingBackground:             Bool = true                                               // Deprecated
+    @objc public var use_themingColor:                Bool = false
+    //@objc public var use_themingBackground:           Bool = false
     @objc public var use_themingLogo:                   Bool = false
     @objc public var use_storeLocalAutoUploadAll:       Bool = false
     @objc public var use_configuration:                 Bool = false                                                // Don't touch me !!
     @objc public var use_loginflowv2:                   Bool = false                                                // Don't touch me !!
 
-    @objc public var disable_intro:                     Bool = false
-    @objc public var disable_request_login_url:         Bool = false
-    @objc public var disable_multiaccount:              Bool = false
-    @objc public var disable_manage_account:            Bool = false
+    @objc public var disable_intro:       Bool = true
+    @objc public var disable_request_login_url:       Bool = true
+    @objc public var disable_multiaccount:            Bool = true
+    @objc public var disable_manage_account:          Bool = false
     @objc public var disable_more_external_site:        Bool = false
     @objc public var disable_openin_file:               Bool = false                                                // Don't touch me !!
-    @objc public var disable_crash_service:             Bool = false
-    
+    @objc public var disable_crash_service:             Bool = true
+    @objc public var disable_request_account:           Bool = false
+
     override init() {
         
         if folderBrandAutoUpload != "" {
@@ -99,66 +104,160 @@ class NCBrandColor: NSObject {
     @objc static let shared: NCBrandColor = {
         let instance = NCBrandColor()
         instance.setDarkMode()
+        instance.createImagesThemingColor()
         return instance
     }()
+    
+    struct cacheImages {
+        static var file = UIImage()
+
+        static var shared = UIImage()
+        static var canShare = UIImage()
+        static var shareByLink = UIImage()
+        
+        static var favorite = UIImage()
+        static var comment = UIImage()
+        static var livePhoto = UIImage()
+        static var offlineFlag = UIImage()
+        static var local = UIImage()
+
+        static var folderEncrypted = UIImage()
+        static var folderSharedWithMe = UIImage()
+        static var folderPublic = UIImage()
+        static var folderGroup = UIImage()
+        static var folderExternal = UIImage()
+        static var folderAutomaticUpload = UIImage()
+        static var folder = UIImage()
+        
+        static var checkedYes = UIImage()
+        static var checkedNo = UIImage()
+        
+        static var buttonMore = UIImage()
+        static var buttonStop = UIImage()
+    }
 
     // Color
-    @objc public let customer:              UIColor = UIColor(red: 0.0/255.0, green: 130.0/255.0, blue: 201.0/255.0, alpha: 1.0)    // BLU NC : #0082c9
+
+    @objc public let customer:              UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0) //UIColor = UIColor(red: 0.0/255.0, green: 130.0/255.0, blue: 201.0/255.0, alpha: 1.0)    // BLU NC : #0082c9
+    @objc public let customerDefault:       UIColor = UIColor(red: 0.0/255.0, green: 130.0/255.0, blue: 201.0/255.0, alpha: 1.0)    // BLU NC : #0082c9
+    @objc public let cellSelection:       UIColor = UIColor(red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 0.7)    // BLU NC : #0082c9
     @objc public var customerText:          UIColor = .white
     
     @objc public var brand:                 UIColor                                                                                 // don't touch me
     @objc public var brandElement:          UIColor                                                                                 // don't touch me
-    @objc public var brandText:             UIColor                                                                                 // don't touch me
+    @objc public var brandText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
 
     @objc public var connectionNo:          UIColor = UIColor(red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
     @objc public var encrypted:             UIColor = .red
     @objc public var backgroundView:        UIColor = .white
-    @objc public var backgroundCell:        UIColor = .white
     @objc public var backgroundForm:        UIColor = UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
     @objc public var textView:              UIColor = .black
     @objc public var separator:             UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
     @objc public var tabBar:                UIColor = .white
     @objc public let nextcloud:             UIColor = UIColor(red: 0.0/255.0, green: 130.0/255.0, blue: 201.0/255.0, alpha: 1.0)
     @objc public let nextcloudSoft:         UIColor = UIColor(red: 90.0/255.0, green: 160.0/255.0, blue: 210.0/255.0, alpha: 1.0)
-    @objc public let icon:                  UIColor = UIColor(red: 104.0/255.0, green: 104.0/255.0, blue: 104.0/255.0, alpha: 1.0)
+    @objc public var icon:                  UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
     @objc public let optionItem:            UIColor = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
     @objc public let graySoft:              UIColor = UIColor(red: 162.0/255.0, green: 162.0/255.0, blue: 162.0/255.0, alpha: 0.5)
     @objc public let yellowFavorite:        UIColor = UIColor(red: 248.0/255.0, green: 205.0/255.0, blue: 70.0/255.0, alpha: 1.0)
     @objc public let textInfo:              UIColor = UIColor(red: 153.0/255.0, green: 153.0/255.0, blue: 153.0/255.0, alpha: 1.0)
     @objc public var select:                UIColor = .white
     @objc public var avatarBorder:          UIColor = .white
+    @objc public let progressColorGreen60:              UIColor = UIColor(red: 115.0/255.0, green: 195.0/255.0, blue: 84.0/255.0, alpha: 1.0)
+    @objc public let customerDarkGrey:              UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+    @objc public var actionCellBackgroundColor:              UIColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
+    @objc public var gray26AndGrayf2:              UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+    @objc public var searchImageColor:              UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+    @objc public var memoryConsuptionBackground:        UIColor = UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
+    @objc public var systemGrayAndGray66:        UIColor = .gray
+    @objc public var commonViewInfoText:        UIColor = UIColor(displayP3Red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
+    @objc public var tileSelectionImageColor:        UIColor = .white
+    @objc public var backgroundCell:        UIColor = .white
+    @objc public var seperatorRename:             UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
+
 
     override init() {
         self.brand = self.customer
-        self.brandElement = self.customer
+//        self.brandElement = self.customer
+        self.brandElement = self.customerDefault
         self.brandText = self.customerText        
+    }
+    
+    private func createImagesThemingColor() {
+        
+        cacheImages.file = UIImage.init(named: "file")!
+        
+        cacheImages.shared = UIImage(named: "share")!.image(color: graySoft, size: 50)
+        cacheImages.canShare = UIImage(named: "share")!.image(color: graySoft, size: 50)
+        cacheImages.shareByLink = UIImage(named: "sharebylink")!.image(color: graySoft, size: 50)
+        
+        cacheImages.favorite = NCUtility.shared.loadImage(named: "star.fill", color: yellowFavorite)
+        cacheImages.comment = UIImage(named: "comment")!.image(color: graySoft, size: 50)
+        cacheImages.livePhoto = NCUtility.shared.loadImage(named: "livephoto", color: textView)
+        cacheImages.offlineFlag = UIImage.init(named: "offlineFlag")!
+        cacheImages.local = UIImage.init(named: "local")!
+            
+        let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
+        cacheImages.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
+        cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: customerDefault, size: folderWidth)
+        cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folder =  UIImage(named: "folder_nmcloud")!
+        
+        cacheImages.checkedYes = UIImage(named: "checkedYes")!
+        cacheImages.checkedNo = NCUtility.shared.loadImage(named: "circle", color: graySoft)
+        
+        cacheImages.buttonMore = UIImage(named: "more")!.image(color: graySoft, size: 50)
+        cacheImages.buttonStop = UIImage(named: "stop")!.image(color: graySoft, size: 50)
     }
     
     @objc public func setDarkMode() {
         let darkMode = CCUtility.getDarkMode()
         if darkMode {
-            tabBar = UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
+//            tabBar = UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
+            tabBar = UIColor(red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
             backgroundView = .black
             backgroundCell = UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
             backgroundForm = .black
             textView = .white
-            separator = UIColor(red: 60.0/255.0, green: 60.0/255.0, blue: 60.0/255.0, alpha: 1.0)
+//            separator = UIColor(red: 60.0/255.0, green: 60.0/255.0, blue: 60.0/255.0, alpha: 1.0)
+            separator = UIColor(red: 76.0/255.0, green: 76.0/255.0, blue: 76.0/255.0, alpha: 1.0)
             select = UIColor.white.withAlphaComponent(0.2)
             avatarBorder = .black
+            icon = UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
+            actionCellBackgroundColor = UIColor(displayP3Red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
+            gray26AndGrayf2 = UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+            searchImageColor = icon
+            memoryConsuptionBackground = backgroundCell
+            systemGrayAndGray66 = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+            tileSelectionImageColor = .black
+            seperatorRename = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
         } else {
             tabBar = .white
             backgroundView = .white
             backgroundCell = .white
             backgroundForm = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
             textView = .black
-            separator = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
+//            separator = UIColor(red: 208.0/255.0, green: 209.0/255.0, blue: 212.0/255.0, alpha: 1.0)
+            separator = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
             select = self.brandElement.withAlphaComponent(0.1)
             avatarBorder = .white
+            // reassign default color
+            icon = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+            actionCellBackgroundColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
+            gray26AndGrayf2 = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+            searchImageColor = icon
+            memoryConsuptionBackground = backgroundCell
+            systemGrayAndGray66 = .gray
+            tileSelectionImageColor = .white
+            seperatorRename = UIColor(red: 76.0/255.0, green: 76.0/255.0, blue: 76.0/255.0, alpha: 1.0)
         }
     }
     
 #if !EXTENSION
-    @objc public func settingThemingColor(account: String) {
+    public func settingThemingColor(account: String) {
         
         let darker: CGFloat = 30    // %
         let lighter: CGFloat = 30   // %
@@ -204,8 +303,8 @@ class NCBrandColor: NSObject {
         setDarkMode()
         
         DispatchQueue.main.async {
-            NCCollectionCommon.shared.createImagesThemingColor()
-            NotificationCenter.default.postOnMainThread(name: NCBrandGlobal.shared.notificationCenterChangeTheming)
+            self.createImagesThemingColor()
+            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming)
         }
     }
 #endif
@@ -390,7 +489,7 @@ class NCBrandColor: NSObject {
     @objc let permissionDefaultFolderRemoteShareNoSupportShareOption: Int   = 15
     
     // Metadata : FileType
-    @objc let metadataTypeFileAudio                 = "audio"
+    @objc let metadataTypeFileAudio                 = "audio_file"
     @objc let metadataTypeFileCompress              = "compress"
     @objc let metadataTypeFileDirectory             = "directory"
     @objc let metadataTypeFileDocument              = "document"
@@ -406,6 +505,8 @@ class NCBrandColor: NSObject {
     @objc let keyFileNameAutoUploadType             = "fileNameAutoUploadType"
     @objc let keyFileNameOriginal                   = "fileNameOriginal"
     @objc let keyFileNameOriginalAutoUpload         = "fileNameOriginalAutoUpload"
+    @objc let keyFileNameOriginalAutoUploadPrefs    = "fileNameOriginalAutoUploadPrefs"
+
 
     // Selector
     @objc let selectorDownloadFile                  = "downloadFile"
@@ -487,6 +588,19 @@ class NCBrandColor: NSObject {
     
     @objc let notificationCenterChangedLocation                 = "changedLocation"
     @objc let notificationStatusAuthorizationChangedLocation    = "statusAuthorizationChangedLocation"
+    @objc let notificationImagePreviewRotateImage    = "imagePreviewRotateImage"
+}
+
+extension UIButton {
+
+  func setBackgroundColor(_ color: UIColor, for forState: UIControl.State) {
+    UIGraphicsBeginImageContext(CGSize(width: 1, height: 1))
+    UIGraphicsGetCurrentContext()!.setFillColor(color.cgColor)
+    UIGraphicsGetCurrentContext()!.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+    let colorImage = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+    self.setBackgroundImage(colorImage, for: forState)
+  }
 }
 
 //DispatchQueue.main.async

@@ -21,13 +21,10 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import <MBProgressHUD/MBProgressHUD.h>
-
 #import "CCCellShareExt.h"
 #import "NCSelectDestination.h"
-#import "CCHud.h"
 
-@interface ShareViewController : UIViewController <UITableViewDelegate, MBProgressHUDDelegate, NCSelectDestinationDelegate, UITextFieldDelegate>
+@interface ShareViewController : UIViewController <UITableViewDelegate, NCSelectDestinationDelegate, UITextFieldDelegate>
 
 @property (nonatomic, strong) NSString *account;
 @property (nonatomic, strong) NSString *urlBase;
@@ -38,8 +35,6 @@
 @property (nonatomic, weak) IBOutlet UIBarButtonItem *destinyFolderButton;
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *constraintTopTableView;
 @property (nonatomic, weak) IBOutlet UIToolbar *toolBar;
-
-@property (nonatomic, strong) CCHud *hud;
 
 - (void)closeShareViewController;
 - (void)reloadData:(NSArray *)files;

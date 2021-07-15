@@ -33,7 +33,6 @@ class DragDropViewController: UIViewController {
     private var imagesDestination: [UIImage] = []
     private var itemsDestination: [String] = []
     
-    //AppDelegate
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
     //MARK: Outlets
@@ -71,14 +70,17 @@ class DragDropViewController: UIViewController {
         
         self.navigationItem.title = NSLocalizedString("_scanned_images_", comment: "")
         cancel.title = NSLocalizedString("_cancel_", comment: "")
+        cancel.tintColor = NCBrandColor.shared.brand
         save.title = NSLocalizedString("_save_", comment: "")
+        save.tintColor = NCBrandColor.shared.brand
+        
         labelTitlePDFzone.text = NSLocalizedString("_scan_label_document_zone_", comment: "")
         
         segmentControlFilter.setTitle(NSLocalizedString("_filter_original_", comment: ""), forSegmentAt: 0)
         segmentControlFilter.setTitle(NSLocalizedString("_filter_grayscale_", comment: ""), forSegmentAt: 1)
         segmentControlFilter.setTitle(NSLocalizedString("_filter_bn_", comment: ""), forSegmentAt: 2)
 
-        add.setImage(UIImage(named: "add")?.image(color: NCBrandColor.shared.brandElement, size: 25), for: .normal)
+        add.setImage(UIImage(named: "plus")?.image(color: NCBrandColor.shared.brandElement, size: 25), for: .normal)
         transferDown.setImage(UIImage(named: "transferDown")?.image(color: NCBrandColor.shared.brandElement, size: 25), for: .normal)
         
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture(recognizer:)))
@@ -87,12 +89,34 @@ class DragDropViewController: UIViewController {
         add.addGestureRecognizer(longPressRecognizerPlus)
         
         // changeTheming
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         
         changeTheming()
         
         loadImage()
+        //loadSampleImages()
+
     }
+    
+    func loadSampleImages() {
+            itemsSource.removeAll()
+            
+            let fileManager = FileManager.default
+            let currentPath = fileManager.currentDirectoryPath
+            print("Current path: \(currentPath)")
+            let directoryContents = Bundle.main.urls(forResourcesWithExtension: "jpg", subdirectory: "")!
+            for fileName in directoryContents {
+                itemsSource.append(fileName.absoluteString)
+            }
+            
+            itemsSource = itemsSource.sorted()
+            
+            collectionViewSource.reloadData()
+            
+            // Save button
+            save.isEnabled = true
+        }
+
     
     @objc func changeTheming() {
         view.backgroundColor = NCBrandColor.shared.backgroundForm
@@ -117,7 +141,7 @@ class DragDropViewController: UIViewController {
         if imagesDestination.count > 0 {
             
             var images: [UIImage] = []
-            var serverUrl = appDelegate.activeServerUrl!
+            var serverUrl = appDelegate.activeServerUrl
 
             for image in imagesDestination {
                 images.append(filter(image: image)!)
@@ -356,7 +380,7 @@ class DragDropViewController: UIViewController {
         
         if pasteboard.hasImages {
             
-            let fileName = CCUtility.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, keyFileName: NCBrandGlobal.shared.keyFileNameMask, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal)!
+            let fileName = CCUtility.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, keyFileName: NCGlobal.shared.keyFileNameMask, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal)!
             let fileNamePath = CCUtility.getDirectoryScan() + "/" + fileName
             
             guard let image = pasteboard.image?.fixedOrientation() else {
@@ -391,15 +415,18 @@ extension DragDropViewController : UICollectionViewDataSource {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell1", for: indexPath) as! ScanCell
             
             let fileNamePath = CCUtility.getDirectoryScan() + "/" + itemsSource[indexPath.row]
+            //let fileNamePath = itemsSource[indexPath.row]
+
             
             guard let data = try? Data(contentsOf: URL(fileURLWithPath: fileNamePath)) else {
                 return cell
             }
-            
+
             guard var image = UIImage(data: data) else {
                 return cell
             }
-            
+            //var image = UIImage(named: "img\(indexPath.row).jpg")!
+
             let imageWidthInPixels = image.size.width * image.scale
             let imageHeightInPixels = image.size.height * image.scale
             

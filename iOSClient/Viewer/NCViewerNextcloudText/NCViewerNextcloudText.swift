@@ -41,8 +41,8 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     override func viewDidLoad() {
         super.viewDidLoad()
              
-        NotificationCenter.default.addObserver(self, selector: #selector(favoriteFile(_:)), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterFavoriteFile), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(viewUnload), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterMenuDetailClose), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(favoriteFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(viewUnload), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterMenuDetailClose), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -73,7 +73,7 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
         let language = NSLocale.preferredLanguages[0] as String
         request.addValue(language, forHTTPHeaderField: "Accept-Language")
                 
-        if editor == NCBrandGlobal.shared.editorOnlyoffice {
+        if editor == NCGlobal.shared.editorOnlyoffice {
             webView.customUserAgent = NCUtility.shared.getCustomUserAgentOnlyOffice()
         } else {
             webView.customUserAgent = CCUtility.getUserAgent()
@@ -132,7 +132,7 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     //MARK: - Action
     
     @objc func openMenuMore() {
-        NCViewer.shared.toggleMoreMenu(viewController: self, metadata: metadata, webView: true)
+        NCViewer.shared.toggleMenu(viewController: self, metadata: metadata, webView: true)
     }
     
     //MARK: -
@@ -146,7 +146,7 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
             }
             
             if message.body as? String == "share" {
-                NCNetworkingNotificationCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 2)
+                NCFunctionCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 2)
             }
             
             if message.body as? String == "loading" {
@@ -192,7 +192,7 @@ extension NCViewerNextcloudText : UINavigationControllerDelegate {
         super.didMove(toParent: parent)
         
         if parent == nil {
-            NotificationCenter.default.postOnMainThread(name: NCBrandGlobal.shared.notificationCenterReloadDataSourceNetworkForced, userInfo: ["serverUrl":self.metadata.serverUrl])
+            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSourceNetworkForced, userInfo: ["serverUrl":self.metadata.serverUrl])
         }
     }
 }

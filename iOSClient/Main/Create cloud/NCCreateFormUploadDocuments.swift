@@ -74,7 +74,7 @@ import NCCommunication
         // title 
         self.title = titleForm
       
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
 
         changeTheming()
         
@@ -111,7 +111,7 @@ import NCCommunication
         row.value = fileNameFolder
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
 
-        row.cellConfig["imageView.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
+        row.cellConfig["imageView.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.customerDefault, size: 25)
         
         row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -173,7 +173,7 @@ import NCCommunication
         // image
         let imagePreview = cell.viewWithTag(100) as! UIImageView
         if template.preview != "" {
-            let fileNameLocalPath = CCUtility.getDirectoryUserData() + "/" + template.name + ".png"
+            let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + template.name + ".png"
             if FileManager.default.fileExists(atPath: fileNameLocalPath) {
                 let imageURL = URL(fileURLWithPath: fileNameLocalPath)
                 if let image = UIImage(contentsOfFile: imageURL.path) {
@@ -277,7 +277,7 @@ import NCCommunication
             
             if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: String(describing: fileNameForm)) != nil {
                 
-                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: String(describing: fileNameForm), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: String(describing: fileNameForm), fileNameView: String(describing: fileNameForm), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false, chunk: false)
                 
                 guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
                 conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
@@ -315,11 +315,11 @@ import NCCommunication
     
     func createDocument(fileNamePath: String, fileName: String) {
         
-        if self.editorId == NCBrandGlobal.shared.editorText || self.editorId == NCBrandGlobal.shared.editorOnlyoffice {
+        if self.editorId == NCGlobal.shared.editorText || self.editorId == NCGlobal.shared.editorOnlyoffice {
              
             var customUserAgent: String?
             
-            if self.editorId == NCBrandGlobal.shared.editorOnlyoffice {
+            if self.editorId == NCGlobal.shared.editorOnlyoffice {
                 customUserAgent = NCUtility.shared.getCustomUserAgentOnlyOffice()
             }
             
@@ -331,21 +331,23 @@ import NCCommunication
                         let results = NCCommunicationCommon.shared.getInternalType(fileName: fileName, mimeType: "", directory: false)
                         
                         self.dismiss(animated: true, completion: {
-                            let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url ?? "", contentType: results.mimeType, livePhoto: false)
+                            let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileName, fileNameView: fileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url ?? "", contentType: results.mimeType, livePhoto: false, chunk: false)
                             
-                            NCViewer.shared.view(viewController: self.appDelegate.activeViewController, metadata: metadata, metadatas: [metadata])
+                            if let viewController = self.appDelegate.activeViewController {
+                                NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata])
+                            }
                         })
                     }
                     
                 } else if errorCode != 0 {
-                    NCContentPresenter.shared.messageNotification("_error_", description: errorMessage, delay: NCBrandGlobal.shared.dismissAfterSecond, type:NCContentPresenter.messageType.error, errorCode: errorCode)
+                    NCContentPresenter.shared.messageNotification("_error_", description: errorMessage, delay: NCGlobal.shared.dismissAfterSecond, type:NCContentPresenter.messageType.error, errorCode: errorCode)
                 } else {
                    print("[LOG] It has been changed user during networking process, error.")
                 }
             }
         }
         
-        if self.editorId == NCBrandGlobal.shared.editorCollabora {
+        if self.editorId == NCGlobal.shared.editorCollabora {
             
             NCCommunication.shared.createRichdocuments(path: fileNamePath, templateId: templateIdentifier) { (account, url, errorCode, errorDescription) in
                 
@@ -353,14 +355,17 @@ import NCCommunication
                    
                     self.dismiss(animated: true, completion: {
                     
-                        let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: (fileName as NSString).deletingPathExtension + "." + self.fileNameExtension, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url!, contentType: "", livePhoto: false)
+                        let createFileName = (fileName as NSString).deletingPathExtension + "." + self.fileNameExtension
+                        let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: createFileName, fileNameView: createFileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url!, contentType: "", livePhoto: false, chunk: false)
                     
-                        NCViewer.shared.view(viewController: self.appDelegate.activeViewController, metadata: metadata, metadatas: [metadata])
+                        if let viewController = self.appDelegate.activeViewController {
+                            NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata])
+                        }
                    })
                    
                     
                 } else if errorCode != 0 {
-                    NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                    NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
                 } else {
                     print("[LOG] It has been changed user during networking process, error.")
                 }
@@ -380,10 +385,10 @@ import NCCommunication
         indicator.color = NCBrandColor.shared.brandElement
         indicator.startAnimating()
         
-        if self.editorId == NCBrandGlobal.shared.editorText || self.editorId == NCBrandGlobal.shared.editorOnlyoffice {
+        if self.editorId == NCGlobal.shared.editorText || self.editorId == NCGlobal.shared.editorOnlyoffice {
                         
             var customUserAgent: String?
-            if self.editorId == NCBrandGlobal.shared.editorOnlyoffice {
+            if self.editorId == NCGlobal.shared.editorOnlyoffice {
                 customUserAgent = NCUtility.shared.getCustomUserAgentOnlyOffice()
             }
             NCCommunication.shared.NCTextGetListOfTemplates(customUserAgent: customUserAgent) { (account, templates, errorCode, errorMessage) in
@@ -417,13 +422,13 @@ import NCCommunication
                     let temp = NCCommunicationEditorTemplates()
                     
                     temp.identifier = ""
-                    if self.editorId == NCBrandGlobal.shared.editorText {
+                    if self.editorId == NCGlobal.shared.editorText {
                         temp.ext = "md"
-                    } else if self.editorId == NCBrandGlobal.shared.editorOnlyoffice && self.typeTemplate == NCBrandGlobal.shared.templateDocument {
+                    } else if self.editorId == NCGlobal.shared.editorOnlyoffice && self.typeTemplate == NCGlobal.shared.templateDocument {
                         temp.ext = "docx"
-                    } else if self.editorId == NCBrandGlobal.shared.editorOnlyoffice && self.typeTemplate == NCBrandGlobal.shared.templateSpreadsheet {
+                    } else if self.editorId == NCGlobal.shared.editorOnlyoffice && self.typeTemplate == NCGlobal.shared.templateSpreadsheet {
                         temp.ext = "xlsx"
-                    } else if self.editorId == NCBrandGlobal.shared.editorOnlyoffice && self.typeTemplate == NCBrandGlobal.shared.templatePresentation {
+                    } else if self.editorId == NCGlobal.shared.editorOnlyoffice && self.typeTemplate == NCGlobal.shared.templatePresentation {
                         temp.ext = "pptx"
                     }
                     temp.name = "Empty"
@@ -441,7 +446,7 @@ import NCCommunication
             
         }
         
-        if self.editorId == NCBrandGlobal.shared.editorCollabora  {
+        if self.editorId == NCGlobal.shared.editorCollabora  {
                         
             NCCommunication.shared.getTemplatesRichdocuments(typeTemplate: typeTemplate) { (account, templates, errorCode, errorDescription) in
                 
@@ -476,11 +481,11 @@ import NCCommunication
                     let temp = NCCommunicationEditorTemplates()
                     
                     temp.identifier = ""
-                    if self.typeTemplate == NCBrandGlobal.shared.templateDocument {
+                    if self.typeTemplate == NCGlobal.shared.templateDocument {
                         temp.ext = "docx"
-                    } else if self.typeTemplate == NCBrandGlobal.shared.templateSpreadsheet {
+                    } else if self.typeTemplate == NCGlobal.shared.templateSpreadsheet {
                         temp.ext = "xlsx"
-                    } else if self.typeTemplate == NCBrandGlobal.shared.templatePresentation {
+                    } else if self.typeTemplate == NCGlobal.shared.templatePresentation {
                         temp.ext = "pptx"
                     }
                     temp.name = "Empty"
@@ -500,7 +505,7 @@ import NCCommunication
     
     func getImageFromTemplate(name: String, preview: String, indexPath: IndexPath) {
         
-        let fileNameLocalPath = CCUtility.getDirectoryUserData() + "/" + name + ".png"
+        let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + name + ".png"
 
         NCCommunication.shared.download(serverUrlFileName: preview, fileNameLocalPath: fileNameLocalPath, requestHandler: { (_) in
             

@@ -73,7 +73,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         longPressedGestureMore.minimumPressDuration = 0.5
         longPressedGestureMore.delegate = self
         longPressedGestureMore.delaysTouchesBegan = true
-        buttonMore.addGestureRecognizer(longPressedGestureMore)        
+        buttonMore.addGestureRecognizer(longPressedGestureMore)
     }
     
     override func prepareForReuse() {
@@ -82,7 +82,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     }
     
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        delegate?.tapMoreGridItem(with: objectId, namedButtonMore: namedButtonMore, sender: sender)
+        delegate?.tapMoreGridItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
     }
     
     @objc func longPressInsideMore(gestureRecognizer: UILongPressGestureRecognizer) {
@@ -113,7 +113,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     
     func selected(_ status: Bool) {
         if status {
-            imageSelect.image = NCCollectionCommon.images.cellCheckedYes
+            imageSelect.image = NCBrandColor.cacheImages.checkedYes
             imageVisualEffect.isHidden = false
             imageVisualEffect.alpha = 0.4
         } else {
@@ -124,7 +124,61 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
 }
 
 protocol NCGridCellDelegate {
-    func tapMoreGridItem(with objectId: String, namedButtonMore: String, sender: Any)
+    func tapMoreGridItem(with objectId: String, namedButtonMore: String, image: UIImage?, sender: Any)
     func longPressMoreGridItem(with objectId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
     func longPressGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer)
+}
+
+// MARK: - Grid Layout
+
+class NCGridLayout: UICollectionViewFlowLayout {
+    
+    var heightLabelPlusButton: CGFloat = 45
+    var marginLeftRight: CGFloat = 6
+    var itemForLine: CGFloat = 3
+    var itemWidthDefault: CGFloat = 120
+
+    override init() {
+        super.init()
+        
+        sectionHeadersPinToVisibleBounds = false
+        
+        minimumInteritemSpacing = 1
+        minimumLineSpacing = marginLeftRight
+        
+        self.scrollDirection = .vertical
+        self.sectionInset = UIEdgeInsets(top: 10, left: marginLeftRight, bottom: 0, right:  marginLeftRight)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override var itemSize: CGSize {
+        get {
+            if let collectionView = collectionView {
+                
+                if collectionView.frame.width < 400 {
+                    itemForLine = 3
+                } else {
+                    itemForLine = collectionView.frame.width / itemWidthDefault
+                }
+                
+                let itemWidth: CGFloat = (collectionView.frame.width - marginLeftRight * 2 - marginLeftRight * (itemForLine - 1)) / itemForLine
+                let itemHeight: CGFloat = itemWidth + heightLabelPlusButton
+                
+                return CGSize(width: itemWidth, height: itemHeight)
+            }
+            
+            // Default fallback
+            return CGSize(width: itemWidthDefault, height: itemWidthDefault)
+        }
+        set {
+            super.itemSize = newValue
+        }
+    }
+    
+    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+        return proposedContentOffset
+    }
 }

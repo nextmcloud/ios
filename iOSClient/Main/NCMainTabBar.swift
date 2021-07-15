@@ -163,7 +163,7 @@ class NCMainTabBar: UITabBar {
         // Media
         if let item = items?[3] {
             item.title = NSLocalizedString("_media_", comment: "")
-            item.image = UIImage(named: "media")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+            item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.brandElement, size: 25)
             item.selectedImage = item.image
         }
         
@@ -213,7 +213,7 @@ class NCMainTabBar: UITabBar {
         }
         
         if let viewController = self.window?.rootViewController {
-            appDelegate.showMenuIn(viewController: viewController)
+            appDelegate.toggleMenu(viewController: viewController)
         }
     }
     

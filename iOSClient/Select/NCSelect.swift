@@ -65,7 +65,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     
     private var emptyDataSet: NCEmptyDataSet?
     
-    private let keyLayout = NCBrandGlobal.shared.layoutViewMove
+    private let keyLayout = NCGlobal.shared.layoutViewMove
     private var serverUrlPush = ""
     private var metadataTouch: tableMetadata?
     private var metadataFolder = tableMetadata()
@@ -105,6 +105,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationController?.presentationController?.delegate = self
+        self.navigationController!.navigationBar.tintColor = NCBrandColor.shared.customer
         
         // Cell
         collectionView.register(UINib.init(nibName: "NCListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
@@ -136,23 +137,27 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         overwriteLabel.text = NSLocalizedString("_overwrite_", comment: "")
         
         // button
-        buttonCreateFolder.layer.cornerRadius = 15
+        buttonCreateFolder.layer.cornerRadius = 10
         buttonCreateFolder.layer.masksToBounds = true
-        buttonCreateFolder.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
+        buttonCreateFolder.layer.borderWidth = 1
+        buttonCreateFolder.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
         buttonCreateFolder.setTitleColor(.black, for: .normal)
 
-        buttonDone.layer.cornerRadius = 15
+        buttonDone.layer.cornerRadius = 10
         buttonDone.layer.masksToBounds = true
-        buttonDone.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
-        buttonDone.setTitleColor(.black, for: .normal)
+        buttonDone.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
+        buttonDone.setTitleColor(.white, for: .normal)
+        buttonDone.setTitleColor(.white, for: .highlighted)
         
-        buttonDone1.layer.cornerRadius = 15
+        buttonDone1.layer.cornerRadius = 10
         buttonDone1.layer.masksToBounds = true
-        buttonDone1.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
+        buttonDone1.layer.borderWidth = 2
+        buttonDone1.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
+//        buttonDone1.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
         buttonDone1.setTitleColor(.black, for: .normal)
                 
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadDataSource), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterReloadDataSource), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadDataSource), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadDataSource), object: nil)
 
         changeTheming()
     }
@@ -188,7 +193,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         (layout, sort, ascending, groupBy, directoryOnTop, titleButton, itemForLine) = NCUtility.shared.getLayoutForView(key: keyLayout,serverUrl: serverUrl)
         gridLayout.itemForLine = CGFloat(itemForLine)
         
-        if layout == NCBrandGlobal.shared.layoutList {
+        if layout == NCGlobal.shared.layoutList {
             collectionView.collectionViewLayout = listLayout
         } else {
             collectionView.collectionViewLayout = gridLayout
@@ -302,7 +307,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
                     self.collectionView.reloadData()
                 })
             })
-            layout = NCBrandGlobal.shared.layoutList
+            layout = NCGlobal.shared.layoutList
         } else {
             // grid layout
             UIView.animate(withDuration: 0.0, animations: {
@@ -311,7 +316,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
                     self.collectionView.reloadData()
                 })
             })
-            layout = NCBrandGlobal.shared.layoutGrid
+            layout = NCGlobal.shared.layoutGrid
         }
     }
     
@@ -324,10 +329,10 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     func tapMoreHeader(sender: Any) {
     }
     
-    func tapMoreListItem(with objectId: String, namedButtonMore: String, sender: Any) {
+    func tapMoreListItem(with objectId: String, namedButtonMore: String, image: UIImage?, sender: Any) {
     }
     
-    func tapMoreGridItem(with objectId: String, namedButtonMore: String, sender: Any) {
+    func tapMoreGridItem(with objectId: String, namedButtonMore: String, image: UIImage?, sender: Any) {
     }
     
     func tapShareListItem(with objectId: String, sender: Any) {
@@ -448,7 +453,7 @@ extension NCSelect: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         guard let metadata = dataSource.cellForItemAt(indexPath: indexPath) else {
-            if layout == NCBrandGlobal.shared.layoutList {
+            if layout == NCGlobal.shared.layoutList {
                 return collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as! NCListCell
             } else {
                 return collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as! NCGridCell
@@ -462,8 +467,8 @@ extension NCSelect: UICollectionViewDataSource {
         // Download preview
         NCOperationQueue.shared.downloadThumbnail(metadata: metadata, urlBase: appDelegate.urlBase, view: collectionView, indexPath: indexPath)
         
-        isShare = metadata.permissions.contains(NCBrandGlobal.shared.permissionShared) && !metadataFolder.permissions.contains(NCBrandGlobal.shared.permissionShared)
-        isMounted = metadata.permissions.contains(NCBrandGlobal.shared.permissionMounted) && !metadataFolder.permissions.contains(NCBrandGlobal.shared.permissionMounted)
+        isShare = metadata.permissions.contains(NCGlobal.shared.permissionShared) && !metadataFolder.permissions.contains(NCGlobal.shared.permissionShared)
+        isMounted = metadata.permissions.contains(NCGlobal.shared.permissionMounted) && !metadataFolder.permissions.contains(NCGlobal.shared.permissionMounted)
         
         if dataSource.metadataShare[metadata.ocId] != nil {
             tableShare = dataSource.metadataShare[metadata.ocId]
@@ -471,7 +476,7 @@ extension NCSelect: UICollectionViewDataSource {
         
         // LAYOUT LIST
         
-        if layout == NCBrandGlobal.shared.layoutList {
+        if layout == NCGlobal.shared.layoutList {
             
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as! NCListCell
             cell.delegate = self
@@ -497,21 +502,21 @@ extension NCSelect: UICollectionViewDataSource {
             if metadata.directory {
                 
                 if metadata.e2eEncrypted {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderEncryptedImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderEncrypted
                 } else if isShare {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderSharedWithMeImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderSharedWithMe
                 } else if (tableShare != nil && tableShare?.shareType != 3) {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderSharedWithMeImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderSharedWithMe
                 } else if (tableShare != nil && tableShare?.shareType == 3) {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderPublicImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderPublic
                 } else if metadata.mountType == "group" {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderGroupImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderGroup
                 } else if isMounted {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderExternalImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderExternal
                 } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderAutomaticUploadImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderAutomaticUpload
                 } else {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folder
                 }
                 
                 cell.labelInfo.text = CCUtility.dateDiff(metadata.date as Date)
@@ -521,7 +526,7 @@ extension NCSelect: UICollectionViewDataSource {
                 
                 // Local image: offline
                 if tableDirectory != nil && tableDirectory!.offline {
-                    cell.imageLocal.image = NCCollectionCommon.images.cellOfflineFlag
+                    cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
                 }
                 
             } else {
@@ -535,7 +540,7 @@ extension NCSelect: UICollectionViewDataSource {
                         if metadata.iconName.count > 0 {
                             cell.imageItem.image = UIImage.init(named: metadata.iconName)
                         } else {
-                            cell.imageItem.image = NCCollectionCommon.images.cellFileImage
+                            cell.imageItem.image = NCBrandColor.cacheImages.file
                         }
                     }
                 }
@@ -544,33 +549,33 @@ extension NCSelect: UICollectionViewDataSource {
                 
                 // image local
                 if dataSource.metadataOffLine.contains(metadata.ocId) {
-                    cell.imageLocal.image = NCCollectionCommon.images.cellOfflineFlag
+                    cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
                 } else if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
-                    cell.imageLocal.image = NCCollectionCommon.images.cellLocal
+                    cell.imageLocal.image = NCBrandColor.cacheImages.local
                 }
             }
             
             // image Favorite
             if metadata.favorite {
-                cell.imageFavorite.image = NCCollectionCommon.images.cellFavouriteImage
+                cell.imageFavorite.image = NCBrandColor.cacheImages.favorite
             }
             
             // Share image
             if (isShare) {
-                cell.imageShared.image = NCCollectionCommon.images.cellSharedImage
+                cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else if (tableShare != nil && tableShare?.shareType == 3) {
-                cell.imageShared.image = NCCollectionCommon.images.cellShareByLinkImage
+                cell.imageShared.image = NCBrandColor.cacheImages.shareByLink
             } else if (tableShare != nil && tableShare?.shareType != 3) {
-                cell.imageShared.image = NCCollectionCommon.images.cellSharedImage
+                cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else {
-                cell.imageShared.image = NCCollectionCommon.images.cellCanShareImage
+                cell.imageShared.image = NCBrandColor.cacheImages.canShare
             }
-            if metadata.ownerId.count > 0 && metadata.ownerId != appDelegate.userID {
-                let fileNameUser = CCUtility.getDirectoryUserData() + "/" + CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase) + "-" + metadata.ownerId + ".png"
+            if metadata.ownerId.count > 0 && metadata.ownerId != appDelegate.userId {
+                let fileNameUser = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + metadata.ownerId + ".png"
                 if FileManager.default.fileExists(atPath: fileNameUser) {
                     cell.imageShared.image = UIImage(contentsOfFile: fileNameUser)
                 } else {
-                    NCCommunication.shared.downloadAvatar(userID: metadata.ownerId, fileNameLocalPath: fileNameUser, size: NCBrandGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
+                    NCCommunication.shared.downloadAvatar(userID: metadata.ownerId, fileNameLocalPath: fileNameUser, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account {
                             cell.imageShared.image = UIImage(contentsOfFile: fileNameUser)
                         }
@@ -586,7 +591,7 @@ extension NCSelect: UICollectionViewDataSource {
     
             // Live Photo
             if metadata.livePhoto {
-                cell.imageStatus.image = NCCollectionCommon.images.cellLivePhotoImage
+                cell.imageStatus.image = NCBrandColor.cacheImages.livePhoto
             }
             
             // Remove last separator
@@ -601,7 +606,7 @@ extension NCSelect: UICollectionViewDataSource {
         
         // LAYOUT GRID
         
-        if layout == NCBrandGlobal.shared.layoutGrid {
+        if layout == NCGlobal.shared.layoutGrid {
             
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as! NCGridCell
             cell.delegate = self
@@ -624,21 +629,21 @@ extension NCSelect: UICollectionViewDataSource {
             if metadata.directory {
                 
                 if metadata.e2eEncrypted {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderEncryptedImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderEncrypted
                 } else if isShare {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderSharedWithMeImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderSharedWithMe
                 } else if (tableShare != nil && tableShare!.shareType != 3) {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderSharedWithMeImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderSharedWithMe
                 } else if (tableShare != nil && tableShare!.shareType == 3) {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderPublicImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderPublic
                 } else if metadata.mountType == "group" {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderGroupImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderGroup
                 } else if isMounted {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderExternalImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderExternal
                 } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderAutomaticUploadImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folderAutomaticUpload
                 } else {
-                    cell.imageItem.image = NCCollectionCommon.images.cellFolderImage
+                    cell.imageItem.image = NCBrandColor.cacheImages.folder
                 }
     
                 let lockServerUrl = CCUtility.stringAppendServerUrl(metadata.serverUrl, addFileName: metadata.fileName)!
@@ -646,7 +651,7 @@ extension NCSelect: UICollectionViewDataSource {
                                 
                 // Local image: offline
                 if tableDirectory != nil && tableDirectory!.offline {
-                    cell.imageLocal.image = NCCollectionCommon.images.cellOfflineFlag
+                    cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
                 }
                 
             } else {
@@ -660,22 +665,22 @@ extension NCSelect: UICollectionViewDataSource {
                         if metadata.iconName.count > 0 {
                             cell.imageItem.image = UIImage.init(named: metadata.iconName)
                         } else {
-                            cell.imageItem.image = NCCollectionCommon.images.cellFileImage
+                            cell.imageItem.image = NCBrandColor.cacheImages.file
                         }
                     }
                 }
                 
                 // image Local
                 if dataSource.metadataOffLine.contains(metadata.ocId) {
-                    cell.imageLocal.image = NCCollectionCommon.images.cellOfflineFlag
+                    cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
                 } else if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
-                    cell.imageLocal.image = NCCollectionCommon.images.cellLocal
+                    cell.imageLocal.image = NCBrandColor.cacheImages.local
                 }
             }
             
             // image Favorite
             if metadata.favorite {
-                cell.imageFavorite.image = NCCollectionCommon.images.cellFavouriteImage
+                cell.imageFavorite.image = NCBrandColor.cacheImages.favorite
             }
             
             cell.imageSelect.isHidden = true
@@ -684,7 +689,7 @@ extension NCSelect: UICollectionViewDataSource {
 
             // Live Photo
             if metadata.livePhoto {
-                cell.imageStatus.image = NCCollectionCommon.images.cellLivePhotoImage
+                cell.imageStatus.image = NCBrandColor.cacheImages.livePhoto
             }
             
             return cell
@@ -768,7 +773,7 @@ extension NCSelect {
             if errorCode == 0 {
                 self.loadDatasource(withLoadFolder: true)
             }  else {
-                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
             }
         }
     }
@@ -780,7 +785,7 @@ extension NCSelect {
         
         NCNetworking.shared.readFolder(serverUrl: serverUrl, account: appDelegate.account) { (_, _, _, _, _, errorCode, errorDescription) in
             if errorCode != 0 {
-                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
             }
             self.networkInProgress = false
             self.loadDatasource(withLoadFolder: false)

@@ -23,15 +23,14 @@
 
 #import "CCAdvanced.h"
 #import "CCUtility.h"
-#import "AppDelegate.h"
 #import "NSNotificationCenter+MainThread.h"
 #import <KTVHTTPCache/KTVHTTPCache.h>
 #import "NCBridgeSwift.h"
 
+
 @interface CCAdvanced ()
 {
     AppDelegate *appDelegate;
-    CCHud *_hud;
 }
 @end
 
@@ -50,6 +49,8 @@
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"showHiddenFiles" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_show_hidden_files_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+    row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
+
     if ([CCUtility getShowHiddenFiles]) row.value = @"1";
     else row.value = @"0";
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
@@ -68,6 +69,7 @@
     else row.value = @"0";
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"livePhoto" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_upload_mov_livephoto_", nil)];
@@ -76,21 +78,22 @@
     else row.value = @"0";
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
     
     // Disable Local Cache After Upload
     
-    section = [XLFormSectionDescriptor formSection];
-    [form addFormSection:section];
-    section.footerTitle = NSLocalizedString(@"_disableLocalCacheAfterUpload_footer_", nil);
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disableLocalCacheAfterUpload" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_disableLocalCacheAfterUpload_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
-    if ([CCUtility getDisableLocalCacheAfterUpload]) row.value = @"1";
-    else row.value = @"0";
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
-    [section addFormRow:row];
+//    section = [XLFormSectionDescriptor formSection];
+//    [form addFormSection:section];
+//    section.footerTitle = NSLocalizedString(@"_disableLocalCacheAfterUpload_footer_", nil);
+//    
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disableLocalCacheAfterUpload" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_disableLocalCacheAfterUpload_", nil)];
+//    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+//    if ([CCUtility getDisableLocalCacheAfterUpload]) row.value = @"1";
+//    else row.value = @"0";
+//    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+//    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+//    [section addFormRow:row];
     
     // Automatic download image
     
@@ -104,6 +107,7 @@
     else row.value = @"0";
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
     
     // Section : Files App --------------------------------------------------------------
@@ -114,14 +118,33 @@
         [form addFormSection:section];
         section.footerTitle = NSLocalizedString(@"_disable_files_app_footer_", nil);
 
+        
         // Disable Files App
-        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disablefilesapp" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_disable_files_app_", nil)];
+
+        //custom cell
+        
+        [[XLFormViewController cellClassesForRowDescriptorTypes] setObject:[ToggleButtonViewCell class] forKey:@"kNMCCustomCellType"];
+
+        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disablefilesapp" rowType:@"kNMCCustomCellType" title:NSLocalizedString(@"_disable_files_app_", nil)];
+
         row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
-        if ([CCUtility getDisableFilesApp]) row.value = @"1";
-        else row.value = @"0";
-        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+        row.cellConfigAtConfigure[@"cellLabel.text"] = NSLocalizedString(@"_disable_files_app_", nil);
+        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"cellLabel.font"];
+        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"cellLabel.textColor"];
+
+        if ([CCUtility getDisableFilesApp]){
+            row.cellConfigAtConfigure[@"switchControl.on"] = @"1";
+        }else {
+            row.cellConfigAtConfigure[@"switchControl.on"] = @"0";
+        }
+        
+        if (NSLocalizedString(@"_disable_files_app_", nil).length > 30 ){
+            row.height = 65;
+        }
+        row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
+
         [section addFormRow:row];
+
     }
     
     // Section : Privacy --------------------------------------------------------------
@@ -137,8 +160,10 @@
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
         [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
         [row.cellConfig setObject:[[UIImage imageNamed:@"crashservice"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
+        row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
         if ([CCUtility getDisableCrashservice]) row.value = @"1";
         else row.value = @"0";
+        
         [section addFormRow:row];
     }
     
@@ -257,7 +282,7 @@
         
     self.title = NSLocalizedString(@"_advanced_", nil);
     appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    _hud = [[CCHud alloc] initWithView:[[[UIApplication sharedApplication] delegate] window]];
+    //_hud = [[CCHud alloc] initWithView:[[[UIApplication sharedApplication] delegate] window]];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeTheming) name:NCBrandGlobal.shared.notificationCenterChangeTheming object:nil];
     [self changeTheming];
@@ -358,7 +383,7 @@
     [appDelegate.activeMedia reloadDataSource];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void) {
-       [_hud hideHud];
+        [[NCUtility shared] stopActivityIndicator];
     });
 }
 
@@ -369,7 +394,7 @@
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:NSLocalizedString(@"_want_delete_cache_", nil) preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alertController addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"_yes_", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [_hud visibleHudTitle:NSLocalizedString(@"_wait_", nil) mode:MBProgressHUDModeIndeterminate color:nil];
+        [[NCUtility shared] startActivityIndicatorWithBackgroundView:nil blurEffect:true bottom:0];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void) {
             [self clearCache];
         });

@@ -1,7 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "selectFull.pdf",
+      "filename" : "green-white-filled@500w.pdf",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "green-Gray90-filled copy@500w.pdf",
       "idiom" : "universal"
     }
   ],

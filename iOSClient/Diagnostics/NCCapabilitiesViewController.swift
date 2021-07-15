@@ -87,65 +87,65 @@ class NCCapabilitiesViewController: UIViewController, UIDocumentInteractionContr
         
         statusFileSharing.layer.cornerRadius = 12.5
         statusFileSharing.layer.borderWidth = 0.5
-        statusFileSharing.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        statusFileSharing.layer.borderColor = UIColor.gray.cgColor
         statusFileSharing.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.3).cgColor
         
         statusExternalSite.layer.cornerRadius = 12.5
         statusExternalSite.layer.borderWidth = 0.5
-        statusExternalSite.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        statusExternalSite.layer.borderColor = UIColor.gray.cgColor
         statusExternalSite.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.3).cgColor
         
         statusEndToEndEncryption.layer.cornerRadius = 12.5
         statusEndToEndEncryption.layer.borderWidth = 0.5
-        statusEndToEndEncryption.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        statusEndToEndEncryption.layer.borderColor = UIColor.gray.cgColor
         statusEndToEndEncryption.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.3).cgColor
         
         statusActivity.layer.cornerRadius = 12.5
         statusActivity.layer.borderWidth = 0.5
-        statusActivity.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        statusActivity.layer.borderColor = UIColor.gray.cgColor
         statusActivity.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.3).cgColor
         
         statusNotification.layer.cornerRadius = 12.5
         statusNotification.layer.borderWidth = 0.5
-        statusNotification.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        statusNotification.layer.borderColor = UIColor.gray.cgColor
         statusNotification.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.3).cgColor
         
         statusDeletedFiles.layer.cornerRadius = 12.5
         statusDeletedFiles.layer.borderWidth = 0.5
-        statusDeletedFiles.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        statusDeletedFiles.layer.borderColor = UIColor.gray.cgColor
         statusDeletedFiles.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.3).cgColor
         
         statusText.layer.cornerRadius = 12.5
         statusText.layer.borderWidth = 0.5
-        statusText.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        statusText.layer.borderColor = UIColor.gray.cgColor
         statusText.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.3).cgColor
 
         statusCollabora.layer.cornerRadius = 12.5
         statusCollabora.layer.borderWidth = 0.5
-        statusCollabora.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        statusCollabora.layer.borderColor = UIColor.gray.cgColor
         statusCollabora.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.3).cgColor
  
         statusOnlyOffice.layer.cornerRadius = 12.5
         statusOnlyOffice.layer.borderWidth = 0.5
-        statusOnlyOffice.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        statusOnlyOffice.layer.borderColor = UIColor.gray.cgColor
         statusOnlyOffice.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.3).cgColor
         
         statusUserStatus.layer.cornerRadius = 12.5
         statusUserStatus.layer.borderWidth = 0.5
-        statusUserStatus.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        statusUserStatus.layer.borderColor = UIColor.gray.cgColor
         statusUserStatus.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.3).cgColor
         
         statusComments.layer.cornerRadius = 12.5
         statusComments.layer.borderWidth = 0.5
-        statusComments.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        statusComments.layer.borderColor = UIColor.gray.cgColor
         statusComments.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.3).cgColor
         
         imageFileSharing.image = UIImage.init(named: "share")!.image(color: .gray, size: 50)
-        imageExternalSite.image = UIImage.init(named: "externalsites")!.image(color: .gray, size: 50)
-        imageEndToEndEncryption.image = UIImage.init(named: "lock")!.image(color: .gray, size: 50)
-        imageActivity.image = UIImage.init(named: "activity")!.image(color: .gray, size: 50)
-        imageNotification.image = UIImage.init(named: "notification")!.image(color: .gray, size: 50)
-        imageDeletedFiles.image = UIImage.init(named: "delete")!.image(color: .gray, size: 50)
+        imageExternalSite.image = NCUtility.shared.loadImage(named: "network", color: .gray)
+        imageEndToEndEncryption.image = NCUtility.shared.loadImage(named: "lock", color: .gray)
+        imageActivity.image = UIImage.init(named: "bolt")!.image(color: .gray, size: 50)
+        imageNotification.image = NCUtility.shared.loadImage(named: "bell", color: .gray)
+        imageDeletedFiles.image = NCUtility.shared.loadImage(named: "trash", color: .gray)
         imageText.image = UIImage.init(named: "text")!.image(color: .gray, size: 50)
         imageCollabora.image = UIImage.init(named: "collabora")!.image(color: .gray, size: 50)
         imageOnlyOffice.image = UIImage.init(named: "onlyoffice")!.image(color: .gray, size: 50)
@@ -159,7 +159,7 @@ class NCCapabilitiesViewController: UIViewController, UIDocumentInteractionContr
             capabilitiesText = text
             updateCapabilities()
         } else {
-            NCContentPresenter.shared.messageNotification("_error_", description: "_no_capabilities_found_", delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCBrandGlobal.shared.ErrorInternalError, forced: true)
+            NCContentPresenter.shared.messageNotification("_error_", description: "_no_capabilities_found_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.ErrorInternalError, forced: true)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 self.dismiss(animated: true, completion: nil)
@@ -181,7 +181,7 @@ class NCCapabilitiesViewController: UIViewController, UIDocumentInteractionContr
                 
                 // EDITORS
                 let serverVersionMajor = NCManageDatabase.shared.getCapabilitiesServerInt(account: account, elements: NCElementsJSON.shared.capabilitiesVersionMajor)
-                if serverVersionMajor >= NCBrandGlobal.shared.nextcloudVersion18 {
+                if serverVersionMajor >= NCGlobal.shared.nextcloudVersion18 {
                     NCCommunication.shared.NCTextObtainEditorDetails() { (account, editors, creators, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account {
                             NCManageDatabase.shared.addDirectEditing(account: account, editors: editors, creators: creators)
@@ -278,9 +278,9 @@ class NCCapabilitiesViewController: UIViewController, UIDocumentInteractionContr
         var onlyofficeEditors = false
         if let editors = NCManageDatabase.shared.getDirectEditingEditors(account: account) {
             for editor in editors {
-                if editor.editor == NCBrandGlobal.shared.editorText {
+                if editor.editor == NCGlobal.shared.editorText {
                     textEditor = true
-                } else if editor.editor == NCBrandGlobal.shared.editorOnlyoffice {
+                } else if editor.editor == NCGlobal.shared.editorOnlyoffice {
                     onlyofficeEditors = true
                 }
             }

@@ -33,7 +33,7 @@ class NCFiles: NCCollectionViewCommon  {
         
         appDelegate.activeFiles = self
         titleCurrentFolder = NCBrandOptions.shared.brand
-        layoutKey = NCBrandGlobal.shared.layoutViewFiles
+        layoutKey = NCGlobal.shared.layoutViewFiles
         enableSearchBar = true
         emptyImage = UIImage.init(named: "folder")?.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width)
         emptyTitle = "_files_no_files_"
@@ -68,7 +68,7 @@ class NCFiles: NCCollectionViewCommon  {
         
         DispatchQueue.global(qos: .background).async {
                         
-            if !self.isSearching && self.appDelegate.account != nil && self.appDelegate.urlBase != nil {
+            if !self.isSearching && self.appDelegate.account != "" && self.appDelegate.urlBase != "" {
                 self.metadatasSource = NCManageDatabase.shared.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", self.appDelegate.account, self.serverUrl))
                 if self.metadataFolder == nil {
                     self.metadataFolder = NCManageDatabase.shared.getMetadataFolder(account: self.appDelegate.account, urlBase: self.appDelegate.urlBase, serverUrl: self.serverUrl)
@@ -100,7 +100,7 @@ class NCFiles: NCCollectionViewCommon  {
                 for metadata in metadatas ?? [] {
                     if !metadata.directory {
                         if NCManageDatabase.shared.isDownloadMetadata(metadata, download: false) {
-                            NCOperationQueue.shared.download(metadata: metadata, selector: NCBrandGlobal.shared.selectorDownloadFile)
+                            NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorDownloadFile)
                         }
                     }
                 }

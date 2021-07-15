@@ -22,10 +22,11 @@
 //
 
 #import "NCManageEndToEndEncryption.h"
-#import "AppDelegate.h"
 #import "NSNotificationCenter+MainThread.h"
+#import <LocalAuthentication/LocalAuthentication.h>
 #import <TOPasscodeViewController/TOPasscodeViewController.h>
 #import "NCBridgeSwift.h"
+#import "CCUtility.h"
 
 @interface NCManageEndToEndEncryption () <NCEndToEndInitializeDelegate, TOPasscodeViewControllerDelegate>
 {
@@ -46,11 +47,11 @@
     BOOL isE2EEEnabled = [[NCManageDatabase shared] getCapabilitiesServerBoolWithAccount:appDelegate.account elements:NCElementsJSON.shared.capabilitiesE2EEEnabled exists:false];
     NSString *versionE2EE = [[NCManageDatabase shared] getCapabilitiesServerStringWithAccount:appDelegate.account elements:NCElementsJSON.shared.capabilitiesE2EEApiVersion];
     
-    if (![versionE2EE isEqual:[[NCBrandGlobal shared] e2eeVersion]] && isE2EEEnabled) {
-        [[NCContentPresenter shared] messageNotification:@"_error_e2ee_" description:@"_err_e2ee_app_version_" delay:[[NCBrandGlobal shared] dismissAfterSecond] type:messageTypeError errorCode:NCBrandGlobal.shared.ErrorInternalError forced:true];
+    if (![versionE2EE isEqual:[[NCGlobal shared] e2eeVersion]] && isE2EEEnabled) {
+        [[NCContentPresenter shared] messageNotification:@"_error_e2ee_" description:@"_err_e2ee_app_version_" delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError errorCode:NCGlobal.shared.ErrorInternalError forced:true];
     }
     
-    if (isE2EEEnabled == NO || ![versionE2EE isEqual:[[NCBrandGlobal shared] e2eeVersion]]) {
+    if (isE2EEEnabled == NO || ![versionE2EE isEqual:[[NCGlobal shared] e2eeVersion]]) {
         
         // Section SERVICE NOT AVAILABLE -------------------------------------------------
         
@@ -61,7 +62,7 @@
         [form addFormSection:section];
         
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"serviceActivated" rowType:XLFormRowDescriptorTypeInfo title:NSLocalizedString(@"_e2e_settings_not_available_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
         [row.cellConfig setObject:[[UIImage imageNamed:@"closeCircle"] imageWithColor:[UIColor redColor] size:25] forKey:@"imageView.image"];
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
         [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
@@ -83,8 +84,8 @@
         [form addFormSection:section];
         
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"serviceActivated" rowType:XLFormRowDescriptorTypeInfo title:NSLocalizedString(@"_e2e_settings_activated_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
-        [row.cellConfig setObject:[[UIImage imageNamed:@"selectFull"] imageWithColor:[UIColor greenColor] size:25] forKey:@"imageView.image"];
+        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
+        [row.cellConfig setObject:[[UIImage imageNamed:@"checkmark.circle.fill"] imageWithColor:[UIColor redColor] size:25] forKey:@"imageView.image"];
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
         [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
         [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
@@ -97,7 +98,7 @@
         
         // Read Passphrase
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"readPassphrase" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_e2e_settings_read_passphrase_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
         [row.cellConfig setObject:[[UIImage imageNamed:@"e2eReadPassphrase"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
         [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
@@ -112,7 +113,7 @@
         
         // remove locally Encryption
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"removeLocallyEncryption" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_e2e_settings_remove_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
         [row.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
         [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
@@ -129,7 +130,7 @@
     
         // Start e2e
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"startE2E" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_e2e_settings_start_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
         [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
         [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
@@ -145,7 +146,7 @@
     
     // Delete publicKey
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"deletePublicKey" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"Delete PublicKey", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
@@ -154,7 +155,7 @@
     
     // Delete privateKey
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"deletePrivateKey" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"Delete PrivateKey", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
@@ -165,6 +166,8 @@
     self.tableView.showsVerticalScrollIndicator = NO;
     self.form = form;
 }
+
+#pragma mark - Life Cycle
 
 - (void)viewDidLoad
 {
@@ -177,18 +180,30 @@
     self.endToEndInitialize = [NCEndToEndInitialize new];
     self.endToEndInitialize.delegate = self;
     
-    // changeTheming
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeTheming) name:NCBrandGlobal.shared.notificationCenterChangeTheming object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground) name:NCBrandGlobal.shared.notificationCenterApplicationDidEnterBackground object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeTheming) name:NCGlobal.shared.notificationCenterChangeTheming object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground) name:NCGlobal.shared.notificationCenterApplicationDidEnterBackground object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(initializeMain) name:NCGlobal.shared.notificationCenterInitializeMain object:nil];
 
     [self changeTheming];
 }
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    appDelegate.activeViewController = self;
+    
+    [self initializeForm];
+    [self.tableView reloadData];
+}
+
+#pragma mark - NotificationCenter
 
 - (void)changeTheming
 {
     self.view.backgroundColor = NCBrandColor.shared.backgroundForm;
     self.tableView.backgroundColor = NCBrandColor.shared.backgroundForm;
-    [self.tableView reloadData];    
+    
+    [self.tableView reloadData];
     [self initializeForm];
 }
 
@@ -197,6 +212,11 @@
     if (passcodeViewController.view.window != nil) {
         [passcodeViewController dismissViewControllerAnimated:true completion:nil];
     }
+}
+
+- (void)initializeMain
+{
+    [[self navigationController] popViewControllerAnimated:YES];
 }
 
 #pragma --------------------------------------------------------------------------------------------
@@ -372,9 +392,9 @@
     
     [[NCCommunication shared] deleteE2EEPublicKeyWithCustomUserAgent:nil addCustomHeaders:nil completionHandler:^(NSString *account, NSInteger errorCode, NSString *errorDescription) {
        if (errorCode == 0 && [account isEqualToString:appDelegate.account]) {
-            [[NCContentPresenter shared] messageNotification:@"E2E delete publicKey" description:@"Success" delay:[[NCBrandGlobal shared] dismissAfterSecond] type:messageTypeSuccess errorCode:NCBrandGlobal.shared.ErrorInternalError forced:true];
+            [[NCContentPresenter shared] messageNotification:@"E2E delete publicKey" description:@"Success" delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeSuccess errorCode:NCGlobal.shared.ErrorInternalError forced:true];
         } else {
-            [[NCContentPresenter shared] messageNotification:@"E2E delete publicKey" description:errorDescription  delay:[[NCBrandGlobal shared] dismissAfterSecond] type:messageTypeError errorCode:errorCode forced:true];
+            [[NCContentPresenter shared] messageNotification:@"E2E delete publicKey" description:errorDescription  delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError errorCode:errorCode forced:true];
         }
     }];
 }
@@ -385,9 +405,9 @@
     
     [[NCCommunication shared] deleteE2EEPrivateKeyWithCustomUserAgent:nil addCustomHeaders:nil completionHandler:^(NSString *account, NSInteger errorCode, NSString *errorDescription) {
         if (errorCode == 0 && [account isEqualToString:appDelegate.account]) {
-            [[NCContentPresenter shared] messageNotification:@"E2E delete privateKey" description:@"Success" delay:[[NCBrandGlobal shared] dismissAfterSecond] type:messageTypeSuccess errorCode:NCBrandGlobal.shared.ErrorInternalError forced:true];
+            [[NCContentPresenter shared] messageNotification:@"E2E delete privateKey" description:@"Success" delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeSuccess errorCode:NCGlobal.shared.ErrorInternalError forced:true];
         } else {
-            [[NCContentPresenter shared] messageNotification:@"E2E delete privateKey" description:errorDescription delay:[[NCBrandGlobal shared] dismissAfterSecond] type:messageTypeError errorCode:errorCode forced:true];
+            [[NCContentPresenter shared] messageNotification:@"E2E delete privateKey" description:errorDescription delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError errorCode:errorCode forced:true];
         }
     }];
 }
@@ -399,7 +419,7 @@
 - (void)endToEndInitializeSuccess
 {
     // Reload All Datasource
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCBrandGlobal.shared.notificationCenterReloadDataSource object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterReloadDataSource object:nil];
 
     [self initializeForm];
 }

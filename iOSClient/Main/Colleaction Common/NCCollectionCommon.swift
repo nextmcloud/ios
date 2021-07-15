@@ -67,9 +67,10 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
         
         images.cellFileImage = UIImage.init(named: "file")!
         
-        images.cellSharedImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.graySoft, size: 50)
-        images.cellCanShareImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.graySoft, size: 50)
-        images.cellShareByLinkImage = UIImage(named: "sharebylink")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+        images.cellSharedImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.commonViewInfoText, size: 50)
+        images.cellCanShareImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.commonViewInfoText, size: 50)
+//        images.cellShareByLinkImage = UIImage(named: "sharebylink")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+        images.cellShareByLinkImage = UIImage(named: "share")!.image(color: NCBrandColor.shared.commonViewInfoText, size: 50)
         
         images.cellFavouriteImage = UIImage(named: "favorite")!.image(color: NCBrandColor.shared.yellowFavorite, size: 50)
         images.cellCommentImage = UIImage(named: "comment")!.image(color: NCBrandColor.shared.graySoft, size: 50)
@@ -78,18 +79,20 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
         images.cellLocal = UIImage.init(named: "local")!
             
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
-        images.cellFolderEncryptedImage = UIImage(named: "folderEncrypted")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderSharedWithMeImage = UIImage(named: "folder_shared_with_me")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderPublicImage = UIImage(named: "folder_public")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderGroupImage = UIImage(named: "folder_group")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderExternalImage = UIImage(named: "folder_external")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderAutomaticUploadImage = UIImage(named: "folderAutomaticUpload")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
-        images.cellFolderImage =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
+        images.cellFolderEncryptedImage = UIImage(named: "folderEncrypted")!
+        images.cellFolderSharedWithMeImage = UIImage(named: "folder_shared_with_me")!
+        images.cellFolderPublicImage = UIImage(named: "folder_public")!
+        images.cellFolderGroupImage = UIImage(named: "folder_group")!
+        images.cellFolderExternalImage = UIImage(named: "folder_external")!
+//        images.cellFolderAutomaticUploadImage = UIImage(named: "folderAutomaticUpload")!.image(color: NCBrandColor.shared.brandElement, size: folderWidth)
+        images.cellFolderAutomaticUploadImage = UIImage(named: "folderAutomaticUpload")!
+        images.cellFolderImage =  UIImage(named: "folder")!
         
-        images.cellCheckedYes = UIImage(named: "checkedYes")!.image(color: .darkGray, size: 50)
-        images.cellCheckedNo = UIImage(named: "checkedNo")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+        images.cellCheckedYes = UIImage(named: "checkedYes")!
+//        images.cellCheckedNo = UIImage(named: "checkedNo")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+        images.cellCheckedNo = UIImage(named: "checkedNo")!.image(color: .darkGray, size: 50)
         
-        images.cellButtonMore = UIImage(named: "more")!.image(color: NCBrandColor.shared.graySoft, size: 50)
+        images.cellButtonMore = UIImage(named: "more")!.image(color: NCBrandColor.shared.commonViewInfoText, size: 50)
         images.cellButtonStop = UIImage(named: "stop")!.image(color: NCBrandColor.shared.graySoft, size: 50)
     }
     
@@ -205,7 +208,7 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
         navigationController.setViewControllers(listViewController, animated: false)
         navigationController.modalPresentationStyle = .formSheet
         
-        appDelegate.window.rootViewController?.present(navigationController, animated: true, completion: nil)
+        appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
     }
     
     // MARK: - Save Photo - Video - Live Photo
@@ -255,7 +258,7 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
         }
         
         if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
-            saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV, progressView: nil, viewActivity: self.appDelegate.window.rootViewController?.view)
+            saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV, progressView: nil, viewActivity: self.appDelegate.window?.rootViewController?.view)
         }
     }
     
@@ -300,16 +303,17 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
             titleSave = NSLocalizedString("_livephoto_save_", comment: "")
         }
         
-        let copy = UIAction(title: NSLocalizedString("_copy_file_", comment: ""), image: UIImage(systemName: "doc.on.doc") ) { action in
+        let copy = UIAction(title: NSLocalizedString("_copy_file_", comment: ""), image: UIImage(systemName: "copy") ) { action in
             self.appDelegate.pasteboardOcIds = [metadata.ocId]
             self.copyPasteboard()
         }
         
-        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(systemName: "info") ) { action in
+//        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(systemName: "share") ) { action in
+        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(named: "share") ) { action in
             NCNetworkingNotificationCenter.shared.openShare(ViewController: viewController, metadata: metadata, indexPage: 0)
         }
         
-        let save = UIAction(title: titleSave, image: UIImage(systemName: "square.and.arrow.down")) { action in
+        let save = UIAction(title: titleSave, image: UIImage(systemName: "save_files")) { action in
             if metadataMOV != nil {
                 NCCollectionCommon.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV!)
             } else {
@@ -325,7 +329,7 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
             NCCollectionCommon.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
         }
         
-        let openIn = UIAction(title: NSLocalizedString("_open_in_", comment: ""), image: UIImage(systemName: "square.and.arrow.up") ) { action in
+        let openIn = UIAction(title: NSLocalizedString("_open_in_", comment: ""), image: UIImage(systemName: "open_file") ) { action in
             NCNetworkingNotificationCenter.shared.downloadOpen(metadata: metadata, selector: NCBrandGlobal.shared.selectorOpenIn)
         }
         
@@ -335,7 +339,7 @@ class NCCollectionCommon: NSObject, NCSelectDelegate {
         
         let open = UIMenu(title: NSLocalizedString("_open_", comment: ""), image: UIImage(systemName: "square.and.arrow.up"), children: [openIn, openQuickLook])
         
-        let moveCopy = UIAction(title: NSLocalizedString("_move_or_copy_", comment: ""), image: UIImage(systemName: "arrow.up.right.square")) { action in
+        let moveCopy = UIAction(title: NSLocalizedString("_move_or_copy_", comment: ""), image: UIImage(systemName: "move")) { action in
             NCCollectionCommon.shared.openSelectView(items: [metadata], viewController: viewController)
         }
         

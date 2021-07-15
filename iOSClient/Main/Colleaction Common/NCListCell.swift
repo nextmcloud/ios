@@ -58,11 +58,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     var objectId = ""
     var indexPath = IndexPath()
     var namedButtonMore = ""
+    @IBOutlet weak var btnMoreRightConstraint: NSLayoutConstraint!
+    
 
     override func awakeFromNib() {
         super.awakeFromNib()
                
-        imageItem.layer.cornerRadius = 6
+        imageItem.layer.cornerRadius = 4
         imageItem.layer.masksToBounds = true
         
         progressView.tintColor = NCBrandColor.shared.brandElement
@@ -79,7 +81,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         longPressedGestureMore.minimumPressDuration = 0.5
         longPressedGestureMore.delegate = self
         longPressedGestureMore.delaysTouchesBegan = true
-        buttonMore.addGestureRecognizer(longPressedGestureMore)        
+        buttonMore.addGestureRecognizer(longPressedGestureMore)
+        
+        separator.backgroundColor = NCBrandColor.shared.separator
+        self.labelInfo.textColor = NCBrandColor.shared.commonViewInfoText
     }
     
     override func prepareForReuse() {
@@ -92,7 +97,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     }
     
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        delegate?.tapMoreListItem(with: objectId, namedButtonMore: namedButtonMore, sender: sender)
+        delegate?.tapMoreListItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
     }
     
     @objc func longPressInsideMore(gestureRecognizer: UILongPressGestureRecognizer) {
@@ -122,27 +127,29 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         if status {
             imageItemLeftConstraint.constant = 45
             imageSelect.isHidden = false
+            btnMoreRightConstraint.constant = -40
         } else {
             imageItemLeftConstraint.constant = 10
             imageSelect.isHidden = true
             backgroundView = nil
+            btnMoreRightConstraint.constant = 0
         }
     }
     
     func selected(_ status: Bool) {
         if status {
-            imageSelect.image = NCCollectionCommon.images.cellCheckedYes
+            imageSelect.image = NCBrandColor.cacheImages.checkedYes
             
             let blurEffect = UIBlurEffect(style: .extraLight)
             let blurEffectView = UIVisualEffectView(effect: blurEffect)
             blurEffectView.frame = self.bounds
             blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            blurEffectView.backgroundColor = NCBrandColor.shared.brandElement.withAlphaComponent(0.2)
+            blurEffectView.backgroundColor = NCBrandColor.shared.cellSelection
             backgroundView = blurEffectView
             
             separator.isHidden = true
         } else {
-            imageSelect.image = NCCollectionCommon.images.cellCheckedNo
+            imageSelect.image = NCBrandColor.cacheImages.checkedNo
             backgroundView = nil
             separator.isHidden = false
         }
@@ -151,7 +158,49 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
 
 protocol NCListCellDelegate {
     func tapShareListItem(with objectId: String, sender: Any)
-    func tapMoreListItem(with objectId: String, namedButtonMore: String, sender: Any)
+    func tapMoreListItem(with objectId: String, namedButtonMore: String, image: UIImage?, sender: Any)
     func longPressMoreListItem(with objectId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
     func longPressListItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer)
+}
+
+// MARK: - List Layout
+
+class NCListLayout: UICollectionViewFlowLayout {
+    
+    var itemHeight: CGFloat = 60
+    
+    override init() {
+        super.init()
+        
+        sectionHeadersPinToVisibleBounds = false
+        
+        minimumInteritemSpacing = 0
+        minimumLineSpacing = 1
+        
+        self.scrollDirection = .vertical
+        self.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override var itemSize: CGSize {
+        get {
+            if let collectionView = collectionView {
+                let itemWidth: CGFloat = collectionView.frame.width
+                return CGSize(width: itemWidth, height: self.itemHeight)
+            }
+            
+            // Default fallback
+            return CGSize(width: 100, height: 100)
+        }
+        set {
+            super.itemSize = newValue
+        }
+    }
+    
+    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+        return proposedContentOffset
+    }
 }

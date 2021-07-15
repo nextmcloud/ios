@@ -27,7 +27,7 @@ class NCManageAutoUploadFileName: XLFormViewController {
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     let dateExample = Date()
-    
+
     // MARK: - View Life Cycle
     
     override func viewDidLoad() {
@@ -79,7 +79,18 @@ class NCManageAutoUploadFileName: XLFormViewController {
         // Maintain the original fileName
         
         row = XLFormRowDescriptor(tag: "maintainOriginalFileName", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_maintain_original_filename_", comment: ""))
-        row.value = CCUtility.getOriginalFileName(NCBrandGlobal.shared.keyFileNameOriginalAutoUpload)
+        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand;
+        var isOrignaleFilenamePrfesChanges : Bool?
+
+        isOrignaleFilenamePrfesChanges = CCUtility.getOriginalFileNamePrefsChanged(NCBrandGlobal.shared.keyFileNameOriginalAutoUploadPrefs)
+        
+        if(!(isOrignaleFilenamePrfesChanges ?? false)){
+            row.value = true
+            CCUtility.setOriginalFileName(true, key:NCBrandGlobal.shared.keyFileNameOriginalAutoUpload)
+        }
+        else{
+            row.value = CCUtility.getOriginalFileName(NCBrandGlobal.shared.keyFileNameOriginalAutoUpload)
+        }
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundView
         
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -96,7 +107,7 @@ class NCManageAutoUploadFileName: XLFormViewController {
 
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
-
+        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand;
         section.addFormRow(row)
                 
         // Section: Rename File Name
@@ -148,6 +159,8 @@ class NCManageAutoUploadFileName: XLFormViewController {
         }
         else if formRow.tag == "maintainOriginalFileName" {
             CCUtility.setOriginalFileName((formRow.value! as AnyObject).boolValue, key:NCBrandGlobal.shared.keyFileNameOriginalAutoUpload)
+            
+                CCUtility.setOriginalFileNamePrefsChanged(true, key:NCBrandGlobal.shared.keyFileNameOriginalAutoUploadPrefs)
             self.reloadForm()
         }
         else if formRow.tag == "maskFileName" {
