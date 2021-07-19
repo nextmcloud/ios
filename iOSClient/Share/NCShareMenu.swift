@@ -11,7 +11,7 @@ import UIKit
 class NCShareMenu: NSObject {
     
 //    func toggleMenu(viewController: UIViewController, key: String, sortButton: UIButton?, serverUrl: String, hideDirectoryOnTop: Bool = false) {
-    func toggleMenu(viewController: UIViewController) {
+    func toggleMenu(viewController: UIViewController, sendMail: Bool) {
         
         let menuViewController = UIStoryboard.init(name: "NCMenu", bundle: nil).instantiateInitialViewController() as! NCMenu
         var actions = [NCMenuAction]()
@@ -37,16 +37,18 @@ class NCShareMenu: NSObject {
             )
         )
         
-        actions.append(
-            NCMenuAction(
-                title: NSLocalizedString("_send_new_email_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "shareTypeEmail").imageColor(NCBrandColor.shared.brandElement),
-                action: { menuAction in
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareSendEmail)
-                    //                    self.reloadDataSource()
-                }
+        if sendMail {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_send_new_email_", comment: ""),
+                    icon: NCUtility.shared.loadImage(named: "shareTypeEmail").imageColor(NCBrandColor.shared.brandElement),
+                    action: { menuAction in
+                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareSendEmail)
+                        //                    self.reloadDataSource()
+                    }
+                )
             )
-        )
+        }
         
         actions.append(
             NCMenuAction(

@@ -21,22 +21,23 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var permission: Int = 0
     var hideDownload: Bool?
+    var password: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         labelNote.text = NSLocalizedString("_share_note_recipient_", comment: "")
         
         commentTextView.layer.borderWidth = 1
-        commentTextView.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
+        commentTextView.layer.borderColor = NCBrandColor.shared.textView.cgColor
 //        commentTextView.text = "Note"
-        commentTextView.textColor = .lightGray
+        commentTextView.textColor = NCBrandColor.shared.textView
         
         btnCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         btnCancel.layer.cornerRadius = 10
         btnCancel.layer.masksToBounds = true
         btnCancel.layer.borderWidth = 1
-        btnCancel.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
-        btnCancel.setTitleColor(NCBrandColor.shared.icon, for: .normal)
+        btnCancel.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        btnCancel.setTitleColor(NCBrandColor.shared.textView, for: .normal)
         btnCancel.backgroundColor = .white
         
         btnSendShare.setTitle(NSLocalizedString("_send_share_", comment: ""), for: .normal)
@@ -44,6 +45,9 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         btnSendShare.layer.masksToBounds = true
         btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         btnSendShare.setTitleColor(.white, for: .normal)
+        
+        self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.icon
+        self.title = self.metadata?.ownerDisplayName
         
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
         // Do any additional setup after loading the view.

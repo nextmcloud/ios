@@ -39,19 +39,20 @@ class NCShareFolderOptions: UIViewController ,UIGestureRecognizerDelegate, NCSha
     @IBOutlet weak var cancel: UIButton!
     @IBOutlet weak var applyChanges: UIButton!
 //    @IBOutlet weak var scrollView: UIScrollView!
+    public var metadata: tableMetadata?
+    public var sharee: NCCommunicationSharee?
+    public var tableShare: tableShare?
     
     
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var ocId = ""
     private var networking: NCShareNetworking?
-    public var metadata: tableMetadata?
     var viewWindowCalendar: UIView?
     private var calendar: FSCalendar?
     var width: CGFloat = 0
     var height: CGFloat = 0
     var permission: Int = 0
     var hideDownload: Bool?
-    public var tableShare: tableShare?
     
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -66,6 +66,7 @@
 		C0A2797E25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2797F25FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
 		C0A2798025FB509D0015F3DC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */; };
+		C0ABA3C526A142F70049DE9A /* NCShareQuickStatusMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABA3C426A142F70049DE9A /* NCShareQuickStatusMenu.swift */; };
 		C0D7889026809F9800B876BB /* NCShareNewUserAddComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D7888F26809F9800B876BB /* NCShareNewUserAddComment.swift */; };
 		C0D788A6268AEE8400B876BB /* NCShareMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D788A5268AEE8400B876BB /* NCShareMenu.swift */; };
 		C48BD5098411F9C26AC8E684 /* Pods_Nextcloud.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14D3CA9207D116AA28A58F65 /* Pods_Nextcloud.framework */; };
@@ -453,6 +454,7 @@
 		C07020EB267B45AE00E094AD /* NCPermissionFolderMenuView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCPermissionFolderMenuView.xib; sourceTree = "<group>"; };
 		C07020FC267F7B8900E094AD /* NCShareNewUserPermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareNewUserPermission.swift; sourceTree = "<group>"; };
 		C0A2797C25FB509C0015F3DC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		C0ABA3C426A142F70049DE9A /* NCShareQuickStatusMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareQuickStatusMenu.swift; sourceTree = "<group>"; };
 		C0D7888F26809F9800B876BB /* NCShareNewUserAddComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareNewUserAddComment.swift; sourceTree = "<group>"; };
 		C0D788A5268AEE8400B876BB /* NCShareMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareMenu.swift; sourceTree = "<group>"; };
 		F700222B1EC479840080073F /* Custom.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Custom.xcassets; sourceTree = "<group>"; };
@@ -1092,6 +1094,7 @@
 				C00B205626908550003E18AD /* NCShareSendEmail.swift */,
 				C00B205C26908B9B003E18AD /* NCShareFolderOptions.swift */,
 				C00B206C2691B8A0003E18AD /* NCShareFileOptions.swift */,
+				C0ABA3C426A142F70049DE9A /* NCShareQuickStatusMenu.swift */,
 			);
 			path = Share;
 			sourceTree = "<group>";
@@ -2357,6 +2360,7 @@
 				F79A65C62191D95E00FF6DCC /* NCSelect.swift in Sources */,
 				F7FAC2672549E1B5008EE2C4 /* NCKTVHTTPCache.swift in Sources */,
 				95BB208A265FEF3F00AF4344 /* NCSortMenu.swift in Sources */,
+				C0ABA3C526A142F70049DE9A /* NCShareQuickStatusMenu.swift in Sources */,
 				F7E0E1DC22327885006B0911 /* NCAudioRecorderViewController.swift in Sources */,
 				F70CAE3A1F8CF31A008125FD /* NCEndToEndEncryption.m in Sources */,
 				F70753EB2542A99800972D44 /* NCViewerImage.swift in Sources */,
@@ -2828,7 +2832,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 6.5.2;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -2887,7 +2891,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 6.5.2;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-ObjC",

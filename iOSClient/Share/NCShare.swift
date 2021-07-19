@@ -60,6 +60,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var networking: NCShareNetworking?
     private var shareeSelected: NCCommunicationSharee?
     public var tableShareSelected: tableShare?
+    private var quickStatusTableShare: tableShare!
+    private var sendEmailSelected: Int!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,6 +72,14 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         searchField.placeholder = NSLocalizedString("_shareLinksearch_placeholder_", comment: "")
         
         self.btnCreateLink.setTitle(NSLocalizedString("_create_link_", comment: ""), for: .normal)
+        self.btnCreateLink.layer.cornerRadius = 5
+        self.btnCreateLink.layer.masksToBounds = true
+        self.btnCreateLink.layer.borderWidth = 1
+        self.btnCreateLink.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
+        self.btnCreateLink.setTitleColor(NCBrandColor.shared.icon, for: .normal)
+        self.btnCreateLink.backgroundColor = NCBrandColor.shared.backgroundView
+//        shareLinkImage.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
+        shareLinkImage.image = UIImage(named: "sharebylink")?.image(color: NCBrandColor.shared.icon, size: 30)
         shareLinkImage.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
         shareLinkLabel.text = NSLocalizedString("_share_link_", comment: "")
         buttonCopy.setImage(UIImage.init(named: "shareCopy")?.image(color: .gray, size: 50), for: .normal)
@@ -126,6 +136,11 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         NotificationCenter.default.addObserver(self, selector: #selector(shareMenuAdvancePermissionClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareAdvancePermission), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(shareMenuSendEmailClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareSendEmail), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(shareMenuUnshareClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareUnshare), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(statusReadOnlyClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusReadOnly), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(statusEditingClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusEditing), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(statusFileDropClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusFileDrop), object: nil)
+
         changeTheming()
     }
     
@@ -203,7 +218,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         } else if shares.firstShareLink == nil {
             networking?.createShareLink(password: "")
         } else {
-            tapMenu(with: shares.firstShareLink!, sender: sender)
+            tapMenu(with: shares.firstShareLink!, sender: sender, index: 0)
         }
     }
     
@@ -244,17 +259,19 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
     
-    func tapMenu(with tableShare: tableShare?, sender: Any) {
+//    func tapMenu(with tableShare: tableShare?, sender: Any) {
+    func tapMenu(with tableShare: tableShare?, sender: Any, index: Int) {
         
         guard let tableShare = tableShare else { return }
 
         self.tableShareSelected = tableShare
+        self.sendEmailSelected = index
         if tableShare.shareType == 3 {
-            let views = NCShareCommon.shared.openViewMenuShareLink(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-            shareLinkMenuView = views.shareLinkMenuView
-            shareMenuViewWindow = views.viewWindow
-//            let shareMenu = NCShareMenu()
-//            shareMenu.toggleMenu(viewController: self)
+//            let views = NCShareCommon.shared.openViewMenuShareLink(shareViewController: self, tableShare: tableShare, metadata: metadata!)
+//            shareLinkMenuView = views.shareLinkMenuView
+//            shareMenuViewWindow = views.viewWindow
+            let shareMenu = NCShareMenu()
+            shareMenu.toggleMenu(viewController: self, sendMail: false)
         
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
             tap.delegate = self
@@ -264,7 +281,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //            shareUserMenuView = views.shareUserMenuView
 //            shareMenuViewWindow = views.viewWindow
             let shareMenu = NCShareMenu()
-            shareMenu.toggleMenu(viewController: self)
+            shareMenu.toggleMenu(viewController: self, sendMail: true)
             
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
             tap.delegate = self
@@ -272,19 +289,24 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         }
     }
     
-    func quickStatus(with tableShare: tableShare?, sender: Any) {
-        guard let tableShare = tableShare else { return }
-
-        if tableShare.shareType != 3 {
-            let views = NCShareCommon.shared.openQuickShare(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-            sharePermissionMenuView = views.sharePermissionMenuView
-            shareMenuViewWindow = views.viewWindow
-            
-            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-            tap.delegate = self
-            shareMenuViewWindow?.addGestureRecognizer(tap)
-        }
-    }
+//    func quickStatus(with tableShare: tableShare?, sender: Any) {
+//        guard let tableShare = tableShare else { return }
+//
+//        if tableShare.shareType != 3 {
+////            let views = NCShareCommon.shared.openQuickShare(shareViewController: self, tableShare: tableShare, metadata: metadata!)
+////            sharePermissionMenuView = views.sharePermissionMenuView
+////            shareMenuViewWindow = views.viewWindow
+////
+////            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
+////            tap.delegate = self
+////            shareMenuViewWindow?.addGestureRecognizer(tap)
+//
+//            self.quickStatusTableShare = tableShare
+//            let quickStatusMenu = NCShareQuickStatusMenu()
+//            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
+//
+//        }
+//    }
     
     /// MARK: - NCShareNetworkingDelegate
     
@@ -394,34 +416,96 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     // MARK: -NCShareMenuOptions
     @objc func shareMenuViewInClicked() {
+        // image to share
+        let image = UIImage(named: "pencil")
+        
+        let imageToShare = [ image! ]
+        let activityViewController = UIActivityViewController(activityItems: imageToShare, applicationActivities: nil)
+        activityViewController.popoverPresentationController?.sourceView = self.view
+        
+        activityViewController.excludedActivityTypes = [ UIActivity.ActivityType.airDrop, UIActivity.ActivityType.postToFacebook ]
+        self.present(activityViewController, animated: true, completion: nil)
         
     }
     
     @objc func shareMenuAdvancePermissionClicked() {
         let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
         let directory = self.metadata?.directory
-        if directory! {
-            let shareFolderOptions = storyboard.instantiateViewController(withIdentifier: "NCShareFolderOptions") as! NCShareFolderOptions
-            shareFolderOptions.metadata = self.metadata
-            shareFolderOptions.tableShare = self.tableShareSelected
-    //        shareFolderOptions.sharee = sharee
-            self.navigationController!.pushViewController(shareFolderOptions, animated: true)
-        } else {
+//        if directory! {
+//            let shareFolderOptions = storyboard.instantiateViewController(withIdentifier: "NCShareFolderOptions") as! NCShareFolderOptions
+//            shareFolderOptions.metadata = self.metadata
+//            shareFolderOptions.tableShare = self.tableShareSelected
+//    //        shareFolderOptions.sharee = sharee
+//            self.navigationController!.pushViewController(shareFolderOptions, animated: true)
+//        } else {
             let shareFileOptions = storyboard.instantiateViewController(withIdentifier: "NCShareFileOptions") as! NCShareFileOptions
             shareFileOptions.metadata = self.metadata
             shareFileOptions.tableShare = self.tableShareSelected
-    //        shareFolderOptions.sharee = sharee
-            self.navigationController!.pushViewController(shareFileOptions, animated: true)
-        }
+            shareFileOptions.sharee = self.shareeSelected
+            guard let navigationController = navigationController else {
+                print("this vc is not embedded in navigationController")
+                return
+            }
+            navigationController.pushViewController(shareFileOptions, animated: true)
+//        }
     }
     
     @objc func shareMenuSendEmailClicked() {
-        
+        let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+        let sendEmail = storyboard.instantiateViewController(withIdentifier: "NCShareSendEmail") as! NCShareSendEmail
+        sendEmail.metadata = self.metadata
+        sendEmail.tableShare = self.tableShareSelected
+//        viewNewUserComment.password = self.password
+//        self.navigationController!.pushViewController(viewNewUserComment, animated: true)
+        guard let navigationController = navigationController else {
+            print("this vc is not embedded in navigationController")
+            return
+        }
+        navigationController.pushViewController(sendEmail, animated: true)
     }
     
     @objc func shareMenuUnshareClicked() {
         guard let tableShare = self.tableShareSelected else { return }
         networking?.unShare(idShare: tableShare.idShare)
+    }
+    
+    // MARK: -StatusChangeNotification
+    func quickStatus(with tableShare: tableShare?, sender: Any) {
+        guard let tableShare = tableShare else { return }
+        
+        self.quickStatusTableShare = tableShare
+        let quickStatusMenu = NCShareQuickStatusMenu()
+        //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
+        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions)
+    }
+    
+    func quickStatusLink(with tableShare: tableShare?, sender: Any) {
+        guard let tableShare = tableShare else { return }
+        
+        self.quickStatusTableShare = tableShare
+        if metadata?.typeFile == "document" {
+            self.quickStatusTableShare = tableShare
+            let quickStatusMenu = NCShareQuickStatusMenu()
+            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions)
+        }
+    }
+    
+    @objc func statusReadOnlyClicked() {
+        let permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata!.directory)
+        
+        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
+    }
+    
+    @objc func statusEditingClicked() {
+        let permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata!.directory)
+        
+        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
+    }
+    
+    @objc func statusFileDropClicked() {
+        let permission = NCGlobal.shared.permissionCreateShare
+        
+        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
     }
 }
 
@@ -450,7 +534,12 @@ extension NCShare: UITableViewDataSource {
         if shares.share != nil {
             numOfRows = shares.share!.count
         }
-        
+        if numOfRows == 0 {
+            self.tableView.setEmptyMessage(NSLocalizedString("no_shares_created", comment: ""))
+        } else {
+            self.tableView.restore()
+        }
+
         return numOfRows
     }
     
@@ -466,6 +555,28 @@ extension NCShare: UITableViewDataSource {
                 cell.delegate = self
                 cell.labelTitle.text = NSLocalizedString("_share_link_", comment: "")
                 cell.labelTitle.textColor = NCBrandColor.shared.textView
+                cell.indexSelected = indexPath.row
+                cell.buttonMenu.isEnabled = false
+                cell.buttonMenu.isHidden = true
+                
+                if self.metadata?.typeFile != "document" {
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.graySoft
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.graySoft)
+                } else {
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
+                }
+                
+                if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
+                    cell.labelQuickStatus.text = NSLocalizedString("_share_file_drop_", comment: "")
+                } else {
+                    // Read Only
+                    if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
+                        cell.labelQuickStatus.text = NSLocalizedString("_share_editing_", comment: "")
+                    } else {
+                        cell.labelQuickStatus.text = NSLocalizedString("_share_read_only_", comment: "")
+                    }
+                }
                 return cell
             }
         } else {
@@ -483,6 +594,7 @@ extension NCShare: UITableViewDataSource {
                 cell.labelCanEdit.isHidden = true//false
                 cell.buttonMenu.isHidden = false
                 cell.imageItem.image = NCShareCommon.shared.getImageShareType(shareType: tableShare.shareType)
+                cell.indexSelected = indexPath.row
                 
                 let status = NCUtility.shared.getUserStatus(userIcon: tableShare.userIcon, userStatus: tableShare.userStatus, userMessage: tableShare.userMessage)
                 cell.imageStatus.image = status.onlineStatus
@@ -491,13 +603,15 @@ extension NCShare: UITableViewDataSource {
                 let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + tableShare.shareWith + ".png"
                 if FileManager.default.fileExists(atPath: fileNameLocalPath) {
                     if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
+//                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
+                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
                     }
                 } else {
                     NCCommunication.shared.downloadAvatar(userID: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
                             if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
+//                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
+                                cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
                             }
                         }
                     }
@@ -560,8 +674,13 @@ class NCShareLinkCell: UITableViewCell {
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var buttonCopy: UIButton!
     @IBOutlet weak var buttonMenu: UIButton!
+    @IBOutlet weak var status: UILabel!
+    @IBOutlet weak var btnQuickStatus: UIButton!
+    @IBOutlet weak var imageDownArrow: UIImageView!
+    @IBOutlet weak var labelQuickStatus: UILabel!
     
     private let iconShare: CGFloat = 200
+    var indexSelected: Int?
     
     var tableShare: tableShare?
     var delegate: NCShareLinkCellDelegate?
@@ -569,9 +688,12 @@ class NCShareLinkCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         
-        imageItem.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
-        buttonCopy.setImage(UIImage.init(named: "shareCopy")!.image(color: .gray, size: 50), for: .normal)
-        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: .gray, size: 50), for: .normal)
+//        imageItem.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
+        imageItem.image = UIImage(named: "sharebylink")?.image(color: NCBrandColor.shared.icon, size: 30)
+        buttonCopy.setImage(UIImage.init(named: "shareCopy")!.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
+        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
+        labelQuickStatus.textColor = NCBrandColor.shared.customer
+//        imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
     }
     
     @IBAction func touchUpInsideCopy(_ sender: Any) {
@@ -579,13 +701,18 @@ class NCShareLinkCell: UITableViewCell {
     }
     
     @IBAction func touchUpInsideMenu(_ sender: Any) {
-        delegate?.tapMenu(with: tableShare, sender: sender)
+        delegate?.tapMenu(with: tableShare, sender: sender, index: indexSelected!)
+    }
+    
+    @IBAction func quickStatusClicked(_ sender: Any) {
+        delegate?.quickStatusLink(with: tableShare, sender: sender)
     }
 }
 
 protocol NCShareLinkCellDelegate {
     func tapCopy(with tableShare: tableShare?, sender: Any)
-    func tapMenu(with tableShare: tableShare?, sender: Any)
+    func tapMenu(with tableShare: tableShare?, sender: Any, index: Int)
+    func quickStatusLink(with tableShare: tableShare?, sender: Any)
 }
 
 // MARK: - NCShareUserCell
@@ -603,7 +730,7 @@ class NCShareUserCell: UITableViewCell {
     
     @IBOutlet weak var labelQuickStatus: UILabel!
     @IBOutlet weak var imageDownArrow: UIImageView!
-    
+    var indexSelected: Int?
     
     var tableShare: tableShare?
     var delegate: NCShareUserCellDelegate?
@@ -613,7 +740,7 @@ class NCShareUserCell: UITableViewCell {
         
         switchCanEdit.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         switchCanEdit.onTintColor = NCBrandColor.shared.brandElement
-        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: .gray, size: 50), for: .normal)
+        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
         imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
     }
@@ -623,7 +750,7 @@ class NCShareUserCell: UITableViewCell {
     }
     
     @IBAction func touchUpInsideMenu(_ sender: Any) {
-        delegate?.tapMenu(with: tableShare, sender: sender)
+        delegate?.tapMenu(with: tableShare, sender: sender, index: indexSelected!)
     }
     
     @IBAction func quickStatusClicked(_ sender: Any) {
@@ -633,7 +760,7 @@ class NCShareUserCell: UITableViewCell {
 
 protocol NCShareUserCellDelegate {
     func switchCanEdit(with tableShare: tableShare?, switch: Bool, sender: UISwitch)
-    func tapMenu(with tableShare: tableShare?, sender: Any)
+    func tapMenu(with tableShare: tableShare?, sender: Any, index: Int)
     func quickStatus(with tableShare: tableShare?, sender: Any)
 }
 
@@ -646,4 +773,24 @@ class NCShareUserDropDownCell: DropDownCell {
     @IBOutlet weak var status: UILabel!
     @IBOutlet weak var imageShareeType: UIImageView!
     @IBOutlet weak var centerTitle: NSLayoutConstraint!
+}
+
+extension UITableView {
+    func setEmptyMessage(_ message: String) {
+        let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.bounds.size.height))
+        messageLabel.text = message
+        messageLabel.textColor = .black
+        messageLabel.numberOfLines = 0
+        messageLabel.textAlignment = .center
+        messageLabel.font = UIFont(name: "TrebuchetMS", size: 15)
+        messageLabel.sizeToFit()
+
+        self.backgroundView = messageLabel
+        self.separatorStyle = .none
+    }
+
+    func restore() {
+        self.backgroundView = nil
+        self.separatorStyle = .singleLine
+    }
 }

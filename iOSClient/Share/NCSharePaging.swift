@@ -275,12 +275,19 @@ class NCSharePagingView: PagingView {
         
         let headerView = Bundle.main.loadNibNamed("NCShareHeaderView", owner: self, options: nil)?.first as! NCShareHeaderView
         headerView.backgroundColor = NCBrandColor.shared.backgroundForm
+        headerView.fileName.textColor = NCBrandColor.shared.icon
+        headerView.labelSharing.textColor = NCBrandColor.shared.icon
+        headerView.labelSharingInfo.textColor = NCBrandColor.shared.icon
+        headerView.info.textColor = NCBrandColor.shared.textInfo
         headerView.ocId = metadata!.ocId
         
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
 //            headerView.imageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
 //            headerView.fullWidthImageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
-            headerView.fullWidthImageView.image = getImage(metadata: metadata!)
+//            headerView.fullWidthImageView.image = getImage(metadata: metadata!)
+            headerView.fullWidthImageView.image = getImageMetadata(metadata!)
+            headerView.fullWidthImageView.contentMode = .scaleToFill
+            headerView.imageView.isHidden = true
         } else {
             if metadata!.directory {
                 let image = UIImage.init(named: "folder")!
@@ -371,6 +378,68 @@ class NCSharePagingView: PagingView {
         
         return image
     }
+    
+    //MARK: - Image
+    
+    func getImageMetadata(_ metadata: tableMetadata) -> UIImage? {
+        
+        if let image = getImage(metadata: metadata) {
+            return image
+        }
+        
+        if metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo && !metadata.hasPreview {
+            NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+        }
+        
+        if CCUtility.fileProviderStoragePreviewIconExists(metadata.ocId, etag: metadata.etag) {
+            if let imagePreviewPath = CCUtility.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag) {
+                return UIImage.init(contentsOfFile: imagePreviewPath)
+            }
+        }
+        
+        return nil
+    }
+    
+//    private func getImage(metadata: tableMetadata) -> UIImage? {
+//
+//        let ext = CCUtility.getExtension(metadata.fileNameView)
+//        var image: UIImage?
+//
+//        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.typeFile == NCGlobal.shared.metadataTypeFileImage {
+//
+//            let previewPath = CCUtility.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)!
+//            let imagePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
+//
+//            if ext == "GIF" {
+//                if !FileManager().fileExists(atPath: previewPath) {
+//                    NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+//                }
+//                image = UIImage.animatedImage(withAnimatedGIFURL: URL(fileURLWithPath: imagePath))
+//            } else if ext == "SVG" {
+//                if let svgImage = SVGKImage(contentsOfFile: imagePath) {
+//                    let scale = svgImage.size.height / svgImage.size.width
+//                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * scale))
+//                    if let image = svgImage.uiImage {
+//                        if !FileManager().fileExists(atPath: previewPath) {
+//                            do {
+//                                try image.pngData()?.write(to: URL(fileURLWithPath: previewPath), options: .atomic)
+//                            } catch { }
+//                        }
+//                        return image
+//                    } else {
+//                        return nil
+//                    }
+//                } else {
+//                    return nil
+//                }
+//            } else {
+//                NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+//                image = UIImage.init(contentsOfFile: imagePath)
+//            }
+//        }
+//
+//        return image
+//    }
 }
 
 class NCShareHeaderView: UIView {

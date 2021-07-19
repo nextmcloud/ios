@@ -277,6 +277,10 @@ class NCGlobal: NSObject {
     let notificationCenterShareAdvancePermission                = "ShareAdvancePermission"
     let notificationCenterShareSendEmail                        = "ShareSendEmail"
     let notificationCenterShareUnshare                          = "ShareUnshare"
+    let notificationCenterStatusReadOnly                        = "statusReadOnly"
+    let notificationCenterStatusEditing                         = "statusEditing"
+    let notificationCenterStatusFileDrop                        = "statusFileDrop"
+
 }
 
 //let rootView = UIApplication.shared.keyWindow?.rootViewController?.view
