@@ -6,6 +6,7 @@
 //  Copyright © 2019 Marino Faggiana. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//  Author TSI-mc
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -285,6 +286,7 @@ extension NCLoginWeb: WKNavigationDelegate {
                     UIView.animate(withDuration: 0.5) {
                         viewController.view.alpha = 1
                     }
+                    appDelegate.adjust.trackEvent(TriggerEvent(Login.rawValue))
                 }
             } else {
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitializeMain)

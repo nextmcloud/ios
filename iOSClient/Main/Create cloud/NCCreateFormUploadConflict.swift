@@ -4,6 +4,7 @@
 //
 //  Created by Marino Faggiana on 29/03/2020.
 //  Copyright © 2020 Marino Faggiana. All rights reserved.
+//  Author TSI-mc
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
@@ -228,6 +229,7 @@ extension NCCreateFormUploadConflictDelegate {
         } else {
             
             appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasNOConflict)
+            appDelegate.adjust.trackEvent(TriggerEvent(FileUpload.rawValue))
         }
                 
         dismiss(animated: true)

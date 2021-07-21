@@ -6,6 +6,7 @@
 //  Copyright © 2019 Marino Faggiana. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//  Author TSI-mc
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -463,6 +464,7 @@ extension NCMedia: UICollectionViewDelegateFlowLayout {
 extension NCMedia {
 
     @objc func reloadDataSource() {
+        appDelegate.adjust.trackEvent(TriggerEvent(ResetsApp.rawValue))
         self.reloadDataSourceWithCompletion { (_) in }
     }
     
