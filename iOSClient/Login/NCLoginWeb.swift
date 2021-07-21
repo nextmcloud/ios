@@ -126,7 +126,7 @@ class NCLoginWeb: UIViewController {
             // builds authentication request
         let request = OIDAuthorizationRequest(configuration: config,
                                                   clientId: "10TVL0SAM30000004901NEXTMAGENTACLOUDIOS0",
-                                                  scopes: [OIDScopeOpenID, OIDScopeProfile],
+                                                  scopes: [OIDScopeOpenID, OIDScopeProfile, "magentacloud", "offline_access"],
                                                   redirectURL: URL(string: "nextmagentacloudios://login")!,
                                                   responseType: OIDResponseTypeCode,
                                                   additionalParameters: ["":"",
@@ -142,9 +142,10 @@ class NCLoginWeb: UIViewController {
               if let authState = authState {
                 //self.setAuthState(authState)
                 print("Got authorization tokens. Access token: " +
-                      "\(authState.lastTokenResponse?.accessToken ?? "nil")")
+                      "\(authState.lastTokenResponse?.idToken ?? "nil")")
+                appDelegate.requestPushNotificationPermission()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    NCCommunication.shared.getLoginFlowV2Poll(token: (authState.lastTokenResponse?.accessToken)!, endpoint: "https://dev2.next.magentacloud.de") { (server, loginName, appPassword, errorCode, errorDescription) in
+                    NCCommunication.shared.getLoginFlowV2Poll(token: (authState.lastTokenResponse?.idToken)!, endpoint: "https://dev2.next.magentacloud.de") { (server, loginName, appPassword, errorCode, errorDescription) in
                         if errorCode == 0 && server != nil && loginName != nil && appPassword != nil {
                             self.createAccount(server: server!, username: loginName!, password: appPassword!)
                         }

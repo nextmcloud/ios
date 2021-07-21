@@ -126,10 +126,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Process upload
         networkingProcessUpload = NCNetworkingProcessUpload.init()
         
-        // Push Notification & display notification
-        application.registerForRemoteNotifications()
-        UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (_, _) in }
+//        // Push Notification & display notification
+//        application.registerForRemoteNotifications()
+//        UNUserNotificationCenter.current().delegate = self
+//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (_, _) in }
 
         // AV
         do {
@@ -420,6 +420,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NCPushNotification.shared().applicationdidReceiveRemoteNotification(userInfo) { (result) in
             completionHandler(result)
         }
+    }
+    
+    func requestPushNotificationPermission(){
+        // Push Notification & display notification
+        UIApplication.shared.registerForRemoteNotifications()
+        UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (_, _) in }
+        NCPushNotification.shared().pushNotification()
     }
         
     // MARK: - Login & checkErrorNetworking
