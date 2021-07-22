@@ -8,8 +8,6 @@
 
 #import "AdjustHelper.h"
 
-
-
 @implementation AdjustHelper
 
 -(void)configAdjust {
@@ -32,6 +30,9 @@
 
 -(void)trackEvent:(TriggerEvent)event {
 //    self.event = [ADJEvent eventWithEventToken:@"gb97gb"];
+    if (false) {
+        return;
+    }
     switch(event){
        case Login:
             self.event = [ADJEvent eventWithEventToken:@"gb97gb"];
@@ -76,6 +77,7 @@
        default :
             break;;
     }
+    [Adjust trackEvent: self.event];
 }
 
 @end
