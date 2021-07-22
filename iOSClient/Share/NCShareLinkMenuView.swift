@@ -372,6 +372,8 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworkin
     // Add another link
     @IBAction func buttonAddAnotherLink(sender: UIButton) {
         appDelegate.adjust.trackEvent(TriggerEvent(CreateLink.rawValue))
+        TealiumHelper.shared.trackEvent(title: "NMC_CreateLink", data: ["": ""])
+        TealiumHelper.shared.trackView(title: "VIEW_Create_Link", data: ["": ""])
         networking?.createShareLink(password: "")
     }
     

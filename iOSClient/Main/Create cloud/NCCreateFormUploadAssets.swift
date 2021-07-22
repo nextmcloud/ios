@@ -618,6 +618,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 self.appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasNOConflict)
                 self.appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasMOV)
                 self.appDelegate.adjust.trackEvent(TriggerEvent(UseCamera.rawValue))
+                TealiumHelper.shared.trackEvent(title: "NMC_Cameraupload", data: ["": ""])
+                TealiumHelper.shared.trackView(title: "VIEW_Cameraupload", data: ["": ""])
             }
         
             DispatchQueue.main.async {self.dismiss(animated: true, completion: nil)  }

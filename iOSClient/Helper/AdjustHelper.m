@@ -75,7 +75,7 @@
            break;
       
        default :
-            break;;
+            break;
     }
     [Adjust trackEvent: self.event];
 }

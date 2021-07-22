@@ -194,7 +194,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
         
         adjust.configAdjust()
-        
+        TealiumHelper.shared.start()
         return true
     }
     

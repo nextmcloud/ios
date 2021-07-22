@@ -1543,6 +1543,8 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
         controller.delegate = self
         
         appDelegate.adjust.trackEvent(TriggerEvent(DocumentScan.rawValue))
+        TealiumHelper.shared.trackEvent(title: "NMC_Documentscan", data: ["": ""])
+        TealiumHelper.shared.trackView(title: "VIEW_documentscan", data: ["": ""])
         self.viewController?.present(controller, animated: true)
     }
     

@@ -230,6 +230,8 @@ extension NCCreateFormUploadConflictDelegate {
             
             appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasNOConflict)
             appDelegate.adjust.trackEvent(TriggerEvent(FileUpload.rawValue))
+            TealiumHelper.shared.trackEvent(title: "NMC_Fileupload", data: ["": ""])
+            TealiumHelper.shared.trackView(title: "VIEW_fileupload", data: ["": ""])
         }
                 
         dismiss(animated: true)

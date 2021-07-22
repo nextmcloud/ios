@@ -31,6 +31,7 @@
 {
     AppDelegate *appDelegate;
     AdjustHelper *adjust;
+    TealiumHelper *tealium;
 }
 @end
 
@@ -221,6 +222,7 @@
     
     adjust = [[AdjustHelper alloc] init];
     [adjust configAdjust];
+    tealium = [[TealiumHelper alloc] init];
     [self changeTheming];
 }
 
@@ -289,6 +291,8 @@
             
             [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
             [adjust trackEvent:9];
+            [tealium trackViewWithTitle:@"NMC_AutoUpload-On" data:[NSDictionary new]];
+            [tealium trackViewWithTitle:@"VIEW_AutoUpload-On" data:[NSDictionary new]];
         } else {
             
             [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUpload" state:NO];
@@ -297,6 +301,8 @@
             // remove
             [[NCManageDatabase shared] clearMetadatasUploadWithAccount:appDelegate.account];
             [adjust trackEvent:10];
+            [tealium trackViewWithTitle:@"NMC_AutoUpload-Off" data:[NSDictionary new]];
+            [tealium trackViewWithTitle:@"VIEW_AutoUpload-Off" data:[NSDictionary new]];
         }
         
         [self reloadForm];

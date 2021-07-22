@@ -734,6 +734,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         if isEditMode { return }
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId) else { return }
         appDelegate.adjust.trackEvent(TriggerEvent(Sharing.rawValue))
+        TealiumHelper.shared.trackEvent(title: "NMC_Sharing", data: ["": ""])
+        TealiumHelper.shared.trackView(title: "VIEW_Sharing", data: ["": ""])
         NCFunctionCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 2)
     }
         

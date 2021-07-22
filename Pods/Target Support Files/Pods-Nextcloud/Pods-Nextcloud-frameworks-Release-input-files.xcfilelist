@@ -4,3 +4,4 @@ ${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MoEngage.framework
 ${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MoEngageCore.framework
 ${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MOAnalytics.framework
 ${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MOMessaging.framework
+${BUILT_PRODUCTS_DIR}/tealium-swift/TealiumSwift.framework

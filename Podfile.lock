@@ -2,19 +2,25 @@ PODS:
   - MoEngage-iOS-SDK (7.0.4):
     - MORichNotification (< 5.1.0, >= 5.0.0)
   - MORichNotification (5.0.0)
+  - tealium-swift (2.4.1):
+    - tealium-swift/TealiumFull (= 2.4.1)
+  - tealium-swift/TealiumFull (2.4.1)
 
 DEPENDENCIES:
   - MoEngage-iOS-SDK (~> 7.0)
+  - tealium-swift
 
 SPEC REPOS:
   trunk:
     - MoEngage-iOS-SDK
     - MORichNotification
+    - tealium-swift
 
 SPEC CHECKSUMS:
   MoEngage-iOS-SDK: 71451fb44893536b0c70ff7dace1989e6fa734ff
   MORichNotification: abf1f1aaed3a9366dc8e966c55652bff7716b3b8
+  tealium-swift: 67fa94e8fb0937a7c949f0160e7ffb76f17fe1cd
 
-PODFILE CHECKSUM: d05ac1c6f1df0cebf9338353df1235e3a24dc6b0
+PODFILE CHECKSUM: d82dc2c6d909b771221c49f80912fb641856ebd2
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.8.4

@@ -465,6 +465,8 @@ extension NCMedia {
 
     @objc func reloadDataSource() {
         appDelegate.adjust.trackEvent(TriggerEvent(ResetsApp.rawValue))
+        TealiumHelper.shared.trackEvent(title: "NMC_Reset", data: ["": ""])
+        TealiumHelper.shared.trackView(title: "VIEW_Reset", data: ["": ""])
         self.reloadDataSourceWithCompletion { (_) in }
     }
     
