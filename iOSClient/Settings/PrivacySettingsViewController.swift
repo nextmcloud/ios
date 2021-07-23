@@ -22,6 +22,7 @@ class PrivacySettingsViewController: XLFormViewController{
         let nib = UINib(nibName: "CustomSectionHeader", bundle: nil)
         self.tableView.register(nib, forHeaderFooterViewReuseIdentifier: "customSectionHeader")
         isShowSettingsButton = UserDefaults.standard.bool(forKey: "showSettingsButton")
+        self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.brand
         changeTheming()
     }
     
@@ -30,8 +31,6 @@ class PrivacySettingsViewController: XLFormViewController{
         tableView.backgroundColor = NCBrandColor.shared.backgroundForm
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none;
         tableView.reloadData()
-   
-        
         initializeForm()
     }
 
@@ -89,13 +88,20 @@ class PrivacySettingsViewController: XLFormViewController{
         XLFormViewController.cellClassesForRowDescriptorTypes()["AnalysisDataCollectionCustomCellType"] = AnalysisDataCollectionSwitch.self
         
         
-        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "AnalysisDataCollectionCustomCellType", title: "")
+        row = XLFormRowDescriptor(tag: "AnalysisDataCollectionSwitch", rowType: "AnalysisDataCollectionCustomCellType", title: "")
         row.cellConfig["analysisDataCollectionSwitchControl.onTintColor"] = NCBrandColor.shared.brand
         row.cellConfig["cellLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView //photos
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_analysis_data_acqusition_", comment: "")
+        if(UserDefaults.standard.bool(forKey: "isAnalysisDataCollectionSwitchOn")){
+            row.cellConfigAtConfigure["analysisDataCollectionSwitchControl.on"] = 1
+        }else {
+            row.cellConfigAtConfigure["analysisDataCollectionSwitchControl.on"] = 0
+        }
+        
         section.addFormRow(row)
+        
         
         XLFormViewController.cellClassesForRowDescriptorTypes()["SaveSettingsButton"] = SaveSettingsCustomButtonCell.self
         
@@ -125,6 +131,13 @@ class PrivacySettingsViewController: XLFormViewController{
         
         if formRow.tag == "SaveSettingsButton" {
             print("save settings clicked")
+            //TODO save button state and leave the page
+            self.navigationController?.popViewController(animated: true)
+            
+        }
+        if formRow.tag == "AnalysisDataCollectionSwitch"{
+            UserDefaults.standard.set((formRow.value! as AnyObject).boolValue, forKey: "isAnalysisDataCollectionSwitchOn")
+
         }
     
     }

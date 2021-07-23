@@ -67,6 +67,10 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         changeTheming()
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        tableView.alwaysBounceVertical = false
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -320,9 +324,9 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             let fileNamePath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + appDelegate.user + ".png"
             
             if let themingAvatarFile = UIImage.init(contentsOfFile: fileNamePath) {
-                cell.avatar?.image = themingAvatarFile
+                cell.avatar?.image = UIImage.init(named: "user_settings")
             } else {
-                cell.avatar?.image = UIImage.init(named: "moreAvatar")
+                cell.avatar?.image = UIImage.init(named: "user_settings")
             }
             cell.avatar?.layer.masksToBounds = true
             cell.avatar?.layer.cornerRadius = cell.avatar.frame.size.width / 2
@@ -331,6 +335,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                 cell.displayName.textColor = NCBrandColor.shared.textView
             }
 
+            cell.isUserInteractionEnabled = false
             cell.selectedBackgroundView = selectionColor
             cell.backgroundColor = NCBrandColor.shared.backgroundCell
 //            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
@@ -344,6 +349,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                     cell.status.textColor = NCBrandColor.shared.textView
                 }
             }
+            
             
             return cell
             

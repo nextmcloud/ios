@@ -158,7 +158,9 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         changeTheming()
         //call new view
         
-        redirectToPrivacyViewController()
+        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed")){
+            redirectToPrivacyViewController()
+        }
     }
         
     override func viewWillAppear(_ animated: Bool) {
@@ -218,8 +220,9 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     }
     
     func redirectToPrivacyViewController(){
+        UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
         let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
-        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacyPolicyViewController") as! InitialPrivacySettingsViewController
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
                 self.present(newViewController, animated: true, completion: nil)
     }
     

@@ -22,6 +22,7 @@ class HelpViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
         let myWebView:WKWebView = WKWebView(frame: CGRect(x:0, y:0, width: UIScreen.main.bounds.width, height:UIScreen.main.bounds.height))
         myWebView.uiDelegate = self
         myWebView.navigationDelegate = self
+        myWebView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.view.addSubview(myWebView)
         
         
@@ -40,5 +41,19 @@ class HelpViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         NCUtility.shared.stopActivityIndicator()
+    }
+    
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+            if navigationAction.navigationType == .linkActivated  {
+                if let url = navigationAction.request.url,
+                    UIApplication.shared.canOpenURL(url) {
+                    UIApplication.shared.open(url)
+                    decisionHandler(.cancel)
+                } else {
+                    decisionHandler(.allow)
+                }
+            } else {
+                decisionHandler(.allow)
+            }
     }
 }

@@ -82,12 +82,20 @@
     //[row.cellConfig setObject:@(UITableViewCellAccessoryDisclosureIndicator) forKey:@"accessoryType"];
     row.action.formSelector = @selector(passcode:);
     [section addFormRow:row];
+    
     // Enable Touch ID
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"enableTouchDaceID" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_enable_touch_face_id_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
+    
+    if([[CCUtility getPasscode] length]){
+        row.disabled = @NO;
+    }else{
+        row.disabled = @YES;
+    }
+
     [section addFormRow:row];
     // Lock no screen
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"notPasscodeAtStart" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_lock_protection_no_screen_", nil)];
@@ -95,6 +103,11 @@
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
+    if([[CCUtility getPasscode] length]){
+        row.disabled = @NO;
+    }else{
+        row.disabled = @YES;
+    }
     [section addFormRow:row];
     
     // EndToEnd Encryption
@@ -278,7 +291,6 @@
 {
     [super viewDidLoad];
     
-    self.title = NSLocalizedString(@"_settings_", nil);
     appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeTheming) name:NCGlobal.shared.notificationCenterChangeTheming object:nil];
@@ -292,7 +304,8 @@
 {
     [super viewWillAppear:animated];
     appDelegate.activeViewController = self;
-    
+    self.navigationItem.title = NSLocalizedString(@"_settings_", nil);
+
     [self initializeForm];
     [self reloadForm];
 }
@@ -343,13 +356,17 @@
     if ([[CCUtility getPasscode] length]) {
         rowBloccoPasscode.title = NSLocalizedString(@"_lock_active_", nil);
         [rowBloccoPasscode.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
+        rowEnableTouchDaceID.disabled = @NO;
+        rowNotPasscodeAtStart.disabled = @NO;
     } else {
         rowBloccoPasscode.title = NSLocalizedString(@"_lock_not_active_", nil);
         [rowBloccoPasscode.cellConfig setObject:[[UIImage imageNamed:@"lock.open"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
+        rowEnableTouchDaceID.disabled = @YES;
+        rowNotPasscodeAtStart.disabled = @YES;
     }
     
-    if ([CCUtility getEnableTouchFaceID]) [rowEnableTouchDaceID setValue:@1]; else [rowEnableTouchDaceID setValue:@0];
-    if ([CCUtility getNotPasscodeAtStart]) [rowNotPasscodeAtStart setValue:@1]; else [rowNotPasscodeAtStart setValue:@0];
+    if ([CCUtility getEnableTouchFaceID] && [[CCUtility getPasscode] length]) [rowEnableTouchDaceID setValue:@1]; else [rowEnableTouchDaceID setValue:@0];
+    if ([CCUtility getNotPasscodeAtStart] && [[CCUtility getPasscode] length]) [rowNotPasscodeAtStart setValue:@1]; else [rowNotPasscodeAtStart setValue:@0];
     if ([CCUtility getDarkModeDetect]) [rowDarkModeDetect setValue:@1]; else [rowDarkModeDetect setValue:@0];
     if ([CCUtility getDarkMode]) [rowDarkMode setValue:@1]; else [rowDarkMode setValue:@0];
 
@@ -411,6 +428,9 @@
         [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterChangeTheming object:nil];
     }
     if ([rowDescriptor.tag isEqualToString:@"privacySettings"]){
+        
+    }
+    if([rowDescriptor.tag isEqualToString:@"bloccopasscode"]){
         
     }
 }
