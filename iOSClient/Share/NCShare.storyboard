@@ -807,17 +807,15 @@
                                                         <constraint firstAttribute="height" constant="1" id="pK4-KI-cKW"/>
                                                     </constraints>
                                                 </view>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Read only" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xNu-eI-efV">
-                                                    <rect key="frame" x="15" y="14.5" width="59.5" height="15"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="15" id="V5V-Qd-CjC"/>
-                                                    </constraints>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Es keine Bearbeitungsfunktionen für Dateien, außer Sie teilen mit MagentaCLOUD Nutzern." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xNu-eI-efV">
+                                                    <rect key="frame" x="15" y="6.5" width="384" height="31.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="xNu-eI-efV" secondAttribute="trailing" constant="15" id="BT9-F2-hgX"/>
                                                 <constraint firstAttribute="trailing" secondItem="dIs-Ap-299" secondAttribute="trailing" id="J7f-fU-Wyz"/>
                                                 <constraint firstItem="dIs-Ap-299" firstAttribute="top" secondItem="rDs-2U-pe7" secondAttribute="top" id="UhG-cw-Ph1"/>
                                                 <constraint firstItem="xNu-eI-efV" firstAttribute="leading" secondItem="rDs-2U-pe7" secondAttribute="leading" constant="15" id="lz7-5K-q8P"/>

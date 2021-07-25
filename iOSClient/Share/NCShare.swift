@@ -447,8 +447,8 @@ extension NCShare: UITableViewDataSource {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell {
                 cell.tableShare = tableShare
                 cell.delegate = self
-                let linkText = UserDefaults.standard.value(forKey: "_share_link_") as! String
-                if linkText != "" {
+//                let linkText = UserDefaults.standard.value(forKey: "_share_link_") as! String
+                if let linkText = UserDefaults.standard.value(forKey: "_share_link_") as? String {
                     cell.labelTitle.text = linkText
                 } else {
                     cell.labelTitle.text = NSLocalizedString("_share_link_", comment: "")

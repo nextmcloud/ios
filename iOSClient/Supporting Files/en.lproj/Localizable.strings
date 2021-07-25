@@ -602,6 +602,7 @@
 "_permissions_"                 = "Permissions";
 "_advance_permissions_"         = "Advance permissions";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCloud users, you have more opportunities for collaboration.";
+"share_editing_message"         = "There are no editing functions for files unless you share them with MagentaCLOUD users.";
 
 // Share Permission
 

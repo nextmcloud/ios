@@ -565,7 +565,13 @@ extension NCShareNewUserPermission: UITableViewDataSource {
                         cell.title.text = NSLocalizedString("_share_allow_upload_", comment: "")
                         return cell
                     } else {
-                        cell.title.text = NSLocalizedString("_share_editing_", comment: "")
+                        let ext = self.metadata?.ext
+                        if ext == "jpg" || ext == "png" || ext == "m4a" {
+                            cell.title.text = NSLocalizedString("share_editing_message", comment: "")
+                            
+                        } else {
+                            cell.title.text = NSLocalizedString("_share_editing_", comment: "")
+                        }
                         return cell
                     }
                 }
