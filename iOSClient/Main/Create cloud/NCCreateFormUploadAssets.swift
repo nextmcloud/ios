@@ -4,6 +4,7 @@
 //
 //  Created by Marino Faggiana on 14/11/2018.
 //  Copyright © 2018 Marino Faggiana. All rights reserved.
+//  Author TSI-mc
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
@@ -501,7 +502,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
     
     @objc func save() {
          
-        DispatchQueue.global().async {
+        DispatchQueue.global().async { [self] in
         
             let useFolderPhotoRow: XLFormRowDescriptor  = self.form.formRow(withTag: "useFolderAutoUpload")!
             let useSubFolderRow: XLFormRowDescriptor  = self.form.formRow(withTag: "useSubFolder")!
@@ -615,7 +616,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
             } else {
                 
                 self.appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasNOConflict)
-                self.appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasMOV)  
+                self.appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasMOV)
+                self.appDelegate.adjust.trackEvent(TriggerEvent(UseCamera.rawValue))
             }
         
             DispatchQueue.main.async {self.dismiss(animated: true, completion: nil)  }

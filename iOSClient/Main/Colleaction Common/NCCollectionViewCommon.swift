@@ -4,6 +4,7 @@
 //
 //  Created by Marino Faggiana on 12/09/2020.
 //  Copyright © 2020 Marino Faggiana. All rights reserved.
+//  Author TSI-mc
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
@@ -732,7 +733,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         
         if isEditMode { return }
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId) else { return }
-        
+        appDelegate.adjust.trackEvent(TriggerEvent(Sharing.rawValue))
         NCFunctionCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 2)
     }
         
