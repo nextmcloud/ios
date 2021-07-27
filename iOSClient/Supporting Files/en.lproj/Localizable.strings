@@ -314,7 +314,7 @@
 "_key_privacy_help_" = "Privacy Policy";
 "_key_reject_help_" = "reject";
 "_key_settings_help_" = "Settings";
-
+"_prefix_upload_path_" = "MagentaCLOUD/";
 
 
 // Manage AutoUpload
