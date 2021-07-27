@@ -153,7 +153,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView //photos
-        row.cellConfig["photoLabel.text"] = NSLocalizedString("_photos_", comment: "")
+        row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         row.cellConfig["textLabel.text"] = ""
         section.addFormRow(row)
         
@@ -242,8 +242,9 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             }
             
             // Update
-            let row : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
-            row.title = self.titleServerUrl
+            let row : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!//
+            //row.title = self.titleServerUrl
+            row.cellConfig["photoLabel.text"] = self.titleServerUrl
             self.updateFormRow(row)
         }
     }
@@ -251,16 +252,16 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     @objc func save() {
         
         let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
-        guard let name = rowFileName.value else {
-            return
-        }
-        let ext = (name as! NSString).pathExtension.uppercased()
+//        guard let name = self.fileName else {
+//            return
+//        }
+        let ext = (self.fileName as! NSString).pathExtension.uppercased()
         var fileNameSave = ""
                    
         if (ext == "") {
-            fileNameSave = name as! String + ".m4a"
+            fileNameSave = self.fileName as! String + ".m4a"
         } else {
-            fileNameSave = (name as! NSString).deletingPathExtension + ".m4a"
+            fileNameSave = (self.fileName as! NSString).deletingPathExtension + ".m4a"
         }
         
         let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase ,url: "", contentType: "", livePhoto: false, chunk: false)

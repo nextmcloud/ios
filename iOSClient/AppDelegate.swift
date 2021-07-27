@@ -30,6 +30,7 @@ import LocalAuthentication
 import Firebase
 import Adjust
 
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, TOPasscodeViewControllerDelegate {
 
@@ -67,6 +68,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     @objc let adjust = AdjustHelper()
     let triggerEvent:TriggerEvent = Login
 
+    var currentAuthorizationFlow: OIDExternalUserAgentSession?
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         let userAgent = CCUtility.getUserAgent() as String
@@ -128,10 +131,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Process upload
         networkingProcessUpload = NCNetworkingProcessUpload.init()
         
-        // Push Notification & display notification
-        application.registerForRemoteNotifications()
-        UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (_, _) in }
+//        // Push Notification & display notification
+//        application.registerForRemoteNotifications()
+//        UNUserNotificationCenter.current().delegate = self
+//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (_, _) in }
 
         // AV
         do {
@@ -427,6 +430,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NCPushNotification.shared().applicationdidReceiveRemoteNotification(userInfo) { (result) in
             completionHandler(result)
         }
+    }
+    
+    func requestPushNotificationPermission(){
+        // Push Notification & display notification
+        UIApplication.shared.registerForRemoteNotifications()
+        UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (_, _) in }
+        NCPushNotification.shared().pushNotification()
     }
         
     // MARK: - Login & checkErrorNetworking
@@ -732,6 +743,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // MARK: - Open URL
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        
+        // Sends the URL to the current authorization flow (if any) which will
+         // process it if it relates to an authorization response.
+         if let authorizationFlow = self.currentAuthorizationFlow,
+                                    authorizationFlow.resumeExternalUserAgentFlow(with: url) {
+            
+           return true
+         }
+
         
         if account == "" { return false }
         

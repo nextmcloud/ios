@@ -145,7 +145,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView //photos
-        row.cellConfig["photoLabel.text"] = NSLocalizedString("_photos_", comment: "")
+        row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         row.cellConfig["textLabel.text"] = ""//topLineView.isHidden
         
         section.addFormRow(row)
@@ -475,7 +475,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
             
             // Update
             let row : XLFormRowDescriptor  = self.form.formRow(withTag: "PhotoButtonDestinationFolder")!
-            row.title = self.titleServerUrl
+            row.cellConfig["photoLabel.text"] = self.titleServerUrl
             self.updateFormRow(row)
         }
     }
