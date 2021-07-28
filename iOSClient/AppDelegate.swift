@@ -29,7 +29,7 @@ import TOPasscodeViewController
 import LocalAuthentication
 import Firebase
 import Adjust
-
+import AppAuth
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, TOPasscodeViewControllerDelegate {

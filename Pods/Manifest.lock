@@ -1,20 +1,36 @@
 PODS:
+  - AppAuth (1.4.0):
+    - AppAuth/Core (= 1.4.0)
+    - AppAuth/ExternalUserAgent (= 1.4.0)
+  - AppAuth/Core (1.4.0)
+  - AppAuth/ExternalUserAgent (1.4.0)
   - MoEngage-iOS-SDK (7.0.4):
     - MORichNotification (< 5.1.0, >= 5.0.0)
   - MORichNotification (5.0.0)
+  - tealium-swift (2.4.1):
+    - tealium-swift/TealiumFull (= 2.4.1)
+  - tealium-swift/Core (2.4.1)
+  - tealium-swift/TealiumFull (2.4.1)
 
 DEPENDENCIES:
+  - AppAuth
   - MoEngage-iOS-SDK (~> 7.0)
+  - tealium-swift
+  - tealium-swift/Core
 
 SPEC REPOS:
   trunk:
+    - AppAuth
     - MoEngage-iOS-SDK
     - MORichNotification
+    - tealium-swift
 
 SPEC CHECKSUMS:
+  AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
   MoEngage-iOS-SDK: 71451fb44893536b0c70ff7dace1989e6fa734ff
   MORichNotification: abf1f1aaed3a9366dc8e966c55652bff7716b3b8
+  tealium-swift: 67fa94e8fb0937a7c949f0160e7ffb76f17fe1cd
 
-PODFILE CHECKSUM: d05ac1c6f1df0cebf9338353df1235e3a24dc6b0
+PODFILE CHECKSUM: 4ad0f0fe41e3cf275b50bf6bd8ad597c4cc21205
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.8.4
