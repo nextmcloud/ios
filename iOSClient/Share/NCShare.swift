@@ -4,6 +4,7 @@
 //
 //  Created by Marino Faggiana on 17/07/2019.
 //  Copyright © 2019 Marino Faggiana. All rights reserved.
+//  Copyright © 2021 TSI-mc. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
@@ -62,6 +63,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     public var tableShareSelected: tableShare?
     private var quickStatusTableShare: tableShare!
     private var sendEmailSelected: Int!
+    private var quickStatusTableShare: tableShare!
+    private var shareeEmail: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -141,6 +144,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         NotificationCenter.default.addObserver(self, selector: #selector(statusEditingClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusEditing), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(statusFileDropClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusFileDrop), object: nil)
 
+        NotificationCenter.default.addObserver(self, selector: #selector(statusReadOnlyClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusReadOnly), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(statusEditingClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusEditing), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(statusFileDropClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusFileDrop), object: nil)
+        
         changeTheming()
     }
     
@@ -170,6 +177,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let searchString = textField.text else { return }
 
         networking?.getSharees(searchString: searchString)
+        self.shareeEmail = searchString
     }
     
     @IBAction func touchUpInsideButtonCopy(_ sender: Any) {
@@ -282,10 +290,34 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //            shareMenuViewWindow = views.viewWindow
             let shareMenu = NCShareMenu()
             shareMenu.toggleMenu(viewController: self, sendMail: true)
+            let views = NCShareCommon.shared.openViewMenuUser(shareViewController: self, tableShare: tableShare, metadata: metadata!)
+            shareUserMenuView = views.shareUserMenuView
+            shareMenuViewWindow = views.viewWindow
             
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
             tap.delegate = self
             shareMenuViewWindow?.addGestureRecognizer(tap)
+        }
+    }
+    
+    func quickStatus(with tableShare: tableShare?, sender: Any) {
+        guard let tableShare = tableShare else { return }
+
+        if tableShare.shareType != 3 {
+//            let views = NCShareCommon.shared.openQuickShare(shareViewController: self, tableShare: tableShare, metadata: metadata!)
+//            sharePermissionMenuView = views.sharePermissionMenuView
+//            shareMenuViewWindow = views.viewWindow
+//
+//            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
+//            tap.delegate = self
+//            shareMenuViewWindow?.addGestureRecognizer(tap)
+            
+            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
+            tap.delegate = self
+            shareMenuViewWindow?.addGestureRecognizer(tap)
+            self.quickStatusTableShare = tableShare
+            let quickStatusMenu = NCShareQuickStatusMenu()
+            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
         }
     }
     
@@ -320,7 +352,9 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     func unShareCompleted() { }
     
-    func updateShareWithError(idShare: Int) { }
+    func updateShareWithError(idShare: Int) {
+        self.reloadData()
+    }
     
     func getSharees(sharees: [NCCommunicationSharee]?) {
         
@@ -398,9 +432,17 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
                     viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
                 }
+//                if directory! {
+//                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserPermission") as! NCShareNewUserPermission
+//                } else {
+////                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+//                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
+//                }
                 
                 viewNewUserPermission.metadata = self!.metadata
                 viewNewUserPermission.sharee = sharee
+                viewNewUserPermission.shareeEmail = self?.shareeEmail
                 self?.navigationController!.pushViewController(viewNewUserPermission, animated: true)
             }
 //            self!.networking?.createShare(shareWith: sharee.shareWith, shareType: sharee.shareType, metadata: self!.metadata!)
@@ -553,7 +595,12 @@ extension NCShare: UITableViewDataSource {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell {
                 cell.tableShare = tableShare
                 cell.delegate = self
-                cell.labelTitle.text = NSLocalizedString("_share_link_", comment: "")
+//                let linkText = UserDefaults.standard.value(forKey: "_share_link_") as! String
+                if let linkText = UserDefaults.standard.value(forKey: "_share_link_") as? String {
+                    cell.labelTitle.text = linkText
+                } else {
+                    cell.labelTitle.text = NSLocalizedString("_share_link_", comment: "")
+                }
                 cell.labelTitle.textColor = NCBrandColor.shared.textView
                 cell.indexSelected = indexPath.row
                 cell.buttonMenu.isEnabled = false

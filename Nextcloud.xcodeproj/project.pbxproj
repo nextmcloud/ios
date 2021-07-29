@@ -92,6 +92,7 @@
 		C00B205726908551003E18AD /* NCShareSendEmail.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00B205626908550003E18AD /* NCShareSendEmail.swift */; };
 		C00B205D26908B9B003E18AD /* NCShareFolderOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00B205C26908B9B003E18AD /* NCShareFolderOptions.swift */; };
 		C00B206D2691B8A0003E18AD /* NCShareFileOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00B206C2691B8A0003E18AD /* NCShareFileOptions.swift */; };
+		C0072DF0263C35C6001496A0 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = C0072DEF263C35C5001496A0 /* SwiftPackageProductDependency */; };
 		C07020E5267B459500E094AD /* NCPermissionMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07020E4267B459500E094AD /* NCPermissionMenuView.swift */; };
 		C07020EC267B45AE00E094AD /* NCPermissionMenuView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C07020EA267B45AE00E094AD /* NCPermissionMenuView.xib */; };
 		C07020ED267B45AE00E094AD /* NCPermissionFolderMenuView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C07020EB267B45AE00E094AD /* NCPermissionFolderMenuView.xib */; };
@@ -103,6 +104,7 @@
 		C0ABA3C526A142F70049DE9A /* NCShareQuickStatusMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ABA3C426A142F70049DE9A /* NCShareQuickStatusMenu.swift */; };
 		C0D7889026809F9800B876BB /* NCShareNewUserAddComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D7888F26809F9800B876BB /* NCShareNewUserAddComment.swift */; };
 		C0D788A6268AEE8400B876BB /* NCShareMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D788A5268AEE8400B876BB /* NCShareMenu.swift */; };
+		C0D788CC268C656C00B876BB /* NCShareQuickStatusMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D788CB268C656C00B876BB /* NCShareQuickStatusMenu.swift */; };
 		C48BD5098411F9C26AC8E684 /* Pods_Nextcloud.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14D3CA9207D116AA28A58F65 /* Pods_Nextcloud.framework */; };
 		C0ABA3D526A6BB260049DE9A /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C0ABA3D426A6BB250049DE9A /* AdjustHelper.m */; };
 		F700222C1EC479840080073F /* Custom.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F700222B1EC479840080073F /* Custom.xcassets */; };
@@ -222,10 +224,10 @@
 		F75A9EE723796C6F0044CFCE /* NCNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = F75A9EE523796C6F0044CFCE /* NCNetworking.swift */; };
 		F75AC2431F1F62450073EC19 /* NCManageAutoUploadFileName.swift in Sources */ = {isa = PBXBuildFile; fileRef = F75AC2421F1F62450073EC19 /* NCManageAutoUploadFileName.swift */; };
 		F75C0C4823D1FAE300163CC8 /* NCRichWorkspaceCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F75C0C4723D1FAE300163CC8 /* NCRichWorkspaceCommon.swift */; };
-		F75E57BD25BF0EC1002B72C2 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = F75E57BC25BF0EC1002B72C2 /* SVGKit */; };
-		F75E57BF25BF0EC8002B72C2 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = F75E57BE25BF0EC8002B72C2 /* SVGKit */; };
-		F75E57C125BF0ECD002B72C2 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = F75E57C025BF0ECD002B72C2 /* SVGKit */; };
-		F75E57C325BF0ED2002B72C2 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = F75E57C225BF0ED2002B72C2 /* SVGKit */; };
+		F75E57BD25BF0EC1002B72C2 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F75E57BC25BF0EC1002B72C2 /* SwiftPackageProductDependency */; };
+		F75E57BF25BF0EC8002B72C2 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F75E57BE25BF0EC8002B72C2 /* SwiftPackageProductDependency */; };
+		F75E57C125BF0ECD002B72C2 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F75E57C025BF0ECD002B72C2 /* SwiftPackageProductDependency */; };
+		F75E57C325BF0ED2002B72C2 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F75E57C225BF0ED2002B72C2 /* SwiftPackageProductDependency */; };
 		F760329F252F0F8E0015A421 /* NCTransferCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F760329D252F0F8E0015A421 /* NCTransferCell.swift */; };
 		F76032A0252F0F8E0015A421 /* NCTransferCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F760329E252F0F8E0015A421 /* NCTransferCell.xib */; };
 		F7632FBF21832F8700721B71 /* NCTrashSectionHeaderMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7632FBE21832F8700721B71 /* NCTrashSectionHeaderMenu.xib */; };
@@ -282,24 +284,24 @@
 		F78071091EDAB65800EAFFF6 /* NSNotificationCenter+MainThread.m in Sources */ = {isa = PBXBuildFile; fileRef = F78071081EDAB65800EAFFF6 /* NSNotificationCenter+MainThread.m */; };
 		F780710A1EDAB65800EAFFF6 /* NSNotificationCenter+MainThread.m in Sources */ = {isa = PBXBuildFile; fileRef = F78071081EDAB65800EAFFF6 /* NSNotificationCenter+MainThread.m */; };
 		F78295311F962EFA00A572F5 /* NCEndToEndEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F70CAE391F8CF31A008125FD /* NCEndToEndEncryption.m */; };
-		F782A57B25123694007BBABD /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = F782A57A25123694007BBABD /* Realm */; };
-		F782A57D25123694007BBABD /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F782A57C25123694007BBABD /* RealmSwift */; };
-		F782A583251236B7007BBABD /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = F782A582251236B7007BBABD /* Realm */; };
-		F782A585251236B7007BBABD /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F782A584251236B7007BBABD /* RealmSwift */; };
-		F782A587251236CA007BBABD /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = F782A586251236CA007BBABD /* Realm */; };
-		F782A589251236CA007BBABD /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F782A588251236CA007BBABD /* RealmSwift */; };
-		F782A58B251236D1007BBABD /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = F782A58A251236D1007BBABD /* Realm */; };
-		F782A58D251236D1007BBABD /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F782A58C251236D1007BBABD /* RealmSwift */; };
+		F782A57B25123694007BBABD /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F782A57A25123694007BBABD /* SwiftPackageProductDependency */; };
+		F782A57D25123694007BBABD /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F782A57C25123694007BBABD /* SwiftPackageProductDependency */; };
+		F782A583251236B7007BBABD /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F782A582251236B7007BBABD /* SwiftPackageProductDependency */; };
+		F782A585251236B7007BBABD /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F782A584251236B7007BBABD /* SwiftPackageProductDependency */; };
+		F782A587251236CA007BBABD /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F782A586251236CA007BBABD /* SwiftPackageProductDependency */; };
+		F782A589251236CA007BBABD /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F782A588251236CA007BBABD /* SwiftPackageProductDependency */; };
+		F782A58B251236D1007BBABD /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F782A58A251236D1007BBABD /* SwiftPackageProductDependency */; };
+		F782A58D251236D1007BBABD /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F782A58C251236D1007BBABD /* SwiftPackageProductDependency */; };
 		F782FDC424E6933900666099 /* NCUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70BFC7320E0FA7C00C67599 /* NCUtility.swift */; };
 		F785EE9D246196DF00B3F945 /* NCNetworkingE2EE.swift in Sources */ = {isa = PBXBuildFile; fileRef = F785EE9C246196DF00B3F945 /* NCNetworkingE2EE.swift */; };
 		F785EE9E2461A09900B3F945 /* NCNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = F75A9EE523796C6F0044CFCE /* NCNetworking.swift */; };
 		F785EEA42461A4A600B3F945 /* NCUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70BFC7320E0FA7C00C67599 /* NCUtility.swift */; };
 		F785EEA52461A4CF00B3F945 /* CCUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = F7053E3D1C639DF500741EA5 /* CCUtility.m */; };
 		F785EEA62461A4FB00B3F945 /* CCUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = F7053E3D1C639DF500741EA5 /* CCUtility.m */; };
-		F786D58D253454BF00E3DD7B /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = F786D58C253454BF00E3DD7B /* NCCommunication */; };
-		F786D593253454CE00E3DD7B /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = F786D592253454CE00E3DD7B /* NCCommunication */; };
-		F786D595253454D300E3DD7B /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = F786D594253454D300E3DD7B /* NCCommunication */; };
-		F786D597253454D800E3DD7B /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = F786D596253454D800E3DD7B /* NCCommunication */; };
+		F786D58D253454BF00E3DD7B /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F786D58C253454BF00E3DD7B /* SwiftPackageProductDependency */; };
+		F786D593253454CE00E3DD7B /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F786D592253454CE00E3DD7B /* SwiftPackageProductDependency */; };
+		F786D595253454D300E3DD7B /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F786D594253454D300E3DD7B /* SwiftPackageProductDependency */; };
+		F786D597253454D800E3DD7B /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F786D596253454D800E3DD7B /* SwiftPackageProductDependency */; };
 		F787704F22E7019900F287A9 /* NCShareLinkCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F787704E22E7019900F287A9 /* NCShareLinkCell.xib */; };
 		F78A18B623CDD07D00F681F3 /* NCViewerRichWorkspaceWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78A18B523CDD07D00F681F3 /* NCViewerRichWorkspaceWebView.swift */; };
 		F78A18B823CDE2B300F681F3 /* NCViewerRichWorkspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78A18B723CDE2B300F681F3 /* NCViewerRichWorkspace.swift */; };
@@ -358,7 +360,7 @@
 		F7C40BEF219994ED0004137E /* KTVCocoaHTTPServer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7C40BEE219994ED0004137E /* KTVCocoaHTTPServer.framework */; };
 		F7C40BF1219994F20004137E /* KTVHTTPCache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7C40BF0219994F20004137E /* KTVHTTPCache.framework */; };
 		F7C40BF32199978B0004137E /* MBProgressHUD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7C40BF22199978B0004137E /* MBProgressHUD.framework */; };
-		F7C4D88D2534887E00C142DA /* Parchment in Frameworks */ = {isa = PBXBuildFile; productRef = F7C4D88C2534887E00C142DA /* Parchment */; };
+		F7C4D88D2534887E00C142DA /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = F7C4D88C2534887E00C142DA /* SwiftPackageProductDependency */; };
 		F7C7B489245EBA4100D93E60 /* NCViewerQuickLook.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C7B488245EBA4100D93E60 /* NCViewerQuickLook.swift */; };
 		F7C9555321F0C4CA0024296E /* NCActivity.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7C9555221F0C4CA0024296E /* NCActivity.storyboard */; };
 		F7C9555521F0C5470024296E /* NCActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C9555421F0C5470024296E /* NCActivity.swift */; };
@@ -528,6 +530,7 @@
 		C0ABA3D326A6BB250049DE9A /* AdjustHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
 		C0ABA3D426A6BB250049DE9A /* AdjustHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
 		C3E8A85DCD6F57798011CA1C /* Pods_Nextcloud.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Nextcloud.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0D788CB268C656C00B876BB /* NCShareQuickStatusMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareQuickStatusMenu.swift; sourceTree = "<group>"; };
 		F700222B1EC479840080073F /* Custom.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Custom.xcassets; sourceTree = "<group>"; };
 		F700510022DF63AC003A3356 /* NCShare.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCShare.storyboard; sourceTree = "<group>"; };
 		F700510222DF6897003A3356 /* Parchment.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Parchment.framework; path = Carthage/Build/iOS/Parchment.framework; sourceTree = "<group>"; };
@@ -866,10 +869,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F75E57C325BF0ED2002B72C2 /* SVGKit in Frameworks */,
-				F782A58D251236D1007BBABD /* RealmSwift in Frameworks */,
-				F786D597253454D800E3DD7B /* NCCommunication in Frameworks */,
-				F782A58B251236D1007BBABD /* Realm in Frameworks */,
+				F75E57C325BF0ED2002B72C2 /* BuildFile in Frameworks */,
+				F782A58D251236D1007BBABD /* BuildFile in Frameworks */,
+				F786D597253454D800E3DD7B /* BuildFile in Frameworks */,
+				F782A58B251236D1007BBABD /* BuildFile in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -877,10 +880,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F75E57BF25BF0EC8002B72C2 /* SVGKit in Frameworks */,
-				F782A585251236B7007BBABD /* RealmSwift in Frameworks */,
-				F786D593253454CE00E3DD7B /* NCCommunication in Frameworks */,
-				F782A583251236B7007BBABD /* Realm in Frameworks */,
+				F75E57BF25BF0EC8002B72C2 /* BuildFile in Frameworks */,
+				F782A585251236B7007BBABD /* BuildFile in Frameworks */,
+				F786D593253454CE00E3DD7B /* BuildFile in Frameworks */,
+				F782A583251236B7007BBABD /* BuildFile in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -888,10 +891,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F75E57C125BF0ECD002B72C2 /* SVGKit in Frameworks */,
-				F782A589251236CA007BBABD /* RealmSwift in Frameworks */,
-				F786D595253454D300E3DD7B /* NCCommunication in Frameworks */,
-				F782A587251236CA007BBABD /* Realm in Frameworks */,
+				F75E57C125BF0ECD002B72C2 /* BuildFile in Frameworks */,
+				F782A589251236CA007BBABD /* BuildFile in Frameworks */,
+				F786D595253454D300E3DD7B /* BuildFile in Frameworks */,
+				F782A587251236CA007BBABD /* BuildFile in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -902,7 +905,7 @@
 				F7176DBA256672640017E83C /* FirebaseCrashlytics.framework in Frameworks */,
 				F74C4FBB2328C3C200A23E25 /* OpenSSL.framework in Frameworks */,
 				F7421EAF2294044B00C4B7C1 /* Accelerate.framework in Frameworks */,
-				F7C4D88D2534887E00C142DA /* Parchment in Frameworks */,
+				F7C4D88D2534887E00C142DA /* BuildFile in Frameworks */,
 				F7C40BF32199978B0004137E /* MBProgressHUD.framework in Frameworks */,
 				F76FDEAB24859C3D0095B6C2 /* Queuer.framework in Frameworks */,
 				F79918A221997FA300C2E308 /* UICKeyChainStore.framework in Frameworks */,
@@ -912,7 +915,7 @@
 				F7AF7633246BEDFE00B86E3C /* TOPasscodeViewController.framework in Frameworks */,
 				F7176DCA256672650017E83C /* FirebaseCore.framework in Frameworks */,
 				F745B251222D871800346520 /* QRCodeReader.framework in Frameworks */,
-				C0072DF0263C35C6001496A0 /* Adjust in Frameworks */,
+				C0072DF0263C35C6001496A0 /* BuildFile in Frameworks */,
 				F765608723BF806D00765969 /* QuickLayout.framework in Frameworks */,
 				F7176DC0256672650017E83C /* FirebaseInstallations.framework in Frameworks */,
 				F7176DC6256672650017E83C /* nanopb.framework in Frameworks */,
@@ -922,18 +925,18 @@
 				F7176DCC256672660017E83C /* FirebaseAnalytics.framework in Frameworks */,
 				F765608B23BF80A400765969 /* SwiftEntryKit.framework in Frameworks */,
 				F7176DCE256672660017E83C /* GoogleAppMeasurement.framework in Frameworks */,
-				F786D58D253454BF00E3DD7B /* NCCommunication in Frameworks */,
+				F786D58D253454BF00E3DD7B /* BuildFile in Frameworks */,
 				F7C40BEF219994ED0004137E /* KTVCocoaHTTPServer.framework in Frameworks */,
-				F782A57B25123694007BBABD /* Realm in Frameworks */,
+				F782A57B25123694007BBABD /* BuildFile in Frameworks */,
 				F7C40BF1219994F20004137E /* KTVHTTPCache.framework in Frameworks */,
 				F774264122EB3F7300B23912 /* DropDown.framework in Frameworks */,
 				F78AA20621F783E900D0F205 /* SwiftRichString.framework in Frameworks */,
 				F7DBD82C23E46A4700ECB7C6 /* MarkdownKit.framework in Frameworks */,
-				F75E57BD25BF0EC1002B72C2 /* SVGKit in Frameworks */,
+				F75E57BD25BF0EC1002B72C2 /* BuildFile in Frameworks */,
 				F74AFCE922E8B025003DE61F /* FSCalendar.framework in Frameworks */,
 				F7B1076D25D3CF2800E72DE2 /* BackgroundTasks.framework in Frameworks */,
 				F7D2C773246470CA008513AE /* XLForm.framework in Frameworks */,
-				F782A57D25123694007BBABD /* RealmSwift in Frameworks */,
+				F782A57D25123694007BBABD /* BuildFile in Frameworks */,
 				F7176DBC256672640017E83C /* FirebaseCoreDiagnostics.framework in Frameworks */,
 				371B5A3323D0BD5500FAFAE9 /* FloatingPanel.framework in Frameworks */,
 				F70F2BA5225F2D8900EBB73E /* ZIPFoundation.framework in Frameworks */,
@@ -1187,6 +1190,7 @@
 				F769453F22E9F077000A798A /* NCSharePaging.swift */,
 				F700510422DF6A89003A3356 /* NCShare.swift */,
 				C0D788A5268AEE8400B876BB /* NCShareMenu.swift */,
+				C0D788CB268C656C00B876BB /* NCShareQuickStatusMenu.swift */,
 				F7E4D9C322ED929B003675FD /* NCShareComments.swift */,
 				F769454122E9F0EE000A798A /* NCShareLinkMenuView.swift */,
 				F769454322E9F142000A798A /* NCShareUserMenuView.swift */,
@@ -1892,10 +1896,10 @@
 			);
 			name = "Notification Service Extension";
 			packageProductDependencies = (
-				F782A58A251236D1007BBABD /* Realm */,
-				F782A58C251236D1007BBABD /* RealmSwift */,
-				F786D596253454D800E3DD7B /* NCCommunication */,
-				F75E57C225BF0ED2002B72C2 /* SVGKit */,
+				F782A58A251236D1007BBABD /* SwiftPackageProductDependency */,
+				F782A58C251236D1007BBABD /* SwiftPackageProductDependency */,
+				F786D596253454D800E3DD7B /* SwiftPackageProductDependency */,
+				F75E57C225BF0ED2002B72C2 /* SwiftPackageProductDependency */,
 			);
 			productName = "Notification Service Extension";
 			productReference = 2C33C47F23E2C475005F963B /* Notification Service Extension.appex */;
@@ -1915,10 +1919,10 @@
 			);
 			name = Share;
 			packageProductDependencies = (
-				F782A582251236B7007BBABD /* Realm */,
-				F782A584251236B7007BBABD /* RealmSwift */,
-				F786D592253454CE00E3DD7B /* NCCommunication */,
-				F75E57BE25BF0EC8002B72C2 /* SVGKit */,
+				F782A582251236B7007BBABD /* SwiftPackageProductDependency */,
+				F782A584251236B7007BBABD /* SwiftPackageProductDependency */,
+				F786D592253454CE00E3DD7B /* SwiftPackageProductDependency */,
+				F75E57BE25BF0EC8002B72C2 /* SwiftPackageProductDependency */,
 			);
 			productName = "Share Ext";
 			productReference = F7CE8AFB1DC1F8D8009CAE48 /* Share.appex */;
@@ -1938,10 +1942,10 @@
 			);
 			name = "File Provider Extension";
 			packageProductDependencies = (
-				F782A586251236CA007BBABD /* Realm */,
-				F782A588251236CA007BBABD /* RealmSwift */,
-				F786D594253454D300E3DD7B /* NCCommunication */,
-				F75E57C025BF0ECD002B72C2 /* SVGKit */,
+				F782A586251236CA007BBABD /* SwiftPackageProductDependency */,
+				F782A588251236CA007BBABD /* SwiftPackageProductDependency */,
+				F786D594253454D300E3DD7B /* SwiftPackageProductDependency */,
+				F75E57C025BF0ECD002B72C2 /* SwiftPackageProductDependency */,
 			);
 			productName = "File Provider Extension";
 			productReference = F771E3D020E2392D00AFB62D /* File Provider Extension.appex */;
@@ -1968,12 +1972,12 @@
 			);
 			name = Nextcloud;
 			packageProductDependencies = (
-				F782A57A25123694007BBABD /* Realm */,
-				F782A57C25123694007BBABD /* RealmSwift */,
-				F786D58C253454BF00E3DD7B /* NCCommunication */,
-				F7C4D88C2534887E00C142DA /* Parchment */,
-				F75E57BC25BF0EC1002B72C2 /* SVGKit */,
-				C0072DEF263C35C5001496A0 /* Adjust */,
+				F782A57A25123694007BBABD /* SwiftPackageProductDependency */,
+				F782A57C25123694007BBABD /* SwiftPackageProductDependency */,
+				F786D58C253454BF00E3DD7B /* SwiftPackageProductDependency */,
+				F7C4D88C2534887E00C142DA /* SwiftPackageProductDependency */,
+				F75E57BC25BF0EC1002B72C2 /* SwiftPackageProductDependency */,
+				C0072DEF263C35C5001496A0 /* SwiftPackageProductDependency */,
 			);
 			productName = "Crypto Cloud";
 			productReference = F7CE8AFA1DC1F8D8009CAE48 /* Nextcloud.app */;
@@ -2072,11 +2076,11 @@
 			);
 			mainGroup = F7F67B9F1A24D27800EE80DA;
 			packageReferences = (
-				F782A57925123694007BBABD /* XCRemoteSwiftPackageReference "realm-cocoa" */,
-				F786D58B253454BF00E3DD7B /* XCRemoteSwiftPackageReference "ios-communication-library" */,
-				F7C4D88B2534887E00C142DA /* XCRemoteSwiftPackageReference "Parchment" */,
-				F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */,
-				C0072DEE263C35C5001496A0 /* XCRemoteSwiftPackageReference "ios_sdk" */,
+				F782A57925123694007BBABD /* RemoteSwiftPackageReference */,
+				F786D58B253454BF00E3DD7B /* RemoteSwiftPackageReference */,
+				F7C4D88B2534887E00C142DA /* RemoteSwiftPackageReference */,
+				F75E57A725BF0D61002B72C2 /* RemoteSwiftPackageReference */,
+				C0072DEE263C35C5001496A0 /* RemoteSwiftPackageReference */,
 			);
 			productRefGroup = F7F67B9F1A24D27800EE80DA;
 			projectDirPath = "";
@@ -2497,6 +2501,7 @@
 				C0ABA3C526A142F70049DE9A /* NCShareQuickStatusMenu.swift in Sources */,
 				F7E0E1DC22327885006B0911 /* NCAudioRecorderViewController.swift in Sources */,
 				F70CAE3A1F8CF31A008125FD /* NCEndToEndEncryption.m in Sources */,
+				C0D788CC268C656C00B876BB /* NCShareQuickStatusMenu.swift in Sources */,
 				F70753EB2542A99800972D44 /* NCViewerImage.swift in Sources */,
 				F74C0436253F1CDC009762AB /* NCShares.swift in Sources */,
 				7A875F1E2694776F00AF558D /* SaveSettingsCustomButtonCell.swift in Sources */,
@@ -2648,7 +2653,10 @@
 					EXTENSION,
 					EXTENSION_NOTIFICATION_SERVICE,
 				);
-				HEADER_SEARCH_PATHS = "\"Libraries external\"/**";
+				HEADER_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/iOSClient/Brand/Notification_Service_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2656,7 +2664,10 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
+				LIBRARY_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -2704,7 +2715,10 @@
 					EXTENSION,
 					EXTENSION_NOTIFICATION_SERVICE,
 				);
-				HEADER_SEARCH_PATHS = "\"Libraries external\"/**";
+				HEADER_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/iOSClient/Brand/Notification_Service_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2712,7 +2726,10 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
+				LIBRARY_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "-ObjC";
@@ -2753,7 +2770,10 @@
 					EXTENSION,
 					EXTENSION_SHARE,
 				);
-				HEADER_SEARCH_PATHS = "\"Libraries external\"/**";
+				HEADER_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/iOSClient/Brand/Share.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2761,7 +2781,10 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
+				LIBRARY_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
@@ -2803,7 +2826,10 @@
 					EXTENSION,
 					EXTENSION_SHARE,
 				);
-				HEADER_SEARCH_PATHS = "\"Libraries external\"/**";
+				HEADER_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/iOSClient/Brand/Share.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2811,7 +2837,10 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
+				LIBRARY_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
@@ -2858,7 +2887,10 @@
 					EXTENSION,
 					EXTENSION_FILE_PROVIDER_EXTENSION,
 				);
-				HEADER_SEARCH_PATHS = "\"Libraries external\"/**";
+				HEADER_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2866,7 +2898,10 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
+				LIBRARY_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
@@ -2913,7 +2948,10 @@
 					EXTENSION,
 					EXTENSION_FILE_PROVIDER_EXTENSION,
 				);
-				HEADER_SEARCH_PATHS = "\"Libraries external\"/**";
+				HEADER_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2921,7 +2959,10 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
+				LIBRARY_SEARCH_PATHS = (
+					"\"Libraries",
+					"external\"/**",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
@@ -3230,7 +3271,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		C0072DEE263C35C5001496A0 /* XCRemoteSwiftPackageReference "ios_sdk" */ = {
+		C0072DEE263C35C5001496A0 /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/adjust/ios_sdk";
 			requirement = {
@@ -3238,7 +3279,7 @@
 				minimumVersion = 4.29.1;
 			};
 		};
-		F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */ = {
+		F75E57A725BF0D61002B72C2 /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SVGKit/SVGKit.git";
 			requirement = {
@@ -3246,7 +3287,7 @@
 				kind = branch;
 			};
 		};
-		F782A57925123694007BBABD /* XCRemoteSwiftPackageReference "realm-cocoa" */ = {
+		F782A57925123694007BBABD /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/realm/realm-cocoa";
 			requirement = {
@@ -3254,7 +3295,7 @@
 				version = 10.6.0;
 			};
 		};
-		F786D58B253454BF00E3DD7B /* XCRemoteSwiftPackageReference "ios-communication-library" */ = {
+		F786D58B253454BF00E3DD7B /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/nextcloud/ios-communication-library/";
 			requirement = {
@@ -3262,7 +3303,7 @@
 				version = 0.93.0;
 			};
 		};
-		F7C4D88B2534887E00C142DA /* XCRemoteSwiftPackageReference "Parchment" */ = {
+		F7C4D88B2534887E00C142DA /* RemoteSwiftPackageReference */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rechsteiner/Parchment";
 			requirement = {
@@ -3273,94 +3314,94 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C0072DEF263C35C5001496A0 /* Adjust */ = {
+		C0072DEF263C35C5001496A0 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C0072DEE263C35C5001496A0 /* XCRemoteSwiftPackageReference "ios_sdk" */;
+			package = C0072DEE263C35C5001496A0 /* RemoteSwiftPackageReference */;
 			productName = Adjust;
 		};
-		F75E57BC25BF0EC1002B72C2 /* SVGKit */ = {
+		F75E57BC25BF0EC1002B72C2 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			package = F75E57A725BF0D61002B72C2 /* RemoteSwiftPackageReference */;
 			productName = SVGKit;
 		};
-		F75E57BE25BF0EC8002B72C2 /* SVGKit */ = {
+		F75E57BE25BF0EC8002B72C2 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			package = F75E57A725BF0D61002B72C2 /* RemoteSwiftPackageReference */;
 			productName = SVGKit;
 		};
-		F75E57C025BF0ECD002B72C2 /* SVGKit */ = {
+		F75E57C025BF0ECD002B72C2 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			package = F75E57A725BF0D61002B72C2 /* RemoteSwiftPackageReference */;
 			productName = SVGKit;
 		};
-		F75E57C225BF0ED2002B72C2 /* SVGKit */ = {
+		F75E57C225BF0ED2002B72C2 /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			package = F75E57A725BF0D61002B72C2 /* RemoteSwiftPackageReference */;
 			productName = SVGKit;
 		};
-		F782A57A25123694007BBABD /* Realm */ = {
+		F782A57A25123694007BBABD /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F782A57925123694007BBABD /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			package = F782A57925123694007BBABD /* RemoteSwiftPackageReference */;
 			productName = Realm;
 		};
-		F782A57C25123694007BBABD /* RealmSwift */ = {
+		F782A57C25123694007BBABD /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F782A57925123694007BBABD /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			package = F782A57925123694007BBABD /* RemoteSwiftPackageReference */;
 			productName = RealmSwift;
 		};
-		F782A582251236B7007BBABD /* Realm */ = {
+		F782A582251236B7007BBABD /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F782A57925123694007BBABD /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			package = F782A57925123694007BBABD /* RemoteSwiftPackageReference */;
 			productName = Realm;
 		};
-		F782A584251236B7007BBABD /* RealmSwift */ = {
+		F782A584251236B7007BBABD /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F782A57925123694007BBABD /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			package = F782A57925123694007BBABD /* RemoteSwiftPackageReference */;
 			productName = RealmSwift;
 		};
-		F782A586251236CA007BBABD /* Realm */ = {
+		F782A586251236CA007BBABD /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F782A57925123694007BBABD /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			package = F782A57925123694007BBABD /* RemoteSwiftPackageReference */;
 			productName = Realm;
 		};
-		F782A588251236CA007BBABD /* RealmSwift */ = {
+		F782A588251236CA007BBABD /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F782A57925123694007BBABD /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			package = F782A57925123694007BBABD /* RemoteSwiftPackageReference */;
 			productName = RealmSwift;
 		};
-		F782A58A251236D1007BBABD /* Realm */ = {
+		F782A58A251236D1007BBABD /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F782A57925123694007BBABD /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			package = F782A57925123694007BBABD /* RemoteSwiftPackageReference */;
 			productName = Realm;
 		};
-		F782A58C251236D1007BBABD /* RealmSwift */ = {
+		F782A58C251236D1007BBABD /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F782A57925123694007BBABD /* XCRemoteSwiftPackageReference "realm-cocoa" */;
+			package = F782A57925123694007BBABD /* RemoteSwiftPackageReference */;
 			productName = RealmSwift;
 		};
-		F786D58C253454BF00E3DD7B /* NCCommunication */ = {
+		F786D58C253454BF00E3DD7B /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F786D58B253454BF00E3DD7B /* XCRemoteSwiftPackageReference "ios-communication-library" */;
+			package = F786D58B253454BF00E3DD7B /* RemoteSwiftPackageReference */;
 			productName = NCCommunication;
 		};
-		F786D592253454CE00E3DD7B /* NCCommunication */ = {
+		F786D592253454CE00E3DD7B /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F786D58B253454BF00E3DD7B /* XCRemoteSwiftPackageReference "ios-communication-library" */;
+			package = F786D58B253454BF00E3DD7B /* RemoteSwiftPackageReference */;
 			productName = NCCommunication;
 		};
-		F786D594253454D300E3DD7B /* NCCommunication */ = {
+		F786D594253454D300E3DD7B /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F786D58B253454BF00E3DD7B /* XCRemoteSwiftPackageReference "ios-communication-library" */;
+			package = F786D58B253454BF00E3DD7B /* RemoteSwiftPackageReference */;
 			productName = NCCommunication;
 		};
-		F786D596253454D800E3DD7B /* NCCommunication */ = {
+		F786D596253454D800E3DD7B /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F786D58B253454BF00E3DD7B /* XCRemoteSwiftPackageReference "ios-communication-library" */;
+			package = F786D58B253454BF00E3DD7B /* RemoteSwiftPackageReference */;
 			productName = NCCommunication;
 		};
-		F7C4D88C2534887E00C142DA /* Parchment */ = {
+		F7C4D88C2534887E00C142DA /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F7C4D88B2534887E00C142DA /* XCRemoteSwiftPackageReference "Parchment" */;
+			package = F7C4D88B2534887E00C142DA /* RemoteSwiftPackageReference */;
 			productName = Parchment;
 		};
 /* End XCSwiftPackageProductDependency section */
