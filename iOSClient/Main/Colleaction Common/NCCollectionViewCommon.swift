@@ -4,6 +4,7 @@
 //
 //  Created by Marino Faggiana on 12/09/2020.
 //  Copyright © 2020 Marino Faggiana. All rights reserved.
+//  Author TSI-mc
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
@@ -156,6 +157,11 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         NotificationCenter.default.addObserver(self, selector: #selector(triggerProgressTask(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterProgressTask), object:nil)
 
         changeTheming()
+        //call new view
+        
+        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed")){
+            redirectToPrivacyViewController()
+        }
     }
         
     override func viewWillAppear(_ animated: Bool) {
@@ -214,6 +220,13 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         return true
     }
     
+    func redirectToPrivacyViewController(){
+        UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
+        let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
+                self.present(newViewController, animated: true, completion: nil)
+    }
+    
     func setNavigationItem() {
         
         if isEditMode {
@@ -241,7 +254,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 image = NCUtility.shared.createAvatar(image: image, size: 30)
                 
                 let button = UIButton(type: .custom)
-                button.setImage(image, for: .normal)
+//                button.setImage(image, for: .normal)
                 
                 if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account) {
                  
@@ -253,13 +266,13 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                         title = title + (account?.alias ?? "")
                     }
                     
-                    button.setTitle(title, for: .normal)
-                    button.setTitleColor(.systemBlue, for: .normal)
+//                    button.setTitle(title, for: .normal)
+//                    button.setTitleColor(.systemBlue, for: .normal)
                 }
                 
                 button.semanticContentAttribute = .forceLeftToRight
                 button.sizeToFit()
-                button.addTarget(self, action: #selector(profileButtonTapped(sender:)), for: .touchUpInside)
+//                button.addTarget(self, action: #selector(profileButtonTapped(sender:)), for: .touchUpInside)
                        
                 navigationItem.setLeftBarButton(UIBarButtonItem(customView: button), animated: true)
                 navigationItem.leftItemsSupplementBackButton = true
@@ -732,7 +745,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         
         if isEditMode { return }
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId) else { return }
-        
+        appDelegate.adjust.trackEvent(TriggerEvent(Sharing.rawValue))
         NCFunctionCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 2)
     }
         
@@ -1263,6 +1276,10 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.imageItem.backgroundColor = nil
             
             cell.progressView.progress = 0.0
+            if UIDevice.current.orientation.isPortrait && UIDevice.current.model.hasPrefix("iPhone") {
+                cell.separator.backgroundColor = .clear
+            }
+
             
             if metadata.directory {
                 
@@ -1554,7 +1571,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegateFlowLayout {
         if let richWorkspaceText = richWorkspaceText {
             let trimmed = richWorkspaceText.trimmingCharacters(in: .whitespaces)
             if trimmed.count > 0 && !isSearching {
-                headerRichWorkspaceHeight = UIScreen.main.bounds.size.height / 4
+                headerRichWorkspaceHeight = UIScreen.main.bounds.size.height / 21
             }
         }
         

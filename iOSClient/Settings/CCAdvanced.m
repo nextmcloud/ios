@@ -168,77 +168,77 @@
     }
     
     // Section DIAGNOSTICS -------------------------------------------------
-
-    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_diagnostics_", nil)];
-    [form addFormSection:section];
-        
-    if ([[NSFileManager defaultManager] fileExistsAtPath:NCCommunicationCommon.shared.filenamePathLog]) {
-        
-        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"log" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_view_log_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
-        [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
-        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-        [row.cellConfig setObject:[[UIImage imageNamed:@"log"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
-        row.action.formBlock = ^(XLFormRowDescriptor * sender) {
-                    
-            [self deselectFormRow:sender];
-            
-            NCViewerQuickLook *viewerQuickLook = [NCViewerQuickLook new];
-            [viewerQuickLook quickLookWithUrl:[NSURL fileURLWithPath:NCCommunicationCommon.shared.filenamePathLog]];
-        };
-        [section addFormRow:row];
-        
-        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"clearlog" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_clear_log_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
-        [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
-        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-        [row.cellConfig setObject:[[UIImage imageNamed:@"clear"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
-        row.action.formBlock = ^(XLFormRowDescriptor * sender) {
-                    
-            [self deselectFormRow:sender];
-
-            [[NCCommunicationCommon shared] clearFileLog];
-            
-            NSInteger logLevel = [CCUtility getLogLevel];
-            BOOL isSimulatorOrTestFlight = [[NCUtility shared] isSimulatorOrTestFlight];
-            NSString *versionNextcloudiOS = [NSString stringWithFormat:[NCBrandOptions shared].textCopyrightNextcloudiOS, NCUtility.shared.getVersionApp];
-            if (isSimulatorOrTestFlight) {
-                [[NCCommunicationCommon shared] writeLog:[NSString stringWithFormat:@"Clear log with level %lu %@ (Simulator / TestFlight)", (unsigned long)logLevel, versionNextcloudiOS]];
-            } else {
-                [[NCCommunicationCommon shared] writeLog:[NSString stringWithFormat:@"Clear log with level %lu %@", (unsigned long)logLevel, versionNextcloudiOS]];
-            }
-        };
-        [section addFormRow:row];
-        
-        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"logLevel" rowType:XLFormRowDescriptorTypeSlider title:NSLocalizedString(@"_level_log_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
-        [row.cellConfig setObject:@(NSTextAlignmentCenter) forKey:@"textLabel.textAlignment"];
-        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
-        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-        NSInteger logLevel = [CCUtility getLogLevel];
-        row.value = @(logLevel);
-        [row.cellConfigAtConfigure setObject:@(2) forKey:@"slider.maximumValue"];
-        [row.cellConfigAtConfigure setObject:@(0) forKey:@"slider.minimumValue"];
-        [row.cellConfigAtConfigure setObject:@(2) forKey:@"steps"];
-        [section addFormRow:row];
-    }
-    
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"capabilities" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_capabilities_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
-    [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:[[UIImage imageNamed:@"capabilities"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
-    row.action.formBlock = ^(XLFormRowDescriptor * sender) {
-                
-        [self deselectFormRow:sender];
-        
-        NCCapabilitiesViewController *capabilities = [[UIStoryboard storyboardWithName:@"NCCapabilitiesViewController" bundle:nil] instantiateInitialViewController];        
-        [self presentViewController:capabilities animated:YES completion:nil];
-    };
-    [section addFormRow:row];
+//
+//    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_diagnostics_", nil)];
+//    [form addFormSection:section];
+//
+//    if ([[NSFileManager defaultManager] fileExistsAtPath:NCCommunicationCommon.shared.filenamePathLog]) {
+//
+//        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"log" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_view_log_", nil)];
+//        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+//        [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
+//        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+//        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+//        [row.cellConfig setObject:[[UIImage imageNamed:@"log"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
+//        row.action.formBlock = ^(XLFormRowDescriptor * sender) {
+//
+//            [self deselectFormRow:sender];
+//
+//            NCViewerQuickLook *viewerQuickLook = [NCViewerQuickLook new];
+//            [viewerQuickLook quickLookWithUrl:[NSURL fileURLWithPath:NCCommunicationCommon.shared.filenamePathLog]];
+//        };
+//        [section addFormRow:row];
+//
+//        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"clearlog" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_clear_log_", nil)];
+//        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+//        [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
+//        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+//        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+//        [row.cellConfig setObject:[[UIImage imageNamed:@"clear"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
+//        row.action.formBlock = ^(XLFormRowDescriptor * sender) {
+//
+//            [self deselectFormRow:sender];
+//
+//            [[NCCommunicationCommon shared] clearFileLog];
+//
+//            NSInteger logLevel = [CCUtility getLogLevel];
+//            BOOL isSimulatorOrTestFlight = [[NCUtility shared] isSimulatorOrTestFlight];
+//            NSString *versionNextcloudiOS = [NSString stringWithFormat:[NCBrandOptions shared].textCopyrightNextcloudiOS, NCUtility.shared.getVersionApp];
+//            if (isSimulatorOrTestFlight) {
+//                [[NCCommunicationCommon shared] writeLog:[NSString stringWithFormat:@"Clear log with level %lu %@ (Simulator / TestFlight)", (unsigned long)logLevel, versionNextcloudiOS]];
+//            } else {
+//                [[NCCommunicationCommon shared] writeLog:[NSString stringWithFormat:@"Clear log with level %lu %@", (unsigned long)logLevel, versionNextcloudiOS]];
+//            }
+//        };
+//        [section addFormRow:row];
+//
+//        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"logLevel" rowType:XLFormRowDescriptorTypeSlider title:NSLocalizedString(@"_level_log_", nil)];
+//        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+//        [row.cellConfig setObject:@(NSTextAlignmentCenter) forKey:@"textLabel.textAlignment"];
+//        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+//        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+//        NSInteger logLevel = [CCUtility getLogLevel];
+//        row.value = @(logLevel);
+//        [row.cellConfigAtConfigure setObject:@(2) forKey:@"slider.maximumValue"];
+//        [row.cellConfigAtConfigure setObject:@(0) forKey:@"slider.minimumValue"];
+//        [row.cellConfigAtConfigure setObject:@(2) forKey:@"steps"];
+//        [section addFormRow:row];
+//    }
+//
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"capabilities" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_capabilities_", nil)];
+//    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+//    [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
+//    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+//    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+//    [row.cellConfig setObject:[[UIImage imageNamed:@"capabilities"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
+//    row.action.formBlock = ^(XLFormRowDescriptor * sender) {
+//
+//        [self deselectFormRow:sender];
+//
+//        NCCapabilitiesViewController *capabilities = [[UIStoryboard storyboardWithName:@"NCCapabilitiesViewController" bundle:nil] instantiateInitialViewController];
+//        [self presentViewController:capabilities animated:YES completion:nil];
+//    };
+//    [section addFormRow:row];
 
     // Section CLEAR CACHE -------------------------------------------------
     

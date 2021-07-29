@@ -25,10 +25,12 @@
 #import "CCManageAutoUpload.h"
 #import "CCUtility.h"
 #import "NCBridgeSwift.h"
+#import "AdjustHelper.h"
 
 @interface CCManageAutoUpload () <NCSelectDelegate>
 {
     AppDelegate *appDelegate;
+    AdjustHelper *adjust;
 }
 @end
 
@@ -217,6 +219,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeTheming) name:NCGlobal.shared.notificationCenterChangeTheming object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(initializeMain) name:NCGlobal.shared.notificationCenterInitializeMain object:nil];
     
+    adjust = [[AdjustHelper alloc] init];
+    [adjust configAdjust];
     [self changeTheming];
 }
 
@@ -284,7 +288,7 @@
             }
             
             [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
-            
+            [adjust trackEvent:9];
         } else {
             
             [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUpload" state:NO];
@@ -292,6 +296,7 @@
 
             // remove
             [[NCManageDatabase shared] clearMetadatasUploadWithAccount:appDelegate.account];
+            [adjust trackEvent:10];
         }
         
         [self reloadForm];

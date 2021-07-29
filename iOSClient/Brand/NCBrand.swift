@@ -200,7 +200,7 @@ class NCBrandColor: NSObject {
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
         cacheImages.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
-        cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: customerDefault, size: folderWidth)
         cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
@@ -386,7 +386,7 @@ class NCBrandColor: NSObject {
     // Avatar & Preview
     let avatarSize: CGFloat                         = 512
     @objc let sizePreview: CGFloat                  = 1024
-    @objc let sizeIcon: CGFloat                     = 512
+    @objc let sizeIcon: CGFloat                     = 1024
     
     // E2EE
     let e2eeMaxFileSize: UInt64                     = 524288000   // 500 MB
@@ -588,6 +588,7 @@ class NCBrandColor: NSObject {
     
     @objc let notificationCenterChangedLocation                 = "changedLocation"
     @objc let notificationStatusAuthorizationChangedLocation    = "statusAuthorizationChangedLocation"
+    @objc let notificationImagePreviewRotateImage    = "imagePreviewRotateImage"
 }
 
 extension UIButton {

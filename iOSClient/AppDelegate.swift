@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 Marino Faggiana. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//  Author TSI-mc
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,6 +28,8 @@ import NCCommunication
 import TOPasscodeViewController
 import LocalAuthentication
 import Firebase
+import Adjust
+import AppAuth
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, TOPasscodeViewControllerDelegate {
@@ -62,7 +65,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var pasteboardOcIds: [String] = []
     var shares: [tableShare] = []
     var timerErrorNetworking: Timer?
+    @objc let adjust = AdjustHelper()
+    let triggerEvent:TriggerEvent = Login
 
+    var currentAuthorizationFlow: OIDExternalUserAgentSession?
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         let userAgent = CCUtility.getUserAgent() as String
@@ -112,6 +119,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             
             CCUtility.deleteAllChainStore()
             if let bundleID = Bundle.main.bundleIdentifier {
+                self.adjust.trackEvent(TriggerEvent(Logout.rawValue))
                 UserDefaults.standard.removePersistentDomain(forName: bundleID)
             }
         }
@@ -123,10 +131,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Process upload
         networkingProcessUpload = NCNetworkingProcessUpload.init()
         
-        // Push Notification & display notification
-        application.registerForRemoteNotifications()
-        UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (_, _) in }
+//        // Push Notification & display notification
+//        application.registerForRemoteNotifications()
+//        UNUserNotificationCenter.current().delegate = self
+//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (_, _) in }
 
         // AV
         do {
@@ -187,6 +195,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         DispatchQueue.main.async {
             self.passcodeWithAutomaticallyPromptForBiometricValidation(true)
         }
+        
+        adjust.configAdjust()
         
         return true
     }
@@ -264,6 +274,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         NCCommunicationCommon.shared.writeLog("bye bye")
     }
+    
+    
+//    willre
     
     // MARK: -
 
@@ -417,6 +430,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NCPushNotification.shared().applicationdidReceiveRemoteNotification(userInfo) { (result) in
             completionHandler(result)
         }
+    }
+    
+    func requestPushNotificationPermission(){
+        // Push Notification & display notification
+        UIApplication.shared.registerForRemoteNotifications()
+        UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (_, _) in }
+        NCPushNotification.shared().pushNotification()
     }
         
     // MARK: - Login & checkErrorNetworking
@@ -722,6 +743,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // MARK: - Open URL
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        
+        // Sends the URL to the current authorization flow (if any) which will
+         // process it if it relates to an authorization response.
+         if let authorizationFlow = self.currentAuthorizationFlow,
+                                    authorizationFlow.resumeExternalUserAgentFlow(with: url) {
+            
+           return true
+         }
+
         
         if account == "" { return false }
         

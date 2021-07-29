@@ -144,7 +144,7 @@
 "_now_"                     = "Now";
 "_wait_"                    = "Please wait …";
 "_attention_"               = "Attention";
-"_recent_"                  = "Recent";
+"_recent_"                  = "Recent files";
 "_view_in_folder_"          = "View in folder";
 "_leave_share_"             = "Leave this share";
 "_delete_file_"             = "Delete file";
@@ -236,7 +236,7 @@
 "_contact_by_email_"            = "Contact us by email";
 "_clear_cache_"                 = "Clear cache";
 "_clear_cache_footer_"          = "Clear downloaded and offline files from the app";
-"_exit_"                        = "Reset application";
+"_exit_"                        = "Logout";
 "_exit_footer_"                 = "Remove all accounts and local data from the app";
 "_funct_not_enabled_"           = "Functionality not enabled";
 "_passcode_activate_"           = "Password lock on";
@@ -299,6 +299,25 @@
 "_trial_expired_day_"           = "Days remaining";
 "_disableLocalCacheAfterUpload_footer_" = "After uploading the file, do not keep it in the local cache";
 "_disableLocalCacheAfterUpload_"        = "Disable local cache";
+"_data_protection_" = "Data protection";
+"_privacy_settings_" = "Privacy Settings";
+"_privacy_policy_" = "Privacy Policy";
+"_used_opensource_software_" = "OpenSource software used";
+"_service_" = "Service";
+"_imprint_" = "Imprint";
+"_info_" = "Info";
+"_magentacloud_version_" = "MagentaCLOUD Version";
+"_privacy_settings_help_text_" = "To optimize your app, we collect anonymous data. For this we use software solutions of different partners. We would like to give you full transparency and decision-making power over the processin and collection of your anonymized usage data. You can also change your settings at any time later in the app settings under data protection. Please note, however, that data collection makes a considerable contribution to the optimization of this app and you prevent this optimization by preventing data transmission.";
+"_required_data_collection_" = "Required data collection";
+"_required_data_collection_help_text_" = "The collection of this data is necessary to be able to use essential functions of the app.";
+"_analysis_data_acqusition_" = "Analysis-data acqusition for the design";
+"_analysis_data_acqusition_help_text_" = "This data helps us to optimize the app usage for you and to identify system crashes and errors more quickly";
+"_privacy_help_text_after_login_" = "This app uses Cookies and similiar technolgies (tools). By clicking Accept, you accept the processing and also the Transfer of your data to third parties. The data will be used for Analysis, retargeting and to Display personalized Content and Advertising on  sites and third-party sites. You can find further informatin, including Information on data processing by third-party Providers, in the settings and in our Privacy Policy.You can reject the use of the Tools or customize them at any time in the Settings.";
+"_key_privacy_help_" = "Privacy Policy";
+"_key_reject_help_" = "reject";
+"_key_settings_help_" = "Settings";
+"_prefix_upload_path_" = "MagentaCLOUD/";
+
 
 // Manage AutoUpload
 
@@ -453,6 +472,7 @@
 "_remove_offline_"              = "Remove from offline";
 "_add_favorites_"               = "Add to favorites";
 "_add_offline_"                 = "Add to offline";
+"_rotate_"                      = "Rotate right";
 "_remove_passcode_"             = "Remove password protection";
 "_protect_passcode_"            = "Protect with password";
 "_share_"                       = "Share";
@@ -776,10 +796,23 @@
 "_quality_medium_"                  = "Average file size of medium quality";
 "_quality_low_"                     = "Small file size of low quality";
 "_file_type_"                       = "File type";
-"_pdf_password_"                    = "PDF Password";
+//"_pdf_password_"                    = "PDF Password";
 "_file_creation_"                   = "File creation";
 "_delete_all_scanned_images_"       = "Do you want to delete all scanned images?";
 "_text_recognition_"                = "Text recognition";
+"_location_"                        = "LOCATION";
+"_save_with_text_recognition_"      = "SAVE WITH TEXT RECOGNITION (OCR)";
+"_pdf_with_ocr_"                    = "PDF (OCR)";
+"_text_file_ocr_"                   = "Textfile (txt)";
+"_save_without_text_recognition_"   = "SAVE WITHOUT TEXT RECOGNITION";
+"_pdf_"                             = "PDF";
+"_jpg_"                             = "JPG";
+"_png_"                             = "PNG";
+"_pdf_password_"                    = "PDF-PASSWORT";
+"_set_password_"                    = "Set password";
+"_no_password_warn_"                 = "Please enter a password for the PDF you want to create or disable the function.";
+"_saved_info_alert_" = "Saving will take some time, espacially if you have selected several pages and file formats.";
+
 
 /* The title on the navigation bar of the Scanning screen. */
 "wescan.scanning.title"             = "Scanning";
@@ -804,7 +837,7 @@
 
 // Offline
 
-"_manage_file_offline_"             = "Manage offline files";
+"_manage_file_offline_"             = "Offline files";
 "_set_available_offline_"           = "Set as available offline";
 "_remove_available_offline_"        = "Remove as available offline";
 

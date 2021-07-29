@@ -1,6 +1,8 @@
 ${PODS_ROOT}/Target Support Files/Pods-Nextcloud/Pods-Nextcloud-frameworks.sh
+${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework
 ${PODS_ROOT}/MORichNotification/Frameworks/MORichNotification.framework
 ${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MoEngage.framework
 ${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MoEngageCore.framework
 ${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MOAnalytics.framework
 ${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MOMessaging.framework
+${BUILT_PRODUCTS_DIR}/tealium-swift/TealiumSwift.framework

@@ -1,0 +1,6 @@
+framework module TealiumSwift {
+  umbrella header "tealium-swift-umbrella.h"
+
+  export *
+  module * { export * }
+}
