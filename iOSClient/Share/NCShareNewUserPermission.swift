@@ -831,8 +831,8 @@ class CellPermission: UITableViewCell {
     }
 }
 
-protocol CellPermissionEditDelegate {
-    func switchChanged(_ sender: UISwitch)
-    func textFieldSelected(_ textField: UITextField)
-    func textFieldTextChanged(_ textField: UITextField)
-}
+//protocol CellPermissionEditDelegate {
+//    func switchChanged(_ sender: UISwitch)
+//    func textFieldSelected(_ textField: UITextField)
+//    func textFieldTextChanged(_ textField: UITextField)
+//}

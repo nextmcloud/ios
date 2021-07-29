@@ -516,12 +516,12 @@ extension NCShareFileOptions: UITableViewDelegate {
         if indexPath.section == 0 {
             for i in 0...filePermissionCount - 2 {
                 if i == indexPath.row {
-                    let cell = tableView.cellForRow(at: IndexPath(row: i, section: 0)) as! CellPermission
+                    let cell = tableView.cellForRow(at: IndexPath(row: i, section: 0)) as! CellPermissionEmail
                     let checkImage = UIImageView(image: UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0))
                     cell.accessoryView = checkImage
                     self.permissionIndex = indexPath.row
                 } else {
-                    let cell = tableView.cellForRow(at: IndexPath(row: i, section: 0)) as! CellPermission
+                    let cell = tableView.cellForRow(at: IndexPath(row: i, section: 0)) as! CellPermissionEmail
                     cell.accessoryView = nil
                 }
             }
@@ -572,7 +572,7 @@ extension NCShareFileOptions: UITableViewDataSource {
         case 0:
             switch row {
             case 0:
-                if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermission", for: indexPath) as? CellPermission {
+                if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEmail", for: indexPath) as? CellPermissionEmail {
                     cell.seperator.isHidden = false
                     cell.title.text = NSLocalizedString("_share_read_only_", comment: "")
                     if self.permissionIndex == 0 {
@@ -583,7 +583,7 @@ extension NCShareFileOptions: UITableViewDataSource {
                 }
             //                    break
             case 1:
-                if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermission", for: indexPath) as? CellPermission {
+                if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEmail", for: indexPath) as? CellPermissionEmail {
                     if self.permissionIndex == 1 {
                         let checkImage = UIImageView(image: UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0))
                         cell.accessoryView = checkImage
@@ -599,7 +599,7 @@ extension NCShareFileOptions: UITableViewDataSource {
                 break
             case 2:
                 if directory! {
-                    if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermission", for: indexPath) as? CellPermission {
+                    if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEmail", for: indexPath) as? CellPermissionEmail {
                         cell.title.text = NSLocalizedString("_share_file_drop_", comment: "")
                         if self.permissionIndex == 2 {
                             let checkImage = UIImageView(image: UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0))
@@ -610,7 +610,7 @@ extension NCShareFileOptions: UITableViewDataSource {
                         return cell
                     }
                 } else {
-                    if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEdit", for: indexPath) as? CellPermissionEdit {
+                    if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEditEmail", for: indexPath) as? CellPermissionEditEmail {
                         cell.delegate = self
                         cell.seperator.isHidden = false
                         cell.seperatorBottom.isHidden = true
@@ -621,7 +621,7 @@ extension NCShareFileOptions: UITableViewDataSource {
                 }
                 break
             case 3:
-                if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEdit", for: indexPath) as? CellPermissionEdit {
+                if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEditEmail", for: indexPath) as? CellPermissionEditEmail {
                     cell.delegate = self
                     cell.seperator.isHidden = false
                     cell.seperatorBottom.isHidden = true
@@ -635,7 +635,7 @@ extension NCShareFileOptions: UITableViewDataSource {
             }
             break
         case 1:
-            if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEdit", for: indexPath) as? CellPermissionEdit {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEditEmail", for: indexPath) as? CellPermissionEditEmail {
                 cell.delegate = self
                 cell.title.text = NSLocalizedString("_LINK_LABEL_", comment: "")
                 cell.title.textColor = NCBrandColor.shared.textInfo
@@ -653,7 +653,7 @@ extension NCShareFileOptions: UITableViewDataSource {
             }
             break
         case 2:
-            if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEdit", for: indexPath) as? CellPermissionEdit {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEditEmail", for: indexPath) as? CellPermissionEditEmail {
                 cell.delegate = self
                 cell.title.text = NSLocalizedString("_share_hide_download_", comment: "")
                 cell.seperator.isHidden = false
@@ -668,7 +668,7 @@ extension NCShareFileOptions: UITableViewDataSource {
             }
             break
         case 3:
-            if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEdit", for: indexPath) as? CellPermissionEdit {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEditEmail", for: indexPath) as? CellPermissionEditEmail {
                 cell.delegate = self
                 cell.title.text = NSLocalizedString("_share_password_protect_", comment: "")
                 cell.seperator.isHidden = false
@@ -689,7 +689,7 @@ extension NCShareFileOptions: UITableViewDataSource {
             }
             break
         case 4:
-            if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEdit", for: indexPath) as? CellPermissionEdit {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: "cellPermissionEditEmail", for: indexPath) as? CellPermissionEditEmail {
                 cell.delegate = self
                 cell.title.text = NSLocalizedString("_share_expiration_date_", comment: "")
                 cell.seperator.isHidden = false
@@ -817,7 +817,7 @@ extension NCShareFileOptions: UITableViewDataSource {
 }
 
 
-class CellPermissionEdit: UITableViewCell, UITextFieldDelegate {
+class CellPermissionEditEmail: UITableViewCell, UITextFieldDelegate {
     @IBOutlet weak var title: UILabel!
     @IBOutlet weak var switchCell: UISwitch!
     @IBOutlet weak var seperator: UIView!
@@ -849,7 +849,7 @@ class CellPermissionEdit: UITableViewCell, UITextFieldDelegate {
     }
 }
 
-class CellPermission: UITableViewCell {
+class CellPermissionEmail: UITableViewCell {
     @IBOutlet weak var title: UILabel!
     @IBOutlet weak var seperator: UIView!
     @IBOutlet weak var titleInfo: UILabel!

@@ -1992,7 +1992,7 @@
                                     </constraints>
                                 </view>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cellPermission" rowHeight="43.5" id="ttI-o7-oJX" customClass="CellPermission" customModule="Nextcloud" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cellPermissionEmail" rowHeight="43.5" id="ttI-o7-oJX" customClass="CellPermissionEmail" customModule="Nextcloud" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="312.5" width="414" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ttI-o7-oJX" id="hkB-Xh-Oxe">
@@ -2040,7 +2040,7 @@
                                             <outlet property="titleInfo" destination="dCx-tc-Wap" id="DV2-Sg-cJz"/>
                                         </connections>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cellPermissionEdit" rowHeight="84" id="VCz-sQ-hsG" customClass="CellPermissionEdit" customModule="Nextcloud" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cellPermissionEditEmail" rowHeight="84" id="VCz-sQ-hsG" customClass="CellPermissionEditEmail" customModule="Nextcloud" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="356" width="414" height="84"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="VCz-sQ-hsG" id="xIH-P6-Fdk">

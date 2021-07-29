@@ -63,7 +63,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     public var tableShareSelected: tableShare?
     private var quickStatusTableShare: tableShare!
     private var sendEmailSelected: Int!
-    private var quickStatusTableShare: tableShare!
     private var shareeEmail: String!
     
     override func viewDidLoad() {
@@ -268,37 +267,69 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
 //    func tapMenu(with tableShare: tableShare?, sender: Any) {
+//    func tapMenu(with tableShare: tableShare?, sender: Any, index: Int) {
+//
+//        guard let tableShare = tableShare else { return }
+//
+//        self.tableShareSelected = tableShare
+//        self.sendEmailSelected = index
+//        if tableShare.shareType == 3 {
+////            let views = NCShareCommon.shared.openViewMenuShareLink(shareViewController: self, tableShare: tableShare, metadata: metadata!)
+////            shareLinkMenuView = views.shareLinkMenuView
+////            shareMenuViewWindow = views.viewWindow
+//            let shareMenu = NCShareMenu()
+//            shareMenu.toggleMenu(viewController: self, sendMail: false)
+//
+//            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
+//            tap.delegate = self
+//            shareMenuViewWindow?.addGestureRecognizer(tap)
+//        } else {
+////            let views = NCShareCommon.shared.openViewMenuUser(shareViewController: self, tableShare: tableShare, metadata: metadata!)
+////            shareUserMenuView = views.shareUserMenuView
+////            shareMenuViewWindow = views.viewWindow
+//            let shareMenu = NCShareMenu()
+//            shareMenu.toggleMenu(viewController: self, sendMail: true)
+//            let views = NCShareCommon.shared.openViewMenuUser(shareViewController: self, tableShare: tableShare, metadata: metadata!)
+//            shareUserMenuView = views.shareUserMenuView
+//            shareMenuViewWindow = views.viewWindow
+//
+//            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
+//            tap.delegate = self
+//            shareMenuViewWindow?.addGestureRecognizer(tap)
+//        }
+//    }
+    
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int) {
         
         guard let tableShare = tableShare else { return }
-
+        
         self.tableShareSelected = tableShare
         self.sendEmailSelected = index
         if tableShare.shareType == 3 {
 //            let views = NCShareCommon.shared.openViewMenuShareLink(shareViewController: self, tableShare: tableShare, metadata: metadata!)
 //            shareLinkMenuView = views.shareLinkMenuView
 //            shareMenuViewWindow = views.viewWindow
+            //            let shareMenu = NCShareMenu()
+            //            shareMenu.toggleMenu(viewController: self)
+            //            let views = NCShareCommon.shared.openViewMenuShareLink(shareViewController: self, tableShare: tableShare, metadata: metadata!)
+            //            shareLinkMenuView = views.shareLinkMenuView
+            //            shareMenuViewWindow = views.viewWindow
             let shareMenu = NCShareMenu()
             shareMenu.toggleMenu(viewController: self, sendMail: false)
-        
-            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-            tap.delegate = self
-            shareMenuViewWindow?.addGestureRecognizer(tap)
-        } else {
-//            let views = NCShareCommon.shared.openViewMenuUser(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-//            shareUserMenuView = views.shareUserMenuView
-//            shareMenuViewWindow = views.viewWindow
-            let shareMenu = NCShareMenu()
-            shareMenu.toggleMenu(viewController: self, sendMail: true)
-            let views = NCShareCommon.shared.openViewMenuUser(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-            shareUserMenuView = views.shareUserMenuView
-            shareMenuViewWindow = views.viewWindow
             
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
             tap.delegate = self
-            shareMenuViewWindow?.addGestureRecognizer(tap)
+            //            shareUserMenuView = views.shareUserMenuView
+            //            shareMenuViewWindow = views.viewWindow
+//            let shareMenu = NCShareMenu()
+//            shareMenu.toggleMenu(viewController: self)
+//            shareMenu.toggleMenu(viewController: self, sendMail: true)
+//
+//            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
+//            tap.delegate = self
         }
     }
+
     
     func quickStatus(with tableShare: tableShare?, sender: Any) {
         guard let tableShare = tableShare else { return }
@@ -317,7 +348,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             shareMenuViewWindow?.addGestureRecognizer(tap)
             self.quickStatusTableShare = tableShare
             let quickStatusMenu = NCShareQuickStatusMenu()
-            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
+            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: "", status: tableShare.permissions)
         }
     }
     
@@ -425,13 +456,13 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
             DispatchQueue.main.async() { [self] in
                 var viewNewUserPermission: NCShareNewUserPermission
-                if directory! {
-//                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFolderPermission") as! NCShareNewUserPermission
-                } else {
-//                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
-                }
+//                if directory! {
+////                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+//                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFolderPermission") as! NCShareNewUserPermission
+//                } else {
+////                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+//                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
+//                }
 //                if directory! {
 //                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
                     viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserPermission") as! NCShareNewUserPermission
@@ -512,14 +543,14 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     // MARK: -StatusChangeNotification
-    func quickStatus(with tableShare: tableShare?, sender: Any) {
-        guard let tableShare = tableShare else { return }
-        
-        self.quickStatusTableShare = tableShare
-        let quickStatusMenu = NCShareQuickStatusMenu()
-        //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
-        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions)
-    }
+//    func quickStatus(with tableShare: tableShare?, sender: Any) {
+//        guard let tableShare = tableShare else { return }
+//        
+//        self.quickStatusTableShare = tableShare
+//        let quickStatusMenu = NCShareQuickStatusMenu()
+//        //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
+//        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions)
+//    }
     
     func quickStatusLink(with tableShare: tableShare?, sender: Any) {
         guard let tableShare = tableShare else { return }
