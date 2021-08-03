@@ -160,7 +160,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     @objc func reloadData() {
         let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
         if shares.firstShareLink == nil {
-            buttonMenu.setImage(UIImage.init(named: "shareAdd")?.image(color: .gray, size: 50), for: .normal)
+//            buttonMenu.setImage(UIImage.init(named: "shareAdd")?.image(color: .gray, size: 50), for: .normal)
             buttonCopy.isHidden = true
         } else {
             buttonMenu.setImage(UIImage.init(named: "shareMenu")?.image(color: .gray, size: 50), for: .normal)
@@ -223,7 +223,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             
             self.present(alertController, animated: true, completion:nil)
         } else if shares.firstShareLink == nil {
-            networking?.createShareLink(password: "")
+//            networking?.createShareLink(password: "")
         } else {
             tapMenu(with: shares.firstShareLink!, sender: sender, index: 0)
         }
@@ -327,30 +327,36 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //
 //            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
 //            tap.delegate = self
+        } else {
+            let shareMenu = NCShareMenu()
+            shareMenu.toggleMenu(viewController: self, sendMail: true)
+            
+            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
+            tap.delegate = self
         }
     }
 
     
-    func quickStatus(with tableShare: tableShare?, sender: Any) {
-        guard let tableShare = tableShare else { return }
-
-        if tableShare.shareType != 3 {
-//            let views = NCShareCommon.shared.openQuickShare(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-//            sharePermissionMenuView = views.sharePermissionMenuView
-//            shareMenuViewWindow = views.viewWindow
+//    func quickStatus(with tableShare: tableShare?, sender: Any) {
+//        guard let tableShare = tableShare else { return }
+//
+//        if tableShare.shareType != 3 {
+////            let views = NCShareCommon.shared.openQuickShare(shareViewController: self, tableShare: tableShare, metadata: metadata!)
+////            sharePermissionMenuView = views.sharePermissionMenuView
+////            shareMenuViewWindow = views.viewWindow
+////
+////            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
+////            tap.delegate = self
+////            shareMenuViewWindow?.addGestureRecognizer(tap)
 //
 //            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
 //            tap.delegate = self
 //            shareMenuViewWindow?.addGestureRecognizer(tap)
-            
-            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-            tap.delegate = self
-            shareMenuViewWindow?.addGestureRecognizer(tap)
-            self.quickStatusTableShare = tableShare
-            let quickStatusMenu = NCShareQuickStatusMenu()
-            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: "", status: tableShare.permissions)
-        }
-    }
+//            self.quickStatusTableShare = tableShare
+//            let quickStatusMenu = NCShareQuickStatusMenu()
+//            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: "", status: tableShare.permissions)
+//        }
+//    }
     
 //    func quickStatus(with tableShare: tableShare?, sender: Any) {
 //        guard let tableShare = tableShare else { return }
@@ -483,6 +489,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     @IBAction func createLinkClicked(_ sender: Any) {
+        buttonMenu.isHidden = false
         networking?.createShareLink(password: "")
     }
     
@@ -543,14 +550,15 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     // MARK: -StatusChangeNotification
-//    func quickStatus(with tableShare: tableShare?, sender: Any) {
-//        guard let tableShare = tableShare else { return }
-//        
-//        self.quickStatusTableShare = tableShare
-//        let quickStatusMenu = NCShareQuickStatusMenu()
-//        //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
-//        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions)
-//    }
+    func quickStatus(with tableShare: tableShare?, sender: Any) {
+        guard let tableShare = tableShare else { return }
+        
+        self.quickStatusTableShare = tableShare
+        let quickStatusMenu = NCShareQuickStatusMenu()
+        //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
+        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions)
+    }
+
     
     func quickStatusLink(with tableShare: tableShare?, sender: Any) {
         guard let tableShare = tableShare else { return }
@@ -769,7 +777,7 @@ class NCShareLinkCell: UITableViewCell {
 //        imageItem.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
         imageItem.image = UIImage(named: "sharebylink")?.image(color: NCBrandColor.shared.icon, size: 30)
         buttonCopy.setImage(UIImage.init(named: "shareCopy")!.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
-        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
+//        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
 //        imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
     }
@@ -818,7 +826,7 @@ class NCShareUserCell: UITableViewCell {
         
         switchCanEdit.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         switchCanEdit.onTintColor = NCBrandColor.shared.brandElement
-        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
+//        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
         imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
     }

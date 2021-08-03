@@ -564,7 +564,8 @@ extension NCSelect: UICollectionViewDataSource {
             if (isShare) {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else if (tableShare != nil && tableShare?.shareType == 3) {
-                cell.imageShared.image = NCBrandColor.cacheImages.shareByLink
+//                cell.imageShared.image = NCBrandColor.cacheImages.shareByLink
+                cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else if (tableShare != nil && tableShare?.shareType != 3) {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else {
