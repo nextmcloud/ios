@@ -48,7 +48,7 @@ extension NCCreateFormUploadConflictDelegate {
     @IBOutlet weak var buttonCancel: UIButton!
     @IBOutlet weak var buttonContinue: UIButton!
     
-    private let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     @objc var metadatasNOConflict: [tableMetadata]
     @objc var metadatasUploadInConflict: [tableMetadata]
@@ -107,6 +107,16 @@ extension NCCreateFormUploadConflictDelegate {
         buttonContinue.isEnabled = false
         buttonContinue.setTitleColor(.lightGray, for: .normal)
         buttonContinue.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
+        
+        if(metadatasUploadInConflict.count == 1){
+                    let blurEffect = UIBlurEffect(style: .light)
+                    let blurVisualEffectView = UIVisualEffectView(effect: blurEffect)
+                    blurVisualEffectView.frame = self.view.bounds
+                    self.view.addSubview(blurVisualEffectView)
+                    self.showSingleFileConflictAlert()
+        }else{
+                    //TODO share dialog for multiple files
+        }
     }
     
     // MARK: - Action
