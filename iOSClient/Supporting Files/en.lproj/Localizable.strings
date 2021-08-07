@@ -574,7 +574,7 @@
 
 // Share
 
-"_share_link_"                  = "Share link";
+"_share_link_"                  = "Link label";//Share link";
 "_share_link_button_"           = "Send link to…";
 "_password_"                    = "Password";
 "_share_password_"              = "Password protected link";

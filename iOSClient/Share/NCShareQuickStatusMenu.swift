@@ -45,11 +45,14 @@ class NCShareQuickStatusMenu: NSObject {
                     }
                 )
             )
-        } else {
+        } else if directoryType != "image" || directoryType !=  "audio" {
             actions.append(
                 NCMenuAction(title: directory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
-                             icon: UIImage(), action: { menuAction in
-//                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
+                             icon: UIImage(),
+                             selected: status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption,
+                             on: false,
+                             action: { menuAction in
+                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
                              }
                 )
             )

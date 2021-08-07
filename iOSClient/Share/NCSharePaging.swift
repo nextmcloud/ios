@@ -70,8 +70,8 @@ class NCSharePaging: UIViewController {
             }
         }
         
-        pagingViewController.activityEnabled = activityEnabled
-        pagingViewController.commentsEnabled = commentsEnabled
+//        pagingViewController.activityEnabled = activityEnabled
+//        pagingViewController.commentsEnabled = commentsEnabled
         pagingViewController.sharingEnabled = sharingEnabled
        
         pagingViewController.metadata = metadata
@@ -106,6 +106,7 @@ class NCSharePaging: UIViewController {
         pagingViewController.delegate = self
         pagingViewController.select(index: indexPage)
         let pagingIndexItem = self.pagingViewController(pagingViewController, pagingItemAt: indexPage) as! PagingIndexItem
+//        let pagingIndexItem = self.pagingViewController(pagingViewController, pagingItemAt: 0) as! PagingIndexItem
         self.title = pagingIndexItem.title
         
         changeTheming()
@@ -118,6 +119,7 @@ class NCSharePaging: UIViewController {
             self.dismiss(animated: false, completion: nil)
         }
         
+//        pagingViewController.menuItemSize = .fixed(width: self.view.bounds.width/3, height: 40)
         pagingViewController.menuItemSize = .fixed(width: self.view.bounds.width/3, height: 40)
     }
     
@@ -141,7 +143,8 @@ class NCSharePaging: UIViewController {
         pagingViewController.selectedBackgroundColor = NCBrandColor.shared.backgroundForm
         pagingViewController.textColor = NCBrandColor.shared.textView
         pagingViewController.selectedTextColor = NCBrandColor.shared.textView
-        pagingViewController.indicatorColor = NCBrandColor.shared.brandElement
+//        pagingViewController.indicatorColor = NCBrandColor.shared.brandElement
+        pagingViewController.indicatorColor = .clear
         (pagingViewController.view as! NCSharePagingView).setupConstraints()
         pagingViewController.reloadMenu()
     }
@@ -175,8 +178,16 @@ extension NCSharePaging: PagingViewControllerDataSource {
     
         let height = pagingViewController.options.menuHeight + NCSharePagingView.HeaderHeight
         let topSafeArea = UIApplication.shared.keyWindow?.safeAreaInsets.top ?? 0
-        
+
         switch index {
+//        case 0:
+//            let viewController = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "sharing") as! NCShare
+//            viewController.sharingEnabled = sharingEnabled
+//            viewController.metadata = metadata
+//            viewController.height = height
+//            return viewController
+        
+        
         case NCGlobal.shared.indexPageActivity:
             let viewController = UIStoryboard(name: "NCActivity", bundle: nil).instantiateInitialViewController() as! NCActivity
             viewController.insets = UIEdgeInsets(top: height - topSafeArea, left: 0, bottom: 0, right: 0)
@@ -202,13 +213,23 @@ extension NCSharePaging: PagingViewControllerDataSource {
     
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
         
+//        switch index {
+//        case NCGlobal.shared.indexPageActivity:
+//            return PagingIndexItem(index: index, title: NSLocalizedString("_activity_", comment: ""))
+//        case NCGlobal.shared.indexPageComments:
+//            return PagingIndexItem(index: index, title: NSLocalizedString("_comments_", comment: ""))
+//        case NCGlobal.shared.indexPageSharing:
+//            return PagingIndexItem(index: index, title: NSLocalizedString("_sharing_", comment: ""))
+//        default:
+//            return PagingIndexItem(index: index, title: "")
+//        }
         switch index {
         case NCGlobal.shared.indexPageActivity:
-            return PagingIndexItem(index: index, title: NSLocalizedString("_activity_", comment: ""))
+            return PagingIndexItem(index: index, title: NSLocalizedString("", comment: ""))
         case NCGlobal.shared.indexPageComments:
-            return PagingIndexItem(index: index, title: NSLocalizedString("_comments_", comment: ""))
+            return PagingIndexItem(index: index, title: NSLocalizedString("", comment: ""))
         case NCGlobal.shared.indexPageSharing:
-            return PagingIndexItem(index: index, title: NSLocalizedString("_sharing_", comment: ""))
+            return PagingIndexItem(index: index, title: NSLocalizedString("", comment: ""))
         default:
             return PagingIndexItem(index: index, title: "")
         }
@@ -216,6 +237,7 @@ extension NCSharePaging: PagingViewControllerDataSource {
    
     func numberOfViewControllers(in pagingViewController: PagingViewController) -> Int {
         return 3
+//        return 1
     }
 }
 
@@ -226,8 +248,8 @@ class NCShareHeaderViewController: PagingViewController {
     public var image: UIImage?
     public var metadata: tableMetadata?
     
-    public var activityEnabled = true
-    public var commentsEnabled = true
+    public var activityEnabled = false
+    public var commentsEnabled = false
     public var sharingEnabled = true
 
     override func loadView() {
@@ -240,16 +262,16 @@ class NCShareHeaderViewController: PagingViewController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if indexPath.item == NCGlobal.shared.indexPageActivity && !activityEnabled {
-            return
-        }
-        if indexPath.item == NCGlobal.shared.indexPageComments && !commentsEnabled {
-            return
-        }
-        if indexPath.item == NCGlobal.shared.indexPageSharing && !sharingEnabled {
-            return
-        }
-        super.collectionView(collectionView, didSelectItemAt: indexPath)
+//        if indexPath.item == NCGlobal.shared.indexPageActivity && !activityEnabled {
+//            return
+//        }
+//        if indexPath.item == NCGlobal.shared.indexPageComments && !commentsEnabled {
+//            return
+//        }
+//        if indexPath.item == NCGlobal.shared.indexPageSharing && !sharingEnabled {
+//            return
+//        }
+//        super.collectionView(collectionView, didSelectItemAt: indexPath)
     }
 }
 
