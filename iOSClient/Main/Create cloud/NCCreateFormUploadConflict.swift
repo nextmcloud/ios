@@ -61,13 +61,14 @@ extension NCCreateFormUploadConflictDelegate {
     var metadatasConflictNewFiles: [String] = []
     var metadatasConflictAlreadyExistingFiles: [String] = []
     var fileNamesPath: [String: String] = [:]
-
+    var blurVisualEffectView: UIView
     // MARK: - Cicle
 
     @objc required init?(coder aDecoder: NSCoder) {
         self.metadatasNOConflict = []
         self.metadatasMOV = []
         self.metadatasUploadInConflict = []
+        self.blurVisualEffectView = UIView()
         super.init(coder: aDecoder)
     }
     
@@ -116,6 +117,11 @@ extension NCCreateFormUploadConflictDelegate {
                     self.showSingleFileConflictAlert()
         }else{
                     //TODO share dialog for multiple files
+            let blurEffect = UIBlurEffect(style: .light)
+            blurVisualEffectView = UIVisualEffectView(effect: blurEffect)
+            blurVisualEffectView.frame = self.view.bounds
+            self.view.addSubview(blurVisualEffectView)
+            self.multiFilesConflictDialog(fileCount: metadatasUploadInConflict.count)
         }
     }
     
