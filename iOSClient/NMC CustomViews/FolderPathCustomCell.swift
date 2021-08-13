@@ -28,6 +28,8 @@ class FolderPathCustomCell: XLFormButtonCell{
         super.update()
         if (rowDescriptor.tag == "PhotoButtonDestinationFolder"){
             bottomLineView.isHidden = true
+        }else{
+            bottomLineView.isHidden = false
         }
     }
    

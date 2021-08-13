@@ -33,6 +33,8 @@
 		7A875F18269470B900AF558D /* AnalysisDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7A875F17269470B900AF558D /* AnalysisDataCollectionSwitch.xib */; };
 		7A875F1E2694776F00AF558D /* SaveSettingsCustomButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A875F1D2694776F00AF558D /* SaveSettingsCustomButtonCell.swift */; };
 		7A875F242694777E00AF558D /* SaveSettingsCustomButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7A875F232694777E00AF558D /* SaveSettingsCustomButtonCell.xib */; };
+		7AE63A5F26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63A5E26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift */; };
+		7AE63A6526C64C7A00CEAAD5 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63A6426C64C7A00CEAAD5 /* NCCreateDocumentCustomTextField.xib */; };
 		950A647E264AACF4006ADE0E /* OriginalFileNameCustomSwitchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 950A6476264AACF4006ADE0E /* OriginalFileNameCustomSwitchCell.xib */; };
 		950A647F264AACF4006ADE0E /* SubFolderCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 950A6477264AACF4006ADE0E /* SubFolderCustomCell.xib */; };
 		950A6480264AACF4006ADE0E /* TypeInFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950A6478264AACF4006ADE0E /* TypeInFileNameCustomSwitchCell.swift */; };
@@ -448,6 +450,8 @@
 		7A875F17269470B900AF558D /* AnalysisDataCollectionSwitch.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AnalysisDataCollectionSwitch.xib; sourceTree = "<group>"; };
 		7A875F1D2694776F00AF558D /* SaveSettingsCustomButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSettingsCustomButtonCell.swift; sourceTree = "<group>"; };
 		7A875F232694777E00AF558D /* SaveSettingsCustomButtonCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SaveSettingsCustomButtonCell.xib; sourceTree = "<group>"; };
+		7AE63A5E26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
+		7AE63A6426C64C7A00CEAAD5 /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
 		950A6476264AACF4006ADE0E /* OriginalFileNameCustomSwitchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OriginalFileNameCustomSwitchCell.xib; sourceTree = "<group>"; };
 		950A6477264AACF4006ADE0E /* SubFolderCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SubFolderCustomCell.xib; sourceTree = "<group>"; };
 		950A6478264AACF4006ADE0E /* TypeInFileNameCustomSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeInFileNameCustomSwitchCell.swift; sourceTree = "<group>"; };
@@ -1620,6 +1624,8 @@
 				F747BA1E22354D2000971601 /* NCCreateFormUploadVoiceNote.storyboard */,
 				F7020FCD2233D7F700B7297D /* NCCreateFormUploadVoiceNote.swift */,
 				7A756F9626BA601B00E0CB38 /* NCCreateFormUploadConflict+Alert.swift */,
+				7AE63A5E26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift */,
+				7AE63A6426C64C7A00CEAAD5 /* NCCreateDocumentCustomTextField.xib */,
 			);
 			path = "Create cloud";
 			sourceTree = "<group>";
@@ -2089,6 +2095,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7AE63A6526C64C7A00CEAAD5 /* NCCreateDocumentCustomTextField.xib in Resources */,
 				F79728D422F96F2E003CACA7 /* NCShareLinkFolderMenuView.xib in Resources */,
 				F7362A1F220C853A005101B5 /* LaunchScreen.storyboard in Resources */,
 				F77444F622281649000D5EB0 /* NCGridMediaCell.xib in Resources */,
@@ -2359,6 +2366,7 @@
 				C0ABA3D526A6BB260049DE9A /* AdjustHelper.m in Sources */,
 				F733598125C1C188002ABA72 /* NCAskAuthorization.swift in Sources */,
 				370D26AF248A3D7A00121797 /* NCImageCellProtocol.swift in Sources */,
+				7AE63A5F26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				F77B0DF51D118A16002130FE /* CCUtility.m in Sources */,
 				F710D1FE24057E5E00A6033D /* NCActionSheetHeader.swift in Sources */,
 				F790110E21415BF600D7B136 /* NCViewerRichdocument.swift in Sources */,
