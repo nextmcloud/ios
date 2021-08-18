@@ -38,6 +38,7 @@ typedef enum : NSUInteger {
 
 -(void)configAdjust;
 -(void)subsessionEnd;
+-(void)subsessionStart;
 -(void)trackLogin;
 -(void)trackEvent:(TriggerEvent)event;
 

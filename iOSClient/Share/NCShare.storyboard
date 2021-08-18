@@ -2157,6 +2157,21 @@
             </objects>
             <point key="canvasLocation" x="7626.0869565217399" y="-244.41964285714283"/>
         </scene>
+        <!--Share Advance Permission-->
+        <scene sceneID="dtc-h5-sjh">
+            <objects>
+                <viewController storyboardIdentifier="NCShareAdvancePermission" id="ZY2-Yi-Vo2" customClass="NCShareAdvancePermission" customModule="Nextcloud" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="k5x-2m-JYA">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="hUT-cY-82i"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="61o-Ze-ecO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4814" y="-827"/>
+        </scene>
         <!--Share New User Add Comment-->
         <scene sceneID="xcn-dr-jfG">
             <objects>

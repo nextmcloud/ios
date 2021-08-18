@@ -74,7 +74,7 @@
                     <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Diy-BQ-ELj">
                         <rect key="frame" x="55" y="0.0" width="455" height="28"/>
                         <connections>
-                            <action selector="quickStatusClicked:" destination="qJF-Yc-gKE" eventType="touchUpInside" id="Ihd-Ja-jTl"/>
+                            <action selector="quickStatusClicked:" destination="qJF-Yc-gKE" eventType="touchUpInside" id="1P3-nZ-bFZ"/>
                         </connections>
                     </button>
                 </subviews>
@@ -113,7 +113,7 @@
     </objects>
     <resources>
         <image name="circle" width="300" height="300"/>
-        <image name="shareCopy" width="329" height="329"/>
+        <image name="shareCopy" width="500" height="500"/>
         <image name="shareMenu" width="329" height="329"/>
     </resources>
 </document>

@@ -976,6 +976,13 @@ class CellPermissionEdit: UITableViewCell, UITextFieldDelegate {
         delegate?.textFieldTextChanged(textField)
         return true
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.switchCell.isOn = false
+        self.textField.text = ""
+        self.textField.placeholder = ""
+    }
 }
 
 class CellPermission: UITableViewCell {

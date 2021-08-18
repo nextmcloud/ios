@@ -197,7 +197,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
         
         adjust.configAdjust()
-        
+        adjust.subsessionStart()
         return true
     }
     

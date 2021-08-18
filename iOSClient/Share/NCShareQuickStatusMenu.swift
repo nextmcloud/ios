@@ -14,7 +14,7 @@ class NCShareQuickStatusMenu: NSObject {
     
     var currentStatus = ""
     
-    func toggleMenu(viewController: UIViewController, directory: Bool, directoryType: String, status: Int) {
+    func toggleMenu(viewController: UIViewController, directory: Bool, directoryType: String, status: Int, shareType: Int) {
         
         print(status)
 //        self.currentStatus = status

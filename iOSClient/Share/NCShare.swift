@@ -149,6 +149,11 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         changeTheming()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.reloadData()
+        self.searchField.text = ""
+    }
+    
     @objc func changeTheming() {
         view.backgroundColor = NCBrandColor.shared.backgroundForm
         tableView.backgroundColor = NCBrandColor.shared.backgroundForm
@@ -226,7 +231,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         } else if shares.firstShareLink == nil {
             networking?.createShareLink(password: "")
         } else {
-//            tapMenu(with: shares.firstShareLink!, sender: sender)
+//            tapMenu(with: shares.firstShareLink!, sender: sender, index: <#Int#>)
+            networking?.createShareLink(password: "")
         }
         
     }
@@ -339,7 +345,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
 
     
-//    func quickStatus(with tableShare: tableShare?, sender: Any) {
+//    func quickStatus(with tableShare: tableShare?, sender: UIButton) {
 //        guard let tableShare = tableShare else { return }
 //
 //        if tableShare.shareType != 3 {
@@ -360,7 +366,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //        }
 //    }
     
-//    func quickStatus(with tableShare: tableShare?, sender: Any) {
+//    func quickStatus(with tableShare: tableShare?, sender: UIButton) {
 //        guard let tableShare = tableShare else { return }
 //
 //        if tableShare.shareType != 3 {
@@ -468,7 +474,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             let directory = self!.metadata?.directory
             let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
             DispatchQueue.main.async() { [self] in
-                var viewNewUserPermission: NCShareNewUserPermission
+//                var viewNewUserPermission: NCShareNewUserPermission
+                var viewNewUserPermission: NCShareAdvancePermission
 //                if directory! {
 ////                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
 //                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFolderPermission") as! NCShareNewUserPermission
@@ -477,8 +484,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
 //                }
 //                if directory! {
-//                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserPermission") as! NCShareNewUserPermission
+                
+                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareAdvancePermission") as! NCShareAdvancePermission
 //                } else {
 ////                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
 //                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
@@ -538,22 +545,24 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //            return
 //        }
 //        navigationController.pushViewController(shareFileOptions, animated: true)
-        
+        //NCShareAdvancePermission
         
         let directory = self.metadata?.directory
         let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-        var viewNewUserPermission: NCShareNewUserPermission
-        viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserPermission") as! NCShareNewUserPermission
-        viewNewUserPermission.metadata = self.metadata
-        viewNewUserPermission.sharee = self.shareeSelected
-        viewNewUserPermission.shareeEmail = self.shareeEmail
-        viewNewUserPermission.newUser = false
-        viewNewUserPermission.tableShare = self.tableShareSelected
+//        var viewNewUserPermission: NCShareNewUserPermission
+//        viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserPermission") as! NCShareNewUserPermission
+        var advancePermission: NCShareAdvancePermission
+        advancePermission = storyboard.instantiateViewController(withIdentifier: "NCShareAdvancePermission") as! NCShareAdvancePermission
+        advancePermission.metadata = self.metadata
+        advancePermission.sharee = self.shareeSelected
+//        advancePermission.shareeEmail = self.shareeEmail
+        advancePermission.newUser = false
+        advancePermission.tableShare = self.tableShareSelected
         guard let navigationController = navigationController else {
             print("this vc is not embedded in navigationController")
             return
         }
-        navigationController.pushViewController(viewNewUserPermission, animated: true)
+        navigationController.pushViewController(advancePermission, animated: true)
     }
     
     @objc func shareMenuSendEmailClicked() {
@@ -577,24 +586,36 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     // MARK: -StatusChangeNotification
-    func quickStatus(with tableShare: tableShare?, sender: Any) {
+    func quickStatus(with tableShare: tableShare?, sender: UIButton) {
         guard let tableShare = tableShare else { return }
         
-        self.quickStatusTableShare = tableShare
+        let index = sender.tag
+        let shares = NCManageDatabase.shared.getTableShares(metadata: self.metadata!)
+        self.quickStatusTableShare = shares.share![index]
+        
+//        self.quickStatusTableShare = quickShare
+//        self.quickStatusTableShare = tableShare
         let quickStatusMenu = NCShareQuickStatusMenu()
         //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
-        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions)
+//        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions, shareType: tableShare.shareType)
+        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
     }
 
     
-    func quickStatusLink(with tableShare: tableShare?, sender: Any) {
+    func quickStatusLink(with tableShare: tableShare?, sender: UIButton) {
         guard let tableShare = tableShare else { return }
         
-        self.quickStatusTableShare = tableShare
+        let index = sender.tag
+        let shares = NCManageDatabase.shared.getTableShares(metadata: self.metadata!)
+        self.quickStatusTableShare = shares.share![index]
+        
+//        self.quickStatusTableShare = quickShare
+//        self.quickStatusTableShare = tableShare
 //        if metadata?.typeFile == "document" {
             self.quickStatusTableShare = tableShare
             let quickStatusMenu = NCShareQuickStatusMenu()
-            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions)
+//        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions, shareType: tableShare.shareType)
+        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
 //        }
     }
     
@@ -651,6 +672,10 @@ extension NCShare: UITableViewDataSource {
         return numOfRows
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("")
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
@@ -673,11 +698,13 @@ extension NCShare: UITableViewDataSource {
                 }
                 cell.labelTitle.textColor = NCBrandColor.shared.textView
                 cell.indexSelected = indexPath.row
+                cell.btnQuickStatus.tag = indexPath.row
 //                cell.buttonMenu.isEnabled = false
 //                cell.buttonMenu.isHidden = true
                 
                 let ext = self.metadata?.ext
-                if self.metadata?.typeFile != "document" || ext == "jpg" || ext == "png" || ext == "m4a" || self.metadata?.typeFile == "image" || self.metadata?.typeFile ==  "audio" {
+//                if self.metadata?.typeFile != "document" || ext == "jpg" || ext == "png" || ext == "m4a" || self.metadata?.typeFile == "image" || self.metadata?.typeFile ==  "audio" {
+                if self.metadata?.typeFile != "document" {
                     cell.labelQuickStatus.textColor = NCBrandColor.shared.graySoft
                     cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.graySoft)
                 } else {
@@ -713,6 +740,7 @@ extension NCShare: UITableViewDataSource {
                 cell.buttonMenu.isHidden = false
                 cell.imageItem.image = NCShareCommon.shared.getImageShareType(shareType: tableShare.shareType)
                 cell.indexSelected = indexPath.row
+                cell.btnQuickStatus.tag = indexPath.row
                 
                 let status = NCUtility.shared.getUserStatus(userIcon: tableShare.userIcon, userStatus: tableShare.userStatus, userMessage: tableShare.userMessage)
                 cell.imageStatus.image = status.onlineStatus
@@ -751,6 +779,16 @@ extension NCShare: UITableViewDataSource {
                 }
                 cell.btnQuickStatus.setTitle("", for: .normal)
                 cell.btnQuickStatus.contentHorizontalAlignment = .left
+                
+                let ext = self.metadata?.ext
+//                if self.metadata?.typeFile != "document" || ext == "jpg" || ext == "png" || ext == "m4a" || self.metadata?.typeFile == "image" || self.metadata?.typeFile ==  "audio" {
+                if self.metadata?.typeFile != "document" {
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.graySoft
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.graySoft)
+                } else {
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
+                }
                 
                 if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
 //                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_file_drop_", comment: ""), for: .normal)
@@ -822,7 +860,7 @@ class NCShareLinkCell: UITableViewCell {
         delegate?.tapMenu(with: tableShare, sender: sender, index: indexSelected!)
     }
     
-    @IBAction func quickStatusClicked(_ sender: Any) {
+    @IBAction func quickStatusClicked(_ sender: UIButton) {
         delegate?.quickStatusLink(with: tableShare, sender: sender)
     }
 }
@@ -830,7 +868,7 @@ class NCShareLinkCell: UITableViewCell {
 protocol NCShareLinkCellDelegate {
     func tapCopy(with tableShare: tableShare?, sender: Any)
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int)
-    func quickStatusLink(with tableShare: tableShare?, sender: Any)
+    func quickStatusLink(with tableShare: tableShare?, sender: UIButton)
 }
 
 // MARK: - NCShareUserCell
@@ -871,7 +909,12 @@ class NCShareUserCell: UITableViewCell {
         delegate?.tapMenu(with: tableShare, sender: sender, index: indexSelected!)
     }
     
-    @IBAction func quickStatusClicked(_ sender: Any) {
+    @IBAction func quickStatusClicked(_ sender: UIButton) {
+//        let index = sender.tag
+//        let share = NCShare()
+//
+//        let shares = NCManageDatabase.shared.getTableShares(metadata: share.metadata ?? <#default value#>)
+//        let tableShare = shares.share![index]
         delegate?.quickStatus(with: tableShare, sender: sender)
     }
 }
@@ -879,7 +922,7 @@ class NCShareUserCell: UITableViewCell {
 protocol NCShareUserCellDelegate {
     func switchCanEdit(with tableShare: tableShare?, switch: Bool, sender: UISwitch)
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int)
-    func quickStatus(with tableShare: tableShare?, sender: Any)
+    func quickStatus(with tableShare: tableShare?, sender: UIButton)
 }
 
 // MARK: - NCShareUserDropDownCell
