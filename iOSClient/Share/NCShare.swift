@@ -612,7 +612,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //        self.quickStatusTableShare = quickShare
 //        self.quickStatusTableShare = tableShare
 //        if metadata?.typeFile == "document" {
-            self.quickStatusTableShare = tableShare
+//            self.quickStatusTableShare = tableShare
             let quickStatusMenu = NCShareQuickStatusMenu()
 //        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions, shareType: tableShare.shareType)
         quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
