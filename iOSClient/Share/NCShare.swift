@@ -588,50 +588,61 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     // MARK: -StatusChangeNotification
     func quickStatus(with tableShare: tableShare?, sender: UIButton) {
         guard let tableShare = tableShare else { return }
-        
-        let index = sender.tag
-        let shares = NCManageDatabase.shared.getTableShares(metadata: self.metadata!)
-        self.quickStatusTableShare = shares.share![index]
-        
-//        self.quickStatusTableShare = quickShare
-//        self.quickStatusTableShare = tableShare
-        let quickStatusMenu = NCShareQuickStatusMenu()
-        //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
-//        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions, shareType: tableShare.shareType)
-        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
+        let directory = self.metadata?.directory
+        if (self.metadata?.typeFile == "document" || directory == true) {
+            let index = sender.tag
+            let shares = NCManageDatabase.shared.getTableShares(metadata: self.metadata!)
+            self.quickStatusTableShare = shares.share![index]
+            
+    //        self.quickStatusTableShare = quickShare
+    //        self.quickStatusTableShare = tableShare
+            let quickStatusMenu = NCShareQuickStatusMenu()
+            //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
+    //        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions, shareType: tableShare.shareType)
+            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
+        } else {
+            return
+        }
     }
 
     
     func quickStatusLink(with tableShare: tableShare?, sender: UIButton) {
         guard let tableShare = tableShare else { return }
-        
-        let index = sender.tag
-        let shares = NCManageDatabase.shared.getTableShares(metadata: self.metadata!)
-        self.quickStatusTableShare = shares.share![index]
-        
-//        self.quickStatusTableShare = quickShare
-//        self.quickStatusTableShare = tableShare
-//        if metadata?.typeFile == "document" {
-//            self.quickStatusTableShare = tableShare
-            let quickStatusMenu = NCShareQuickStatusMenu()
-//        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions, shareType: tableShare.shareType)
-        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
-//        }
+        let directory = self.metadata?.directory
+        if (self.metadata?.typeFile == "document" || directory == true) {
+            let index = sender.tag
+            let shares = NCManageDatabase.shared.getTableShares(metadata: self.metadata!)
+            self.quickStatusTableShare = shares.share![index]
+            
+    //        self.quickStatusTableShare = quickShare
+    //        self.quickStatusTableShare = tableShare
+    //        if metadata?.typeFile == "document" {
+    //            self.quickStatusTableShare = tableShare
+                let quickStatusMenu = NCShareQuickStatusMenu()
+    //        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions, shareType: tableShare.shareType)
+            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
+    //        }
+        } else {
+            return
+        }
     }
     
     @objc func statusReadOnlyClicked() {
+        guard self.quickStatusTableShare != nil else { return }
         let permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata!.directory)
         
         networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
     }
     
     @objc func statusEditingClicked() {
+        guard self.quickStatusTableShare != nil else { return }
         let permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata!.directory)
         
         networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
     }
     
     @objc func statusFileDropClicked() {
+        guard self.quickStatusTableShare != nil else { return }
         let permission = NCGlobal.shared.permissionCreateShare
         
         networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
@@ -680,6 +691,7 @@ extension NCShare: UITableViewDataSource {
         
         let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
         let tableShare = shares.share![indexPath.row]
+        let directory = self.metadata?.directory
         
         // LINK
         if tableShare.shareType == 3 {
@@ -704,12 +716,12 @@ extension NCShare: UITableViewDataSource {
                 
                 let ext = self.metadata?.ext
 //                if self.metadata?.typeFile != "document" || ext == "jpg" || ext == "png" || ext == "m4a" || self.metadata?.typeFile == "image" || self.metadata?.typeFile ==  "audio" {
-                if self.metadata?.typeFile != "document" {
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.graySoft
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.graySoft)
-                } else {
+                if (self.metadata?.typeFile == "document" || directory == true) {
                     cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
                     cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
+                } else {
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.graySoft
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.graySoft)
                 }
                 
                 if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
@@ -782,12 +794,13 @@ extension NCShare: UITableViewDataSource {
                 
                 let ext = self.metadata?.ext
 //                if self.metadata?.typeFile != "document" || ext == "jpg" || ext == "png" || ext == "m4a" || self.metadata?.typeFile == "image" || self.metadata?.typeFile ==  "audio" {
-                if self.metadata?.typeFile != "document" {
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.graySoft
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.graySoft)
-                } else {
+                
+                if (self.metadata?.typeFile == "document" ||  directory == true) {
                     cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
                     cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
+                } else {
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.graySoft
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.graySoft)
                 }
                 
                 if tableShare.permissions == NCGlobal.shared.permissionCreateShare {

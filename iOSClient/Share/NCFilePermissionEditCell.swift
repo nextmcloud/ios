@@ -41,7 +41,7 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
             self.seperatorBottom.isHidden = true
             self.cellTextField.isHidden = true
         }
-        if rowDescriptor.tag == "kNMCFilePermissionCellLinkLabel" {
+        if rowDescriptor.tag == "kNMCFilePermissionEditCellLinkLabel" {
             self.switchControl.isHidden = true
             self.cellTextField.isEnabled = true
         }

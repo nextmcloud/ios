@@ -63,6 +63,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     var headerView: NCShareAdvancePermissionHeader! = nil
     var footerView: NCShareAdvancePermissionFooter! = nil
     var directory: Bool!
+    var typeFile: String!
 
 //    required init(coder aDecoder: NSCoder) {
 //        super.init(coder: aDecoder)
@@ -126,7 +127,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
 //        btnNext.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
 //        btnNext.setTitleColor(.white, for: .normal)
 
-        
+        self.typeFile = self.metadata?.typeFile
         self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.icon
         UserDefaults.standard.setValue(self.linkLabel, forKey: "_share_link_")
         
@@ -231,7 +232,6 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
 
     func initializeForm() {
-        
         let form : XLFormDescriptor
         var section : XLFormSectionDescriptor
         var row : XLFormRowDescriptor
@@ -289,69 +289,81 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
         row = XLFormRowDescriptor(tag: "NCFilePermissionCellRead", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_read_only_", comment: "")
-        
-//        if metadata?.permissions == "RDNVCK" {
-//            row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-////            row.value = "read"
-//        } else {
-//            row.cellConfig["imageCheck.image"] = UIImage(named: "")
-//        }
-        
+                
         if tableShare?.permissions == NCGlobal.shared.permissionCreateShare {
-//            row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+            
         } else {
             // Read Only
-            if newUser == true {
-                row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+            if CCUtility.isAnyPermission(toEdit: tableShare!.permissions) {
+//                cell.labelQuickStatus.text = NSLocalizedString("_share_editing_", comment: "")
             } else {
-                if CCUtility.isAnyPermission(toEdit: tableShare!.permissions) {
-    //                cell.labelQuickStatus.text = NSLocalizedString("_share_editing_", comment: "")
-                } else {
-                    row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-                }
+                row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
             }
         }
+        if newUser == true || (self.directory == false && self.typeFile != "document") {
+            row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+        }
+//        if self.typeFile == "document" {
+//            row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+//        }
         
-//        row.action.formSelector = #selector(filePermission(_:))
-//        row.action.
-//        row.
         section.addFormRow(row)
         
         //editing
 //        "_share_allow_editing_"         = "Allow editing";
 //        "_share_editing_"               = "Editing";
 
-        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
-        
-        row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditing", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
-        row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_allow_editing_", comment: "")
-        
-//        if metadata?.permissions == NCGlobal.shared.permissionMaxFileShare || metadata?.permissions == NCGlobal.shared.permissionMaxFolderShare ||  metadata?.permissions == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption {
-//            row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-//        }
-            
-//        if metadata?.permissions == "RGDNV" {
-//            row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-////            row.value = "edit"
-//        } else {
-//            row.cellConfig["imageCheck.image"] = UIImage(named: "")
-//        }
-        
-        if newUser == false {
-            if tableShare?.permissions == NCGlobal.shared.permissionCreateShare {
-
-            } else {
-                // Read Only
-                if CCUtility.isAnyPermission(toEdit: tableShare!.permissions) {
-                    row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-                } else {
+        if directory! {
+            XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
+            row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditing", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+            row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_allow_editing_", comment: "")
+            if newUser == false {
+                if tableShare?.permissions == NCGlobal.shared.permissionCreateShare {
                     
+                } else {
+                    // Read Only
+                    if CCUtility.isAnyPermission(toEdit: tableShare!.permissions) {
+                        row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+                    } else {
+                        
+                    }
                 }
             }
+            row.action.formSelector = #selector(filePermission(_:))
+            section.addFormRow(row)
+        } else {
+//            if self.typeFile == "jpg" || self.typeFile == "png" || self.typeFile == "m4a" {
+            if self.typeFile == "document" {
+                XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
+                
+                row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditing", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+                row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_allow_editing_", comment: "")
+                
+                if newUser == false {
+                    if tableShare?.permissions == NCGlobal.shared.permissionCreateShare {
+
+                    } else {
+                        // Read Only
+                        if CCUtility.isAnyPermission(toEdit: tableShare!.permissions) {
+                            row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+                        } else {
+                            
+                        }
+                    }
+                }
+            
+                row.action.formSelector = #selector(filePermission(_:))
+                section.addFormRow(row)
+//                cell.title.text = NSLocalizedString("share_editing_message", comment: "")
+            } else {
+                XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
+                
+                row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditingMsg", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+                row.cellConfig["titleLabel.text"] = NSLocalizedString("share_editing_message", comment: "")
+                section.addFormRow(row)
+            }
         }
-    
-        row.action.formSelector = #selector(filePermission(_:))
-        section.addFormRow(row)
+        
         
         //file drop
         //"_share_file_drop_"             = "File drop (upload only)";
@@ -536,10 +548,14 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             metadata.permissions = "RDNVCK"
             let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead")!
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-            let row1 : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionCellEditing")!
-            row1.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
-            let row2 : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellFileDrop")!
-            row2.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
+            if self.typeFile == "document" || self.directory {
+                let row1 : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionCellEditing")!
+                row1.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
+            }
+            if self.directory {
+                let row2 : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellFileDrop")!
+                row2.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
+            }
             
             self.reloadForm()
             break
@@ -551,11 +567,15 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             metadata.permissions = "RGDNV"
             let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead")!
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
-            let row1 : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionCellEditing")!
-            row1.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-            let row2 : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellFileDrop")!
-            row2.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
-            
+//            if self.typeFile != "jpg" || self.typeFile != "png" || self.typeFile != "m4a" {
+            if self.typeFile == "document" || self.directory {
+                let row1 : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionCellEditing")!
+                row1.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+            }
+            if self.directory {
+                let row2 : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellFileDrop")!
+                row2.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
+            }
             self.reloadForm()
             break
         case "NCFilePermissionCellFileDrop":
@@ -568,8 +588,10 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
             let row1 : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionCellEditing")!
             row1.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
-            let row2 : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellFileDrop")!
-            row2.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+            if self.directory {
+                let row2 : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellFileDrop")!
+                row2.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+            }
             
             self.reloadForm()
             break

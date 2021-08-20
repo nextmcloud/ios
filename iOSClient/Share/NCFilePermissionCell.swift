@@ -16,12 +16,11 @@ class NCFilePermissionCell: XLFormButtonCell {
     @IBOutlet weak var seperatorBelow: UIView!
     @IBOutlet weak var seperatorBelowFull: UIView!
     
-    
     override func awakeFromNib() {
         super.awakeFromNib()
         self.selectionStyle = .none
         
-        //        autoUploadSwitchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
+//        autoUploadSwitchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
         
     }
     
@@ -31,7 +30,7 @@ class NCFilePermissionCell: XLFormButtonCell {
     
     override func update() {
         super.update()
-        
+        self.selectionStyle = .none
         if rowDescriptor.tag == "NCFilePermissionCellSharing" || rowDescriptor.tag == "NCFilePermissionCellAdvanceTxt" {
             self.seperator.isHidden = true
             self.seperatorBelowFull.isHidden = false
@@ -51,6 +50,11 @@ class NCFilePermissionCell: XLFormButtonCell {
         if  rowDescriptor.tag == "kNMCFilePermissionEditCellEditingCanShare" {
             self.seperatorBelowFull.isHidden = false
         }
+        
+        if  rowDescriptor.tag == "kNMCFilePermissionCellEditingMsg" {
+            self.seperatorBelow.isHidden = true
+            self.seperatorBelowFull.isHidden = false
+        }
     }
     
     @objc func switchChanged(mySwitch: UISwitch) {
@@ -66,6 +70,5 @@ class NCFilePermissionCell: XLFormButtonCell {
     override func formDescriptorCellDidSelected(withForm controller: XLFormViewController!) {
         self.selectionStyle = .none
     }
-    
     
 }
