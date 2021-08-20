@@ -48,7 +48,7 @@ extension NCCreateFormUploadConflictDelegate {
     @IBOutlet weak var buttonCancel: UIButton!
     @IBOutlet weak var buttonContinue: UIButton!
     
-    private let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     @objc var metadatasNOConflict: [tableMetadata]
     @objc var metadatasUploadInConflict: [tableMetadata]
@@ -61,13 +61,14 @@ extension NCCreateFormUploadConflictDelegate {
     var metadatasConflictNewFiles: [String] = []
     var metadatasConflictAlreadyExistingFiles: [String] = []
     var fileNamesPath: [String: String] = [:]
-
+    var blurVisualEffectView: UIView
     // MARK: - Cicle
 
     @objc required init?(coder aDecoder: NSCoder) {
         self.metadatasNOConflict = []
         self.metadatasMOV = []
         self.metadatasUploadInConflict = []
+        self.blurVisualEffectView = UIView()
         super.init(coder: aDecoder)
     }
     
@@ -107,6 +108,21 @@ extension NCCreateFormUploadConflictDelegate {
         buttonContinue.isEnabled = false
         buttonContinue.setTitleColor(.lightGray, for: .normal)
         buttonContinue.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
+        
+        if(metadatasUploadInConflict.count == 1){
+                    let blurEffect = UIBlurEffect(style: .light)
+                    let blurVisualEffectView = UIVisualEffectView(effect: blurEffect)
+                    blurVisualEffectView.frame = self.view.bounds
+                    self.view.addSubview(blurVisualEffectView)
+                    self.showSingleFileConflictAlert()
+        }else{
+                    //TODO share dialog for multiple files
+            let blurEffect = UIBlurEffect(style: .light)
+            blurVisualEffectView = UIVisualEffectView(effect: blurEffect)
+            blurVisualEffectView.frame = self.view.bounds
+            self.view.addSubview(blurVisualEffectView)
+            self.multiFilesConflictDialog(fileCount: metadatasUploadInConflict.count)
+        }
     }
     
     // MARK: - Action

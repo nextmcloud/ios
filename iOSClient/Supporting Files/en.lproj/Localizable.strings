@@ -169,6 +169,15 @@
 "_alias_"                   = "Alias";
 "_alias_footer_"            = "Give your account names a descriptive name such as Home, Office, School …";
 "_auto_upload_help_text_"   = "With this option, you upload your photos or videos to the same folder that you selected for \"Automatic upload.\"";
+"_single_file_conflict_title_" = "File conflict";
+"_multi_file_conflict_title_" = " %@ File conflicts";
+"_replace_action_title_" = "Replace";
+"_keep_both_action_title_" = "Keep both";
+"_cancel_keep_existing_action_title_" = "Cancel and keep existing";
+"_replace_all_action_title_" = "Replace all";
+"_keep_both_for_all_action_title_" = "Keep both for all";
+"_more_action_title_" = "More Details";
+
 
 /* User status */
 "_online_"                  = "Online";

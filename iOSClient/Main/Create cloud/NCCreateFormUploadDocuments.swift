@@ -75,6 +75,8 @@ import NCCommunication
         self.title = titleForm
       
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+        
+        fileName = CCUtility.createFileNameDate("Text", extension: "md")!
 
         changeTheming()
         
@@ -106,16 +108,29 @@ import NCCommunication
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
         form.addFormSection(section)
         
-        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: fileNameFolder)
-        row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.value = fileNameFolder
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-
-        row.cellConfig["imageView.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.customerDefault, size: 25)
+//        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: fileNameFolder)
+//        row.action.formSelector = #selector(changeDestinationFolder(_:))
+//        row.value = fileNameFolder
+//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+//
+//        row.cellConfig["imageView.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.customerDefault, size: 25)
+//
+//        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
+//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
         
-        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
+        
+        
+        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: "")
+        row.action.formSelector = #selector(changeDestinationFolder(_:))
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
+        
+        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
+        row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView //photos
+        row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
+        row.cellConfig["textLabel.text"] = ""
 
         section.addFormRow(row)
         
@@ -124,17 +139,28 @@ import NCCommunication
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
         form.addFormSection(section)
         
-        row = XLFormRowDescriptor(tag: "fileName", rowType: XLFormRowDescriptorTypeAccount, title: NSLocalizedString("_filename_", comment: ""))
-        row.value = fileName
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+//        row = XLFormRowDescriptor(tag: "fileName", rowType: XLFormRowDescriptorTypeAccount, title: NSLocalizedString("_filename_", comment: ""))
+//        row.value = fileName
+//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+//
+//        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
+//        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textField.textColor"] = NCBrandColor.shared.textView
+//
+//        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
+//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
         
-        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textField.textColor"] = NCBrandColor.shared.textView
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = NCCreateDocumentCustomTextField.self
         
-        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = NCCreateDocumentCustomTextField.self
+
+        row.cellConfigAtConfigure["backgroundColor"] = NCBrandColor.shared.backgroundForm;
+        row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["fileNameTextField.placeholder"] = self.fileName
         
         section.addFormRow(row)
         
@@ -228,10 +254,32 @@ import NCCommunication
             fileNameFolder = (serverUrl as NSString).lastPathComponent
         }
         
-        let buttonDestinationFolder : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
-        buttonDestinationFolder.title = fileNameFolder
+//        let buttonDestinationFolder : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
+//        buttonDestinationFolder.title = fileNameFolder
+        
+        let row : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
+        row.cellConfig["photoLabel.text"] = fileNameFolder
         
         self.tableView.reloadData()
+    }
+    
+    override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
+        
+        super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)
+        
+        if formRow.tag == "fileName" {
+            
+            self.form.delegate = nil
+            
+            if let fileNameNew = formRow.value {
+                self.fileName = CCUtility.removeForbiddenCharactersServer(fileNameNew as? String)
+            }
+            
+            formRow.value = self.fileName
+            //self.updateFormRow(formRow)
+            
+            self.form.delegate = self
+        }
     }
     
     @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {
@@ -261,23 +309,23 @@ import NCCommunication
         }
         templateIdentifier = selectTemplate.identifier
 
-        let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
-        guard var fileNameForm = rowFileName.value else {
-            return
-        }
+        //let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
+//        guard var fileNameForm = self.fileName? else {
+//            return
+//        }
         
-        if fileNameForm as! String == "" {
+        if fileName as! String == "" {
             return
         } else {
             
-            let result = NCCommunicationCommon.shared.getInternalType(fileName: fileNameForm as! String, mimeType: "", directory: false)
+            let result = NCCommunicationCommon.shared.getInternalType(fileName: fileName as! String, mimeType: "", directory: false)
             if NCUtility.shared.isDirectEditing(account: appDelegate.account, contentType: result.mimeType) == nil {
-                fileNameForm = (fileNameForm as! NSString).deletingPathExtension + "." + fileNameExtension
+                fileName = (fileName as! NSString).deletingPathExtension + "." + fileNameExtension
             }
             
-            if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: String(describing: fileNameForm)) != nil {
+            if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: String(describing: fileName)) != nil {
                 
-                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: String(describing: fileNameForm), fileNameView: String(describing: fileNameForm), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false, chunk: false)
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: String(describing: fileName), fileNameView: String(describing: fileName), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false, chunk: false)
                 
                 guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
                 conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
@@ -290,8 +338,8 @@ import NCCommunication
                 
             } else {
                                 
-                let fileNamePath = CCUtility.returnFileNamePath(fromFileName: String(describing: fileNameForm), serverUrl: serverUrl, urlBase: appDelegate.urlBase, account: appDelegate.account)!
-                createDocument(fileNamePath: fileNamePath, fileName: String(describing: fileNameForm))
+                let fileNamePath = CCUtility.returnFileNamePath(fromFileName: String(describing: fileName), serverUrl: serverUrl, urlBase: appDelegate.urlBase, account: appDelegate.account)!
+                createDocument(fileNamePath: fileNamePath, fileName: String(describing: fileName))
             }
         }
     }
