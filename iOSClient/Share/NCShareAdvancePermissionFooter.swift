@@ -12,5 +12,5 @@ class NCShareAdvancePermissionFooter: UIView {
 
     @IBOutlet weak var buttonCancel: UIButton!
     @IBOutlet weak var buttonNext: UIButton!
-    
+ 
 }

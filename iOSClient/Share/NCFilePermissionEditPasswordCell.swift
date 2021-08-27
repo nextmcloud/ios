@@ -28,6 +28,7 @@ class NCFilePermissionEditPasswordCell: XLFormBaseCell , UITextFieldDelegate {
         self.selectionStyle = .none
         self.cellTextField.isSecureTextEntry = true
         switchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
+        self.backgroundColor = NCBrandColor.shared.backgroundView
     }
     
     override func configure() {

@@ -1446,6 +1446,10 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 cell.hideButtonShare(true)
             }
             
+            if tableShare?.shareWith != "" {
+                cell.imageShared.image = cell.imageShared.image?.imageColor(NCBrandColor.shared.customer)
+            }
+            
             return cell
         }
         

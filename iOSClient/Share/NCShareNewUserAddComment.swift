@@ -37,6 +37,8 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = NCBrandColor.shared.backgroundView
+        self.commentTextView.backgroundColor = NCBrandColor.shared.backgroundView
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
             self.imageView.image = getImageMetadata(metadata!)
             self.folderImageView.isHidden = true
@@ -56,9 +58,9 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         self.labelFileName.text = self.metadata?.fileNameView
         self.labelFileName.textColor = NCBrandColor.shared.textView
         if metadata!.favorite {
-            self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 20), for: .normal)
+            self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
         } else {
-            self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 20), for: .normal)
+            self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
         }
         self.labelDescription.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
         
@@ -151,10 +153,10 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
             NCNetworking.shared.favoriteMetadata(metadata, urlBase: appDelegate.urlBase) { (errorCode, errorDescription) in
                 if errorCode == 0 {
                     if !metadata.favorite {
-                        self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 20), for: .normal)
+                        self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
                         self.metadata?.favorite = true
                     } else {
-                        self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 20), for: .normal)
+                        self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
                         self.metadata?.favorite = false
                     }
                 } else {

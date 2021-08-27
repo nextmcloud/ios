@@ -37,11 +37,11 @@ class NCSharePaging: UIViewController {
     private var sharingEnabled = true
     
     @objc var metadata = tableMetadata()
-    @objc var indexPage: Int = 0
+    @objc var indexPage: Int = 2
         
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.view.backgroundColor = NCBrandColor.shared.backgroundView
         // Verify Comments & Sharing enabled
         let serverVersionMajor = NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesVersionMajor)
         let comments = NCManageDatabase.shared.getCapabilitiesServerBool(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesFilesComments, exists: false)
@@ -81,6 +81,12 @@ class NCSharePaging: UIViewController {
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
 
         // Pagination
+//        pagingViewController.view.frame.size.height = 0
+//        pagingViewController.selectedBackgroundColor = .clear
+//        pagingViewController.menuBackgroundColor = .clear
+//        pagingViewController.backgroundColor = .clear
+//        pagingViewController.tabBarItem.ba = .clear
+        
         addChild(pagingViewController)
         view.addSubview(pagingViewController.view)
         pagingViewController.didMove(toParent: self)
@@ -108,6 +114,7 @@ class NCSharePaging: UIViewController {
         let pagingIndexItem = self.pagingViewController(pagingViewController, pagingItemAt: indexPage) as! PagingIndexItem
 //        let pagingIndexItem = self.pagingViewController(pagingViewController, pagingItemAt: 0) as! PagingIndexItem
         self.title = pagingIndexItem.title
+        pagingViewController.collectionView.isHidden = true
         
         changeTheming()
     }
@@ -120,7 +127,7 @@ class NCSharePaging: UIViewController {
         }
         
 //        pagingViewController.menuItemSize = .fixed(width: self.view.bounds.width/3, height: 40)
-        pagingViewController.menuItemSize = .fixed(width: self.view.bounds.width/3, height: 40)
+        pagingViewController.menuItemSize = .fixed(width: 0, height: 10)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -136,13 +143,20 @@ class NCSharePaging: UIViewController {
     //MARK: - NotificationCenter
     
     @objc func changeTheming() {
-        view.backgroundColor = NCBrandColor.shared.backgroundForm
+        view.backgroundColor = NCBrandColor.shared.backgroundView
         
-        pagingViewController.backgroundColor = NCBrandColor.shared.backgroundForm
-        pagingViewController.menuBackgroundColor = NCBrandColor.shared.backgroundForm
-        pagingViewController.selectedBackgroundColor = NCBrandColor.shared.backgroundForm
-        pagingViewController.textColor = NCBrandColor.shared.textView
-        pagingViewController.selectedTextColor = NCBrandColor.shared.textView
+//        pagingViewController.backgroundColor = NCBrandColor.shared.backgroundForm
+//        pagingViewController.menuBackgroundColor = NCBrandColor.shared.backgroundForm
+//        pagingViewController.selectedBackgroundColor = NCBrandColor.shared.backgroundForm
+//        pagingViewController.textColor = NCBrandColor.shared.textView
+//        pagingViewController.selectedTextColor = NCBrandColor.shared.textView
+////        pagingViewController.indicatorColor = NCBrandColor.shared.brandElement
+//        pagingViewController.indicatorColor = .clear
+        pagingViewController.backgroundColor = NCBrandColor.shared.backgroundView
+        pagingViewController.menuBackgroundColor = NCBrandColor.shared.backgroundView
+        pagingViewController.selectedBackgroundColor = NCBrandColor.shared.backgroundView
+        pagingViewController.textColor = NCBrandColor.shared.backgroundView
+        pagingViewController.selectedTextColor = NCBrandColor.shared.backgroundView
 //        pagingViewController.indicatorColor = NCBrandColor.shared.brandElement
         pagingViewController.indicatorColor = .clear
         (pagingViewController.view as! NCSharePagingView).setupConstraints()
@@ -223,6 +237,7 @@ extension NCSharePaging: PagingViewControllerDataSource {
 //        default:
 //            return PagingIndexItem(index: index, title: "")
 //        }
+        
         switch index {
         case NCGlobal.shared.indexPageActivity:
             return PagingIndexItem(index: index, title: NSLocalizedString("", comment: ""))
@@ -233,6 +248,7 @@ extension NCSharePaging: PagingViewControllerDataSource {
         default:
             return PagingIndexItem(index: index, title: "")
         }
+        
     }
    
     func numberOfViewControllers(in pagingViewController: PagingViewController) -> Int {
@@ -278,7 +294,7 @@ class NCShareHeaderViewController: PagingViewController {
 class NCSharePagingView: PagingView {
     
 //    static let HeaderHeight: CGFloat = 250
-    static let HeaderHeight: CGFloat = 350
+    static let HeaderHeight: CGFloat = 320
     var metadata: tableMetadata?
     
     var headerHeightConstraint: NSLayoutConstraint?
@@ -296,7 +312,7 @@ class NCSharePagingView: PagingView {
     override func setupConstraints() {
         
         let headerView = Bundle.main.loadNibNamed("NCShareHeaderView", owner: self, options: nil)?.first as! NCShareHeaderView
-        headerView.backgroundColor = NCBrandColor.shared.backgroundForm
+        headerView.backgroundColor = NCBrandColor.shared.backgroundView
         headerView.fileName.textColor = NCBrandColor.shared.icon
         headerView.labelSharing.textColor = NCBrandColor.shared.icon
         headerView.labelSharingInfo.textColor = NCBrandColor.shared.icon
@@ -323,9 +339,9 @@ class NCSharePagingView: PagingView {
         headerView.fileName.text = metadata?.fileNameView
         headerView.fileName.textColor = NCBrandColor.shared.textView
         if metadata!.favorite {
-            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 20), for: .normal)
+            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
         } else {
-            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 20), for: .normal)
+            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
         }
         headerView.info.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
         addSubview(headerView)
@@ -334,12 +350,12 @@ class NCSharePagingView: PagingView {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         headerView.translatesAutoresizingMaskIntoConstraints = false
         
-//        headerHeightConstraint = headerView.heightAnchor.constraint(
-//            equalToConstant: NCSharePagingView.HeaderHeight
-//        )
         headerHeightConstraint = headerView.heightAnchor.constraint(
-            equalToConstant: metadata!.directory ? 350 : 370
+            equalToConstant: NCSharePagingView.HeaderHeight
         )
+//        headerHeightConstraint = headerView.heightAnchor.constraint(
+//            equalToConstant: metadata!.directory ? 350 : 370
+//        )
         
         headerHeightConstraint?.isActive = true
         
@@ -477,15 +493,15 @@ class NCShareHeaderView: UIView {
     
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var ocId = ""
-
+    
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
             NCNetworking.shared.favoriteMetadata(metadata, urlBase: appDelegate.urlBase) { (errorCode, errorDescription) in
                 if errorCode == 0 {
                     if !metadata.favorite {
-                        self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 20), for: .normal)
+                        self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
                     } else {
-                        self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 20), for: .normal)
+                        self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
                     }
                 } else {
                     NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)

@@ -19,7 +19,7 @@ class NCFilePermissionCell: XLFormButtonCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         self.selectionStyle = .none
-        
+        self.backgroundColor = NCBrandColor.shared.backgroundView
 //        autoUploadSwitchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
         
     }

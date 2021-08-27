@@ -241,6 +241,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
 //        self.headerView = NCShareAdvancePermissionHeader()
         self.headerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?.first as! NCShareAdvancePermissionHeader)
 //        self.headerView.favorite.translatesAutoresizingMaskIntoConstraints = false
+        self.headerView.backgroundColor = NCBrandColor.shared.backgroundView
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
             self.headerView.fullWidthImageView.image = getImageMetadata(metadata!)
             self.headerView.fullWidthImageView.contentMode = .scaleToFill
@@ -263,9 +264,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         self.headerView.fileName.textColor = NCBrandColor.shared.textView
         self.headerView.favorite.addTarget(self, action: #selector(favoriteClicked), for: .touchUpInside)
         if metadata!.favorite {
-            self.headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 20), for: .normal)
+            self.headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
         } else {
-            self.headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 20), for: .normal)
+            self.headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
         }
         self.headerView.info.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
         self.headerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 250)
@@ -290,16 +291,19 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         row = XLFormRowDescriptor(tag: "NCFilePermissionCellRead", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_read_only_", comment: "")
                 
-        if tableShare?.permissions == NCGlobal.shared.permissionCreateShare {
-            
-        } else {
-            // Read Only
-            if CCUtility.isAnyPermission(toEdit: tableShare!.permissions) {
-//                cell.labelQuickStatus.text = NSLocalizedString("_share_editing_", comment: "")
+        if let permission = tableShare?.permissions {
+            if tableShare?.permissions == NCGlobal.shared.permissionCreateShare {
+                
             } else {
-                row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+                // Read Only
+                if CCUtility.isAnyPermission(toEdit: tableShare!.permissions) {
+    //                cell.labelQuickStatus.text = NSLocalizedString("_share_editing_", comment: "")
+                } else {
+                    row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+                }
             }
         }
+        
         if newUser == true || (self.directory == false && self.typeFile != "document") {
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
         }
@@ -493,6 +497,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         section.addFormRow(row)
         
         self.footerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionFooter", owner: self, options: nil)?.first as! NCShareAdvancePermissionFooter)
+        self.footerView.backgroundColor = NCBrandColor.shared.backgroundView
         self.footerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 80)
         self.footerView.buttonCancel.addTarget(self, action: #selector(cancelClicked(_:)), for: .touchUpInside)
         self.footerView.buttonNext.addTarget(self, action: #selector(nextClicked(_:)), for: .touchUpInside)
@@ -632,6 +637,10 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             }
             break
         case "kNMCFilePermissionEditCellExpiration":
+            if let value = newValue as? Bool {
+                self.setExpiration = value
+            }
+            
             if let exp = formRow.value as? NSDate {
                 self.form.delegate = nil
                 self.expirationDate = exp
@@ -777,6 +786,16 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     //
     //                }))
                     
+                    self.present(alert, animated: true)
+                    return
+//                }
+            }
+        }
+        
+        if self.setExpiration == true {
+            if self.self.expirationDateText == nil || self.self.expirationDateText == "" {
+                    let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_expiration", comment: ""), preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
                     self.present(alert, animated: true)
                     return
 //                }
@@ -968,9 +987,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         headerView.fileName.text = metadata?.fileNameView
         headerView.fileName.textColor = NCBrandColor.shared.textView
         if metadata!.favorite {
-            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 20), for: .normal)
+            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
         } else {
-            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 20), for: .normal)
+            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
         }
         headerView.info.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
 //        addSubview(headerView)

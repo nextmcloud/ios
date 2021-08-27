@@ -2741,7 +2741,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2796,7 +2796,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud Notification Service";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2844,7 +2844,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/Share/Share-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/Share/Share-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2894,7 +2894,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/Share/Share-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/Share/Share-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USE_HEADERMAP = YES;
@@ -2949,7 +2949,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3004,7 +3004,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -3060,7 +3060,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_OBJC_BRIDGING_HEADER = "iOSClient/Nextcloud-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3118,7 +3118,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_OBJC_BRIDGING_HEADER = "iOSClient/Nextcloud-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USE_HEADERMAP = YES;

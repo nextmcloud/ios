@@ -27,6 +27,7 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
         self.cellTextField.isEnabled = false
         self.selectionStyle = .none
         switchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
+        self.backgroundColor = NCBrandColor.shared.backgroundView
     }
     
     override func configure() {
