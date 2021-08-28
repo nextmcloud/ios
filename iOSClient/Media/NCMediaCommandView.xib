@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina3_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -135,6 +135,7 @@
                     <blurEffect style="regular"/>
                 </visualEffectView>
             </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="i1s-Qa-dG1" firstAttribute="leading" secondItem="IxY-xH-yZQ" secondAttribute="trailing" constant="8" id="Owq-aa-Sr6"/>
@@ -145,7 +146,6 @@
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="enp-xt-Y5y" secondAttribute="trailing" constant="8" id="rSU-Dz-YXW"/>
                 <constraint firstItem="enp-xt-Y5y" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="8" id="z6I-sd-mmD"/>
             </constraints>
-            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <connections>
                 <outlet property="buttonControlWidthConstraint" destination="wkm-j1-5v4" id="SHm-F2-NjB"/>
                 <outlet property="controlButtonView" destination="i1s-Qa-dG1" id="5q4-uE-oC5"/>
@@ -163,7 +163,7 @@
     <resources>
         <image name="more" width="425" height="425"/>
         <image name="plus-slash-minus" width="512" height="512"/>
-        <image name="zoomInMedia" width="512" height="512"/>
-        <image name="zoomOutMedia" width="512" height="512"/>
+        <image name="zoomInMedia" width="24" height="24"/>
+        <image name="zoomOutMedia" width="24" height="24"/>
     </resources>
 </document>

@@ -779,14 +779,14 @@ extension NCShare: UITableViewDataSource {
                 let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + tableShare.shareWith + ".png"
                 if FileManager.default.fileExists(atPath: fileNameLocalPath) {
                     if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
+//                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
 //                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
                     }
                 } else {
                     NCCommunication.shared.downloadAvatar(userID: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
                             if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
+//                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
 //                                cell.imageItem.image = UIImage(named: "cloudUpload")?.image(color: NCBrandColor.shared.icon, size: 30)
                             }
                         }
