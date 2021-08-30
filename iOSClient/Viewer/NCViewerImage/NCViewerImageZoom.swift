@@ -58,7 +58,9 @@ class NCViewerImageZoom: UIViewController {
     private var startImageViewBottomConstraint: CGFloat = 0
     private var startPoint = CGPoint.zero
     private var topPoint = CGPoint.zero
-    private var fram: CGRect!
+    
+
+    // MARK: - View Life Cycle
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -98,7 +100,6 @@ class NCViewerImageZoom: UIViewController {
         
         updateZoomScale()
         centreConstraints()
-        NotificationCenter.default.addObserver(self, selector: #selector(rotateImage), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationImagePreviewRotateImage), object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -200,6 +201,14 @@ class NCViewerImageZoom: UIViewController {
                     self.updateZoomScale()
                     self.centreConstraints()
                 }
+            } else if detailView.isSavedContraint() {
+                UIView.animate(withDuration: 0.3) {
+                    self.imageViewTopConstraint.constant = self.detailView.imageViewTopConstraintConstant
+                    self.imageViewBottomConstraint.constant = self.detailView.imageViewBottomConstraintConstant
+                    self.detailViewTopConstraint.constant = self.detailView.detailViewTopConstraintConstant
+                    self.view.layoutIfNeeded()
+                } completion: { (_) in
+                }
             }
             
         case .changed:
@@ -231,11 +240,14 @@ class NCViewerImageZoom: UIViewController {
                         self.detailViewTopConstraint.constant = -self.imageViewBottomConstraint.constant
                         self.view.layoutIfNeeded()
                     } completion: { (_) in
-                        //end.
+                        // Save detail constraints
+                        self.detailView.imageViewTopConstraintConstant = self.imageViewTopConstraint.constant
+                        self.detailView.imageViewBottomConstraintConstant = self.imageViewBottomConstraint.constant
+                        self.detailView.detailViewTopConstraintConstant = self.detailViewTopConstraint.constant
                     }
                 }
                 
-                detailView.show(textColor: self.viewerImage?.textColor)
+               // detailView.show(textColor: self.viewerImage?.textColor)
             }
             
             // CLOSE DETAIL
@@ -286,47 +298,7 @@ class NCViewerImageZoom: UIViewController {
         let contentHeight = yOffset * 2 + imageView.frame.height
         scrollView.contentSize = CGSize(width: scrollView.contentSize.width, height: contentHeight)
     }
-    
-    @objc func rotateImage() {
-        let image = imageView.image?.rotateOriginal(radians: .pi/2)
-        imageView.image = image
-        let data = image?.pngData()
-        
-        let path = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileName)!)
-        do {
-            try data?.write(to: path)
-        } catch  {
-            print("Unable to save file")
-        }
-        //        NCManageDatabase.shared.updateMetadatas([metadata], metadatasResult: [metadata])
-    }
-
 }
-
-extension UIImage {
-    func rotateOriginal(radians: Float) -> UIImage? {
-        var newSize = CGRect(origin: CGPoint.zero, size: self.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
-        // Trim off the extremely small float value to prevent core graphics from rounding it up
-        newSize.width = floor(newSize.width)
-        newSize.height = floor(newSize.height)
-
-        UIGraphicsBeginImageContextWithOptions(newSize, false, self.scale)
-        let context = UIGraphicsGetCurrentContext()!
-
-        // Move origin to middle
-        context.translateBy(x: newSize.width/2, y: newSize.height/2)
-        // Rotate around middle
-        context.rotate(by: CGFloat(radians))
-        // Draw the image at its center
-        self.draw(in: CGRect(x: -self.size.width/2, y: -self.size.height/2, width: self.size.width, height: self.size.height))
-
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-
-        return newImage
-    }
-}
-
 
 extension NCViewerImageZoom: UIScrollViewDelegate {
     

@@ -21,7 +21,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import MapKit
 
 class NCViewerImageDetailView: UIView {
@@ -50,6 +50,10 @@ class NCViewerImageDetailView: UIView {
     var heightMap: CGFloat = 0
     var size: Int64 = 0
     var image: UIImage?
+    
+    var imageViewTopConstraintConstant: CGFloat = 0
+    var imageViewBottomConstraintConstant: CGFloat = 0
+    var detailViewTopConstraintConstant: CGFloat = 0
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -81,10 +85,18 @@ class NCViewerImageDetailView: UIView {
     
     func hide() {
         isHidden = true
+        
+        imageViewTopConstraintConstant = 0
+        imageViewBottomConstraintConstant = 0
+        detailViewTopConstraintConstant = 0
     }
     
     func isShow() -> Bool {
         return !isHidden
+    }
+    
+    func isSavedContraint() -> Bool {
+        return imageViewTopConstraintConstant != 0 && imageViewBottomConstraintConstant != 0 && detailViewTopConstraintConstant != 0 
     }
     
     //MARK: - EXIF

@@ -21,12 +21,14 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+
+import UIKit
 import FloatingPanel
 import NCCommunication
 
 extension NCViewer {
 
-    func toggleMenu(viewController: UIViewController, metadata: tableMetadata, webView: Bool) {
+    func toggleMenu(viewController: UIViewController, metadata: tableMetadata, webView: Bool, imageIcon: UIImage?) {
         
         let menuViewController = UIStoryboard.init(name: "NCMenu", bundle: nil).instantiateInitialViewController() as! NCMenu
         var actions = [NCMenuAction]()
@@ -50,6 +52,9 @@ extension NCViewer {
         } else {
             titleDelete = NSLocalizedString("_delete_file_", comment: "")
         }
+        
+
+        let isFolderEncrypted = CCUtility.isFolderEncrypted(metadata.serverUrl, e2eEncrypted: metadata.e2eEncrypted, account: metadata.account, urlBase: metadata.urlBase)
         
         //
         // FAVORITE
@@ -125,6 +130,7 @@ extension NCViewer {
 //                )
 //            )
 //        }
+
         
         //
         // OPEN IN
@@ -134,6 +140,7 @@ extension NCViewer {
                 NCMenuAction(
                     title: NSLocalizedString("_open_in_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "open_file"),
+
                     action: { menuAction in
                         NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorOpenIn)
                     }
@@ -144,7 +151,7 @@ extension NCViewer {
         //
         // PRINT
         //
-        if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.contentType == "application/pdf" {
+        if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.contentType == "application/pdf" || metadata.contentType == "com.adobe.pdf" {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_print_", comment: ""),
@@ -198,8 +205,9 @@ extension NCViewer {
                             
                             vcRename.metadata = metadata
                             vcRename.disableChangeExt = true
-
-                            let popup = NCPopupViewController(contentController: vcRename, popupWidth: 300, popupHeight: 360)
+                            vcRename.imagePreview = imageIcon
+                            
+                            let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
                             
                             viewController.present(popup, animated: true)
                         }
@@ -240,6 +248,7 @@ extension NCViewer {
 //                )
 //            )
 //        }
+
         
         //
         // COPY
@@ -283,6 +292,7 @@ extension NCViewer {
                         icon: NCUtility.shared.loadImage(named: "cloudDownload"),
                         action: { menuAction in
                             NCNetworking.shared.download(metadata: metadata, activityIndicator: false, selector: "") { (_) in }
+
                         }
                     )
                 )
@@ -292,16 +302,34 @@ extension NCViewer {
         //
         // PDF
         //
-        if (metadata.typeFile == NCGlobal.shared.metadataTypeFileDocument && metadata.contentType == "application/pdf" ) {
+
+        if metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_search_", comment: ""),
-                    icon: UIImage(named: "search")!.image(color: NCBrandColor.shared.icon, size: 50),
+                    icon: UIImage(named: "search")!.image(color: NCBrandColor.shared.gray, size: 50),
                     action: { menuAction in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuSearchTextPDF)
                     }
                 )
             )
+        }
+        
+        //
+        // MODIFY
+        //
+        if #available(iOS 13.0, *) {
+            if !isFolderEncrypted && metadata.contentType != "image/gif" && (metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" || metadata.typeFile == NCGlobal.shared.metadataTypeFileImage) {
+                actions.append(
+                    NCMenuAction(
+                        title: NSLocalizedString("_modify_", comment: ""),
+                        icon: NCUtility.shared.loadImage(named: "pencil.tip.crop.circle"),
+                        action: { menuAction in
+                            NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
+                        }
+                    )
+                )
+            }
         }
         
         //

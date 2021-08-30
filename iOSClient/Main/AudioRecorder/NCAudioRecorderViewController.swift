@@ -24,12 +24,11 @@
 //  Based on code of Venkat Kukunuru
 //  --------------------------------
 
-import Foundation
 import UIKit
 import AVFoundation
 import QuartzCore
 
-@objc protocol NCAudioRecorderViewControllerDelegate : class {
+@objc protocol NCAudioRecorderViewControllerDelegate : AnyObject {
     func didFinishRecording(_ viewController: NCAudioRecorderViewController, fileName: String)
     func didFinishWithoutRecording(_ viewController: NCAudioRecorderViewController, fileName: String)
 }
@@ -40,43 +39,45 @@ class NCAudioRecorderViewController: UIViewController , NCAudioRecorderDelegate 
     var recording: NCAudioRecorder!
     var recordDuration: TimeInterval = 0
     var fileName: String = ""
-    
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+
     @IBOutlet weak var contentContainerView: UIView!
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var startStopLabel: UILabel!
     @IBOutlet weak var voiceRecordHUD: VoiceRecordHUD!
     
-    // MARK: View Life Cycle
-    
+    // MARK: - View Life Cycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        voiceRecordHUD.update(0.0)
+        durationLabel.text = ""
+        startStopLabel.text = NSLocalizedString("_voice_memo_start_", comment: "")
+        
+        changeTheming()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        contentContainerView.backgroundColor = UIColor.lightGray
-        voiceRecordHUD.update(0.0)
-        voiceRecordHUD.fillColor = UIColor.green
-        durationLabel.text = ""
-        startStopLabel.text = NSLocalizedString("_voice_memo_start_", comment: "")
     }
     
-    func createRecorder(fileName: String) {
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
         
-        self.fileName = fileName
-        recording = NCAudioRecorder(to: fileName)
-        recording.delegate = self
-
-        DispatchQueue.global().async {
-            // Background thread
-            do {
-                try self.recording.prepare()
-            } catch {
-                print(error)
-            }
-        }
+        changeTheming()
     }
+    
+    // MARK: - Colors
+    
+    func changeTheming() {
+        
+        view.backgroundColor = .clear
+        contentContainerView.backgroundColor = UIColor.lightGray
+        voiceRecordHUD.fillColor = UIColor.green
+    }
+    
+    // MARK: - Action
     
     @IBAction func touchViewController() {
         
@@ -84,6 +85,7 @@ class NCAudioRecorderViewController: UIViewController , NCAudioRecorderDelegate 
             startStop()
         } else {
             dismiss(animated: true) {
+                self.appDelegate.setAVAudioSession()
                 self.delegate?.didFinishWithoutRecording(self, fileName: self.fileName)
             }
         }
@@ -98,14 +100,34 @@ class NCAudioRecorderViewController: UIViewController , NCAudioRecorderDelegate 
             voiceRecordHUD.update(0.0)
         
             dismiss(animated: true) {
+                self.appDelegate.setAVAudioSession()
                 self.delegate?.didFinishRecording(self, fileName: self.fileName)
             }
+            
         } else {
             
             recordDuration = 0
             do {
                 try recording.record()
                 startStopLabel.text = NSLocalizedString("_voice_memo_stop_", comment: "")
+            } catch {
+                print(error)
+            }
+        }
+    }
+    
+    // MARK: - Code
+    
+    func createRecorder(fileName: String) {
+        
+        self.fileName = fileName
+        recording = NCAudioRecorder(to: fileName)
+        recording.delegate = self
+
+        DispatchQueue.global().async {
+            // Background thread
+            do {
+                try self.recording.prepare()
             } catch {
                 print(error)
             }
@@ -161,7 +183,7 @@ open class NCAudioRecorder : NSObject {
     var recorder: AVAudioRecorder?
     fileprivate var player: AVAudioPlayer?
     fileprivate var link: CADisplayLink?
-    
+
     var metering: Bool {
         return delegate?.responds(to: #selector(NCAudioRecorderDelegate.audioMeterDidUpdate(_:))) == true
     }
@@ -171,11 +193,20 @@ open class NCAudioRecorder : NSObject {
     public init(to: String) {
         url = URL(fileURLWithPath: NCAudioRecorder.directory).appendingPathComponent(to)
         super.init()
+        
+        do {
+            try session.setCategory(.playAndRecord, mode: .default)
+            try session.overrideOutputAudioPort(AVAudioSession.PortOverride.speaker)
+            try session.setActive(true)
+        } catch {
+            print(error)
+        }
     }
     
     // MARK: - Record
     
     open func prepare() throws {
+        
         let settings: [String: AnyObject] = [
             AVFormatIDKey : NSNumber(value: Int32(kAudioFormatAppleLossless) as Int32),
             AVEncoderAudioQualityKey: AVAudioQuality.max.rawValue as AnyObject,
@@ -191,37 +222,20 @@ open class NCAudioRecorder : NSObject {
     }
     
     open func record() throws {
+        
         if recorder == nil {
             try prepare()
         }
         
-        try session.setCategory(.playAndRecord, mode: .default)
-        try session.overrideOutputAudioPort(AVAudioSession.PortOverride.speaker)
-        
-        recorder?.record()
-        state = .record
-        
-        if metering {
-            startMetering()
+        self.state = .record
+        if self.metering {
+            self.startMetering()
         }
-    }
-    
-    open func play() throws {
-        if recorder == nil {
-            try prepare()
-        }
-        
-        try session.setCategory(.playback, mode: .default)
-        try AVAudioSession.sharedInstance().setActive(true)
-
-        player = try AVAudioPlayer(contentsOf: url)
-        player?.prepareToPlay()
-
-        player?.play()
-        state = .play
+        self.recorder?.record()
     }
     
     open func stop() {
+        
         switch state {
         case .play:
             player?.stop()
@@ -250,11 +264,13 @@ open class NCAudioRecorder : NSObject {
     }
     
     fileprivate func startMetering() {
+        
         link = CADisplayLink(target: self, selector: #selector(NCAudioRecorder.updateMeter))
         link?.add(to: RunLoop.current, forMode: RunLoop.Mode.common)
     }
     
     fileprivate func stopMetering() {
+        
         link?.invalidate()
         link = nil
     }
@@ -276,6 +292,8 @@ class VoiceRecordHUD: UIView {
         }
     }
     
+    // MARK: - View Life Cycle
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         image = UIImage(named: "microphone")

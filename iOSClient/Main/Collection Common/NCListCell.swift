@@ -47,7 +47,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     @IBOutlet weak var progressView: UIProgressView!
     
     @IBOutlet weak var separator: UIView!
-    
+
+    @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
+
     var filePreviewImageView : UIImageView {
         get{
          return imageItem
@@ -85,6 +87,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         
         separator.backgroundColor = NCBrandColor.shared.separator
         self.labelInfo.textColor = NCBrandColor.shared.commonViewInfoText
+        separatorHeightConstraint.constant = 0.5
     }
     
     override func prepareForReuse() {
@@ -139,14 +142,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
     func selected(_ status: Bool) {
         if status {
             imageSelect.image = NCBrandColor.cacheImages.checkedYes
-            
+
             let blurEffect = UIBlurEffect(style: .extraLight)
             let blurEffectView = UIVisualEffectView(effect: blurEffect)
             blurEffectView.frame = self.bounds
             blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             blurEffectView.backgroundColor = NCBrandColor.shared.brandElement.withAlphaComponent(0.2)
             backgroundView = blurEffectView
-            
             separator.isHidden = true
         } else {
             imageSelect.image = NCBrandColor.cacheImages.checkedNo
@@ -163,12 +165,22 @@ protocol NCListCellDelegate {
     func longPressListItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer)
 }
 
+// optional func
+extension NCListCellDelegate {
+    func tapShareListItem(with objectId: String, sender: Any) {}
+    func tapMoreListItem(with objectId: String, namedButtonMore: String, image: UIImage?, sender: Any) {}
+    func longPressMoreListItem(with objectId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) {}
+    func longPressListItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) {}
+}
+
 // MARK: - List Layout
 
 class NCListLayout: UICollectionViewFlowLayout {
     
     var itemHeight: CGFloat = 60
-    
+
+    // MARK: - View Life Cycle
+
     override init() {
         super.init()
         

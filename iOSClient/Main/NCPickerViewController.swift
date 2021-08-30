@@ -6,7 +6,10 @@
 //  Copyright (c) 2018 Marino Faggiana. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+<<<<<<< HEAD
 //  Author TSI-mc
+=======
+>>>>>>> feature_branded_client_4
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -22,7 +25,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import TLPhotoPicker
 import MobileCoreServices
 
@@ -73,6 +76,8 @@ class NCPhotosPickerViewController: NSObject {
         }
         configure.selectedColor = NCBrandColor.shared.brandElement
         configure.singleSelectedMode = singleSelectedMode
+
+        configure.allowedAlbumCloudShared = true
         
         let viewController = customPhotoPickerViewController(withTLPHAssets: { (assets) in
             
@@ -87,15 +92,15 @@ class NCPhotosPickerViewController: NSObject {
         }, didCancel: nil)
         
         viewController.didExceedMaximumNumberOfSelection = { (picker) in
-            NCContentPresenter.shared.messageNotification("_info_", description: "_limited_dimension_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.ErrorInternalError)
+            NCContentPresenter.shared.messageNotification("_info_", description: "_limited_dimension_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
         }
         
         viewController.handleNoAlbumPermissions = { (picker) in
-            NCContentPresenter.shared.messageNotification("_info_", description: "_denied_album_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.ErrorInternalError)
+            NCContentPresenter.shared.messageNotification("_info_", description: "_denied_album_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
         }
         
         viewController.handleNoCameraPermissions = { (picker) in
-            NCContentPresenter.shared.messageNotification("_info_", description: "_denied_camera_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.ErrorInternalError)
+            NCContentPresenter.shared.messageNotification("_info_", description: "_denied_camera_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
         }
         
         viewController.configure = configure
@@ -156,7 +161,7 @@ class NCDocumentPickerViewController: NSObject, UIDocumentPickerDelegate {
                     
                     do {
                         try data?.write(to: path)
-                        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: fileName, fileNameView: fileName, ocId: ocId, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false, chunk: false)
+                        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: fileName, fileNameView: fileName, ocId: ocId, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
                         
                         metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
                         metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
@@ -176,14 +181,13 @@ class NCDocumentPickerViewController: NSObject, UIDocumentPickerDelegate {
                         } else {
                             
                             appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
-                            appDelegate.adjust.trackEvent(TriggerEvent(FileUpload.rawValue))
                         }
                         
                     } catch {
-                        NCContentPresenter.shared.messageNotification("_error_", description: "_write_file_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.ErrorInternalError)
+                        NCContentPresenter.shared.messageNotification("_error_", description: "_write_file_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
                     }
                 } else {
-                    NCContentPresenter.shared.messageNotification("_error_", description: "_read_file_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.ErrorInternalError)
+                    NCContentPresenter.shared.messageNotification("_error_", description: "_read_file_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
                 }
             }
         }

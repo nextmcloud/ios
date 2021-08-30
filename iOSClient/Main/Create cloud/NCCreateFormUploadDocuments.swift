@@ -21,13 +21,21 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+
+import UIKit
 import NCCommunication
 
 // MARK: -
 
 @objc class NCCreateFormUploadDocuments: XLFormViewController, NCSelectDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, NCCreateFormUploadConflictDelegate {
+
+
+    @IBOutlet weak var indicator: UIActivityIndicatorView!
+    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var collectionViewHeigth: NSLayoutConstraint!
     
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+
     var editorId = ""
     var creatorId = ""
     var typeTemplate = ""
@@ -40,22 +48,15 @@ import NCCommunication
     var listOfTemplate: [NCCommunicationEditorTemplates] = []
     var selectTemplate: NCCommunicationEditorTemplates?
     
-    @IBOutlet weak var indicator: UIActivityIndicatorView!
-    @IBOutlet weak var collectionView: UICollectionView!
-    @IBOutlet weak var collectionViewHeigth: NSLayoutConstraint!
-    
     // Layout
     let numItems = 2
     let sectionInsets: CGFloat = 10
     let highLabelName: CGFloat = 20
     
-    let appDelegate = UIApplication.shared.delegate as! AppDelegate
-
     // MARK: - View Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account) {
             fileNameFolder = "/"
         } else {
@@ -63,7 +64,6 @@ import NCCommunication
         }
         
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
-                
         let cancelButton : UIBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancel))
         let saveButton : UIBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_save_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(save))
         
@@ -73,24 +73,35 @@ import NCCommunication
         
         // title 
         self.title = titleForm
-      
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+
         
         fileName = CCUtility.createFileNameDate("Text", extension: "md")!
 
         changeTheming()
         
+        initializeForm()
+        
         // load the templates available
         getTemplate()
     }
     
-    @objc func changeTheming() {
-        view.backgroundColor = NCBrandColor.shared.backgroundForm
-        collectionView.backgroundColor = NCBrandColor.shared.backgroundForm
-        tableView.backgroundColor = NCBrandColor.shared.backgroundForm
-        collectionView.reloadData()
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        changeTheming()
+    }
+    
+    // MARK: - Theming
+    
+    func changeTheming() {
+        
+        view.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        collectionView.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        tableView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        
         tableView.reloadData()
-        initializeForm()
+        collectionView.reloadData()
     }
     
     // MARK: - Tableview (XLForm)
@@ -241,7 +252,7 @@ import NCCommunication
     
     // MARK: - Action
     
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], buttonType: String, overwrite: Bool) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
         
         guard let serverUrl = serverUrl else {
             return
@@ -299,6 +310,8 @@ import NCCommunication
         viewController.type = ""
 
         navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+        viewController.typeOfCommandView = .selectCreateFolder
+
         self.present(navigationController, animated: true, completion: nil)
     }
     
@@ -309,8 +322,27 @@ import NCCommunication
         }
         templateIdentifier = selectTemplate.identifier
 
-        //let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
-//        guard var fileNameForm = self.fileName? else {
+//<<<<<<< HEAD
+//        //let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
+////        guard var fileNameForm = self.fileName? else {
+////            return
+////        }
+//
+//        if fileName as! String == "" {
+//            return
+//        } else {
+//
+//            let result = NCCommunicationCommon.shared.getInternalType(fileName: fileName as! String, mimeType: "", directory: false)
+//            if NCUtility.shared.isDirectEditing(account: appDelegate.account, contentType: result.mimeType) == nil {
+//                fileName = (fileName as! NSString).deletingPathExtension + "." + fileNameExtension
+//            }
+//
+//            if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: String(describing: fileName)) != nil {
+//
+//                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: String(describing: fileName), fileNameView: String(describing: fileName), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false, chunk: false)
+//=======
+//        let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
+//        guard var fileNameForm = rowFileName.value else {
 //            return
 //        }
         
@@ -318,14 +350,14 @@ import NCCommunication
             return
         } else {
             
-            let result = NCCommunicationCommon.shared.getInternalType(fileName: fileName as! String, mimeType: "", directory: false)
-            if NCUtility.shared.isDirectEditing(account: appDelegate.account, contentType: result.mimeType) == nil {
-                fileName = (fileName as! NSString).deletingPathExtension + "." + fileNameExtension
+            let result = NCCommunicationCommon.shared.getInternalType(fileName: fileNameForm as! String, mimeType: "", directory: false)
+            if NCUtility.shared.isDirectEditing(account: appDelegate.account, contentType: result.mimeType).count == 0 {
+                fileNameForm = (fileNameForm as! NSString).deletingPathExtension + "." + fileNameExtension
             }
             
-            if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: String(describing: fileName)) != nil {
+            if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: String(describing: fileNameForm)) != nil {
                 
-                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: String(describing: fileName), fileNameView: String(describing: fileName), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false, chunk: false)
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: String(describing: fileNameForm), fileNameView: String(describing: fileNameForm), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
                 
                 guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
                 conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
@@ -337,7 +369,7 @@ import NCCommunication
                 self.present(conflictViewController, animated: true, completion: nil)
                 
             } else {
-                                
+
                 let fileNamePath = CCUtility.returnFileNamePath(fromFileName: String(describing: fileName), serverUrl: serverUrl, urlBase: appDelegate.urlBase, account: appDelegate.account)!
                 createDocument(fileNamePath: fileNamePath, fileName: String(describing: fileName))
             }
@@ -379,10 +411,10 @@ import NCCommunication
                         let results = NCCommunicationCommon.shared.getInternalType(fileName: fileName, mimeType: "", directory: false)
                         
                         self.dismiss(animated: true, completion: {
-                            let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileName, fileNameView: fileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url ?? "", contentType: results.mimeType, livePhoto: false, chunk: false)
+                            let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileName, fileNameView: fileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url ?? "", contentType: results.mimeType, livePhoto: false)
                             
                             if let viewController = self.appDelegate.activeViewController {
-                                NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata])
+                                NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata], imageIcon: nil)
                             }
                         })
                     }
@@ -404,10 +436,11 @@ import NCCommunication
                     self.dismiss(animated: true, completion: {
                     
                         let createFileName = (fileName as NSString).deletingPathExtension + "." + self.fileNameExtension
-                        let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: createFileName, fileNameView: createFileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url!, contentType: "", livePhoto: false, chunk: false)
+
+                        let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: createFileName, fileNameView: createFileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url!, contentType: "", livePhoto: false)
                     
                         if let viewController = self.appDelegate.activeViewController {
-                            NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata])
+                            NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata], imageIcon: nil)
                         }
                    })
                    

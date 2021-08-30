@@ -41,6 +41,8 @@ class NCTrashListCell: UICollectionViewCell {
     
     @IBOutlet weak var separator: UIView!
 
+    @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
+
     var delegate: NCTrashListCellDelegate?
     
     var objectId = ""
@@ -49,13 +51,15 @@ class NCTrashListCell: UICollectionViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
        
-        imageRestore.image =  UIImage(named: "restore")!.image(color: NCBrandColor.shared.optionItem, size: 25)
-        imageMore.image = UIImage(named: "more")!.image(color: NCBrandColor.shared.optionItem, size: 25)
+        imageRestore.image = NCBrandColor.cacheImages.buttonRestore
+        imageMore.image = NCBrandColor.cacheImages.buttonMore
         
         imageItem.layer.cornerRadius = 6
         imageItem.layer.masksToBounds = true
         
         separator.backgroundColor = NCBrandColor.shared.separator
+
+        separatorHeightConstraint.constant = 0.5
     }
     
     @IBAction func touchUpInsideMore(_ sender: Any) {

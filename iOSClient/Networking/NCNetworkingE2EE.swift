@@ -19,7 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import OpenSSL
 import NCCommunication
 import CFNetwork
@@ -43,8 +43,7 @@ import Alamofire
         
         fileNameFolder = NCUtilityFileSystem.shared.createFileName(fileNameFolder, serverUrl: serverUrl, account: account)
         if fileNameFolder.count == 0 {
-            completion(0, "")
-            return
+            return completion(0, "")
         }
         fileNameIdentifier = CCUtility.generateRandomIdentifier()
         fileNameFolderUrl = serverUrl + "/" + fileNameIdentifier
@@ -59,8 +58,7 @@ import Alamofire
                             if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: account, serverUrl: serverUrl) {
                                 NCCommunication.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { (_, _, _, _) in }
                             }
-                            completion(NCGlobal.shared.ErrorInternalError, "Error convert ocId")
-                            return
+                            return completion(NCGlobal.shared.errorInternalError, "Error convert ocId")
                         }
                         NCCommunication.shared.markE2EEFolder(fileId: fileId, delete: false) { (account, errorCode, errorDescription) in
                             if errorCode == 0 {
@@ -98,7 +96,7 @@ import Alamofire
                                     if errorCode == 0 {
                                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCreateFolder, userInfo: nil)
                                     }
-                                    completion(errorCode, errorDescription ?? "")
+                                    completion(errorCode, errorDescription)
                                 }
                                 
                             } else {
@@ -140,7 +138,7 @@ import Alamofire
                             if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: metadata.account, serverUrl: metadata.serverUrl) {
                                 NCCommunication.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { (_, _, _, _) in }
                             }
-                            completion(errorCode, errorDescription ?? "")
+                            completion(errorCode, errorDescription)
                         }
                     } else {
                         // unlock
@@ -163,7 +161,7 @@ import Alamofire
         // verify if exists the new fileName
         if NCManageDatabase.shared.getE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", metadata.account, metadata.serverUrl, fileNameNew)) != nil {
             
-            completion(NCGlobal.shared.ErrorInternalError, "_file_already_exists_")
+            completion(NCGlobal.shared.errorInternalError, "_file_already_exists_")
 
         } else {
             
@@ -194,20 +192,20 @@ import Alamofire
     
     //MARK: - Upload
     
-    func upload(metadata: tableMetadata, account: tableAccount, completion: @escaping (_ errorCode: Int, _ errorDescription: String)->()) {
+    func upload(metadata: tableMetadata, account: tableAccount, start: @escaping () -> Void, completion: @escaping (_ errorCode: Int, _ errorDescription: String)->()) {
         
         let objectE2eEncryption = tableE2eEncryption()
         var key: NSString?, initializationVector: NSString?, authenticationTag: NSString?
         let ocIdTemp = metadata.ocId
         let serverUrl = metadata.serverUrl
-        
+                
         // Verify max size
         if metadata.size > NCGlobal.shared.e2eeMaxFileSize {
             NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
 
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":NCGlobal.shared.ErrorInternalError, "errorDescription":"E2E Error file too big"])
-            completion(NCGlobal.shared.ErrorInternalError, "E2E Error file too big")
-            return
+            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":NCGlobal.shared.errorInternalError, "errorDescription":"E2E Error file too big"])
+            start()
+            return completion(NCGlobal.shared.errorInternalError, "E2E Error file too big")
         }
         
         // Update metadata
@@ -225,9 +223,9 @@ import Alamofire
         if NCEndToEndEncryption.sharedManager()?.encryptFileName(metadata.fileNameView, fileNameIdentifier: metadata.fileName, directory: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId), key: &key, initializationVector: &initializationVector, authenticationTag: &authenticationTag) == false {
             
             NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":NCGlobal.shared.ErrorInternalError, "errorDescription":"_e2e_error_create_encrypted_"])
-            completion(NCGlobal.shared.ErrorInternalError, "_e2e_error_create_encrypted_")
-            return
+            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":NCGlobal.shared.errorInternalError, "errorDescription":"_e2e_error_create_encrypted_"])
+            start()
+            return completion(NCGlobal.shared.errorInternalError, "_e2e_error_create_encrypted_")
         }
         
         if let result = NCManageDatabase.shared.getE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", metadata.account, serverUrl)) {
@@ -255,12 +253,17 @@ import Alamofire
         if let getMetadata = NCManageDatabase.shared.getMetadataFromOcId(ocIdTemp) {
             metadata = getMetadata
         } else {
-            return
+            start()
+            return completion(NCGlobal.shared.errorInternalError, "_e2e_error_create_encrypted_")
         }
         
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["ocId":metadata.ocId, "serverUrl":metadata.serverUrl])
         
+        NCContentPresenter.shared.noteTop(text: NSLocalizedString("_upload_e2ee_", comment: ""), image: nil, type: NCContentPresenter.messageType.info, delay: NCGlobal.shared.dismissAfterSecond, name: nil)
+        
         NCNetworkingE2EE.shared.sendE2EMetadata(account: metadata.account, serverUrl: serverUrl, fileNameRename: nil, fileNameNewRename: nil, deleteE2eEncryption: nil, urlBase: account.urlBase, upload: true) { (e2eToken, errorCode, errorDescription) in
+            
+            start()
             
             if errorCode == 0 && e2eToken != nil {
                                                 
@@ -275,66 +278,70 @@ import Alamofire
                     
                 }, progressHandler: { (progress) in
                     
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterProgressTask, userInfo: ["account":metadata.account, "ocId":metadata.ocId, "serverUrl":serverUrl, "status":NSNumber(value: NCGlobal.shared.metadataStatusInUpload), "progress":NSNumber(value: progress.fractionCompleted), "totalBytes":NSNumber(value: progress.totalUnitCount), "totalBytesExpected":NSNumber(value: progress.completedUnitCount)])
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterProgressTask, userInfo: ["account":metadata.account, "ocId":metadata.ocId, "fileName":metadata.fileName, "serverUrl":serverUrl, "status":NSNumber(value: NCGlobal.shared.metadataStatusInUpload), "progress":NSNumber(value: progress.fractionCompleted), "totalBytes":NSNumber(value: progress.totalUnitCount), "totalBytesExpected":NSNumber(value: progress.completedUnitCount)])
                     
                 }) { (account, ocId, etag, date, size, allHeaderFields, error, errorCode, errorDescription) in
-                
+                                    
                     NCNetworking.shared.uploadRequest[fileNameLocalPath] = nil
-                    guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-
-                    if error?.isExplicitlyCancelledError ?? false {
                     
-                        CCUtility.removeFile(atPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId))
-                        NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
-                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":errorCode, "errorDescription":""])
+                    if let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) {
+                        
+                        let metadata = tableMetadata.init(value: metadata)
+                        
+                        if error?.isExplicitlyCancelledError ?? false {
+                        
+                            CCUtility.removeFile(atPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId))
+                            NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":errorCode, "errorDescription":""])
+                            completion(0, "")
 
-                    } else if errorCode == 0 && ocId != nil {
-                        
-                        guard let metadataTemp = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-                        let metadata = tableMetadata.init(value: metadataTemp)
-                        
-                        NCUtilityFileSystem.shared.moveFileInBackground(atPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId), toPath: CCUtility.getDirectoryProviderStorageOcId(ocId))
-                        
-                        metadata.date = date ?? NSDate()
-                        metadata.etag = etag ?? ""
-                        metadata.ocId = ocId!
-                        
-                        metadata.session = ""
-                        metadata.sessionError = ""
-                        metadata.sessionTaskIdentifier = 0
-                        metadata.status = NCGlobal.shared.metadataStatusNormal
-                        
-                        NCManageDatabase.shared.addMetadata(metadata)
-                        NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
-                        NCManageDatabase.shared.addLocalFile(metadata: metadata)
-                        
-                        NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
-                                                
-                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp ,"errorCode":errorCode, "errorDescription":""])
-                                                                                    
-                    } else {
-                        
-                        if errorCode == 401 || errorCode == 403 {
-                        
-                            NCNetworkingCheckRemoteUser.shared.checkRemoteUser(account: metadata.account)
-                            NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
-                        
-                        } else if errorCode == Int(CFNetworkErrors.cfurlErrorServerCertificateUntrusted.rawValue) {
-                        
-                            CCUtility.setCertificateError(metadata.account, error: true)
-                            NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
-                                                
+                        } else if errorCode == 0 && ocId != nil {
+                            
+                            NCUtilityFileSystem.shared.moveFileInBackground(atPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId), toPath: CCUtility.getDirectoryProviderStorageOcId(ocId))
+                            
+                            metadata.date = date ?? NSDate()
+                            metadata.etag = etag ?? ""
+                            metadata.ocId = ocId!
+                            
+                            metadata.session = ""
+                            metadata.sessionError = ""
+                            metadata.sessionTaskIdentifier = 0
+                            metadata.status = NCGlobal.shared.metadataStatusNormal
+                            
+                            NCManageDatabase.shared.addMetadata(metadata)
+                            NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
+                            NCManageDatabase.shared.addLocalFile(metadata: metadata)
+                            
+                            NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+                                                    
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp ,"errorCode":errorCode, "errorDescription":""])
+                            
                         } else {
-                        
-                            NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
+                            
+                            if errorCode == 401 || errorCode == 403 {
+                            
+                                #if !EXTENSION
+                                NCNetworkingCheckRemoteUser.shared.checkRemoteUser(account: metadata.account)
+                                #endif
+                                NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
+                            
+                            } else if errorCode == Int(CFNetworkErrors.cfurlErrorServerCertificateUntrusted.rawValue) {
+                            
+                                CCUtility.setCertificateError(metadata.account)
+                                NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
+                                                    
+                            } else {
+                            
+                                NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
+                            }
+                            
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":errorCode, "errorDescription":""])
                         }
-                        
-                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":errorCode, "errorDescription":""])
                     }
                     
-                    NCNetworkingE2EE.shared.unlock(account: metadata.account, serverUrl: serverUrl) { (_, _, _, _) in }
-        
-                    completion(errorCode, errorDescription)                    
+                    NCNetworkingE2EE.shared.unlock(account: metadata.account, serverUrl: serverUrl) { (_, _, _, _) in
+                        completion(errorCode, errorDescription)
+                    }
                 }
                 
             } else {
@@ -342,10 +349,9 @@ import Alamofire
                 if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocIdTemp) {
                     NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
 
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":errorCode, "errorDescription":errorDescription ?? ""])
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":errorCode, "errorDescription":errorDescription])
                 }
-                
-                completion(errorCode, errorDescription ?? "")
+                completion(errorCode, errorDescription)
             }
         }
     }
@@ -357,8 +363,7 @@ import Alamofire
         var e2eToken: String?
         
         guard let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl)) else {
-            completion(nil, nil, 0, "")
-            return
+            return completion(nil, nil, 0, "")
         }
         
         if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: account, serverUrl: serverUrl) {
@@ -378,8 +383,7 @@ import Alamofire
         var e2eToken: String?
         
         guard let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl)) else {
-            completion(nil, nil, 0, "")
-            return
+            return completion(nil, nil, 0, "")
         }
         
         if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: account, serverUrl: serverUrl) {
@@ -394,7 +398,7 @@ import Alamofire
         }
     }
     
-    @objc func sendE2EMetadata(account: String, serverUrl: String, fileNameRename: String?, fileNameNewRename: String?, deleteE2eEncryption : NSPredicate?, urlBase: String, upload: Bool = false, completion: @escaping (_ e2eToken: String?, _ errorCode: Int, _ errorDescription: String?)->()) {
+    @objc func sendE2EMetadata(account: String, serverUrl: String, fileNameRename: String?, fileNameNewRename: String?, deleteE2eEncryption : NSPredicate?, urlBase: String, upload: Bool = false, completion: @escaping (_ e2eToken: String?, _ errorCode: Int, _ errorDescription: String)->()) {
             
         self.lock(account: account, serverUrl: serverUrl) { (directory, e2eToken, errorCode, errorDescription) in
             if errorCode == 0 && e2eToken != nil && directory != nil {
@@ -405,8 +409,7 @@ import Alamofire
                     
                     if errorCode == 0 && e2eMetadata != nil {
                         if !NCEndToEndMetadata.shared.decoderMetadata(e2eMetadata!, privateKey: CCUtility.getEndToEndPrivateKey(account), serverUrl: serverUrl, account: account, urlBase: urlBase) {
-                            completion(e2eToken, NCGlobal.shared.ErrorInternalError, NSLocalizedString("_e2e_error_encode_metadata_", comment: ""))
-                            return
+                            return completion(e2eToken, NCGlobal.shared.errorInternalError, NSLocalizedString("_e2e_error_encode_metadata_", comment: ""))
                         }
                         method = "PUT"
                     }
@@ -441,7 +444,7 @@ import Alamofire
                     }
                 }
             } else {
-                completion(e2eToken, errorCode, errorDescription)
+                completion(e2eToken, errorCode, errorDescription ?? "")
             }
         }
     }

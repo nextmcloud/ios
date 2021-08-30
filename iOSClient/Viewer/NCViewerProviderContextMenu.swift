@@ -21,9 +21,10 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import AVFoundation
 import NCCommunication
+import SVGKit
 
 class NCViewerProviderContextMenu: UIViewController  {
 
@@ -32,34 +33,41 @@ class NCViewerProviderContextMenu: UIViewController  {
     private var audioPlayer: AVAudioPlayer?
     private var metadata: tableMetadata?
     private var metadataLivePhoto: tableMetadata?
+    private var image: UIImage?
+    
+    private let sizeIcon: CGFloat = 150
         
+    // MARK: - View Life Cycle
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    init(metadata: tableMetadata) {
+    init(metadata: tableMetadata, image: UIImage?) {
         super.init(nibName: nil, bundle: nil)
         
         self.metadata = metadata
         self.metadataLivePhoto = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(downloadStartFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadStartFile), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(downloadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(downloadCancelFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadCancelFile), object: nil)
+        self.image = image
         
         if metadata.directory {
-
-            let image = UIImage(named: "folder_nmcloud")!.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width / 2)
-            imageView.image = image
-            imageView.frame = resize(image.size)
+            
+            var imageFolder = UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: sizeIcon*2)
+            
+            if let image = self.image {
+                imageFolder =  image.image(color: NCBrandColor.shared.brandElement, size: sizeIcon*2)
+            }
+            
+            imageView.image = imageFolder
+            imageView.frame = resize(CGSize(width: sizeIcon, height: sizeIcon))
 
         } else {
                          
             // ICON
-            if let image = UIImage.init(named: metadata.iconName)?.resizeImage(size: CGSize(width: UIScreen.main.bounds.width / 2, height: UIScreen.main.bounds.height / 2), isAspectRation: true) {
+            if let image = UIImage.init(named: metadata.iconName)?.resizeImage(size: CGSize(width: sizeIcon*2, height: sizeIcon*2), isAspectRation: true) {
                 
                 imageView.image = image
-                imageView.frame = resize(image.size)
+                imageView.frame = resize(CGSize(width: sizeIcon, height: sizeIcon))
             }
             
             // PREVIEW
@@ -115,6 +123,11 @@ class NCViewerProviderContextMenu: UIViewController  {
                 NCOperationQueue.shared.download(metadata: metadata, selector: "")
             }
             
+            // AUTO DOWNLOAD IMAGE SVG
+            if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.contentType == "image/svg+xml" {
+                NCOperationQueue.shared.download(metadata: metadata, selector: "")
+            }
+            
             // AUTO DOWNLOAD LIVE PHOTO
             if let metadataLivePhoto = self.metadataLivePhoto {
                 if !CCUtility.fileProviderStorageExists(metadataLivePhoto.ocId, fileNameView: metadataLivePhoto.fileNameView) {
@@ -127,6 +140,22 @@ class NCViewerProviderContextMenu: UIViewController  {
     override func loadView() {
         view = imageView
         imageView.contentMode = .scaleAspectFill
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+     
+        NotificationCenter.default.addObserver(self, selector: #selector(downloadStartFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadStartFile), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(downloadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(downloadCancelFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadCancelFile), object: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadStartFile), object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadCancelFile), object: nil)
     }
     
     override func viewDidLayoutSubviews() {
@@ -145,7 +174,6 @@ class NCViewerProviderContextMenu: UIViewController  {
     // MARK: - NotificationCenter
 
     @objc func downloadStartFile(_ notification: NSNotification) {
-        if self.view?.window == nil { return }
         
         if let userInfo = notification.userInfo as NSDictionary? {
             if let ocId = userInfo["ocId"] as? String {
@@ -157,7 +185,6 @@ class NCViewerProviderContextMenu: UIViewController  {
     }
     
     @objc func downloadedFile(_ notification: NSNotification) {
-        if self.view?.window == nil { return }
         
         if let userInfo = notification.userInfo as NSDictionary? {
             if let ocId = userInfo["ocId"] as? String, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), let errorCode = userInfo["errorCode"] as? Int {
@@ -181,7 +208,6 @@ class NCViewerProviderContextMenu: UIViewController  {
     }
     
     @objc func downloadCancelFile(_ notification: NSNotification) {
-        if self.view?.window == nil { return }
         
         if let userInfo = notification.userInfo as NSDictionary? {
             if let ocId = userInfo["ocId"] as? String {
@@ -202,6 +228,12 @@ class NCViewerProviderContextMenu: UIViewController  {
         
         if metadata.contentType == "image/gif" {
             image = UIImage.animatedImage(withAnimatedGIFURL: URL(fileURLWithPath: filePath))
+        } else if metadata.contentType == "image/svg+xml" {
+            let imagePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
+            if let svgImage = SVGKImage(contentsOfFile: imagePath) {
+                svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: NCGlobal.shared.sizePreview)
+                image = svgImage.uiImage
+            }
         } else {
             image = UIImage.init(contentsOfFile: filePath)
         }
@@ -215,9 +247,6 @@ class NCViewerProviderContextMenu: UIViewController  {
         let filePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
 
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
-
             audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: filePath), fileTypeHint: AVFileType.mp3.rawValue)
 
             guard let player = audioPlayer else { return }
@@ -260,8 +289,6 @@ class NCViewerProviderContextMenu: UIViewController  {
     
     private func resize(_ size: CGSize?) -> CGRect {
         
-        var height = UIScreen.main.bounds.height/2
-        var width = UIScreen.main.bounds.width/2
         var frame = CGRect.zero
         
         guard let size = size else {
@@ -269,15 +296,10 @@ class NCViewerProviderContextMenu: UIViewController  {
             return frame
         }
         
-        if size.width < width {
+        if size.width <= UIScreen.main.bounds.width {
             frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
             preferredContentSize = frame.size
             return frame
-        }
-        
-        if size.width >= size.height {
-            height = UIScreen.main.bounds.height
-            width = UIScreen.main.bounds.width
         }
         
         let originRatio = size.width / size.height
@@ -285,11 +307,11 @@ class NCViewerProviderContextMenu: UIViewController  {
         var newSize = CGSize.zero
         
         if originRatio < newRatio {
-            newSize.height = height
-            newSize.width = height * originRatio
+            newSize.height = UIScreen.main.bounds.height
+            newSize.width = UIScreen.main.bounds.height * originRatio
         } else {
-            newSize.width = width
-            newSize.height = width / originRatio
+            newSize.width = UIScreen.main.bounds.width
+            newSize.height = UIScreen.main.bounds.width / originRatio
         }
         
         frame = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)

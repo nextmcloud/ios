@@ -21,11 +21,13 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import NCCommunication
 
 class NCOffline: NCCollectionViewCommon  {
     
+    // MARK: - View Life Cycle
+
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
@@ -69,7 +71,7 @@ class NCOffline: NCCollectionViewCommon  {
                 }
             }
             
-            self.dataSource = NCDataSource.init(metadatasSource: self.metadatasSource, sort: self.sort, ascending: self.ascending, directoryOnTop: self.directoryOnTop, favoriteOnTop: true, filterLivePhoto: true)
+            self.dataSource = NCDataSource.init(metadatasSource: self.metadatasSource, sort: self.layoutForView?.sort, ascending: self.layoutForView?.ascending, directoryOnTop: self.layoutForView?.directoryOnTop, favoriteOnTop: true, filterLivePhoto: true)
             
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()
@@ -95,7 +97,7 @@ class NCOffline: NCCollectionViewCommon  {
             isReloadDataSourceNetworkInProgress = true
             collectionView?.reloadData()
             
-            networkReadFolder(forced: forced) { (metadatas, metadatasUpdate, errorCode, errorDescription) in
+            networkReadFolder(forced: forced) { (tableDirectory, metadatas, metadatasUpdate, metadatasDelete, errorCode, errorDescription) in
                 if errorCode == 0 {
                     for metadata in metadatas ?? [] {
                         if !metadata.directory {
@@ -108,7 +110,8 @@ class NCOffline: NCCollectionViewCommon  {
                 
                 self.refreshControl.endRefreshing()
                 self.isReloadDataSourceNetworkInProgress = false
-                if metadatasUpdate?.count ?? 0 > 0 || forced {
+                self.richWorkspaceText = tableDirectory?.richWorkspace
+                if metadatasUpdate?.count ?? 0 > 0 || metadatasDelete?.count ?? 0 > 0 || forced {
                     self.reloadDataSource()
                 } else {
                     self.collectionView?.reloadData()

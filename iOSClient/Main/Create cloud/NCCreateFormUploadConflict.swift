@@ -4,7 +4,6 @@
 //
 //  Created by Marino Faggiana on 29/03/2020.
 //  Copyright © 2020 Marino Faggiana. All rights reserved.
-//  Author TSI-mc
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
@@ -23,6 +22,7 @@
 //
 
 import Foundation
+import UIKit
 
 @objc protocol NCCreateFormUploadConflictDelegate {
     @objc func dismissCreateFormUploadConflict(metadatas: [tableMetadata]?)
@@ -37,6 +37,7 @@ extension NCCreateFormUploadConflictDelegate {
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var labelSubTitle: UILabel!
 
+    @IBOutlet weak var viewSwitch: UIView!
     @IBOutlet weak var switchNewFiles: UISwitch!
     @IBOutlet weak var switchAlreadyExistingFiles: UISwitch!
 
@@ -49,6 +50,8 @@ extension NCCreateFormUploadConflictDelegate {
     @IBOutlet weak var buttonContinue: UIButton!
     
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    @IBOutlet weak var viewButton: UIView!
+
     
     @objc var metadatasNOConflict: [tableMetadata]
     @objc var metadatasUploadInConflict: [tableMetadata]
@@ -62,13 +65,15 @@ extension NCCreateFormUploadConflictDelegate {
     var metadatasConflictAlreadyExistingFiles: [String] = []
     var fileNamesPath: [String: String] = [:]
     var blurVisualEffectView: UIView
-    // MARK: - Cicle
+    
+    // MARK: - View Life Cycle
 
     @objc required init?(coder aDecoder: NSCoder) {
         self.metadatasNOConflict = []
         self.metadatasMOV = []
         self.metadatasUploadInConflict = []
         self.blurVisualEffectView = UIView()
+
         super.init(coder: aDecoder)
     }
     
@@ -101,6 +106,7 @@ extension NCCreateFormUploadConflictDelegate {
         buttonCancel.layer.masksToBounds = true
         buttonCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         buttonCancel.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
+
         
         buttonContinue.layer.cornerRadius = 20
         buttonContinue.layer.masksToBounds = true
@@ -123,6 +129,24 @@ extension NCCreateFormUploadConflictDelegate {
             self.view.addSubview(blurVisualEffectView)
             self.multiFilesConflictDialog(fileCount: metadatasUploadInConflict.count)
         }
+        
+        changeTheming()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        changeTheming()
+    }
+    
+    // MARK: - Theming
+    
+    func changeTheming(){
+        
+        view.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        viewSwitch.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        viewButton.backgroundColor = NCBrandColor.shared.systemGroupedBackground
     }
     
     // MARK: - Action
@@ -165,7 +189,8 @@ extension NCCreateFormUploadConflictDelegate {
             }
             
             switchAlreadyExistingFiles.isOn = true
-            NCContentPresenter.shared.messageNotification("_info_", description: "_file_not_rewite_doc_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.ErrorInternalError, forced: true)
+
+            NCContentPresenter.shared.messageNotification("_info_", description: "_file_not_rewite_doc_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorInternalError, forced: true)
         }
         
         tableView.reloadData()
@@ -246,6 +271,7 @@ extension NCCreateFormUploadConflictDelegate {
             
             appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasNOConflict)
             appDelegate.adjust.trackEvent(TriggerEvent(FileUpload.rawValue))
+
         }
                 
         dismiss(animated: true)
@@ -280,6 +306,8 @@ extension NCCreateFormUploadConflict: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as? NCCreateFormUploadConflictCell {
+
+            cell.backgroundColor = tableView.backgroundColor
             
             let metadataNewFile = metadatasUploadInConflict[indexPath.row]
 
@@ -356,36 +384,30 @@ extension NCCreateFormUploadConflict: UITableViewDataSource {
                 } else {
                     
                     CCUtility.extractImageVideoFromAssetLocalIdentifier(forUpload: metadataNewFile, notification: false) { (metadataNew, fileNamePath) in
-                        DispatchQueue.global(qos: .background).async {
-                            if metadataNew != nil {
-                                self.fileNamesPath[metadataNewFile.fileNameView] = fileNamePath!
+
+                       
+                        if metadataNew != nil {
+                            self.fileNamesPath[metadataNewFile.fileNameView] = fileNamePath!
+                            
+                            do {
                                 
-                                do {
-                                    
-                                    let fileDictionary = try FileManager.default.attributesOfItem(atPath: fileNamePath!)
-                                    let fileSize = fileDictionary[FileAttributeKey.size] as! Int64
-                                    
-                                    if mediaType == PHAssetMediaType.image {
-                                        let data = try Data(contentsOf: URL(fileURLWithPath: fileNamePath!))
-                                        if let image = UIImage(data: data) {
-                                            DispatchQueue.main.async {
-                                                cell.imageNewFile.image = image
-                                            }
-                                        }
-                                    } else if mediaType == PHAssetMediaType.video {
-                                        if let image = NCUtility.shared.imageFromVideo(url: URL(fileURLWithPath: fileNamePath!), at: 0) {
-                                            DispatchQueue.main.async {
-                                                cell.imageNewFile.image = image
-                                            }
-                                        }
+                                let fileDictionary = try FileManager.default.attributesOfItem(atPath: fileNamePath!)
+                                let fileSize = fileDictionary[FileAttributeKey.size] as! Int64
+                                
+                                if mediaType == PHAssetMediaType.image {
+                                    let data = try Data(contentsOf: URL(fileURLWithPath: fileNamePath!))
+                                    if let image = UIImage(data: data) {
+                                        cell.imageNewFile.image = image
                                     }
-                                    
-                                    DispatchQueue.main.async {
-                                        cell.labelDetailNewFile.text = CCUtility.dateDiff(date) + "\n" + CCUtility.transformedSize(fileSize)
+                                } else if mediaType == PHAssetMediaType.video {
+                                    if let image = NCUtility.shared.imageFromVideo(url: URL(fileURLWithPath: fileNamePath!), at: 0) {
+                                        cell.imageNewFile.image = image
                                     }
-                                    
-                                } catch { print("Error: \(error)") }
-                            }
+                                }
+                                
+                                cell.labelDetailNewFile.text = CCUtility.dateDiff(date) + "\n" + CCUtility.transformedSize(fileSize)
+                               
+                            } catch { print("Error: \(error)") }
                         }
                     }
                 }

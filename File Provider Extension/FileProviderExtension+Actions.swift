@@ -21,6 +21,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import UIKit
 import FileProvider
 import NCCommunication
 
@@ -47,7 +48,7 @@ extension FileProviderExtension {
                         let file = files.first!
                         let metadata = NCManageDatabase.shared.convertNCFileToMetadata(file, isEncrypted: false, account: fileProviderData.shared.account)
             
-                        NCManageDatabase.shared.addDirectory(encrypted: false, favorite: false, ocId: ocId!, fileId: metadata.fileId, etag: metadata.etag, permissions: metadata.permissions, serverUrl: serverUrlFileName, richWorkspace: metadata.richWorkspace, account: metadata.account)
+                        NCManageDatabase.shared.addDirectory(encrypted: false, favorite: false, ocId: ocId!, fileId: metadata.fileId, etag: metadata.etag, permissions: metadata.permissions, serverUrl: serverUrlFileName, account: metadata.account)
                         NCManageDatabase.shared.addMetadata(metadata)
                         
                         guard let metadataInsert = NCManageDatabase.shared.getMetadataFromOcId(ocId!) else {
