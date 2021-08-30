@@ -63,7 +63,7 @@
 
             avatar = [[NCUtility shared] createAvatarWithImage:avatar size:40];
         } else {
-            avatar = [[UIImage imageNamed:@"avatar"] imageWithColor:NCBrandColor.shared.gray size:40];
+            avatar = [[UIImage imageNamed:@"avatar"] imageWithColor:NCBrandColor.shared.icon size:40];
         }
         
         row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
@@ -86,7 +86,7 @@
     [row.cellConfig setObject:[[UIImage imageNamed:@"form-textbox"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textField.font"];
     [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textField.textColor"];
-    row.value = accountActive.alias;
+    row.value = activeAccount.alias;
 
     [section addFormRow:row];
     
