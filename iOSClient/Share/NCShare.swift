@@ -95,6 +95,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         self.btnCreateLink.titleLabel!.minimumScaleFactor = 0.5
         self.btnCreateLink.titleLabel?.textColor = NCBrandColor.shared.backgroundView
         
+        self.labelShareByMail.text = NSLocalizedString("personal_share_by_mail", comment: "")
 //        shareLinkImage.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
         shareLinkImage.image = UIImage(named: "sharebylink")?.image(color: NCBrandColor.shared.icon, size: 30)
 //        shareLinkImage.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
