@@ -1445,8 +1445,8 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             if appDelegate.disableSharesView {
                 cell.hideButtonShare(true)
             }
-            
-            if tableShare?.shareWith != "" {
+            let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
+            if shares.share!.count > 0 {
                 cell.imageShared.image = cell.imageShared.image?.imageColor(NCBrandColor.shared.customer)
             }
             

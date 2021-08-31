@@ -20,6 +20,7 @@ class NCFilePermissionCell: XLFormButtonCell {
         super.awakeFromNib()
         self.selectionStyle = .none
         self.backgroundColor = NCBrandColor.shared.backgroundView
+        self.titleLabel.textColor = NCBrandColor.shared.shareCellTitleColor
 //        autoUploadSwitchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
         
     }
@@ -69,6 +70,10 @@ class NCFilePermissionCell: XLFormButtonCell {
     
     override func formDescriptorCellDidSelected(withForm controller: XLFormViewController!) {
         self.selectionStyle = .none
+    }
+    
+    override class func formDescriptorCellHeight(for rowDescriptor: XLFormRowDescriptor!) -> CGFloat {
+        return 44.0
     }
     
 }

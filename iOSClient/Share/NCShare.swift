@@ -47,6 +47,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     @IBOutlet weak var btnCreateLink: UIButton!
     @IBOutlet weak var containerView: UIView!
     @IBOutlet weak var labelYourShare: UILabel!
+    @IBOutlet weak var labelShareByMail: UILabel!
     
     
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -79,6 +80,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         searchField.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
         searchField.layer.borderWidth = 1
         searchField.placeholder = NSLocalizedString("_shareLinksearch_placeholder_", comment: "")
+        searchField.textColor = NCBrandColor.shared.systemGrayAndGray66
         
         self.btnCreateLink.setTitle(NSLocalizedString("_create_link_", comment: ""), for: .normal)
 //        self.btnCreateLink.setTitle("_shareLinksearch_placeholder_", for: .normal)
@@ -88,9 +90,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         self.btnCreateLink.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
         self.btnCreateLink.setTitleColor(NCBrandColor.shared.icon, for: .normal)
         self.btnCreateLink.backgroundColor = NCBrandColor.shared.backgroundView
-        self.btnCreateLink.titleLabel?.font = UIFont.systemFont(ofSize: 18)
+        self.btnCreateLink.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         self.btnCreateLink.titleLabel!.adjustsFontSizeToFitWidth = true
         self.btnCreateLink.titleLabel!.minimumScaleFactor = 0.5
+        self.btnCreateLink.titleLabel?.textColor = NCBrandColor.shared.backgroundView
         
 //        shareLinkImage.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
         shareLinkImage.image = UIImage(named: "sharebylink")?.image(color: NCBrandColor.shared.icon, size: 30)
@@ -111,7 +114,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         tableView.register(UINib.init(nibName: "NCShareLinkCell", bundle: nil), forCellReuseIdentifier: "cellLink")
         tableView.register(UINib.init(nibName: "NCShareUserCell", bundle: nil), forCellReuseIdentifier: "cellUser")
         
-        navigationController?.navigationBar.backgroundColor = .clear
         
         NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadDataNCShare), object: nil)
         
@@ -172,6 +174,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         tableView.backgroundColor = NCBrandColor.shared.backgroundView
         tableView.reloadData()
         shareLinkLabel.textColor = NCBrandColor.shared.textView
+        self.labelShareByMail.textColor = NCBrandColor.shared.shareByEmailTextColor
     }
         
     @objc func reloadData() {
@@ -691,7 +694,9 @@ extension NCShare: UITableViewDataSource {
         }
         if numOfRows == 0 {
             self.tableView.setEmptyMessage(NSLocalizedString("no_shares_created", comment: ""))
-            labelYourShare.isHidden = true
+
+//            labelYourShare.text = NSLocalizedString("no_shares_created", comment: "")
+//            labelYourShare.textAlignment = .center
         } else {
             self.tableView.restore()
         }
@@ -725,7 +730,7 @@ extension NCShare: UITableViewDataSource {
                 } else {
                     cell.labelTitle.text = NSLocalizedString("_share_link_", comment: "")
                 }
-                cell.labelTitle.textColor = NCBrandColor.shared.textView
+                cell.labelTitle.textColor = NCBrandColor.shared.shareCellTitleColor
                 cell.indexSelected = indexPath.row
                 cell.btnQuickStatus.tag = indexPath.row
 //                cell.buttonMenu.isEnabled = false
@@ -737,8 +742,8 @@ extension NCShare: UITableViewDataSource {
                     cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
                     cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
                 } else {
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.graySoft
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.graySoft)
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.quickStatusTextColor
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.quickStatusTextColor)
                 }
                 
                 if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
@@ -761,7 +766,7 @@ extension NCShare: UITableViewDataSource {
                 cell.tableShare = tableShare
                 cell.delegate = self
                 cell.labelTitle.text = tableShare.shareWithDisplayname
-                cell.labelTitle.textColor = NCBrandColor.shared.textView
+                cell.labelTitle.textColor = NCBrandColor.shared.shareCellTitleColor
                 cell.labelCanEdit.text = NSLocalizedString("_share_permission_edit_", comment: "")
                 cell.labelCanEdit.textColor = NCBrandColor.shared.textView
                 cell.isUserInteractionEnabled = true
@@ -777,21 +782,38 @@ extension NCShare: UITableViewDataSource {
                 cell.status.text = status.statusMessage
                 
                 let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + tableShare.shareWith + ".png"
+                
                 if FileManager.default.fileExists(atPath: fileNameLocalPath) {
                     if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-//                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
+//                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
 //                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
                     }
                 } else {
                     NCCommunication.shared.downloadAvatar(userID: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
                             if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-//                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
-//                                cell.imageItem.image = UIImage(named: "cloudUpload")?.image(color: NCBrandColor.shared.icon, size: 30)
+//                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
+//                                cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
                             }
                         }
                     }
                 }
+                
+//                if FileManager.default.fileExists(atPath: fileNameLocalPath) {
+//                    if let image = UIImage(contentsOfFile: fileNameLocalPath) {
+////                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
+////                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
+//                    }
+//                } else {
+//                    NCCommunication.shared.downloadAvatar(userID: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
+//                        if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
+//                            if let image = UIImage(contentsOfFile: fileNameLocalPath) {
+////                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
+////                                cell.imageItem.image = UIImage(named: "cloudUpload")?.image(color: NCBrandColor.shared.icon, size: 30)
+//                            }
+//                        }
+//                    }
+//                }
                 
                 if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
                     cell.switchCanEdit.setOn(true, animated: false)
@@ -817,8 +839,8 @@ extension NCShare: UITableViewDataSource {
                     cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
                     cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
                 } else {
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.graySoft
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.graySoft)
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.quickStatusTextColor
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.quickStatusTextColor)
                 }
                 
                 if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
@@ -877,8 +899,8 @@ class NCShareLinkCell: UITableViewCell {
         
 //        imageItem.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
         imageItem.image = UIImage(named: "sharebylink")?.image(color: NCBrandColor.shared.icon, size: 30)
-        buttonCopy.setImage(UIImage.init(named: "shareCopy")!.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
-        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
+        buttonCopy.setImage(UIImage.init(named: "shareCopy")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
+        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
 //        imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
     }
@@ -927,7 +949,7 @@ class NCShareUserCell: UITableViewCell {
         
         switchCanEdit.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
         switchCanEdit.onTintColor = NCBrandColor.shared.brandElement
-        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
+        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
         imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
     }
@@ -969,15 +991,20 @@ class NCShareUserDropDownCell: DropDownCell {
 
 extension UITableView {
     func setEmptyMessage(_ message: String) {
-        let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: self.bounds.size.height))
+//        let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: 20))
+        let messageLabel = UILabel(frame: CGRect(x: 15, y: 0, width: self.bounds.size.width, height: 20))
         messageLabel.text = message
-        messageLabel.textColor = .black
+        messageLabel.textColor = NCBrandColor.shared.textInfo
         messageLabel.numberOfLines = 0
         messageLabel.textAlignment = .center
-        messageLabel.font = UIFont(name: "TrebuchetMS", size: 15)
+        messageLabel.font = UIFont.systemFont(ofSize: 17)
         messageLabel.sizeToFit()
 
-        self.backgroundView = messageLabel
+//        self.backgroundColor = .red
+//        messageLabel.backgroundColor = .green
+//        self.backgroundView?.addSubview(messageLabel)
+//        self.backgroundView = messageLabel
+        self.addSubview(messageLabel)
 //        self.separatorStyle = .none
     }
 

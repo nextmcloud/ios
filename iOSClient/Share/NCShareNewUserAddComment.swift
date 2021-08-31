@@ -42,7 +42,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
             self.imageView.image = getImageMetadata(metadata!)
             self.folderImageView.isHidden = true
-            self.headerImageViewSpaceFavorite.constant = 5.0
+//            self.headerImageViewSpaceFavorite.constant = 5.0
         } else {
             if metadata!.directory {
                 let image = UIImage.init(named: "folder")!
@@ -52,7 +52,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
             } else {
                 self.folderImageView.image = UIImage.init(named: "file")
             }
-            self.headerImageViewSpaceFavorite.constant = -49.0
+//            self.headerImageViewSpaceFavorite.constant = -49.0
         }
         self.favorite.layoutIfNeeded()
         self.labelFileName.text = self.metadata?.fileNameView
@@ -67,16 +67,16 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         labelNote.text = NSLocalizedString("_share_note_recipient_", comment: "")
         
         commentTextView.layer.borderWidth = 1
-        commentTextView.layer.borderColor = NCBrandColor.shared.textView.cgColor
+        commentTextView.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
 //        commentTextView.text = "Note"
-        commentTextView.textColor = NCBrandColor.shared.textView
+        commentTextView.textColor = NCBrandColor.shared.shareCellTitleColor
         
         btnCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         btnCancel.layer.cornerRadius = 10
         btnCancel.layer.masksToBounds = true
         btnCancel.layer.borderWidth = 1
-        btnCancel.layer.borderColor = NCBrandColor.shared.textView.cgColor
-        btnCancel.setTitleColor(NCBrandColor.shared.textView, for: .normal)
+        btnCancel.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
+        btnCancel.setTitleColor(NCBrandColor.shared.shareCellTitleColor, for: .normal)
         btnCancel.backgroundColor = .white
         
         btnSendShare.setTitle(NSLocalizedString("_send_share_", comment: ""), for: .normal)

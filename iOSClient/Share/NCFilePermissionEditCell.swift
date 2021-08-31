@@ -28,6 +28,7 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
         self.selectionStyle = .none
         switchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
         self.backgroundColor = NCBrandColor.shared.backgroundView
+        self.titleLabel.textColor = NCBrandColor.shared.shareCellTitleColor
     }
     
     override func configure() {
@@ -38,13 +39,21 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
         super.update()
         
 //        if rowDescriptor.tag == "kNMCFilePermissionCellLinkLabel" || rowDescriptor.tag == "kNMCFilePermissionCellHideDownload" {
-        if rowDescriptor.tag == "kNMCFilePermissionCellHideDownload" || rowDescriptor.tag ==  "kNMCFilePermissionCellEditingCanShare" {
+        if rowDescriptor.tag == "kNMCFilePermissionCellHideDownload" {
+            self.seperator.isHidden = true
+            self.seperatorBottom.isHidden = true
+            self.cellTextField.isHidden = true
+        }
+
+        
+        if rowDescriptor.tag ==  "kNMCFilePermissionCellEditingCanShare" {
             self.seperatorBottom.isHidden = true
             self.cellTextField.isHidden = true
         }
         if rowDescriptor.tag == "kNMCFilePermissionEditCellLinkLabel" {
             self.switchControl.isHidden = true
             self.cellTextField.isEnabled = true
+            self.seperatorBottom.isHidden = true
         }
         if rowDescriptor.tag == "kNMCFilePermissionEditCellLinkLabel" {
             self.switchControl.isHidden = true

@@ -21,6 +21,7 @@ class NCShareAdvancePermissionHeader: UIView {
     var delegate: NCShareAdvancePermissionHeaderDelegate?
     var ocId = ""
     
+    
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         delegate?.favoriteClicked()
 //        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {

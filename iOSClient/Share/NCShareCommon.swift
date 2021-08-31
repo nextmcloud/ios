@@ -258,11 +258,11 @@ class NCShareCommon: NSObject {
             return UIImage(named: "shareTypeLink")?.imageColor(NCBrandColor.shared.textView)
         case self.SHARE_TYPE_EMAIL:
 //            return UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.textView)
-            return UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.textView)
         case self.SHARE_TYPE_CONTACT:
             return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.textView)
         case self.SHARE_TYPE_REMOTE:
-            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.textView)
         case self.SHARE_TYPE_CIRCLE:
             return UIImage(named: "shareTypeCircles")?.imageColor(NCBrandColor.shared.textView)
         case self.SHARE_TYPE_GUEST:

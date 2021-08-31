@@ -294,7 +294,7 @@ class NCShareHeaderViewController: PagingViewController {
 class NCSharePagingView: PagingView {
     
 //    static let HeaderHeight: CGFloat = 250
-    static let HeaderHeight: CGFloat = 320
+    static let HeaderHeight: CGFloat = 350
     var metadata: tableMetadata?
     
     var headerHeightConstraint: NSLayoutConstraint?
@@ -313,7 +313,7 @@ class NCSharePagingView: PagingView {
         
         let headerView = Bundle.main.loadNibNamed("NCShareHeaderView", owner: self, options: nil)?.first as! NCShareHeaderView
         headerView.backgroundColor = NCBrandColor.shared.backgroundView
-        headerView.fileName.textColor = NCBrandColor.shared.icon
+        headerView.fileName.textColor = NCBrandColor.shared.fileFolderName
         headerView.labelSharing.textColor = NCBrandColor.shared.icon
         headerView.labelSharingInfo.textColor = NCBrandColor.shared.icon
         headerView.info.textColor = NCBrandColor.shared.textInfo
