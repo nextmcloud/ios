@@ -44,29 +44,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
-    public func setup(serverUrl: String, fileNamePath: String, fileName: String) {
-    
-        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account) {
-            titleServerUrl = "/"
-        } else {
-            titleServerUrl = (serverUrl as NSString).lastPathComponent
-        }
-    
-        self.fileName = fileName
-        self.serverUrl = serverUrl
-        self.fileNamePath = fileNamePath
-        
-        // player
-        do {
-            try audioPlayer = AVAudioPlayer(contentsOf: URL(fileURLWithPath: fileNamePath))
-            audioPlayer.prepareToPlay()
-            audioPlayer.delegate = self
-            durationPlayer = TimeInterval(audioPlayer.duration)
-        } catch {
-            buttonPlayStop.isEnabled = false
-        }
-    }
-    
     var cellBackgoundColor = NCBrandColor.shared.secondarySystemGroupedBackground
 
     // MARK: - View Life Cycle
@@ -434,18 +411,11 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         let viewController = navigationController.topViewController as! NCSelect
         
         viewController.delegate = self
-        viewController.hideButtonCreateFolder = false
-        viewController.includeDirectoryE2EEncryption = true
-        viewController.includeImages = false
-        viewController.selectFile = false
-        viewController.titleButtonDone = NSLocalizedString("_select_", comment: "")
-        viewController.type = ""
-        
-        navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
         viewController.typeOfCommandView = .selectCreateFolder
         viewController.includeDirectoryE2EEncryption = true
         
         self.present(navigationController, animated: true, completion: nil)
+
     }
     
     //MARK: Player - Timer

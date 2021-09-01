@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -124,6 +124,7 @@
                 <constraint firstItem="UtT-L6-mgW" firstAttribute="leading" secondItem="w2m-Vw-hpd" secondAttribute="trailing" constant="10" id="PQ8-0b-fLa"/>
                 <constraint firstItem="AXX-71-9Q6" firstAttribute="leading" secondItem="w2m-Vw-hpd" secondAttribute="trailing" constant="10" id="Qvq-r5-AX9"/>
                 <constraint firstItem="AyA-hP-r6w" firstAttribute="leading" secondItem="Gu8-oz-zWa" secondAttribute="leading" constant="10" id="RYl-cO-cCN"/>
+                <constraint firstItem="Gu8-oz-zWa" firstAttribute="trailing" secondItem="yhy-xd-w5C" secondAttribute="trailing" id="S39-7P-KS8"/>
                 <constraint firstItem="Gu8-oz-zWa" firstAttribute="bottom" secondItem="m2p-oJ-j15" secondAttribute="bottom" constant="7" id="SYv-gc-ahx"/>
                 <constraint firstItem="C4K-Nv-phA" firstAttribute="leading" secondItem="w2m-Vw-hpd" secondAttribute="trailing" constant="-10" id="Sof-wy-toF"/>
                 <constraint firstItem="Gu8-oz-zWa" firstAttribute="trailing" secondItem="UtT-L6-mgW" secondAttribute="trailing" constant="90" id="Tq4-bB-YMV"/>
@@ -140,13 +141,13 @@
                 <constraint firstItem="UtT-L6-mgW" firstAttribute="top" secondItem="Gu8-oz-zWa" secondAttribute="top" constant="13" id="nrY-2F-QZ2"/>
                 <constraint firstItem="Gu8-oz-zWa" firstAttribute="trailing" secondItem="AXX-71-9Q6" secondAttribute="trailing" constant="90" id="p0M-zU-aDG"/>
                 <constraint firstItem="w2m-Vw-hpd" firstAttribute="centerY" secondItem="Gu8-oz-zWa" secondAttribute="centerY" id="qKl-4Y-m5t"/>
-                <constraint firstItem="Gu8-oz-zWa" firstAttribute="trailing" secondItem="yhy-xd-w5C" secondAttribute="trailing" id="s2S-RP-cw5"/>
                 <constraint firstItem="AyA-hP-r6w" firstAttribute="centerY" secondItem="Gu8-oz-zWa" secondAttribute="centerY" id="sJp-0x-bdC"/>
                 <constraint firstItem="Gu8-oz-zWa" firstAttribute="trailing" secondItem="o4u-0K-Qpt" secondAttribute="trailing" constant="45" id="tOD-Sd-Uhy"/>
                 <constraint firstItem="jc6-Vg-TaS" firstAttribute="centerY" secondItem="o4u-0K-Qpt" secondAttribute="centerY" id="xnq-6u-TXH"/>
             </constraints>
             <size key="customSize" width="650" height="58"/>
             <connections>
+                <outlet property="btnMoreRightConstraint" destination="S39-7P-KS8" id="cag-xo-Bpl"/>
                 <outlet property="buttonMore" destination="yhy-xd-w5C" id="agm-M9-xtq"/>
                 <outlet property="buttonShared" destination="o4u-0K-Qpt" id="5hT-Su-kWL"/>
                 <outlet property="imageFavorite" destination="C4K-Nv-phA" id="3nc-zz-N5c"/>

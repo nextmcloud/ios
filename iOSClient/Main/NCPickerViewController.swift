@@ -6,10 +6,6 @@
 //  Copyright (c) 2018 Marino Faggiana. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-<<<<<<< HEAD
-//  Author TSI-mc
-=======
->>>>>>> feature_branded_client_4
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by

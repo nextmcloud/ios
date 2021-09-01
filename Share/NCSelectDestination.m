@@ -47,7 +47,7 @@
 {
     [super viewDidLoad];
     
-    tableAccount *tableAccount = [[NCManageDatabase shared] getAccountActive];
+    tableAccount *tableAccount = [[NCManageDatabase shared] getActiveAccount];
     
     if (tableAccount) {
         

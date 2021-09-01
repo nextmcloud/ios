@@ -210,7 +210,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // Display Name user & Quota
         var quota: String = ""
 
-        guard let tabAccount = NCManageDatabase.shared.getAccountActive() else {
+        guard let tabAccount = NCManageDatabase.shared.getActiveAccount() else {
             return
         }
         self.tabAccount = tabAccount

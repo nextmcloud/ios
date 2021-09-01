@@ -40,6 +40,34 @@
 		7AE63AED26D633BA00CEAAD5 /* NCGridCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63AE826D633BA00CEAAD5 /* NCGridCell.xib */; };
 		7AE63AEE26D633BA00CEAAD5 /* NCListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63AE926D633BA00CEAAD5 /* NCListCell.swift */; };
 		7AE63AEF26D633BA00CEAAD5 /* NCCollectionViewCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63AEA26D633BA00CEAAD5 /* NCCollectionViewCommon.swift */; };
+		7AE63B2426DCF9ED00CEAAD5 /* NCNetworkingE2EE.swift in Sources */ = {isa = PBXBuildFile; fileRef = F785EE9C246196DF00B3F945 /* NCNetworkingE2EE.swift */; };
+		7AE63B2A26DCFB2600CEAAD5 /* NCNetworkingChunkedUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63B2926DCFB2600CEAAD5 /* NCNetworkingChunkedUpload.swift */; };
+		7AE63B2F26DCFB2900CEAAD5 /* NCNetworkingChunkedUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63B2926DCFB2600CEAAD5 /* NCNetworkingChunkedUpload.swift */; };
+		7AE63B3026DCFB2A00CEAAD5 /* NCNetworkingChunkedUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63B2926DCFB2600CEAAD5 /* NCNetworkingChunkedUpload.swift */; };
+		7AE63B3626DCFB6300CEAAD5 /* NCContentPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63B3526DCFB6300CEAAD5 /* NCContentPresenter.swift */; };
+		7AE63B3B26DCFB7100CEAAD5 /* NCContentPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63B3526DCFB6300CEAAD5 /* NCContentPresenter.swift */; };
+		7AE63B5526DCFC4200CEAAD5 /* NCShareExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63B5426DCFC4200CEAAD5 /* NCShareExtension.swift */; };
+		7AE63B5A26DCFC8E00CEAAD5 /* NCListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63AE926D633BA00CEAAD5 /* NCListCell.swift */; };
+		7AE63B5F26DCFC9E00CEAAD5 /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7239870253D86B600257F49 /* NCEmptyDataSet.swift */; };
+		7AE63B6426DCFDC300CEAAD5 /* NCImageCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCImageCellProtocol.swift */; };
+		7AE63B6926DCFE3000CEAAD5 /* NCRenameFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20EA2660DFA200AF4344 /* NCRenameFile.swift */; };
+		7AE63B7726DCFFBB00CEAAD5 /* NCShareExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63B5426DCFC4200CEAAD5 /* NCShareExtension.swift */; };
+		7AE63B7C26DCFFEA00CEAAD5 /* NCAccountRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20F82660E2C600AF4344 /* NCAccountRequest.swift */; };
+		7AE63B8126DD01BF00CEAAD5 /* NCDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C1EEA425053A9C00866ACC /* NCDataSource.swift */; };
+		7AE63B8626DD01F000CEAAD5 /* NCPopupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20F12660E25200AF4344 /* NCPopupViewController.swift */; };
+		7AE63B8B26DD039000CEAAD5 /* NCOperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72A47EB2487B06B005AD489 /* NCOperationQueue.swift */; };
+		7AE63B9C26DD104000CEAAD5 /* NSMutableAttributedString+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63B9B26DD104000CEAAD5 /* NSMutableAttributedString+Extensions.swift */; };
+		7AE63BA526DDFAAD00CEAAD5 /* NSMutableAttributedString+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63B9B26DD104000CEAAD5 /* NSMutableAttributedString+Extensions.swift */; };
+		7AE63BAB26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
+		7AE63BB026DDFBD200CEAAD5 /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
+		7AE63BB826DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BB626DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift */; };
+		7AE63BB926DDFC7C00CEAAD5 /* NCBackgroundImageColor.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BB726DDFC7C00CEAAD5 /* NCBackgroundImageColor.storyboard */; };
+		7AE63BBE26DDFC8500CEAAD5 /* NCBackgroundImageColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BB626DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift */; };
+		7AE63BF326DE0E1200CEAAD5 /* ChromaColorPicker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7AE63BE426DE09AB00CEAAD5 /* ChromaColorPicker.framework */; };
+		7AE63BF426DE0E1200CEAAD5 /* ChromaColorPicker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7AE63BE426DE09AB00CEAAD5 /* ChromaColorPicker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7AE63BFC26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BF926DE5FCD00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib */; };
+		7AE63BFD26DE5FCE00CEAAD5 /* NCSelectCommandViewCopyMove.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BFA26DE5FCD00CEAAD5 /* NCSelectCommandViewCopyMove.xib */; };
+		7AE63BFE26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BFB26DE5FCD00CEAAD5 /* NCSelectCommandViewSelect.xib */; };
 		950A647E264AACF4006ADE0E /* OriginalFileNameCustomSwitchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 950A6476264AACF4006ADE0E /* OriginalFileNameCustomSwitchCell.xib */; };
 		950A647F264AACF4006ADE0E /* SubFolderCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 950A6477264AACF4006ADE0E /* SubFolderCustomCell.xib */; };
 		950A6480264AACF4006ADE0E /* TypeInFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950A6478264AACF4006ADE0E /* TypeInFileNameCustomSwitchCell.swift */; };
@@ -122,7 +150,6 @@
 		F70BFC7520E0FA7D00C67599 /* NCUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70BFC7320E0FA7C00C67599 /* NCUtility.swift */; };
 		F70CAE3A1F8CF31A008125FD /* NCEndToEndEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F70CAE391F8CF31A008125FD /* NCEndToEndEncryption.m */; };
 		F70CEF5623E9C7E50007035B /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70CEF5523E9C7E50007035B /* UIColor+Extensions.swift */; };
-		F70D8D8124A4A9BF000A5756 /* NCNetworkingAutoUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70D8D8024A4A9BF000A5756 /* NCNetworkingAutoUpload.swift */; };
 		F70F2BA5225F2D8900EBB73E /* ZIPFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F70F2BA4225F2D8900EBB73E /* ZIPFoundation.framework */; };
 		F710D1F52405770F00A6033D /* NCViewerPDF.swift in Sources */ = {isa = PBXBuildFile; fileRef = F710D1F42405770F00A6033D /* NCViewerPDF.swift */; };
 		F710D1FE24057E5E00A6033D /* NCActionSheetHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F710D1FB24057E5E00A6033D /* NCActionSheetHeader.swift */; };
@@ -131,10 +158,8 @@
 		F710E8111EF95C9C00DC2427 /* ImagesIntro.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F710E80F1EF95C9C00DC2427 /* ImagesIntro.xcassets */; };
 		F7134186259747BA00768D21 /* NCPushNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = F7134185259747BA00768D21 /* NCPushNotification.m */; };
 		F713FF002472764100214AF6 /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = F713FEFF2472764100214AF6 /* UIImage+animatedGIF.m */; };
-		F71459C21D12E3B700CAFEEC /* ShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F7C0F46F1C8880540059EC54 /* ShareViewController.m */; };
 		F71459D21D12E3B700CAFEEC /* CCUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = F7053E3D1C639DF500741EA5 /* CCUtility.m */; };
 		F71459E11D12E3B700CAFEEC /* CCHud.m in Sources */ = {isa = PBXBuildFile; fileRef = F7514EDB1C7B1336008F3338 /* CCHud.m */; };
-		F7145A041D12E3B700CAFEEC /* CCloadItemData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7296A661C8880ED001A7809 /* CCloadItemData.swift */; };
 		F7145A1A1D12E3B700CAFEEC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F7F67BB81A24D27800EE80DA /* Images.xcassets */; };
 		F7145A231D12E3B700CAFEEC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F7E70DE91A24DE4100E1B66A /* Localizable.strings */; };
 		F717402D24F699A5000C87D5 /* NCFavorite.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F717402B24F699A5000C87D5 /* NCFavorite.storyboard */; };
@@ -301,7 +326,6 @@
 		F78ACD52219046DC0088454D /* NCSectionHeaderFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78ACD51219046DC0088454D /* NCSectionHeaderFooter.swift */; };
 		F78ACD54219047D40088454D /* NCSectionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = F78ACD53219047D40088454D /* NCSectionFooter.xib */; };
 		F78ACD58219048040088454D /* NCSectionHeaderMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F78ACD57219048040088454D /* NCSectionHeaderMenu.xib */; };
-		F78B9685234F785300F54315 /* NCSelectDestination.m in Sources */ = {isa = PBXBuildFile; fileRef = F78B9682234F785300F54315 /* NCSelectDestination.m */; };
 		F78B9686234F785300F54315 /* NCSelectDestination.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F78B9684234F785300F54315 /* NCSelectDestination.storyboard */; };
 		F78BFEE11D31126B00E513CF /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F78BFEDE1D31126B00E513CF /* MainInterface.storyboard */; };
 		F78E7065219F096B006F23E4 /* NCAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78E7064219F096B006F23E4 /* NCAvatar.swift */; };
@@ -367,11 +391,8 @@
 		F7EFC0C6256BC77700461AAD /* NCMoreUserCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7EFC0C5256BC77700461AAD /* NCMoreUserCell.xib */; };
 		F7EFC0CD256BF8DD00461AAD /* NCUserStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7EFC0CC256BF8DD00461AAD /* NCUserStatus.swift */; };
 		F7F1E54C2492369A00E42386 /* NCMediaCommandView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7F1E54B2492369A00E42386 /* NCMediaCommandView.xib */; };
-		F7F4B1D823C74B3E00D82A6E /* NCRichWorkspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7F4B1D723C74B3E00D82A6E /* NCRichWorkspace.swift */; };
 		F7F878AE1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7F878AD1FB9E3B900599E4F /* NCEndToEndMetadata.swift */; };
 		F7F878AF1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7F878AD1FB9E3B900599E4F /* NCEndToEndMetadata.swift */; };
-		F7F8D71C1ED6183000E711F3 /* CCCellShareExt.m in Sources */ = {isa = PBXBuildFile; fileRef = F7F8D71A1ED6183000E711F3 /* CCCellShareExt.m */; };
-		F7F8D71D1ED6183000E711F3 /* CCCellShareExt.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7F8D71B1ED6183000E711F3 /* CCCellShareExt.xib */; };
 		F7F9D1BB25397CE000D9BFF5 /* NCViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7F9D1BA25397CE000D9BFF5 /* NCViewer.swift */; };
 		F7FAC2672549E1B5008EE2C4 /* NCKTVHTTPCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FAC2662549E1B5008EE2C4 /* NCKTVHTTPCache.swift */; };
 /* End PBXBuildFile section */
@@ -401,6 +422,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		7AE63BF526DE0E1300CEAAD5 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				7AE63BF426DE0E1200CEAAD5 /* ChromaColorPicker.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F77B0F981D118A16002130FE /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -457,6 +489,18 @@
 		7AE63AE826D633BA00CEAAD5 /* NCGridCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCGridCell.xib; sourceTree = "<group>"; };
 		7AE63AE926D633BA00CEAAD5 /* NCListCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCListCell.swift; sourceTree = "<group>"; };
 		7AE63AEA26D633BA00CEAAD5 /* NCCollectionViewCommon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCollectionViewCommon.swift; sourceTree = "<group>"; };
+		7AE63B2926DCFB2600CEAAD5 /* NCNetworkingChunkedUpload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCNetworkingChunkedUpload.swift; sourceTree = "<group>"; };
+		7AE63B3526DCFB6300CEAAD5 /* NCContentPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCContentPresenter.swift; sourceTree = "<group>"; };
+		7AE63B5426DCFC4200CEAAD5 /* NCShareExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCShareExtension.swift; sourceTree = "<group>"; };
+		7AE63B9B26DD104000CEAAD5 /* NSMutableAttributedString+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSMutableAttributedString+Extensions.swift"; sourceTree = "<group>"; };
+		7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCViewCertificateDetails.swift; sourceTree = "<group>"; };
+		7AE63BB626DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCBackgroundImageColor.swift; sourceTree = "<group>"; };
+		7AE63BB726DDFC7C00CEAAD5 /* NCBackgroundImageColor.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCBackgroundImageColor.storyboard; sourceTree = "<group>"; };
+		7AE63BDE26DE08FA00CEAAD5 /* ChromaColorPicker.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = ChromaColorPicker.framework.dSYM; path = "Carthage/Build/ChromaColorPicker.xcframework/ios-arm64_x86_64-simulator/dSYMs/ChromaColorPicker.framework.dSYM"; sourceTree = "<group>"; };
+		7AE63BE426DE09AB00CEAAD5 /* ChromaColorPicker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ChromaColorPicker.framework; path = Carthage/Build/iOS/ChromaColorPicker.framework; sourceTree = "<group>"; };
+		7AE63BF926DE5FCD00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "NCSelectCommandViewSelect+CreateFolder.xib"; sourceTree = "<group>"; };
+		7AE63BFA26DE5FCD00CEAAD5 /* NCSelectCommandViewCopyMove.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCSelectCommandViewCopyMove.xib; sourceTree = "<group>"; };
+		7AE63BFB26DE5FCD00CEAAD5 /* NCSelectCommandViewSelect.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCSelectCommandViewSelect.xib; sourceTree = "<group>"; };
 		950A6476264AACF4006ADE0E /* OriginalFileNameCustomSwitchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OriginalFileNameCustomSwitchCell.xib; sourceTree = "<group>"; };
 		950A6477264AACF4006ADE0E /* SubFolderCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SubFolderCustomCell.xib; sourceTree = "<group>"; };
 		950A6478264AACF4006ADE0E /* TypeInFileNameCustomSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeInFileNameCustomSwitchCell.swift; sourceTree = "<group>"; };
@@ -885,6 +929,7 @@
 				F7C40BF32199978B0004137E /* MBProgressHUD.framework in Frameworks */,
 				F76FDEAB24859C3D0095B6C2 /* Queuer.framework in Frameworks */,
 				F79918A221997FA300C2E308 /* UICKeyChainStore.framework in Frameworks */,
+				7AE63BF326DE0E1200CEAAD5 /* ChromaColorPicker.framework in Frameworks */,
 				F7176DC8256672650017E83C /* Protobuf.framework in Frameworks */,
 				F733B65221997CC2001C1FFA /* TLPhotoPicker.framework in Frameworks */,
 				F7176DC2256672650017E83C /* PromisesObjC.framework in Frameworks */,
@@ -958,6 +1003,15 @@
 				7AE63AEA26D633BA00CEAAD5 /* NCCollectionViewCommon.swift */,
 			);
 			path = "Collection Common";
+			sourceTree = "<group>";
+		};
+		7AE63BB526DDFC7C00CEAAD5 /* BackgroundImageColor */ = {
+			isa = PBXGroup;
+			children = (
+				7AE63BB626DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift */,
+				7AE63BB726DDFC7C00CEAAD5 /* NCBackgroundImageColor.storyboard */,
+			);
+			path = BackgroundImageColor;
 			sourceTree = "<group>";
 		};
 		956E0D5B26691EA700DA4F91 /* NMCViews */ = {
@@ -1222,6 +1276,7 @@
 		F74D3DB81BAC1941000BAE4B /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				7AE63B2926DCFB2600CEAAD5 /* NCNetworkingChunkedUpload.swift */,
 				95BB20D226600FB900AF4344 /* NCNetworkingProcessUpload.swift */,
 				F72CD63925C19EBF00F46F9A /* NCAutoUpload.swift */,
 				F75A9EE523796C6F0044CFCE /* NCNetworking.swift */,
@@ -1360,6 +1415,9 @@
 		F79A65C12191D8DC00FF6DCC /* Select */ = {
 			isa = PBXGroup;
 			children = (
+				7AE63BFA26DE5FCD00CEAAD5 /* NCSelectCommandViewCopyMove.xib */,
+				7AE63BFB26DE5FCD00CEAAD5 /* NCSelectCommandViewSelect.xib */,
+				7AE63BF926DE5FCD00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib */,
 				F79A65C22191D90F00FF6DCC /* NCSelect.storyboard */,
 				F79A65C52191D95E00FF6DCC /* NCSelect.swift */,
 			);
@@ -1369,6 +1427,7 @@
 		F7A0D14E259229FA008F8A13 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				7AE63B9B26DD104000CEAAD5 /* NSMutableAttributedString+Extensions.swift */,
 				F70460512499061800BB98A7 /* NotificationCenter+MainThread.swift */,
 				F78071071EDAB65800EAFFF6 /* NSNotificationCenter+MainThread.h */,
 				F78071081EDAB65800EAFFF6 /* NSNotificationCenter+MainThread.m */,
@@ -1513,6 +1572,7 @@
 		F7BFFA991A24D7BB0044ED85 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				7AE63B3526DCFB6300CEAAD5 /* NCContentPresenter.swift */,
 				95BB20F12660E25200AF4344 /* NCPopupViewController.swift */,
 				F7514EDA1C7B1336008F3338 /* CCHud.h */,
 				F7514EDB1C7B1336008F3338 /* CCHud.m */,
@@ -1532,6 +1592,7 @@
 		F7C0F46D1C8880540059EC54 /* Share */ = {
 			isa = PBXGroup;
 			children = (
+				7AE63B5426DCFC4200CEAAD5 /* NCShareExtension.swift */,
 				F78B9683234F785300F54315 /* NCSelectDestination.h */,
 				F78B9682234F785300F54315 /* NCSelectDestination.m */,
 				F78B9684234F785300F54315 /* NCSelectDestination.storyboard */,
@@ -1686,6 +1747,7 @@
 		F7F67BAA1A24D27800EE80DA /* iOSClient */ = {
 			isa = PBXGroup;
 			children = (
+				7AE63BB526DDFC7C00CEAAD5 /* BackgroundImageColor */,
 				C0ABA3D226A6BAF80049DE9A /* Helper */,
 				95BB20F72660E2C600AF4344 /* Account Request */,
 				95BB20E82660DFA200AF4344 /* Rename file */,
@@ -1747,6 +1809,8 @@
 		F7FC7D541DC1F93700BB2C6A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7AE63BE426DE09AB00CEAAD5 /* ChromaColorPicker.framework */,
+				7AE63BDE26DE08FA00CEAAD5 /* ChromaColorPicker.framework.dSYM */,
 				F7B1076C25D3CF2800E72DE2 /* BackgroundTasks.framework */,
 				F7F35B592578FB63003F5589 /* CollaboraOnlineWebViewKeyboardManager.framework */,
 				F7176DDA256672D90017E83C /* libsqlite3.tbd */,
@@ -1828,6 +1892,7 @@
 		F7FE125B1BAC03FB0041924B /* Security */ = {
 			isa = PBXGroup;
 			children = (
+				7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */,
 				F70CAE381F8CF31A008125FD /* NCEndToEndEncryption.h */,
 				F70CAE391F8CF31A008125FD /* NCEndToEndEncryption.m */,
 				F7F878AD1FB9E3B900599E4F /* NCEndToEndMetadata.swift */,
@@ -1929,6 +1994,7 @@
 				F77B0F981D118A16002130FE /* Embed App Extensions */,
 				F75A40001EBCB82B00B213E8 /* ShellScript */,
 				29C8CA4BB2EACD8DFED0164E /* [CP] Embed Pods Frameworks */,
+				7AE63BF526DE0E1300CEAAD5 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2076,7 +2142,7 @@
 				F78B9686234F785300F54315 /* NCSelectDestination.storyboard in Resources */,
 				F78BFEE11D31126B00E513CF /* MainInterface.storyboard in Resources */,
 				F7145A1A1D12E3B700CAFEEC /* Images.xcassets in Resources */,
-				F7F8D71D1ED6183000E711F3 /* CCCellShareExt.xib in Resources */,
+				7AE63BB926DDFC7C00CEAAD5 /* NCBackgroundImageColor.storyboard in Resources */,
 				F7145A231D12E3B700CAFEEC /* Localizable.strings in Resources */,
 				F700222D1EC479840080073F /* Custom.xcassets in Resources */,
 			);
@@ -2111,12 +2177,14 @@
 				F765F73225237E3F00391DBE /* NCRecent.storyboard in Resources */,
 				958C881126399033006C8923 /* FolderPathCustomCell.xib in Resources */,
 				F78F74342163757000C2ADAD /* NCTrash.storyboard in Resources */,
+				7AE63BFD26DE5FCE00CEAAD5 /* NCSelectCommandViewCopyMove.xib in Resources */,
 				F79A65C32191D90F00FF6DCC /* NCSelect.storyboard in Resources */,
 				F7226EDC1EE4089300EBECB1 /* Main.storyboard in Resources */,
 				F7EFC0C6256BC77700461AAD /* NCMoreUserCell.xib in Resources */,
 				F7632FBF21832F8700721B71 /* NCTrashSectionHeaderMenu.xib in Resources */,
 				7A875F0C26946D0B00AF558D /* RequiredDataCollectionSwitch.xib in Resources */,
 				F7E0E1DE22327DBA006B0911 /* NCAudioRecorderViewController.storyboard in Resources */,
+				7AE63BFE26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect.xib in Resources */,
 				F7F1E54C2492369A00E42386 /* NCMediaCommandView.xib in Resources */,
 				F710E8111EF95C9C00DC2427 /* ImagesIntro.xcassets in Resources */,
 				95353BA3267232A100E5F8B0 /* PasswordInputField.xib in Resources */,
@@ -2168,6 +2236,7 @@
 				F7632FC1218353AA00721B71 /* NCTrashSectionFooter.xib in Resources */,
 				7AE63AED26D633BA00CEAAD5 /* NCGridCell.xib in Resources */,
 				956E0D7B266A495500DA4F91 /* PdfWithOcrSwitchView.xib in Resources */,
+				7AE63BFC26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib in Resources */,
 				950A6482264AACF4006ADE0E /* AutoUploadFolderCustomCell.xib in Resources */,
 				F774264A22EB4D0000B23912 /* NCShareUserDropDownCell.xib in Resources */,
 				F722814323C8C34500C41898 /* NCRichWorkspace.xib in Resources */,
@@ -2299,29 +2368,39 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7AE63B6926DCFE3000CEAAD5 /* NCRenameFile.swift in Sources */,
+				7AE63B8126DD01BF00CEAAD5 /* NCDataSource.swift in Sources */,
 				F73D5E48246DE09200DF6467 /* NCElementsJSON.swift in Sources */,
 				F7A0D1362591FBC5008F8A13 /* String+Extensions.swift in Sources */,
 				F7A0D1472592256F008F8A13 /* UIImageView+Extensions.swift in Sources */,
 				F70460532499095400BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
-				F71459C21D12E3B700CAFEEC /* ShareViewController.m in Sources */,
 				F70BFC7520E0FA7D00C67599 /* NCUtility.swift in Sources */,
+				7AE63B5F26DCFC9E00CEAAD5 /* NCEmptyDataSet.swift in Sources */,
+				7AE63B8B26DD039000CEAAD5 /* NCOperationQueue.swift in Sources */,
 				F798F0E225880608000DAFFD /* UIColor+Extensions.swift in Sources */,
+				7AE63B5526DCFC4200CEAAD5 /* NCShareExtension.swift in Sources */,
 				F78295311F962EFA00A572F5 /* NCEndToEndEncryption.m in Sources */,
 				F74AF3A5247FB6AE00AC767B /* NCUtilityFileSystem.swift in Sources */,
 				F7F878AF1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */,
+				7AE63BAB26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift in Sources */,
+				7AE63BB826DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift in Sources */,
 				95BB2056265FE2AE00AF4344 /* NCGlobal.swift in Sources */,
+				7AE63B5A26DCFC8E00CEAAD5 /* NCListCell.swift in Sources */,
+				7AE63B9C26DD104000CEAAD5 /* NSMutableAttributedString+Extensions.swift in Sources */,
+				7AE63B2426DCF9ED00CEAAD5 /* NCNetworkingE2EE.swift in Sources */,
 				F71459D21D12E3B700CAFEEC /* CCUtility.m in Sources */,
-				F7F8D71C1ED6183000E711F3 /* CCCellShareExt.m in Sources */,
 				F71459E11D12E3B700CAFEEC /* CCHud.m in Sources */,
 				F765609023BF813600765969 /* NCContentPresenter.swift in Sources */,
+				7AE63B2F26DCFB2900CEAAD5 /* NCNetworkingChunkedUpload.swift in Sources */,
 				F75A9EE723796C6F0044CFCE /* NCNetworking.swift in Sources */,
 				F7A76DC8256A71CD00119AB3 /* UIImage+Extensions.swift in Sources */,
 				F7BAADC91ED5A87C00B7EAD4 /* NCDatabase.swift in Sources */,
 				F780710A1EDAB65800EAFFF6 /* NSNotificationCenter+MainThread.m in Sources */,
-				F78B9685234F785300F54315 /* NCSelectDestination.m in Sources */,
-				F7145A041D12E3B700CAFEEC /* CCloadItemData.swift in Sources */,
+				7AE63B6426DCFDC300CEAAD5 /* NCImageCellProtocol.swift in Sources */,
+				7AE63B7C26DCFFEA00CEAAD5 /* NCAccountRequest.swift in Sources */,
 				F76B3CCF1EAE01BD00921AC9 /* NCBrand.swift in Sources */,
 				F7BAADCC1ED5A87C00B7EAD4 /* NCManageDatabase.swift in Sources */,
+				7AE63B8626DD01F000CEAAD5 /* NCPopupViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2331,6 +2410,7 @@
 			files = (
 				F771E3F720E239B500AFB62D /* FileProviderExtension+Actions.swift in Sources */,
 				F76673F022C90434007ED366 /* FileProviderUtility.swift in Sources */,
+				7AE63B3026DCFB2A00CEAAD5 /* NCNetworkingChunkedUpload.swift in Sources */,
 				F7434B3420E23FD700417916 /* NCDatabase.swift in Sources */,
 				95BB2063265FE90E00AF4344 /* NCGlobal.swift in Sources */,
 				F7434B3820E2400600417916 /* NCBrand.swift in Sources */,
@@ -2339,6 +2419,7 @@
 				F73D5E49246DE09200DF6467 /* NCElementsJSON.swift in Sources */,
 				F771E3D520E2392D00AFB62D /* FileProviderItem.swift in Sources */,
 				F7434B3620E23FE000417916 /* NCManageDatabase.swift in Sources */,
+				7AE63B3B26DCFB7100CEAAD5 /* NCContentPresenter.swift in Sources */,
 				F798F0E725880609000DAFFD /* UIColor+Extensions.swift in Sources */,
 				F7A0D1482592256F008F8A13 /* UIImageView+Extensions.swift in Sources */,
 				F70460542499095400BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
@@ -2383,6 +2464,7 @@
 				371B5A2E23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift in Sources */,
 				F77444F8222816D5000D5EB0 /* NCPickerViewController.swift in Sources */,
 				F72A47EC2487B06B005AD489 /* NCOperationQueue.swift in Sources */,
+				7AE63B2A26DCFB2600CEAAD5 /* NCNetworkingChunkedUpload.swift in Sources */,
 				F769454622E9F1B0000A798A /* NCShareCommon.swift in Sources */,
 				958C87F926382B6C006C8923 /* ToggleButtonViewCell.swift in Sources */,
 				7A875F122694704E00AF558D /* AnalysisDataCollectionSwitch.swift in Sources */,
@@ -2395,6 +2477,7 @@
 				F75A9EE623796C6F0044CFCE /* NCNetworking.swift in Sources */,
 				F758B460212C56A400515F55 /* ScanCollectionView.swift in Sources */,
 				956E0D5D26691F5E00DA4F91 /* FileNameInputTextField.swift in Sources */,
+				7AE63BA526DDFAAD00CEAAD5 /* NSMutableAttributedString+Extensions.swift in Sources */,
 				F78ACD52219046DC0088454D /* NCSectionHeaderFooter.swift in Sources */,
 				F749C10C23C4A5340027D966 /* NCIntroViewController.swift in Sources */,
 				950A6480264AACF4006ADE0E /* TypeInFileNameCustomSwitchCell.swift in Sources */,
@@ -2413,6 +2496,7 @@
 				F7A321AD1E9E6AD50069AD1B /* CCAdvanced.m in Sources */,
 				950A6484264AACF4006ADE0E /* AutoUploadFolderCustomCell.swift in Sources */,
 				F77B0E4F1D118A16002130FE /* CCManageAutoUpload.m in Sources */,
+				7AE63B3626DCFB6300CEAAD5 /* NCContentPresenter.swift in Sources */,
 				F7BAADC81ED5A87C00B7EAD4 /* NCDatabase.swift in Sources */,
 				F75C0C4823D1FAE300163CC8 /* NCRichWorkspaceCommon.swift in Sources */,
 				F78ACD4A21903F850088454D /* NCTrashListCell.swift in Sources */,
@@ -2459,6 +2543,7 @@
 				F755BD9B20594AC7008C5FBB /* NCService.swift in Sources */,
 				95353B85267137F400E5F8B0 /* PNGImageSaveSwitchView.swift in Sources */,
 				F7B7504B2397D38F004E13EC /* UIImage+Extensions.swift in Sources */,
+				7AE63BBE26DDFC8500CEAAD5 /* NCBackgroundImageColor.swift in Sources */,
 				958C8817263990D6006C8923 /* FolderPathCustomCell.swift in Sources */,
 				95BB20EC2660DFA200AF4344 /* NCRenameFile.swift in Sources */,
 				F7EFC0CD256BF8DD00461AAD /* NCUserStatus.swift in Sources */,
@@ -2468,7 +2553,6 @@
 				F7020FCE2233D7F700B7297D /* NCCreateFormUploadVoiceNote.swift in Sources */,
 				7AE63AEB26D633BA00CEAAD5 /* NCGridCell.swift in Sources */,
 				F7134186259747BA00768D21 /* NCPushNotification.m in Sources */,
-				F7F4B1D823C74B3E00D82A6E /* NCRichWorkspace.swift in Sources */,
 				F726EEEC1FED1C820030B9C8 /* NCEndToEndInitialize.swift in Sources */,
 				F79A65C62191D95E00FF6DCC /* NCSelect.swift in Sources */,
 				F7FAC2672549E1B5008EE2C4 /* NCKTVHTTPCache.swift in Sources */,
@@ -2483,6 +2567,7 @@
 				F707C26521A2DC5200F6181E /* NCStoreReview.swift in Sources */,
 				7AE63AEF26D633BA00CEAAD5 /* NCCollectionViewCommon.swift in Sources */,
 				7A875F0626946CDE00AF558D /* RequiredDataCollectionSwitch.swift in Sources */,
+				7AE63B7726DCFFBB00CEAAD5 /* NCShareExtension.swift in Sources */,
 				F7BAADCB1ED5A87C00B7EAD4 /* NCManageDatabase.swift in Sources */,
 				F70968A424212C4E00ED60E5 /* NCLivePhoto.swift in Sources */,
 				95BB2088265FEF3F00AF4344 /* NCMenu.swift in Sources */,
@@ -2505,12 +2590,12 @@
 				F7C7B489245EBA4100D93E60 /* NCViewerQuickLook.swift in Sources */,
 				F758B45E212C569D00515F55 /* ScanCell.swift in Sources */,
 				F77B0ED11D118A16002130FE /* Acknowledgements.m in Sources */,
-				F70D8D8124A4A9BF000A5756 /* NCNetworkingAutoUpload.swift in Sources */,
 				95BB20FA2660E2C600AF4344 /* NCAccountRequest.swift in Sources */,
 				F7D96FCC246ED7E200536D73 /* NCNetworkingCheckRemoteUser.swift in Sources */,
 				F7E4D9C422ED929B003675FD /* NCShareComments.swift in Sources */,
 				F717402E24F699A5000C87D5 /* NCFavorite.swift in Sources */,
 				F74DE14325135B6800917068 /* NCTransfers.swift in Sources */,
+				7AE63BB026DDFBD200CEAAD5 /* NCViewCertificateDetails.swift in Sources */,
 				956E0D75266A494000DA4F91 /* PdfWithOcrSwitchView.swift in Sources */,
 				95BB20F22660E25200AF4344 /* NCPopupViewController.swift in Sources */,
 				956E0D8D266A4FEB00DA4F91 /* PdfWithoutOcrSwitchView.swift in Sources */,
@@ -3235,8 +3320,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/nextcloud/ios-communication-library/";
 			requirement = {
-				kind = exactVersion;
-				version = 0.93.0;
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.99.2;
 			};
 		};
 		F7C4D88B2534887E00C142DA /* XCRemoteSwiftPackageReference "Parchment" */ = {

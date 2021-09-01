@@ -56,7 +56,6 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     @objc var titleButtonDone1 = NSLocalizedString("_copy_", comment: "")
     @objc var isButtonDone1Hide = true
     @objc var isOverwriteHide = true
-    @IBOutlet fileprivate weak var buttonCancel: UIBarButtonItem!
    
     private var selectCommandViewSelect: NCSelectCommandView?
     
@@ -67,13 +66,8 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     }
 
     // ------ external settings ------------------------------------
-    @objc var delegate: NCSelectDelegate?
     @objc var typeOfCommandView: selectType = .select
-    
-    @objc var includeDirectoryE2EEncryption = false
-    @objc var includeImages = false
     @objc var enableSelectFile = false
-    @objc var type = ""
     @objc var items: [Any] = []
     
     var titleCurrentFolder = NCBrandOptions.shared.brand
@@ -321,12 +315,12 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 //=======
     
     @IBAction func actionDone(_ sender: Any) {
-           delegate?.dismissSelect(serverUrl: serverUrl, metadata: metadataFolder, type: type, items: items, buttonType: "done", overwrite: overwrite)
+           delegate?.dismissSelect(serverUrl: serverUrl, metadata: metadataFolder, type: type, items: items, overwrite: overwrite,copy: true, move: false)
            self.dismiss(animated: true, completion: nil)
        }
    
     @IBAction func actionDone1(_ sender: Any) {
-           delegate?.dismissSelect(serverUrl: serverUrl, metadata: metadataFolder, type: type, items: items, buttonType: "done1", overwrite: overwrite)
+           delegate?.dismissSelect(serverUrl: serverUrl, metadata: metadataFolder, type: type, items: items, overwrite: overwrite,copy: true, move: false)
            self.dismiss(animated: true, completion: nil)
        }
         

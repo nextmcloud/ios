@@ -24,6 +24,15 @@
 import Foundation
 import NCCommunication
 
+public protocol NCRenameFileDelegate {
+    func rename(fileName: String, fileNameNew: String)
+}
+
+// optional func
+public extension NCRenameFileDelegate {
+    func rename(fileName: String, fileNameNew: String) {}
+}
+
 class NCRenameFile: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var titleLabel: UILabel!
@@ -36,12 +45,15 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var renameButton: UIButton!
     @IBOutlet weak var seperator: UIView!
-    
+    var delegate: NCRenameFileDelegate?
+
 
     var metadata: tableMetadata?
     var imagePreview: UIImage?
     var disableChangeExt: Bool = false
-    
+    var fileName: String?
+    let width: CGFloat = 300
+    let height: CGFloat = 310
     // MARK: - Life Cycle
     
     override func viewDidLoad() {
@@ -202,6 +214,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             } else {
             
                 fileNameNew = fileNameWithoutExtNew + "." + extNew
+                self.delegate?.rename(fileName: self.fileName ?? "", fileNameNew: fileNameNew)
                 renameMetadata(metadata, fileNameNew: fileNameNew)
             }
         }

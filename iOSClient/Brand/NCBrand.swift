@@ -50,7 +50,7 @@ import UIKit
     @objc public var mailMe:                            String = "ios@nextcloud.com"
     @objc public var textCopyrightNextcloudiOS:         String = "Nextcloud Coherence for iOS %@ © 2021"
     @objc public var textCopyrightNextcloudServer:      String = "Nextcloud Server %@"
-    @objc public var loginBaseUrl:                      String = "https://dev2.next.magentacloud.de/"
+    @objc public var loginBaseUrl:                      String = "https://dev99-dipak.next.magentacloud.de/"
 
     @objc public var pushNotificationServerProxy:       String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost:                     String = "https://nextcloud.com/install"
@@ -144,6 +144,7 @@ import UIKit
         
         static var buttonMore = UIImage()
         static var buttonStop = UIImage()
+        static var buttonRestore = UIImage()
     }
 
     // Color
@@ -504,7 +505,7 @@ import UIKit
             NCBrandColor.shared.brand = NCBrandColor.shared.customer
             NCBrandColor.shared.brandText = NCBrandColor.shared.customerText
         }
-        setDarkMode()
+        //setDarkMode()
         DispatchQueue.main.async {
             self.createImagesThemingColor()
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming)

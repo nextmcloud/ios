@@ -26,6 +26,7 @@ import UIKit
 
 class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCellProtocol {
     
+    
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageItemLeftConstraint: NSLayoutConstraint!
     
@@ -55,7 +56,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
          return imageItem
         }
     }
-
+  
     var delegate: NCListCellDelegate?
     var objectId = ""
     var indexPath = IndexPath()

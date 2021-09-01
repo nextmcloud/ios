@@ -160,15 +160,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
         
         // Detect Dark mode
-        if #available(iOS 13.0, *) {
-            if CCUtility.getDarkModeDetect() {
-                if UITraitCollection.current.userInterfaceStyle == .dark {
-                    CCUtility.setDarkMode(true)
-                } else {
-                    CCUtility.setDarkMode(false)
-                }
-            }
-        }
+//        if #available(iOS 13.0, *) {
+//            if CCUtility.getDarkModeDetect() {
+//                if UITraitCollection.current.userInterfaceStyle == .dark {
+//                    CCUtility.setDarkMode(true)
+//                } else {
+//                    CCUtility.setDarkMode(false)
+//                }
+//            }
+//        }
         
 
         // Background task: register

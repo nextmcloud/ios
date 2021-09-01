@@ -510,7 +510,7 @@ extension NCCollectionViewCommon {
                 title: NSLocalizedString("_save_selected_files_", comment: ""),
                 icon: NCUtility.shared.loadImage(named: "save_files"),
                 action: { menuAction in
-                    for ocId in selectOcId {
+                    for ocId in self.selectOcId {
 
                         if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
                             if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo {
@@ -540,7 +540,7 @@ extension NCCollectionViewCommon {
                 icon: NCUtility.shared.loadImage(named: "move"),
                 action: { menuAction in
                     var meradatasSelect = [tableMetadata]()
-                    for ocId in selectOcId {
+                    for ocId in self.selectOcId {
                         if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
                             meradatasSelect.append(metadata)
                         }
@@ -562,7 +562,7 @@ extension NCCollectionViewCommon {
                 icon: NCUtility.shared.loadImage(named: "copy"),
                 action: { menuAction in
                     self.appDelegate.pasteboardOcIds.removeAll()
-                    for ocId in selectOcId {
+                    for ocId in self.selectOcId {
                         self.appDelegate.pasteboardOcIds.append(ocId)
                     }
                     NCFunctionCenter.shared.copyPasteboard()

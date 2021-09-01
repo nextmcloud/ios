@@ -31,28 +31,28 @@ class NCManageAutoUploadFileName: XLFormViewController {
 
     // MARK: - View Life Cycle
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        self.title = NSLocalizedString("_mode_filename_", comment: "")
-        
-        // Theming view
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
-        
-        changeTheming()
-    }
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//
+//        self.title = NSLocalizedString("_mode_filename_", comment: "")
+//
+//        // Theming view
+//        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
+//
+//        changeTheming()
+//    }
     
-    func reloadForm() {
-        
-        self.form.delegate = nil
-        
-        let maskFileName : XLFormRowDescriptor = self.form.formRow(withTag: "maskFileName")!
-        let previewFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "previewFileName")!
-        previewFileName.value = self.previewFileName(valueRename: maskFileName.value as? String)
-        
-        self.tableView.reloadData()
-        self.form.delegate = self
-    }
+//    func reloadForm() {
+//
+//        self.form.delegate = nil
+//
+//        let maskFileName : XLFormRowDescriptor = self.form.formRow(withTag: "maskFileName")!
+//        let previewFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "previewFileName")!
+//        previewFileName.value = self.previewFileName(valueRename: maskFileName.value as? String)
+//
+//        self.tableView.reloadData()
+//        self.form.delegate = self
+//    }
     
     @objc func changeTheming() {
         view.backgroundColor = NCBrandColor.shared.backgroundForm

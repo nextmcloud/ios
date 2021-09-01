@@ -25,7 +25,6 @@ import Foundation
 import Queuer
 import UIKit
 
-@objc protocol createFormUploadAssetsDelegate {
     
 
 protocol createFormUploadAssetsDelegate {
@@ -244,7 +243,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 
         row = XLFormRowDescriptor(tag: "useSubFolder", rowType: "NMCCustomSwitchCellsubFolderUpload", title: self.titleServerUrl)
         row.cellConfig["subFolderLabel.text"] = NSLocalizedString("_autoupload_create_subfolder_", comment: "")
-        let tableAccount = NCManageDatabase.shared.getAccountActive()
+        let tableAccount = NCManageDatabase.shared.getActiveAccount()
         if tableAccount?.autoUploadCreateSubfolder == true {
             row.cellConfigAtConfigure["subFolderSwitch.on"] = 1
             row.value = 1
@@ -380,7 +379,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
             row.cellConfig["fileNameTextField.text"] = fileNameMask
         }else{
             let asset = assets[0]
-            let  placeHolderString =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal)
+            let  placeHolderString =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
             row.cellConfig["fileNameTextField.placeholder"] = placeHolderString
         }
         row.hidden = "$\("maintainOriginalFileName") == 1"
@@ -561,7 +560,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 }
             }else{
                 let asset = assets[0]
-                formRow.cellConfig["fileNameTextField.placeholder"] =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal)
+                formRow.cellConfig["fileNameTextField.placeholder"] =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal, forcedNewFileName: true)
 //=======
 //                    NCContentPresenter.shared.messageNotification("_info_", description: "_forbidden_characters_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCharactersForbidden, forced: true)
 //                }
@@ -751,17 +750,16 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                             metadataMOVForUpload.livePhoto = true
                             
                             metadataMOVForUpload.session = self.session
-<<<<<<< HEAD
-                            metadataMOVForUpload.sessionSelector = NCBrandGlobal.shared.selectorUploadFile
-                            metadataMOVForUpload.size = fileSize
-                            metadataMOVForUpload.status = NCBrandGlobal.shared.metadataStatusWaitUpload
-                            metadataMOVForUpload.typeFile = NCBrandGlobal.shared.metadataTypeFileVideo
-=======
+//<<<<<<< HEAD
+//                            metadataMOVForUpload.sessionSelector = NCBrandGlobal.shared.selectorUploadFile
+//                            metadataMOVForUpload.size = fileSize
+//                            metadataMOVForUpload.status = NCBrandGlobal.shared.metadataStatusWaitUpload
+//                            metadataMOVForUpload.typeFile = NCBrandGlobal.shared.metadataTypeFileVideo
+//=======
                             metadataMOVForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
                             metadataMOVForUpload.size = fileSize
                             metadataMOVForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
                             metadataMOVForUpload.typeFile = NCGlobal.shared.metadataTypeFileVideo
->>>>>>> feature_branded_client_4
 
                             metadatasMOV.append(metadataMOVForUpload)
                         }
@@ -869,12 +867,6 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
     }
     
     @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {
-        let useFolderPhotoRow: XLFormRowDescriptor  = self.form.formRow(withTag: "useFolderAutoUpload")!
-        self.deselectFormRow(sender)
-        
-        if (useFolderPhotoRow.value! as AnyObject).boolValue == true{
-            return
-        }
         
         self.deselectFormRow(sender)
         
@@ -883,18 +875,10 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         let viewController = navigationController.topViewController as! NCSelect
         
         viewController.delegate = self
-        viewController.hideButtonCreateFolder = false
-        viewController.includeDirectoryE2EEncryption = true
-        viewController.includeImages = false
-        viewController.selectFile = false
-        viewController.titleButtonDone = NSLocalizedString("_select_", comment: "")
-        viewController.type = ""
-        
-        navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
         viewController.typeOfCommandView = .selectCreateFolder
         viewController.includeDirectoryE2EEncryption = true
         
         self.present(navigationController, animated: true, completion: nil)
+    
     }
-}
 }

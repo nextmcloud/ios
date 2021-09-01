@@ -101,7 +101,8 @@ extension NCViewer {
                             NotificationCenter.default.postOnMainThread(name: NCBrandGlobal.shared.notificationImagePreviewRotateImage)
                             if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
                                 
-                                NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
+//                                NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
+                                NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
                             } else {
                                 NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: !localFile!.offline)
                             }
@@ -291,8 +292,7 @@ extension NCViewer {
                         title: NSLocalizedString("_download_image_max_", comment: ""),
                         icon: NCUtility.shared.loadImage(named: "cloudDownload"),
                         action: { menuAction in
-                            NCNetworking.shared.download(metadata: metadata, activityIndicator: false, selector: "") { (_) in }
-
+                            NCNetworking.shared.download(metadata: metadata, selector: "") { (_) in }
                         }
                     )
                 )

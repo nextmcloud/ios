@@ -350,14 +350,14 @@ import NCCommunication
             return
         } else {
             
-            let result = NCCommunicationCommon.shared.getInternalType(fileName: fileNameForm as! String, mimeType: "", directory: false)
+            let result = NCCommunicationCommon.shared.getInternalType(fileName: fileName as! String, mimeType: "", directory: false)
             if NCUtility.shared.isDirectEditing(account: appDelegate.account, contentType: result.mimeType).count == 0 {
-                fileNameForm = (fileNameForm as! NSString).deletingPathExtension + "." + fileNameExtension
+                fileName = (fileName as! NSString).deletingPathExtension + "." + fileNameExtension
             }
             
-            if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: String(describing: fileNameForm)) != nil {
+            if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: String(describing: fileName)) != nil {
                 
-                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: String(describing: fileNameForm), fileNameView: String(describing: fileNameForm), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: String(describing: fileName), fileNameView: String(fileName), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
                 
                 guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
                 conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
