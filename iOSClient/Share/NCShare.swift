@@ -90,7 +90,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         self.btnCreateLink.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
         self.btnCreateLink.setTitleColor(NCBrandColor.shared.icon, for: .normal)
         self.btnCreateLink.backgroundColor = NCBrandColor.shared.backgroundView
-        self.btnCreateLink.titleLabel?.font = UIFont.systemFont(ofSize: 17)
+        self.btnCreateLink.titleLabel?.font = UIFont.systemFont(ofSize: 24)
         self.btnCreateLink.titleLabel!.adjustsFontSizeToFitWidth = true
         self.btnCreateLink.titleLabel!.minimumScaleFactor = 0.5
         self.btnCreateLink.titleLabel?.textColor = NCBrandColor.shared.backgroundView
@@ -993,7 +993,7 @@ class NCShareUserDropDownCell: DropDownCell {
 extension UITableView {
     func setEmptyMessage(_ message: String) {
 //        let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: 20))
-        let messageLabel = UILabel(frame: CGRect(x: 15, y: 0, width: self.bounds.size.width, height: 20))
+        let messageLabel = UILabel(frame: CGRect(x: 10, y: 0, width: self.bounds.size.width, height: 20))
         messageLabel.text = message
         messageLabel.textColor = NCBrandColor.shared.textInfo
         messageLabel.numberOfLines = 0
