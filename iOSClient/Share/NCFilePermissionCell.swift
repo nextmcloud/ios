@@ -56,6 +56,10 @@ class NCFilePermissionCell: XLFormButtonCell {
             self.seperatorBelow.isHidden = true
             self.seperatorBelowFull.isHidden = false
         }
+        
+        if rowDescriptor.tag == "kNMCFilePermissionCellEditingMsg" {
+            self.seperatorBelowFull.isHidden = true
+        }
     }
     
     @objc func switchChanged(mySwitch: UISwitch) {

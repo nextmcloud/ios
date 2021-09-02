@@ -675,8 +675,8 @@
 "_LINK_LABEL_"                      = "LINK LABEL";
 "_HIDE_DOWNLOAD_"                   = "HIDE DOWNLOAD";
 "_custom_link_label"                = "Your custom link label";
-"_please_enter_password"            = "Please enter the password or disable password option";// for the PDF you want to create or disable the function.";
-"_please_enter_expiration"          = "Please enter the expiry date or disable password option";
+"_please_enter_password"            = "Please enter the password or disable the function.";// for the PDF you want to create or disable the function.";
+"_please_enter_expiration"          = "Please enter the expiry date or disable the function.";
 "_PERMISSION_"                      = "PERMISSION";
 "_advance_permissions_"             = "Advance permissions";
 "_PASSWORD_PROTECTION_"             = "PASSWORD PROTECTION";

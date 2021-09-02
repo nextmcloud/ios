@@ -67,6 +67,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var quickStatusTableShare: tableShare!
     private var sendEmailSelected: Int!
     private var shareeEmail: String!
+    private var isCreateLink = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -90,7 +91,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         self.btnCreateLink.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
         self.btnCreateLink.setTitleColor(NCBrandColor.shared.icon, for: .normal)
         self.btnCreateLink.backgroundColor = NCBrandColor.shared.backgroundView
-        self.btnCreateLink.titleLabel?.font = UIFont.systemFont(ofSize: 24)
+        self.btnCreateLink.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         self.btnCreateLink.titleLabel!.adjustsFontSizeToFitWidth = true
         self.btnCreateLink.titleLabel!.minimumScaleFactor = 0.5
         self.btnCreateLink.titleLabel?.textColor = NCBrandColor.shared.backgroundView
@@ -188,6 +189,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             buttonMenu.setImage(UIImage.init(named: "shareMenu")?.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
             buttonMenu.isHidden = true
             buttonCopy.isHidden = true
+            self.tableView.setEmptyMessage(NSLocalizedString("", comment: ""))
+
         }
         tableView.reloadData()
     }
@@ -411,10 +414,19 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     func shareCompleted() {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
         self.reloadData()
+        if self.isCreateLink == true {
+            self.isCreateLink = false
+        }
     }
     
     func unShareCompleted() {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
+        if tableShareSelected?.shareType == 3 {
+            guard let metadata = self.metadata else { return }
+            let isFilesSharingPublicPasswordEnforced = NCManageDatabase.shared.getCapabilitiesServerBool(account: metadata.account, elements: NCElementsJSON.shared.capabilitiesFileSharingPubPasswdEnforced, exists: false)
+            var shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
+            shares.firstShareLink = nil
+        }
         self.reloadData()
     }
     
@@ -524,7 +536,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     @IBAction func createLinkClicked(_ sender: Any) {
         self.touchUpInsideButtonMenu(sender)
-        
+        self.isCreateLink = true
 //        guard let metadata = self.metadata else { return }
 //        let isFilesSharingPublicPasswordEnforced = NCManageDatabase.shared.getCapabilitiesServerBool(account: metadata.account, elements: NCElementsJSON.shared.capabilitiesFileSharingPubPasswdEnforced, exists: false)
 //        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
@@ -688,10 +700,10 @@ extension NCShare: UITableViewDataSource {
         
         var numOfRows = 0
         let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
-        
+        self.tableView.setEmptyMessage(NSLocalizedString("", comment: ""))
+        print(shares.share!.count)
         if shares.share != nil {
             numOfRows = shares.share!.count
-            labelYourShare.isHidden = false
         }
         if numOfRows == 0 {
             self.tableView.setEmptyMessage(NSLocalizedString("no_shares_created", comment: ""))
@@ -759,6 +771,117 @@ extension NCShare: UITableViewDataSource {
                 }
                 return cell
             }
+        } else if tableShare.shareType == 4 {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: "cellUser", for: indexPath) as? NCShareUserCell {
+                
+                cell.contentView.backgroundColor = NCBrandColor.shared.backgroundView
+                cell.tableShare = tableShare
+                cell.delegate = self
+                cell.labelTitle.text = tableShare.shareWithDisplayname
+                cell.labelTitle.textColor = NCBrandColor.shared.shareCellTitleColor
+                cell.labelCanEdit.text = NSLocalizedString("_share_permission_edit_", comment: "")
+                cell.labelCanEdit.textColor = NCBrandColor.shared.textView
+                cell.isUserInteractionEnabled = true
+                cell.switchCanEdit.isHidden = true//false
+                cell.labelCanEdit.isHidden = true//false
+                cell.buttonMenu.isHidden = false
+                cell.imageItem.image = NCShareCommon.shared.getImageShareType(shareType: tableShare.shareType)
+                cell.indexSelected = indexPath.row
+                cell.btnQuickStatus.tag = indexPath.row
+                
+                let status = NCUtility.shared.getUserStatus(userIcon: tableShare.userIcon, userStatus: tableShare.userStatus, userMessage: tableShare.userMessage)
+                cell.imageStatus.image = status.onlineStatus
+                cell.status.text = status.statusMessage
+                
+                let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + tableShare.shareWith + ".png"
+                
+                if FileManager.default.fileExists(atPath: fileNameLocalPath) {
+                    if let image = UIImage(contentsOfFile: fileNameLocalPath) {
+//                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
+//                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
+                    }
+                } else {
+                    NCCommunication.shared.downloadAvatar(userID: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
+                        if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
+                            if let image = UIImage(contentsOfFile: fileNameLocalPath) {
+//                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
+//                                cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
+                            }
+                        }
+                    }
+                }
+                
+//                if FileManager.default.fileExists(atPath: fileNameLocalPath) {
+//                    if let image = UIImage(contentsOfFile: fileNameLocalPath) {
+////                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
+////                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
+//                    }
+//                } else {
+//                    NCCommunication.shared.downloadAvatar(userID: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
+//                        if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
+//                            if let image = UIImage(contentsOfFile: fileNameLocalPath) {
+////                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
+////                                cell.imageItem.image = UIImage(named: "cloudUpload")?.image(color: NCBrandColor.shared.icon, size: 30)
+//                            }
+//                        }
+//                    }
+//                }
+                
+                if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
+                    cell.switchCanEdit.setOn(true, animated: false)
+//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_editing_", comment: ""), for: .normal)
+                } else {
+                    cell.switchCanEdit.setOn(false, animated: false)
+                }
+                
+                // If the initiator or the recipient is not the current user, show the list of sharees without any options to edit it.
+                if tableShare.uidOwner != self.appDelegate.userId && tableShare.uidFileOwner != self.appDelegate.userId {
+                    cell.isUserInteractionEnabled = false
+                    cell.switchCanEdit.isHidden = true
+                    cell.labelCanEdit.isHidden = true
+                    cell.buttonMenu.isHidden = true
+                }
+                cell.btnQuickStatus.setTitle("", for: .normal)
+                cell.btnQuickStatus.contentHorizontalAlignment = .left
+                
+                let ext = self.metadata?.ext
+//                if self.metadata?.typeFile != "document" || ext == "jpg" || ext == "png" || ext == "m4a" || self.metadata?.typeFile == "image" || self.metadata?.typeFile ==  "audio" {
+                
+                if (self.metadata?.typeFile == "document" ||  directory == true) {
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
+                } else {
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.quickStatusTextColor
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.quickStatusTextColor)
+                }
+                
+                if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
+//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_file_drop_", comment: ""), for: .normal)
+                    cell.labelQuickStatus.text = NSLocalizedString("_share_file_drop_", comment: "")
+                } else {
+                    // Read Only
+                    if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
+                        cell.labelQuickStatus.text = NSLocalizedString("_share_editing_", comment: "")
+                    } else {
+                        cell.labelQuickStatus.text = NSLocalizedString("_share_read_only_", comment: "")
+                    }
+                }
+                
+//                if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
+//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_file_drop_", comment: ""), for: .normal)
+//                }
+//                else if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
+//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_editing_", comment: ""), for: .normal)
+//                } else {
+//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_read_only_", comment: ""), for: .normal)
+//                }
+//                if CCUtility.isPermission(toRead: tableShare.permissions) {
+//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_read_only_", comment: ""), for: .normal)
+//                }
+                
+                return cell
+            }
+            
         } else {
         // USER
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellUser", for: indexPath) as? NCShareUserCell {
@@ -1011,6 +1134,7 @@ extension UITableView {
 
     func restore() {
         self.backgroundView = nil
+        self.subviews.forEach({ $0.removeFromSuperview() })
 //        self.separatorStyle = .none
     }
 }
