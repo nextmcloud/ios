@@ -37,7 +37,7 @@ class NCShareQuickStatusMenu: NSObject {
             actions.append(
                 NCMenuAction(
                     title: directory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
-                    icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption) ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
+                    icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption || status == (NCGlobal.shared.permissionShareShare - NCGlobal.shared.permissionReadShare))  ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
                     selected: false,
                     on: false,
                     action: { menuAction in
@@ -62,8 +62,8 @@ class NCShareQuickStatusMenu: NSObject {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_share_file_drop_", comment: ""),
-                    icon: UIImage(),
-                    selected: status == NCGlobal.shared.permissionCreateShare,
+                    icon: status == NCGlobal.shared.permissionCreateShare ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
+                    selected: false,
                     on: false,
                     action: { menuAction in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusFileDrop)

@@ -1357,15 +1357,17 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 cell.imageShared.image = UIImage(named: "avatar")
                 let fileNameUser = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + metadata.ownerId + ".png"
                 if FileManager.default.fileExists(atPath: fileNameUser) {
-                    if let image = UIImage(contentsOfFile: fileNameUser) {
-                        cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
-                    }
+//                    if let image = UIImage(contentsOfFile: fileNameUser) {
+//                        cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
+//                    }
+                    cell.imageShared.image = NCBrandColor.cacheImages.shared
                 } else {
                     NCCommunication.shared.downloadAvatar(userID: metadata.ownerId, fileNameLocalPath: fileNameUser, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account {
-                            if let image = UIImage(contentsOfFile: fileNameUser) {
-                                cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
-                            }
+//                            if let image = UIImage(contentsOfFile: fileNameUser) {
+//                                cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
+//                            }
+                            cell.imageShared.image = NCBrandColor.cacheImages.shared
                         }
                     }
                 }

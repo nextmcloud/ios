@@ -959,7 +959,7 @@ extension NCShare: UITableViewDataSource {
                 let ext = self.metadata?.ext
 //                if self.metadata?.typeFile != "document" || ext == "jpg" || ext == "png" || ext == "m4a" || self.metadata?.typeFile == "image" || self.metadata?.typeFile ==  "audio" {
                 
-                if (self.metadata?.typeFile == "document" ||  directory == true) {
+                if (self.metadata?.typeFile == "document" ||  directory == true || ext == "jpg" || ext == "png") {
                     cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
                     cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
                 } else {
