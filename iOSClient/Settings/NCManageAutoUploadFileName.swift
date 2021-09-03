@@ -96,7 +96,7 @@ class NCManageAutoUploadFileName: XLFormViewController {
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
 //=======
 //        row.value = CCUtility.getOriginalFileName(NCGlobal.shared.keyFileNameOriginalAutoUpload)
 //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
@@ -115,7 +115,7 @@ class NCManageAutoUploadFileName: XLFormViewController {
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
 
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand;
 //=======
 //        row.value = CCUtility.getFileNameType(NCGlobal.shared.keyFileNameAutoUploadType)
@@ -146,11 +146,11 @@ class NCManageAutoUploadFileName: XLFormViewController {
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
 
         row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textField.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
 //=======
 //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
 //
@@ -169,11 +169,10 @@ class NCManageAutoUploadFileName: XLFormViewController {
         row = XLFormRowDescriptor(tag: "previewFileName", rowType: XLFormRowDescriptorTypeTextView, title: "")
         row.height = 180
         row.disabled = true
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundView
+        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
 
-        row.cellConfig["textView.backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         row.cellConfig["textView.font"] = UIFont.systemFont(ofSize: 14.0)
-        row.cellConfig["textView.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["textView.textColor"] = NCBrandColor.shared.label
 //=======
 //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
 //

@@ -50,7 +50,7 @@ import UIKit
     @objc public var mailMe:                            String = "ios@nextcloud.com"
     @objc public var textCopyrightNextcloudiOS:         String = "Nextcloud Coherence for iOS %@ © 2021"
     @objc public var textCopyrightNextcloudServer:      String = "Nextcloud Server %@"
-    @objc public var loginBaseUrl:                      String = "https://dev99-dipak.next.magentacloud.de/"
+    @objc public var loginBaseUrl:                      String = "https://dev1.next.magentacloud.de/"
 
     @objc public var pushNotificationServerProxy:       String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost:                     String = "https://nextcloud.com/install"
@@ -164,7 +164,7 @@ import UIKit
     @objc public var encrypted:             UIColor = .red
     @objc public var backgroundView:        UIColor = .white
     @objc public var backgroundForm:        UIColor = UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
-    @objc public var textView:              UIColor = .black
+   // @objc public var textView:              UIColor = .black
     //@objc public var separator:             UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
     @objc public var tabBar:                UIColor = .white
     @objc public let nextcloud:             UIColor = UIColor(red: 0.0/255.0, green: 130.0/255.0, blue: 201.0/255.0, alpha: 1.0)
@@ -186,7 +186,7 @@ import UIKit
     @objc public var systemGrayAndGray66:        UIColor = .gray
     @objc public var commonViewInfoText:        UIColor = UIColor(displayP3Red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
     @objc public var tileSelectionImageColor:        UIColor = .white
-    @objc public var backgroundCell:        UIColor = .white
+    //@objc public var backgroundCell:        UIColor = .white
     @objc public var seperatorRename:             UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
 
 
@@ -358,6 +358,20 @@ import UIKit
             }
         }
     }
+    
+    @objc public var iconColor: UIColor{
+            if #available(iOS 13.0, *) {
+                if UITraitCollection.current.userInterfaceStyle == .dark {
+                    return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
+                }else {
+                    return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+                }
+            }else{
+           return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+        }
+       
+    }
+    
     override init() {
         self.brand = self.customer
 //        self.brandElement = self.customer

@@ -150,7 +150,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 //        row.cellConfig["imageView.image"] = UIImage(named: "folder")!.image(color: NCBrandColor.shared.customerDefault, size: 25)
 //        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
 //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
         //custom folder upload
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
@@ -162,7 +162,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView //photos
+        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label //photos
         row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         row.cellConfig["textLabel.text"] = ""//topLineView.isHidden
         
@@ -174,7 +174,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
 //
 //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
 //        //row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand
         
         
@@ -187,7 +187,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row = XLFormRowDescriptor(tag: "useFolderAutoUpload", rowType: "NMCCustomSwitchCellAutoUpload", title: self.titleServerUrl)
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_use_folder_auto_upload_", comment: "")
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label
         row.cellConfigAtConfigure["autoUploadSwitchControl.on"] = 0 //onTintColor
         row.cellConfig["autoUploadSwitchControl.onTintColor"] = NCBrandColor.shared.brand
         row.value = 0
@@ -232,7 +232,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 //        row.hidden = "$\("useFolderAutoUpload") == 0"
 //
 //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
 //        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"useFolderAutoUpload" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_lock_protection_no_screen_", nil)];
         
@@ -247,7 +247,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         if tableAccount?.autoUploadCreateSubfolder == true {
             row.cellConfigAtConfigure["subFolderSwitch.on"] = 1
             row.value = 1
-            row.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.textView
+            row.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.label
         } else {
             row.cellConfigAtConfigure["subFolderSwitch.on"] = 0
             row.value = 0
@@ -301,7 +301,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 //        //row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
 //
 //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
         //######## custom row maintain original filename
         
@@ -319,7 +319,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         }
 //        row.cellConfig["originalFileNameSwitch.on"] = CCUtility.getOriginalFileName(NCBrandGlobal.shared.keyFileNameOriginal)
         row.cellConfig["originalFileNameTitle.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["originalFileNameTitle.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["originalFileNameTitle.textColor"] = NCBrandColor.shared.label
         row.cellConfig["originalFileNameSwitch.onTintColor"] = NCBrandColor.shared.brand
 
         //#######end of custom row maintain original filename
@@ -334,7 +334,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 //        //row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
 //
 //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
         //###### custom row Add File Name Type
         XLFormViewController.cellClassesForRowDescriptorTypes()["NMCCustomSwitchCellTypeInFileName"] = TypeInFileNameCustomSwitchCell.self
@@ -347,7 +347,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
        // row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
 
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand
 
         //#######end of custom row Add File Name Type
@@ -363,11 +363,11 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
 //
 //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
 //
 //        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
 //        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textField.textColor"] = NCBrandColor.shared.textView
+//        row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
         
         //custom row mask file name
         row = XLFormRowDescriptor(tag: "maskFileName", rowType: "NMCCustomInputFieldFileName", title: NSLocalizedString("_filename_", comment: ""))
@@ -386,11 +386,11 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
        // row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
 
         //row.cellConfig["labelFileName.font"] = UIFont.systemFont(ofSize: 15.0)
-        //row.cellConfig["labelFileName.textColor"] = NCBrandColor.shared.textView
+        //row.cellConfig["labelFileName.textColor"] = NCBrandColor.shared.label
 
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.label
 
         //end of custom row mask file name
 //=======
@@ -445,9 +445,9 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row.disabled = true
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
 
-        row.cellConfig["textView.backgroundColor"] = NCBrandColor.shared.backgroundForm
+        row.cellConfig["textView.backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         row.cellConfig["textView.font"] = UIFont.systemFont(ofSize: 14.0)
-        row.cellConfig["textView.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["textView.textColor"] = NCBrandColor.shared.label
 //=======
 //        row.cellConfig["backgroundColor"] = cellBackgoundColor
 //
@@ -475,7 +475,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 
                 //enable subfolder selection option
                 let subfolderSwitchOption : XLFormRowDescriptor  = self.form.formRow(withTag: "useSubFolder")!
-                subfolderSwitchOption.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.textView//isEnabled
+                subfolderSwitchOption.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.label//isEnabled
                 subfolderSwitchOption.value = "enable_switch"
                 self.reloadForm()
 
@@ -483,7 +483,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 
                 //enable folder selection option
                 let buttonDestinationFolder : XLFormRowDescriptor  = self.form.formRow(withTag: "PhotoButtonDestinationFolder")!
-                buttonDestinationFolder.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView
+                buttonDestinationFolder.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label
                 
                 //hide subfolder selection option
                 let subfolderSwitchOption : XLFormRowDescriptor  = self.form.formRow(withTag: "useSubFolder")!

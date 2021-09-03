@@ -57,7 +57,7 @@
     if (activeAccount.autoUpload) row.value = @1;
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
 
     [section addFormRow:row];
@@ -72,7 +72,7 @@
     row.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
     [row.cellConfig setObject:[[UIImage imageNamed:@"foldersOnTop"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
     //[row.cellConfig setObject:@(UITableViewCellAccessoryDisclosureIndicator) forKey:@"accessoryType"];
     row.action.formSelector = @selector(selectAutomaticUploadFolder);
@@ -89,7 +89,7 @@
     if (activeAccount.autoUploadImage) row.value = @1;
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
 
@@ -99,7 +99,7 @@
     if (activeAccount.autoUploadWWAnPhoto) row.value = @1;
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
     
@@ -114,7 +114,7 @@
     if (activeAccount.autoUploadVideo) row.value = @1;
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
     
@@ -124,7 +124,7 @@
     if (activeAccount.autoUploadWWAnVideo) row.value = @1;
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
     
@@ -139,7 +139,7 @@
     if (activeAccount.autoUploadDeleteAssetLocalIdentifier) row.value = @1;
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
 
     [section addFormRow:row];
@@ -155,7 +155,7 @@
     if (activeAccount.autoUploadBackground) row.value = @1;
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
     
@@ -171,7 +171,7 @@
     if (activeAccount.autoUploadFull) row.value = @1;
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
 
     [section addFormRow:row];
@@ -187,7 +187,7 @@
     if (activeAccount.autoUploadCreateSubfolder) row.value = @1;
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
 
     [section addFormRow:row];
@@ -200,7 +200,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"autoUploadFileName" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_autoupload_filenamemask_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
 
     row.action.viewControllerClass = [NCManageAutoUploadFileName class];
     [section addFormRow:row];

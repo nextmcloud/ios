@@ -61,7 +61,7 @@ class PrivacySettingsViewController: XLFormViewController{
 //
 //        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
 //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
         
         //custom cell
@@ -77,7 +77,7 @@ class PrivacySettingsViewController: XLFormViewController{
         row.cellConfig["requiredDataCollectionSwitchControl.onTintColor"] = NCBrandColor.shared.brand
         row.cellConfig["cellLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView //photos
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label //photos
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_required_data_collection_", comment: "")
         section.addFormRow(row)
         
@@ -92,7 +92,7 @@ class PrivacySettingsViewController: XLFormViewController{
         row.cellConfig["analysisDataCollectionSwitchControl.onTintColor"] = NCBrandColor.shared.brand
         row.cellConfig["cellLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView //photos
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label //photos
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_analysis_data_acqusition_", comment: "")
         if(UserDefaults.standard.bool(forKey: "isAnalysisDataCollectionSwitchOn")){
             row.cellConfigAtConfigure["analysisDataCollectionSwitchControl.on"] = 1
@@ -114,7 +114,7 @@ class PrivacySettingsViewController: XLFormViewController{
 //        row.cellConfig["analysisDataCollectionSwitchControl.onTintColor"] = NCBrandColor.shared.brand
 //        row.cellConfig["cellLabel.textAlignment"] = NSTextAlignment.left.rawValue
 //        row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView //photos
+//        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label //photos
 //        row.cellConfig["cellLabel.text"] = NSLocalizedString("_analysis_data_acqusition_", comment: "")
         
         if(isShowSettingsButton){

@@ -150,13 +150,13 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
         //
         //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         //
         row.cellConfig["fileNameInputTextField.placeholder"] = self.fileName
         
         row.cellConfig["fileNameInputTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameInputTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.label
         
         
         section.addFormRow(row)
@@ -172,7 +172,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.customer, size: 25)
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label
         row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         row.cellConfig["textLabel.text"] = ""
         
@@ -189,7 +189,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_pdf_with_ocr_", comment: "")
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label
         
         section.addFormRow(row)
         // END of Save with Text Recognition PDF
@@ -200,7 +200,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_text_file_ocr_", comment: "")
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label
         
         section.addFormRow(row)
         //END of Save with Text Recognition text file
@@ -214,7 +214,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_pdf_", comment: "")
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label
         
         section.addFormRow(row)
         // END of PDF without text recongnition
@@ -226,7 +226,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_jpg_", comment: "")
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label
         
         section.addFormRow(row)
         // END JPG without text recongnition
@@ -237,7 +237,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_png_", comment: "")
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label
         
         section.addFormRow(row)
         // END without text recongnition
@@ -253,7 +253,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_set_password_", comment: "")
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label
         
         section.addFormRow(row)
         // END of set PDF password switch
@@ -266,7 +266,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         row.cellConfig["fileNameInputTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameInputTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.label
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
         row.hidden = 1
         
@@ -285,7 +285,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         //
         //        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
         //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         //
         //        section.addFormRow(row)
         
@@ -307,7 +307,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         //
         //        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.center.rawValue
         //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
         // section.addFormRow(row)
 //=======
@@ -358,11 +358,11 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
         
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
         row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textField.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
         
         //section.addFormRow(row)
 //=======
@@ -393,7 +393,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["imageView.image"] = UIImage(named: "textRecognition")!.image(color: NCBrandColor.shared.brandElement, size: 25) 
         
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
         //section.addFormRow(row)
 //=======
@@ -430,7 +430,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         row.cellConfig["tintColor"] = NCBrandColor.shared.brandElement
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
         //section.addFormRow(row)
         
@@ -440,11 +440,11 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
         //
         //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         //
         //        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
         //        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-        //        row.cellConfig["textField.textColor"] = NCBrandColor.shared.textView
+        //        row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
         
         //section.addFormRow(row)
 //=======
@@ -581,7 +581,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             if (!isPDFWithoutOCRSwitchOn){
                 if (formRow.value! as AnyObject).boolValue  == true {
                     let setPasswordSwitchOption : XLFormRowDescriptor  = self.form.formRow(withTag: "PDFSetPasswordSwitch")!
-                    setPasswordSwitchOption.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView//isEnabled
+                    setPasswordSwitchOption.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label//isEnabled
                     setPasswordSwitchOption.value = "enable_switch"
                     
                     self.tableView.reloadData()
@@ -604,7 +604,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             if(!isPDFWithOCRSwitchOn){
                 if (formRow.value! as AnyObject).boolValue  == true {
                     let setPasswordSwitchOption : XLFormRowDescriptor  = self.form.formRow(withTag: "PDFSetPasswordSwitch")!
-                    setPasswordSwitchOption.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.textView//isEnabled
+                    setPasswordSwitchOption.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label//isEnabled
                     setPasswordSwitchOption.value = "enable_switch"
                     
                     self.tableView.reloadData()

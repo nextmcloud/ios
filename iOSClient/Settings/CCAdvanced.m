@@ -49,13 +49,13 @@
     [form addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"showHiddenFiles" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_show_hidden_files_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
 
     if ([CCUtility getShowHiddenFiles]) row.value = @"1";
     else row.value = @"0";
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
 
     [section addFormRow:row];
     
@@ -66,20 +66,20 @@
     section.footerTitle = [NSString stringWithFormat:@"%@\n%@", NSLocalizedString(@"_format_compatibility_footer_", nil), NSLocalizedString(@"_upload_mov_livephoto_footer_", nil)];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"formatCompatibility" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_format_compatibility_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     if ([CCUtility getFormatCompatibility]) row.value = @"1";
     else row.value = @"0";
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"livePhoto" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_upload_mov_livephoto_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     if ([CCUtility getLivePhoto]) row.value = @"1";
     else row.value = @"0";
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
 
     [section addFormRow:row];
@@ -91,11 +91,11 @@
 //    section.footerTitle = NSLocalizedString(@"_disableLocalCacheAfterUpload_footer_", nil);
 //    
 //    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disableLocalCacheAfterUpload" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_disableLocalCacheAfterUpload_", nil)];
-//    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+//    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
 //    if ([CCUtility getDisableLocalCacheAfterUpload]) row.value = @"1";
 //    else row.value = @"0";
 //    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-//    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+//    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
 //    [section addFormRow:row];
 
     
@@ -106,11 +106,11 @@
     section.footerTitle = NSLocalizedString(@"_automatic_Download_Image_footer_", nil);
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"automaticDownloadImage" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_automatic_Download_Image_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     if ([CCUtility getAutomaticDownloadImage]) row.value = @"1";
     else row.value = @"0";
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
 
     [section addFormRow:row];
@@ -132,10 +132,10 @@
 
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disablefilesapp" rowType:@"kNMCCustomCellType" title:NSLocalizedString(@"_disable_files_app_", nil)];
 
-        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
         row.cellConfigAtConfigure[@"cellLabel.text"] = NSLocalizedString(@"_disable_files_app_", nil);
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"cellLabel.font"];
-        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"cellLabel.textColor"];
+        [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"cellLabel.textColor"];
 
         if ([CCUtility getDisableFilesApp]){
             row.cellConfigAtConfigure[@"switchControl.on"] = @"1";
@@ -208,9 +208,9 @@
         section.footerTitle = NSLocalizedString(@"_privacy_footer_", nil);
         
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"crashservice" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_crashservice_title_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+        [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
         [row.cellConfig setObject:[[UIImage imageNamed:@"crashservice"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
         row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
         if ([CCUtility getDisableCrashservice]) row.value = @"1";
@@ -362,7 +362,7 @@
     
     // Exit
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"esci" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_exit_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
     [row.cellConfig setObject:[UIColor redColor] forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];

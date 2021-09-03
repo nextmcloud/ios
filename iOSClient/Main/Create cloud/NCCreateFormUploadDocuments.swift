@@ -139,7 +139,7 @@ import NCCommunication
         
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView //photos
+        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label //photos
         row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         row.cellConfig["textLabel.text"] = ""
 
@@ -167,10 +167,10 @@ import NCCommunication
         row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
         row.cellClass = NCCreateDocumentCustomTextField.self
 
-        row.cellConfigAtConfigure["backgroundColor"] = NCBrandColor.shared.backgroundForm;
+        row.cellConfigAtConfigure["backgroundColor"] =  NCBrandColor.shared.secondarySystemGroupedBackground;
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.label
         row.cellConfig["fileNameTextField.placeholder"] = self.fileName
         
         section.addFormRow(row)
@@ -229,7 +229,7 @@ import NCCommunication
         // select
         let imageSelect = cell.viewWithTag(300) as! UIImageView
         if selectTemplate != nil && selectTemplate?.name == template.name {
-            cell.backgroundColor = NCBrandColor.shared.textView
+            cell.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
             imageSelect.image = UIImage(named: "plus100")
             imageSelect.isHidden = false
         } else {

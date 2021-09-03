@@ -105,8 +105,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 //        tableView.backgroundColor = NCBrandColor.shared.backgroundForm
 //        tableView.reloadData()
 //
-//        labelTimer.textColor = NCBrandColor.shared.textView
-//        labelDuration.textColor = NCBrandColor.shared.textView
+//        labelTimer.textColor = NCBrandColor.shared.label
+//        labelDuration.textColor = NCBrandColor.shared.label
 //
 //        initializeForm()
 //=======
@@ -181,7 +181,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 //        
 //        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
 //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
         
         //custom cell
@@ -196,7 +196,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView //photos
+        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label //photos
         row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         row.cellConfig["textLabel.text"] = ""
 //=======
@@ -228,12 +228,12 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         //row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
         row.cellConfigAtConfigure["backgroundColor"] = NCBrandColor.shared.backgroundForm;
         //row.cellConfig["labelFileName.font"] = UIFont.systemFont(ofSize: 15.0)
-        //row.cellConfig["labelFileName.textColor"] = NCBrandColor.shared.textView
+        //row.cellConfig["labelFileName.textColor"] = NCBrandColor.shared.label
         //row.cellConfig["labelFileName.text"] = NSLocalizedString("_filename_", comment: "")
         
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.label
         row.cellConfig["fileNameTextField.placeholder"] = self.fileName
 //=======
 //        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())

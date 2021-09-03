@@ -131,6 +131,13 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
 
         changeTheming()
+        
+        //call new view
+               
+        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed")){
+            redirectToPrivacyViewController()
+        }
+
     }
         
     override func viewWillAppear(_ animated: Bool) {
@@ -240,6 +247,13 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         changeTheming()
     }
     
+    func redirectToPrivacyViewController(){
+            UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
+            let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+            let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
+                    self.present(newViewController, animated: true, completion: nil)
+    }
+
     // MARK: - NotificationCenter
 
     @objc func initialize() {

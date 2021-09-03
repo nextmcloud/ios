@@ -63,7 +63,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"autoUpload" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_settings_autoupload_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:[[UIImage imageNamed:@"autoUpload"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
 
     row.action.viewControllerClass = [CCManageAutoUpload class];
@@ -79,7 +79,7 @@
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[[UIImage imageNamed:@"lock.open"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
 
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
     //[row.cellConfig setObject:@(UITableViewCellAccessoryDisclosureIndicator) forKey:@"accessoryType"];
@@ -90,7 +90,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"enableTouchDaceID" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_enable_touch_face_id_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     
     if([[CCUtility getPasscode] length]){
@@ -104,7 +104,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"notPasscodeAtStart" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_lock_protection_no_screen_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     if([[CCUtility getPasscode] length]){
         row.disabled = @NO;
@@ -118,7 +118,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"e2eEncryption" rowType:XLFormRowDescriptorTypeButton title:title];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
 
     row.action.viewControllerClass = [NCManageEndToEndEncryption class];
@@ -137,7 +137,7 @@
 //        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
 //        [row.cellConfig setObject:[[UIImage imageNamed:@"themeLightDark"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
 //        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-//        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+//        [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
 //        row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
 //        if ([CCUtility getDarkModeDetect]) row.value = @1;
 //        else row.value = @0;
@@ -149,7 +149,7 @@
 //        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
 //        [row.cellConfig setObject:[[UIImage imageNamed:@"themeLightDark"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
 //        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-//        [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+//        [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
 //        row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
 //        if ([CCUtility getDarkMode]) row.value = @1;
 //        else row.value = @0;
@@ -170,7 +170,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"advanced" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_advanced_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:[[UIImage imageNamed:@"gear"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
     row.action.viewControllerClass = [CCAdvanced class];
     [section addFormRow:row];
@@ -192,7 +192,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"privacySettings" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_privacy_settings_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     //[row.cellConfig setObject:[[UIImage imageNamed:@"gear"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
     row.action.viewControllerClass = [privacySettingsViewController class];
     [section addFormRow:row];
@@ -202,7 +202,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"advanced" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_privacy_policy_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     //[row.cellConfig setObject:[[UIImage imageNamed:@"gear"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
     row.action.viewControllerClass = [PrivacyPolicyViewController class];
     [section addFormRow:row];
@@ -212,7 +212,7 @@
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
   
    
     row.action.viewControllerClass = [OpenSourceSoftwareViewController class];
@@ -228,7 +228,7 @@
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
   
    
     row.action.viewControllerClass = [HelpViewController class];
@@ -239,7 +239,7 @@
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
   
    
     row.action.viewControllerClass = [ImprintViewController class];
@@ -259,10 +259,10 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disablefilesapp" rowType:@"kNMCCustomCellType" title:NSLocalizedString(@"_magentacloud_version_", nil)];
     NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleInfoDictionaryVersion"];
 
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundCell;
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     row.cellConfigAtConfigure[@"cellLabel.text"] = NSLocalizedString(@"_magentacloud_version_", nil);
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"cellLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.textView forKey:@"cellLabel.textColor"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"cellLabel.textColor"];
     
     row.cellConfigAtConfigure[@"versionLabel.text"] = appVersion;
     

@@ -153,8 +153,8 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     @objc func changeTheming() {
         view.backgroundColor = NCBrandColor.shared.tabBar
         seperator.backgroundColor = NCBrandColor.shared.seperatorRename
-        fileNameWithoutExt.backgroundColor = NCBrandColor.shared.backgroundCell
-        ext.backgroundColor = NCBrandColor.shared.backgroundCell
+        fileNameWithoutExt.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        ext.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
     }
     
     // MARK: - Action
