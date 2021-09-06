@@ -6,6 +6,7 @@
 //  Copyright © 2019 Marino Faggiana. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//  Author TSI-mc
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,6 +26,7 @@ import Foundation
 import WebKit
 import NCCommunication
 import FloatingPanel
+import AppAuth
 
 class NCLoginWeb: UIViewController {
     
@@ -38,6 +40,8 @@ class NCLoginWeb: UIViewController {
     @objc var loginFlowV2Token = ""
     @objc var loginFlowV2Endpoint = ""
     @objc var loginFlowV2Login = ""
+    
+    private var authState: OIDAuthState?
     
     // MARK: - Life Cycle
     
@@ -82,6 +86,8 @@ class NCLoginWeb: UIViewController {
         self.view.addSubview(activityIndicator)
         
         if let url = URL(string: urlBase) {
+            
+            //getTokenUsingAppAuth()
             loadWebPage(webView: webView!, url: url)
         } else {
             NCContentPresenter.shared.messageNotification("_error_", description: "_login_url_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.ErrorInternalError, forced: true)
@@ -100,6 +106,58 @@ class NCLoginWeb: UIViewController {
         
         // Start timer error network
         appDelegate.startTimerErrorNetworking()
+    }
+    
+    func getTokenUsingAppAuth(){
+        let authorizationEndpoint = URL(string: "https://accounts.google.com/o/oauth2/v2/auth")!
+        let tokenEndpoint = URL(string: "https://www.googleapis.com/oauth2/v4/token")!
+        let configuration = OIDServiceConfiguration(authorizationEndpoint: authorizationEndpoint,
+                                                    tokenEndpoint: tokenEndpoint)
+        
+        let issuer = URL(string: "https://accounts.login00.idm.ver.sul.t-online.de/.well-known/openid-configuration")!
+
+        // discovers endpoints
+        OIDAuthorizationService.discoverConfiguration(forIssuer: issuer) { configuration, error in
+          guard let config = configuration else {
+            print("Error retrieving discovery document: \(error?.localizedDescription ?? "Unknown error")")
+            return
+          }
+
+          // perform the auth request...
+            // builds authentication request
+        let request = OIDAuthorizationRequest(configuration: config,
+                                                  clientId: "10TVL0SAM30000004901NEXTMAGENTACLOUDIOS0",
+                                                  scopes: [OIDScopeOpenID, OIDScopeProfile, "magentacloud", "offline_access"],
+                                                  redirectURL: URL(string: "nextmagentacloudios://login")!,
+                                                  responseType: OIDResponseTypeCode,
+                                                  additionalParameters: ["":"",
+                                                  ])
+
+            // performs authentication request
+            print("Initiating authorization request with scope: \(request.scope ?? "nil")")
+
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+
+            appDelegate.currentAuthorizationFlow =
+                OIDAuthState.authState(byPresenting: request, presenting: self) { authState, error in
+              if let authState = authState {
+                //self.setAuthState(authState)
+                print("Got authorization tokens. Access token: " +
+                      "\(authState.lastTokenResponse?.idToken ?? "nil")")
+                appDelegate.requestPushNotificationPermission()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    NCCommunication.shared.getLoginFlowV2Poll(token: (authState.lastTokenResponse?.idToken)!, endpoint: "https://dev2.next.magentacloud.de") { (server, loginName, appPassword, errorCode, errorDescription) in
+                        if errorCode == 0 && server != nil && loginName != nil && appPassword != nil {
+                            self.createAccount(server: server!, username: loginName!, password: appPassword!)
+                        }
+                    }
+                }
+              } else {
+                print("Authorization error: \(error?.localizedDescription ?? "Unknown error")")
+                //self.setAuthState(nil)
+              }
+            }
+        }
     }
     
     func loadWebPage(webView: WKWebView, url: URL)  {
@@ -285,6 +343,7 @@ extension NCLoginWeb: WKNavigationDelegate {
                     UIView.animate(withDuration: 0.5) {
                         viewController.view.alpha = 1
                     }
+                    appDelegate.adjust.trackEvent(TriggerEvent(Login.rawValue))
                 }
             } else {
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitializeMain)

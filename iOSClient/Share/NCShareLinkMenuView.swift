@@ -6,6 +6,7 @@
 //  Copyright © 2019 Marino Faggiana. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//  Author TSI-mc
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -370,7 +371,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworkin
     
     // Add another link
     @IBAction func buttonAddAnotherLink(sender: UIButton) {
-        
+        appDelegate.adjust.trackEvent(TriggerEvent(CreateLink.rawValue))
         networking?.createShareLink(password: "")
     }
     

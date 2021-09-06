@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="P4P-kP-0dM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="P4P-kP-0dM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -85,6 +86,78 @@
             </objects>
             <point key="canvasLocation" x="12655" y="607"/>
         </scene>
+        <!--Initial Privacy Settings View Controller-->
+        <scene sceneID="Ly5-dm-LTN">
+            <objects>
+                <viewController storyboardIdentifier="privacyPolicyViewController" id="PY5-f7-e4T" customClass="InitialPrivacySettingsViewController" customModule="Nextcloud" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="hni-Ja-wnk">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Privacy Settings" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8xu-Ne-bL3">
+                                <rect key="frame" x="20" y="238" width="374" height="29"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="nie-WT-tde" userLabel="privacy help text">
+                                <rect key="frame" x="57" y="287" width="300" height="322"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="300" id="74m-fB-woG"/>
+                                </constraints>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ctD-ho-2Qo" userLabel="AcceptButton">
+                                <rect key="frame" x="122" y="629" width="170" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="GLd-mk-HjN"/>
+                                    <constraint firstAttribute="width" constant="170" id="gfL-ro-VWd"/>
+                                </constraints>
+                                <state key="normal" title="Accept"/>
+                                <connections>
+                                    <action selector="onAcceptButtonClicked:" destination="PY5-f7-e4T" eventType="touchUpInside" id="dE5-Sn-MPD"/>
+                                </connections>
+                            </button>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="dataPrivacy" translatesAutoresizingMaskIntoConstraints="NO" id="FtM-jd-ZnZ">
+                                <rect key="frame" x="177" y="158" width="60" height="60"/>
+                                <color key="tintColor" systemColor="systemRedColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="60" id="KBI-24-269"/>
+                                    <constraint firstAttribute="height" constant="60" id="bjJ-Jn-hyk"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="90K-Ak-MHR"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="ctD-ho-2Qo" firstAttribute="top" secondItem="nie-WT-tde" secondAttribute="bottom" constant="20" id="1sa-S3-6zn"/>
+                            <constraint firstItem="8xu-Ne-bL3" firstAttribute="top" secondItem="FtM-jd-ZnZ" secondAttribute="bottom" constant="20" id="E7l-bu-Xk0"/>
+                            <constraint firstItem="ctD-ho-2Qo" firstAttribute="centerX" secondItem="hni-Ja-wnk" secondAttribute="centerX" id="OIv-AW-3CL"/>
+                            <constraint firstItem="nie-WT-tde" firstAttribute="top" secondItem="8xu-Ne-bL3" secondAttribute="bottom" constant="20" id="Pie-1h-nKH"/>
+                            <constraint firstItem="8xu-Ne-bL3" firstAttribute="centerX" secondItem="hni-Ja-wnk" secondAttribute="centerX" id="RiV-JI-KId"/>
+                            <constraint firstItem="FtM-jd-ZnZ" firstAttribute="centerX" secondItem="hni-Ja-wnk" secondAttribute="centerX" id="TtH-b1-Y7z"/>
+                            <constraint firstItem="nie-WT-tde" firstAttribute="centerY" secondItem="hni-Ja-wnk" secondAttribute="centerY" id="WWb-wX-etf"/>
+                            <constraint firstItem="90K-Ak-MHR" firstAttribute="trailing" secondItem="8xu-Ne-bL3" secondAttribute="trailing" constant="20" id="bwo-Kj-pft"/>
+                            <constraint firstItem="8xu-Ne-bL3" firstAttribute="top" secondItem="90K-Ak-MHR" secondAttribute="top" constant="150" id="ogJ-wG-ggL"/>
+                            <constraint firstItem="8xu-Ne-bL3" firstAttribute="leading" secondItem="90K-Ak-MHR" secondAttribute="leading" constant="20" id="qaB-VF-cAb"/>
+                            <constraint firstItem="nie-WT-tde" firstAttribute="centerX" secondItem="hni-Ja-wnk" secondAttribute="centerX" id="y7T-3Z-KyD"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="D53-Fi-rZA"/>
+                    <connections>
+                        <outlet property="acceptButton" destination="ctD-ho-2Qo" id="b7I-4d-syL"/>
+                        <outlet property="dataPrivacyImage" destination="FtM-jd-ZnZ" id="w4e-u3-9Cn"/>
+                        <outlet property="privacySettingsHelpText" destination="nie-WT-tde" id="Qm7-cB-NLs"/>
+                        <outlet property="privacySettingsTitle" destination="8xu-Ne-bL3" id="0j2-qh-qKS"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dpo-CR-pW3" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="14313.04347826087" y="608.70535714285711"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="Zwa-9g-1qn">
             <objects>
@@ -104,5 +177,35 @@
             </objects>
             <point key="canvasLocation" x="11762" y="607"/>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="VGf-bI-Gc7">
+            <objects>
+                <navigationController storyboardIdentifier="privacySettingsNavigation" automaticallyAdjustsScrollViewInsets="NO" id="no4-X5-VgN" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Cy3-8g-Mvp">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="PY5-f7-e4T" kind="relationship" relationship="rootViewController" id="KXE-g3-9nR"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="tbR-jV-rUF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="13402.898550724638" y="608.70535714285711"/>
+        </scene>
     </scenes>
+    <resources>
+        <image name="dataPrivacy" width="36" height="36"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>

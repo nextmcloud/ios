@@ -6,6 +6,7 @@
 //  Copyright © 2018 Marino Faggiana. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//  Author TSI-mc
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -156,6 +157,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         row.cellConfig["textLabel.text"] = ""
         
         section.addFormRow(row)
@@ -621,7 +623,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         }
     }
     
-    @objc func save() {
+    func startProcessForSaving(){
         
         let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
         guard let name = rowFileName.value else {
@@ -645,7 +647,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             showAlert()
             return
         }
-        
+                
         NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
         
         saveImages(fileNameSave: fileNameSave,fileType: "jpg",metadataConflict: nil,completion: { (success) -> Void in
@@ -736,6 +738,25 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                         })
                 }
             })
+    }
+    
+    @objc func save() {
+        
+        // Request delete all image scanned
+        let alertController = UIAlertController(title: "", message: NSLocalizedString("_saved_info_alert_", comment: ""), preferredStyle: .alert)
+        let alertWindow = UIWindow(frame: UIScreen.main.bounds)
+        alertWindow.windowLevel = UIWindow.Level.alert
+        alertWindow.rootViewController = UIViewController()
+        alertWindow.makeKeyAndVisible()
+        let actionOk = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default) { (action:UIAlertAction) in
+            self.startProcessForSaving()
+            alertController.dismiss(animated: true, completion: nil)
+        }
+        
+        alertController.addAction(actionOk)
+        //alertWindow.addSubview(alertController)
+        self.present(alertController, animated: true)
+        
         
 //        if (isPNGFormatSwitchOn){
 //            saveImages(fileNameSave: fileNameSave, fileType: "png",metadataConflict: nil,completion: { (success) -> Void in
@@ -810,6 +831,21 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
     }
     
+    func showAlertForInfo(){
+        // Request delete all image scanned
+        let alertController = UIAlertController(title: "", message: NSLocalizedString("_saved_info_alert_", comment: ""), preferredStyle: .alert)
+        let alertWindow = UIWindow(frame: UIScreen.main.bounds)
+        alertWindow.windowLevel = UIWindow.Level.alert
+        alertWindow.rootViewController = UIViewController()
+        alertWindow.makeKeyAndVisible()
+        let actionOk = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default) { (action:UIAlertAction) in
+            alertController.dismiss(animated: true, completion: nil)
+        }
+        
+        alertController.addAction(actionOk)
+        //alertWindow.addSubview(alertController)
+        self.present(alertController, animated: true)
+    }
     func saveTxtFile(completion: (Bool) -> ()){
         
         let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
@@ -1541,6 +1577,7 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
         let controller = VNDocumentCameraViewController()
         controller.delegate = self
         
+        appDelegate.adjust.trackEvent(TriggerEvent(DocumentScan.rawValue))
         self.viewController?.present(controller, animated: true)
     }
     

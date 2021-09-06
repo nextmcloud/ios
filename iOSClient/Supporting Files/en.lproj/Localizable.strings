@@ -142,7 +142,7 @@
 "_now_"                     = "Now";
 "_wait_"                    = "Please wait …";
 "_attention_"               = "Attention";
-"_recent_"                  = "Recent";
+"_recent_"                  = "Recent files";
 "_view_in_folder_"          = "View in folder";
 "_leave_share_"             = "Leave this share";
 "_delete_file_"             = "Delete file";
@@ -167,6 +167,15 @@
 "_alias_"                   = "Alias";
 "_alias_footer_"            = "Give your account names a descriptive name such as Home, Office, School …";
 "_auto_upload_help_text_"   = "With this option, you upload your photos or videos to the same folder that you selected for \"Automatic upload.\"";
+"_single_file_conflict_title_" = "File conflict";
+"_multi_file_conflict_title_" = " %@ File conflicts";
+"_replace_action_title_" = "Replace";
+"_keep_both_action_title_" = "Keep both";
+"_cancel_keep_existing_action_title_" = "Cancel and keep existing";
+"_replace_all_action_title_" = "Replace all";
+"_keep_both_for_all_action_title_" = "Keep both for all";
+"_more_action_title_" = "More Details";
+
 
 /* User status */
 "_online_"                  = "Online";
@@ -297,6 +306,25 @@
 "_trial_expired_day_"           = "Days remaining";
 "_disableLocalCacheAfterUpload_footer_" = "After uploading the file, do not keep it in the local cache";
 "_disableLocalCacheAfterUpload_"        = "Disable local cache";
+"_data_protection_" = "Data protection";
+"_privacy_settings_" = "Privacy Settings";
+"_privacy_policy_" = "Privacy Policy";
+"_used_opensource_software_" = "OpenSource software used";
+"_service_" = "Service";
+"_imprint_" = "Imprint";
+"_info_" = "Info";
+"_magentacloud_version_" = "MagentaCLOUD Version";
+"_privacy_settings_help_text_" = "To optimize your app, we collect anonymous data. For this we use software solutions of different partners. We would like to give you full transparency and decision-making power over the processin and collection of your anonymized usage data. You can also change your settings at any time later in the app settings under data protection. Please note, however, that data collection makes a considerable contribution to the optimization of this app and you prevent this optimization by preventing data transmission.";
+"_required_data_collection_" = "Required data collection";
+"_required_data_collection_help_text_" = "The collection of this data is necessary to be able to use essential functions of the app.";
+"_analysis_data_acqusition_" = "Analysis-data acqusition for the design";
+"_analysis_data_acqusition_help_text_" = "This data helps us to optimize the app usage for you and to identify system crashes and errors more quickly";
+"_privacy_help_text_after_login_" = "This app uses Cookies and similiar technolgies (tools). By clicking Accept, you accept the processing and also the Transfer of your data to third parties. The data will be used for Analysis, retargeting and to Display personalized Content and Advertising on  sites and third-party sites. You can find further informatin, including Information on data processing by third-party Providers, in the settings and in our Privacy Policy.You can reject the use of the Tools or customize them at any time in the Settings.";
+"_key_privacy_help_" = "Privacy Policy";
+"_key_reject_help_" = "reject";
+"_key_settings_help_" = "Settings";
+"_prefix_upload_path_" = "MagentaCLOUD/";
+
 
 // Manage AutoUpload
 
@@ -773,6 +801,7 @@
 "_pdf_password_"                    = "PDF-PASSWORT";
 "_set_password_"                    = "Set password";
 "_no_password_warn_"                 = "Please enter a password for the PDF you want to create or disable the function.";
+"_saved_info_alert_" = "Saving will take some time, espacially if you have selected several pages and file formats.";
 
 
 /* The title on the navigation bar of the Scanning screen. */
@@ -798,7 +827,7 @@
 
 // Offline
 
-"_manage_file_offline_"             = "Manage offline files";
+"_manage_file_offline_"             = "Offline files";
 "_set_available_offline_"           = "Set as available offline";
 "_remove_available_offline_"        = "Remove as available offline";
 

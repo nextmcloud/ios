@@ -50,7 +50,7 @@ import UIKit
     @objc public var mailMe:                            String = "ios@nextcloud.com"
     @objc public var textCopyrightNextcloudiOS:         String = "Nextcloud Coherence for iOS %@ © 2021"
     @objc public var textCopyrightNextcloudServer:      String = "Nextcloud Server %@"
-    @objc public var loginBaseUrl:                      String = "https://nextcloud.indemo.t-systems.net/"
+    @objc public var loginBaseUrl:                      String = "https://dev2.next.magentacloud.de/"
     @objc public var pushNotificationServerProxy:       String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost:                     String = "https://nextcloud.com/install"
     @objc public var linkloginPreferredProviders:       String = "https://nextcloud.com/signup-ios";
@@ -386,7 +386,7 @@ class NCBrandColor: NSObject {
     // Avatar & Preview
     let avatarSize: CGFloat                         = 512
     @objc let sizePreview: CGFloat                  = 1024
-    @objc let sizeIcon: CGFloat                     = 512
+    @objc let sizeIcon: CGFloat                     = 1024
     
     // E2EE
     let e2eeMaxFileSize: UInt64                     = 524288000   // 500 MB

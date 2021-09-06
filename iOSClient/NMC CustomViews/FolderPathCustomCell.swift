@@ -16,9 +16,6 @@ class FolderPathCustomCell: XLFormButtonCell{
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
-        
-        
     }
     
     override func configure() {
@@ -31,6 +28,8 @@ class FolderPathCustomCell: XLFormButtonCell{
         super.update()
         if (rowDescriptor.tag == "PhotoButtonDestinationFolder"){
             bottomLineView.isHidden = true
+        }else{
+            bottomLineView.isHidden = false
         }
     }
    

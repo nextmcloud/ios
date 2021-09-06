@@ -187,7 +187,7 @@
         [application setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
     }
     // sdk Adjust
-    NSString *yourAppToken = @"{YourAppToken}";
+    NSString *yourAppToken = @"1zfaxn19pd7k";
     NSString *environment = ADJEnvironmentSandbox;
     ADJConfig *adjustConfig = [ADJConfig configWithAppToken:yourAppToken
                                                 environment:environment];
@@ -283,6 +283,26 @@
         [self scheduleAppRefresh];
         [self scheduleBackgroundProcessing];
     }
+}
+
+-(void)didBecomeActiveWithConversation:(MSConversation *)conversation {
+    // Called when the extension is about to move from the inactive to active state.
+    // This will happen when the extension is about to present UI.
+    // Use this method to configure the extension and restore previously stored state.
+
+    [Adjust trackSubsessionStart];
+}
+
+-(void)willResignActiveWithConversation:(MSConversation *)conversation {
+    // Called when the extension is about to move from the active to inactive state.
+    // This will happen when the user dissmises the extension, changes to a different
+    // conversation or quits Messages.
+    
+    // Use this method to release shared resources, save user data, invalidate timers,
+    // and store enough state information to restore your extension to its current state
+    // in case it is terminated later.
+
+    [Adjust trackSubsessionEnd];
 }
 
 //

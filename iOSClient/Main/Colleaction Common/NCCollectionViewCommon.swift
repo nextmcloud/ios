@@ -4,6 +4,7 @@
 //
 //  Created by Marino Faggiana on 12/09/2020.
 //  Copyright © 2020 Marino Faggiana. All rights reserved.
+//  Author TSI-mc
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
@@ -156,6 +157,11 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         NotificationCenter.default.addObserver(self, selector: #selector(triggerProgressTask(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterProgressTask), object:nil)
 
         changeTheming()
+        //call new view
+        
+        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed")){
+            redirectToPrivacyViewController()
+        }
     }
         
     override func viewWillAppear(_ animated: Bool) {
@@ -212,6 +218,13 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     
     override var canBecomeFirstResponder: Bool {
         return true
+    }
+    
+    func redirectToPrivacyViewController(){
+        UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
+        let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
+                self.present(newViewController, animated: true, completion: nil)
     }
     
     func setNavigationItem() {
@@ -732,7 +745,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         
         if isEditMode { return }
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId) else { return }
-        
+        appDelegate.adjust.trackEvent(TriggerEvent(Sharing.rawValue))
         NCFunctionCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 2)
     }
         
