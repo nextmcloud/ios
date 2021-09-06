@@ -325,10 +325,12 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             
             let fileNamePath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + appDelegate.user + ".png"
             
-            if let themingAvatarFile = UIImage.init(contentsOfFile: fileNamePath) {
-                cell.avatar?.image = UIImage.init(named: "user_settings")
+            if UIImage.init(contentsOfFile: fileNamePath) != nil {
+                //cell.avatar?.image = UIImage.init(named: "user_settings")
+                cell.avatar?.image = UIImage.init(named: "user_settings")?.image(color: NCBrandColor.shared.iconColor, size: 25)
             } else {
-                cell.avatar?.image = UIImage.init(named: "user_settings")
+                //cell.avatar?.image = UIImage.init(named: "user_settings")
+                cell.avatar?.image = UIImage.init(named: "user_settings")?.image(color: NCBrandColor.shared.iconColor, size: 25)
             }
             cell.avatar?.layer.masksToBounds = true
             cell.avatar?.layer.cornerRadius = cell.avatar.frame.size.width / 2
@@ -341,7 +343,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 //            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
             cell.selectedBackgroundView = selectionColor
             cell.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+           // cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
             
             if NCManageDatabase.shared.getCapabilitiesServerBool(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesUserStatusEnabled, exists: false) {
                 if let account = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", appDelegate.account)) {

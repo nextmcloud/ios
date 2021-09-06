@@ -27,9 +27,8 @@ class PrivacySettingsViewController: XLFormViewController{
     }
     
     @objc func changeTheming() {
-        view.backgroundColor = NCBrandColor.shared.backgroundForm
-        tableView.backgroundColor = NCBrandColor.shared.backgroundForm
-        tableView.separatorStyle = UITableViewCell.SeparatorStyle.none;
+        tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        tableView.separatorColor = .none
         tableView.reloadData()
         initializeForm()
     }
@@ -110,6 +109,7 @@ class PrivacySettingsViewController: XLFormViewController{
         
         
         row = XLFormRowDescriptor(tag: "SaveSettingsButton", rowType: "SaveSettingsButton", title: "")
+        row.cellConfig["backgroundColor"] = UIColor.clear
 
 //        row.cellConfig["analysisDataCollectionSwitchControl.onTintColor"] = NCBrandColor.shared.brand
 //        row.cellConfig["cellLabel.textAlignment"] = NSTextAlignment.left.rawValue

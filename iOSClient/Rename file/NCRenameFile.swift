@@ -70,7 +70,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             
             fileNameWithoutExt.text = metadata.fileNameWithoutExt
             fileNameWithoutExt.delegate = self
-            fileNameWithoutExt.layer.borderColor = NCBrandColor.shared.icon.cgColor
+            fileNameWithoutExt.layer.borderColor = NCBrandColor.shared.iconColor.cgColor
             fileNameWithoutExt.becomeFirstResponder()
             
             ext.text = metadata.ext
@@ -108,12 +108,12 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
         }
         
         cancelButton.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
-        cancelButton.setTitleColor(NCBrandColor.shared.icon, for: .normal)
+        cancelButton.setTitleColor(NCBrandColor.shared.iconColor, for: .normal)
         cancelButton.layer.cornerRadius = 5
         cancelButton.layer.masksToBounds = true
 //        cancelButton.layer.backgroundColor =  NCBrandColor.shared.graySoft.withAlphaComponent(0.2).cgColor
         cancelButton.layer.borderWidth = 0.3
-        cancelButton.layer.borderColor = NCBrandColor.shared.icon.cgColor
+        cancelButton.layer.borderColor = NCBrandColor.shared.iconColor.cgColor
         
         renameButton.setTitle(NSLocalizedString("_rename_", comment: ""), for: .normal)
         renameButton.setTitleColor(NCBrandColor.shared.brandText, for: .normal)

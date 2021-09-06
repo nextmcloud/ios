@@ -111,8 +111,9 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
     }
     
     @objc func changeTheming() {
-        view.backgroundColor = NCBrandColor.shared.backgroundForm
-        tableView.backgroundColor = NCBrandColor.shared.backgroundForm
+        view.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        cellBackgoundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         tableView.reloadData()
         initializeForm()
         self.reloadForm()
@@ -159,7 +160,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row = XLFormRowDescriptor(tag: "PhotoButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
         row.action.formSelector = #selector(changeDestinationFolder(_:))
         row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
-        
+        row.cellConfig["backgroundColor"] = cellBackgoundColor
+
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label //photos
@@ -185,6 +187,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 
 
         row = XLFormRowDescriptor(tag: "useFolderAutoUpload", rowType: "NMCCustomSwitchCellAutoUpload", title: self.titleServerUrl)
+        row.cellConfig["backgroundColor"] = cellBackgoundColor
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_use_folder_auto_upload_", comment: "")
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label
@@ -254,8 +257,11 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
             row.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.graySoft
         }
         //row.hidden = "$\("useFolderAutoUpload") == 0"
+        row.cellConfig["backgroundColor"] = cellBackgoundColor
         row.cellConfig["subFolderLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["subFolderSwitch.onTintColor"] = NCBrandColor.shared.brand
+        row.cellConfig["backgroundColor"] = cellBackgoundColor
+
         //end of custom subfolder row
 //=======
 //        row = XLFormRowDescriptor(tag: "useSubFolder", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_autoupload_create_subfolder_", comment: ""))
@@ -321,6 +327,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row.cellConfig["originalFileNameTitle.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["originalFileNameTitle.textColor"] = NCBrandColor.shared.label
         row.cellConfig["originalFileNameSwitch.onTintColor"] = NCBrandColor.shared.brand
+        row.cellConfig["backgroundColor"] = cellBackgoundColor
 
         //#######end of custom row maintain original filename
         
@@ -391,6 +398,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.label
+        row.cellConfig["backgroundColor"] = cellBackgoundColor
 
         //end of custom row mask file name
 //=======
@@ -448,6 +456,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row.cellConfig["textView.backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         row.cellConfig["textView.font"] = UIFont.systemFont(ofSize: 14.0)
         row.cellConfig["textView.textColor"] = NCBrandColor.shared.label
+        row.cellConfig["backgroundColor"] = cellBackgoundColor
+
 //=======
 //        row.cellConfig["backgroundColor"] = cellBackgoundColor
 //

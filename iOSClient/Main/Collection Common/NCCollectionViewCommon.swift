@@ -248,7 +248,6 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     }
     
     func redirectToPrivacyViewController(){
-            UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
             let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
             let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
                     self.present(newViewController, animated: true, completion: nil)
@@ -666,8 +665,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 button.sizeToFit()
                 button.addTarget(self, action: #selector(profileButtonTapped(sender:)), for: .touchUpInside)
                        
-                navigationItem.setLeftBarButton(UIBarButtonItem(customView: button), animated: true)
-                navigationItem.leftItemsSupplementBackButton = true
+//                navigationItem.setLeftBarButton(UIBarButtonItem(customView: button), animated: true)
+//                navigationItem.leftItemsSupplementBackButton = true
             }
         }
     }

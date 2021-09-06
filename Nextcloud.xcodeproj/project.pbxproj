@@ -3045,7 +3045,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";

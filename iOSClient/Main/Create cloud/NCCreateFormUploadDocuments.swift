@@ -66,7 +66,9 @@ import NCCommunication
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         let cancelButton : UIBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancel))
         let saveButton : UIBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_save_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(save))
-        
+        cancelButton.tintColor = NCBrandColor.shared.brand
+        saveButton.tintColor = NCBrandColor.shared.brand
+
         self.navigationItem.leftBarButtonItem = cancelButton
         self.navigationItem.rightBarButtonItem = saveButton
         self.navigationItem.rightBarButtonItem?.isEnabled = false
@@ -182,7 +184,7 @@ import NCCommunication
         let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
         header.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
         header.textLabel?.textColor = .gray
-        header.tintColor = NCBrandColor.shared.backgroundForm
+        header.tintColor = NCBrandColor.shared.secondarySystemGroupedBackground
     }
 
     // MARK: - CollectionView

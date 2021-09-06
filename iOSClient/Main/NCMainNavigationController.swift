@@ -73,7 +73,7 @@ class NCMainNavigationController: UINavigationController {
             navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor:NCBrandColor.shared.label]
         }
         
-        navigationBar.tintColor = .systemBlue
+        navigationBar.tintColor = NCBrandColor.shared.brand
         navigationBar.setNeedsLayout()
     }
 }

@@ -53,7 +53,7 @@ class NCActionSheetHeader: NSObject {
         headerView.backgroundColor = NCBrandColor.shared.backgroundForm
         headerView.imageItem.image = image
         headerView.label.text = text
-        headerView.label.textColor = NCBrandColor.shared.icon
+        headerView.label.textColor = NCBrandColor.shared.iconColor
         
         return headerView
     }

@@ -53,14 +53,16 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancel))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_save_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(save))
-        
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+
+        self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
+        self.navigationItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.brand
 
         // title
         self.title = NSLocalizedString("_voice_memo_title_", comment: "")
         
         // Button Play Stop
-        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
+        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
         
         // Progress view
         progressView.progress = 0
@@ -191,6 +193,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         
         
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
+        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         row.action.formSelector = #selector(changeDestinationFolder(_:))
         row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
         
@@ -284,7 +287,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
         header.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
         header.textLabel?.textColor = .gray
-        header.tintColor = NCBrandColor.shared.backgroundForm
+        header.tintColor = cellBackgoundColor
     }
     
 //    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -473,7 +476,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
         
-        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
+        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
     }
     
     func stop() {
@@ -486,7 +489,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         progressView.progress = 0
         updateTimerUI()
         
-        buttonPlayStop.setImage(UIImage(named: "stop")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
+        buttonPlayStop.setImage(UIImage(named: "stop")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
     }
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
@@ -496,7 +499,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         progressView.progress = 0
         updateTimerUI()
         
-        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
+        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
 
     }
 }

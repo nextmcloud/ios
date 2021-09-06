@@ -51,9 +51,9 @@ class NCSortMenu: NSObject {
             NCMenuAction(
                 title: NSLocalizedString("_order_by_name_a_z_", comment: ""),
 
-                icon: UIImage(named: "sortFileNameAZ")!.image(color: NCBrandColor.shared.icon, size: 50),
+                icon: UIImage(named: "sortFileNameAZ")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                 onTitle: NSLocalizedString("_order_by_name_z_a_", comment: ""),
-                onIcon: UIImage(named: "sortFileNameZA")!.image(color: NCBrandColor.shared.icon, size: 50),
+                onIcon: UIImage(named: "sortFileNameZA")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                 selected: layoutForView.sort == "fileName",
                 on: layoutForView.sort == "fileName",
                 action: { menuAction in
@@ -70,9 +70,9 @@ class NCSortMenu: NSObject {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_order_by_date_more_recent_", comment: ""),
-                icon: UIImage(named: "sortDateMoreRecent")!.image(color: NCBrandColor.shared.icon, size: 50),
+                icon: UIImage(named: "sortDateMoreRecent")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                 onTitle: NSLocalizedString("_order_by_date_less_recent_", comment: ""),
-                onIcon: UIImage(named: "sortDateLessRecent")!.image(color: NCBrandColor.shared.icon, size: 50),
+                onIcon: UIImage(named: "sortDateLessRecent")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                 selected: layoutForView.sort == "date",
                 on: layoutForView.sort == "date",
                 action: { menuAction in
@@ -90,9 +90,9 @@ class NCSortMenu: NSObject {
             NCMenuAction(
                 title: NSLocalizedString("_order_by_size_smallest_", comment: ""),
 
-                icon: UIImage(named: "sortSmallest")!.image(color: NCBrandColor.shared.icon, size: 50),
+                icon: UIImage(named: "sortSmallest")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                 onTitle: NSLocalizedString("_order_by_size_largest_", comment: ""),
-                onIcon: UIImage(named: "sortLargest")!.image(color: NCBrandColor.shared.icon, size: 50),
+                onIcon: UIImage(named: "sortLargest")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                 selected: layoutForView.sort == "size",
                 on: layoutForView.sort == "size",
                 action: { menuAction in
@@ -111,7 +111,7 @@ class NCSortMenu: NSObject {
                 NCMenuAction(
                     title: NSLocalizedString("_directory_on_top_no_", comment: ""),
 
-                    icon: UIImage(named: "foldersOnTop")!.image(color: NCBrandColor.shared.icon, size: 50),
+                    icon: UIImage(named: "foldersOnTop")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                     selected: layoutForView.directoryOnTop,
                     on: layoutForView.directoryOnTop,
                     action: { menuAction in

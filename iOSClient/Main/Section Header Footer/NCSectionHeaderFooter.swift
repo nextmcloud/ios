@@ -50,11 +50,11 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
 
         backgroundColor = .clear
         
-        buttonSwitch.setImage(UIImage.init(named: "switchList")!.image(color: NCBrandColor.shared.gray, size: 25), for: .normal)
+        buttonSwitch.setImage(UIImage.init(named: "switchList")!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
         
         buttonOrder.setTitle("", for: .normal)
-        buttonOrder.setTitleColor(.systemBlue, for: .normal)
-        buttonMore.setImage(UIImage.init(named: "more")!.image(color:  NCBrandColor.shared.gray, size: 25), for: .normal)
+        buttonOrder.setTitleColor(NCBrandColor.shared.brand, for: .normal)
+        buttonMore.setImage(UIImage.init(named: "more")!.image(color:  NCBrandColor.shared.iconColor, size: 25), for: .normal)
                 
         // Gradient
         gradient.startPoint = CGPoint(x: 0, y: 0.50)
@@ -167,7 +167,7 @@ class NCSectionFooter: UICollectionReusableView {
         super.awakeFromNib()
         
         self.backgroundColor = UIColor.clear
-        labelSection.textColor = NCBrandColor.shared.icon
+        labelSection.textColor = NCBrandColor.shared.iconColor
     }
     
     func setTitleLabel(directories: Int, files: Int, size: Int64) {

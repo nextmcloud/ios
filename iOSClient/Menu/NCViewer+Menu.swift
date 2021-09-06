@@ -96,7 +96,7 @@ extension NCViewer {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_rotate_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "rotate"),
+                        icon: NCUtility.shared.loadImage(named: "rotate",color: NCBrandColor.shared.iconColor),
                         action: { menuAction in
                             NotificationCenter.default.postOnMainThread(name: NCBrandGlobal.shared.notificationImagePreviewRotateImage)
                             if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
@@ -140,7 +140,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_open_in_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "open_file"),
+                    icon: NCUtility.shared.loadImage(named: "open_file",color: NCBrandColor.shared.iconColor),
 
                     action: { menuAction in
                         NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorOpenIn)
@@ -156,7 +156,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_print_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "printer"),
+                    icon: NCUtility.shared.loadImage(named: "printer",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint)
                     }
@@ -170,11 +170,11 @@ extension NCViewer {
         if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo {
             
             var title: String = NSLocalizedString("_save_selected_files_", comment: "")
-            var icon = NCUtility.shared.loadImage(named: "save_files")
+            var icon = NCUtility.shared.loadImage(named: "save_files",color: NCBrandColor.shared.iconColor)
             let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
             if metadataMOV != nil {
                 title = NSLocalizedString("_livephoto_save_", comment: "")
-                icon = NCUtility.shared.loadImage(named: "livephoto")
+                icon = NCUtility.shared.loadImage(named: "livephoto",color: NCBrandColor.shared.iconColor)
             }
             
             actions.append(
@@ -199,7 +199,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "rename"),
+                    icon: NCUtility.shared.loadImage(named: "rename",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         
                         if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
@@ -273,7 +273,7 @@ extension NCViewer {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_view_in_folder_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "arrow.forward.square"),
+                        icon: NCUtility.shared.loadImage(named: "arrow.forward.square",color: NCBrandColor.shared.iconColor),
                         action: { menuAction in
                             NCFunctionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
                         }
@@ -290,7 +290,7 @@ extension NCViewer {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_download_image_max_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "cloudDownload"),
+                        icon: NCUtility.shared.loadImage(named: "cloudDownload",color: NCBrandColor.shared.iconColor),
                         action: { menuAction in
                             NCNetworking.shared.download(metadata: metadata, selector: "") { (_) in }
                         }
@@ -307,7 +307,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_search_", comment: ""),
-                    icon: UIImage(named: "search")!.image(color: NCBrandColor.shared.gray, size: 50),
+                    icon: UIImage(named: "search")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                     action: { menuAction in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuSearchTextPDF)
                     }
@@ -323,7 +323,7 @@ extension NCViewer {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_modify_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "pencil.tip.crop.circle"),
+                        icon: NCUtility.shared.loadImage(named: "pencil.tip.crop.circle",color: NCBrandColor.shared.iconColor),
                         action: { menuAction in
                             NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
                         }
@@ -339,7 +339,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: titleDelete,
-                    icon: NCUtility.shared.loadImage(named: "trash"),
+                    icon: NCUtility.shared.loadImage(named: "trash",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         
                         let alertController = UIAlertController(title: "", message: NSLocalizedString("_want_delete_", comment: ""), preferredStyle: .alert)

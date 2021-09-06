@@ -119,9 +119,9 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     
     @objc func changeTheming() {
         
-        view.backgroundColor = NCBrandColor.shared.backgroundForm
-        tableView.backgroundColor = NCBrandColor.shared.backgroundForm
-        cellBackgoundColor = NCBrandColor.shared.backgroundForm
+        view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        tableView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        cellBackgoundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         tableView.reloadData()
     }
     
@@ -267,7 +267,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["fileNameInputTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameInputTextField.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.label
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         row.hidden = 1
         
         
@@ -426,7 +426,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             row.selectorOptions = ["PDF"]
         }
         row.value = "PDF"
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         
         row.cellConfig["tintColor"] = NCBrandColor.shared.brandElement
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
