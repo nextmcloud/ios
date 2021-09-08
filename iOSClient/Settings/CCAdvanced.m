@@ -43,6 +43,9 @@
     XLFormSectionDescriptor *section;
     XLFormRowDescriptor *row;
     
+    //Set default chunkSize and hide the option
+    [CCUtility setChunkSize:0];
+    
     // Section HIDDEN FILES -------------------------------------------------
 
     section = [XLFormSectionDescriptor formSection];
@@ -185,7 +188,8 @@
     // Section : Chunk --------------------------------------------------------------
     
         section = [XLFormSectionDescriptor formSection];
-        [form addFormSection:section];
+        //Hide section
+        //[form addFormSection:section];
         section.footerTitle = NSLocalizedString(@"_chunk_footer_title_", nil);
     
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"chunk" rowType:XLFormRowDescriptorTypeStepCounter title:NSLocalizedString(@"_chunk_size_mb_", nil)];
@@ -197,7 +201,10 @@
         [row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
         [row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
         [row.cellConfigAtConfigure setObject:@100 forKey:@"stepControl.maximumValue"];
-        [section addFormRow:row];
+    
+        //hide the option
+
+        //[section addFormRow:row];
     
     // Section : Privacy --------------------------------------------------------------
 

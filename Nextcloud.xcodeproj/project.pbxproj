@@ -51,7 +51,6 @@
 		7AE63B5F26DCFC9E00CEAAD5 /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7239870253D86B600257F49 /* NCEmptyDataSet.swift */; };
 		7AE63B6426DCFDC300CEAAD5 /* NCImageCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCImageCellProtocol.swift */; };
 		7AE63B6926DCFE3000CEAAD5 /* NCRenameFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20EA2660DFA200AF4344 /* NCRenameFile.swift */; };
-		7AE63B7726DCFFBB00CEAAD5 /* NCShareExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63B5426DCFC4200CEAAD5 /* NCShareExtension.swift */; };
 		7AE63B7C26DCFFEA00CEAAD5 /* NCAccountRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20F82660E2C600AF4344 /* NCAccountRequest.swift */; };
 		7AE63B8126DD01BF00CEAAD5 /* NCDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C1EEA425053A9C00866ACC /* NCDataSource.swift */; };
 		7AE63B8626DD01F000CEAAD5 /* NCPopupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20F12660E25200AF4344 /* NCPopupViewController.swift */; };
@@ -61,13 +60,17 @@
 		7AE63BAB26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
 		7AE63BB026DDFBD200CEAAD5 /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
 		7AE63BB826DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BB626DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift */; };
-		7AE63BB926DDFC7C00CEAAD5 /* NCBackgroundImageColor.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BB726DDFC7C00CEAAD5 /* NCBackgroundImageColor.storyboard */; };
 		7AE63BBE26DDFC8500CEAAD5 /* NCBackgroundImageColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BB626DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift */; };
 		7AE63BF326DE0E1200CEAAD5 /* ChromaColorPicker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7AE63BE426DE09AB00CEAAD5 /* ChromaColorPicker.framework */; };
 		7AE63BF426DE0E1200CEAAD5 /* ChromaColorPicker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7AE63BE426DE09AB00CEAAD5 /* ChromaColorPicker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7AE63BFC26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BF926DE5FCD00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib */; };
 		7AE63BFD26DE5FCE00CEAAD5 /* NCSelectCommandViewCopyMove.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BFA26DE5FCD00CEAAD5 /* NCSelectCommandViewCopyMove.xib */; };
 		7AE63BFE26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BFB26DE5FCD00CEAAD5 /* NCSelectCommandViewSelect.xib */; };
+		7AE63C7F26E89A7B00CEAAD5 /* NCListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63AE726D633BA00CEAAD5 /* NCListCell.xib */; };
+		7AE63C8326E8AF9500CEAAD5 /* NCSectionHeaderMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F78ACD57219048040088454D /* NCSectionHeaderMenu.xib */; };
+		7AE63C8726E8AFE800CEAAD5 /* NCTrashSectionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7632FC0218353AA00721B71 /* NCTrashSectionFooter.xib */; };
+		7AE63C8B26E8AFF100CEAAD5 /* NCGridCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63AE826D633BA00CEAAD5 /* NCGridCell.xib */; };
+		7AE63C9226E8B00B00CEAAD5 /* NCAccountRequest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB20F92660E2C600AF4344 /* NCAccountRequest.storyboard */; };
 		950A647E264AACF4006ADE0E /* OriginalFileNameCustomSwitchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 950A6476264AACF4006ADE0E /* OriginalFileNameCustomSwitchCell.xib */; };
 		950A647F264AACF4006ADE0E /* SubFolderCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 950A6477264AACF4006ADE0E /* SubFolderCustomCell.xib */; };
 		950A6480264AACF4006ADE0E /* TypeInFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 950A6478264AACF4006ADE0E /* TypeInFileNameCustomSwitchCell.swift */; };
@@ -326,7 +329,6 @@
 		F78ACD52219046DC0088454D /* NCSectionHeaderFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78ACD51219046DC0088454D /* NCSectionHeaderFooter.swift */; };
 		F78ACD54219047D40088454D /* NCSectionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = F78ACD53219047D40088454D /* NCSectionFooter.xib */; };
 		F78ACD58219048040088454D /* NCSectionHeaderMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F78ACD57219048040088454D /* NCSectionHeaderMenu.xib */; };
-		F78B9686234F785300F54315 /* NCSelectDestination.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F78B9684234F785300F54315 /* NCSelectDestination.storyboard */; };
 		F78BFEE11D31126B00E513CF /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F78BFEDE1D31126B00E513CF /* MainInterface.storyboard */; };
 		F78E7065219F096B006F23E4 /* NCAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78E7064219F096B006F23E4 /* NCAvatar.swift */; };
 		F78F74342163757000C2ADAD /* NCTrash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F78F74332163757000C2ADAD /* NCTrash.storyboard */; };
@@ -2139,10 +2141,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F78B9686234F785300F54315 /* NCSelectDestination.storyboard in Resources */,
+				7AE63C9226E8B00B00CEAAD5 /* NCAccountRequest.storyboard in Resources */,
+				7AE63C8B26E8AFF100CEAAD5 /* NCGridCell.xib in Resources */,
+				7AE63C8726E8AFE800CEAAD5 /* NCTrashSectionFooter.xib in Resources */,
+				7AE63C8326E8AF9500CEAAD5 /* NCSectionHeaderMenu.xib in Resources */,
+				7AE63C7F26E89A7B00CEAAD5 /* NCListCell.xib in Resources */,
 				F78BFEE11D31126B00E513CF /* MainInterface.storyboard in Resources */,
 				F7145A1A1D12E3B700CAFEEC /* Images.xcassets in Resources */,
-				7AE63BB926DDFC7C00CEAAD5 /* NCBackgroundImageColor.storyboard in Resources */,
 				F7145A231D12E3B700CAFEEC /* Localizable.strings in Resources */,
 				F700222D1EC479840080073F /* Custom.xcassets in Resources */,
 			);
@@ -2567,7 +2572,6 @@
 				F707C26521A2DC5200F6181E /* NCStoreReview.swift in Sources */,
 				7AE63AEF26D633BA00CEAAD5 /* NCCollectionViewCommon.swift in Sources */,
 				7A875F0626946CDE00AF558D /* RequiredDataCollectionSwitch.swift in Sources */,
-				7AE63B7726DCFFBB00CEAAD5 /* NCShareExtension.swift in Sources */,
 				F7BAADCB1ED5A87C00B7EAD4 /* NCManageDatabase.swift in Sources */,
 				F70968A424212C4E00ED60E5 /* NCLivePhoto.swift in Sources */,
 				95BB2088265FEF3F00AF4344 /* NCMenu.swift in Sources */,
@@ -2749,8 +2753,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/Notification_Service_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2780,7 +2784,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud Notification Service";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
@@ -2797,7 +2801,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
-				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/Share.entitlements;
+				CODE_SIGN_ENTITLEMENTS = /Users/A107161739/Projects/NMC/ios/iOSClient/Brand/Share.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
@@ -2847,9 +2851,9 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
-				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/Share.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_ENTITLEMENTS = /Users/A107161739/Projects/NMC/ios/iOSClient/Brand/Share.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2878,7 +2882,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
+				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/Share/Share-Bridging-Header.h";
@@ -2903,8 +2907,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2958,8 +2962,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2988,7 +2992,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
@@ -3067,8 +3071,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/iOSClient.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -3103,7 +3107,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
