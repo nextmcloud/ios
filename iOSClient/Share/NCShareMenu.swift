@@ -11,20 +11,22 @@ import UIKit
 class NCShareMenu: NSObject {
     
 //    func toggleMenu(viewController: UIViewController, key: String, sortButton: UIButton?, serverUrl: String, hideDirectoryOnTop: Bool = false) {
-    func toggleMenu(viewController: UIViewController, sendMail: Bool) {
+    func toggleMenu(viewController: UIViewController, sendMail: Bool, folder: Bool) {
         
         let menuViewController = UIStoryboard.init(name: "NCMenu", bundle: nil).instantiateInitialViewController() as! NCMenu
         var actions = [NCMenuAction]()
         
-        actions.append(
-            NCMenuAction(
-                title: NSLocalizedString("_open_in_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "viewInFolder").imageColor(NCBrandColor.shared.brandElement),
-                action: { menuAction in
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareViewIn)
-                }
+        if !folder {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_open_in_", comment: ""),
+                    icon: NCUtility.shared.loadImage(named: "viewInFolder").imageColor(NCBrandColor.shared.brandElement),
+                    action: { menuAction in
+                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareViewIn)
+                    }
+                )
             )
-        )
+        }
         
         actions.append(
             NCMenuAction(

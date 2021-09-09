@@ -330,9 +330,11 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int) {
         
         guard let tableShare = tableShare else { return }
+        guard let metadata = self.metadata else { return }
         
         self.tableShareSelected = tableShare
         self.sendEmailSelected = index
+        let isFolder = metadata.directory
         if tableShare.shareType == 3 {
 //            let views = NCShareCommon.shared.openViewMenuShareLink(shareViewController: self, tableShare: tableShare, metadata: metadata!)
 //            shareLinkMenuView = views.shareLinkMenuView
@@ -343,7 +345,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             //            shareLinkMenuView = views.shareLinkMenuView
             //            shareMenuViewWindow = views.viewWindow
             let shareMenu = NCShareMenu()
-            shareMenu.toggleMenu(viewController: self, sendMail: false)
+            let isFolder = metadata.directory
+            shareMenu.toggleMenu(viewController: self, sendMail: false, folder: isFolder)
             
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
             tap.delegate = self
@@ -357,7 +360,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //            tap.delegate = self
         } else {
             let shareMenu = NCShareMenu()
-            shareMenu.toggleMenu(viewController: self, sendMail: true)
+            shareMenu.toggleMenu(viewController: self, sendMail: true, folder: isFolder)
             
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
             tap.delegate = self
