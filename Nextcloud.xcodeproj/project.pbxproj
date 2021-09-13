@@ -2732,7 +2732,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2787,7 +2787,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2801,7 +2801,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
-				CODE_SIGN_ENTITLEMENTS = /Users/A107161739/Projects/NMC/ios/iOSClient/Brand/Share.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "/Users/t-systems/Documents/Project/MagentaCloud/ios/Share/Share-Bridging-Header.h";
 				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
@@ -2835,7 +2835,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/Share/Share-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/Share/Share-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2851,7 +2851,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
-				CODE_SIGN_ENTITLEMENTS = /Users/A107161739/Projects/NMC/ios/iOSClient/Brand/Share.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "/Users/t-systems/Documents/Project/MagentaCloud/ios/Share/Share-Bridging-Header.h";
 				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
@@ -2885,7 +2885,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/Share/Share-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/Share/Share-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USE_HEADERMAP = YES;
@@ -2940,7 +2940,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2995,7 +2995,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A107161739/Projects/NMC/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -3039,7 +3039,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 6.5.3;
+				MARKETING_VERSION = 6.5.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -3051,7 +3051,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_OBJC_BRIDGING_HEADER = "iOSClient/Nextcloud-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3098,7 +3098,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 6.5.3;
+				MARKETING_VERSION = 6.5.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -3109,7 +3109,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_OBJC_BRIDGING_HEADER = "iOSClient/Nextcloud-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USE_HEADERMAP = YES;

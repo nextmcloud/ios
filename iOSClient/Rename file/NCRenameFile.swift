@@ -53,7 +53,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     var disableChangeExt: Bool = false
     var fileName: String?
     let width: CGFloat = 300
-    let height: CGFloat = 310
+    let height: CGFloat = 350
     // MARK: - Life Cycle
     
     override func viewDidLoad() {

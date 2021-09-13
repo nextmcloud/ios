@@ -22,7 +22,7 @@
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)it.twsweb.Crypto-Cloud</string>
+		<string>$(AppIdentifierPrefix)in.t-system.Nextcloud</string>
 	</array>
 </dict>
 </plist>

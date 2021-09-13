@@ -102,7 +102,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         
     private let headerHeight: CGFloat = 50
     private var headerRichWorkspaceHeight: CGFloat = 0
-    private let footerHeight: CGFloat = 100
+    private let footerHeight: CGFloat = 105
     
     private var shares: [tableShare]?
     
