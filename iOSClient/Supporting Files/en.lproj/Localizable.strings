@@ -613,9 +613,9 @@
 "_delete_comment_"              = "Delete comment";
 "_share_allow_editing_"         = "Allow editing";
 "_share_read_only_"             = "Read only";
-"_share_editing_"               = "Editing";
+"_share_editing_"               = "Can edit";
 "_share_allow_upload_"          = "Allow upload and editing";
-"_share_file_drop_"             = "File drop (upload only)";
+"_share_file_drop_"             = "Filedrop only";
 "_share_hide_download_"         = "Hide download";
 "_share_password_protect_"      = "Password protect";
 "_share_expiration_date_"       = "Set expiration date";
@@ -631,12 +631,13 @@
 "_share_internal_link_"         = "Internal link";
 "_share_internal_link_des_"     = "Only works for users with access to this folder";
 "_permissions_"                 = "Permissions";
-"_advance_permissions_"         = "Advance permissions";
+"_advance_permissions_"         = "Advanced permissions";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCloud users, you have more opportunities for collaboration.";
 "no_shares_created"             = "No shares created yet.";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCloud users, you have more opportunities for collaboration.";
 "share_editing_message"         = "There are no editing functions for files unless you share them with MagentaCLOUD users.";
 "personal_share_by_mail"        = "Personal share by mail";
+"_file_drop_message_"           = "With File drop, only uploading is allowed. Only you can see files and folders that have been uploaded.";
 // Share Permission
 
 "_share_permission_title_"          = "Privileges";
@@ -666,7 +667,7 @@
 "_share_link_upload_"               = "File drop (upload only)";
 "_share_link_upload_modify_"        = "Allow upload and editing";
 "_share_link_hide_download_"        = "Hide download";
-"_PERMISSION_"                      = "PERMISSION";
+"_PERMISSIONS_"                     = "PERMISSIONS";
 "_ADVANCE_PERMISSION_"              = "ADVANCE PERMISSION";
 "_PASSWORD_PROTECTION_"             = "PASSWORD PROTECTION";
 "_EXPIRATION_DATE_"                 = "EXPIRATION DATE";
@@ -677,8 +678,8 @@
 "_custom_link_label"                = "Your custom link label";
 "_please_enter_password"            = "Please enter the password or disable the function.";// for the PDF you want to create or disable the function.";
 "_please_enter_expiration"          = "Please enter the expiry date or disable the function.";
-"_PERMISSION_"                      = "PERMISSION";
-"_advance_permissions_"             = "Advance permissions";
+"_PERMISSIONS_"                     = "PERMISSIONS";
+"_advance_permissions_"             = "Advanced permissions";
 "_PASSWORD_PROTECTION_"             = "PASSWORD PROTECTION";
 "_EXPIRATION_DATE_"                 = "EXPIRATION DATE";
 "_file_drop_message_"               = "With File drop, only uploading is allowed. Only you can see files and folders that have been uploaded.";

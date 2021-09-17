@@ -78,7 +78,7 @@ class NCShareFolderOptions: UIViewController ,UIGestureRecognizerDelegate, NCSha
         labelSetExpiration?.text = NSLocalizedString("_share_expiration_date_", comment: "")
         labelSetExpiration?.textColor = NCBrandColor.shared.icon
 
-        labelPermission?.text = NSLocalizedString("_PERMISSION_", comment: "")
+        labelPermission?.text = NSLocalizedString("_PERMISSIONS_", comment: "")
         labelPermission?.textColor = NCBrandColor.shared.commonViewInfoText
         labelAdvancePermission?.text = NSLocalizedString("_ADVANCE_PERMISSION_", comment: "")
         labelAdvancePermission?.textColor = NCBrandColor.shared.commonViewInfoText

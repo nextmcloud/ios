@@ -23,5 +23,9 @@ class NCShareHeaderCustomCell: XLFormBaseCell {
     
     override func update() {
         super.update()
+        
+        if rowDescriptor.tag == "kNMCShareHeaderCustomCell" {
+            
+        }
     }
 }

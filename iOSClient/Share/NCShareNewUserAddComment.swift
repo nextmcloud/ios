@@ -41,12 +41,14 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         self.commentTextView.backgroundColor = NCBrandColor.shared.backgroundView
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
             self.imageView.image = getImageMetadata(metadata!)
+            self.imageView.contentMode = .scaleAspectFill
             self.folderImageView.isHidden = true
 //            self.headerImageViewSpaceFavorite.constant = 5.0
         } else {
             if metadata!.directory {
-                let image = UIImage.init(named: "folder")!
-                self.folderImageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
+                self.folderImageView.image = UIImage.init(named: "folder")!
+//                let image = UIImage.init(named: "folder")!
+//                self.folderImageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
             } else if metadata!.iconName.count > 0 {
                 self.folderImageView.image = UIImage.init(named: metadata!.iconName)
             } else {

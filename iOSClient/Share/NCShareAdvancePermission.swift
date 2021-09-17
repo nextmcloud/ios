@@ -223,7 +223,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         self.headerView.backgroundColor = NCBrandColor.shared.backgroundView
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
             self.headerView.fullWidthImageView.image = getImageMetadata(metadata!)
-            self.headerView.fullWidthImageView.contentMode = .scaleToFill
+            self.headerView.fullWidthImageView.contentMode = .scaleAspectFill
             self.headerView.imageView.isHidden = true
         } else {
             if metadata!.directory {
@@ -235,7 +235,6 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 self.headerView.imageView.image = UIImage.init(named: "file")
             }
 
-//            self.headerImageViewSpaceFavorite.constant = -49.0
         }
         self.headerView.favorite.setNeedsUpdateConstraints()
         self.headerView.favorite.layoutIfNeeded()
@@ -249,7 +248,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         }
         self.headerView.info.textColor = NCBrandColor.shared.optionItem
         self.headerView.info.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
-        self.headerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 250)
+        self.headerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 260)
         self.tableView.tableHeaderView = self.headerView
         
         //Sharing
@@ -262,14 +261,14 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         
         //PERMISSION
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCShareHeaderCustomCell"] = NCShareHeaderCustomCell.self
-        row = XLFormRowDescriptor(tag: "kNMCShareHeaderCustomCell", rowType: "kNMCShareHeaderCustomCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
-//        row.height = 15
-        row.cellConfig["titleLabel.text"] = NSLocalizedString("_PERMISSION_", comment: "")
+        row = XLFormRowDescriptor(tag: "kNMCShareHeaderCustomCell", rowType: "kNMCShareHeaderCustomCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
+        row.height = 30
+        row.cellConfig["titleLabel.text"] = NSLocalizedString("_PERMISSIONS_", comment: "")
         section.addFormRow(row)
         
         //read only
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
-        row = XLFormRowDescriptor(tag: "NCFilePermissionCellRead", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+        row = XLFormRowDescriptor(tag: "NCFilePermissionCellRead", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_read_only_", comment: "")
         row.height = 44
         
@@ -301,7 +300,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
 
         if directory! {
             XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
-            row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditing", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+            row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditing", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
             row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_allow_editing_", comment: "")
             row.height = 44
             if newUser == false {
@@ -323,7 +322,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             if self.typeFile == "document" {
                 XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
                 
-                row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditing", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+                row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditing", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
                 row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_allow_editing_", comment: "")
                 row.height = 44
                 if newUser == false {
@@ -345,7 +344,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             } else {
                 XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
                 
-                row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditingMsg", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+                row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditingMsg", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
                 row.cellConfig["titleLabel.text"] = NSLocalizedString("share_editing_message", comment: "")
                 row.height = 44
                 section.addFormRow(row)
@@ -357,10 +356,19 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         //"_share_file_drop_"             = "File drop (upload only)";
         if self.directory {
             XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
-            row = XLFormRowDescriptor(tag: "NCFilePermissionCellFileDrop", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+            row = XLFormRowDescriptor(tag: "NCFilePermissionCellFileDrop", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
             row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_file_drop_", comment: "")
             row.height = 44
             section.addFormRow(row)
+            
+            //sammelbox message
+            XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
+            
+            row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellFiledropMessage", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
+            row.cellConfig["titleLabel.text"] = NSLocalizedString("_file_drop_message_", comment: "")
+            row.height = 84
+            section.addFormRow(row)
+            
         }
 //        if metadata?.permissions == "RGDNVCK" {
 //            row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
@@ -381,29 +389,18 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             }
         }
         
-        //can share
-        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
-
-        row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellEditingCanShare", rowType: "kNMCFilePermissionEditCell", title: "")
-        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
-        row.cellClass = NCFilePermissionEditCell.self
-//        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
-//
-//        row = XLFormRowDescriptor(tag: "NCFilePermissionCellEditingCanShare", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
-        row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_can_reshare_", comment: "")
-        row.height = 44
-        section.addFormRow(row)
-        
         //ADVANCE PERMISSION
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
 
-        row = XLFormRowDescriptor(tag: "NCFilePermissionCellAdvanceTxt", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
-        row.cellConfig["titleLabel.text"] = NSLocalizedString("_advance_permissions_", comment: "")
+        row = XLFormRowDescriptor(tag: "NCFilePermissionCellAdvanceTxt", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
+//        row.cellConfig["titleLabel.text"] = NSLocalizedString("_advance_permissions_", comment: "")
+        row.cellConfig["titleLabelBottom.text"] = NSLocalizedString("_advance_permissions_", comment: "")
+        row.height = 88
         section.addFormRow(row)
         
         
 //        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
-//        row = XLFormRowDescriptor(tag: "NCFilePermissionCellAdvanceText", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+//        row = XLFormRowDescriptor(tag: "NCFilePermissionCellAdvanceText", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
 //        row.cellConfig["titleLabel.text"] = NSLocalizedString("_advance_permissions_", comment: "")
 ////        row.height = 15
 //        section.addFormRow(row)
@@ -411,9 +408,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         //link label
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCShareHeaderCustomCell"] = NCShareHeaderCustomCell.self
 
-        row = XLFormRowDescriptor(tag: "kNMCShareHeaderCustomCell", rowType: "kNMCShareHeaderCustomCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+        row = XLFormRowDescriptor(tag: "kNMCShareHeaderCustomCell", rowType: "kNMCShareHeaderCustomCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_LINK_LABEL_", comment: "")
-//        row.height = 15
+        row.height = 20
         section.addFormRow(row)
 //
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
@@ -426,9 +423,22 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         row.height = 88
         section.addFormRow(row)
 
+        //can share
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
+
+        row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellEditingCanShare", rowType: "kNMCFilePermissionEditCell", title: "")
+        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
+        row.cellClass = NCFilePermissionEditCell.self
+//        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
+//
+//        row = XLFormRowDescriptor(tag: "NCFilePermissionCellEditingCanShare", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
+        row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_can_reshare_", comment: "")
+        row.height = 44
+        section.addFormRow(row)
+        
         //hide download
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
-        row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellHideDownload", rowType: "kNMCFilePermissionEditCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+        row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellHideDownload", rowType: "kNMCFilePermissionEditCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_hide_download_", comment: "")
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
         row.cellClass = NCFilePermissionEditCell.self
@@ -437,9 +447,8 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
 
         //password
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCShareHeaderCustomCell"] = NCShareHeaderCustomCell.self
-        row = XLFormRowDescriptor(tag: "kNMCShareHeaderCustomCellPassword", rowType: "kNMCShareHeaderCustomCell", title: NSLocalizedString("_PERMISSION_", comment: ""))
+        row = XLFormRowDescriptor(tag: "kNMCShareHeaderCustomCellPassword", rowType: "kNMCShareHeaderCustomCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_PASSWORD_PROTECTION_", comment: "")
-//        row.height = 15
         section.addFormRow(row)
 
 

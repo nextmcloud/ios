@@ -778,7 +778,7 @@ extension NCShareFileOptions: UITableViewDataSource {
             
             let labelPermissions = UILabel(frame: CGRect(x: leftMargin, y: Int(labelSharing.frame.origin.y + labelSharing.frame.size.height) + 5, width: 200, height: 18))
             labelPermissions.textColor = NCBrandColor.shared.textInfo
-            labelPermissions.text = NSLocalizedString("_PERMISSION_", comment: "")
+            labelPermissions.text = NSLocalizedString("_PERMISSIONS_", comment: "")
             labelPermissions.font = UIFont.systemFont(ofSize: 12)
             
             view.addSubview(imageView)

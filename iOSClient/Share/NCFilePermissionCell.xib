@@ -21,8 +21,8 @@
                         <constraint firstAttribute="height" constant="1" id="xuz-qE-ndo"/>
                     </constraints>
                 </view>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lxv-XQ-lLv">
-                    <rect key="frame" x="15" y="34" width="384" height="20.5"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lxv-XQ-lLv">
+                    <rect key="frame" x="15" y="44" width="384" height="0.0"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -48,12 +48,19 @@
                         <constraint firstAttribute="height" constant="1" id="duv-5E-r71"/>
                     </constraints>
                 </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HdM-8X-5xs">
+                    <rect key="frame" x="15" y="44" width="0.0" height="0.0"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="JtC-J3-Cwv" secondAttribute="trailing" constant="15" id="4Ok-d1-Ejn"/>
                 <constraint firstAttribute="trailing" secondItem="z5R-Tu-VFZ" secondAttribute="trailing" id="5Zk-dY-XTv"/>
                 <constraint firstItem="Lxv-XQ-lLv" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="15" id="GsO-TO-riY"/>
+                <constraint firstItem="HdM-8X-5xs" firstAttribute="leading" secondItem="Lxv-XQ-lLv" secondAttribute="leading" id="GxJ-Pp-dOF"/>
                 <constraint firstItem="91s-f8-YLv" firstAttribute="trailing" secondItem="z5R-Tu-VFZ" secondAttribute="trailing" id="LwD-fZ-8bC"/>
                 <constraint firstAttribute="top" secondItem="z5R-Tu-VFZ" secondAttribute="top" id="RKQ-3R-TMo"/>
                 <constraint firstAttribute="bottom" secondItem="91s-f8-YLv" secondAttribute="bottom" id="cvX-Dm-pHX"/>
@@ -63,6 +70,7 @@
                 <constraint firstItem="z5R-Tu-VFZ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="o0O-SQ-fRJ"/>
                 <constraint firstItem="91s-f8-YLv" firstAttribute="leading" secondItem="Lxv-XQ-lLv" secondAttribute="leading" id="o5R-Lt-JKx"/>
                 <constraint firstItem="QRA-6T-SB4" firstAttribute="leading" secondItem="z5R-Tu-VFZ" secondAttribute="leading" id="p4C-3C-X2P"/>
+                <constraint firstItem="HdM-8X-5xs" firstAttribute="top" secondItem="Lxv-XQ-lLv" secondAttribute="bottom" id="r8e-WY-1vk"/>
                 <constraint firstItem="JtC-J3-Cwv" firstAttribute="centerY" secondItem="Lxv-XQ-lLv" secondAttribute="centerY" id="t4u-Pz-C3d"/>
                 <constraint firstItem="Lxv-XQ-lLv" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="tma-Ev-0To"/>
             </constraints>
@@ -73,6 +81,7 @@
                 <outlet property="seperatorBelow" destination="91s-f8-YLv" id="nPP-qw-VVt"/>
                 <outlet property="seperatorBelowFull" destination="QRA-6T-SB4" id="fCo-1H-RD0"/>
                 <outlet property="titleLabel" destination="Lxv-XQ-lLv" id="GQG-qA-vjH"/>
+                <outlet property="titleLabelBottom" destination="HdM-8X-5xs" id="H4V-Un-lEs"/>
             </connections>
             <point key="canvasLocation" x="-68.115942028985515" y="22.767857142857142"/>
         </view>

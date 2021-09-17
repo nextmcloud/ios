@@ -324,12 +324,13 @@ class NCSharePagingView: PagingView {
 //            headerView.fullWidthImageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
 //            headerView.fullWidthImageView.image = getImage(metadata: metadata!)
             headerView.fullWidthImageView.image = getImageMetadata(metadata!)
-            headerView.fullWidthImageView.contentMode = .scaleToFill
+            headerView.fullWidthImageView.contentMode = .scaleAspectFill
             headerView.imageView.isHidden = true
         } else {
             if metadata!.directory {
-                let image = UIImage.init(named: "folder")!
-                headerView.imageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
+                headerView.imageView.image = UIImage.init(named: "folder")!
+//                let image = UIImage.init(named: "folder")!
+//                headerView.imageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
             } else if metadata!.iconName.count > 0 {
                 headerView.imageView.image = UIImage.init(named: metadata!.iconName)
             } else {

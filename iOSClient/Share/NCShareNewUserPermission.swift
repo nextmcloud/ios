@@ -900,7 +900,7 @@ extension NCShareNewUserPermission: UITableViewDataSource {
             if section == 0 {
                 headerLable.text = NSLocalizedString("_sharing_", comment: "")
                 headerSectionLabel.font = UIFont.systemFont(ofSize: 12)
-                headerSectionLabel.text = NSLocalizedString("_PERMISSION_", comment: "")
+                headerSectionLabel.text = NSLocalizedString("_PERMISSIONS_", comment: "")
             } else {
 //                headerLable.text = NSLocalizedString("_advance_permissions_", comment: "")
 //                headerSectionLabel.text = NSLocalizedString("_LINK_LABEL_", comment: "")

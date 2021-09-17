@@ -15,6 +15,7 @@ class NCFilePermissionCell: XLFormButtonCell {
     @IBOutlet weak var imageCheck: UIImageView!
     @IBOutlet weak var seperatorBelow: UIView!
     @IBOutlet weak var seperatorBelowFull: UIView!
+    @IBOutlet weak var titleLabelBottom: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -34,8 +35,10 @@ class NCFilePermissionCell: XLFormButtonCell {
         self.selectionStyle = .none
         if rowDescriptor.tag == "NCFilePermissionCellSharing" || rowDescriptor.tag == "NCFilePermissionCellAdvanceTxt" {
             self.seperator.isHidden = true
-            self.seperatorBelowFull.isHidden = false
+            self.seperatorBelowFull.isHidden = true
+            self.seperatorBelow.isHidden = true
             self.titleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+            self.titleLabelBottom.font = UIFont.boldSystemFont(ofSize: 17)
         }
         if rowDescriptor.tag == "kNMCFilePermissionCellEditing" {
             self.seperator.isHidden = true
@@ -44,8 +47,8 @@ class NCFilePermissionCell: XLFormButtonCell {
         
         if  rowDescriptor.tag == "NCFilePermissionCellFileDrop" {
             self.seperator.isHidden = true
-            self.seperatorBelow.isHidden = true
-//            self.seperatorBelowFull.isHidden = false
+            self.seperatorBelow.isHidden = false
+            self.seperatorBelowFull.isHidden = true
         }
         
         if  rowDescriptor.tag == "kNMCFilePermissionEditCellEditingCanShare" {
@@ -53,12 +56,18 @@ class NCFilePermissionCell: XLFormButtonCell {
         }
         
         if  rowDescriptor.tag == "kNMCFilePermissionCellEditingMsg" {
+            self.seperator.isHidden = true
             self.seperatorBelow.isHidden = true
             self.seperatorBelowFull.isHidden = false
         }
         
         if rowDescriptor.tag == "kNMCFilePermissionCellEditingMsg" {
             self.seperatorBelowFull.isHidden = true
+        }
+        
+        if rowDescriptor.tag == "kNMCFilePermissionCellFiledropMessage" {
+            self.seperator.isHidden = true
+            self.seperatorBelow.isHidden = false
         }
     }
     

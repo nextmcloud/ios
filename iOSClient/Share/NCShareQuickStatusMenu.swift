@@ -33,10 +33,35 @@ class NCShareQuickStatusMenu: NSObject {
             )
         )
 
+//        if directoryType == "document" || directoryType == "directory" {
+//            actions.append(
+//                NCMenuAction(
+//                    title: directory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
+//                    icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption || status == (NCGlobal.shared.permissionShareShare - NCGlobal.shared.permissionReadShare))  ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
+//                    selected: false,
+//                    on: false,
+//                    action: { menuAction in
+//                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
+//                    }
+//                )
+//            )
+//        } else if directoryType != "image" || directoryType !=  "audio" {
+//            actions.append(
+//                NCMenuAction(title: directory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
+//                             icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption) ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
+//                             selected: false,
+//                             on: false,
+//                             action: { menuAction in
+//                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
+//                             }
+//                )
+//            )
+//        }
+        
         if directoryType == "document" || directoryType == "directory" {
             actions.append(
                 NCMenuAction(
-                    title: directory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
+                    title: directory ? NSLocalizedString("_share_editing_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
                     icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption || status == (NCGlobal.shared.permissionShareShare - NCGlobal.shared.permissionReadShare))  ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
                     selected: false,
                     on: false,
@@ -47,7 +72,7 @@ class NCShareQuickStatusMenu: NSObject {
             )
         } else if directoryType != "image" || directoryType !=  "audio" {
             actions.append(
-                NCMenuAction(title: directory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
+                NCMenuAction(title: directory ? NSLocalizedString("_share_editing_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
                              icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption) ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
                              selected: false,
                              on: false,

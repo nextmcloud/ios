@@ -80,8 +80,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         searchField.layer.masksToBounds = true
         searchField.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
         searchField.layer.borderWidth = 1
-        searchField.placeholder = NSLocalizedString("_shareLinksearch_placeholder_", comment: "")
-        searchField.textColor = NCBrandColor.shared.systemGrayAndGray66
+//        searchField.placeholder = NSLocalizedString("_shareLinksearch_placeholder_", comment: "")
+        searchField.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("_shareLinksearch_placeholder_", comment: ""),
+                                                               attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.fileFolderName])
+        searchField.textColor = NCBrandColor.shared.singleTitleColorButton
         
         self.btnCreateLink.setTitle(NSLocalizedString("_create_link_", comment: ""), for: .normal)
 //        self.btnCreateLink.setTitle("_shareLinksearch_placeholder_", for: .normal)
@@ -642,7 +644,9 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     func quickStatusLink(with tableShare: tableShare?, sender: UIButton) {
         guard let tableShare = tableShare else { return }
         let directory = self.metadata?.directory
-        if (self.metadata?.typeFile == "document" || directory == true) {
+        let ext = self.metadata?.ext
+        
+        if (self.metadata?.typeFile == "document" || directory == true || ext == "jpg" || ext == "png") {
             let index = sender.tag
             let shares = NCManageDatabase.shared.getTableShares(metadata: self.metadata!)
             self.quickStatusTableShare = shares.share![index]
@@ -775,6 +779,7 @@ extension NCShare: UITableViewDataSource {
                 return cell
             }
         } else if tableShare.shareType == 4 {
+            //external
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellUser", for: indexPath) as? NCShareUserCell {
                 
                 cell.contentView.backgroundColor = NCBrandColor.shared.backgroundView
