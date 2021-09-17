@@ -29,6 +29,9 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
         switchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
         self.backgroundColor = NCBrandColor.shared.backgroundView
         self.titleLabel.textColor = NCBrandColor.shared.shareCellTitleColor
+        self.cellTextField.attributedPlaceholder = NSAttributedString(string: "",
+                                                               attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.fileFolderName])
+        self.cellTextField.textColor = NCBrandColor.shared.singleTitleColorButton
     }
     
     override func configure() {
@@ -37,17 +40,11 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
     
     override func update() {
         super.update()
-        
-//        if rowDescriptor.tag == "kNMCFilePermissionCellLinkLabel" || rowDescriptor.tag == "kNMCFilePermissionCellHideDownload" {
-        if rowDescriptor.tag == "kNMCFilePermissionCellHideDownload" {
-            self.seperator.isHidden = true
-            self.seperatorBottom.isHidden = true
-            self.cellTextField.isHidden = true
-        }
-
-        
+                
         if rowDescriptor.tag ==  "kNMCFilePermissionCellEditingCanShare" {
+            self.seperatorMiddle.isHidden = true
             self.seperatorBottom.isHidden = true
+            self.seperatorMiddle.isHidden = true
             self.cellTextField.isHidden = true
         }
         if rowDescriptor.tag == "kNMCFilePermissionEditCellLinkLabel" {
@@ -65,6 +62,10 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
         
         if rowDescriptor.tag == "kNMCFilePermissionEditCellPassword" {
 //            self.cellTextField.isSecureTextEntry = true
+        }
+        
+        if rowDescriptor.tag == "kNMCFilePermissionEditCellHideDownload" {
+            self.seperatorMiddle.isHidden = true
         }
         
 //        if let rowValue = rowDescriptor.value as? String {

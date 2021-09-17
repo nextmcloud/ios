@@ -626,7 +626,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         case "kNMCFilePermissionEditCellLinkLabel":
             if let label = formRow.value as? String {
                 self.form.delegate = nil
-                self.password = label
+                self.linkLabel = label
                 self.form.delegate = self
             }
             break
@@ -787,7 +787,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         }
         
         if self.setExpiration == true {
-            if self.self.expirationDateText == nil || self.self.expirationDateText == "" {
+            if self.expirationDateText == nil || self.self.expirationDateText == "" {
                     let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_expiration", comment: ""), preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
                     self.present(alert, animated: true)
@@ -906,7 +906,10 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         
         dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
         self.expirationDate = datePicker.date as NSDate
-
+        
+        self.metadata?.trashbinDeletionTime = self.expirationDate
+        self.expirationDateText = dateFormatter.string(from: datePicker.date)
+        
         self.tableView.beginUpdates()
         self.tableView.reloadRows(at: [IndexPath(row: 0, section: 4)], with: .none)
         self.tableView.endUpdates()
