@@ -131,7 +131,7 @@
                                 <rect key="frame" x="5" y="0.0" width="404" height="852"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="iSO-mc-0TB">
-                                        <rect key="frame" x="16" y="30" width="372" height="40"/>
+                                        <rect key="frame" x="11" y="30" width="382" height="40"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="40" id="0aG-z9-fcy"/>
                                         </constraints>
@@ -142,13 +142,13 @@
                                         </connections>
                                     </textField>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Llh-YR-Hge">
-                                        <rect key="frame" x="26" y="74" width="34" height="16"/>
+                                        <rect key="frame" x="21" y="74" width="34" height="16"/>
                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="13"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CPS-kb-Roa">
-                                        <rect key="frame" x="16" y="106" width="129" height="40"/>
+                                        <rect key="frame" x="11" y="106" width="129" height="40"/>
                                         <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="40" id="PKM-hy-SrO"/>
@@ -162,7 +162,7 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your shares" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Rfm-Hr-dId">
-                                        <rect key="frame" x="16" y="170" width="378" height="20.5"/>
+                                        <rect key="frame" x="11" y="170" width="383" height="20.5"/>
                                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -258,13 +258,13 @@
                                     <constraint firstItem="YYp-o8-YJP" firstAttribute="leading" secondItem="HPl-mj-r5E" secondAttribute="trailing" constant="8" id="R36-FW-w0B"/>
                                     <constraint firstItem="pfo-D0-W7b" firstAttribute="centerY" secondItem="HPl-mj-r5E" secondAttribute="centerY" constant="15" id="Rji-xW-vn7"/>
                                     <constraint firstAttribute="bottom" secondItem="c94-b9-Sim" secondAttribute="bottom" id="Svm-RV-vnl"/>
-                                    <constraint firstAttribute="trailing" secondItem="iSO-mc-0TB" secondAttribute="trailing" constant="16" id="Vhu-GP-EJN"/>
+                                    <constraint firstAttribute="trailing" secondItem="iSO-mc-0TB" secondAttribute="trailing" constant="11" id="Vhu-GP-EJN"/>
                                     <constraint firstItem="Rfm-Hr-dId" firstAttribute="top" secondItem="CPS-kb-Roa" secondAttribute="bottom" constant="24" id="Vsf-4n-jvY"/>
                                     <constraint firstItem="8Cj-cK-AKZ" firstAttribute="leading" secondItem="X2m-IC-J1u" secondAttribute="leading" constant="5" id="WlZ-CY-x4s"/>
                                     <constraint firstItem="CPS-kb-Roa" firstAttribute="top" secondItem="Llh-YR-Hge" secondAttribute="bottom" constant="16" id="WuA-CX-Cju"/>
                                     <constraint firstItem="Qek-aQ-NjE" firstAttribute="leading" secondItem="cLd-wD-cSC" secondAttribute="trailing" constant="30" id="bSw-vM-d12"/>
                                     <constraint firstAttribute="trailing" secondItem="Rfm-Hr-dId" secondAttribute="trailing" constant="10" id="cC0-zx-Wlz"/>
-                                    <constraint firstItem="iSO-mc-0TB" firstAttribute="leading" secondItem="X2m-IC-J1u" secondAttribute="leading" constant="16" id="d8E-WM-YfC"/>
+                                    <constraint firstItem="iSO-mc-0TB" firstAttribute="leading" secondItem="X2m-IC-J1u" secondAttribute="leading" constant="11" id="d8E-WM-YfC"/>
                                     <constraint firstItem="FFi-7t-C8U" firstAttribute="centerY" secondItem="HPl-mj-r5E" secondAttribute="centerY" id="fkL-uP-Iob"/>
                                     <constraint firstItem="YYp-o8-YJP" firstAttribute="centerY" secondItem="HPl-mj-r5E" secondAttribute="centerY" constant="-15" id="iu4-c5-p5k"/>
                                     <constraint firstItem="iSO-mc-0TB" firstAttribute="top" secondItem="X2m-IC-J1u" secondAttribute="top" constant="30" id="jPM-Uo-0lS"/>
@@ -1954,7 +1954,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="favorite" width="512" height="512"/>
+        <image name="favorite" width="315" height="315"/>
         <image name="folder" width="96" height="96"/>
         <image name="shareCopy" width="500" height="500"/>
         <image name="shareMenu" width="500" height="500"/>

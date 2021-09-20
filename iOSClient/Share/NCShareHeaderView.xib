@@ -96,6 +96,6 @@
         </view>
     </objects>
     <resources>
-        <image name="favorite" width="512" height="512"/>
+        <image name="favorite" width="315" height="315"/>
     </resources>
 </document>

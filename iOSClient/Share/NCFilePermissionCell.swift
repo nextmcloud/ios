@@ -23,12 +23,12 @@ class NCFilePermissionCell: XLFormButtonCell {
         self.backgroundColor = NCBrandColor.shared.backgroundView
         self.titleLabel.textColor = NCBrandColor.shared.shareCellTitleColor
 //        autoUploadSwitchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
-        
     }
     
     override func configure() {
         super.configure()
     }
+    
     
     override func update() {
         super.update()

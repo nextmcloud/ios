@@ -169,6 +169,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         self.labelShareByMail.textColor = NCBrandColor.shared.shareByEmailTextColor
         self.view.backgroundColor = NCBrandColor.shared.backgroundView
         self.containerView.backgroundColor = NCBrandColor.shared.backgroundView
+        self.containerView.frame = self.view.frame
         searchField.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("_shareLinksearch_placeholder_", comment: ""),
                                                                attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.searchFieldPlaceHolder])
         searchField.textColor = NCBrandColor.shared.icon
