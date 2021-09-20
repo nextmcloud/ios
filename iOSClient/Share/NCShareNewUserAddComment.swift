@@ -37,8 +37,6 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = NCBrandColor.shared.backgroundView
-        self.commentTextView.backgroundColor = NCBrandColor.shared.backgroundView
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
             self.imageView.image = getImageMetadata(metadata!)
             self.imageView.contentMode = .scaleAspectFill
@@ -58,7 +56,6 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         }
         self.favorite.layoutIfNeeded()
         self.labelFileName.text = self.metadata?.fileNameView
-        self.labelFileName.textColor = NCBrandColor.shared.textView
         if metadata!.favorite {
             self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
         } else {
@@ -69,28 +66,38 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         labelNote.text = NSLocalizedString("_share_note_recipient_", comment: "")
         
         commentTextView.layer.borderWidth = 1
+        commentTextView.layer.cornerRadius = 4.0
         commentTextView.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
+        
 //        commentTextView.text = "Note"
-        commentTextView.textColor = NCBrandColor.shared.shareCellTitleColor
         
         btnCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         btnCancel.layer.cornerRadius = 10
         btnCancel.layer.masksToBounds = true
         btnCancel.layer.borderWidth = 1
-        btnCancel.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
-        btnCancel.setTitleColor(NCBrandColor.shared.shareCellTitleColor, for: .normal)
-        btnCancel.backgroundColor = .white
         
         btnSendShare.setTitle(NSLocalizedString("_send_share_", comment: ""), for: .normal)
         btnSendShare.layer.cornerRadius = 10
         btnSendShare.layer.masksToBounds = true
+        
+        self.title = self.metadata?.ownerDisplayName
+        
+        networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
+        changeTheming()
+    }
+    
+    @objc func changeTheming() {
+        self.view.backgroundColor = NCBrandColor.shared.backgroundView
+        self.commentTextView.backgroundColor = NCBrandColor.shared.backgroundView
+        self.labelFileName.textColor = NCBrandColor.shared.textView
+        commentTextView.textColor = NCBrandColor.shared.shareCellTitleColor
+        btnCancel.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
+        self.btnCancel.setTitleColor(UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0), for: .normal)
+        btnCancel.backgroundColor = .white
         btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         btnSendShare.setTitleColor(.white, for: .normal)
         
         self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.icon
-        self.title = self.metadata?.ownerDisplayName
-        
-        networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
     }
     
     @IBAction func cancelClicked(_ sender: Any) {

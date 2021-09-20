@@ -15,6 +15,7 @@ class NCShareHeaderCustomCell: XLFormBaseCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         self.selectionStyle = .none
+        self.backgroundColor = NCBrandColor.shared.backgroundView
     }
     
     override func configure() {

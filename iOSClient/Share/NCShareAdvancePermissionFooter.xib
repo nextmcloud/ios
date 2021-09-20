@@ -14,10 +14,10 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rCI-63-PtL">
-                    <rect key="frame" x="20" y="80" width="162" height="40"/>
+                    <rect key="frame" x="16" y="80" width="150" height="40"/>
                     <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="162" id="81P-DS-Kww"/>
+                        <constraint firstAttribute="width" constant="150" id="81P-DS-Kww"/>
                         <constraint firstAttribute="height" constant="40" id="vdI-sH-cTb"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
@@ -25,7 +25,7 @@
                     <state key="normal" title="Cancel"/>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mg2-Ou-yoX">
-                    <rect key="frame" x="232" y="80" width="162" height="40"/>
+                    <rect key="frame" x="248" y="80" width="150" height="40"/>
                     <color key="backgroundColor" red="0.8862745098" green="0.0" blue="0.4549019608" alpha="1" colorSpace="calibratedRGB"/>
                     <state key="normal" title="Send share"/>
                     <state key="highlighted">
@@ -36,8 +36,8 @@
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="rCI-63-PtL" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="9zh-25-lIL"/>
-                <constraint firstItem="rCI-63-PtL" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" symbolic="YES" id="Mx0-hP-5EU"/>
-                <constraint firstAttribute="trailing" secondItem="Mg2-Ou-yoX" secondAttribute="trailing" constant="20" symbolic="YES" id="OZC-dq-mfi"/>
+                <constraint firstItem="rCI-63-PtL" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="16" id="Mx0-hP-5EU"/>
+                <constraint firstAttribute="trailing" secondItem="Mg2-Ou-yoX" secondAttribute="trailing" constant="16" id="OZC-dq-mfi"/>
                 <constraint firstItem="Mg2-Ou-yoX" firstAttribute="centerY" secondItem="rCI-63-PtL" secondAttribute="centerY" id="oTB-2x-LmZ"/>
                 <constraint firstItem="Mg2-Ou-yoX" firstAttribute="height" secondItem="rCI-63-PtL" secondAttribute="height" id="v0g-Wu-nHm"/>
                 <constraint firstItem="Mg2-Ou-yoX" firstAttribute="width" secondItem="rCI-63-PtL" secondAttribute="width" id="yxa-9O-yuj"/>

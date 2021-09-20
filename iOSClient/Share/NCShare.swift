@@ -72,31 +72,19 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.backgroundColor = NCBrandColor.shared.backgroundView
-        self.containerView.backgroundColor = NCBrandColor.shared.backgroundView
         viewContainerConstraint.constant = height
 //        searchFieldTopConstraint.constant = 10
         searchField.layer.cornerRadius = 5
         searchField.layer.masksToBounds = true
-        searchField.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
         searchField.layer.borderWidth = 1
-//        searchField.placeholder = NSLocalizedString("_shareLinksearch_placeholder_", comment: "")
-        searchField.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("_shareLinksearch_placeholder_", comment: ""),
-                                                               attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.fileFolderName])
-        searchField.textColor = NCBrandColor.shared.singleTitleColorButton
         
         self.btnCreateLink.setTitle(NSLocalizedString("_create_link_", comment: ""), for: .normal)
-//        self.btnCreateLink.setTitle("_shareLinksearch_placeholder_", for: .normal)
         self.btnCreateLink.layer.cornerRadius = 7
         self.btnCreateLink.layer.masksToBounds = true
         self.btnCreateLink.layer.borderWidth = 1
-        self.btnCreateLink.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
-        self.btnCreateLink.setTitleColor(NCBrandColor.shared.icon, for: .normal)
-        self.btnCreateLink.backgroundColor = NCBrandColor.shared.backgroundView
         self.btnCreateLink.titleLabel?.font = UIFont.systemFont(ofSize: 20)
         self.btnCreateLink.titleLabel!.adjustsFontSizeToFitWidth = true
         self.btnCreateLink.titleLabel!.minimumScaleFactor = 0.5
-        self.btnCreateLink.titleLabel?.textColor = NCBrandColor.shared.backgroundView
         
         self.labelShareByMail.text = NSLocalizedString("personal_share_by_mail", comment: "")
 //        shareLinkImage.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
@@ -179,6 +167,17 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         tableView.reloadData()
         shareLinkLabel.textColor = NCBrandColor.shared.textView
         self.labelShareByMail.textColor = NCBrandColor.shared.shareByEmailTextColor
+        self.view.backgroundColor = NCBrandColor.shared.backgroundView
+        self.containerView.backgroundColor = NCBrandColor.shared.backgroundView
+        searchField.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("_shareLinksearch_placeholder_", comment: ""),
+                                                               attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.searchFieldPlaceHolder])
+        searchField.textColor = NCBrandColor.shared.icon
+        self.btnCreateLink.layer.borderColor = NCBrandColor.shared.icon.cgColor
+        self.btnCreateLink.setTitleColor(NCBrandColor.shared.icon, for: .normal)
+        self.btnCreateLink.backgroundColor = NCBrandColor.shared.backgroundView
+        searchField.layer.borderColor = NCBrandColor.shared.icon.cgColor
+        labelYourShare.text = NSLocalizedString("_your_shares_", comment: "")
+//        self.btnCreateLink.titleLabel?.textColor = NCBrandColor.shared.backgroundView
     }
         
     @objc func reloadData() {
@@ -713,7 +712,7 @@ extension NCShare: UITableViewDataSource {
             numOfRows = shares.share!.count
         }
         if numOfRows == 0 {
-            self.tableView.setEmptyMessage(NSLocalizedString("no_shares_created", comment: ""))
+            self.tableView.setEmptyMessage(NSLocalizedString("_your_shares_", comment: ""))
 
 //            labelYourShare.text = NSLocalizedString("no_shares_created", comment: "")
 //            labelYourShare.textAlignment = .center
@@ -740,6 +739,7 @@ extension NCShare: UITableViewDataSource {
                 cell.tableShare = tableShare
                 cell.delegate = self
                 cell.contentView.backgroundColor = NCBrandColor.shared.backgroundView
+                cell.imageView?.image = cell.imageView?.image?.imageColor(NCBrandColor.shared.icon)
 //                let linkText = UserDefaults.standard.value(forKey: "_share_link_") as! String
                 if let linkText = UserDefaults.standard.value(forKey: "_share_link_") as? String {
                     if linkText.count > 0 {

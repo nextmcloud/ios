@@ -486,7 +486,7 @@
 "_protect_passcode_"            = "Protect with password";
 "_share_"                       = "Share";
 "_reload_"                      = "Reload";
-"_open_in_"                     = "Open in…";
+"_open_in_"                     = "Open in …";
 "_open_"                        = "Open…";
 "_remove_local_file_"           = "Remove from cache";
 "_add_local_"                   = "Add to local storage";
@@ -622,7 +622,7 @@
 "_share_note_recipient_"        = "Note to recipient";
 "_share_delete_sharelink_"      = "Delete share link";
 "_share_add_sharelink_"         = "Add another link";
-"_create_link_"                 = "Create link";
+"_create_link_"                 = "Create Link";
 "_share_can_reshare_"           = "Can reshare";
 "_share_can_create_"            = "Can create";
 "_share_can_change_"            = "Can change";
@@ -633,6 +633,7 @@
 "_permissions_"                 = "Permissions";
 "_advance_permissions_"         = "Advanced permissions";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCloud users, you have more opportunities for collaboration.";
+"_your_shares_"                 = "Your Shares";
 "no_shares_created"             = "No shares created yet.";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCloud users, you have more opportunities for collaboration.";
 "share_editing_message"         = "There are no editing functions for files unless you share them with MagentaCLOUD users.";

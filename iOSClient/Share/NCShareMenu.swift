@@ -43,7 +43,7 @@ class NCShareMenu: NSObject {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_send_new_email_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "shareTypeEmail").imageColor(NCBrandColor.shared.brandElement),
+                    icon: NCUtility.shared.loadImage(named: "email").imageColor(NCBrandColor.shared.brandElement),
                     action: { menuAction in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareSendEmail)
                         //                    self.reloadDataSource()
