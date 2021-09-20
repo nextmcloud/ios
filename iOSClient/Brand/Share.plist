@@ -37,8 +37,6 @@
 		<string>MainInterface</string>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.share-services</string>
-		<key>NSExtensionPrincipalClass</key>
-		<string>Share.NCShareExtension</string>
 	</dict>
 </dict>
 </plist>

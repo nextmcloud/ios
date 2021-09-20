@@ -24,6 +24,7 @@
 import UIKit
 import NCCommunication
 
+
 class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDelegate, NCRenameFileDelegate, NCAccountRequestDelegate {
     
     @IBOutlet weak var collectionView: UICollectionView!
@@ -104,7 +105,7 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
         uploadView.layer.cornerRadius = 10
         //uploadImage.image = NCUtility.shared.loadImage(named: "square.and.arrow.up", color: NCBrandColor.shared.label)
         uploadLabel.text = NSLocalizedString("_upload_", comment: "")
-        uploadLabel.textColor = .systemBlue
+        uploadLabel.textColor = NCBrandColor.shared.customer
         let uploadGesture = UITapGestureRecognizer(target: self, action:  #selector(actionUpload))
         uploadView.addGestureRecognizer(uploadGesture)
                 
@@ -216,59 +217,60 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
         
         navigationItem.title = navigationTitle
         cancelButton.title = NSLocalizedString("_cancel_", comment: "")
+        cancelButton.tintColor = NCBrandColor.shared.customer
 
         // BACK BUTTON
 
         let backButton = UIButton(type: .custom)
         backButton.setImage(UIImage(named: "back"), for: .normal)
-        backButton.tintColor = .systemBlue
+        backButton.tintColor = NCBrandColor.shared.customer
         backButton.semanticContentAttribute = .forceLeftToRight
         backButton.setTitle(" "+NSLocalizedString("_back_", comment: ""), for: .normal)
-        backButton.setTitleColor(.systemBlue, for: .normal)
+        backButton.setTitleColor(NCBrandColor.shared.customer, for: .normal)
         backButton.addTarget(self, action: #selector(backButtonTapped(sender:)), for: .touchUpInside)
         
         // PROFILE BUTTON
                 
-        var image = NCUtility.shared.loadImage(named: "person.crop.circle")
-        let fileNamePath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(activeAccount.user, urlBase: activeAccount.urlBase)) + "-" + activeAccount.user + ".png"
-        if let userImage = UIImage(contentsOfFile: fileNamePath) {
-            image = userImage
-        }
-            
-        image = NCUtility.shared.createAvatar(image: image, size: 30)
-            
-        let profileButton = UIButton(type: .custom)
-        profileButton.setImage(image, for: .normal)
-            
-        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: activeAccount.urlBase, account: activeAccount.account) {
-             
-
-            var title = "  "
-            if activeAccount?.alias == "" {
-                title = title + (activeAccount?.user ?? "")
-            } else {
-                title = title + (activeAccount?.alias ?? "")
-            }
-                
-            profileButton.setTitle(title, for: .normal)
-            profileButton.setTitleColor(.systemBlue, for: .normal)
-        }
-            
-        profileButton.semanticContentAttribute = .forceLeftToRight
-        profileButton.sizeToFit()
-        profileButton.addTarget(self, action: #selector(profileButtonTapped(sender:)), for: .touchUpInside)
-                   
-        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: activeAccount.urlBase, account: activeAccount.account) {
-
-            navigationItem.setLeftBarButtonItems([UIBarButtonItem(customView: profileButton)], animated: true)
-            
-        } else {
-
-            let space = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
-            space.width = 20
-            
-            navigationItem.setLeftBarButtonItems([UIBarButtonItem(customView: backButton), space, UIBarButtonItem(customView: profileButton)], animated: true)
-        }
+//        var image = NCUtility.shared.loadImage(named: "person.crop.circle")
+//        let fileNamePath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(activeAccount.user, urlBase: activeAccount.urlBase)) + "-" + activeAccount.user + ".png"
+//        if let userImage = UIImage(contentsOfFile: fileNamePath) {
+//            image = userImage
+//        }
+//
+//        image = NCUtility.shared.createAvatar(image: image, size: 30)
+//
+//        let profileButton = UIButton(type: .custom)
+//        profileButton.setImage(image, for: .normal)
+//
+//        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: activeAccount.urlBase, account: activeAccount.account) {
+//
+//
+//            var title = "  "
+//            if activeAccount?.alias == "" {
+//                title = title + (activeAccount?.user ?? "")
+//            } else {
+//                title = title + (activeAccount?.alias ?? "")
+//            }
+//
+//            profileButton.setTitle(title, for: .normal)
+//            profileButton.setTitleColor(.systemBlue, for: .normal)
+//        }
+//
+//        profileButton.semanticContentAttribute = .forceLeftToRight
+//        profileButton.sizeToFit()
+//        profileButton.addTarget(self, action: #selector(profileButtonTapped(sender:)), for: .touchUpInside)
+//
+//        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: activeAccount.urlBase, account: activeAccount.account) {
+//
+//            navigationItem.setLeftBarButtonItems([UIBarButtonItem(customView: profileButton)], animated: true)
+//
+//        } else {
+//
+//            let space = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
+//            space.width = 20
+//
+//            navigationItem.setLeftBarButtonItems([UIBarButtonItem(customView: backButton), space, UIBarButtonItem(customView: profileButton)], animated: true)
+//        }
     }
     
     func setCommandView() {
