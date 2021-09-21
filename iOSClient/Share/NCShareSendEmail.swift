@@ -20,6 +20,7 @@ class NCShareSendEmail: UIViewController, UITextViewDelegate, NCShareNetworkingD
     @IBOutlet weak var labelSharing: UILabel!
     @IBOutlet weak var labelNote: UILabel!
     @IBOutlet weak var commentTextView: UITextView!
+    @IBOutlet weak var commentContainerView: UIView!
     @IBOutlet weak var btnCancel: UIButton!
     @IBOutlet weak var btnSendShare: UIButton!
     
@@ -40,7 +41,6 @@ class NCShareSendEmail: UIViewController, UITextViewDelegate, NCShareNetworkingD
         super.viewDidLoad()
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
             self.imageView.image = getImageMetadata(metadata!)
-            self.imageView.contentMode = .scaleToFill
             self.folderImageView.isHidden = true
         } else {
             if metadata!.directory {
@@ -64,8 +64,8 @@ class NCShareSendEmail: UIViewController, UITextViewDelegate, NCShareNetworkingD
         
         labelNote.text = NSLocalizedString("_share_note_recipient_", comment: "")
         
-        commentTextView.layer.borderWidth = 1
-        commentTextView.layer.borderColor = NCBrandColor.shared.icon.cgColor
+        commentContainerView.layer.borderWidth = 1
+        commentContainerView.layer.borderColor = NCBrandColor.shared.icon.cgColor
         commentTextView.textColor = NCBrandColor.shared.icon
         
         btnCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
