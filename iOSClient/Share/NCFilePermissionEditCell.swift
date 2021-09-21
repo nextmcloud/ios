@@ -32,6 +32,12 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
         self.cellTextField.attributedPlaceholder = NSAttributedString(string: "",
                                                                attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.fileFolderName])
         self.cellTextField.textColor = NCBrandColor.shared.singleTitleColorButton
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+    }
+    
+    @objc func changeTheming() {
+        self.backgroundColor = NCBrandColor.shared.backgroundView
+        self.titleLabel.textColor = NCBrandColor.shared.icon
     }
     
     override func configure() {

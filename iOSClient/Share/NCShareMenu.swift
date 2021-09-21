@@ -31,7 +31,7 @@ class NCShareMenu: NSObject {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_advance_permissions_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "pencil").imageColor(NCBrandColor.shared.brandElement),
+                icon: NCUtility.shared.loadImage(named: "rename").imageColor(NCBrandColor.shared.brandElement),
                 action: { menuAction in
                     NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareAdvancePermission)
                     //                    self.reloadDataSource()

@@ -67,7 +67,6 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         
         commentTextView.layer.borderWidth = 1
         commentTextView.layer.cornerRadius = 4.0
-        commentTextView.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
         
 //        commentTextView.text = "Note"
         
@@ -83,19 +82,21 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         self.title = self.metadata?.ownerDisplayName
         
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
-        changeTheming()
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
     }
     
     @objc func changeTheming() {
         self.view.backgroundColor = NCBrandColor.shared.backgroundView
         self.commentTextView.backgroundColor = NCBrandColor.shared.backgroundView
         self.labelFileName.textColor = NCBrandColor.shared.textView
+        self.labelDescription.textColor = NCBrandColor.shared.textInfo
         commentTextView.textColor = NCBrandColor.shared.shareCellTitleColor
         btnCancel.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
         self.btnCancel.setTitleColor(UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0), for: .normal)
         btnCancel.backgroundColor = .white
         btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         btnSendShare.setTitleColor(.white, for: .normal)
+        commentTextView.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
         
         self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.icon
     }

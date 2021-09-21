@@ -22,7 +22,13 @@ class NCFilePermissionCell: XLFormButtonCell {
         self.selectionStyle = .none
         self.backgroundColor = NCBrandColor.shared.backgroundView
         self.titleLabel.textColor = NCBrandColor.shared.shareCellTitleColor
-//        autoUploadSwitchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+    }
+    
+    @objc func changeTheming() {
+        self.backgroundColor = NCBrandColor.shared.backgroundView
+        self.titleLabel.textColor = NCBrandColor.shared.icon
+        self.titleLabelBottom.textColor = NCBrandColor.shared.icon
     }
     
     override func configure() {
