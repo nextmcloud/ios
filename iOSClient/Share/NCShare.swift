@@ -500,8 +500,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                     }
                 }
             }
-
-            cell.imageShareeType.image = NCShareCommon.shared.getImageShareType(shareType: sharee.shareType)
+            let image: UIImage? = sharee.shareType == NCShareCommon.shared.SHARE_TYPE_USER ? NCShareCommon.shared.getImageShareType(shareType: sharee.shareType) : nil
+            cell.imageShareeType.image = image
         }
         
         dropDown.selectionAction = { [weak self] (index, item) in
@@ -732,8 +732,7 @@ extension NCShare: UITableViewDataSource {
         
         let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
         let tableShare = shares.share![indexPath.row]
-        let directory = self.metadata?.directory
-        print(shares.share)
+        let directory = self.metadata?.directory ?? false
         // LINK
         if tableShare.shareType == 3 {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell {
@@ -742,14 +741,11 @@ extension NCShare: UITableViewDataSource {
                 cell.contentView.backgroundColor = NCBrandColor.shared.backgroundView
                 cell.imageView?.image = cell.imageView?.image?.imageColor(NCBrandColor.shared.icon)
 //                let linkText = UserDefaults.standard.value(forKey: "_share_link_") as! String
-                if let linkText = UserDefaults.standard.value(forKey: "_share_link_") as? String {
-                    if linkText.count > 0 {
-                        cell.labelTitle.text = linkText
-                    } else {
-                        cell.labelTitle.text = NSLocalizedString("_share_link_", comment: "")
-                    }
+                                                
+                if let linkText = UserDefaults.standard.value(forKey: "_share_link_") as? String, linkText.count > 0 {
+                    cell.labelTitle.text = linkText
                 } else {
-                    cell.labelTitle.text = NSLocalizedString("_share_link_", comment: "")
+                    cell.labelTitle.text = directory ? NSLocalizedString("_share_link_folder_", comment: "") : NSLocalizedString("_share_link_file_", comment: "")
                 }
                 cell.labelTitle.textColor = NCBrandColor.shared.shareCellTitleColor
                 cell.indexSelected = indexPath.row

@@ -584,6 +584,8 @@
 // Share
 
 "_share_link_"                  = "Link label";//Share link";
+"_share_link_file_"             = "Link to file";//Share link to file";
+"_share_link_folder_"           = "Link to folder";//Share link to folder";
 "_share_link_button_"           = "Send link to…";
 "_password_"                    = "Password";
 "_share_password_"              = "Password protected link";
