@@ -323,6 +323,7 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
             viewNewUserComment.metadata = self.metadata
             viewNewUserComment.sharee = sharee
             viewNewUserComment.password = self.password
+            viewNewUserComment.isUpdating = false
             self.navigationController!.pushViewController(viewNewUserComment, animated: true)
         } else {
 //            self.networking?.createShare(shareWith: sharee!.shareWith, shareType: sharee!.shareType, metadata: self.metadata!)

@@ -602,16 +602,11 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     @objc func shareMenuSendEmailClicked() {
         let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-        let sendEmail = storyboard.instantiateViewController(withIdentifier: "NCShareSendEmail") as! NCShareSendEmail
-        sendEmail.metadata = self.metadata
-        sendEmail.tableShare = self.tableShareSelected
-//        viewNewUserComment.password = self.password
-//        self.navigationController!.pushViewController(viewNewUserComment, animated: true)
-        guard let navigationController = navigationController else {
-            print("this vc is not embedded in navigationController")
-            return
-        }
-        navigationController.pushViewController(sendEmail, animated: true)
+        let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
+        viewNewUserComment.metadata = self.metadata
+        viewNewUserComment.tableShare = self.tableShareSelected
+        viewNewUserComment.isUpdating = true
+        self.navigationController?.pushViewController(viewNewUserComment, animated: true)
     }
     
     @objc func shareMenuUnshareClicked() {

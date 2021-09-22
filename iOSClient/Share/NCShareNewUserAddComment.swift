@@ -15,14 +15,16 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var folderImageView: UIImageView!
-    @IBOutlet weak var favorite: UIButton!
     @IBOutlet weak var labelFileName: UILabel!
+    @IBOutlet weak var favorite: UIButton!
     @IBOutlet weak var labelDescription: UILabel!
-    
+    @IBOutlet weak var labelSharing: UILabel!
     @IBOutlet weak var labelNote: UILabel!
     @IBOutlet weak var commentTextView: UITextView!
+    @IBOutlet weak var commentContainerView: UIView!
     @IBOutlet weak var btnCancel: UIButton!
     @IBOutlet weak var btnSendShare: UIButton!
+   
     public var metadata: tableMetadata?
     public var sharee: NCCommunicationSharee?
     private var networking: NCShareNetworking?
@@ -30,10 +32,11 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     var permission: Int = 0
     var hideDownload: Bool?
     var password: String!
-    @IBOutlet weak var headerImageViewSpaceFavorite: NSLayoutConstraint!
     var creatingShare = false
     var note = ""
     var shareeEmail: String?
+    public var tableShare: tableShare?
+    var isUpdating = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,18 +44,14 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
             self.imageView.image = getImageMetadata(metadata!)
             self.imageView.contentMode = .scaleAspectFill
             self.folderImageView.isHidden = true
-//            self.headerImageViewSpaceFavorite.constant = 5.0
         } else {
             if metadata!.directory {
                 self.folderImageView.image = UIImage.init(named: "folder")!
-//                let image = UIImage.init(named: "folder")!
-//                self.folderImageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
             } else if metadata!.iconName.count > 0 {
                 self.folderImageView.image = UIImage.init(named: metadata!.iconName)
             } else {
                 self.folderImageView.image = UIImage.init(named: "file")
             }
-//            self.headerImageViewSpaceFavorite.constant = -49.0
         }
         self.favorite.layoutIfNeeded()
         self.labelFileName.text = self.metadata?.fileNameView
@@ -65,24 +64,32 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         
         labelNote.text = NSLocalizedString("_share_note_recipient_", comment: "")
         
-        commentTextView.layer.borderWidth = 1
-        commentTextView.layer.cornerRadius = 4.0
-        
-//        commentTextView.text = "Note"
+        commentContainerView.layer.borderWidth = 1
+        commentContainerView.layer.cornerRadius = 4.0
         
         btnCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         btnCancel.layer.cornerRadius = 10
         btnCancel.layer.masksToBounds = true
         btnCancel.layer.borderWidth = 1
+        btnCancel.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
+        btnCancel.setTitleColor(UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0), for: .normal)
+        btnCancel.backgroundColor = .white
         
         btnSendShare.setTitle(NSLocalizedString("_send_share_", comment: ""), for: .normal)
         btnSendShare.layer.cornerRadius = 10
         btnSendShare.layer.masksToBounds = true
+        btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
+        btnSendShare.setTitleColor(.white, for: .normal)
         
-        self.title = self.metadata?.ownerDisplayName
+        setTitle()
         
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+    }
+    
+    func setTitle() {
+        let defaultTitle = NSLocalizedString("_sharing_", comment: "")
+        title = isUpdating ? (tableShare?.shareWith ?? defaultTitle) : (sharee?.shareWith ?? defaultTitle)
     }
     
     @objc func changeTheming() {
@@ -96,7 +103,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         btnCancel.backgroundColor = .white
         btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         btnSendShare.setTitleColor(.white, for: .normal)
-        commentTextView.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
+        commentContainerView.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
         
         self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.icon
     }
@@ -117,7 +124,11 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
             }
         }
         self.note = message
-        self.networking?.createShare(shareWith: sharee!.shareWith, shareType: sharee!.shareType, metadata: self.metadata!)
+        if isUpdating {
+            self.networking?.updateShare(idShare: tableShare!.idShare, password: nil, permission: self.tableShare!.permissions, note: message, expirationDate: nil, hideDownload: tableShare!.hideDownload)
+        } else {
+            self.networking?.createShare(shareWith: sharee!.shareWith, shareType: sharee!.shareType, metadata: self.metadata!)
+        }
         self.creatingShare = true
     }
     
