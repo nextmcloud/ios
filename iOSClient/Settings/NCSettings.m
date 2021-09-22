@@ -589,6 +589,7 @@
     } else {
      
         passcodeViewController = [[TOPasscodeViewController alloc] initPasscodeType:TOPasscodeTypeSixDigits allowCancel:true];
+        //passcodeViewController = [[TOPasscodeViewController alloc] initWithStyle:TOPasscodeViewStyleOpaqueDark passcodeType:TOPasscodeTypeSixDigits];
         passcodeViewController.delegate = self;
         passcodeViewController.keypadButtonShowLettering = false;
         

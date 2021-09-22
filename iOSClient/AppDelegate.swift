@@ -755,6 +755,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         if passcodeViewController == nil {
             
+//            passcodeViewController = TOPasscodeViewController.init(passcodeType: .sixDigits, allowCancel: false)
             passcodeViewController = TOPasscodeViewController.init(passcodeType: .sixDigits, allowCancel: false)
             passcodeViewController?.delegate = self
             passcodeViewController?.keypadButtonShowLettering = false
