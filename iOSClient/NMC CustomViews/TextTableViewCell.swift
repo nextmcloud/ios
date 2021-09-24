@@ -18,6 +18,7 @@ class TextTableViewCell: XLFormBaseCell,UITextFieldDelegate {
         // Initialization code
         
         fileNameTextField.delegate = self
+        topLineView.backgroundColor = NCBrandColor.shared.secondarySystemBackground
         
     }
 

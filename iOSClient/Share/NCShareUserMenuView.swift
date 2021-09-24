@@ -20,7 +20,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import Foundation
+import UIKit
 import FSCalendar
 import NCCommunication
 
@@ -85,19 +85,19 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworkin
         switchSetExpirationDate.onTintColor = NCBrandColor.shared.brandElement
         
         labelCanReshare?.text = NSLocalizedString("_share_can_reshare_", comment: "")
-        labelCanReshare?.textColor = NCBrandColor.shared.textView
+        labelCanReshare?.textColor = NCBrandColor.shared.label
         labelCanCreate?.text = NSLocalizedString("_share_can_create_", comment: "")
-        labelCanCreate?.textColor = NCBrandColor.shared.textView
+        labelCanCreate?.textColor = NCBrandColor.shared.label
         labelCanChange?.text = NSLocalizedString("_share_can_change_", comment: "")
-        labelCanChange?.textColor = NCBrandColor.shared.textView
+        labelCanChange?.textColor = NCBrandColor.shared.label
         labelCanDelete?.text = NSLocalizedString("_share_can_delete_", comment: "")
-        labelCanDelete?.textColor = NCBrandColor.shared.textView
+        labelCanDelete?.textColor = NCBrandColor.shared.label
         labelSetExpirationDate?.text = NSLocalizedString("_share_expiration_date_", comment: "")
-        labelSetExpirationDate?.textColor = NCBrandColor.shared.textView
+        labelSetExpirationDate?.textColor = NCBrandColor.shared.label
         labelNoteToRecipient?.text = NSLocalizedString("_share_note_recipient_", comment: "")
-        labelNoteToRecipient?.textColor = NCBrandColor.shared.textView
+        labelNoteToRecipient?.textColor = NCBrandColor.shared.label
         labelUnshare?.text = NSLocalizedString("_share_unshare_", comment: "")
-        labelUnshare?.textColor = NCBrandColor.shared.textView
+        labelUnshare?.textColor = NCBrandColor.shared.label
         
         fieldSetExpirationDate.inputView = UIView()
         
@@ -216,7 +216,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworkin
             }
         }
         
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
     
     @IBAction func switchCanCreate(sender: UISwitch) {
@@ -231,7 +231,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworkin
 
         let permission = CCUtility.getPermissionsValue(byCanEdit: canEdit, andCanCreate: sender.isOn, andCanChange: canChange, andCanDelete: canDelete, andCanShare: canShare, andIsFolder: metadata.directory)
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
     
     @IBAction func switchCanChange(sender: UISwitch) {
@@ -246,7 +246,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworkin
         
         let permission = CCUtility.getPermissionsValue(byCanEdit: canEdit, andCanCreate: canCreate, andCanChange: sender.isOn, andCanDelete: canDelete, andCanShare: canShare, andIsFolder: metadata.directory)
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
     
     @IBAction func switchCanDelete(sender: UISwitch) {
@@ -261,7 +261,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworkin
         
         let permission = CCUtility.getPermissionsValue(byCanEdit: canEdit, andCanCreate: canCreate, andCanChange: canChange, andCanDelete: sender.isOn, andCanShare: canShare, andIsFolder: metadata.directory)
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
     
     // Set expiration date
@@ -273,7 +273,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworkin
             fieldSetExpirationDate.isEnabled = true
             fieldSetExpirationDate(sender: fieldSetExpirationDate)
         } else {
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, expirationDate: "", hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, label: nil, expirationDate: "", hideDownload: tableShare.hideDownload)
         }
     }
     
@@ -295,7 +295,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworkin
         guard let tableShare = self.tableShare else { return }
         if fieldNoteToRecipient.text == nil { return }
         
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: fieldNoteToRecipient.text, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: fieldNoteToRecipient.text, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
     
     // Unshare
@@ -348,7 +348,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworkin
             dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
             let expirationDate = dateFormatter.string(from: date)
             
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, expirationDate: expirationDate, hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, label: nil, expirationDate: expirationDate, hideDownload: tableShare.hideDownload)
         }
     }
     

@@ -31,11 +31,11 @@ class InitialPrivacySettingsViewController: UIViewController {
         //dataPrivacyImage!.image(color: NCBrandColor.shared.icon, size: 60)
         dataPrivacyImage.image = UIImage(named: "dataPrivacy")!.image(color: NCBrandColor.shared.brand, size: 60)
         privacySettingsHelpText.delegate = self
+        privacySettingsHelpText.textColor = NCBrandColor.shared.label
         privacySettingsHelpText.hyperLink(originalText: privacyHelpText,
                                          linkTextsAndTypes: [NSLocalizedString("_key_privacy_help_", comment: ""): LinkType.privacyPolicy.rawValue,
                                                              NSLocalizedString("_key_reject_help_", comment: ""): LinkType.reject.rawValue,
                                                              NSLocalizedString("_key_settings_help_", comment: ""): LinkType.settings.rawValue])
-        
         
         acceptButton.backgroundColor = NCBrandColor.shared.brand
         acceptButton.tintColor = UIColor.white
@@ -63,6 +63,7 @@ class InitialPrivacySettingsViewController: UIViewController {
     }
     
     @IBAction func onAcceptButtonClicked(_ sender: Any) {
+        UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
         self.dismiss(animated: true, completion: nil)
     }
 }
@@ -79,6 +80,7 @@ extension InitialPrivacySettingsViewController: UITextViewDelegate {
                 self.navigationController?.pushViewController(privacyViewController, animated: true)
             case LinkType.reject:
                 UserDefaults.standard.set(false, forKey: "isAnalysisDataCollectionSwitchOn")
+                UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
                 self.dismiss(animated: true, completion: nil)
             case LinkType.settings:
                 let privacySettingsViewController = PrivacySettingsViewController()
@@ -100,9 +102,10 @@ public extension UITextView {
         
         let attributedOriginalText = NSMutableAttributedString(string: originalText)
         
+        let fullRange = NSRange(location: 0, length: attributedOriginalText.length)
+        attributedOriginalText.addAttribute(NSAttributedString.Key.foregroundColor, value: NCBrandColor.shared.label, range: fullRange)
         for linkTextAndType in linkTextsAndTypes {
             let linkRange = attributedOriginalText.mutableString.range(of: linkTextAndType.key)
-            let fullRange = NSRange(location: 0, length: attributedOriginalText.length)
             attributedOriginalText.addAttribute(NSAttributedString.Key.link, value: linkTextAndType.value, range: linkRange)
             attributedOriginalText.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: fullRange)
             attributedOriginalText.addAttribute(NSAttributedString.Key.foregroundColor, value: NCBrandColor.shared.brand, range: linkRange)
@@ -110,7 +113,7 @@ public extension UITextView {
         }
         
         self.linkTextAttributes = [
-            kCTForegroundColorAttributeName: UIColor.blue
+            kCTForegroundColorAttributeName: NCBrandColor.shared.label
         ] as [NSAttributedString.Key: Any]
         
         self.attributedText = attributedOriginalText
