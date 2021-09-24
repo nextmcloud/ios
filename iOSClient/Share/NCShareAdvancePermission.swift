@@ -64,6 +64,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     var footerView: NCShareAdvancePermissionFooter! = nil
     var directory: Bool!
     var typeFile: String!
+    let tableViewBottomInset: CGFloat = 80.0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,13 +72,8 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         self.typeFile = self.metadata?.typeFile
         UserDefaults.standard.setValue(self.linkLabel, forKey: "_share_link_")
         
-//        self.tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: self.tableView.bounds.size.width, height: dummyViewHeight))
-//        self.tableView.contentInset = UIEdgeInsets(top: -dummyViewHeight, left: 0, bottom: 0, right: 0)
         self.metadata?.permissions = self.permissions
-        if newUser == true {
-            self.title = self.shareeEmail
-        } else {
-            self.title = self.metadata?.ownerDisplayName
+        if !(newUser ?? false) {
             if let expire = metadata?.trashbinDeletionTime {
                 
                 if expire.timeIntervalSinceNow.sign == .minus {
@@ -93,7 +89,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 }
             }
         }
-        
+        setTitle()
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -135,30 +131,49 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase,  view: self.view, delegate: self)
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         initializeForm()
+        changeTheming()
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+    }
+    
+    func setTitle() {
+        if newUser ?? false {
+            title = sharee?.shareWith ?? NSLocalizedString("_sharing_", comment: "")
+        } else {
+            if let shareType = tableShare?.shareType, shareType == NCShareCommon.shared.SHARE_TYPE_USER || shareType == NCShareCommon.shared.SHARE_TYPE_EMAIL {
+                title = tableShare?.shareWith ?? NSLocalizedString("_sharing_", comment: "")
+            } else {
+                title = NSLocalizedString("_sharing_", comment: "")
+            }
+        }
     }
     
     @objc func changeTheming() {
         tableView.backgroundColor = NCBrandColor.shared.backgroundView
         self.view.backgroundColor = NCBrandColor.shared.backgroundView
-        self.navigationController!.navigationBar.tintColor = NCBrandColor.shared.customer
+        self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.customer
         self.headerView.backgroundColor = NCBrandColor.shared.backgroundView
         self.headerView.fileName.textColor = NCBrandColor.shared.textView
         self.headerView.info.textColor = NCBrandColor.shared.textInfo
         self.footerView.backgroundColor = NCBrandColor.shared.backgroundView
+        
+        self.footerView.buttonCancel.setTitleColor(NCBrandColor.shared.gray26AndGrayf2, for: .normal)
+        footerView.buttonCancel.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
+        footerView.buttonCancel.backgroundColor = NCBrandColor.shared.backgroundView
+        self.footerView.buttonNext.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
+        self.footerView.buttonNext.setTitleColor(.white, for: .normal)
+        
         tableView.reloadData()
     }
     
     @objc func keyboardWillShow(_ notification:Notification) {
-
         if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardSize.height, right: 0)
         }
     }
+    
     @objc func keyboardWillHide(_ notification:Notification) {
-
         if ((notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue) != nil {
-            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: tableViewBottomInset, right: 0)
         }
     }
 
@@ -200,7 +215,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         }
         self.headerView.info.textColor = NCBrandColor.shared.optionItem
         self.headerView.info.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
-        self.headerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 260)
+        self.headerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 250)
         self.tableView.tableHeaderView = self.headerView
         
         //Sharing
@@ -214,7 +229,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         //PERMISSION
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCShareHeaderCustomCell"] = NCShareHeaderCustomCell.self
         row = XLFormRowDescriptor(tag: "kNMCShareHeaderCustomCell", rowType: "kNMCShareHeaderCustomCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
-        row.height = 46
+        row.height = 26
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_PERMISSIONS_", comment: "")
         section.addFormRow(row)
         
@@ -240,9 +255,6 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         if newUser == true || (self.directory == false && self.typeFile != "document") {
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
         }
-//        if self.typeFile == "document" {
-//            row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-//        }
         
         section.addFormRow(row)
         
@@ -298,11 +310,10 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 
                 row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditingMsg", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
                 row.cellConfig["titleLabel.text"] = NSLocalizedString("share_editing_message", comment: "")
-                row.height = 44
+                row.height = 60
                 section.addFormRow(row)
             }
         }
-        
         
         //file drop
         //"_share_file_drop_"             = "File drop (upload only)";
@@ -322,12 +333,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             section.addFormRow(row)
             
         }
-//        if metadata?.permissions == "RGDNVCK" {
-//            row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-////            row.value = "fileDrop"
-//        } else {
-//            row.cellConfig["imageCheck.image"] = UIImage(named: "")
-//        }
+
         if newUser == false {
             if tableShare?.permissions == NCGlobal.shared.permissionCreateShare {
                 row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
@@ -341,38 +347,35 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             }
         }
         
+        //empty cell
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCXLFormBaseCell"] = XLFormBaseCell.self
+        row = XLFormRowDescriptor(tag: "kNMCXLFormBaseCell", rowType: "kNMCXLFormBaseCell", title: NSLocalizedString("", comment: ""))
+        row.height = 16
+        section.addFormRow(row)
+        
         //ADVANCE PERMISSION
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
 
         row = XLFormRowDescriptor(tag: "NCFilePermissionCellAdvanceTxt", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
-//        row.cellConfig["titleLabel.text"] = NSLocalizedString("_advance_permissions_", comment: "")
-        row.cellConfig["titleLabelBottom.text"] = NSLocalizedString("_advance_permissions_", comment: "")
-        row.height = 44
+        row.cellConfig["titleLabel.text"] = NSLocalizedString("_advance_permissions_", comment: "")
+        row.height = 52
         section.addFormRow(row)
-        
-        
-//        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
-//        row = XLFormRowDescriptor(tag: "NCFilePermissionCellAdvanceText", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
-//        row.cellConfig["titleLabel.text"] = NSLocalizedString("_advance_permissions_", comment: "")
-////        row.height = 15
-//        section.addFormRow(row)
 
-        //link label
+        //link label section header
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCShareHeaderCustomCell"] = NCShareHeaderCustomCell.self
-
         row = XLFormRowDescriptor(tag: "kNMCShareHeaderCustomCell", rowType: "kNMCShareHeaderCustomCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_LINK_LABEL_", comment: "")
-        row.height = 46
+        row.height = 20
         section.addFormRow(row)
-//
-        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
-        row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellLinkLabel", rowType: "kNMCFilePermissionEditCell", title: "")
-        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
-//        section.footerTitle = "OthersFormViewController.swift"
-        row.cellConfig["titleLabel.text"] = NSLocalizedString("_custom_link_label", comment: "")
+        
+        // Custom Link label
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNCShareTextInputCell"] = NCShareTextInputCell.self
+        row = XLFormRowDescriptor(tag: "kNCShareTextInputCellCustomLinkField", rowType: "kNCShareTextInputCell", title: "")
         row.cellConfig["cellTextField.placeholder"] = NSLocalizedString("_custom_link_label", comment: "")
-        row.cellClass = NCFilePermissionEditCell.self
-        row.height = 88
+        row.cellConfig["cellTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["cellTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.textView
+        row.height = 44
         section.addFormRow(row)
 
         //can share
@@ -381,9 +384,6 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellEditingCanShare", rowType: "kNMCFilePermissionEditCell", title: "")
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
         row.cellClass = NCFilePermissionEditCell.self
-//        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
-//
-//        row = XLFormRowDescriptor(tag: "NCFilePermissionCellEditingCanShare", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_can_reshare_", comment: "")
         row.height = 44
         section.addFormRow(row)
@@ -404,24 +404,26 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         row.height = 46
         section.addFormRow(row)
 
-
-//        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_PASSWORD_PROTECTION_", comment: ""))
-//        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
-//        row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellPassword", rowType: "kNMCFilePermissionEditCell", title: "")
-//        row.cellConfig["titleLabel.text"] = NSLocalizedString("_set_password_", comment: "")
-//        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
-//        row.cellClass = NCFilePermissionEditCell.self
-//        row.height = 88
-////        row.cellConfig["cellTextField.text"] = "false"
-//        section.addFormRow(row)
-        
-        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditPasswordCell"] = NCFilePermissionEditPasswordCell.self
-        row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditPasswordCellWithText", rowType: "kNMCFilePermissionEditPasswordCell", title: "")
+        // Set password
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
+        row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditPasswordCellWithText", rowType: "kNMCFilePermissionEditCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_set_password_", comment: "")
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
-        row.cellConfig["cellTextField.placeholder"] = NSLocalizedString("_insert_password_", comment: "")
-        row.cellClass = NCFilePermissionEditPasswordCell.self
-        row.height = 88
+        row.cellClass = NCFilePermissionEditCell.self
+        row.height = 44
+        section.addFormRow(row)
+        
+        // enter password input field
+        XLFormViewController.cellClassesForRowDescriptorTypes()["NMCSetPasswordCustomInputField"] = PasswordInputField.self
+        row = XLFormRowDescriptor(tag: "SetPasswordInputField", rowType: "NMCSetPasswordCustomInputField", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = PasswordInputField.self
+        row.cellConfig["fileNameInputTextField.placeholder"] = NSLocalizedString("_password_", comment: "")
+        row.cellConfig["fileNameInputTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["fileNameInputTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+        row.height = 44
+        row.hidden = 1
         section.addFormRow(row)
 
         //expiration
@@ -430,31 +432,44 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_EXPIRATION_DATE_", comment: "")
         row.height = 46
         section.addFormRow(row)
-
-//        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("", comment: ""))
+        
+        // expiry date switch
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
-        row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellExpiration", rowType: "kNMCFilePermissionEditCell", title: "")
+        row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellExpiration", rowType: "kNMCFilePermissionEditCell", title: NSLocalizedString("_share_expiration_date_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_expiration_date_", comment: "")
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
+        row.cellClass = NCFilePermissionEditCell.self
+        row.height = 44
+        section.addFormRow(row)
+        
+        // set expiry date field
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNCShareTextInputCell"] = NCShareTextInputCell.self
+        row = XLFormRowDescriptor(tag: "NCShareTextInputCellExpiry", rowType: "kNCShareTextInputCell", title: "")
+        row.cellClass = NCShareTextInputCell.self
+        row.cellConfig["cellTextField.placeholder"] = ""
         if newUser == false {
             row.cellConfig["cellTextField.text"] = self.expirationDateText
         }
-        row.cellClass = NCFilePermissionEditCell.self
-        row.height = 88
+        row.cellConfig["cellTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["cellTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.textView
+        row.height = 44
+        row.hidden = 1
         section.addFormRow(row)
         
         self.footerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionFooter", owner: self, options: nil)?.first as! NCShareAdvancePermissionFooter)
         self.footerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 100)
         self.footerView.buttonCancel.addTarget(self, action: #selector(cancelClicked(_:)), for: .touchUpInside)
         self.footerView.buttonNext.addTarget(self, action: #selector(nextClicked(_:)), for: .touchUpInside)
-        self.tableView.tableFooterView = self.footerView
-        self.self.footerView.buttonCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
+//        self.tableView.tableFooterView = self.footerView
+        self.footerView.buttonCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         self.footerView.buttonCancel.layer.cornerRadius = 10
         self.footerView.buttonCancel.layer.masksToBounds = true
         self.footerView.buttonCancel.layer.borderWidth = 1
-        self.footerView.buttonCancel.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
-        self.footerView.buttonCancel.setTitleColor(UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0), for: .normal)
-        self.footerView.buttonCancel.backgroundColor = .white
+        
+        
+        
+        footerView.addShadow(location: .top)
 
         if newUser! {
             self.footerView.buttonNext.setTitle(NSLocalizedString("_next_", comment: ""), for: .normal)
@@ -463,9 +478,14 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         }
         self.footerView.buttonNext.layer.cornerRadius = 10
         self.footerView.buttonNext.layer.masksToBounds = true
-        self.footerView.buttonNext.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
-        self.footerView.buttonNext.setTitleColor(.white, for: .normal)
-
+        
+        self.view.addSubview(footerView)
+        footerView.translatesAutoresizingMaskIntoConstraints = false
+        footerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        footerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        footerView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        footerView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: tableViewBottomInset, right: 0)
         form.addFormSection(section)
         self.form = form
     }
@@ -553,49 +573,67 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     
     
     override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
-
         super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)
-        
         
         switch formRow.tag {
         case "kNMCFilePermissionEditCellHideDownload":
             if let value = newValue as? Bool {
                 self.hideDownload = value
             }
-            break
+            
         case "kNMCFilePermissionEditPasswordCellWithText":
             if let value = newValue as? Bool {
                 self.passwordProtected = value
+                let setPasswordInputField : XLFormRowDescriptor  = self.form.formRow(withTag: "SetPasswordInputField")!
+                if let indexPath = self.form.indexPath(ofFormRow: setPasswordInputField) {
+                    let cell = tableView.cellForRow(at: indexPath) as? PasswordInputField
+                    cell?.fileNameInputTextField.text = ""
+                }
+                password = ""
+                setPasswordInputField.hidden = !value
             }
             
+        case "SetPasswordInputField":
             if let pwd = formRow.value as? String {
                 self.form.delegate = nil
                 self.password = pwd
-    //            formRow.value = "self.fileName"
                 self.form.delegate = self
             }
-            break
+            
         case "kNMCFilePermissionEditCellLinkLabel":
             if let label = formRow.value as? String {
                 self.form.delegate = nil
                 self.linkLabel = label
                 self.form.delegate = self
             }
-            break
+            
         case "kNMCFilePermissionEditCellExpiration":
             if let value = newValue as? Bool {
                 self.setExpiration = value
+                let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellExpiry")!
+                expirationDateText = ""
+                inputField.hidden = !value
             }
             
-            if let exp = formRow.value as? NSDate {
+        case "NCShareTextInputCellExpiry":
+            if let exp = formRow.value as? Date {
                 self.form.delegate = nil
-                self.expirationDate = exp
+                self.expirationDateText = getServerStyleDate(date: exp)
                 self.form.delegate = self
             }
-            break
+            
         default:
             break
         }
+    }
+    
+    func getServerStyleDate(date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.formatterBehavior = .behavior10_4
+        dateFormatter.dateStyle = .medium
+        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
+        let expiryDate = dateFormatter.string(from: date)
+        return expiryDate
     }
     
     // MARK: - Switch actions
@@ -681,70 +719,26 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         canReshare = sender.isOn
     }
     
-    func hideDownloadValueChanged(sender: UISwitch) {
-        
-        hideDownload = sender.isOn
-    }
-    
-    func setPasswordValueChanged(sender: UISwitch) {
-        
-        self.passwordProtected = sender.isOn
-        
-        self.tableView.beginUpdates()
-        self.tableView.reloadRows(at: [IndexPath(row: 0, section: 3)], with: .none)
-        self.tableView.endUpdates()
-    }
-    
-    @IBAction func setExpirationValueChanged(sender: UISwitch) {
-        self.setExpiration = sender.isOn
-        self.tableView.beginUpdates()
-        self.tableView.reloadRows(at: [IndexPath(row: 0, section: 4)], with: .none)
-        self.tableView.endUpdates()
-    }
-    
-    func fieldSetExpirationDate(sender: UITextField) {
-//        width = self.view.frame.width
-//        height = self.view.frame.height
-//        let calendar = NCShareCommon.shared.openCalendar(view: self.view, width: width, height: height)
-//        calendar.calendarView.delegate = self
-//        self.calendar = calendar.calendarView
-//        viewWindowCalendar = calendar.viewWindow
-//
-//        let tap = UITapGestureRecognizer(target: self, action: #selector(tapViewWindowCalendar))
-//        tap.delegate = self
-//        viewWindowCalendar?.addGestureRecognizer(tap)
-    }
-    
-    
     @IBAction func cancelClicked(_ sender: Any) {
         navigationController?.popViewController(animated: true)
     }
     
     @IBAction func nextClicked(_ sender: Any) {
-        
-        if self.passwordProtected == true {
+        if passwordProtected {
             if self.password == nil || self.password == "" {
-//                let string = pwd.trimmingCharacters(in: .whitespaces)
-//                if string.count < 1 {
-                    let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_password", comment: ""), preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
-    //                alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { action in
-    //
-    //                }))
-                    
-                    self.present(alert, animated: true)
-                    return
-//                }
+                let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_password", comment: ""), preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
+                self.present(alert, animated: true)
+                return
             }
         }
         
-        if self.setExpiration == true {
-            if self.expirationDateText == nil || self.self.expirationDateText == "" {
-                    let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_expiration", comment: ""), preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
-                    self.present(alert, animated: true)
-                    return
-//                }
+        if setExpiration {
+            if self.expirationDateText == "" {
+                let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_expiration", comment: ""), preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
+                self.present(alert, animated: true)
+                return
             }
         }
         
@@ -758,9 +752,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             viewNewUserComment.metadata = self.metadata
             viewNewUserComment.sharee = sharee
             viewNewUserComment.password = self.password
+            viewNewUserComment.isUpdating = false
             self.navigationController!.pushViewController(viewNewUserComment, animated: true)
         } else {
-//            self.networking?.createShare(shareWith: sharee!.shareWith, shareType: sharee!.shareType, metadata: self.metadata!)
             let directory = metadata?.directory
             if directory! {
                 switch self.permissions {
@@ -832,146 +826,13 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     
     func getSharees(sharees: [NCCommunicationSharee]?) { }
     
-    
-    func setDatePicker(sender: UITextField) {
-        //Format Date
-        datePicker.datePickerMode = .date
-
-        //ToolBar
-        let toolbar = UIToolbar();
-        toolbar.sizeToFit()
-        let doneButton = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(doneDatePicker));
-        let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
-        let cancelButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelDatePicker));
-
-        toolbar.setItems([doneButton,spaceButton,cancelButton], animated: false)
-
-        sender.inputAccessoryView = toolbar
-        sender.inputView = datePicker
-    }
-    
-    @objc func doneDatePicker(){
-        let dateFormatter = DateFormatter()
-        dateFormatter.formatterBehavior = .behavior10_4
-        dateFormatter.dateStyle = .medium
-        self.expirationDateText = dateFormatter.string(from: datePicker.date as Date)
-        
-        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
-        self.expirationDate = datePicker.date as NSDate
-        
-        self.metadata?.trashbinDeletionTime = self.expirationDate
-        self.expirationDateText = dateFormatter.string(from: datePicker.date)
-        
-        self.tableView.beginUpdates()
-        self.tableView.reloadRows(at: [IndexPath(row: 0, section: 4)], with: .none)
-        self.tableView.endUpdates()
-        self.view.endEditing(true)
-    }
-
-    @objc func cancelDatePicker() {
-        self.view.endEditing(true)
-    }
-    
     @objc func filePermission(_ sender: XLFormRowDescriptor) {
         print("")
     }
     
-//    @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {
-//        let useFolderPhotoRow: XLFormRowDescriptor  = self.form.formRow(withTag: "useFolderAutoUpload")!
-//        self.deselectFormRow(sender)
-//        
-//        if (useFolderPhotoRow.value! as AnyObject).boolValue == true{
-//            return
-//        }
-//        
-//        let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
-//        let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
-//        let viewController = navigationController.topViewController as! NCSelect
-//        
-//        viewController.delegate = self
-//        viewController.hideButtonCreateFolder = false
-//        viewController.includeDirectoryE2EEncryption = true
-//        viewController.includeImages = false
-//        viewController.selectFile = false
-//        viewController.titleButtonDone = NSLocalizedString("_select_", comment: "")
-//        viewController.type = ""
-//        
-//        navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-//        self.present(navigationController, animated: true, completion: nil)
-//    }
-    
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], buttonType: String, overwrite: Bool) {
         
     }
-    
-    //MARK: - Header View
-    
-//    func setupHeader() {
-//
-//        let headerView = Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?.first as! NCShareAdvancePermissionHeader
-//        headerView.backgroundColor = NCBrandColor.shared.backgroundForm
-//        headerView.fileName.textColor = NCBrandColor.shared.icon
-////        headerView.labelSharing.textColor = NCBrandColor.shared.icon
-////        headerView.labelSharingInfo.textColor = NCBrandColor.shared.icon
-//        headerView.info.textColor = NCBrandColor.shared.textInfo
-//        headerView.ocId = metadata!.ocId
-//
-//        if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
-////            headerView.imageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
-////            headerView.fullWidthImageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
-////            headerView.fullWidthImageView.image = getImage(metadata: metadata!)
-//            headerView.fullWidthImageView.image = getImageMetadata(metadata!)
-//            headerView.fullWidthImageView.contentMode = .scaleToFill
-//            headerView.imageView.isHidden = true
-//        } else {
-//            if metadata!.directory {
-//                let image = UIImage.init(named: "folder")!
-//                headerView.imageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
-//            } else if metadata!.iconName.count > 0 {
-//                headerView.imageView.image = UIImage.init(named: metadata!.iconName)
-//            } else {
-//                headerView.imageView.image = UIImage.init(named: "file")
-//            }
-//        }
-//        headerView.fileName.text = metadata?.fileNameView
-//        headerView.fileName.textColor = NCBrandColor.shared.textView
-//        if metadata!.favorite {
-//            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
-//        } else {
-//            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
-//        }
-//        headerView.info.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
-////        addSubview(headerView)
-////
-////        pageView.translatesAutoresizingMaskIntoConstraints = false
-////        collectionView.translatesAutoresizingMaskIntoConstraints = false
-////        headerView.translatesAutoresizingMaskIntoConstraints = false
-////
-//////        headerHeightConstraint = headerView.heightAnchor.constraint(
-//////            equalToConstant: NCSharePagingView.HeaderHeight
-//////        )
-////        headerHeightConstraint = headerView.heightAnchor.constraint(
-////            equalToConstant: metadata!.directory ? 350 : 370
-////        )
-////
-////        headerHeightConstraint?.isActive = true
-////
-////        NSLayoutConstraint.activate([
-////            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
-////            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-////            collectionView.heightAnchor.constraint(equalToConstant: options.menuHeight),
-////            collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
-////
-////            headerView.topAnchor.constraint(equalTo: topAnchor),
-////            headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-////            headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-////
-////            pageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-////            pageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-////            pageView.bottomAnchor.constraint(equalTo: bottomAnchor),
-////            pageView.topAnchor.constraint(equalTo: topAnchor, constant: 10)
-////        ])
-//    }
     
     //MARK: - Image
     
