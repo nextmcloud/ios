@@ -14,7 +14,7 @@ class PasswordInputField: XLFormBaseCell,UITextFieldDelegate {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        
+        fileNameInputTextField.isSecureTextEntry = true
         fileNameInputTextField.delegate = self
     }
 

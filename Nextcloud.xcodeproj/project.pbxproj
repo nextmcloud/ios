@@ -91,6 +91,9 @@
 		95BB20FA2660E2C600AF4344 /* NCAccountRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20F82660E2C600AF4344 /* NCAccountRequest.swift */; };
 		95BB20FB2660E2C600AF4344 /* NCAccountRequest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB20F92660E2C600AF4344 /* NCAccountRequest.storyboard */; };
 		95BB21172660F55900AF4344 /* NCLogin.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB21162660F55900AF4344 /* NCLogin.storyboard */; };
+		B176BA9926F8B83A009A0F33 /* NCShareTextInputCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B176BA9826F8B83A009A0F33 /* NCShareTextInputCell.swift */; };
+		B176BAB626F8F7A0009A0F33 /* NCShareTextInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B176BAB526F8F7A0009A0F33 /* NCShareTextInputCell.xib */; };
+		B176BAD626FD9FF8009A0F33 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B176BAD526FD9FF8009A0F33 /* UIView+Extensions.swift */; };
 		C0072DF0263C35C6001496A0 /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = C0072DEF263C35C5001496A0 /* Adjust */; };
 		C00B205726908551003E18AD /* NCShareSendEmail.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00B205626908550003E18AD /* NCShareSendEmail.swift */; };
 		C00B205D26908B9B003E18AD /* NCShareFolderOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00B205C26908B9B003E18AD /* NCShareFolderOptions.swift */; };
@@ -529,6 +532,9 @@
 		95BB20F82660E2C600AF4344 /* NCAccountRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCAccountRequest.swift; sourceTree = "<group>"; };
 		95BB20F92660E2C600AF4344 /* NCAccountRequest.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCAccountRequest.storyboard; sourceTree = "<group>"; };
 		95BB21162660F55900AF4344 /* NCLogin.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCLogin.storyboard; sourceTree = "<group>"; };
+		B176BA9826F8B83A009A0F33 /* NCShareTextInputCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareTextInputCell.swift; sourceTree = "<group>"; };
+		B176BAB526F8F7A0009A0F33 /* NCShareTextInputCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareTextInputCell.xib; sourceTree = "<group>"; };
+		B176BAD526FD9FF8009A0F33 /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		C00B205626908550003E18AD /* NCShareSendEmail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareSendEmail.swift; sourceTree = "<group>"; };
 		C00B205C26908B9B003E18AD /* NCShareFolderOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareFolderOptions.swift; sourceTree = "<group>"; };
 		C00B206C2691B8A0003E18AD /* NCShareFileOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareFileOptions.swift; sourceTree = "<group>"; };
@@ -1235,6 +1241,8 @@
 				C0D605F126C294E500B67843 /* NCFilePermissionCell.xib */,
 				C0D605FB26C2999500B67843 /* NCFilePermissionEditCell.swift */,
 				C0D6060126C299BF00B67843 /* NCFilePermissionEditCell.xib */,
+				B176BA9826F8B83A009A0F33 /* NCShareTextInputCell.swift */,
+				B176BAB526F8F7A0009A0F33 /* NCShareTextInputCell.xib */,
 				C0D6064326CCDCFD00B67843 /* NCFilePermissionEditPasswordCell.swift */,
 				C0D6064926CCDD2000B67843 /* NCFilePermissionEditPasswordCell.xib */,
 				C0D6060B26C2A12300B67843 /* NCShareAdvancePermissionHeader.swift */,
@@ -1452,6 +1460,7 @@
 				F713FEFF2472764100214AF6 /* UIImage+animatedGIF.m */,
 				F7B7504A2397D38E004E13EC /* UIImage+Extensions.swift */,
 				F7A0D1452592256F008F8A13 /* UIImageView+Extensions.swift */,
+				B176BAD526FD9FF8009A0F33 /* UIView+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2239,6 +2248,7 @@
 				F7C9555321F0C4CA0024296E /* NCActivity.storyboard in Resources */,
 				F78ACD54219047D40088454D /* NCSectionFooter.xib in Resources */,
 				950A647F264AACF4006ADE0E /* SubFolderCustomCell.xib in Resources */,
+				B176BAB626F8F7A0009A0F33 /* NCShareTextInputCell.xib in Resources */,
 				F704B5E32430AA6F00632F5F /* NCCreateFormUploadConflict.storyboard in Resources */,
 				F77B0F611D118A16002130FE /* Acknowledgements.rtf in Resources */,
 				F73D11FA253C5F4800DF9BEC /* NCViewerNextcloudText.storyboard in Resources */,
@@ -2520,6 +2530,7 @@
 				F70460522499061800BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
 				7A875EDA26943BC200AF558D /* OpenSourceSoftwareViewController.swift in Sources */,
 				F78F74362163781100C2ADAD /* NCTrash.swift in Sources */,
+				B176BA9926F8B83A009A0F33 /* NCShareTextInputCell.swift in Sources */,
 				C07020E5267B459500E094AD /* NCPermissionMenuView.swift in Sources */,
 				F7651A8B23A2A3F2001403D2 /* NCCreateFormUploadDocuments.swift in Sources */,
 				F74AF3A4247FB6AE00AC767B /* NCUtilityFileSystem.swift in Sources */,
@@ -2609,6 +2620,7 @@
 				F74DE14325135B6800917068 /* NCTransfers.swift in Sources */,
 				F755E6462525946C008DAB45 /* NCCollectionViewCommon.swift in Sources */,
 				956E0D75266A494000DA4F91 /* PdfWithOcrSwitchView.swift in Sources */,
+				B176BAD626FD9FF8009A0F33 /* UIView+Extensions.swift in Sources */,
 				95BB20F22660E25200AF4344 /* NCPopupViewController.swift in Sources */,
 				956E0D8D266A4FEB00DA4F91 /* PdfWithoutOcrSwitchView.swift in Sources */,
 				95BB2083265FEF3F00AF4344 /* NCShareComments+Menu.swift in Sources */,

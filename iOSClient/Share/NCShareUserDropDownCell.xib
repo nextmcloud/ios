@@ -29,16 +29,16 @@
                     </userDefinedRuntimeAttributes>
                 </imageView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VIB-Xt-ckX">
-                    <rect key="frame" x="8" y="15" width="439" height="20.5"/>
+                    <rect key="frame" x="8" y="15" width="435" height="20.5"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="PlH-LZ-AzK">
-                    <rect key="frame" x="457" y="15" width="20" height="20"/>
+                    <rect key="frame" x="453" y="13" width="24" height="24"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="20" id="Ej8-sj-gmZ"/>
-                        <constraint firstAttribute="height" constant="20" id="pRc-Ln-wNF"/>
+                        <constraint firstAttribute="width" constant="24" id="Ej8-sj-gmZ"/>
+                        <constraint firstAttribute="height" constant="24" id="pRc-Ln-wNF"/>
                     </constraints>
                 </imageView>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="GxZ-7K-Vqz">

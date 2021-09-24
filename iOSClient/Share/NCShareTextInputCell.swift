@@ -1,22 +1,20 @@
 //
-//  NCFilePermissionEditCell.swift
+//  NCShareTextInputCell.swift
 //  Nextcloud
 //
-//  Created by T-systems on 10/08/21.
-//  Copyright © 2021 Marino Faggiana. All rights reserved.
+//  Created by T-systems on 20/09/21.
+//  Copyright © 2021 Kunal. All rights reserved.
 //
 
 import UIKit
 
-class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
+class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
     
     @IBOutlet weak var seperator: UIView!
-    @IBOutlet weak var seperatorMiddle: UIView!
     @IBOutlet weak var seperatorBottom: UIView!
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var switchControl: UISwitch!
     @IBOutlet weak var cellTextField: UITextField!
-    @IBOutlet weak var buttonLinkLabel: UIButton!
+    @IBOutlet weak var calendarImageView: UIImageView!
+    
     let datePicker = UIDatePicker()
     var expirationDateText: String!
     var expirationDate: NSDate!
@@ -24,20 +22,13 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
     override func awakeFromNib() {
         super.awakeFromNib()
         self.cellTextField.delegate = self
-        self.cellTextField.isEnabled = false
+        self.cellTextField.isEnabled = true
+        calendarImageView.image = UIImage(named: "calender")?.imageColor(NCBrandColor.shared.brandElement) 
         self.selectionStyle = .none
-        switchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
         self.backgroundColor = NCBrandColor.shared.backgroundView
-        self.titleLabel.textColor = NCBrandColor.shared.shareCellTitleColor
         self.cellTextField.attributedPlaceholder = NSAttributedString(string: "",
                                                                attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.fileFolderName])
         self.cellTextField.textColor = NCBrandColor.shared.singleTitleColorButton
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
-    }
-    
-    @objc func changeTheming() {
-        self.backgroundColor = NCBrandColor.shared.backgroundView
-        self.titleLabel.textColor = NCBrandColor.shared.icon
     }
     
     override func configure() {
@@ -46,57 +37,13 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
     
     override func update() {
         super.update()
-                
-        if rowDescriptor.tag ==  "kNMCFilePermissionCellEditingCanShare" {
-            self.seperatorMiddle.isHidden = true
-            self.seperatorBottom.isHidden = true
-            self.cellTextField.isHidden = true
-        }
-        if rowDescriptor.tag == "kNMCFilePermissionEditCellLinkLabel" {
-            self.switchControl.isHidden = true
-            self.cellTextField.isEnabled = true
-            self.seperatorBottom.isHidden = true
-        }
-        if rowDescriptor.tag == "kNMCFilePermissionEditCellLinkLabel" {
-            self.switchControl.isHidden = true
-        }
-        
-        if rowDescriptor.tag == "kNMCFilePermissionEditCellExpiration" {
+        calendarImageView.isHidden = rowDescriptor.tag != "NCShareTextInputCellExpiry"
+        if rowDescriptor.tag == "NCShareTextInputCellExpiry" {
+            seperator.isHidden = true
             setDatePicker(sender: self.cellTextField)
         }
-        
-        if rowDescriptor.tag == "kNMCFilePermissionEditPasswordCellWithText" {
-            self.seperatorMiddle.isHidden = true
-//            self.seperatorBottom.isHidden = true
-        }
-        
-        if rowDescriptor.tag == "kNMCFilePermissionEditCellHideDownload" {
-            seperator.isHidden = true
-            self.seperatorMiddle.isHidden = true
-        }
-    }
-    
-    @objc func switchChanged(mySwitch: UISwitch) {
-        let isOn = mySwitch.isOn
-        if isOn {
-            //on
-            self.rowDescriptor.value = isOn
-            self.cellTextField.isEnabled = true
-            cellTextField.delegate = self
-        } else {
-            self.rowDescriptor.value = isOn
-            self.cellTextField.isEnabled = false
-            if rowDescriptor.tag == "kNMCFilePermissionEditCellExpiration" || rowDescriptor.tag == "kNMCFilePermissionEditCellPassword" {
-                self.cellTextField.text = ""
-            }
-        }
-        if rowDescriptor.tag == "kNMCFilePermissionEditPasswordCellWithText" {
-            seperatorBottom.isHidden = isOn
-            seperatorMiddle.isHidden = !isOn
-        }
-        if rowDescriptor.tag == "kNMCFilePermissionEditCellExpiration" {
-            seperatorBottom.isHidden = isOn
-            seperatorMiddle.isHidden = !isOn
+        if rowDescriptor.tag == "kNCShareTextInputCellCustomLinkField" {
+            seperatorBottom.isHidden = true
         }
     }
     
@@ -157,7 +104,6 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
         dateFormatter.dateStyle = .medium
         self.expirationDateText = dateFormatter.string(from: datePicker.date as Date)
         
-        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
         self.expirationDate = datePicker.date as NSDate
         self.cellTextField.text = self.expirationDateText
         self.rowDescriptor.value = self.expirationDate

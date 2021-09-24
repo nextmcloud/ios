@@ -15,14 +15,11 @@ class NCShareHeaderCustomCell: XLFormBaseCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         self.selectionStyle = .none
-        
+        self.backgroundColor = .clear
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
     }
     
     @objc func changeTheming() {
-//        self.backgroundColor = NCBrandColor.shared.backgroundView
-        self.backgroundColor = .clear
-        self.titleLabel.textColor = NCBrandColor.shared.icon
     }
     
     override func configure() {
@@ -30,6 +27,8 @@ class NCShareHeaderCustomCell: XLFormBaseCell {
     }
     
     override func update() {
+        self.backgroundColor = .clear
+        self.titleLabel.textColor = NCBrandColor.shared.icon
         super.update()
         
         if rowDescriptor.tag == "kNMCShareHeaderCustomCell" {

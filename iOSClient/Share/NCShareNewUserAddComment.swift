@@ -12,7 +12,6 @@ import NCCommunication
 import SVGKit
 
 class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNetworkingDelegate {
-    
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var folderImageView: UIImageView!
     @IBOutlet weak var labelFileName: UILabel!
@@ -24,7 +23,8 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     @IBOutlet weak var commentContainerView: UIView!
     @IBOutlet weak var btnCancel: UIButton!
     @IBOutlet weak var btnSendShare: UIButton!
-   
+    @IBOutlet weak var buttonContainerView: UIView!
+    
     public var metadata: tableMetadata?
     public var sharee: NCCommunicationSharee?
     private var networking: NCShareNetworking?
@@ -71,20 +71,15 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         btnCancel.layer.cornerRadius = 10
         btnCancel.layer.masksToBounds = true
         btnCancel.layer.borderWidth = 1
-        btnCancel.layer.borderColor = NCBrandColor.shared.customerDarkGrey.cgColor
-        btnCancel.setTitleColor(UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0), for: .normal)
-        btnCancel.backgroundColor = .white
         
         btnSendShare.setTitle(NSLocalizedString("_send_share_", comment: ""), for: .normal)
         btnSendShare.layer.cornerRadius = 10
         btnSendShare.layer.masksToBounds = true
-        btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
-        btnSendShare.setTitleColor(.white, for: .normal)
-        
         setTitle()
-        
+        changeTheming()
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+        buttonContainerView.addShadow(location: .top)
     }
     
     func setTitle() {
@@ -97,10 +92,11 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         self.commentTextView.backgroundColor = NCBrandColor.shared.backgroundView
         self.labelFileName.textColor = NCBrandColor.shared.textView
         self.labelDescription.textColor = NCBrandColor.shared.textInfo
-        commentTextView.textColor = NCBrandColor.shared.shareCellTitleColor
+        commentTextView.textColor = NCBrandColor.shared.gray26AndGrayf2
+        btnCancel.setTitleColor(NCBrandColor.shared.gray26AndGrayf2, for: .normal)
         btnCancel.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
-        self.btnCancel.setTitleColor(UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0), for: .normal)
-        btnCancel.backgroundColor = .white
+        btnCancel.backgroundColor = .clear
+        buttonContainerView.backgroundColor = NCBrandColor.shared.backgroundView
         btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         btnSendShare.setTitleColor(.white, for: .normal)
         commentContainerView.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
@@ -133,16 +129,16 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-        if textView.textColor == UIColor.lightGray {
+        if textView.textColor == NCBrandColor.shared.fileFolderName {
             textView.text = nil
-            textView.textColor = UIColor.black
+            textView.textColor = NCBrandColor.shared.gray26AndGrayf2
         }
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.isEmpty {
             textView.text = "Note"
-            textView.textColor = UIColor.lightGray
+            textView.textColor = NCBrandColor.shared.fileFolderName
         }
     }
     

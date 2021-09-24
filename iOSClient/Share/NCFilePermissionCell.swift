@@ -67,10 +67,6 @@ class NCFilePermissionCell: XLFormButtonCell {
             self.seperatorBelowFull.isHidden = false
         }
         
-        if rowDescriptor.tag == "kNMCFilePermissionCellEditingMsg" {
-            self.seperatorBelowFull.isHidden = true
-        }
-        
         if rowDescriptor.tag == "kNMCFilePermissionCellFiledropMessage" {
             self.seperator.isHidden = true
             self.seperatorBelow.isHidden = true
