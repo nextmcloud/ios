@@ -28,7 +28,7 @@ class NCShareHeaderCustomCell: XLFormBaseCell {
     
     override func update() {
         self.backgroundColor = .clear
-        self.titleLabel.textColor = NCBrandColor.shared.icon
+        self.titleLabel.textColor = NCBrandColor.shared.systemGray
         super.update()
         
         if rowDescriptor.tag == "kNMCShareHeaderCustomCell" {

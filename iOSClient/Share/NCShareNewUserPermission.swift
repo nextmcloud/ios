@@ -355,7 +355,7 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
                 }
             }
             
-            networking?.updateShare(idShare: self.tableShare!.idShare, password: self.password, permission: self.permissionInt, note: nil, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
+            networking?.updateShare(idShare: self.tableShare!.idShare, password: self.password, permission: self.permissionInt, note: nil, label: nil, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
         }
     }
     
@@ -584,7 +584,7 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
             } else if ext == "SVG" {
                 if let svgImage = SVGKImage(contentsOfFile: imagePath) {
                     let scale = svgImage.size.height / svgImage.size.width
-                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * scale))
+                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * Int(scale)))
                     if let image = svgImage.uiImage {
                         if !FileManager().fileExists(atPath: previewPath) {
                             do {

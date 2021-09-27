@@ -28,13 +28,13 @@ class NCFilePermissionEditPasswordCell: XLFormBaseCell , UITextFieldDelegate {
         self.selectionStyle = .none
         self.cellTextField.isSecureTextEntry = true
         switchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
-        self.backgroundColor = NCBrandColor.shared.backgroundView
+        self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         self.titleLabel.textColor = NCBrandColor.shared.shareCellTitleColor
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
     }
     
     @objc func changeTheming() {
-        self.backgroundColor = NCBrandColor.shared.backgroundView
+        self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         self.titleLabel.textColor = NCBrandColor.shared.icon
     }
     

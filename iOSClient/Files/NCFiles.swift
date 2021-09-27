@@ -21,12 +21,14 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import NCCommunication
 
 class NCFiles: NCCollectionViewCommon  {
     
     internal var isRoot: Bool = true
+
+    // MARK: - View Life Cycle
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -44,6 +46,7 @@ class NCFiles: NCCollectionViewCommon  {
         
         if isRoot {
             serverUrl = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account)
+            titleCurrentFolder = getNavigationTitle()
         }
         
         super.viewWillAppear(animated)
@@ -51,14 +54,15 @@ class NCFiles: NCCollectionViewCommon  {
     
     // MARK: - NotificationCenter
     
-    override func initializeMain() {
+    override func initialize() {
         
         if isRoot {
             serverUrl = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account)
+            titleCurrentFolder = getNavigationTitle()
             reloadDataSourceNetwork(forced: true)
         }
         
-        super.initializeMain()
+        super.initialize()
     }
     
     // MARK: - DataSource + NC Endpoint
@@ -75,7 +79,7 @@ class NCFiles: NCCollectionViewCommon  {
                 }
             }
             
-            self.dataSource = NCDataSource.init(metadatasSource: self.metadatasSource, sort: self.sort, ascending: self.ascending, directoryOnTop: self.directoryOnTop, favoriteOnTop: true, filterLivePhoto: true)
+            self.dataSource = NCDataSource.init(metadatasSource: self.metadatasSource, sort: self.layoutForView?.sort, ascending: self.layoutForView?.ascending, directoryOnTop: self.layoutForView?.directoryOnTop, favoriteOnTop: true, filterLivePhoto: true)
             
             DispatchQueue.main.async { [weak self] in
                 self?.refreshControl.endRefreshing()
@@ -95,7 +99,7 @@ class NCFiles: NCCollectionViewCommon  {
         isReloadDataSourceNetworkInProgress = true
         collectionView?.reloadData()
                
-        networkReadFolder(forced: forced) { (metadatas, metadatasUpdate, errorCode, errorDescription) in
+        networkReadFolder(forced: forced) { (tableDirectory, metadatas, metadatasUpdate, metadatasDelete, errorCode, errorDescription) in
             if errorCode == 0 {
                 for metadata in metadatas ?? [] {
                     if !metadata.directory {
@@ -108,7 +112,8 @@ class NCFiles: NCCollectionViewCommon  {
             
             self.refreshControl.endRefreshing()
             self.isReloadDataSourceNetworkInProgress = false
-            if metadatasUpdate?.count ?? 0 > 0 || forced {
+            self.richWorkspaceText = tableDirectory?.richWorkspace
+            if metadatasUpdate?.count ?? 0 > 0 || metadatasDelete?.count ?? 0 > 0 || forced {
                 self.reloadDataSource()
             } else {
                 self.collectionView?.reloadData()

@@ -106,7 +106,7 @@ class NCPermissionMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworki
             if metadata.directory {
                 switchFileDrop.setOn(false, animated: false)
             }
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
             sender.setOn(true, animated: false)
         }
@@ -124,7 +124,7 @@ class NCPermissionMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworki
             if metadata.directory {
                 switchFileDrop.setOn(false, animated: false)
             }
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
             sender.setOn(true, animated: false)
         }
@@ -139,7 +139,7 @@ class NCPermissionMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworki
         if sender.isOn && permission != tableShare.permissions {
             switchReadOnly.setOn(false, animated: false)
             switchEditing.setOn(false, animated: false)
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
             sender.setOn(true, animated: false)
         }

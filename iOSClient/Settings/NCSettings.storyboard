@@ -100,9 +100,8 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="nie-WT-tde" userLabel="privacy help text">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="fjhfhjvhvhjkvhjk jhkjh" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="nie-WT-tde" userLabel="privacy help text">
                                 <rect key="frame" x="57" y="287" width="300" height="322"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="300" id="74m-fB-woG"/>
                                 </constraints>

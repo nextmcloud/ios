@@ -1,82 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="300"
-   height="300"
-   viewBox="0 0 300 300"
-   version="1.1"
-   id="svg15"
-   sodipodi:docname="Application-Logo.svg"
-   inkscape:version="1.0.2 (e86c870879, 2021-01-15, custom)">
-  <metadata
-     id="metadata19">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1171"
-     id="namedview17"
-     showgrid="false"
-     inkscape:zoom="2.3833333"
-     inkscape:cx="150"
-     inkscape:cy="150"
-     inkscape:window-x="1920"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg15" />
-  <defs
-     id="defs5" />
-  <circle
-     id="Ellipse_12"
-     data-name="Ellipse 12"
-     cx="168.616"
-     cy="132.263"
-     r="72.070999"
-     fill="#fb8ac4" />
-  <circle
-     id="Ellipse_13"
-     data-name="Ellipse 13"
-     cx="99.706001"
-     cy="129.735"
-     r="42.990002"
-     fill="#f65aa8" />
-  <path
-     id="Pfad_434"
-     data-name="Pfad 434"
-     d="m 229.94,211.29 h -4.742 l -1.264,1.264 c -12.012,13.908 -37.3,15.805 -50.576,7.586 a 68.278,68.278 0 0 1 -41.726,12.644 78.583,78.583 0 0 1 -56.266,-22.127 48.805,48.805 0 0 1 -9.483,1.263 42.99,42.99 0 0 1 0,-85.98 41.726,41.726 0 0 1 42.99,40.463 c 33.507,-10.748 75.232,-38.565 75.232,-0.632 a 46.264,46.264 0 1 1 45.835,45.519 z"
-     fill="#f82f99"
-     fill-rule="evenodd" />
-  <path
-     id="Pfad_435"
-     data-name="Pfad 435"
-     d="m 155.972,124.045 54.37,55.634 H 100.97 Z"
-     fill="#da0072"
-     fill-rule="evenodd" />
-  <path
-     id="Pfad_436"
-     data-name="Pfad 436"
-     d="m 155.972,111.401 54.37,55.634 h -35.72 v 59.427 c -0.632,0 -0.632,-0.632 -1.264,-0.632 a 76.371,76.371 0 0 1 -36.036,12.644 v -71.439 h -36.036 z"
-     fill="#ffffff"
-     fill-rule="evenodd" />
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="300" viewBox="0 0 300 300">
+  <defs>
+    <clipPath id="clip-iOS_Application_logo_for_launch">
+      <rect width="300" height="300"/>
+    </clipPath>
+  </defs>
+  <g id="iOS_Application_logo_for_launch" data-name="iOS Application logo for launch" clip-path="url(#clip-iOS_Application_logo_for_launch)">
+    <path id="Differenzmenge_7" data-name="Differenzmenge 7" d="M17043.014-6277.408a74.15,74.15,0,0,1-51.084-20.293,40.579,40.579,0,0,1-8.912.987,39.97,39.97,0,0,1-15.658-3.161,40.09,40.09,0,0,1-12.787-8.621,40.115,40.115,0,0,1-8.621-12.785,39.961,39.961,0,0,1-3.162-15.658,40.1,40.1,0,0,1,2.387-13.68,40.106,40.106,0,0,1,6.6-11.664,40.32,40.32,0,0,1,9.977-8.812,39.926,39.926,0,0,1,12.516-5.121,39.934,39.934,0,0,1,39.859-37.62,39.943,39.943,0,0,1,11.367,1.643,67.41,67.41,0,0,1,10.424-10.856,67.1,67.1,0,0,1,12.627-8.292,66.608,66.608,0,0,1,14.4-5.293,67.237,67.237,0,0,1,15.738-1.861,66.685,66.685,0,0,1,23.594,4.277,66.635,66.635,0,0,1,19.91,11.789,66.96,66.96,0,0,1,14.668,17.739,66.3,66.3,0,0,1,7.859,22.125,42.649,42.649,0,0,1,13.533,5.4,43.075,43.075,0,0,1,10.8,9.421,42.77,42.77,0,0,1,7.15,12.529,42.849,42.849,0,0,1,2.588,14.725,42.727,42.727,0,0,1-3.381,16.736,42.812,42.812,0,0,1-9.215,13.667,42.849,42.849,0,0,1-13.668,9.215,42.725,42.725,0,0,1-16.736,3.379,43.219,43.219,0,0,1-4.557-.237,39.822,39.822,0,0,1-13.168,9.656,39.628,39.628,0,0,1-16.52,3.567,39.58,39.58,0,0,1-17.539-4.044v-50.322h33.172l-50.49-51.667-50.787,51.667h33.465v61.2C17047.266-6277.5,17045.129-6277.408,17043.014-6277.408Z" transform="translate(-16910.789 6506.494)" fill="#fff"/>
+    <path id="Differenzmenge_8" data-name="Differenzmenge 8" d="M101.572,63.219H68.4V51.666H90.282l11.288,11.551Zm-67.811,0H0L11.421,51.666h22.34V63.218Z" transform="translate(104.816 115.954)" fill="#f2f2f2"/>
+    <text id="MagentaCLOUD" transform="translate(150 281)" fill="#fff" font-size="44" font-family="TeleNeo-Bold, TeleNeo" font-weight="700"><tspan x="-142.076" y="0">Magenta</tspan><tspan y="0" font-family="TeleNeo-Regular, TeleNeo" font-weight="400">CLOUD</tspan></text>
+  </g>
 </svg>

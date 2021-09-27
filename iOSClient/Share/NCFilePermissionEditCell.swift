@@ -27,8 +27,8 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
         self.cellTextField.isEnabled = false
         self.selectionStyle = .none
         switchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
-        self.backgroundColor = NCBrandColor.shared.backgroundView
-        self.titleLabel.textColor = NCBrandColor.shared.shareCellTitleColor
+        self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        self.titleLabel.textColor = NCBrandColor.shared.label
         self.cellTextField.attributedPlaceholder = NSAttributedString(string: "",
                                                                attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.fileFolderName])
         self.cellTextField.textColor = NCBrandColor.shared.singleTitleColorButton
@@ -36,8 +36,8 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
     }
     
     @objc func changeTheming() {
-        self.backgroundColor = NCBrandColor.shared.backgroundView
-        self.titleLabel.textColor = NCBrandColor.shared.icon
+        self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        self.titleLabel.textColor = NCBrandColor.shared.iconColor
     }
     
     override func configure() {

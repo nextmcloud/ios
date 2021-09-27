@@ -21,10 +21,10 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import WebKit
 
-@objc protocol NCBrowserWebDelegate: class {
+@objc protocol NCBrowserWebDelegate: AnyObject {
     @objc optional func browserWebDismiss()
 }
 
@@ -40,6 +40,8 @@ class NCBrowserWeb: UIViewController {
     
     @IBOutlet weak var buttonExit: UIButton!
     
+    // MARK: - View Life Cycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -57,9 +59,18 @@ class NCBrowserWeb: UIViewController {
             buttonExit.isHidden = true
         } else {
             self.view.bringSubviewToFront(buttonExit)
+            let image = NCUtility.shared.loadImage(named: "xmark", color: .systemBlue)
+            buttonExit.setImage(image, for: .normal)
         }
         
-        loadWebPage(webView: webView!, url: URL(string: urlBase)!)
+        if let url = URL(string: urlBase) {
+            loadWebPage(webView: webView!, url: url)
+        } else {
+            let url = URL(fileURLWithPath: urlBase)
+            loadWebPage(webView: webView!, url: url)
+        }
+        
+        //navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: UIImage(named: "more")!.image(color: NCBrandColor.shared.label, size: 25), style: .plain, target: self, action: #selector(self.openMenuMore))
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -69,6 +80,20 @@ class NCBrowserWeb: UIViewController {
             navigationItem.title = titleBrowser
         }
     }
+    
+    deinit {
+        
+    }
+    
+    // MARK: - Action
+
+    @IBAction func touchUpInsideButtonExit(_ sender: UIButton) {
+        self.dismiss(animated: true) {
+            self.delegate?.browserWebDismiss?()
+        }
+    }
+    
+    //
     
     func loadWebPage(webView: WKWebView, url: URL)  {
         
@@ -81,17 +106,10 @@ class NCBrowserWeb: UIViewController {
 
         webView.load(request)
     }
-    
-    @IBAction func touchUpInsideButtonExit(_ sender: UIButton) {
-        self.dismiss(animated: true) {
-            self.delegate?.browserWebDismiss?()
-        }
-    }
 }
 
 extension NCBrowserWeb: WKNavigationDelegate {
     
-   
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         if let serverTrust = challenge.protectionSpace.serverTrust {
             completionHandler(Foundation.URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust: serverTrust))

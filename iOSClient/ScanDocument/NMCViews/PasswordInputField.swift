@@ -11,11 +11,14 @@ import Foundation
 class PasswordInputField: XLFormBaseCell,UITextFieldDelegate {
     
     @IBOutlet weak var fileNameInputTextField: UITextField!
+    @IBOutlet weak var separatorBottom: UIView!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
         fileNameInputTextField.isSecureTextEntry = true
         fileNameInputTextField.delegate = self
+        separatorBottom.backgroundColor = NCBrandColor.shared.systemGray4
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

@@ -148,17 +148,17 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
     
     @objc func changeTheming() {
-        tableView.backgroundColor = NCBrandColor.shared.backgroundView
-        self.view.backgroundColor = NCBrandColor.shared.backgroundView
+        tableView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        self.view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.customer
-        self.headerView.backgroundColor = NCBrandColor.shared.backgroundView
-        self.headerView.fileName.textColor = NCBrandColor.shared.textView
+        self.headerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        self.headerView.fileName.textColor = NCBrandColor.shared.label
         self.headerView.info.textColor = NCBrandColor.shared.textInfo
-        self.footerView.backgroundColor = NCBrandColor.shared.backgroundView
+        self.footerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         
-        self.footerView.buttonCancel.setTitleColor(NCBrandColor.shared.gray26AndGrayf2, for: .normal)
-        footerView.buttonCancel.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
-        footerView.buttonCancel.backgroundColor = NCBrandColor.shared.backgroundView
+        self.footerView.buttonCancel.setTitleColor(NCBrandColor.shared.label, for: .normal)
+        footerView.buttonCancel.layer.borderColor = NCBrandColor.shared.label.cgColor
+        footerView.buttonCancel.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         self.footerView.buttonNext.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         self.footerView.buttonNext.setTitleColor(.white, for: .normal)
         
@@ -187,7 +187,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
 //        self.headerView = NCShareAdvancePermissionHeader()
         self.headerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?.first as! NCShareAdvancePermissionHeader)
 //        self.headerView.favorite.translatesAutoresizingMaskIntoConstraints = false
-        self.headerView.backgroundColor = NCBrandColor.shared.backgroundView
+        self.headerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
             self.headerView.fullWidthImageView.image = getImageMetadata(metadata!)
             self.headerView.fullWidthImageView.contentMode = .scaleAspectFill
@@ -374,7 +374,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         row.cellConfig["cellTextField.placeholder"] = NSLocalizedString("_custom_link_label", comment: "")
         row.cellConfig["cellTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["cellTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.label
         row.height = 44
         section.addFormRow(row)
 
@@ -420,8 +420,8 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         row.cellConfig["fileNameInputTextField.placeholder"] = NSLocalizedString("_password_", comment: "")
         row.cellConfig["fileNameInputTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameInputTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.textView
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+        row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.label
+        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         row.height = 44
         row.hidden = 1
         section.addFormRow(row)
@@ -783,7 +783,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 }
             }
             
-            networking?.updateShare(idShare: self.tableShare!.idShare, password: self.password, permission: self.permissionInt, note: nil, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
+            networking?.updateShare(idShare: self.tableShare!.idShare, password: self.password, permission: self.permissionInt, note: nil, label: nil, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
         }
     }
     
@@ -830,7 +830,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         print("")
     }
     
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], buttonType: String, overwrite: Bool) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
         
     }
     
@@ -873,7 +873,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             } else if ext == "SVG" {
                 if let svgImage = SVGKImage(contentsOfFile: imagePath) {
                     let scale = svgImage.size.height / svgImage.size.width
-                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * scale))
+                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * Int(scale)))
                     if let image = svgImage.uiImage {
                         if !FileManager().fileExists(atPath: previewPath) {
                             do {

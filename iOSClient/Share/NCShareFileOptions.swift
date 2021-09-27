@@ -270,7 +270,7 @@ class NCShareFileOptions: UIViewController , UIGestureRecognizerDelegate, NCShar
             }
         }
         
-        self.networking?.updateShare(idShare: tableShare!.idShare, password: self.password, permission: self.permissionsInt!, note: nil, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
+        self.networking?.updateShare(idShare: tableShare!.idShare, password: self.password, permission: self.permissionsInt!, note: nil, label: nil, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
     }
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
@@ -463,7 +463,7 @@ class NCShareFileOptions: UIViewController , UIGestureRecognizerDelegate, NCShar
             } else if ext == "SVG" {
                 if let svgImage = SVGKImage(contentsOfFile: imagePath) {
                     let scale = svgImage.size.height / svgImage.size.width
-                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * scale))
+                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * Int(scale)))
                     if let image = svgImage.uiImage {
                         if !FileManager().fileExists(atPath: previewPath) {
                             do {

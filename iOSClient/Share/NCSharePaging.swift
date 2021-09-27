@@ -22,7 +22,7 @@
 //
 
 
-import Foundation
+import UIKit
 import Parchment
 import NCCommunication
 import SVGKit
@@ -39,9 +39,11 @@ class NCSharePaging: UIViewController {
     @objc var metadata = tableMetadata()
     @objc var indexPage: Int = 2
         
+    // MARK: - View Life Cycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = NCBrandColor.shared.backgroundView
+        self.view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         // Verify Comments & Sharing enabled
         let serverVersionMajor = NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesVersionMajor)
         let comments = NCManageDatabase.shared.getCapabilitiesServerBool(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesFilesComments, exists: false)
@@ -73,7 +75,6 @@ class NCSharePaging: UIViewController {
 //        pagingViewController.activityEnabled = activityEnabled
 //        pagingViewController.commentsEnabled = commentsEnabled
         pagingViewController.sharingEnabled = sharingEnabled
-       
         pagingViewController.metadata = metadata
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
@@ -143,7 +144,7 @@ class NCSharePaging: UIViewController {
     //MARK: - NotificationCenter
     
     @objc func changeTheming() {
-        view.backgroundColor = NCBrandColor.shared.backgroundView
+        view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         
 //        pagingViewController.backgroundColor = NCBrandColor.shared.backgroundForm
 //        pagingViewController.menuBackgroundColor = NCBrandColor.shared.backgroundForm
@@ -152,11 +153,11 @@ class NCSharePaging: UIViewController {
 //        pagingViewController.selectedTextColor = NCBrandColor.shared.textView
 ////        pagingViewController.indicatorColor = NCBrandColor.shared.brandElement
 //        pagingViewController.indicatorColor = .clear
-        pagingViewController.backgroundColor = NCBrandColor.shared.backgroundView
-        pagingViewController.menuBackgroundColor = NCBrandColor.shared.backgroundView
-        pagingViewController.selectedBackgroundColor = NCBrandColor.shared.backgroundView
-        pagingViewController.textColor = NCBrandColor.shared.backgroundView
-        pagingViewController.selectedTextColor = NCBrandColor.shared.backgroundView
+        pagingViewController.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        pagingViewController.menuBackgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        pagingViewController.selectedBackgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        pagingViewController.textColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        pagingViewController.selectedTextColor = NCBrandColor.shared.secondarySystemGroupedBackground
 //        pagingViewController.indicatorColor = NCBrandColor.shared.brandElement
         pagingViewController.indicatorColor = .clear
         (pagingViewController.view as! NCSharePagingView).setupConstraints()
@@ -262,7 +263,7 @@ extension NCSharePaging: PagingViewControllerDataSource {
 class NCShareHeaderViewController: PagingViewController {
     
     public var image: UIImage?
-    public var metadata: tableMetadata?
+    public var metadata = tableMetadata()
     
     public var activityEnabled = false
     public var commentsEnabled = false
@@ -299,7 +300,9 @@ class NCSharePagingView: PagingView {
     
     var headerHeightConstraint: NSLayoutConstraint?
     
-    public init(options: Parchment.PagingOptions, collectionView: UICollectionView, pageView: UIView, metadata: tableMetadata?) {
+    // MARK: - View Life Cycle
+
+    public init(options: Parchment.PagingOptions, collectionView: UICollectionView, pageView: UIView, metadata: tableMetadata) {
         super.init(options: options, collectionView: collectionView, pageView: pageView)
         
         self.metadata = metadata
@@ -312,11 +315,11 @@ class NCSharePagingView: PagingView {
     override func setupConstraints() {
         
         let headerView = Bundle.main.loadNibNamed("NCShareHeaderView", owner: self, options: nil)?.first as! NCShareHeaderView
-        headerView.backgroundColor = NCBrandColor.shared.backgroundView
-        headerView.fileName.textColor = NCBrandColor.shared.fileFolderName
-        headerView.labelSharing.textColor = NCBrandColor.shared.textView
-        headerView.labelSharingInfo.textColor = NCBrandColor.shared.icon
-        headerView.info.textColor = NCBrandColor.shared.textInfo
+        headerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        headerView.fileName.textColor = NCBrandColor.shared.label
+        headerView.labelSharing.textColor = NCBrandColor.shared.label
+        headerView.labelSharingInfo.textColor = NCBrandColor.shared.label
+        headerView.info.textColor = NCBrandColor.shared.systemGray2
         headerView.ocId = metadata!.ocId
         
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
@@ -338,7 +341,7 @@ class NCSharePagingView: PagingView {
             }
         }
         headerView.fileName.text = metadata?.fileNameView
-        headerView.fileName.textColor = NCBrandColor.shared.textView
+        headerView.fileName.textColor = NCBrandColor.shared.label
         if metadata!.favorite {
             headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
         } else {
@@ -395,7 +398,7 @@ class NCSharePagingView: PagingView {
             } else if ext == "SVG" {
                 if let svgImage = SVGKImage(contentsOfFile: imagePath) {
                     let scale = svgImage.size.height / svgImage.size.width
-                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * scale))
+                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * Int(scale)))
                     if let image = svgImage.uiImage {
                         if !FileManager().fileExists(atPath: previewPath) {
                             do {

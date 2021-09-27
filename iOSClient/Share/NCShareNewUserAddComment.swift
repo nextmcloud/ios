@@ -88,18 +88,18 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     }
     
     @objc func changeTheming() {
-        self.view.backgroundColor = NCBrandColor.shared.backgroundView
-        self.commentTextView.backgroundColor = NCBrandColor.shared.backgroundView
-        self.labelFileName.textColor = NCBrandColor.shared.textView
-        self.labelDescription.textColor = NCBrandColor.shared.textInfo
-        commentTextView.textColor = NCBrandColor.shared.gray26AndGrayf2
-        btnCancel.setTitleColor(NCBrandColor.shared.gray26AndGrayf2, for: .normal)
-        btnCancel.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
+        self.view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        self.commentTextView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        self.labelFileName.textColor = NCBrandColor.shared.label
+        self.labelDescription.textColor = NCBrandColor.shared.systemGray
+        commentTextView.textColor = NCBrandColor.shared.label
+        btnCancel.setTitleColor(NCBrandColor.shared.label, for: .normal)
+        btnCancel.layer.borderColor = NCBrandColor.shared.label.cgColor
         btnCancel.backgroundColor = .clear
-        buttonContainerView.backgroundColor = NCBrandColor.shared.backgroundView
+        buttonContainerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         btnSendShare.setTitleColor(.white, for: .normal)
-        commentContainerView.layer.borderColor = NCBrandColor.shared.gray26AndGrayf2.cgColor
+        commentContainerView.layer.borderColor = NCBrandColor.shared.label.cgColor
         
         self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.icon
     }
@@ -121,25 +121,11 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         }
         self.note = message
         if isUpdating {
-            self.networking?.updateShare(idShare: tableShare!.idShare, password: nil, permission: self.tableShare!.permissions, note: message, expirationDate: nil, hideDownload: tableShare!.hideDownload)
+            self.networking?.updateShare(idShare: tableShare!.idShare, password: nil, permission: self.tableShare!.permissions, note: message, label: nil, expirationDate: nil, hideDownload: tableShare!.hideDownload)
         } else {
             self.networking?.createShare(shareWith: sharee!.shareWith, shareType: sharee!.shareType, metadata: self.metadata!)
         }
         self.creatingShare = true
-    }
-    
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        if textView.textColor == NCBrandColor.shared.fileFolderName {
-            textView.text = nil
-            textView.textColor = NCBrandColor.shared.gray26AndGrayf2
-        }
-    }
-    
-    func textViewDidEndEditing(_ textView: UITextView) {
-        if textView.text.isEmpty {
-            textView.text = "Note"
-            textView.textColor = NCBrandColor.shared.fileFolderName
-        }
     }
     
     //MARK: - Image
@@ -201,7 +187,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
             } else if ext == "SVG" {
                 if let svgImage = SVGKImage(contentsOfFile: imagePath) {
                     let scale = svgImage.size.height / svgImage.size.width
-                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * scale))
+                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * Int(scale)))
                     if let image = svgImage.uiImage {
                         if !FileManager().fileExists(atPath: previewPath) {
                             do {

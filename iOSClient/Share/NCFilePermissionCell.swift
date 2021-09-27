@@ -20,15 +20,15 @@ class NCFilePermissionCell: XLFormButtonCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         self.selectionStyle = .none
-        self.backgroundColor = NCBrandColor.shared.backgroundView
-        self.titleLabel.textColor = NCBrandColor.shared.shareCellTitleColor
+        self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        self.titleLabel.textColor = NCBrandColor.shared.label
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
     }
     
     @objc func changeTheming() {
-        self.backgroundColor = NCBrandColor.shared.backgroundView
-        self.titleLabel.textColor = NCBrandColor.shared.icon
-        self.titleLabelBottom.textColor = NCBrandColor.shared.icon
+        self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        self.titleLabel.textColor = NCBrandColor.shared.iconColor
+        self.titleLabelBottom.textColor = NCBrandColor.shared.iconColor
     }
     
     override func configure() {

@@ -25,7 +25,7 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
         self.cellTextField.isEnabled = true
         calendarImageView.image = UIImage(named: "calender")?.imageColor(NCBrandColor.shared.brandElement) 
         self.selectionStyle = .none
-        self.backgroundColor = NCBrandColor.shared.backgroundView
+        self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         self.cellTextField.attributedPlaceholder = NSAttributedString(string: "",
                                                                attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.fileFolderName])
         self.cellTextField.textColor = NCBrandColor.shared.singleTitleColorButton

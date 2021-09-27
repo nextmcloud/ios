@@ -22,7 +22,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import Parchment
 import DropDown
 import NCCommunication
@@ -69,9 +69,13 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var shareeEmail: String!
     private var isCreateLink = false
     
+    // MARK: - View Life Cycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+
         viewContainerConstraint.constant = height
 //        searchFieldTopConstraint.constant = 10
         searchField.layer.cornerRadius = 5
@@ -102,6 +106,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         tableView.dataSource = self
         tableView.delegate = self
         tableView.allowsSelection = false
+        tableView.backgroundColor = NCBrandColor.shared.systemBackground
 
         tableView.register(UINib.init(nibName: "NCShareLinkCell", bundle: nil), forCellReuseIdentifier: "cellLink")
         tableView.register(UINib.init(nibName: "NCShareUserCell", bundle: nil), forCellReuseIdentifier: "cellUser")
@@ -110,7 +115,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadDataNCShare), object: nil)
         
         // Shared with you by ...
-        if metadata!.ownerId != self.appDelegate.userId {
+        if metadata!.ownerId != "" && metadata!.ownerId != self.appDelegate.userId {
             
 //            searchFieldTopConstraint.constant = 65
 
@@ -120,7 +125,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //                    sharedWithYouByImage.image = NCUtility.shared.createAvatar(image: image, size: 40)
                 }
             } else {
-                NCCommunication.shared.downloadAvatar(userID: metadata!.ownerId, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
+                NCCommunication.shared.downloadAvatar(userId: metadata!.ownerId, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                     if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
                         if let image = UIImage(contentsOfFile: fileNameLocalPath) {
 //                            self.sharedWithYouByImage.image = NCUtility.shared.createAvatar(image: image, size: 40)
@@ -161,24 +166,23 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     @objc func changeTheming() {
-//        view.backgroundColor = NCBrandColor.shared.backgroundForm
-        view.backgroundColor = NCBrandColor.shared.backgroundView
-        tableView.backgroundColor = NCBrandColor.shared.backgroundView
+        view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        tableView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         tableView.reloadData()
         shareLinkLabel.textColor = NCBrandColor.shared.textView
         self.labelShareByMail.textColor = NCBrandColor.shared.shareByEmailTextColor
-        self.view.backgroundColor = NCBrandColor.shared.backgroundView
-        self.containerView.backgroundColor = NCBrandColor.shared.backgroundView
+        self.view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        self.containerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         self.containerView.frame = self.view.frame
         searchField.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("_shareLinksearch_placeholder_", comment: ""),
                                                                attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.searchFieldPlaceHolder])
-        searchField.textColor = NCBrandColor.shared.icon
-        self.btnCreateLink.layer.borderColor = NCBrandColor.shared.icon.cgColor
-        self.btnCreateLink.setTitleColor(NCBrandColor.shared.icon, for: .normal)
-        self.btnCreateLink.backgroundColor = NCBrandColor.shared.backgroundView
-        searchField.layer.borderColor = NCBrandColor.shared.icon.cgColor
+        searchField.textColor = NCBrandColor.shared.label
+        self.btnCreateLink.layer.borderColor = NCBrandColor.shared.label.cgColor
+        self.btnCreateLink.setTitleColor(NCBrandColor.shared.label, for: .normal)
+        self.btnCreateLink.backgroundColor = .clear
+        searchField.layer.borderColor = NCBrandColor.shared.systemGray2.cgColor
         labelYourShare.text = NSLocalizedString("_your_shares_", comment: "")
-//        self.btnCreateLink.titleLabel?.textColor = NCBrandColor.shared.backgroundView
+//        self.btnCreateLink.titleLabel?.textColor = NCBrandColor.shared.secondarySystemGroupedBackground
     }
         
     @objc func reloadData() {
@@ -192,7 +196,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             buttonMenu.isHidden = true
             buttonCopy.isHidden = true
             self.tableView.setEmptyMessage(NSLocalizedString("", comment: ""))
-
         }
         tableView.reloadData()
     }
@@ -293,7 +296,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: canShare, andIsFolder: metadata.directory)
         }
         
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
     
 //    func tapMenu(with tableShare: tableShare?, sender: Any) {
@@ -448,7 +451,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         let appearance = DropDown.appearance()
         
 //        appearance.backgroundColor = NCBrandColor.shared.backgroundForm
-        appearance.backgroundColor = NCBrandColor.shared.backgroundView
+        appearance.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         appearance.cornerRadius = 10
         appearance.shadowColor = UIColor(white: 0.5, alpha: 1)
         appearance.shadowOpacity = 0.9
@@ -490,7 +493,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                     cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
                 }
             } else {
-                NCCommunication.shared.downloadAvatar(userID: sharee.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
+                NCCommunication.shared.downloadAvatar(userId: sharee.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                     if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
                         if let image = UIImage(contentsOfFile: fileNameLocalPath) {
                             DispatchQueue.main.async {
@@ -663,21 +666,21 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard self.quickStatusTableShare != nil else { return }
         let permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata!.directory)
         
-        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
+        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
     }
     
     @objc func statusEditingClicked() {
         guard self.quickStatusTableShare != nil else { return }
         let permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata!.directory)
         
-        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
+        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
     }
     
     @objc func statusFileDropClicked() {
         guard self.quickStatusTableShare != nil else { return }
         let permission = NCGlobal.shared.permissionCreateShare
         
-        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
+        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
     }
 }
 
@@ -733,8 +736,8 @@ extension NCShare: UITableViewDataSource {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell {
                 cell.tableShare = tableShare
                 cell.delegate = self
-                cell.contentView.backgroundColor = NCBrandColor.shared.backgroundView
-                cell.imageView?.image = cell.imageView?.image?.imageColor(NCBrandColor.shared.icon)
+                cell.contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+                cell.imageView?.image = cell.imageView?.image?.imageColor(NCBrandColor.shared.iconColor)
 //                let linkText = UserDefaults.standard.value(forKey: "_share_link_") as! String
                                                 
                 if let linkText = UserDefaults.standard.value(forKey: "_share_link_") as? String, linkText.count > 0 {
@@ -742,7 +745,7 @@ extension NCShare: UITableViewDataSource {
                 } else {
                     cell.labelTitle.text = directory ? NSLocalizedString("_share_link_folder_", comment: "") : NSLocalizedString("_share_link_file_", comment: "")
                 }
-                cell.labelTitle.textColor = NCBrandColor.shared.shareCellTitleColor
+                cell.labelTitle.textColor = NCBrandColor.shared.label
                 cell.indexSelected = indexPath.row
                 cell.btnQuickStatus.tag = indexPath.row
 //                cell.buttonMenu.isEnabled = false
@@ -774,13 +777,13 @@ extension NCShare: UITableViewDataSource {
             //external
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellUser", for: indexPath) as? NCShareUserCell {
                 
-                cell.contentView.backgroundColor = NCBrandColor.shared.backgroundView
+                cell.contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
                 cell.tableShare = tableShare
                 cell.delegate = self
                 cell.labelTitle.text = tableShare.shareWithDisplayname
-                cell.labelTitle.textColor = NCBrandColor.shared.shareCellTitleColor
+                cell.labelTitle.textColor = NCBrandColor.shared.label
                 cell.labelCanEdit.text = NSLocalizedString("_share_permission_edit_", comment: "")
-                cell.labelCanEdit.textColor = NCBrandColor.shared.textView
+                cell.labelCanEdit.textColor = NCBrandColor.shared.iconColor
                 cell.isUserInteractionEnabled = true
                 cell.switchCanEdit.isHidden = true//false
                 cell.labelCanEdit.isHidden = true//false
@@ -801,7 +804,7 @@ extension NCShare: UITableViewDataSource {
 //                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
                     }
                 } else {
-                    NCCommunication.shared.downloadAvatar(userID: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
+                    NCCommunication.shared.downloadAvatar(userId: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
                             if let image = UIImage(contentsOfFile: fileNameLocalPath) {
 //                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
@@ -886,13 +889,13 @@ extension NCShare: UITableViewDataSource {
         // USER
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellUser", for: indexPath) as? NCShareUserCell {
                 
-                cell.contentView.backgroundColor = NCBrandColor.shared.backgroundView
+                cell.contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
                 cell.tableShare = tableShare
                 cell.delegate = self
                 cell.labelTitle.text = tableShare.shareWithDisplayname
-                cell.labelTitle.textColor = NCBrandColor.shared.shareCellTitleColor
+                cell.labelTitle.textColor = NCBrandColor.shared.label
                 cell.labelCanEdit.text = NSLocalizedString("_share_permission_edit_", comment: "")
-                cell.labelCanEdit.textColor = NCBrandColor.shared.textView
+                cell.labelCanEdit.textColor = NCBrandColor.shared.iconColor
                 cell.isUserInteractionEnabled = true
                 cell.switchCanEdit.isHidden = true//false
                 cell.labelCanEdit.isHidden = true//false
@@ -913,7 +916,7 @@ extension NCShare: UITableViewDataSource {
 //                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
                     }
                 } else {
-                    NCCommunication.shared.downloadAvatar(userID: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
+                    NCCommunication.shared.downloadAvatar(userId: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
                             if let image = UIImage(contentsOfFile: fileNameLocalPath) {
 //                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)

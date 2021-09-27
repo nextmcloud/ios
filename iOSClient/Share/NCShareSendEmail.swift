@@ -104,7 +104,7 @@ class NCShareSendEmail: UIViewController, UITextViewDelegate, NCShareNetworkingD
             }
         }
         self.note = message
-        self.networking?.updateShare(idShare: tableShare!.idShare, password: nil, permission: self.tableShare!.permissions, note: message, expirationDate: nil, hideDownload: tableShare!.hideDownload)
+        self.networking?.updateShare(idShare: tableShare!.idShare, password: nil, permission: self.tableShare!.permissions, note: message, label: nil, expirationDate: nil, hideDownload: tableShare!.hideDownload)
         self.creatingShare = true
     }
     
@@ -181,7 +181,7 @@ class NCShareSendEmail: UIViewController, UITextViewDelegate, NCShareNetworkingD
             } else if ext == "SVG" {
                 if let svgImage = SVGKImage(contentsOfFile: imagePath) {
                     let scale = svgImage.size.height / svgImage.size.width
-                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * scale))
+                    svgImage.size = CGSize(width: NCGlobal.shared.sizePreview, height: (NCGlobal.shared.sizePreview * Int(scale)))
                     if let image = svgImage.uiImage {
                         if !FileManager().fileExists(atPath: previewPath) {
                             do {
