@@ -63,6 +63,10 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
         return true
     }
     
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        rowDescriptor.value = cellTextField.text
+    }
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.formViewController()?.textFieldShouldReturn(textField)
         return true
@@ -112,5 +116,17 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
 
     @objc func cancelDatePicker() {
         self.cellTextField.endEditing(true)
+    }
+}
+
+class NCSeparatorCell: XLFormBaseCell {
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        selectionStyle = .none
+    }
+    
+    override func update() {
+        super.update()
+        self.selectionStyle = .none
     }
 }

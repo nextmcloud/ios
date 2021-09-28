@@ -61,7 +61,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
             self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
         }
         self.labelDescription.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
-        
+        labelSharing.text = NSLocalizedString("_sharing_", comment: "")
         labelNote.text = NSLocalizedString("_share_note_recipient_", comment: "")
         
         commentContainerView.layer.borderWidth = 1

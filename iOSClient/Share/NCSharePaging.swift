@@ -498,6 +498,16 @@ class NCShareHeaderView: UIView {
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var ocId = ""
     
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        setupUI()
+    }
+    
+    func setupUI() {
+        labelSharing.text = NSLocalizedString("_sharing_", comment: "")
+        labelSharingInfo.text = NSLocalizedString("_sharing_message_", comment: "")
+    }
+    
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
             NCNetworking.shared.favoriteMetadata(metadata, urlBase: appDelegate.urlBase) { (errorCode, errorDescription) in

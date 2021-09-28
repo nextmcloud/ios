@@ -738,13 +738,12 @@ extension NCShare: UITableViewDataSource {
                 cell.delegate = self
                 cell.contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
                 cell.imageView?.image = cell.imageView?.image?.imageColor(NCBrandColor.shared.iconColor)
-//                let linkText = UserDefaults.standard.value(forKey: "_share_link_") as! String
-                                                
-                if let linkText = UserDefaults.standard.value(forKey: "_share_link_") as? String, linkText.count > 0 {
-                    cell.labelTitle.text = linkText
+                if !tableShare.label.isEmpty {
+                    cell.labelTitle.text = String(format: NSLocalizedString("_share_linklabel_", comment: ""), tableShare.label) 
                 } else {
                     cell.labelTitle.text = directory ? NSLocalizedString("_share_link_folder_", comment: "") : NSLocalizedString("_share_link_file_", comment: "")
                 }
+                
                 cell.labelTitle.textColor = NCBrandColor.shared.label
                 cell.indexSelected = indexPath.row
                 cell.btnQuickStatus.tag = indexPath.row

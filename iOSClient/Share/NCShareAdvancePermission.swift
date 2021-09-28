@@ -70,7 +70,6 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         super.viewDidLoad()
         
         self.typeFile = self.metadata?.typeFile
-        UserDefaults.standard.setValue(self.linkLabel, forKey: "_share_link_")
         
         self.metadata?.permissions = self.permissions
         if !(newUser ?? false) {
@@ -348,7 +347,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         }
         
         //empty cell
-        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCXLFormBaseCell"] = XLFormBaseCell.self
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCXLFormBaseCell"] = NCSeparatorCell.self
         row = XLFormRowDescriptor(tag: "kNMCXLFormBaseCell", rowType: "kNMCXLFormBaseCell", title: NSLocalizedString("", comment: ""))
         row.height = 16
         section.addFormRow(row)
@@ -593,6 +592,13 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 setPasswordInputField.hidden = !value
             }
             
+        case "kNCShareTextInputCellCustomLinkField":
+            if let label = formRow.value as? String {
+                self.form.delegate = nil
+                self.linkLabel = label
+                self.form.delegate = self
+            }
+            
         case "SetPasswordInputField":
             if let pwd = formRow.value as? String {
                 self.form.delegate = nil
@@ -742,11 +748,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             }
         }
         
-        if self.newUser == true {
-            if self.linkLabel != "" {
-                UserDefaults.standard.setValue(self.linkLabel, forKey: "_share_link_")
-            }
-            
+        if self.newUser == true {            
             let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
             let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
             viewNewUserComment.metadata = self.metadata
@@ -783,7 +785,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 }
             }
             
-            networking?.updateShare(idShare: self.tableShare!.idShare, password: self.password, permission: self.permissionInt, note: nil, label: nil, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
+            networking?.updateShare(idShare: self.tableShare!.idShare, password: self.password, permission: self.permissionInt, note: nil, label: linkLabel, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
         }
     }
     
