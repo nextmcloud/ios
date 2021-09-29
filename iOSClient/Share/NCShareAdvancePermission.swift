@@ -41,7 +41,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     var filePermissionCount = 0
     var password: String!
     var linkLabel = ""
-    var expirationDateText = ""
+//    var expirationDateText = ""
     var expirationDate: NSDate!
 //    @IBOutlet weak var headerImageViewSpaceFavorite: NSLayoutConstraint!
     var permissionIndex = 0
@@ -81,7 +81,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                     let dateFormatter = DateFormatter()
                     dateFormatter.formatterBehavior = .behavior10_4
                     dateFormatter.dateStyle = .medium
-                    self.expirationDateText = dateFormatter.string(from: expire as Date)
+//                    self.expirationDateText = dateFormatter.string(from: expire as Date)
                     
                     dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
                     self.expirationDate = expire
@@ -109,7 +109,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 break
             }
             
-            if let expire = metadata?.trashbinDeletionTime {
+            if let expire = tableShare?.expirationDate {
                 
                 if expire.timeIntervalSinceNow.sign == .minus {
                      print("date1 is earlier than date2")
@@ -117,14 +117,14 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                     let dateFormatter = DateFormatter()
                     dateFormatter.formatterBehavior = .behavior10_4
                     dateFormatter.dateStyle = .medium
-                    self.expirationDateText = dateFormatter.string(from: expire as Date)
+//                    self.expirationDateText = dateFormatter.string(from: expire as Date)
                     
                     dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
                     self.expirationDate = expire
                 }
             }
         }
-        
+
         self.directory = self.metadata?.directory
         
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase,  view: self.view, delegate: self)
@@ -371,6 +371,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNCShareTextInputCell"] = NCShareTextInputCell.self
         row = XLFormRowDescriptor(tag: "kNCShareTextInputCellCustomLinkField", rowType: "kNCShareTextInputCell", title: "")
         row.cellConfig["cellTextField.placeholder"] = NSLocalizedString("_custom_link_label", comment: "")
+        row.cellConfig["cellTextField.text"] = tableShare?.label
         row.cellConfig["cellTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["cellTextField.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.label
@@ -422,7 +423,8 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.label
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         row.height = 44
-        row.hidden = 1
+        let hasPassword = tableShare?.password != nil && !tableShare!.password.isEmpty
+        row.hidden = NSNumber.init(booleanLiteral: !hasPassword)
         section.addFormRow(row)
 
         //expiration
@@ -447,13 +449,19 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         row.cellClass = NCShareTextInputCell.self
         row.cellConfig["cellTextField.placeholder"] = ""
         if newUser == false {
-            row.cellConfig["cellTextField.text"] = self.expirationDateText
+            if let date = tableShare?.expirationDate {
+                row.cellConfig["cellTextField.text"] = getDisplayStyleDate(date: date as Date)
+            }
         }
         row.cellConfig["cellTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["cellTextField.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.textView
+        if let date = expirationDate {
+            row.cellConfig["cellTextField.text"] = getDisplayStyleDate(date: date as Date)
+        }
         row.height = 44
-        row.hidden = 1
+        let hasExpiry = tableShare?.expirationDate != nil
+        row.hidden = NSNumber.init(booleanLiteral: !hasExpiry)
         section.addFormRow(row)
         
         self.footerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionFooter", owner: self, options: nil)?.first as! NCShareAdvancePermissionFooter)
@@ -570,6 +578,31 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         }
     }
     
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        //hide download
+        let hideDownloadRow: XLFormRowDescriptor = self.form.formRow(withTag: "kNMCFilePermissionEditCellHideDownload")!
+        if let hideDownloadRowIndexPath = form.indexPath(ofFormRow: hideDownloadRow), indexPath == hideDownloadRowIndexPath {
+            let cell = cell as? NCFilePermissionEditCell
+            cell?.switchControl.isOn = tableShare?.hideDownload ?? false
+        }
+        
+        // set password
+        let setPassword : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionEditPasswordCellWithText")!
+        if let setPasswordIndexPath = self.form.indexPath(ofFormRow: setPassword), indexPath == setPasswordIndexPath {
+            let passwordCell = cell as? NCFilePermissionEditCell
+            if let password = tableShare?.password {
+                passwordCell?.switchControl.isOn = !password.isEmpty
+            } else {
+                passwordCell?.switchControl.isOn = false
+            }
+        }
+        //updateExpiryDateSwitch
+        let expiryRow : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionEditCellExpiration")!
+        if let expiryIndexPath = self.form.indexPath(ofFormRow: expiryRow), indexPath == expiryIndexPath {
+            let cell = cell as? NCFilePermissionEditCell
+            cell?.switchControl.isOn = tableShare?.expirationDate != nil
+        }
+    }
     
     override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
         super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)
@@ -617,14 +650,13 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             if let value = newValue as? Bool {
                 self.setExpiration = value
                 let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellExpiry")!
-                expirationDateText = ""
                 inputField.hidden = !value
             }
             
         case "NCShareTextInputCellExpiry":
             if let exp = formRow.value as? Date {
                 self.form.delegate = nil
-                self.expirationDateText = getServerStyleDate(date: exp)
+                expirationDate = exp as NSDate
                 self.form.delegate = self
             }
             
@@ -637,7 +669,16 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         let dateFormatter = DateFormatter()
         dateFormatter.formatterBehavior = .behavior10_4
         dateFormatter.dateStyle = .medium
-        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
+        dateFormatter.dateFormat = "YYYY-MM-dd"
+        let expiryDate = dateFormatter.string(from: date)
+        return expiryDate
+    }
+    
+    func getDisplayStyleDate(date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.formatterBehavior = .behavior10_4
+        dateFormatter.dateStyle = .medium
+        dateFormatter.dateFormat = "dd-MMM-YYYY"
         let expiryDate = dateFormatter.string(from: date)
         return expiryDate
     }
@@ -725,13 +766,55 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         canReshare = sender.isOn
     }
     
+    func getPasswordFromField() -> String {
+        var password = ""
+        let setPasswordInputField : XLFormRowDescriptor  = self.form.formRow(withTag: "SetPasswordInputField")!
+        if let indexPath = self.form.indexPath(ofFormRow: setPasswordInputField) {
+            let cell = tableView.cellForRow(at: indexPath) as? PasswordInputField
+            password = cell?.fileNameInputTextField.text ?? ""
+        }
+        return password
+    }
+    
+    func isPasswordEnabled() -> Bool {
+        let passwordField: XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionEditPasswordCellWithText")!
+        if let indexPath = self.form.indexPath(ofFormRow: passwordField) {
+            let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionEditCell
+            return cell?.switchControl.isOn ?? false
+        }
+        return false
+    }
+    
+    func getExpiryFromField() -> String? {
+        var expiry: String?
+        let expiryInputField : XLFormRowDescriptor  = self.form.formRow(withTag: "NCShareTextInputCellExpiry")!
+        if let indexPath = self.form.indexPath(ofFormRow: expiryInputField) {
+            let cell = tableView.cellForRow(at: indexPath) as? NCShareTextInputCell
+            expiry = cell?.cellTextField.text ?? ""
+        }
+        return expiry
+    }
+    
+    func isExpiryEnabled() -> Bool {
+        let expiryField: XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionEditCellExpiration")!
+        if let indexPath = self.form.indexPath(ofFormRow: expiryField) {
+            let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionEditCell
+            return cell?.switchControl.isOn ?? false
+        }
+        return false
+    }
+    
+    
     @IBAction func cancelClicked(_ sender: Any) {
         navigationController?.popViewController(animated: true)
     }
     
     @IBAction func nextClicked(_ sender: Any) {
-        if passwordProtected {
-            if self.password == nil || self.password == "" {
+        let password = getPasswordFromField()
+        let isPasswordEnabled = self.isPasswordEnabled()
+        let isExpiryEnabled = self.isExpiryEnabled()
+        if isPasswordEnabled {
+            if  password == "" {
                 let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_password", comment: ""), preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
                 self.present(alert, animated: true)
@@ -739,8 +822,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             }
         }
         
-        if setExpiration {
-            if self.expirationDateText == "" {
+        if isExpiryEnabled {
+            let inputDate = getExpiryFromField() ?? ""
+            if inputDate.isEmpty {
                 let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_expiration", comment: ""), preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
                 self.present(alert, animated: true)
@@ -785,7 +869,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 }
             }
             
-            networking?.updateShare(idShare: self.tableShare!.idShare, password: self.password, permission: self.permissionInt, note: nil, label: linkLabel, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
+            let label = linkLabel.trimmingCharacters(in: .whitespacesAndNewlines)
+            let expirationDate = isExpiryEnabled ? getServerStyleDate(date: self.expirationDate as Date) : ""
+            networking?.updateShare(idShare: self.tableShare!.idShare, password: password, permission: self.permissionInt, note: nil, label: label, expirationDate: expirationDate, hideDownload: self.hideDownload)
         }
     }
     

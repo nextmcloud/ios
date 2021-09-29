@@ -106,6 +106,7 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
         let dateFormatter = DateFormatter()
         dateFormatter.formatterBehavior = .behavior10_4
         dateFormatter.dateStyle = .medium
+        dateFormatter.dateFormat = "dd-MMM-YYYY"
         self.expirationDateText = dateFormatter.string(from: datePicker.date as Date)
         
         self.expirationDate = datePicker.date as NSDate
