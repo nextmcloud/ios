@@ -18,6 +18,7 @@ class SaveSettingsCustomButtonCell: XLFormButtonCell {
             // Initialization code
             self.backgroundColor = NCBrandColor.shared.backgroundForm
             self.selectionStyle = .none
+            self.separatorInset = UIEdgeInsets(top: 0, left: .greatestFiniteMagnitude, bottom: 0, right: .greatestFiniteMagnitude)
             
             saveSettingsButton.addTarget(self, action: #selector(saveButtonClicked), for: .touchUpInside)
 
