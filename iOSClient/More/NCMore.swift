@@ -250,9 +250,10 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 //        let percentageUsed = "\((tabAccount.quotaUsed / tabAccount.quotaTotal) / (1024*1024))"
         let used = Double(tabAccount.quotaUsed)
         let allot = Double(tabAccount.quotaTotal)
-        let percentageUsed = String(format: "%.2f%%", (used * 100/allot) * 100)
+        let percentageUsed = (used/allot) * 100
+        let percentageUsedFormatted = String(format: "%ld%%", percentageUsed)
 
-        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), (used * 100/allot) * 100)
+        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
         labelQuota.textColor = NCBrandColor.shared.label
         quotaLabel1.textColor = NCBrandColor.shared.label
         quotalabel2.textColor = NCBrandColor.shared.label
