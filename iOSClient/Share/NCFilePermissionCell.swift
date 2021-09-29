@@ -71,6 +71,7 @@ class NCFilePermissionCell: XLFormButtonCell {
             self.seperator.isHidden = true
             self.seperatorBelow.isHidden = true
             self.seperatorBelowFull.isHidden = false
+            self.imageCheck.isHidden = true
         }
     }
     

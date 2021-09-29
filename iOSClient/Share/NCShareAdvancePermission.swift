@@ -37,7 +37,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
 //    private var calendar: FSCalendar?
     var width: CGFloat = 0
     var height: CGFloat = 0
-    var permission: Int = 0
+//    var permission: Int = 0
     var filePermissionCount = 0
     var password: String!
     var linkLabel = ""
@@ -320,6 +320,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
             row = XLFormRowDescriptor(tag: "NCFilePermissionCellFileDrop", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
             row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_file_drop_", comment: "")
+            if tableShare?.permissions == NCGlobal.shared.permissionCreateShare {
+                row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+            }
             row.height = 44
             section.addFormRow(row)
             
@@ -328,6 +331,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             
             row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellFiledropMessage", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
             row.cellConfig["titleLabel.text"] = NSLocalizedString("_file_drop_message_", comment: "")
+            row.cellConfig["imageCheck.image"] = UIImage()
             row.height = 84
             section.addFormRow(row)
             
@@ -579,6 +583,19 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        //can Reshare
+        let canReshareRow: XLFormRowDescriptor = self.form.formRow(withTag: "kNMCFilePermissionEditCellEditingCanShare")!
+        if let canReShareRowIndexPath = form.indexPath(ofFormRow: canReshareRow), indexPath == canReShareRowIndexPath {
+            let cell = cell as? NCFilePermissionEditCell
+            // Can reshare (file)
+            if let permissionValue = tableShare?.permissions {
+                let canReshare = CCUtility.isPermission(toCanShare: permissionValue)
+                cell?.switchControl.isOn = canReshare
+            } else {
+                cell?.switchControl.isOn = false
+            }
+        }
+        
         //hide download
         let hideDownloadRow: XLFormRowDescriptor = self.form.formRow(withTag: "kNMCFilePermissionEditCellHideDownload")!
         if let hideDownloadRowIndexPath = form.indexPath(ofFormRow: hideDownloadRow), indexPath == hideDownloadRowIndexPath {
@@ -608,6 +625,12 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)
         
         switch formRow.tag {
+        
+        case "kNMCFilePermissionEditCellEditingCanShare":
+            if let value = newValue as? Bool {
+                canReshareValueChanged(isOn: value)
+            }
+            
         case "kNMCFilePermissionEditCellHideDownload":
             if let value = newValue as? Bool {
                 self.hideDownload = value
@@ -687,7 +710,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     
     func readOnlyValueChanged(sender: UISwitch) {
         guard let metadata = self.metadata else { return }
-        permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata.directory)
+        permissionInt = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata.directory)
 
         if sender.isOn {
             if metadata.directory {
@@ -705,7 +728,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     
     func allowUploadEditingValueChanged(sender: UISwitch) {
         guard let metadata = self.metadata else { return }
-        permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata.directory)
+        permissionInt = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata.directory)
 
         if sender.isOn {
 //            switchReadOnly.setOn(false, animated: false)
@@ -722,7 +745,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     func fileDropValueChanged(sender: UISwitch) {
 
         guard let metadata = self.metadata else { return }
-        permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata.directory)
+        permissionInt = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata.directory)
 
         if sender.isOn {
 //            switchReadOnly.setOn(false, animated: false)
@@ -735,7 +758,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
     
 //    @IBAction func canReshareValueChanged(sender: UISwitch) {
-    func canReshareValueChanged(sender: UISwitch) {
+    func canReshareValueChanged(isOn: Bool) {
         guard let tableShare = self.tableShare else { return }
         guard let metadata = self.metadata else { return }
 
@@ -747,23 +770,24 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         var permission: Int = 0
         
         if metadata.directory {
-            permission = CCUtility.getPermissionsValue(byCanEdit: canEdit, andCanCreate: canCreate, andCanChange: canChange, andCanDelete: canDelete, andCanShare: sender.isOn, andIsFolder: metadata.directory)
+            permission = CCUtility.getPermissionsValue(byCanEdit: canEdit, andCanCreate: canCreate, andCanChange: canChange, andCanDelete: canDelete, andCanShare: isOn, andIsFolder: metadata.directory)
         } else {
-            if sender.isOn {
+            if isOn {
                 if canEdit {
-                    permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: sender.isOn, andIsFolder: metadata.directory)
+                    permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: isOn, andIsFolder: metadata.directory)
                 } else {
-                    permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: sender.isOn, andIsFolder: metadata.directory)
+                    permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: isOn, andIsFolder: metadata.directory)
                 }
             } else {
                 if canEdit {
-                    permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: sender.isOn, andIsFolder: metadata.directory)
+                    permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: isOn, andIsFolder: metadata.directory)
                 } else {
-                    permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: sender.isOn, andIsFolder: metadata.directory)
+                    permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: isOn, andIsFolder: metadata.directory)
                 }
             }
         }
-        canReshare = sender.isOn
+        self.permissionInt = permission
+        canReshare = isOn
     }
     
     func getPasswordFromField() -> String {
