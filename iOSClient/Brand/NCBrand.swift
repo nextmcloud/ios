@@ -64,7 +64,7 @@ import UIKit
     @objc public var folderBrandAutoUpload:             String = ""                                                 // example "_auto_upload_folder_"   Don't touch me !!
     
     // Auto Upload default folder
-    @objc public var folderDefaultAutoUpload:           String = "Photos"
+    //@objc public var folderDefaultAutoUpload:           String = "Camera-Media"
     
     // Capabilities Group
 
@@ -98,12 +98,24 @@ import UIKit
     @objc public var disable_background_color:          Bool = true
     @objc public var disable_background_image:          Bool = true
 
+    @objc public var folderDefaultAutoUpload: String {
+        get {
+            if Locale.current.languageCode == "de" {
+                return "Kamera-Medien"
+            } else {
+                return "Camera-Media"
+            }
+        }
+    }
+    
     override init() {
         
         if folderBrandAutoUpload != "" {
-            folderDefaultAutoUpload = folderBrandAutoUpload
+            //folderDefaultAutoUpload = folderBrandAutoUpload
         }
     }
+    
+    
 }
 
 //MARK: - Color
@@ -402,7 +414,9 @@ class NCBrandColor: NSObject {
         cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: customerDefault, size: folderWidth)
         cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
+        //cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!
+
         cacheImages.folder =  UIImage(named: "folder_nmcloud")!
         
         cacheImages.checkedYes = UIImage(named: "checkedYes")!

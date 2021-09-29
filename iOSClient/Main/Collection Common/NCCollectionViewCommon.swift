@@ -137,7 +137,10 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed")){
             redirectToPrivacyViewController()
         }
-
+        
+        if(!UserDefaults.standard.bool(forKey: "isMediaPathSetToDefaultFolder")){
+            setDefaultFolderPathToMediaView()
+        }
     }
         
     override func viewWillAppear(_ animated: Bool) {
@@ -245,12 +248,6 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         super.traitCollectionDidChange(previousTraitCollection)
         
         changeTheming()
-    }
-    
-    func redirectToPrivacyViewController(){
-            let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
-            let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
-                    self.present(newViewController, animated: true, completion: nil)
     }
 
     // MARK: - NotificationCenter
@@ -1099,6 +1096,23 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                completion(nil, nil, nil, nil, errorCode, errorDescription)
             }
         }
+    }
+    
+    // MARK: - NMC Custom features Method calls
+    
+    
+    func redirectToPrivacyViewController(){
+            let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+            let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
+                    self.present(newViewController, animated: true, completion: nil)
+    }
+    
+    func setDefaultFolderPathToMediaView(){
+        let serverUrl = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account)
+        guard let serverUrlPush = CCUtility.stringAppendServerUrl(serverUrl, addFileName: NCBrandOptions.shared.folderDefaultAutoUpload) else { return }
+        let path = CCUtility.returnPathfromServerUrl(serverUrlPush, urlBase: appDelegate.urlBase, account: appDelegate.account) ?? ""
+        NCManageDatabase.shared.setAccountMediaPath(path, account: appDelegate.account)
+        UserDefaults.standard.set(true, forKey: "isMediaPathSetToDefaultFolder")
     }
 }
 
