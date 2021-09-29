@@ -51,6 +51,7 @@ class NCViewerImageZoom: UIViewController {
     var index: Int = 0
     var minScale: CGFloat = 0
     var noPreview: Bool = false
+    private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     var doubleTapGestureRecognizer: UITapGestureRecognizer = UITapGestureRecognizer()
                 
@@ -100,6 +101,7 @@ class NCViewerImageZoom: UIViewController {
         
         updateZoomScale()
         centreConstraints()
+        NotificationCenter.default.addObserver(self, selector: #selector(rotateImage), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationImagePreviewRotateImage), object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -297,6 +299,30 @@ class NCViewerImageZoom: UIViewController {
 
         let contentHeight = yOffset * 2 + imageView.frame.height
         scrollView.contentSize = CGSize(width: scrollView.contentSize.width, height: contentHeight)
+    }
+    
+    @objc func rotateImage() {
+        let rotatedImage = imageView.image?.rotate(radians: .pi/2)
+        imageView.image = rotatedImage
+        let data = rotatedImage?.pngData()
+        let url = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileName)!)
+        do {
+            try data?.write(to: url)
+        } catch {
+            print("Unable to save file")
+        }
+//        NCManageDatabase.shared.updateMetadatas([metadata], metadatasResult: [metadata])
+        let ocId = NSUUID().uuidString
+        let size = NCUtilityFileSystem.shared.getFileSize(filePath: url.path)
+        let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: metadata.fileNameView)!
+        if NCUtilityFileSystem.shared.copyFile(atPath: url.path, toPath: fileNamePath) {
+            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: metadata.account, fileName: metadata.fileName, fileNameView: metadata.fileNameView, ocId: ocId, serverUrl: metadata.serverUrl, urlBase: metadata.urlBase, url: url.path, contentType: "", livePhoto: false)
+            metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
+            metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
+            metadataForUpload.size = size
+            metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
+            appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
+        }
     }
 }
 
