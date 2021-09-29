@@ -126,7 +126,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         }
 
         self.directory = self.metadata?.directory
-        
+        self.linkLabel = tableShare?.label ?? ""
+        self.permissionInt = tableShare?.permissions ?? 0
+        self.hideDownload = tableShare?.hideDownload ?? false
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase,  view: self.view, delegate: self)
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         initializeForm()
