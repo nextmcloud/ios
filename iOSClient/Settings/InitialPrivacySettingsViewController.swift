@@ -42,6 +42,8 @@ class InitialPrivacySettingsViewController: UIViewController {
         acceptButton.layer.cornerRadius = 5
         acceptButton.layer.borderWidth = 1
         acceptButton.layer.borderColor = NCBrandColor.shared.brand.cgColor
+        privacySettingsHelpText.centerText()
+        privacySettingsHelpText.font = UIFont(name: privacySettingsHelpText.font!.fontName, size: 16)
         self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
 
     }
@@ -118,6 +120,15 @@ public extension UITextView {
         
         self.attributedText = attributedOriginalText
     }
+       
+    func centerText() {
+            self.textAlignment = .center
+            let fittingSize = CGSize(width: 300, height: CGFloat.greatestFiniteMagnitude)
+            let size = sizeThatFits(fittingSize)
+            let topOffset = (bounds.size.height - size.height * zoomScale) / 2
+            let positiveTopOffset = max(1, topOffset)
+            contentOffset.y = -positiveTopOffset
+        }
 }
 
 enum LinkType: String {
