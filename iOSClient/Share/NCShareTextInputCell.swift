@@ -89,6 +89,10 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
         //Format Date
         datePicker.datePickerMode = .date
         datePicker.minimumDate = Date()
+        if #available(iOS 13.4, *) {
+            datePicker.preferredDatePickerStyle = .wheels
+            datePicker.sizeToFit()
+        }
         //ToolBar
         let toolbar = UIToolbar();
         toolbar.sizeToFit()

@@ -201,7 +201,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         appDelegate.activeViewController = self
         
-        viewQuota.backgroundColor = NCBrandColor.shared.memoryConsuptionBackground
+        viewQuota.backgroundColor = NCBrandColor.shared.systemGroupedBackground
         progressQuota.progressTintColor = NCBrandColor.shared.brandElement
         progressQuota.trackTintColor = .lightGray
         progressQuota.layer.borderWidth = 2
