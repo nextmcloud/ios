@@ -166,6 +166,11 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         tableView.reloadData()
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        footerView.buttonCancel.layer.borderColor = NCBrandColor.shared.label.cgColor
+    }
+    
     @objc func keyboardWillShow(_ notification:Notification) {
         if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
             tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardSize.height, right: 0)

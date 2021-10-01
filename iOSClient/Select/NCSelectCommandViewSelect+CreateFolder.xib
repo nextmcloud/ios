@@ -12,68 +12,70 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="NCSelectCommandView" customModule="Nextcloud" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+            <rect key="frame" x="0.0" y="0.0" width="461" height="442"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hnf-K7-plh">
-                    <rect key="frame" x="180" y="225" width="120" height="30"/>
-                    <color key="backgroundColor" systemColor="systemGray4Color"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="120" id="hNM-l8-5EZ"/>
-                        <constraint firstAttribute="height" constant="30" id="u76-eq-MhY"/>
-                    </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                    <state key="normal" title="Select">
-                        <color key="titleColor" systemColor="labelColor"/>
-                    </state>
-                    <connections>
-                        <action selector="selectButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Sv5-p0-quT"/>
-                    </connections>
-                </button>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xmS-E7-44n">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="1"/>
+                    <rect key="frame" x="0.0" y="0.0" width="461" height="1"/>
                     <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="1" id="HLl-PW-5av"/>
                     </constraints>
                 </view>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iw1-z7-Ulz">
-                    <rect key="frame" x="20" y="225" width="120" height="30"/>
-                    <color key="backgroundColor" systemColor="systemGray4Color"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="30" id="Bat-f2-vWJ"/>
-                        <constraint firstAttribute="width" constant="120" id="uLS-hh-RtK"/>
-                    </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                    <state key="normal" title="Create  folder">
-                        <color key="titleColor" systemColor="labelColor"/>
-                    </state>
-                    <connections>
-                        <action selector="createFolderButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Lfp-5d-sgv"/>
-                    </connections>
-                </button>
+                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="iEQ-3A-FCI">
+                    <rect key="frame" x="16" y="201" width="429" height="40"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iw1-z7-Ulz">
+                            <rect key="frame" x="0.0" y="0.0" width="206.5" height="40"/>
+                            <color key="backgroundColor" systemColor="systemGray4Color"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="Bat-f2-vWJ"/>
+                            </constraints>
+                            <inset key="titleEdgeInsets" minX="10" minY="0.0" maxX="6" maxY="0.0"/>
+                            <inset key="imageEdgeInsets" minX="-6" minY="0.0" maxX="0.0" maxY="0.0"/>
+                            <state key="normal" title="Create  folder" image="addFolder">
+                                <color key="titleColor" systemColor="labelColor"/>
+                            </state>
+                            <connections>
+                                <action selector="createFolderButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Lfp-5d-sgv"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hnf-K7-plh">
+                            <rect key="frame" x="222.5" y="0.0" width="206.5" height="40"/>
+                            <color key="backgroundColor" systemColor="systemGray4Color"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="Select">
+                                <color key="titleColor" systemColor="labelColor"/>
+                            </state>
+                            <connections>
+                                <action selector="selectButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Sv5-p0-quT"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                </stackView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="Hnf-K7-plh" secondAttribute="trailing" constant="20" id="49y-gw-FQN"/>
                 <constraint firstItem="xmS-E7-44n" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="CiY-20-2Gk"/>
                 <constraint firstItem="xmS-E7-44n" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="IWq-yN-wAO"/>
-                <constraint firstItem="iw1-z7-Ulz" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="20" id="b8g-gg-Apj"/>
-                <constraint firstItem="iw1-z7-Ulz" firstAttribute="centerY" secondItem="vUN-kp-3ea" secondAttribute="centerY" id="e34-ws-R7V"/>
-                <constraint firstItem="Hnf-K7-plh" firstAttribute="centerY" secondItem="vUN-kp-3ea" secondAttribute="centerY" id="lf3-1a-P6a"/>
+                <constraint firstItem="iEQ-3A-FCI" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="Iwb-5M-0V3"/>
+                <constraint firstItem="iEQ-3A-FCI" firstAttribute="centerX" secondItem="vUN-kp-3ea" secondAttribute="centerX" id="rlg-Yb-cNG"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="xmS-E7-44n" secondAttribute="trailing" id="sg2-b1-tqE"/>
+                <constraint firstItem="iEQ-3A-FCI" firstAttribute="centerY" secondItem="vUN-kp-3ea" secondAttribute="centerY" id="xgA-EE-Jdm"/>
             </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="createFolderButton" destination="iw1-z7-Ulz" id="EMv-UC-IBh"/>
                 <outlet property="selectButton" destination="Hnf-K7-plh" id="hTj-bA-h3I"/>
                 <outlet property="separatorHeightConstraint" destination="HLl-PW-5av" id="Zjf-UY-YAw"/>
                 <outlet property="separatorView" destination="xmS-E7-44n" id="9YB-B1-j8j"/>
             </connections>
-            <point key="canvasLocation" x="-249" y="153"/>
+            <point key="canvasLocation" x="-126.5625" y="156.25"/>
         </view>
     </objects>
     <resources>
+        <image name="addFolder" width="25" height="25"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
