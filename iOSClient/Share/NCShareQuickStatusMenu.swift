@@ -14,7 +14,7 @@ class NCShareQuickStatusMenu: NSObject {
     
     var currentStatus = ""
     
-    func toggleMenu(viewController: UIViewController, directory: Bool, directoryType: String, status: Int, shareType: Int) {
+    func toggleMenu(viewController: UIViewController, directory: Bool, directoryType: String, fileExtension: String?, status: Int, shareType: Int) {
         
         print(status)
 //        self.currentStatus = status
@@ -33,61 +33,39 @@ class NCShareQuickStatusMenu: NSObject {
             )
         )
 
-//        if directoryType == "document" || directoryType == "directory" {
-//            actions.append(
-//                NCMenuAction(
-//                    title: directory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
-//                    icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption || status == (NCGlobal.shared.permissionShareShare - NCGlobal.shared.permissionReadShare))  ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
-//                    selected: false,
-//                    on: false,
-//                    action: { menuAction in
-//                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
-//                    }
-//                )
-//            )
-//        } else if directoryType != "image" || directoryType !=  "audio" {
-//            actions.append(
-//                NCMenuAction(title: directory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
-//                             icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption) ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
-//                             selected: false,
-//                             on: false,
-//                             action: { menuAction in
-//                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
-//                             }
-//                )
-//            )
-//        }
-        
-        if directoryType == "document" || directoryType == "directory" {
-            actions.append(
-                NCMenuAction(
-                    title: directory ? NSLocalizedString("_share_editing_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
-                    icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption || status == (NCGlobal.shared.permissionShareShare - NCGlobal.shared.permissionReadShare))  ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
-                    selected: false,
-                    on: false,
-                    action: { menuAction in
-                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
-                    }
+        if NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: fileExtension ?? "", shareType: shareType) {
+            if directoryType == "document" || directoryType == "directory" {
+                actions.append(
+                    NCMenuAction(
+                        title: directory ? NSLocalizedString("_share_editing_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
+                        icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption || status == (NCGlobal.shared.permissionShareShare - NCGlobal.shared.permissionReadShare))  ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) ?? UIImage() : UIImage(),
+                        selected: false,
+                        on: false,
+                        action: { menuAction in
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
+                        }
+                    )
                 )
-            )
-        } else if directoryType != "image" || directoryType !=  "audio" {
-            actions.append(
-                NCMenuAction(title: directory ? NSLocalizedString("_share_editing_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
-                             icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption) ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
-                             selected: false,
-                             on: false,
-                             action: { menuAction in
-                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
-                             }
+            } else if directoryType != "image" || directoryType !=  "audio" {
+                actions.append(
+                    NCMenuAction(title: directory ? NSLocalizedString("_share_editing_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
+                                 icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption) ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) ?? UIImage() : UIImage(),
+                                 selected: false,
+                                 on: false,
+                                 action: { menuAction in
+                                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
+                                 }
+                    )
                 )
-            )
+            }
         }
         
-        if directory {
+        if directory,
+           NCShareCommon.shared.isFileDropOptionVisible(isDirectory: directory, shareType: shareType) {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_share_file_drop_", comment: ""),
-                    icon: status == NCGlobal.shared.permissionCreateShare ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
+                    icon: status == NCGlobal.shared.permissionCreateShare ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) ?? UIImage() : UIImage(),
                     selected: false,
                     on: false,
                     action: { menuAction in

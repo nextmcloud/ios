@@ -533,7 +533,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                 viewNewUserPermission.sharee = sharee
                 viewNewUserPermission.shareeEmail = self?.shareeEmail
                 viewNewUserPermission.newUser = true
-                viewNewUserPermission.tableShare = self!.tableShareSelected
                 self?.navigationController!.pushViewController(viewNewUserPermission, animated: true)
             }
 //            self!.networking?.createShare(shareWith: sharee.shareWith, shareType: sharee.shareType, metadata: self!.metadata!)
@@ -632,7 +631,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             let quickStatusMenu = NCShareQuickStatusMenu()
             //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
     //        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions, shareType: tableShare.shareType)
-            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
+            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, fileExtension: self.metadata?.ext, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
         } else {
             return
         }
@@ -655,7 +654,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     //            self.quickStatusTableShare = tableShare
                 let quickStatusMenu = NCShareQuickStatusMenu()
     //        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions, shareType: tableShare.shareType)
-            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
+            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, fileExtension: self.metadata?.ext, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
     //        }
         } else {
             return

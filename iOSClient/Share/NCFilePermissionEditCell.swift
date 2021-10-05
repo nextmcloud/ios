@@ -74,6 +74,10 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
             seperator.isHidden = true
             self.seperatorMiddle.isHidden = true
         }
+        
+        if  rowDescriptor.tag == "kNMCFilePermissionEditCellEditingCanShare" {
+            self.seperator.isHidden = true
+        }
     }
     
     @objc func switchChanged(mySwitch: UISwitch) {

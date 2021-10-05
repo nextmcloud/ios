@@ -27,7 +27,7 @@ class NCFilePermissionCell: XLFormButtonCell {
     
     @objc func changeTheming() {
         self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        self.titleLabel.textColor = NCBrandColor.shared.iconColor
+        self.titleLabel.textColor = NCBrandColor.shared.label
         self.titleLabelBottom.textColor = NCBrandColor.shared.iconColor
     }
     
@@ -58,6 +58,7 @@ class NCFilePermissionCell: XLFormButtonCell {
         }
         
         if  rowDescriptor.tag == "kNMCFilePermissionEditCellEditingCanShare" {
+            self.seperator.isHidden = true
             self.seperatorBelowFull.isHidden = false
         }
         

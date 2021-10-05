@@ -42,9 +42,6 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
             seperator.isHidden = true
             setDatePicker(sender: self.cellTextField)
         }
-        if rowDescriptor.tag == "kNCShareTextInputCellCustomLinkField" {
-            seperatorBottom.isHidden = true
-        }
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
