@@ -36,7 +36,7 @@ extension NCMedia {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_select_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "selectFull"),
+                        icon: NCUtility.shared.loadImage(named: "selectFull",color: NCBrandColor.shared.iconColor),
 
                         action: { menuAction in
                             self.isEditMode = true
@@ -48,7 +48,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString(filterTypeFileImage ? "_media_viewimage_show_" : "_media_viewimage_hide_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "file_photo_menu"),
+                    icon: NCUtility.shared.loadImage(named: filterTypeFileImage ? "nocamera" : "file_photo_menu",color: NCBrandColor.shared.iconColor),
 
                     selected: filterTypeFileImage,
                     on: true,
@@ -63,7 +63,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString(filterTypeFileVideo ? "_media_viewvideo_show_" : "_media_viewvideo_hide_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "videoyes"),
+                    icon: NCUtility.shared.loadImage(named: filterTypeFileVideo ? "videono" : "videoyes",color: NCBrandColor.shared.iconColor),
                     selected: filterTypeFileVideo,
                     on: true,
                     action: { menuAction in
@@ -77,7 +77,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_select_media_folder_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "mediaFolder"),
+                    icon: NCUtility.shared.loadImage(named: "mediaFolder",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as! UINavigationController
                         let viewController = navigationController.topViewController as! NCSelect
@@ -94,7 +94,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_modified_date_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "sortFileNameAZ"),
+                    icon: NCUtility.shared.loadImage(named: "sortFileNameAZ",color: NCBrandColor.shared.iconColor),
 
                     selected: CCUtility.getMediaSortDate() == "date",
                     on: true,
@@ -108,7 +108,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_created_date_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "sortFileNameAZ"),
+                    icon: NCUtility.shared.loadImage(named: "sortFileNameAZ",color: NCBrandColor.shared.iconColor),
                     selected: CCUtility.getMediaSortDate() == "creationDate",
                     on: true,
                     action: { menuAction in
@@ -121,7 +121,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_upload_date_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "sortFileNameAZ"),
+                    icon: NCUtility.shared.loadImage(named: "sortFileNameAZ",color: NCBrandColor.shared.iconColor),
                     selected: CCUtility.getMediaSortDate() == "uploadDate",
                     on: true,
                     action: { menuAction in
@@ -139,7 +139,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_cancel_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "xmark"),
+                    icon: NCUtility.shared.loadImage(named: "xmark",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         self.isEditMode = false
                         self.selectOcId.removeAll()
@@ -154,7 +154,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_open_in_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "square.and.arrow.up"),
+                    icon: NCUtility.shared.loadImage(named: "viewInFolder",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         self.isEditMode = false
                         NCFunctionCenter.shared.openActivityViewController(selectOcId: self.selectOcId)
@@ -170,7 +170,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_save_selected_files_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "square.and.arrow.down"),
+                    icon: NCUtility.shared.loadImage(named: "file_photo_menu",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         self.isEditMode = false
                         for ocId in self.selectOcId {
@@ -200,7 +200,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_move_or_copy_selected_files_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "move"),
+                    icon: NCUtility.shared.loadImage(named: "move",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         self.isEditMode = false
                         var meradatasSelect = [tableMetadata]()
@@ -224,7 +224,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_copy_file_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "doc.on.doc"),
+                    icon: NCUtility.shared.loadImage(named: "copy",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         self.isEditMode = false
                         self.appDelegate.pasteboardOcIds.removeAll()
@@ -244,7 +244,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_delete_selected_files_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "trash"),
+                    icon: NCUtility.shared.loadImage(named: "trash",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         self.isEditMode = false
                         for ocId in self.selectOcId {

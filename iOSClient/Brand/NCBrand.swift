@@ -206,16 +206,19 @@ class NCBrandColor: NSObject {
     }
     
     @objc public var systemGrayAndGray66:        UIColor = .gray
-    @objc public var commonViewInfoText:        UIColor = UIColor(displayP3Red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
+    @objc public var commonViewInfoText: UIColor =  UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
     @objc public var tileSelectionImageColor:        UIColor = .white
     //@objc public var backgroundCell:        UIColor = .white
     @objc public var seperatorRename:             UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
+
     @objc public var fileFolderName:          UIColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
     @objc public var searchFieldPlaceHolder:          UIColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
     @objc public var singleTitleColorButton:          UIColor = UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
     @objc public var quickStatusTextColor:          UIColor = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
     @objc public var shareCellTitleColor:    UIColor = UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
     @objc public var shareByEmailTextColor:    UIColor = UIColor(displayP3Red: 13.0/255.0, green: 57.0/255.0, blue: 223.0/255.0, alpha: 1.0)
+    @objc public var dotMenuGray: UIColor = UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
+    @objc public var sublineGray: UIColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
     
 //    private func createImagesThemingColor() {
 //
@@ -396,7 +399,7 @@ class NCBrandColor: NSObject {
         }
        
     }
-    
+        
     override init() {
         self.brand = self.customer
 //        self.brandElement = self.customer
@@ -410,9 +413,9 @@ class NCBrandColor: NSObject {
 
         cacheImages.file = UIImage.init(named: "file")!
         
-        cacheImages.shared = UIImage(named: "share")!.image(color: gray, size: 50)
-        cacheImages.canShare = UIImage(named: "share")!.image(color: gray, size: 50)
-        cacheImages.shareByLink = UIImage(named: "sharebylink")!.image(color: gray, size: 50)
+        cacheImages.shared = UIImage(named: "share")!.image(color: iconColor, size: 50)
+        cacheImages.canShare = UIImage(named: "share")!.image(color: iconColor, size: 50)
+        cacheImages.shareByLink = UIImage(named: "sharebylink")!.image(color: iconColor, size: 50)
         
         cacheImages.favorite = NCUtility.shared.loadImage(named: "star.fill", color: yellowFavorite)
         cacheImages.comment = UIImage(named: "comment")!.image(color: gray, size: 50)
@@ -421,11 +424,11 @@ class NCBrandColor: NSObject {
         cacheImages.local = UIImage.init(named: "local")!
             
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
-        cacheImages.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folderEncrypted = UIImage(named: "folderEncrypted")!
         cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
-        cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: customerDefault, size: folderWidth)
-        cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folderPublic = UIImage(named: "folder_public")!
+        cacheImages.folderGroup = UIImage(named: "folder_group")!
+        cacheImages.folderExternal = UIImage(named: "folder_external")!
         //cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!
 
@@ -434,8 +437,8 @@ class NCBrandColor: NSObject {
         cacheImages.checkedYes = UIImage(named: "checkedYes")!
         cacheImages.checkedNo = NCUtility.shared.loadImage(named: "circle", color: graySoft)
         
-        cacheImages.buttonMore = UIImage(named: "more")!.image(color: graySoft, size: 50)
-        cacheImages.buttonStop = UIImage(named: "stop")!.image(color: graySoft, size: 50)
+        cacheImages.buttonMore = UIImage(named: "more")!.image(color: iconColor, size: 50)
+        cacheImages.buttonStop = UIImage(named: "stop")!.image(color: iconColor, size: 50)
     }
     
 //    @objc public func setDarkMode() {
