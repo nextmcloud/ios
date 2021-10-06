@@ -263,7 +263,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                     row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
                 }
             }
-            let enabled = self.isEditingEnabled()
+            let enabled = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: shareType)
             row.cellConfig["titleLabel.textColor"] = enabled ? NCBrandColor.shared.label : NCBrandColor.shared.systemGray
             row.disabled = !enabled
             section.addFormRow(row)
@@ -726,22 +726,6 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     
     func isInternalUser() -> Bool {
         return NCShareCommon.shared.isInternalUser(shareType: shareType)
-    }
-    
-    func isFileTypeAllowedForEditing(fileExtension: String) -> Bool {
-        if fileExtension == "md" || fileExtension == "txt" {
-            return true
-        } else {
-            return isInternalUser()
-        }
-    }
-    
-    func isEditingEnabled() -> Bool {
-        if !directory {//file
-            return isFileTypeAllowedForEditing(fileExtension: metadata?.ext ?? "")
-        } else {
-            return true
-        }
     }
     
     func getPasswordFromField() -> String? {
