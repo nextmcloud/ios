@@ -64,7 +64,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     var setExpiration = false
     var headerView: NCShareAdvancePermissionHeader! = nil
     var footerView: NCShareAdvancePermissionFooter! = nil
-    var directory: Bool!
+    var directory: Bool = false
     var typeFile: String!
     let tableViewBottomInset: CGFloat = 80.0
 
@@ -127,7 +127,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             }
         }
 
-        self.directory = self.metadata?.directory
+        self.directory = self.metadata?.directory ?? false
         self.linkLabel = tableShare?.label ?? ""
         self.permissionInt = tableShare?.permissions ?? 0
         self.hideDownload = tableShare?.hideDownload ?? false
@@ -175,7 +175,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     
     @objc func keyboardWillShow(_ notification:Notification) {
         if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
-            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardSize.height, right: 0)
+            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardSize.height + 60, right: 0)
         }
     }
     
@@ -254,20 +254,21 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         
         //editing
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
-        if self.typeFile == "document" || self.directory {
-            row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditing", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
-            row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_allow_editing_", comment: "")
-            row.height = 44
-            if let permission = tableShare?.permissions {
-                if CCUtility.isAnyPermission(toEdit: permission), permission != NCGlobal.shared.permissionCreateShare {
-                    row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-                }
+        
+        row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditing", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
+        row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_allow_editing_", comment: "")
+        row.height = 44
+        if let permission = tableShare?.permissions {
+            if CCUtility.isAnyPermission(toEdit: permission), permission != NCGlobal.shared.permissionCreateShare {
+                row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
             }
-            let enabled = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: shareType)
-            row.cellConfig["titleLabel.textColor"] = enabled ? NCBrandColor.shared.label : NCBrandColor.shared.systemGray
-            row.disabled = !enabled
-            section.addFormRow(row)
-        } else {
+        }
+        let enabled = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: shareType)
+        row.cellConfig["titleLabel.textColor"] = enabled ? NCBrandColor.shared.label : NCBrandColor.shared.systemGray
+        row.disabled = !enabled
+        section.addFormRow(row)
+        
+        if !directory {
             row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditingMsg", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
             row.cellConfig["titleLabel.text"] = NSLocalizedString("share_editing_message", comment: "")
             row.height = 60
@@ -404,7 +405,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNCShareTextInputCell"] = NCShareTextInputCell.self
         row = XLFormRowDescriptor(tag: "NCShareTextInputCellExpiry", rowType: "kNCShareTextInputCell", title: "")
         row.cellClass = NCShareTextInputCell.self
-        row.cellConfig["cellTextField.placeholder"] = ""
+        row.cellConfig["cellTextField.placeholder"] = NSLocalizedString("_share_expiration_date_placeholder_", comment: "")
         if newUser == false {
             if let date = tableShare?.expirationDate {
                 row.cellConfig["cellTextField.text"] = getDisplayStyleDate(date: date as Date)
