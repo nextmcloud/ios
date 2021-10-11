@@ -241,7 +241,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     @IBAction func touchUpInsideButtonMenu(_ sender: Any) {
         
-        guard let metadata = self.metadata else { return }
+        guard let metadata = metadata else { return }
         let isFilesSharingPublicPasswordEnforced = NCManageDatabase.shared.getCapabilitiesServerBool(account: metadata.account, elements: NCElementsJSON.shared.capabilitiesFileSharingPubPasswdEnforced, exists: false)
         let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
         
@@ -251,14 +251,14 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                 textField.isSecureTextEntry = true
             }
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .default) { (action:UIAlertAction) in })
-            let okAction = UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default) { (action:UIAlertAction) in
+            let okAction = UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default) {[weak self] (action:UIAlertAction) in
                 let password = alertController.textFields?.first?.text
-                self.networking?.createShareLink(password: password ?? "")
+                self?.networking?.createShareLink(password: password ?? "")
             }
             
             alertController.addAction(okAction)
             
-            self.present(alertController, animated: true, completion:nil)
+            present(alertController, animated: true, completion:nil)
         } else if shares.firstShareLink == nil {
             networking?.createShareLink(password: "")
         } else {
@@ -469,7 +469,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         dropDown.direction = .bottom
         
         dropDown.cellNib = UINib(nibName: "NCShareUserDropDownCell", bundle: nil)
-        dropDown.customCellConfiguration = { (index: Index, item: String, cell: DropDownCell) -> Void in
+        dropDown.customCellConfiguration = {[weak self] (index: Index, item: String, cell: DropDownCell) -> Void in
             guard let cell = cell as? NCShareUserDropDownCell else { return }
             let sharee = sharees[index]
             cell.imageItem.image = NCShareCommon.shared.getImageShareType(shareType: sharee.shareType)
@@ -482,14 +482,14 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                 cell.centerTitle.constant = 0
             }
 
-            let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(self.appDelegate.user, urlBase: self.appDelegate.urlBase)) + "-" + sharee.label + ".png"
+            let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(self?.appDelegate.user, urlBase: self?.appDelegate.urlBase)) + "-" + sharee.label + ".png"
             if FileManager.default.fileExists(atPath: fileNameLocalPath) {
                 if let image = UIImage(contentsOfFile: fileNameLocalPath) {
                     cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
                 }
             } else {
                 NCCommunication.shared.downloadAvatar(userId: sharee.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
-                    if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
+                    if errorCode == 0 && account == self?.appDelegate.account && UIImage(data: data!) != nil {
                         if let image = UIImage(contentsOfFile: fileNameLocalPath) {
                             DispatchQueue.main.async {
                                 cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
@@ -504,7 +504,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         dropDown.selectionAction = { [weak self] (index, item) in
             let sharee = sharees[index]
-            let directory = self!.metadata?.directory
+            let directory = self?.metadata?.directory ?? false
             let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
             DispatchQueue.main.async() { [self] in
 //                var viewNewUserPermission: NCShareNewUserPermission
@@ -597,9 +597,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     @objc func shareMenuUnshareClicked() {
-        
         guard let tableShare = self.tableShareSelected else { return }
-        networking?.unShare(idShare: self.tableShareSelected!.idShare)
+        networking?.unShare(idShare: tableShare.idShare)
     }
     
     // MARK: -StatusChangeNotification
