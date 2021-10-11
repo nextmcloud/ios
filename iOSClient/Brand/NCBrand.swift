@@ -217,8 +217,11 @@ class NCBrandColor: NSObject {
     @objc public var quickStatusTextColor:          UIColor = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
     @objc public var shareCellTitleColor:    UIColor = UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
     @objc public var shareByEmailTextColor:    UIColor = UIColor(displayP3Red: 13.0/255.0, green: 57.0/255.0, blue: 223.0/255.0, alpha: 1.0)
-    @objc public var dotMenuGray: UIColor = UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
+    //@objc public var dotMenuGray: UIColor = UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
     @objc public var sublineGray: UIColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+    @objc public let nmcYellowFavorite:        UIColor = UIColor(red: 254.0/255.0, green: 203.0/255.0, blue: 0/255.0, alpha: 1.0)
+    @objc public let nmcGray30:        UIColor = UIColor(red: 254.0/255.0, green: 203.0/255.0, blue: 0/255.0, alpha: 1.0)
+    @objc public let nmcGray70:        UIColor = UIColor(red: 254.0/255.0, green: 203.0/255.0, blue: 0/255.0, alpha: 1.0)
     
 //    private func createImagesThemingColor() {
 //
@@ -400,6 +403,45 @@ class NCBrandColor: NSObject {
        
     }
         
+    @objc public var nmcGray1: UIColor{
+            if #available(iOS 13.0, *) {
+                if UITraitCollection.current.userInterfaceStyle == .dark {
+                    return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
+                }else {
+                    return  UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
+                }
+            }else{
+           return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+        }
+       
+    }
+    
+    @objc public var nmcSeparator: UIColor{
+            if #available(iOS 13.0, *) {
+                if UITraitCollection.current.userInterfaceStyle == .dark {
+                    return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
+                }else {
+                    return  UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
+                }
+            }else{
+           return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+        }
+       
+    }
+    
+    @objc public var nmcCommonViewInfoText: UIColor{
+            if #available(iOS 13.0, *) {
+                if UITraitCollection.current.userInterfaceStyle == .dark {
+                    return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
+                }else {
+                    return  UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
+                }
+            }else{
+           return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+        }
+       
+    }
+    
     override init() {
         self.brand = self.customer
 //        self.brandElement = self.customer
@@ -413,9 +455,9 @@ class NCBrandColor: NSObject {
 
         cacheImages.file = UIImage.init(named: "file")!
         
-        cacheImages.shared = UIImage(named: "share")!.image(color: iconColor, size: 50)
-        cacheImages.canShare = UIImage(named: "share")!.image(color: iconColor, size: 50)
-        cacheImages.shareByLink = UIImage(named: "sharebylink")!.image(color: iconColor, size: 50)
+        cacheImages.shared = UIImage(named: "share")!.image(color: nmcGray1, size: 50)
+        cacheImages.canShare = UIImage(named: "share")!.image(color: nmcGray1, size: 50)
+        cacheImages.shareByLink = UIImage(named: "sharebylink")!.image(color: nmcGray1, size: 50)
         
         cacheImages.favorite = NCUtility.shared.loadImage(named: "star.fill", color: yellowFavorite)
         cacheImages.comment = UIImage(named: "comment")!.image(color: gray, size: 50)
