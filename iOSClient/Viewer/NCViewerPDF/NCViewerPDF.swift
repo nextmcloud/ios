@@ -59,6 +59,7 @@ class NCViewerPDF: UIViewController, NCViewerPDFSearchDelegate {
         pdfView.displayDirection = .horizontal
         pdfView.autoresizingMask = [.flexibleWidth, .flexibleHeight, .flexibleTopMargin, .flexibleBottomMargin]
         pdfView.usePageViewController(true, withViewOptions: nil)
+        pdfView.tintColor = .red
         
         view.addSubview(pdfView)
         
@@ -106,7 +107,7 @@ class NCViewerPDF: UIViewController, NCViewerPDFSearchDelegate {
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTap(_:)))
         tapGesture.numberOfTapsRequired = 1
-        pdfView.addGestureRecognizer(tapGesture)
+//        pdfView.addGestureRecognizer(tapGesture)
         
         // recognize single / double tap
         for gesture in pdfView.gestureRecognizers! {

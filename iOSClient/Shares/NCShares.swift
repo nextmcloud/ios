@@ -34,7 +34,7 @@ class NCShares: NCCollectionViewCommon  {
         titleCurrentFolder = NSLocalizedString("_list_shares_", comment: "")
         layoutKey = NCGlobal.shared.layoutViewShares 
         enableSearchBar = false
-        emptyImage = UIImage.init(named: "share")?.image(color: .gray, size: UIScreen.main.bounds.width)
+        emptyImage = UIImage.init(named: "share")?.image(color: NCBrandColor.shared.nmcGray1, size: UIScreen.main.bounds.width)
         emptyTitle = "_list_shares_no_files_"
         emptyDescription = "_tutorial_list_shares_view_"
     }

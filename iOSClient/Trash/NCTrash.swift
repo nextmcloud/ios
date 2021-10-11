@@ -126,7 +126,7 @@ class NCTrash: UIViewController, UIGestureRecognizerDelegate, NCTrashListCellDel
     
     func emptyDataSetView(_ view: NCEmptyView) {
         
-        view.emptyImage.image = UIImage.init(named: "trash")?.image(color: .gray, size: UIScreen.main.bounds.width)
+        view.emptyImage.image = UIImage.init(named: "trash")?.image(color: NCBrandColor.shared.nmcGray1, size: UIScreen.main.bounds.width)
         view.emptyTitle.text = NSLocalizedString("_trash_no_trash_", comment: "")
         view.emptyDescription.text = NSLocalizedString("_trash_no_trash_description_", comment: "")
     }
