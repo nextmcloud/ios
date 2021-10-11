@@ -158,6 +158,13 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         NotificationCenter.default.addObserver(self, selector: #selector(statusFileDropClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusFileDrop), object: nil)
         
         changeTheming()
+        let isCurrentUser = NCShareCommon.shared.isCurrentUserIsFileOwner(fileOwnerId: metadata?.ownerId ?? "")
+        let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
+        if isCurrentUser || canReshare {
+            containerView.isHidden = false
+        } else {
+            containerView.isHidden = true
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -623,8 +630,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         let directory = self.metadata?.directory
         if (self.metadata?.typeFile == "document" || directory == true) {
             let index = sender.tag
-            let shares = NCManageDatabase.shared.getTableShares(metadata: self.metadata!)
-            self.quickStatusTableShare = shares.share![index]
+            self.quickStatusTableShare = tableShare
             
     //        self.quickStatusTableShare = quickShare
     //        self.quickStatusTableShare = tableShare
@@ -645,9 +651,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         if (self.metadata?.typeFile == "document" || directory == true || ext == "jpg" || ext == "png") {
             let index = sender.tag
-            let shares = NCManageDatabase.shared.getTableShares(metadata: self.metadata!)
-            self.quickStatusTableShare = shares.share![index]
-            
+            self.quickStatusTableShare = tableShare
+            //sdsd
     //        self.quickStatusTableShare = quickShare
     //        self.quickStatusTableShare = tableShare
     //        if metadata?.typeFile == "document" {
@@ -1022,7 +1027,7 @@ class NCShareLinkCell: UITableViewCell {
     var indexSelected: Int?
     
     var tableShare: tableShare?
-    var delegate: NCShareLinkCellDelegate?
+    weak var delegate: NCShareLinkCellDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -1048,7 +1053,7 @@ class NCShareLinkCell: UITableViewCell {
     }
 }
 
-protocol NCShareLinkCellDelegate {
+protocol NCShareLinkCellDelegate: class {
     func tapCopy(with tableShare: tableShare?, sender: Any)
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int)
     func quickStatusLink(with tableShare: tableShare?, sender: UIButton)
@@ -1072,7 +1077,7 @@ class NCShareUserCell: UITableViewCell {
     var indexSelected: Int?
     
     var tableShare: tableShare?
-    var delegate: NCShareUserCellDelegate?
+    weak var delegate: NCShareUserCellDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -1102,7 +1107,7 @@ class NCShareUserCell: UITableViewCell {
     }
 }
 
-protocol NCShareUserCellDelegate {
+protocol NCShareUserCellDelegate: class {
     func switchCanEdit(with tableShare: tableShare?, switch: Bool, sender: UISwitch)
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int)
     func quickStatus(with tableShare: tableShare?, sender: UIButton)

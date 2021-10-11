@@ -307,4 +307,15 @@ class NCShareCommon: NSObject {
     func isFileDropOptionVisible(isDirectory: Bool, shareType: Int) -> Bool {
         return (isDirectory && (isLinkShare(shareType: shareType) || isExternalUserShare(shareType: shareType)))
     }
+    
+    func isCurrentUserIsFileOwner(fileOwnerId: String) -> Bool {
+        if let currentUser = NCManageDatabase.shared.getActiveAccount(), currentUser.userId == fileOwnerId {
+            return true
+        }
+        return false
+    }
+    
+    func canReshare(withPermission permission: String) -> Bool {
+        return permission.contains(NCGlobal.shared.permissionCanShare)
+    }
 }

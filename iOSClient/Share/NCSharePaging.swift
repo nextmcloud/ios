@@ -321,6 +321,7 @@ class NCSharePagingView: PagingView {
         headerView.labelSharingInfo.textColor = NCBrandColor.shared.label
         headerView.info.textColor = NCBrandColor.shared.systemGray2
         headerView.ocId = metadata!.ocId
+        headerView.updateCanReshareUI()
         
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
 //            headerView.imageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
@@ -493,7 +494,10 @@ class NCShareHeaderView: UIView {
     @IBOutlet weak var labelSharing: UILabel!
     @IBOutlet weak var labelSharingInfo: UILabel!
     @IBOutlet weak var fullWidthImageView: UIImageView!
-    
+    @IBOutlet weak var canShareInfoView: UIView!
+    @IBOutlet weak var sharedByLabel: UILabel!
+    @IBOutlet weak var resharingAllowedLabel: UILabel!
+    @IBOutlet weak var sharedByImageView: UIImageView!
     
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var ocId = ""
@@ -506,6 +510,21 @@ class NCShareHeaderView: UIView {
     func setupUI() {
         labelSharing.text = NSLocalizedString("_sharing_", comment: "")
         labelSharingInfo.text = NSLocalizedString("_sharing_message_", comment: "")
+    }
+    
+    func updateCanReshareUI() {
+        let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+        let isCurrentUser = NCShareCommon.shared.isCurrentUserIsFileOwner(fileOwnerId: metadata?.ownerId ?? "")
+        let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
+        canShareInfoView.isHidden = isCurrentUser
+        labelSharingInfo.isHidden = !isCurrentUser
+        
+        if !isCurrentUser {
+            sharedByImageView.image = UIImage(named: "cloudUpload")?.image(color: .systemBlue, size: 26)
+            let ownerName = metadata?.ownerDisplayName ?? ""
+            sharedByLabel.text = NSLocalizedString("_shared_with_you_by_", comment: "") + " " + ownerName
+            resharingAllowedLabel.text = canReshare ? NSLocalizedString("_share_reshare_allowed_", comment: "") : NSLocalizedString("_share_reshare_not_allowed_", comment: "")
+        }
     }
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
