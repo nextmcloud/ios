@@ -67,7 +67,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var quickStatusTableShare: tableShare!
     private var sendEmailSelected: Int!
     private var shareeEmail: String!
-    private var isCreateLink = false
     
     // MARK: - View Life Cycle
 
@@ -428,21 +427,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     func shareCompleted() {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
-        self.reloadData()
-        if self.isCreateLink == true {
-            self.isCreateLink = false
-        }
     }
     
     func unShareCompleted() {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
-        if tableShareSelected?.shareType == 3 {
-            guard let metadata = self.metadata else { return }
-            let isFilesSharingPublicPasswordEnforced = NCManageDatabase.shared.getCapabilitiesServerBool(account: metadata.account, elements: NCElementsJSON.shared.capabilitiesFileSharingPubPasswdEnforced, exists: false)
-            var shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
-            shares.firstShareLink = nil
-        }
-        self.reloadData()
     }
     
     func updateShareWithError(idShare: Int) {
@@ -550,16 +538,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     @IBAction func createLinkClicked(_ sender: Any) {
         self.touchUpInsideButtonMenu(sender)
-        self.isCreateLink = true
-//        guard let metadata = self.metadata else { return }
-//        let isFilesSharingPublicPasswordEnforced = NCManageDatabase.shared.getCapabilitiesServerBool(account: metadata.account, elements: NCElementsJSON.shared.capabilitiesFileSharingPubPasswdEnforced, exists: false)
-//        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
-//
-//        if shares.firstShareLink == nil {
-//            networking?.createShareLink(password: "")
-//        } else {
-////            tapMenu(with: shares.firstShareLink!, sender: sender, index: 0)
-//        }
     }
     
     
@@ -713,17 +691,17 @@ extension NCShare: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         var numOfRows = 0
-        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        if let shareLink = shares.firstShareLink {
+            shares.share?.insert(shareLink, at: 0)
+        }
+        
         self.tableView.setEmptyMessage(NSLocalizedString("", comment: ""))
-        print(shares.share!.count)
         if shares.share != nil {
             numOfRows = shares.share!.count
         }
         if numOfRows == 0 {
             self.tableView.setEmptyMessage(NSLocalizedString("_your_shares_", comment: ""))
-
-//            labelYourShare.text = NSLocalizedString("no_shares_created", comment: "")
-//            labelYourShare.textAlignment = .center
         } else {
             self.tableView.restore()
         }
@@ -737,9 +715,13 @@ extension NCShare: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        if let shareLink = shares.firstShareLink {
+            shares.share?.insert(shareLink, at: 0)
+        }
         let tableShare = shares.share![indexPath.row]
         let directory = self.metadata?.directory ?? false
+        
         // LINK
         if tableShare.shareType == 3 {
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell {
@@ -1098,11 +1080,6 @@ class NCShareUserCell: UITableViewCell {
     }
     
     @IBAction func quickStatusClicked(_ sender: UIButton) {
-//        let index = sender.tag
-//        let share = NCShare()
-//
-//        let shares = NCManageDatabase.shared.getTableShares(metadata: share.metadata ?? <#default value#>)
-//        let tableShare = shares.share![index]
         delegate?.quickStatus(with: tableShare, sender: sender)
     }
 }
