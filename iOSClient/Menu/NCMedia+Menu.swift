@@ -223,7 +223,7 @@ extension NCMedia {
             //
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_copy_file_", comment: ""),
+                    title: NSLocalizedString("_copy_to_clipboard_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "copy",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         self.isEditMode = false
