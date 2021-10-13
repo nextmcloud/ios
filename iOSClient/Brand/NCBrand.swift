@@ -442,6 +442,10 @@ class NCBrandColor: NSObject {
        
     }
     
+    @objc public var notificationAction: UIColor {
+        return UIColor(red: 0/255.0, green: 153/255.0, blue: 255/255.0, alpha: 1.0)
+    }
+    
     override init() {
         self.brand = self.customer
 //        self.brandElement = self.customer

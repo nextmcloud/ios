@@ -176,19 +176,19 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         cell.primary.isHidden = true
         cell.primary.titleLabel?.font = .systemFont(ofSize: 14)
         cell.primary.setTitleColor(.white, for: .normal)
-        cell.primary.layer.cornerRadius = 15
+        cell.primary.layer.cornerRadius = 10
         cell.primary.layer.masksToBounds = true
-        cell.primary.layer.backgroundColor = NCBrandColor.shared.brandElement.cgColor
+        cell.primary.layer.backgroundColor = NCBrandColor.shared.notificationAction.cgColor
         
         cell.secondary.isEnabled = false
         cell.secondary.isHidden = true
         cell.secondary.titleLabel?.font = .systemFont(ofSize: 14)
-        cell.secondary.setTitleColor(.gray, for: .normal)
-        cell.secondary.layer.cornerRadius = 15
+        cell.secondary.setTitleColor(NCBrandColor.shared.notificationAction, for: .normal)
+        cell.secondary.layer.cornerRadius = 10
         cell.secondary.layer.masksToBounds = true
-        cell.secondary.layer.backgroundColor = NCBrandColor.shared.systemGray5.cgColor
-        cell.secondary.layer.borderWidth = 0.3
-        cell.secondary.layer.borderColor = UIColor.gray.cgColor
+        cell.secondary.layer.backgroundColor = UIColor.clear.cgColor
+        cell.secondary.layer.borderWidth = 1
+        cell.secondary.layer.borderColor = NCBrandColor.shared.notificationAction.cgColor
         
         cell.messageBottomMargin.constant = 10
         
@@ -223,8 +223,8 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
                     }
                 }
                 
-                let widthPrimary = cell.primary.intrinsicContentSize.width + 30;
-                let widthSecondary = cell.secondary.intrinsicContentSize.width + 30;
+                let widthPrimary = cell.primary.intrinsicContentSize.width + 48;
+                let widthSecondary = cell.secondary.intrinsicContentSize.width + 48;
                 
                 if widthPrimary > widthSecondary {
                     cell.primaryWidth.constant = widthPrimary
