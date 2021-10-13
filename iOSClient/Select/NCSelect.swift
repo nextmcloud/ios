@@ -120,7 +120,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationController?.presentationController?.delegate = self
-        self.navigationController!.navigationBar.tintColor = NCBrandColor.shared.customer
+        self.navigationController!.navigationBar.tintColor = NCBrandColor.shared.label
         
         view.backgroundColor = NCBrandColor.shared.systemBackground
 
@@ -870,6 +870,7 @@ class NCSelectCommandView: UIView {
         separatorView.backgroundColor = NCBrandColor.shared.separator
         
         overwriteLabel?.text = NSLocalizedString("_overwrite_", comment: "")
+        overwriteSwitch?.onTintColor = NCBrandColor.shared.customer
         
         selectButton?.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         selectButton?.setTitleColor(.white, for: .normal)
@@ -886,13 +887,19 @@ class NCSelectCommandView: UIView {
         createFolderButton?.layer.borderColor = NCBrandColor.shared.label.cgColor
         createFolderButton?.setImage(UIImage(named: "addFolder")?.imageColor(NCBrandColor.shared.label), for: .normal)
         
-        copyButton?.layer.cornerRadius = 15
+        copyButton?.layer.cornerRadius = 10
         copyButton?.layer.masksToBounds = true
         copyButton?.setTitle(NSLocalizedString("_copy_", comment: ""), for: .normal)
+        copyButton?.backgroundColor = .clear
+        copyButton?.setTitleColor(NCBrandColor.shared.label, for: .normal)
+        copyButton?.layer.borderWidth = 1
+        copyButton?.layer.borderColor = NCBrandColor.shared.label.cgColor
         
-        moveButton?.layer.cornerRadius = 15
+        moveButton?.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
+        moveButton?.layer.cornerRadius = 10
         moveButton?.layer.masksToBounds = true
         moveButton?.setTitle(NSLocalizedString("_move_", comment: ""), for: .normal)
+        moveButton?.setTitleColor(.white, for: .normal)
     }
     
     @IBAction func createFolderButtonPressed(_ sender: UIButton) {

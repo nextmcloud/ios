@@ -1374,9 +1374,9 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             self.header = header
             
             if collectionView.collectionViewLayout == gridLayout {
-                header.buttonSwitch.setImage(UIImage.init(named: "switchList")!.image(color: NCBrandColor.shared.gray, size: 50), for: .normal)
+                header.buttonSwitch.setImage(UIImage.init(named: "switchList")!.image(color: NCBrandColor.shared.nmcGray0, size: 50), for: .normal)
             } else {
-                header.buttonSwitch.setImage(UIImage.init(named: "switchGrid")!.image(color: NCBrandColor.shared.gray, size: 50), for: .normal)
+                header.buttonSwitch.setImage(UIImage.init(named: "switchGrid")!.image(color: NCBrandColor.shared.nmcGray0, size: 50), for: .normal)
             }
             
             header.delegate = self
