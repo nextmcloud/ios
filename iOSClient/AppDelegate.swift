@@ -224,7 +224,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     // L' applicazione entrerà in primo piano (attivo sempre)
     func applicationDidBecomeActive(_ application: UIApplication) {
-        
+
+        hidePrivacyProtectionWindow()
         NCSettingsBundleHelper.setVersionAndBuildNumber()
         
         if account == "" { return }
@@ -270,11 +271,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterApplicationWillEnterForeground)
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSourceNetworkForced)
+        
     }
 
     // L' applicazione si dimetterà dallo stato di attivo
     func applicationWillResignActive(_ application: UIApplication) {
         
+        showPrivacyProtectionWindow()
         if account == "" { return }
         
         // Dismiss FileViewInFolder
@@ -292,11 +295,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         if let directory = CCUtility.getDirectoryProviderStorage() {
             NCUtilityFileSystem.shared.cleanUp(directory: directory, days: TimeInterval(days))
         }
+
     }
     
     // L' applicazione è entrata nello sfondo
     func applicationDidEnterBackground(_ application: UIApplication) {
-        
+      
         if account == "" { return }
         
         // STOP TIMER UPLOAD PROCESS
@@ -321,6 +325,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         NCCommunicationCommon.shared.writeLog("bye bye")
     }
+    
+    // MARK: Privacy Protection
+       
+    private var privacyProtectionWindow: UIWindow?
+
+    private func showPrivacyProtectionWindow() {
+           privacyProtectionWindow = UIWindow(frame: UIScreen.main.bounds)
+           //privacyProtectionWindow?.rootViewController = PrivacyProtectionViewController()
+          
+        
+        let imageView = UIImageView(frame: privacyProtectionWindow!.bounds)
+        imageView.tag = 101
+        imageView.backgroundColor = NCBrandColor.shared.brand
+        imageView.contentMode = .center
+        imageView.image = UIImage(named: "logo")
+        privacyProtectionWindow?.addSubview(imageView)
+        
+        privacyProtectionWindow?.windowLevel = .alert + 1
+        privacyProtectionWindow?.makeKeyAndVisible()
+        //UIApplication.shared.keyWindow?.subviews.last?.addSubview(imageView)
+    }
+
+    private func hidePrivacyProtectionWindow() {
+           privacyProtectionWindow?.isHidden = true
+           privacyProtectionWindow = nil
+    }
+    
     
     // MARK: -
 
