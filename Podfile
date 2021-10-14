@@ -9,5 +9,5 @@ target 'Nextcloud' do
   pod 'AppAuth'
   pod 'tealium-swift'
   pod "tealium-swift/Core"
-
+  pod 'ChromaColorPicker'
 end

@@ -7,7 +7,7 @@
 //
 
 #import "AdjustHelper.h"
-#import <AdjustSdk/AdjustSdk.h>
+//#import <AdjustSdk/AdjustSdk.h>
 
 @implementation AdjustHelper
 

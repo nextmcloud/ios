@@ -68,10 +68,7 @@
 		7AE63BA526DDFAAD00CEAAD5 /* NSMutableAttributedString+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63B9B26DD104000CEAAD5 /* NSMutableAttributedString+Extensions.swift */; };
 		7AE63BAB26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
 		7AE63BB026DDFBD200CEAAD5 /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
-		7AE63BB826DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BB626DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift */; };
 		7AE63BBE26DDFC8500CEAAD5 /* NCBackgroundImageColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BB626DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift */; };
-		7AE63BF326DE0E1200CEAAD5 /* ChromaColorPicker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7AE63BE426DE09AB00CEAAD5 /* ChromaColorPicker.framework */; settings = {ATTRIBUTES = (Required, ); }; };
-		7AE63BF426DE0E1200CEAAD5 /* ChromaColorPicker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7AE63BE426DE09AB00CEAAD5 /* ChromaColorPicker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7AE63BFC26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BF926DE5FCD00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib */; };
 		7AE63BFD26DE5FCE00CEAAD5 /* NCSelectCommandViewCopyMove.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BFA26DE5FCD00CEAAD5 /* NCSelectCommandViewCopyMove.xib */; };
 		7AE63BFE26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BFB26DE5FCD00CEAAD5 /* NCSelectCommandViewSelect.xib */; };
@@ -442,6 +439,13 @@
 			remoteGlobalIDString = 2C33C47E23E2C475005F963B;
 			remoteInfo = "Notification Service Extension";
 		};
+		B19939FD2716CE3A00F8AF30 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F7F67BA01A24D27800EE80DA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F77B0DEB1D118A16002130FE;
+			remoteInfo = Nextcloud;
+		};
 		F7145A311D12E65F00CAFEEC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F7F67BA01A24D27800EE80DA /* Project object */;
@@ -470,17 +474,6 @@
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 1;
-		};
-		7AE63BF526DE0E1300CEAAD5 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				7AE63BF426DE0E1200CEAAD5 /* ChromaColorPicker.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F77B0F981D118A16002130FE /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -609,6 +602,8 @@
 		B176BA9826F8B83A009A0F33 /* NCShareTextInputCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareTextInputCell.swift; sourceTree = "<group>"; };
 		B176BAB526F8F7A0009A0F33 /* NCShareTextInputCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareTextInputCell.xib; sourceTree = "<group>"; };
 		B176BAD526FD9FF8009A0F33 /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
+		B1D656932705A5420082281D /* ChromaColorPicker.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ChromaColorPicker.xcframework; path = Carthage/Build/iOS/ChromaColorPicker.xcframework; sourceTree = "<group>"; };
+		B1D6569C2705A5AE0082281D /* ChromaColorPicker.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ChromaColorPicker.framework; path = "Carthage/Build/iOS/ChromaColorPicker.xcframework/ios-arm64/ChromaColorPicker.framework"; sourceTree = "<group>"; };
 		C00B205626908550003E18AD /* NCShareSendEmail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareSendEmail.swift; sourceTree = "<group>"; };
 		C00B205C26908B9B003E18AD /* NCShareFolderOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareFolderOptions.swift; sourceTree = "<group>"; };
 		C00B206C2691B8A0003E18AD /* NCShareFileOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareFileOptions.swift; sourceTree = "<group>"; };
@@ -966,6 +961,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B19939F52716CE3A00F8AF30 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F7145A141D12E3B700CAFEEC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1002,7 +1004,6 @@
 				F7C40BF32199978B0004137E /* MBProgressHUD.framework in Frameworks */,
 				F76FDEAB24859C3D0095B6C2 /* Queuer.framework in Frameworks */,
 				F79918A221997FA300C2E308 /* UICKeyChainStore.framework in Frameworks */,
-				7AE63BF326DE0E1200CEAAD5 /* ChromaColorPicker.framework in Frameworks */,
 				F7176DC8256672650017E83C /* Protobuf.framework in Frameworks */,
 				F733B65221997CC2001C1FFA /* TLPhotoPicker.framework in Frameworks */,
 				F7176DC2256672650017E83C /* PromisesObjC.framework in Frameworks */,
@@ -1900,6 +1901,8 @@
 		F7FC7D541DC1F93700BB2C6A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B1D6569C2705A5AE0082281D /* ChromaColorPicker.framework */,
+				B1D656932705A5420082281D /* ChromaColorPicker.xcframework */,
 				7A82A1C626F35E0A00D52790 /* SwiftEntryKit.xcframework */,
 				7A82A1B226F35C8400D52790 /* MarkdownKit.xcframework */,
 				7A82A1A926F35C5000D52790 /* OpenSSL.xcframework */,
@@ -2087,9 +2090,8 @@
 				F77B0EDC1D118A16002130FE /* Frameworks */,
 				F77B0EE91D118A16002130FE /* Resources */,
 				F77B0F981D118A16002130FE /* Embed App Extensions */,
-				F75A40001EBCB82B00B213E8 /* ShellScript */,
+				F75A40001EBCB82B00B213E8 /* Run Script */,
 				29C8CA4BB2EACD8DFED0164E /* [CP] Embed Pods Frameworks */,
-				7AE63BF526DE0E1300CEAAD5 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2224,6 +2226,13 @@
 
 /* Begin PBXResourcesBuildPhase section */
 		2C33C47D23E2C475005F963B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B19939F62716CE3A00F8AF30 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2375,6 +2384,7 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Nextcloud/Pods-Nextcloud-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
+				"${BUILT_PRODUCTS_DIR}/ChromaColorPicker/ChromaColorPicker.framework",
 				"${PODS_ROOT}/MORichNotification/Frameworks/MORichNotification.framework",
 				"${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MoEngage.framework",
 				"${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MoEngageCore.framework",
@@ -2385,6 +2395,7 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ChromaColorPicker.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MORichNotification.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MoEngage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MoEngageCore.framework",
@@ -2419,7 +2430,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		F75A40001EBCB82B00B213E8 /* ShellScript */ = {
+		F75A40001EBCB82B00B213E8 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 12;
 			files = (
@@ -2444,6 +2455,7 @@
 				"$(SRCROOT)/Carthage/Build/iOS/TOPasscodeViewController.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/Queuer.framework",
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2493,7 +2505,6 @@
 				F74AF3A5247FB6AE00AC767B /* NCUtilityFileSystem.swift in Sources */,
 				F7F878AF1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */,
 				7AE63BAB26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift in Sources */,
-				7AE63BB826DDFC7C00CEAAD5 /* NCBackgroundImageColor.swift in Sources */,
 				95BB2056265FE2AE00AF4344 /* NCGlobal.swift in Sources */,
 				7AE63B5A26DCFC8E00CEAAD5 /* NCListCell.swift in Sources */,
 				7AE63B9C26DD104000CEAAD5 /* NSMutableAttributedString+Extensions.swift in Sources */,
@@ -2739,6 +2750,11 @@
 			target = 2C33C47E23E2C475005F963B /* Notification Service Extension */;
 			targetProxy = 2C33C48423E2C475005F963B /* PBXContainerItemProxy */;
 		};
+		B19939FE2716CE3A00F8AF30 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F77B0DEB1D118A16002130FE /* Nextcloud */;
+			targetProxy = B19939FD2716CE3A00F8AF30 /* PBXContainerItemProxy */;
+		};
 		F7145A321D12E65F00CAFEEC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F71459B41D12E3B700CAFEEC /* Share */;
@@ -2877,8 +2893,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/Notification_Service_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -2908,7 +2924,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud Notification Service";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
@@ -3007,7 +3023,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/Share/Share-Bridging-Header.h";
@@ -3064,7 +3080,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/A118830248/Documents/iOSProjects/NMCIOS/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3085,8 +3101,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -3115,7 +3131,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/File Provider Extension/FileProviderExtension-Bridging-Header.h";
@@ -3145,6 +3161,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Carthage/Build/iOS/ChromaColorPicker.xcframework/ios-arm64",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
@@ -3162,7 +3179,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 6.5.9;
+				MARKETING_VERSION = 6.5.14;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -3194,8 +3211,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/iOSClient.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
@@ -3205,6 +3222,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Carthage/Build/iOS/ChromaColorPicker.xcframework/ios-arm64",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
@@ -3221,7 +3239,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 6.5.9;
+				MARKETING_VERSION = 6.5.14;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -3230,7 +3248,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "/Users/t-systems/Documents/Project/MagentaCloud/ios/iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
