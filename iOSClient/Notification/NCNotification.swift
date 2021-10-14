@@ -190,7 +190,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         cell.secondary.layer.borderWidth = 1
         cell.secondary.layer.borderColor = NCBrandColor.shared.notificationAction.cgColor
         
-        cell.messageBottomMargin.constant = 10
+//        cell.messageBottomMargin.constant = 10
         
         // Action
         if let actions = notification.actions {
@@ -234,7 +234,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
                     cell.secondaryWidth.constant = widthSecondary
                 }
                 
-                cell.messageBottomMargin.constant = 40
+//                cell.messageBottomMargin.constant = 40
             }
         }
         
