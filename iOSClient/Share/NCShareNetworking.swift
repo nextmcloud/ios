@@ -28,7 +28,7 @@ class NCShareNetworking: NSObject {
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     var urlBase: String
-    var delegate: NCShareNetworkingDelegate?
+    weak var delegate: NCShareNetworkingDelegate?
     var view: UIView
     var metadata: tableMetadata
     
@@ -130,7 +130,7 @@ class NCShareNetworking: NSObject {
     }
 }
 
-protocol NCShareNetworkingDelegate {
+protocol NCShareNetworkingDelegate: class {
     func readShareCompleted()
     func shareCompleted()
     func unShareCompleted()

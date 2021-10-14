@@ -20,8 +20,6 @@ class FolderPathCustomCell: XLFormButtonCell{
     
     override func configure() {
         super.configure()
-        
-        
     }
     
     override func update() {
@@ -32,5 +30,4 @@ class FolderPathCustomCell: XLFormButtonCell{
             bottomLineView.isHidden = false
         }
     }
-   
 }

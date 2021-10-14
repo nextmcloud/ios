@@ -74,7 +74,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
+        UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
+        UIToolbar.appearance().tintColor = NCBrandColor.shared.customer
+
         let userAgent = CCUtility.getUserAgent() as String
         let isSimulatorOrTestFlight = NCUtility.shared.isSimulatorOrTestFlight()
         let versionNextcloudiOS = String(format: NCBrandOptions.shared.textCopyrightNextcloudiOS, NCUtility.shared.getVersionApp())
@@ -216,7 +218,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
         
         adjust.configAdjust()
-
+        adjust.subsessionStart()
+        
         return true
     }
     

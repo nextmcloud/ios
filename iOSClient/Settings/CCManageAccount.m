@@ -82,7 +82,7 @@
     [form addFormSection:section];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"alias" rowType:XLFormRowDescriptorTypeAccount];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.backgroundView;
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     [row.cellConfig setObject:[[UIImage imageNamed:@"form-textbox"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textField.font"];
     [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textField.textColor"];

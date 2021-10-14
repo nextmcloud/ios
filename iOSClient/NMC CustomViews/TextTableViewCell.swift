@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TextTableViewCell: XLFormBaseCell,UITextFieldDelegate {
+class TextTableViewCell: XLFormBaseCell, UITextFieldDelegate {
 
     @IBOutlet weak var fileNameTextField: UITextField!
     @IBOutlet weak var topLineView: UIView!

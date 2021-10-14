@@ -1443,8 +1443,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.indexPath = indexPath
             cell.labelTitle.text = metadata.fileNameView
             cell.labelTitle.textColor = NCBrandColor.shared.label
-            cell.labelInfo.text = ""
-            cell.labelInfo.textColor = NCBrandColor.shared.systemGray
+            cell.separator.backgroundColor = NCBrandColor.shared.separator
             
             cell.imageSelect.image = nil
             cell.imageStatus.image = nil
@@ -1457,6 +1456,10 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.imageItem.backgroundColor = nil
             
             cell.progressView.progress = 0.0
+            if UIDevice.current.orientation.isPortrait && UIDevice.current.model.hasPrefix("iPhone") {
+                cell.separator.backgroundColor = .clear
+            }
+
             
             if metadata.directory {
                 
@@ -1523,7 +1526,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             if (isShare) {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else if (tableShare != nil && tableShare?.shareType == 3) {
-                cell.imageShared.image = NCBrandColor.cacheImages.shareByLink
+                cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else if (tableShare != nil && tableShare?.shareType != 3) {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else {
@@ -1536,15 +1539,17 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 cell.imageShared.image = UIImage(named: "avatar")
                 let fileNameUser = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + metadata.ownerId + ".png"
                 if FileManager.default.fileExists(atPath: fileNameUser) {
-                    if let image = UIImage(contentsOfFile: fileNameUser) {
-                        cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
-                    }
+//                    if let image = UIImage(contentsOfFile: fileNameUser) {
+//                        cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
+//                    }
+                    cell.imageShared.image = NCBrandColor.cacheImages.shared
                 } else {
                     NCCommunication.shared.downloadAvatar(userId: metadata.ownerId, fileNameLocalPath: fileNameUser, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account {
-                            if let image = UIImage(contentsOfFile: fileNameUser) {
-                                cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
-                            }
+//                            if let image = UIImage(contentsOfFile: fileNameUser) {
+//                                cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
+//                            }
+                            cell.imageShared.image = NCBrandColor.cacheImages.shared
                         }
                     }
                 }
@@ -1565,7 +1570,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 cell.progressView.progress = progress
                 cell.setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCBrandColor.cacheImages.buttonMore)
             }
-            
             // Write status on Label Info
             switch metadata.status {
             case NCGlobal.shared.metadataStatusWaitDownload:
@@ -1631,6 +1635,10 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             // Disable Share Button
             if appDelegate.disableSharesView {
                 cell.hideButtonShare(true)
+            }
+            let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
+            if shares.share!.count > 0 {
+                cell.imageShared.image = cell.imageShared.image?.imageColor(NCBrandColor.shared.customer)
             }
             
             return cell

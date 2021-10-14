@@ -201,6 +201,15 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         appDelegate.activeViewController = self
         
+        viewQuota.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
+        progressQuota.trackTintColor = .lightGray
+        progressQuota.layer.borderWidth = 2
+        progressQuota.layer.borderColor = UIColor(hex: "#CCCCCC")?.cgColor
+        quotaLabel1.textColor = NCBrandColor.shared.gray26AndGrayf2
+        quotalabel2.textColor = NCBrandColor.shared.gray26AndGrayf2
+        labelQuota.textColor = NCBrandColor.shared.gray26AndGrayf2
+        labelQuotaExternalSite.textColor = NCBrandColor.shared.gray26AndGrayf2
         loadItems()
  
     }
@@ -241,9 +250,10 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 //        let percentageUsed = "\((tabAccount.quotaUsed / tabAccount.quotaTotal) / (1024*1024))"
         let used = Double(tabAccount.quotaUsed)
         let allot = Double(tabAccount.quotaTotal)
-        let percentageUsed = String(format: "%.2f%%", (used * 100/allot) * 100)
+        let percentageUsed = (used/allot) * 100
+        let percentageUsedFormatted = "\(Int(percentageUsed))%"
 
-        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), (used * 100/allot) * 100)
+        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
         labelQuota.textColor = NCBrandColor.shared.label
         quotaLabel1.textColor = NCBrandColor.shared.label
         quotalabel2.textColor = NCBrandColor.shared.label

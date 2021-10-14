@@ -88,6 +88,8 @@
 "_audio_"                   = "Audio";
 "_unknown_"                 = "Unknown";
 "_next_"                    = "Next";
+"_send_share_"              = "Send share";
+"_send_new_email_"          = "Send new email";
 "_success_"                 = "Success";
 "_initialization_"          = "Initialization";
 "_experimental_"            = "Experimental";
@@ -258,7 +260,7 @@
 "_quota_space_unknown_"         = "Unknown";
 "_quota_using_"                 = "%@ ";//"Memory used up to %@ of %@";//You are using %@ of %@";
 "_quota_using_of_"              = "of %@";
-"_quota_using_percentage_"      = "Memory to %.2f %% occupied";
+"_quota_using_percentage_"      = "Memory to %@ occupied";
 
 // Settings
 
@@ -478,6 +480,10 @@
 "_update_in_progress_"          = "Version upgrade, please wait…";
 "_forbidden_characters_"        = "The file or folder name contains invalid characters";
 "_mail_not_can_send_mail_"      = "No account set up, or wrong email address entered";
+"_prompt_insert_password"       = "Please enter password";
+
+// File
+
 "_photo_camera_"                = "Photos";
 "_media_"                       = "Media";
 "_unzip_in_progress_"           = "Extraction in progress on local storage…";
@@ -516,7 +522,7 @@
 "_protect_passcode_"            = "Protect with password";
 "_share_"                       = "Share";
 "_reload_"                      = "Reload";
-"_open_in_"                     = "Open in…";
+"_open_in_"                     = "Open in …";
 "_open_"                        = "Open…";
 "_remove_local_file_"           = "Remove from cache";
 "_add_local_"                   = "Add to local storage";
@@ -609,7 +615,10 @@
 
 // Share
 
-"_share_link_"                  = "Share link";
+"_share_link_"                  = "Link label";//Share link";
+"_share_linklabel_"             = "Link '%@'";
+"_share_link_file_"             = "Link to file";//Share link to file";
+"_share_link_folder_"           = "Link to folder";//Share link to folder";
 "_share_link_button_"           = "Send link to…";
 "_Link_name_"                   = "Link name";
 "_password_"                    = "Password";
@@ -635,21 +644,25 @@
 "_enforce_password_protection_" = "Enforce password protection";
 "_password_obligatory_"         = "Enforce password protection enabled, password obligatory";
 "_shared_with_you_by_"          = "Shared with you by";
-"_shareLinksearch_placeholder_" = "Type a name and press Enter";
+"_share_reshare_allowed_"       = "Resharing is allowed";
+"_share_reshare_not_allowed_"   = "Resharing is not allowed";
+"_shareLinksearch_placeholder_" = "Contact name or email address";
 "_new_comment_"                 = "New comment…";
 "_edit_comment_"                = "Edit comment";
 "_delete_comment_"              = "Delete comment";
 "_share_allow_editing_"         = "Allow editing";
-"_share_read_only_"             = "View only";
+"_share_read_only_"             = "Read only";
+"_share_editing_"               = "Can edit";
 "_share_allow_upload_"          = "Allow upload and editing";
-"_share_file_drop_"             = "File drop (upload only)";
+"_share_file_drop_"             = "Filedrop only";
 "_share_hide_download_"         = "Hide download";
 "_share_password_protect_"      = "Password protect";
 "_share_expiration_date_"       = "Set expiration date";
-"_share_note_recipient_"        = "Note to recipient";
-
-"_share_delete_sharelink_"      = "Delete link";
+"_share_expiration_date_placeholder_"       = "Expiration date for this share";
+"_share_note_recipient_"        = "YOUR MESSAGE";
+"_share_delete_sharelink_"      = "Delete share link";
 "_share_add_sharelink_"         = "Add another link";
+"_create_link_"                 = "Create Link";
 "_share_can_reshare_"           = "Can reshare";
 "_share_can_create_"            = "Can create";
 "_share_can_change_"            = "Can change";
@@ -657,7 +670,15 @@
 "_share_unshare_"               = "Unshare";
 "_share_internal_link_"         = "Internal link";
 "_share_internal_link_des_"     = "Only works for users with access to this folder";
-
+"_permissions_"                 = "Permissions";
+"_advance_permissions_"         = "Advanced permissions";
+"_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCloud users, you have more opportunities for collaboration.";
+"_your_shares_"                 = "Your Shares";
+"no_shares_created"             = "No shares created yet.";
+"_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCloud users, you have more opportunities for collaboration.";
+"share_editing_message"         = "There are no editing functions for files unless you share them with MagentaCLOUD users.";
+"personal_share_by_mail"        = "Personal share by mail";
+"_file_drop_message_"           = "With File drop, only uploading is allowed. Only you can see files and folders that have been uploaded.";
 // Share Permission
 
 "_share_permission_title_"          = "Privileges";
@@ -687,6 +708,27 @@
 "_share_link_upload_"               = "File drop (upload only)";
 "_share_link_upload_modify_"        = "Allow upload and editing";
 "_share_link_hide_download_"        = "Hide download";
+"_PERMISSIONS_"                     = "PERMISSIONS";
+"_ADVANCE_PERMISSION_"              = "ADVANCE PERMISSION";
+"_PASSWORD_PROTECTION_"             = "PASSWORD PROTECTION";
+"_EXPIRATION_DATE_"                 = "EXPIRATION DATE";
+"_file_drop_message_"               = "With File drop, only uploading is allowed. Only you can see files and folders that have been uploaded.";
+"_apply_changes_"                   = "Apply changes";
+"_LINK_LABEL_"                      = "LINK LABEL";
+"_HIDE_DOWNLOAD_"                   = "HIDE DOWNLOAD";
+"_custom_link_label"                = "Your custom link label";
+"_please_enter_password"            = "Please enter the password or disable the function.";// for the PDF you want to create or disable the function.";
+"_please_enter_expiration"          = "Please enter the expiry date or disable the function.";
+"_PERMISSIONS_"                     = "PERMISSIONS";
+"_advance_permissions_"             = "Advanced permissions";
+"_PASSWORD_PROTECTION_"             = "PASSWORD PROTECTION";
+"_EXPIRATION_DATE_"                 = "EXPIRATION DATE";
+"_file_drop_message_"               = "With File drop, only uploading is allowed. Only you can see files and folders that have been uploaded.";
+"_apply_changes_"                   = "Apply changes";
+"_LINK_LABEL_"                      = "LINK LABEL";
+"_HIDE_DOWNLOAD_"                   = "HIDE DOWNLOAD";
+"_custom_link_label"                = "Your custom link label";
+
 
 // ShareInfoCMOC
 

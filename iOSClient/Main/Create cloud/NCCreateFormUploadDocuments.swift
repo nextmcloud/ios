@@ -226,7 +226,7 @@ import NCCommunication
         // name
         let name = cell.viewWithTag(200) as! UILabel
         name.text = template.name
-        name.textColor = NCBrandColor.shared.backgroundView
+        name.textColor = NCBrandColor.shared.secondarySystemGroupedBackground
         
         // select
         let imageSelect = cell.viewWithTag(300) as! UIImageView
@@ -235,7 +235,7 @@ import NCCommunication
             imageSelect.image = UIImage(named: "plus100")
             imageSelect.isHidden = false
         } else {
-            cell.backgroundColor = NCBrandColor.shared.backgroundView
+            cell.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
             imageSelect.isHidden = true
         }
         

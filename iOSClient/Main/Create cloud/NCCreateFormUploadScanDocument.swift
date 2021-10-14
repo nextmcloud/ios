@@ -93,7 +93,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         //        self.tableView.sectionHeaderHeight = 10
         //        self.tableView.sectionFooterHeight = 10
-        //        self.tableView.backgroundColor = NCBrandColor.shared.backgroundView
+        //        self.tableView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         
         
         //        let row : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!

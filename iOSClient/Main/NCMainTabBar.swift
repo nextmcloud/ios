@@ -59,6 +59,11 @@ class NCMainTabBar: UITabBar {
         changeTheming()
     }
     
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        super.traitCollectionDidChange(previousTraitCollection)
+//        NCBrandColor.shared.settingThemingColor(account: appDelegate.account)
+//    }
+    
     @objc func changeTheming() {
         tintColor = NCBrandColor.shared.brandElement
         if let centerButton = self.viewWithTag(99) {

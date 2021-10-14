@@ -613,52 +613,6 @@
     [UICKeyChainStore setString:sDisable forKey:@"disableLocalCacheAfterUpload" service:NCGlobal.shared.serviceShareKeyChain];
 }
 
-//<<<<<<< HEAD
-//+ (BOOL)getDarkMode
-//{
-//    NSString *sDisable = [UICKeyChainStore stringForKey:@"darkMode" service:NCGlobal.shared.serviceShareKeyChain];
-//    if(!sDisable){
-//        if (@available(iOS 13.0, *)) {
-//            if ([CCUtility getDarkModeDetect]) {
-//                if ([[UITraitCollection currentTraitCollection] userInterfaceStyle] == UIUserInterfaceStyleDark) {
-//                    sDisable = @"YES";
-//                    [CCUtility setDarkMode:YES];
-//                } else {
-//                    sDisable = @"NO";
-//                    [CCUtility setDarkMode:NO];
-//                }
-//            }
-//        }
-//    }
-//    return [sDisable boolValue];
-//}
-//
-//+ (void)setDarkMode:(BOOL)disable
-//{
-//    NSString *sDisable = (disable) ? @"true" : @"false";
-//    [UICKeyChainStore setString:sDisable forKey:@"darkMode" service:NCGlobal.shared.serviceShareKeyChain];
-//}
-//
-//+ (BOOL)getDarkModeDetect
-//{
-//    NSString *valueString = [UICKeyChainStore stringForKey:@"darkModeDetect" service:NCGlobal.shared.serviceShareKeyChain];
-//
-//    // Default TRUE
-//    if (valueString == nil) {
-//        [self setDarkModeDetect:YES];
-//        return true;
-//    }
-//
-//    return [valueString boolValue];
-//}
-//
-//+ (void)setDarkModeDetect:(BOOL)disable
-//{
-//    NSString *sDisable = (disable) ? @"true" : @"false";
-//    [UICKeyChainStore setString:sDisable forKey:@"darkModeDetect" service:NCGlobal.shared.serviceShareKeyChain];
-//}
-//
-//=======
 + (BOOL)getLivePhoto
 {
     NSString *valueString = [UICKeyChainStore stringForKey:@"livePhoto" service:NCGlobal.shared.serviceShareKeyChain];
@@ -1431,7 +1385,8 @@
             [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterUploadedFile object:nil userInfo:@{@"ocId": metadata.ocId, @"errorCode": @(NCGlobal.shared.errorInternalError), @"errorDescription": @"_err_file_not_found_"}];
         }
         
-        return completion(nil, nil);
+        completion(nil, nil);
+        return;
     }
     
     PHAsset *asset = result[0];

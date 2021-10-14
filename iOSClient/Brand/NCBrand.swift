@@ -51,7 +51,6 @@ import UIKit
     @objc public var textCopyrightNextcloudiOS:         String = "Nextcloud Coherence for iOS %@ © 2021"
     @objc public var textCopyrightNextcloudServer:      String = "Nextcloud Server %@"
     @objc public var loginBaseUrl:                      String = "https://dev1.next.magentacloud.de/"
-
     @objc public var pushNotificationServerProxy:       String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost:                     String = "https://nextcloud.com/install"
     @objc public var linkloginPreferredProviders:       String = "https://nextcloud.com/signup-ios";
@@ -71,7 +70,6 @@ import UIKit
 
 //    @objc public var capabilitiesGroups:                String = "group.in.t-systems.com"
     @objc public var capabilitiesGroups:                String = "group.com.t-systems.pu-ds.magentacloud.qa"
-
     
     // User Agent
     @objc public var userAgent:                         String = "Nextcloud-iOS"                                    // Don't touch me !!
@@ -122,7 +120,7 @@ import UIKit
 
 //MARK: - Color
 
-@objc class NCBrandColor: NSObject {
+class NCBrandColor: NSObject {
     @objc static let shared: NCBrandColor = {
         let instance = NCBrandColor()
         //instance.setDarkMode()
@@ -174,15 +172,15 @@ import UIKit
 
     @objc public var connectionNo:          UIColor = UIColor(red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
     @objc public var encrypted:             UIColor = .red
-    @objc public var backgroundView:        UIColor = .white
+//    @objc public var backgroundView:        UIColor = NCBrandColor.shared.secondarySystemGroupedBackground
     @objc public var backgroundForm:        UIColor = UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
-   // @objc public var textView:              UIColor = .black
-    //@objc public var separator:             UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
+    @objc public var textView:              UIColor = .black//label
+//    @objc public var separator:             UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
     @objc public var tabBar:                UIColor = .white
     @objc public let nextcloud:             UIColor = UIColor(red: 0.0/255.0, green: 130.0/255.0, blue: 201.0/255.0, alpha: 1.0)
     @objc public let nextcloudSoft:         UIColor = UIColor(red: 90.0/255.0, green: 160.0/255.0, blue: 210.0/255.0, alpha: 1.0)
     @objc public let gray:                  UIColor = UIColor(red: 104.0/255.0, green: 104.0/255.0, blue: 104.0/255.0, alpha: 1.0)
-   // @objc public var icon:                  UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+    @objc public var icon:                  UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)//iconColor
     @objc public let optionItem:            UIColor = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
     @objc public let graySoft:              UIColor = UIColor(red: 162.0/255.0, green: 162.0/255.0, blue: 162.0/255.0, alpha: 0.5)
     @objc public let yellowFavorite:        UIColor = UIColor(red: 248.0/255.0, green: 205.0/255.0, blue: 70.0/255.0, alpha: 1.0)
@@ -194,19 +192,36 @@ import UIKit
     @objc public var actionCellBackgroundColor:              UIColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
     @objc public var gray26AndGrayf2:              UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
     @objc public var searchImageColor:              UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
-    @objc public var memoryConsuptionBackground:        UIColor = UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
+    
+    @objc public var memoryConsuptionBackground: UIColor {
+            if #available(iOS 13.0, *) {
+                if UITraitCollection.current.userInterfaceStyle == .dark {
+                    return  UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
+                } else {
+                    return  UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
+                }
+            } else {
+           return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+        }
+    }
+    
     @objc public var systemGrayAndGray66:        UIColor = .gray
     @objc public var commonViewInfoText: UIColor =  UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
     @objc public var tileSelectionImageColor:        UIColor = .white
     //@objc public var backgroundCell:        UIColor = .white
     @objc public var seperatorRename:             UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
+
+    @objc public var fileFolderName:          UIColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+    @objc public var searchFieldPlaceHolder:          UIColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+    @objc public var singleTitleColorButton:          UIColor = UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
+    @objc public var quickStatusTextColor:          UIColor = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
+    @objc public var shareCellTitleColor:    UIColor = UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+    @objc public var shareByEmailTextColor:    UIColor = UIColor(displayP3Red: 13.0/255.0, green: 57.0/255.0, blue: 223.0/255.0, alpha: 1.0)
     //@objc public var dotMenuGray: UIColor = UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
     @objc public var sublineGray: UIColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
     @objc public let nmcYellowFavorite:        UIColor = UIColor(red: 254.0/255.0, green: 203.0/255.0, blue: 0/255.0, alpha: 1.0)
     @objc public let nmcGray30:        UIColor = UIColor(red: 254.0/255.0, green: 203.0/255.0, blue: 0/255.0, alpha: 1.0)
     @objc public let nmcGray70:        UIColor = UIColor(red: 254.0/255.0, green: 203.0/255.0, blue: 0/255.0, alpha: 1.0)
-
-
     
 //    private func createImagesThemingColor() {
 //
@@ -427,18 +442,16 @@ import UIKit
        
     }
     
+    @objc public var notificationAction: UIColor {
+        return UIColor(red: 0/255.0, green: 153/255.0, blue: 255/255.0, alpha: 1.0)
+    }
+    
     override init() {
         self.brand = self.customer
 //        self.brandElement = self.customer
         self.brandElement = self.customerDefault
         self.brandText = self.customerText
     }
-    
-//    override init() {
-//        self.brand = self.customer
-//        self.brandElement = self.customer
-//        self.brandText = self.customerText
-//    }
     
     public func createImagesThemingColor() {
         
@@ -493,8 +506,11 @@ import UIKit
 //            searchImageColor = icon
 //            memoryConsuptionBackground = backgroundCell
 //            systemGrayAndGray66 = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+//            fileFolderName = .white
 //            tileSelectionImageColor = .black
 //            seperatorRename = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
+//            quickStatusTextColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+//            shareCellTitleColor = UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
 //        } else {
 //            tabBar = .white
 //            backgroundView = .white
@@ -502,38 +518,25 @@ import UIKit
 //            backgroundForm = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
 //            textView = .black
 ////            separator = UIColor(red: 208.0/255.0, green: 209.0/255.0, blue: 212.0/255.0, alpha: 1.0)
-//            separator = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
+////            separator = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
 //            select = self.brandElement.withAlphaComponent(0.1)
 //            avatarBorder = .white
 //            // reassign default color
 //            icon = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
 //            actionCellBackgroundColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
 //            gray26AndGrayf2 = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+//            fileFolderName = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
 //            searchImageColor = icon
 //            memoryConsuptionBackground = backgroundCell
 //            systemGrayAndGray66 = .gray
 //            tileSelectionImageColor = .white
 //            seperatorRename = UIColor(red: 76.0/255.0, green: 76.0/255.0, blue: 76.0/255.0, alpha: 1.0)
+//            quickStatusTextColor = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
+//            shareCellTitleColor = UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
 //        }
 //    }
-//
-//#if !EXTENSION
-//func cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!.image(color: brandElement, size: folderWidth)
-//        cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: brandElement, size: folderWidth)
-//        cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
-//        cacheImages.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement, size: folderWidth)
-//        cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
-//        cacheImages.folder =  UIImage(named: "folder")!.image(color: brandElement, size: folderWidth)
-//
-//        cacheImages.checkedYes = NCUtility.shared.loadImage(named: "checkmark.circle.fill", color: .systemBlue)
-//        cacheImages.checkedNo = NCUtility.shared.loadImage(named: "circle", color: gray)
-//
-//        cacheImages.buttonMore = UIImage(named: "more")!.image(color: gray, size: 50)
-//        cacheImages.buttonStop = UIImage(named: "stop")!.image(color: gray, size: 50)
-//        cacheImages.buttonRestore = UIImage(named: "restore")!.image(color: gray, size: 50)
-//    }
     
-    #if !EXTENSION
+#if !EXTENSION
     public func settingThemingColor(account: String) {
         
         let darker: CGFloat = 30    // %
@@ -576,7 +579,7 @@ import UIKit
             NCBrandColor.shared.brand = NCBrandColor.shared.customer
             NCBrandColor.shared.brandText = NCBrandColor.shared.customerText
         }
-        //setDarkMode()
+//        setDarkMode()
         DispatchQueue.main.async {
             self.createImagesThemingColor()
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming)
@@ -620,7 +623,7 @@ import UIKit
         }
     }
 }
-        
+
 //MARK: - Global
 
 @objc class NCBrandGlobal: NSObject {
@@ -893,4 +896,3 @@ extension UIButton {
 
 //#if TARGET_OS_SIMULATOR
 //#endif
-

@@ -192,7 +192,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
             selectCommandViewSelect?.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
             selectCommandViewSelect?.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
             selectCommandViewSelect?.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
-            selectCommandViewSelect?.heightAnchor.constraint(equalToConstant: 80).isActive = true
+            selectCommandViewSelect?.heightAnchor.constraint(equalToConstant: 105).isActive = true
         }
         
         if typeOfCommandView == .copyMove {
@@ -615,7 +615,8 @@ extension NCSelect: UICollectionViewDataSource {
             if (isShare) {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else if (tableShare != nil && tableShare?.shareType == 3) {
-                cell.imageShared.image = NCBrandColor.cacheImages.shareByLink
+//                cell.imageShared.image = NCBrandColor.cacheImages.shareByLink
+                cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else if (tableShare != nil && tableShare?.shareType != 3) {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else {
@@ -870,13 +871,20 @@ class NCSelectCommandView: UIView {
         
         overwriteLabel?.text = NSLocalizedString("_overwrite_", comment: "")
         
-        selectButton?.layer.cornerRadius = 15
+        selectButton?.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
+        selectButton?.setTitleColor(.white, for: .normal)
+        selectButton?.layer.cornerRadius = 10
         selectButton?.layer.masksToBounds = true
         selectButton?.setTitle(NSLocalizedString("_select_", comment: ""), for: .normal)
         
-        createFolderButton?.layer.cornerRadius = 15
+        createFolderButton?.layer.cornerRadius = 10
         createFolderButton?.layer.masksToBounds = true
         createFolderButton?.setTitle(NSLocalizedString("_create_folder_", comment: ""), for: .normal)
+        createFolderButton?.backgroundColor = .clear
+        createFolderButton?.setTitleColor(NCBrandColor.shared.label, for: .normal)
+        createFolderButton?.layer.borderWidth = 1
+        createFolderButton?.layer.borderColor = NCBrandColor.shared.label.cgColor
+        createFolderButton?.setImage(UIImage(named: "addFolder")?.imageColor(NCBrandColor.shared.label), for: .normal)
         
         copyButton?.layer.cornerRadius = 15
         copyButton?.layer.masksToBounds = true
@@ -905,5 +913,10 @@ class NCSelectCommandView: UIView {
     
     @IBAction func valueChangedSwitchOverwrite(_ sender: UISwitch) {
         selectView?.valueChangedSwitchOverwrite(sender)
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        createFolderButton?.layer.borderColor = NCBrandColor.shared.label.cgColor
     }
 }
