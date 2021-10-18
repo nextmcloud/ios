@@ -344,6 +344,12 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         
         //hide download
         if isHideDownloadOptionVisible() {
+            XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCShareHeaderCustomCell"] = NCShareHeaderCustomCell.self
+            row = XLFormRowDescriptor(tag: "kNMCShareHeaderCustomCellHideDownload", rowType: "kNMCShareHeaderCustomCell", title: NSLocalizedString("", comment: ""))
+            row.cellConfig["titleLabel.text"] = NSLocalizedString("_HIDE_DOWNLOAD_", comment: "")
+            row.height = 46
+            section.addFormRow(row)
+            
             XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
             row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellHideDownload", rowType: "kNMCFilePermissionEditCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
             row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_hide_download_", comment: "")
