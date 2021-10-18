@@ -26,7 +26,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     @IBOutlet weak var buttonContainerView: UIView!
     
     public var metadata: tableMetadata?
-    public var sharee: NCCommunicationSharee?
+    public var sharee: NCCommunicationShareeProtocol?
     private var networking: NCShareNetworking?
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var permission: Int = 0

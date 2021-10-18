@@ -10,6 +10,22 @@ import UIKit
 import NCCommunication
 import SVGKit
 
+protocol NCCommunicationShareeProtocol {
+    var circleInfo: String {get set}
+    var circleOwner: String {get set}
+    var label: String {get set}
+    var name: String {get set}
+    var shareType: Int {get set}
+    var shareWith: String {get set}
+    var uuid: String {get set}
+    var userClearAt: NSDate? {get set}
+    var userIcon: String {get set}
+    var userMessage: String {get set}
+    var userStatus: String {get set}
+}
+
+extension NCCommunicationSharee: NCCommunicationShareeProtocol {}
+
 class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareNetworkingDelegate, NCShareAdvancePermissionHeaderDelegate {
     fileprivate struct Tags {
         static let SwitchBool = "switchBool"
@@ -29,7 +45,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
     
     public var metadata: tableMetadata?
-    public var sharee: NCCommunicationSharee?
+    public var sharee: NCCommunicationShareeProtocol?
     public var tableShare: tableShare?
     private var networking: NCShareNetworking?
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
