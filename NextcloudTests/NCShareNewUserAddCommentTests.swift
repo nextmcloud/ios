@@ -7,6 +7,8 @@
 //
 
 import XCTest
+@testable import Nextcloud
+
 class NCShareNewUserAddCommentTests: XCTestCase {
     var sut: NCShareNewUserAddComment!
     
