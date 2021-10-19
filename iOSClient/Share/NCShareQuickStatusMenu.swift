@@ -10,7 +10,6 @@
 import UIKit
 
 class NCShareQuickStatusMenu: NSObject {
-//    func toggleMenu(viewController: UIViewController, key: String, sortButton: UIButton?, serverUrl: String, hideDirectoryOnTop: Bool = false) {
     
     var currentStatus = ""
     
@@ -19,12 +18,16 @@ class NCShareQuickStatusMenu: NSObject {
         print(status)
 //        self.currentStatus = status
         let menuViewController = UIStoryboard.init(name: "NCMenu", bundle: nil).instantiateInitialViewController() as! NCMenu
+        
+        let isRead = (!CCUtility.isAnyPermission(toEdit: status) && status !=  NCGlobal.shared.permissionCreateShare)
+        let isEdit = (CCUtility.isAnyPermission(toEdit: status) && status != NCGlobal.shared.permissionCreateShare)
+        
         var actions = [NCMenuAction]()
-        print(status)
+        
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_share_read_only_", comment: ""),
-                icon: status == NCGlobal.shared.permissionReadShare ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) as! UIImage : UIImage(),
+                icon: isRead ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) ?? UIImage() : UIImage(),
                 selected: false,
                 on: false,
                 action: { menuAction in
@@ -34,30 +37,17 @@ class NCShareQuickStatusMenu: NSObject {
         )
 
         if NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: fileExtension ?? "", shareType: shareType) {
-            if directoryType == "document" || directoryType == "directory" {
-                actions.append(
-                    NCMenuAction(
-                        title: directory ? NSLocalizedString("_share_editing_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
-                        icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption || status == (NCGlobal.shared.permissionShareShare - NCGlobal.shared.permissionReadShare))  ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) ?? UIImage() : UIImage(),
-                        selected: false,
-                        on: false,
-                        action: { menuAction in
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
-                        }
-                    )
+            actions.append(
+                NCMenuAction(
+                    title: directory ? NSLocalizedString("_share_editing_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
+                    icon: isEdit ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) ?? UIImage() : UIImage(),
+                    selected: false,
+                    on: false,
+                    action: { menuAction in
+                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
+                    }
                 )
-            } else if directoryType != "image" || directoryType !=  "audio" {
-                actions.append(
-                    NCMenuAction(title: directory ? NSLocalizedString("_share_editing_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
-                                 icon: (status == NCGlobal.shared.permissionMaxFileShare || status == NCGlobal.shared.permissionMaxFolderShare ||  status == NCGlobal.shared.permissionDefaultFileRemoteShareNoSupportShareOption) ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) ?? UIImage() : UIImage(),
-                                 selected: false,
-                                 on: false,
-                                 action: { menuAction in
-                                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
-                                 }
-                    )
-                )
-            }
+            )
         }
         
         if directory,

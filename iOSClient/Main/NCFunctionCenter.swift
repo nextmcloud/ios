@@ -195,7 +195,7 @@ import Queuer
         shareViewController.metadata = metadata
         shareViewController.indexPage = indexPage
         
-        shareNavigationController.modalPresentationStyle = .formSheet
+        shareNavigationController.modalPresentationStyle = .fullScreen
         ViewController.present(shareNavigationController, animated: true, completion: nil)
     }
      

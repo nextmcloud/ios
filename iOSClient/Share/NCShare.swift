@@ -604,16 +604,11 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     // MARK: -StatusChangeNotification
     func quickStatus(with tableShare: tableShare?, sender: UIButton) {
         guard let tableShare = tableShare else { return }
-        let directory = self.metadata?.directory
-        if (self.metadata?.typeFile == "document" || directory == true) {
-            let index = sender.tag
+        let directory = self.metadata?.directory ?? false
+        let editingAllowed = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: tableShare.shareType)
+        if editingAllowed {
             self.quickStatusTableShare = tableShare
-            
-    //        self.quickStatusTableShare = quickShare
-    //        self.quickStatusTableShare = tableShare
             let quickStatusMenu = NCShareQuickStatusMenu()
-            //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
-    //        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions, shareType: tableShare.shareType)
             quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, fileExtension: self.metadata?.ext, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
         } else {
             return
@@ -623,23 +618,12 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     func quickStatusLink(with tableShare: tableShare?, sender: UIButton) {
         guard let tableShare = tableShare else { return }
-        let directory = self.metadata?.directory
-        let ext = self.metadata?.ext
+        let directory = metadata?.directory ?? false
         
-        if (self.metadata?.typeFile == "document" || directory == true || ext == "jpg" || ext == "png") {
-            let index = sender.tag
+        if directory {
             self.quickStatusTableShare = tableShare
-            //sdsd
-    //        self.quickStatusTableShare = quickShare
-    //        self.quickStatusTableShare = tableShare
-    //        if metadata?.typeFile == "document" {
-    //            self.quickStatusTableShare = tableShare
-                let quickStatusMenu = NCShareQuickStatusMenu()
-    //        quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, status: tableShare.permissions, shareType: tableShare.shareType)
+            let quickStatusMenu = NCShareQuickStatusMenu()
             quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, fileExtension: self.metadata?.ext, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
-    //        }
-        } else {
-            return
         }
     }
     
@@ -737,18 +721,6 @@ extension NCShare: UITableViewDataSource {
                 cell.labelTitle.textColor = NCBrandColor.shared.label
                 cell.indexSelected = indexPath.row
                 cell.btnQuickStatus.tag = indexPath.row
-//                cell.buttonMenu.isEnabled = false
-//                cell.buttonMenu.isHidden = true
-                
-                let ext = self.metadata?.ext
-//                if self.metadata?.typeFile != "document" || ext == "jpg" || ext == "png" || ext == "m4a" || self.metadata?.typeFile == "image" || self.metadata?.typeFile ==  "audio" {
-                if (self.metadata?.typeFile == "document" || directory == true) {
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
-                } else {
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.quickStatusTextColor
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.quickStatusTextColor)
-                }
                 
                 if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
                     cell.labelQuickStatus.text = NSLocalizedString("_share_file_drop_", comment: "")
@@ -760,6 +732,17 @@ extension NCShare: UITableViewDataSource {
                         cell.labelQuickStatus.text = NSLocalizedString("_share_read_only_", comment: "")
                     }
                 }
+                
+                if directory {
+                    cell.btnQuickStatus.isEnabled = true
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
+                } else {
+                    cell.btnQuickStatus.isEnabled = false
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.quickStatusTextColor
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.quickStatusTextColor)
+                }
+                
                 return cell
             }
         } else if tableShare.shareType == 4 {
@@ -789,39 +772,18 @@ extension NCShare: UITableViewDataSource {
                 
                 if FileManager.default.fileExists(atPath: fileNameLocalPath) {
                     if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-//                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
-//                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
                     }
                 } else {
                     NCCommunication.shared.downloadAvatar(userId: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
                             if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-//                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
-//                                cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
                             }
                         }
                     }
                 }
                 
-//                if FileManager.default.fileExists(atPath: fileNameLocalPath) {
-//                    if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-////                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
-////                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
-//                    }
-//                } else {
-//                    NCCommunication.shared.downloadAvatar(userID: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
-//                        if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
-//                            if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-////                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
-////                                cell.imageItem.image = UIImage(named: "cloudUpload")?.image(color: NCBrandColor.shared.icon, size: 30)
-//                            }
-//                        }
-//                    }
-//                }
-                
                 if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
                     cell.switchCanEdit.setOn(true, animated: false)
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_editing_", comment: ""), for: .normal)
                 } else {
                     cell.switchCanEdit.setOn(false, animated: false)
                 }
@@ -836,19 +798,11 @@ extension NCShare: UITableViewDataSource {
                 cell.btnQuickStatus.setTitle("", for: .normal)
                 cell.btnQuickStatus.contentHorizontalAlignment = .left
                 
-                let ext = self.metadata?.ext
-//                if self.metadata?.typeFile != "document" || ext == "jpg" || ext == "png" || ext == "m4a" || self.metadata?.typeFile == "image" || self.metadata?.typeFile ==  "audio" {
-                
-                if (self.metadata?.typeFile == "document" ||  directory == true) {
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
-                } else {
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.quickStatusTextColor
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.quickStatusTextColor)
-                }
+                cell.btnQuickStatus.isEnabled = true
+                cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
+                cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
                 
                 if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_file_drop_", comment: ""), for: .normal)
                     cell.labelQuickStatus.text = NSLocalizedString("_share_file_drop_", comment: "")
                 } else {
                     // Read Only
@@ -859,21 +813,17 @@ extension NCShare: UITableViewDataSource {
                     }
                 }
                 
-//                if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_file_drop_", comment: ""), for: .normal)
-//                }
-//                else if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_editing_", comment: ""), for: .normal)
-//                } else {
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_read_only_", comment: ""), for: .normal)
-//                }
-//                if CCUtility.isPermission(toRead: tableShare.permissions) {
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_read_only_", comment: ""), for: .normal)
-//                }
+                let isEditingAllowed = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: tableShare.shareType)
+                if isEditingAllowed {
+                    cell.btnQuickStatus.isEnabled = true
+                } else {
+                    cell.btnQuickStatus.isEnabled = false
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.quickStatusTextColor
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.quickStatusTextColor)
+                }
                 
                 return cell
             }
-            
         } else {
         // USER
             if let cell = tableView.dequeueReusableCell(withIdentifier: "cellUser", for: indexPath) as? NCShareUserCell {
@@ -901,39 +851,19 @@ extension NCShare: UITableViewDataSource {
                 
                 if FileManager.default.fileExists(atPath: fileNameLocalPath) {
                     if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-//                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
-//                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
+
                     }
                 } else {
                     NCCommunication.shared.downloadAvatar(userId: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
                             if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-//                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 40)
-//                                cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
                             }
                         }
                     }
                 }
                 
-//                if FileManager.default.fileExists(atPath: fileNameLocalPath) {
-//                    if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-////                        cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
-////                        cell.imageItem.image = UIImage(named: "user")?.image(color: NCBrandColor.shared.icon, size: 30)
-//                    }
-//                } else {
-//                    NCCommunication.shared.downloadAvatar(userID: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
-//                        if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
-//                            if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-////                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
-////                                cell.imageItem.image = UIImage(named: "cloudUpload")?.image(color: NCBrandColor.shared.icon, size: 30)
-//                            }
-//                        }
-//                    }
-//                }
-                
                 if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
                     cell.switchCanEdit.setOn(true, animated: false)
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_editing_", comment: ""), for: .normal)
                 } else {
                     cell.switchCanEdit.setOn(false, animated: false)
                 }
@@ -948,19 +878,11 @@ extension NCShare: UITableViewDataSource {
                 cell.btnQuickStatus.setTitle("", for: .normal)
                 cell.btnQuickStatus.contentHorizontalAlignment = .left
                 
-                let ext = self.metadata?.ext
-//                if self.metadata?.typeFile != "document" || ext == "jpg" || ext == "png" || ext == "m4a" || self.metadata?.typeFile == "image" || self.metadata?.typeFile ==  "audio" {
-                
-                if (self.metadata?.typeFile == "document" ||  directory == true || ext == "jpg" || ext == "png") {
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
-                } else {
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.quickStatusTextColor
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.quickStatusTextColor)
-                }
+                cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
+                cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
+                cell.btnQuickStatus.isEnabled = true
                 
                 if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_file_drop_", comment: ""), for: .normal)
                     cell.labelQuickStatus.text = NSLocalizedString("_share_file_drop_", comment: "")
                 } else {
                     // Read Only
@@ -971,17 +893,14 @@ extension NCShare: UITableViewDataSource {
                     }
                 }
                 
-//                if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_file_drop_", comment: ""), for: .normal)
-//                }
-//                else if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_editing_", comment: ""), for: .normal)
-//                } else {
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_read_only_", comment: ""), for: .normal)
-//                }
-//                if CCUtility.isPermission(toRead: tableShare.permissions) {
-//                    cell.btnQuickStatus.setTitle(NSLocalizedString("_share_read_only_", comment: ""), for: .normal)
-//                }
+                let isEditingAllowed = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: tableShare.shareType)
+                if isEditingAllowed {
+                    cell.btnQuickStatus.isEnabled = true
+                } else {
+                    cell.btnQuickStatus.isEnabled = false
+                    cell.labelQuickStatus.textColor = NCBrandColor.shared.quickStatusTextColor
+                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.quickStatusTextColor)
+                }
                 
                 return cell
             }
@@ -1012,13 +931,10 @@ class NCShareLinkCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        
-//        imageItem.image = NCShareCommon.shared.createLinkAvatar(imageName: "sharebylink", colorCircle: NCBrandColor.shared.brandElement)
         imageItem.image = UIImage(named: "sharebylink")?.image(color: NCBrandColor.shared.label, size: 30)
         buttonCopy.setImage(UIImage.init(named: "shareCopy")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
-//        imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
     }
     
     @IBAction func touchUpInsideCopy(_ sender: Any) {
@@ -1102,7 +1018,6 @@ class NCShareUserDropDownCell: DropDownCell {
 
 extension UITableView {
     func setEmptyMessage(_ message: String) {
-//        let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: 20))
         let messageLabel = UILabel(frame: CGRect(x: 10, y: 0, width: self.bounds.size.width, height: 20))
         messageLabel.text = message
         messageLabel.textColor = NCBrandColor.shared.textInfo
@@ -1110,18 +1025,11 @@ extension UITableView {
         messageLabel.textAlignment = .center
         messageLabel.font = UIFont.systemFont(ofSize: 17)
         messageLabel.sizeToFit()
-
-//        self.backgroundColor = .red
-//        messageLabel.backgroundColor = .green
-//        self.backgroundView?.addSubview(messageLabel)
-//        self.backgroundView = messageLabel
         self.addSubview(messageLabel)
-//        self.separatorStyle = .none
     }
 
     func restore() {
         self.backgroundView = nil
         self.subviews.forEach({ $0.removeFromSuperview() })
-//        self.separatorStyle = .none
     }
 }

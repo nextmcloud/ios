@@ -100,8 +100,6 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         btnSendShare.setTitleColor(.white, for: .normal)
         commentContainerView.layer.borderColor = NCBrandColor.shared.label.cgColor
-        
-        self.navigationController?.navigationBar.tintColor = NCBrandColor.shared.icon
     }
     
     @IBAction func cancelClicked(_ sender: Any) {
