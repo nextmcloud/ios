@@ -71,7 +71,7 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
         }
         
         if rowDescriptor.tag == "kNMCFilePermissionEditCellHideDownload" {
-            seperator.isHidden = true
+            seperator.isHidden = false
             self.seperatorMiddle.isHidden = true
         }
         
