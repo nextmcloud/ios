@@ -451,12 +451,11 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row = XLFormRowDescriptor(tag: "previewFileName", rowType: XLFormRowDescriptorTypeTextView, title: "")
         row.height = 180
         row.disabled = true
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
 
-        row.cellConfig["textView.backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
+        row.cellConfig["textView.backgroundColor"] = NCBrandColor.shared.systemGroupedBackground
         row.cellConfig["textView.font"] = UIFont.systemFont(ofSize: 14.0)
         row.cellConfig["textView.textColor"] = NCBrandColor.shared.label
-        row.cellConfig["backgroundColor"] = cellBackgoundColor
+        row.cellConfig["backgroundColor"] = NCBrandColor.shared.systemGroupedBackground
 
 //=======
 //        row.cellConfig["backgroundColor"] = cellBackgoundColor
@@ -594,6 +593,17 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         let maskFileName : XLFormRowDescriptor = self.form.formRow(withTag: "maskFileName")!
         let previewFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "previewFileName")!
         previewFileName.value = self.previewFileName(valueRename: maskFileName.value as? String)
+        
+        let fileNameMask : String = CCUtility.getFileNameMask(NCBrandGlobal.shared.keyFileNameMask)
+
+        if fileNameMask.count > 0 {
+            //row.value = fileNameMask
+            maskFileName.cellConfig["fileNameTextField.text"] = fileNameMask
+        }else{
+            let asset = assets[0]
+            let  placeHolderString =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
+            maskFileName.cellConfig["fileNameTextField.placeholder"] = placeHolderString
+        }
         
         self.tableView.reloadData()
         self.form.delegate = self
@@ -869,11 +879,12 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 //            returnString = CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal)
 //=======
             CCUtility.setFileNameMask("", key: NCGlobal.shared.keyFileNameMask)
-            returnString = CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
+            //returnString = CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
+            returnString = ""
 //>>>>>>> feature_branded_client_4
         }
         
-        return String(format: NSLocalizedString("_preview_filename_", comment: ""), "MM, MMM, DD, YY, YYYY, HH, hh, mm, ss, ampm") + ":" + "\n\n" + returnString
+        return String(format: NSLocalizedString("_preview_filename_", comment: ""), "MM, MMM, DD, YY, YYYY, HH, hh, mm, ss, ampm") + "" + "\n\n" + returnString
     }
     
     @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {
