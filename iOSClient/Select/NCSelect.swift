@@ -120,7 +120,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationController?.presentationController?.delegate = self
-        self.navigationController!.navigationBar.tintColor = NCBrandColor.shared.label
+        self.navigationController!.navigationBar.tintColor = NCBrandColor.shared.brand
         
         view.backgroundColor = NCBrandColor.shared.systemBackground
 
@@ -144,8 +144,8 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         
         // Add Refresh Control
         collectionView.addSubview(refreshControl)
-        refreshControl.tintColor = NCBrandColor.shared.brandText
-        refreshControl.backgroundColor = NCBrandColor.shared.brandElement
+        refreshControl.tintColor = NCBrandColor.shared.systemBackground
+        refreshControl.backgroundColor = NCBrandColor.shared.systemBackground
         refreshControl.addTarget(self, action: #selector(loadDatasource), for: .valueChanged)
         
         // Empty

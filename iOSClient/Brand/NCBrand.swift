@@ -455,6 +455,9 @@ class NCBrandColor: NSObject {
        
     }
 
+    @objc public var nmcIconSharedWithMe: UIColor{
+        return  UIColor(displayP3Red: 0.0/255.0, green: 153.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+    }
     
     override init() {
         self.brand = self.customer

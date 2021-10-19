@@ -1535,24 +1535,34 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             if appDelegate.account != metadata.account {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             }
+            
+            
+            let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
+            if shares.share!.count > 0 {
+                cell.imageShared.image = cell.imageShared.image?.imageColor(NCBrandColor.shared.customer)
+            }
+            
             if metadata.ownerId.count > 0 && metadata.ownerId != appDelegate.userId && appDelegate.account == metadata.account {
                 cell.imageShared.image = UIImage(named: "avatar")
-                let fileNameUser = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + metadata.ownerId + ".png"
-                if FileManager.default.fileExists(atPath: fileNameUser) {
-//                    if let image = UIImage(contentsOfFile: fileNameUser) {
-//                        cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
+//                let fileNameUser = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + metadata.ownerId + ".png"
+                
+                cell.imageShared.image = UIImage.init(named: "cloudUpload")?.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)
+                
+//                if FileManager.default.fileExists(atPath: fileNameUser) {
+////                    if let image = UIImage(contentsOfFile: fileNameUser) {
+////                        cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
+////                    }
+//                    cell.imageShared.image = NCBrandColor.cacheImages.shared
+//                } else {
+//                    NCCommunication.shared.downloadAvatar(userId: metadata.ownerId, fileNameLocalPath: fileNameUser, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
+//                        if errorCode == 0 && account == self.appDelegate.account {
+////                            if let image = UIImage(contentsOfFile: fileNameUser) {
+////                                cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
+////                            }
+//                            cell.imageShared.image = NCBrandColor.cacheImages.shared
+//                        }
 //                    }
-                    cell.imageShared.image = NCBrandColor.cacheImages.shared
-                } else {
-                    NCCommunication.shared.downloadAvatar(userId: metadata.ownerId, fileNameLocalPath: fileNameUser, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
-                        if errorCode == 0 && account == self.appDelegate.account {
-//                            if let image = UIImage(contentsOfFile: fileNameUser) {
-//                                cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
-//                            }
-                            cell.imageShared.image = NCBrandColor.cacheImages.shared
-                        }
-                    }
-                }
+//                }
             }
             
             // Transfer
@@ -1636,10 +1646,10 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             if appDelegate.disableSharesView {
                 cell.hideButtonShare(true)
             }
-            let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
-            if shares.share!.count > 0 {
-                cell.imageShared.image = cell.imageShared.image?.imageColor(NCBrandColor.shared.customer)
-            }
+//            let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
+//            if shares.share!.count > 0 {
+//                cell.imageShared.image = cell.imageShared.image?.imageColor(NCBrandColor.shared.customer)
+//            }
             
             return cell
         }
