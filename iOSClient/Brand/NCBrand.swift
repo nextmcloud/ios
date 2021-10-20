@@ -446,6 +446,23 @@ class NCBrandColor: NSObject {
         return UIColor(red: 0/255.0, green: 153/255.0, blue: 255/255.0, alpha: 1.0)
     }
     
+    @objc public var nmcGray0: UIColor{
+            if #available(iOS 13.0, *) {
+                if UITraitCollection.current.userInterfaceStyle == .dark {
+                    return  UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+                }else {
+                    return  UIColor(red: 19.0/255.0, green: 19.0/255.0, blue: 19.0/255.0, alpha: 1.0)
+                }
+            }else{
+           return  UIColor(red: 19.0/255.0, green: 19.0/255.0, blue: 19.0/255.0, alpha: 1.0)
+        }
+       
+    }
+
+    @objc public var nmcIconSharedWithMe: UIColor{
+        return  UIColor(displayP3Red: 0.0/255.0, green: 153.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+    }
+
     override init() {
         self.brand = self.customer
 //        self.brandElement = self.customer
