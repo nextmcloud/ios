@@ -42,7 +42,7 @@ extension AppDelegate {
         
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_upload_photos_videos_", comment: ""), icon: UIImage(named: "file_photo")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { menuAction in
+                title: NSLocalizedString("_upload_photos_videos_", comment: ""), icon: UIImage(named: "file_photo_menu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { menuAction in
 
                     NCAskAuthorization.shared.askAuthorizationPhotoLibrary(viewController: viewController) { (hasPermission) in
                         if hasPermission {
@@ -57,7 +57,7 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_upload_file_", comment: ""), icon: UIImage(named: "file")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { menuAction in
+                title: NSLocalizedString("_upload_file_", comment: ""), icon: UIImage(named: "uploadFile")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { menuAction in
                     if let tabBarController = self.window?.rootViewController as? UITabBarController {
                         self.documentPickerViewController = NCDocumentPickerViewController.init(tabBarController: tabBarController)
                     }
@@ -68,7 +68,7 @@ extension AppDelegate {
         if NCCommunication.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorText}) && !isEncrypted {
             let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorText})!
             actions.append(
-                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { menuAction in
+                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt_menu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { menuAction in
                     guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
                         return
                     }

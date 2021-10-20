@@ -26,43 +26,24 @@
                     <rect key="frame" x="0.0" y="190" width="320" height="100"/>
                     <subviews>
                         <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="h1j-Bi-at4">
-                            <rect key="frame" x="20" y="0.0" width="51" height="31"/>
+                            <rect key="frame" x="16" y="0.0" width="51" height="31"/>
                             <connections>
                                 <action selector="valueChangedSwitchOverwrite:" destination="iN0-l3-epB" eventType="valueChanged" id="GaC-ye-b4N"/>
                             </connections>
                         </switch>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Overwrite" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tE2-bY-JfT">
-                            <rect key="frame" x="77" y="7.5" width="100" height="16"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="100" id="C4z-aI-zCo"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <rect key="frame" x="73" y="5.5" width="74" height="20.5"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WCL-bl-0j0">
-                            <rect key="frame" x="20" y="70" width="120" height="30"/>
-                            <color key="backgroundColor" systemColor="systemGray4Color"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="30" id="AHg-gX-UT0"/>
-                                <constraint firstAttribute="width" constant="120" id="e9E-Zi-Svf"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                            <state key="normal" title="Create  folder">
-                                <color key="titleColor" systemColor="labelColor"/>
-                            </state>
-                            <connections>
-                                <action selector="createFolderButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="ffk-c7-NT1"/>
-                            </connections>
-                        </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mg4-vG-Xr7">
-                            <rect key="frame" x="180" y="0.0" width="120" height="30"/>
+                            <rect key="frame" x="168" y="-4.5" width="136" height="40"/>
                             <color key="backgroundColor" systemColor="systemGray4Color"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="30" id="aRa-Cb-dIJ"/>
-                                <constraint firstAttribute="width" constant="120" id="q7x-Zg-aFX"/>
+                                <constraint firstAttribute="height" constant="40" id="aRa-Cb-dIJ"/>
                             </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <state key="normal" title="Copy">
                                 <color key="titleColor" systemColor="labelColor"/>
                             </state>
@@ -70,44 +51,62 @@
                                 <action selector="copyButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="vrD-3Y-ANH"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Oq2-Kg-sDp">
-                            <rect key="frame" x="180" y="70" width="120" height="30"/>
-                            <color key="backgroundColor" systemColor="systemGray4Color"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="120" id="JyD-uF-cFT"/>
-                                <constraint firstAttribute="height" constant="30" id="QAO-kF-IOZ"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                            <state key="normal" title="Move">
-                                <color key="titleColor" systemColor="labelColor"/>
-                            </state>
-                            <connections>
-                                <action selector="moveButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YiA-iN-EwL"/>
-                            </connections>
-                        </button>
+                        <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="apz-d8-hiU">
+                            <rect key="frame" x="16" y="43.5" width="288" height="40"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WCL-bl-0j0">
+                                    <rect key="frame" x="0.0" y="0.0" width="136" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemGray4Color"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="AHg-gX-UT0"/>
+                                    </constraints>
+                                    <inset key="imageEdgeInsets" minX="-8" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                    <state key="normal" title="Create folder" image="addFolder">
+                                        <color key="titleColor" systemColor="labelColor"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="createFolderButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="ffk-c7-NT1"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Oq2-Kg-sDp">
+                                    <rect key="frame" x="152" y="0.0" width="136" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemGray4Color"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="QAO-kF-IOZ"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <state key="normal" title="Move">
+                                        <color key="titleColor" systemColor="labelColor"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="moveButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YiA-iN-EwL"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </stackView>
                     </subviews>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
-                        <constraint firstItem="tE2-bY-JfT" firstAttribute="leading" secondItem="h1j-Bi-at4" secondAttribute="trailing" constant="8" symbolic="YES" id="BBW-Mt-T2Q"/>
-                        <constraint firstItem="h1j-Bi-at4" firstAttribute="leading" secondItem="DhT-bZ-rgC" secondAttribute="leading" constant="20" id="BK8-FJ-PCw"/>
-                        <constraint firstAttribute="trailing" secondItem="Mg4-vG-Xr7" secondAttribute="trailing" constant="20" id="Efe-Jl-OSp"/>
+                        <constraint firstItem="tE2-bY-JfT" firstAttribute="centerY" secondItem="h1j-Bi-at4" secondAttribute="centerY" id="9SE-vn-zmA"/>
+                        <constraint firstItem="h1j-Bi-at4" firstAttribute="leading" secondItem="DhT-bZ-rgC" secondAttribute="leading" constant="16" id="BK8-FJ-PCw"/>
+                        <constraint firstAttribute="trailing" secondItem="Mg4-vG-Xr7" secondAttribute="trailing" constant="16" id="Efe-Jl-OSp"/>
                         <constraint firstItem="h1j-Bi-at4" firstAttribute="top" secondItem="DhT-bZ-rgC" secondAttribute="top" id="H3s-ru-V9X"/>
-                        <constraint firstAttribute="bottom" secondItem="WCL-bl-0j0" secondAttribute="bottom" id="TzK-c5-jnE"/>
-                        <constraint firstItem="WCL-bl-0j0" firstAttribute="leading" secondItem="DhT-bZ-rgC" secondAttribute="leading" constant="20" id="caB-Op-vpM"/>
+                        <constraint firstItem="Mg4-vG-Xr7" firstAttribute="centerY" secondItem="h1j-Bi-at4" secondAttribute="centerY" id="P2h-TK-YFC"/>
                         <constraint firstAttribute="height" constant="100" id="dTc-rJ-Jrz"/>
-                        <constraint firstItem="tE2-bY-JfT" firstAttribute="centerY" secondItem="h1j-Bi-at4" secondAttribute="centerY" id="fRN-zY-g9L"/>
-                        <constraint firstItem="Mg4-vG-Xr7" firstAttribute="top" secondItem="DhT-bZ-rgC" secondAttribute="top" id="fzS-ny-eXi"/>
-                        <constraint firstAttribute="bottom" secondItem="Oq2-Kg-sDp" secondAttribute="bottom" id="omd-Zc-koD"/>
-                        <constraint firstAttribute="trailing" secondItem="Oq2-Kg-sDp" secondAttribute="trailing" constant="20" id="pkS-bX-XZ5"/>
+                        <constraint firstItem="apz-d8-hiU" firstAttribute="top" secondItem="Mg4-vG-Xr7" secondAttribute="bottom" constant="8" id="l9n-jQ-krG"/>
+                        <constraint firstItem="tE2-bY-JfT" firstAttribute="leading" secondItem="h1j-Bi-at4" secondAttribute="trailing" constant="8" symbolic="YES" id="wyO-Fx-GNd"/>
+                        <constraint firstItem="Mg4-vG-Xr7" firstAttribute="width" secondItem="WCL-bl-0j0" secondAttribute="width" id="yWH-BX-BuU"/>
                     </constraints>
                 </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="apz-d8-hiU" secondAttribute="trailing" constant="16" id="1FI-fk-fBP"/>
                 <constraint firstItem="xmS-E7-44n" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="CiY-20-2Gk"/>
                 <constraint firstItem="DhT-bZ-rgC" firstAttribute="centerY" secondItem="vUN-kp-3ea" secondAttribute="centerY" id="Cpf-hy-uuK"/>
                 <constraint firstItem="xmS-E7-44n" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="IWq-yN-wAO"/>
+                <constraint firstItem="apz-d8-hiU" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="Z9e-Um-dyg"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="DhT-bZ-rgC" secondAttribute="trailing" id="fRj-jo-arf"/>
                 <constraint firstItem="DhT-bZ-rgC" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="kwq-qj-Dfr"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="xmS-E7-44n" secondAttribute="trailing" id="sg2-b1-tqE"/>
@@ -125,6 +124,7 @@
         </view>
     </objects>
     <resources>
+        <image name="addFolder" width="25" height="25"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
