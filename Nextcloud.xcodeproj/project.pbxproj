@@ -134,6 +134,7 @@
 		95BB21172660F55900AF4344 /* NCLogin.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB21162660F55900AF4344 /* NCLogin.storyboard */; };
 		B11D7079271D62C600A303D2 /* NCShareAdvancePermissionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11D7078271D62C600A303D2 /* NCShareAdvancePermissionTests.swift */; };
 		B11D7089271D83D200A303D2 /* NCShareNewUserAddCommentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11D7088271D83D200A303D2 /* NCShareNewUserAddCommentTests.swift */; };
+		B11D70C32720248100A303D2 /* NCShareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11D70C22720248100A303D2 /* NCShareTests.swift */; };
 		B176BA9926F8B83A009A0F33 /* NCShareTextInputCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B176BA9826F8B83A009A0F33 /* NCShareTextInputCell.swift */; };
 		B176BAB626F8F7A0009A0F33 /* NCShareTextInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B176BAB526F8F7A0009A0F33 /* NCShareTextInputCell.xib */; };
 		B176BAD626FD9FF8009A0F33 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B176BAD526FD9FF8009A0F33 /* UIView+Extensions.swift */; };
@@ -605,6 +606,7 @@
 		B11D7078271D62C600A303D2 /* NCShareAdvancePermissionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareAdvancePermissionTests.swift; sourceTree = "<group>"; };
 		B11D707A271D62C600A303D2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B11D7088271D83D200A303D2 /* NCShareNewUserAddCommentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareNewUserAddCommentTests.swift; sourceTree = "<group>"; };
+		B11D70C22720248100A303D2 /* NCShareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareTests.swift; sourceTree = "<group>"; };
 		B176BA9826F8B83A009A0F33 /* NCShareTextInputCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareTextInputCell.swift; sourceTree = "<group>"; };
 		B176BAB526F8F7A0009A0F33 /* NCShareTextInputCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareTextInputCell.xib; sourceTree = "<group>"; };
 		B176BAD526FD9FF8009A0F33 /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
@@ -1179,6 +1181,7 @@
 			isa = PBXGroup;
 			children = (
 				B11D7078271D62C600A303D2 /* NCShareAdvancePermissionTests.swift */,
+				B11D70C22720248100A303D2 /* NCShareTests.swift */,
 				B11D7088271D83D200A303D2 /* NCShareNewUserAddCommentTests.swift */,
 				B11D707A271D62C600A303D2 /* Info.plist */,
 			);
@@ -2531,6 +2534,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B11D70C32720248100A303D2 /* NCShareTests.swift in Sources */,
 				B11D7089271D83D200A303D2 /* NCShareNewUserAddCommentTests.swift in Sources */,
 				B11D7079271D62C600A303D2 /* NCShareAdvancePermissionTests.swift in Sources */,
 			);
