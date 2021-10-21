@@ -237,6 +237,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         
         coordinator.animate(alongsideTransition: nil) { _ in
             self.collectionView?.collectionViewLayout.invalidateLayout()
+            self.collectionView?.reloadData()
         }
     }
     
@@ -1456,9 +1457,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.imageItem.backgroundColor = nil
             
             cell.progressView.progress = 0.0
-            if UIDevice.current.orientation.isPortrait && UIDevice.current.model.hasPrefix("iPhone") {
-                cell.separator.backgroundColor = .clear
-            }
+            
 
             
             if metadata.directory {
@@ -1613,12 +1612,23 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 cell.hideButtonShare(false)
             }
             
-            // Remove last separator
-            if collectionView.numberOfItems(inSection: indexPath.section) == indexPath.row + 1 {
+
+            
+            //Hide lines on iPhone
+            if !UIDevice.current.orientation.isLandscape && UIDevice.current.model.hasPrefix("iPhone") {
                 cell.separator.isHidden = true
-            } else {
+            }else{
                 cell.separator.isHidden = false
+                // Remove last separator
+                if collectionView.numberOfItems(inSection: indexPath.section) == indexPath.row + 1 {
+                    cell.separator.isHidden = true
+                } else {
+                    cell.separator.isHidden = false
+                }
             }
+            
+            
+            
             
             // Edit mode
             if isEditMode {
