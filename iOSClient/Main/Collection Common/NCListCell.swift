@@ -148,7 +148,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
             let blurEffectView = UIVisualEffectView(effect: blurEffect)
             blurEffectView.frame = self.bounds
             blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            blurEffectView.backgroundColor = NCBrandColor.shared.brandElement.withAlphaComponent(0.2)
+            blurEffectView.backgroundColor = NCBrandColor.shared.nmcGray0.withAlphaComponent(0.2)
             backgroundView = blurEffectView
             separator.isHidden = true
         } else {

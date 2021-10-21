@@ -59,7 +59,7 @@ class NCViewerImageZoom: UIViewController {
     private var startImageViewBottomConstraint: CGFloat = 0
     private var startPoint = CGPoint.zero
     private var topPoint = CGPoint.zero
-    
+//    var currentOcid = [String]()
 
     // MARK: - View Life Cycle
 
@@ -302,8 +302,9 @@ class NCViewerImageZoom: UIViewController {
     }
     
     @objc func rotateImage() {
+
         let rotatedImage = imageView.image?.rotate(radians: .pi/2)
-        imageView.image = rotatedImage
+//        imageView.image = rotatedImage
         let data = rotatedImage?.pngData()
         let url = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileName)!)
         do {
@@ -311,8 +312,9 @@ class NCViewerImageZoom: UIViewController {
         } catch {
             print("Unable to save file")
         }
-//        NCManageDatabase.shared.updateMetadatas([metadata], metadatasResult: [metadata])
+        NCManageDatabase.shared.updateMetadatas([metadata], metadatasResult: [metadata])
         let ocId = NSUUID().uuidString
+//        let ocId = self.metadata.ocId
         let size = NCUtilityFileSystem.shared.getFileSize(filePath: url.path)
         let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: metadata.fileNameView)!
         if NCUtilityFileSystem.shared.copyFile(atPath: url.path, toPath: fileNamePath) {
@@ -322,6 +324,7 @@ class NCViewerImageZoom: UIViewController {
             metadataForUpload.size = size
             metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
             appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
+            imageView.image = UIImage()
         }
     }
 }
