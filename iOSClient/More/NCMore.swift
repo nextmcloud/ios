@@ -201,15 +201,15 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         appDelegate.activeViewController = self
         
-        viewQuota.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        viewQuota.backgroundColor = NCBrandColor.shared.memoryConsuptionBackground
         progressQuota.progressTintColor = NCBrandColor.shared.brandElement
-        progressQuota.trackTintColor = .lightGray
+        progressQuota.trackTintColor = NCBrandColor.shared.commonViewInfoText
         progressQuota.layer.borderWidth = 2
         progressQuota.layer.borderColor = UIColor(hex: "#CCCCCC")?.cgColor
-        quotaLabel1.textColor = NCBrandColor.shared.gray26AndGrayf2
-        quotalabel2.textColor = NCBrandColor.shared.gray26AndGrayf2
-        labelQuota.textColor = NCBrandColor.shared.gray26AndGrayf2
-        labelQuotaExternalSite.textColor = NCBrandColor.shared.gray26AndGrayf2
+        quotaLabel1.textColor = NCBrandColor.shared.nmcGray0
+        quotalabel2.textColor = NCBrandColor.shared.nmcGray0
+        labelQuota.textColor = NCBrandColor.shared.nmcGray0
+        labelQuotaExternalSite.textColor = NCBrandColor.shared.nmcGray0
         loadItems()
  
     }

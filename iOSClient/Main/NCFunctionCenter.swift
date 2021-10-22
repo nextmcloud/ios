@@ -727,53 +727,53 @@ import Queuer
         if metadataMOV != nil {
             titleSave = NSLocalizedString("_livephoto_save_", comment: "")
         }
-        let titleFavorite = metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: "")
+//        let titleFavorite = metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: "")
+//
+//        let serverUrl = metadata.serverUrl + "/" + metadata.fileName
+//        var isOffline = false
+//        if metadata.directory {
+//            if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl)) {
+//                isOffline = directory.offline
+//            }
+//        } else {
+//            if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
+//                isOffline = localFile.offline
+//            }
+//        }
+//        let titleOffline = isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: "")
+//
+//        let copy = UIAction(title: NSLocalizedString("_copy_file_", comment: ""), image: UIImage(systemName: "doc.on.doc")) { action in
+//            self.appDelegate.pasteboardOcIds = [metadata.ocId]
+//            self.copyPasteboard()
+//        }
         
-        let serverUrl = metadata.serverUrl + "/" + metadata.fileName
-        var isOffline = false
-        if metadata.directory {
-            if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl)) {
-                isOffline = directory.offline
-            }
-        } else {
-            if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
-                isOffline = localFile.offline
-            }
-        }
-        let titleOffline = isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: "")
-        
-        let copy = UIAction(title: NSLocalizedString("_copy_file_", comment: ""), image: UIImage(systemName: "doc.on.doc")) { action in
-            self.appDelegate.pasteboardOcIds = [metadata.ocId]
-            self.copyPasteboard()
-        }
-        
-        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(systemName: "info")) { action in
+        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(named: "details")?.imageColor(NCBrandColor.shared.nmcGray0)) { action in
             self.openShare(ViewController: viewController, metadata: metadata, indexPage: 0)
         }
         
-        let offline = UIAction(title: titleOffline, image: UIImage(systemName: "tray.and.arrow.down")) { action in
-            if isOffline {
-                if metadata.directory {
-                    NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, offline: false, account: self.appDelegate.account)
-                } else {
-                    NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: false)
-                }
-            } else {
-                if metadata.directory {
-                    NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, offline: true, account: self.appDelegate.account)
-                    NCOperationQueue.shared.synchronizationMetadata(metadata, selector: NCGlobal.shared.selectorDownloadAllFile)
-                } else {
-                    NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
-                    if let metadataLivePhoto = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
-                        NCNetworking.shared.download(metadata: metadataLivePhoto, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
-                    }
-                }
-            }
-            
-            if viewController is NCCollectionViewCommon {
-                (viewController as! NCCollectionViewCommon).reloadDataSource()
-            }
-        }
+//        let offline = UIAction(title: titleOffline, image: UIImage(systemName: "tray.and.arrow.down")) { action in
+//            if isOffline {
+//                if metadata.directory {
+//                    NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, offline: false, account: self.appDelegate.account)
+//                } else {
+//                    NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: false)
+//                }
+//            } else {
+//                if metadata.directory {
+//                    NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, offline: true, account: self.appDelegate.account)
+//                    NCOperationQueue.shared.synchronizationMetadata(metadata, selector: NCGlobal.shared.selectorDownloadAllFile)
+//                } else {
+//                    NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
+//                    if let metadataLivePhoto = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
+//                        NCNetworking.shared.download(metadata: metadataLivePhoto, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
+//                    }
+//                }
+//            }
+//
+//            if viewController is NCCollectionViewCommon {
+//                (viewController as! NCCollectionViewCommon).reloadDataSource()
+//            }
+//        }
         
         let save = UIAction(title: titleSave, image: UIImage(systemName: "square.and.arrow.down")) { action in
             if metadataMOV != nil {
@@ -803,9 +803,9 @@ import Queuer
             self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorOpenIn)
         }
         
-        let print = UIAction(title: NSLocalizedString("_print_", comment: ""), image: UIImage(systemName: "printer") ) { action in
-            self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint)
-        }
+//        let print = UIAction(title: NSLocalizedString("_print_", comment: ""), image: UIImage(systemName: "printer") ) { action in
+//            self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint)
+//        }
         
         let modify = UIAction(title: NSLocalizedString("_modify_", comment: ""), image: UIImage(systemName: "pencil.tip.crop.circle")) { action in
             self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
