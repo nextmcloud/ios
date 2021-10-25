@@ -64,7 +64,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var networking: NCShareNetworking?
     private var shareeSelected: NCCommunicationSharee?
     public  var tableShareSelected: tableShare?
-    private var quickStatusTableShare: tableShare!
+    var quickStatusTableShare: tableShare!
     private var sendEmailSelected: Int!
     private var shareeEmail: String!
     
@@ -72,9 +72,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-
         viewContainerConstraint.constant = height
         searchField.layer.cornerRadius = 5
         searchField.layer.masksToBounds = true
