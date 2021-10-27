@@ -467,10 +467,14 @@ class NCBrandColor: NSObject {
     }
     
     @objc public var nmcGray80TabBar: UIColor {
-        if UITraitCollection.current.userInterfaceStyle == .dark {
-            return  UIColor(displayP3Red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                return  UIColor(displayP3Red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
+            } else {
+                return .white
+            }
         } else {
-            return .white
+            return  UIColor(displayP3Red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
         }
     }
     
