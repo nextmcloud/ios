@@ -81,11 +81,13 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         searchField.layer.masksToBounds = true
         searchField.layer.borderWidth = 1
         
+        searchField.delegate = self
+        
         self.btnCreateLink.setTitle(NSLocalizedString("_create_link_", comment: ""), for: .normal)
         self.btnCreateLink.layer.cornerRadius = 7
         self.btnCreateLink.layer.masksToBounds = true
         self.btnCreateLink.layer.borderWidth = 1
-        self.btnCreateLink.titleLabel?.font = UIFont.systemFont(ofSize: 20)
+        self.btnCreateLink.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         self.btnCreateLink.titleLabel!.adjustsFontSizeToFitWidth = true
         self.btnCreateLink.titleLabel!.minimumScaleFactor = 0.5
         
@@ -186,7 +188,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         self.btnCreateLink.layer.borderColor = NCBrandColor.shared.label.cgColor
         self.btnCreateLink.setTitleColor(NCBrandColor.shared.label, for: .normal)
         self.btnCreateLink.backgroundColor = .clear
-        searchField.layer.borderColor = NCBrandColor.shared.systemGray2.cgColor
+        searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
         labelYourShare.text = NSLocalizedString("_your_shares_", comment: "")
 //        self.btnCreateLink.titleLabel?.textColor = NCBrandColor.shared.secondarySystemGroupedBackground
     }
@@ -471,6 +473,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         dropDown.cellNib = UINib(nibName: "NCShareUserDropDownCell", bundle: nil)
         dropDown.customCellConfiguration = {[weak self] (index: Index, item: String, cell: DropDownCell) -> Void in
             guard let cell = cell as? NCShareUserDropDownCell else { return }
+            self?.searchField.layer.borderColor = NCBrandColor.shared.brand.cgColor
             let sharee = sharees[index]
             cell.imageItem.image = NCShareCommon.shared.getImageShareType(shareType: sharee.shareType)
             let status = NCUtility.shared.getUserStatus(userIcon: sharee.userIcon, userStatus: sharee.userStatus, userMessage: sharee.userMessage)
@@ -504,6 +507,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         dropDown.selectionAction = { [weak self] (index, item) in
             let sharee = sharees[index]
+            self?.searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
             let directory = self?.metadata?.directory ?? false
             let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
             DispatchQueue.main.async() { [self] in
@@ -652,6 +656,27 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         super.traitCollectionDidChange(previousTraitCollection)
         tableView.reloadData()
     }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        if searchField.isEditing {
+            searchField.resignFirstResponder()
+        }
+    }
+}
+
+extension NCShare: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        if textField == searchField {
+            searchField.layer.borderColor = NCBrandColor.shared.brand.cgColor
+        }
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if textField == searchField {
+            searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
+        }
+    }
 }
 
 // MARK: - UITableViewDelegate
@@ -684,7 +709,7 @@ extension NCShare: UITableViewDataSource {
             numOfRows = shares.share!.count
         }
         if numOfRows == 0 {
-            self.tableView.setEmptyMessage(NSLocalizedString("_your_shares_", comment: ""))
+            self.tableView.setEmptyMessage(NSLocalizedString("no_shares_created", comment: ""))
         } else {
             self.tableView.restore()
         }

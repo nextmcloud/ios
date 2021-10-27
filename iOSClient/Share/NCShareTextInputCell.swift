@@ -97,7 +97,7 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
         let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
         let cancelButton = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelDatePicker));
 
-        toolbar.setItems([doneButton,spaceButton,cancelButton], animated: false)
+        toolbar.setItems([cancelButton, spaceButton, doneButton], animated: false)
 
         sender.inputAccessoryView = toolbar
         sender.inputView = datePicker
@@ -107,7 +107,7 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
         let dateFormatter = DateFormatter()
         dateFormatter.formatterBehavior = .behavior10_4
         dateFormatter.dateStyle = .medium
-        dateFormatter.dateFormat = "dd-MMM-YYYY"
+        dateFormatter.dateFormat = NCShareAdvancePermission.displayDateFormat
         self.expirationDateText = dateFormatter.string(from: datePicker.date as Date)
         
         self.expirationDate = datePicker.date as NSDate
