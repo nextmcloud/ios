@@ -1278,6 +1278,8 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.progressView.progress = 0.0
             if UIDevice.current.orientation.isPortrait && UIDevice.current.model.hasPrefix("iPhone") {
                 cell.separator.backgroundColor = .clear
+            } else {
+                cell.separator.backgroundColor = NCBrandColor.shared.nmcSeparator
             }
 
             

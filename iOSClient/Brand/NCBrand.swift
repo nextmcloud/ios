@@ -417,16 +417,7 @@ class NCBrandColor: NSObject {
     }
     
     @objc public var nmcSeparator: UIColor{
-            if #available(iOS 13.0, *) {
-                if UITraitCollection.current.userInterfaceStyle == .dark {
-                    return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
-                }else {
-                    return  UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
-                }
-            }else{
-           return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
-        }
-       
+        return  UIColor(red: 76.0/255.0, green: 76.0/255.0, blue: 76.0/255.0, alpha: 1.0)
     }
     
     @objc public var nmcCommonViewInfoText: UIColor{
@@ -473,7 +464,18 @@ class NCBrandColor: NSObject {
         }else{
             return  UIColor(red: 19.0/255.0, green: 19.0/255.0, blue: 19.0/255.0, alpha: 1.0)
         }
-        
+    }
+    
+    @objc public var nmcGray80TabBar: UIColor {
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                return .white
+            }else {
+                return  UIColor(displayP3Red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
+            }
+        } else {
+            return  UIColor(displayP3Red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
+        }
     }
     
     override init() {
