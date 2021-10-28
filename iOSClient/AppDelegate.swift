@@ -800,8 +800,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         if passcodeViewController == nil {
             
-            passcodeViewController = TOPasscodeViewController.init(passcodeType: .sixDigits, allowCancel: false)
-            //passcodeViewController = TOPasscodeViewController.init(style: TOPasscodeViewStyle.opaqueDark, allowCancel: false, passcodeType: TOPasscodeType.sixDigits)
+//            passcodeViewController = TOPasscodeViewController.init(passcodeType: .sixDigits, allowCancel: false)
+            passcodeViewController = TOPasscodeViewController.init(style: .opaqueLight, passcodeType: .sixDigits)
             passcodeViewController?.delegate = self
             passcodeViewController?.keypadButtonShowLettering = false
             if CCUtility.getEnableTouchFaceID() && laContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {

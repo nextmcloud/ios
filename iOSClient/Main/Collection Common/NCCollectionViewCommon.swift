@@ -705,7 +705,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     func emptyDataSetView(_ view: NCEmptyView) {
                 
         if searchController?.isActive ?? false {
-            view.emptyImage.image = UIImage.init(named: "search")?.image(color: .gray, size: UIScreen.main.bounds.width)
+            view.emptyImage.image = UIImage.init(named: "search")?.image(color: NCBrandColor.shared.iconColor, size: UIScreen.main.bounds.width)
             if isReloadDataSourceNetworkInProgress {
                 view.emptyTitle.text = NSLocalizedString("_search_in_progress_", comment: "")
             } else {
@@ -722,7 +722,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 view.emptyTitle.text = NSLocalizedString(emptyTitle, comment: "")
                 view.emptyDescription.text = NSLocalizedString(emptyDescription, comment: "")
             } else {
-                view.emptyImage.image = UIImage.init(named: "folder")?.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width)
+                view.emptyImage.image = UIImage.init(named: "folder")
                 view.emptyTitle.text = NSLocalizedString("_files_no_files_", comment: "")
                 view.emptyDescription.text = NSLocalizedString("_no_file_pull_down_", comment: "")
             }
@@ -1498,6 +1498,8 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 }
                 
                 cell.labelInfo.text = CCUtility.dateDiff(metadata.date as Date)
+                cell.labelInfo.textColor = NCBrandColor.shared.nmcGray80
+                
                 
                 let lockServerUrl = CCUtility.stringAppendServerUrl(metadata.serverUrl, addFileName: metadata.fileName)!
                 let tableDirectory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, lockServerUrl))

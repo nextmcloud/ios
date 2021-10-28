@@ -205,7 +205,18 @@ class NCBrandColor: NSObject {
         }
     }
     
-    @objc public var systemGrayAndGray66:        UIColor = .gray
+    @objc public var gray60: UIColor {
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                return  UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
+            } else {
+                return  UIColor(red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+            }
+        } else {
+            return  UIColor(red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+        }
+    }
+    
     @objc public var commonViewInfoText: UIColor =  UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
     @objc public var tileSelectionImageColor:        UIColor = .white
     //@objc public var backgroundCell:        UIColor = .white
@@ -220,7 +231,7 @@ class NCBrandColor: NSObject {
     //@objc public var dotMenuGray: UIColor = UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
     @objc public var sublineGray: UIColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
     @objc public let nmcYellowFavorite:        UIColor = UIColor(red: 254.0/255.0, green: 203.0/255.0, blue: 0/255.0, alpha: 1.0)
-    @objc public let nmcGray30:        UIColor = UIColor(red: 254.0/255.0, green: 203.0/255.0, blue: 0/255.0, alpha: 1.0)
+    @objc public let nmcGray30:        UIColor = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
     @objc public let nmcGray70:        UIColor = UIColor(red: 254.0/255.0, green: 203.0/255.0, blue: 0/255.0, alpha: 1.0)
     
 //    private func createImagesThemingColor() {
@@ -417,16 +428,7 @@ class NCBrandColor: NSObject {
     }
     
     @objc public var nmcSeparator: UIColor{
-            if #available(iOS 13.0, *) {
-                if UITraitCollection.current.userInterfaceStyle == .dark {
-                    return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
-                }else {
-                    return  UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
-                }
-            }else{
-           return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
-        }
-       
+        return  UIColor(red: 76.0/255.0, green: 76.0/255.0, blue: 76.0/255.0, alpha: 1.0)
     }
     
     @objc public var nmcCommonViewInfoText: UIColor{
@@ -463,6 +465,30 @@ class NCBrandColor: NSObject {
         return  UIColor(displayP3Red: 0.0/255.0, green: 153.0/255.0, blue: 255.0/255.0, alpha: 1.0)
     }
 
+    @objc public var nmcGray80: UIColor {
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                return  UIColor(displayP3Red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
+            }else {
+                return  UIColor(red: 19.0/255.0, green: 19.0/255.0, blue: 19.0/255.0, alpha: 1.0)
+            }
+        }else{
+            return  UIColor(red: 19.0/255.0, green: 19.0/255.0, blue: 19.0/255.0, alpha: 1.0)
+        }
+    }
+    
+    @objc public var nmcGray80TabBar: UIColor {
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                return  UIColor(displayP3Red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
+            } else {
+                return .white
+            }
+        } else {
+            return  UIColor(displayP3Red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
+        }
+    }
+    
     override init() {
         self.brand = self.customer
 //        self.brandElement = self.customer
