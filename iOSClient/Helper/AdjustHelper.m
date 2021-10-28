@@ -35,13 +35,10 @@
 
 -(void)trackEvent:(TriggerEvent)event {
 //    self.event = [ADJEvent eventWithEventToken:@"gb97gb"];
-//    if (false) {
-//        return;
-//    }
-    
-//    [Adjust requestTrackingAuthorizationWithCompletionHandler:^(NSUInteger status) {
-//    }];
-
+    BOOL track = [[NSUserDefaults standardUserDefaults] valueForKey:@"isAnalysisDataCollectionSwitchOn"];
+    if (!track) {
+        return;
+    }
     
     switch(event){
        case Login:

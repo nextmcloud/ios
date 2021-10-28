@@ -811,9 +811,9 @@ import Queuer
             self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
         }
         
-        let saveAsScan = UIAction(title: NSLocalizedString("_save_as_scan_", comment: ""), image: UIImage(systemName: "viewfinder.circle")) { action in
-            self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
-        }
+//        let saveAsScan = UIAction(title: NSLocalizedString("_save_as_scan_", comment: ""), image: UIImage(systemName: "viewfinder.circle")) { action in
+//            self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
+//        }
         
         //let open = UIMenu(title: NSLocalizedString("_open_", comment: ""), image: UIImage(systemName: "square.and.arrow.up"), children: [openIn, openQuickLook])
         
@@ -884,9 +884,9 @@ import Queuer
             children.insert(save, at: 2)
         }
         
-        if (metadata.contentType != "image/svg+xml") && (metadata.typeFile == NCGlobal.shared.metadataTypeFileImage) {
-            children.insert(saveAsScan, at: 2)
-        }
+//        if (metadata.contentType != "image/svg+xml") && (metadata.typeFile == NCGlobal.shared.metadataTypeFileImage) {
+//            children.insert(saveAsScan, at: 2)
+//        }
         
         if (metadata.contentType != "image/svg+xml") && (metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.contentType == "application/pdf" || metadata.contentType == "com.adobe.pdf") {
             children.insert(print, at: 2)

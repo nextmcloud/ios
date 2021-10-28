@@ -259,19 +259,19 @@ extension NCCollectionViewCommon {
         //
         // SAVE AS SCAN
         //
-        if #available(iOS 13.0, *) {
-            if (metadata.typeFile == NCGlobal.shared.metadataTypeFileImage && metadata.contentType != "image/svg+xml") {
-                actions.append(
-                    NCMenuAction(
-                        title: NSLocalizedString("_save_as_scan_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "viewfinder.circle",color: NCBrandColor.shared.iconColor),
-                        action: { menuAction in
-                            NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
-                        }
-                    )
-                )
-            }
-        }
+//        if #available(iOS 13.0, *) {
+//            if (metadata.typeFile == NCGlobal.shared.metadataTypeFileImage && metadata.contentType != "image/svg+xml") {
+//                actions.append(
+//                    NCMenuAction(
+//                        title: NSLocalizedString("_save_as_scan_", comment: ""),
+//                        icon: NCUtility.shared.loadImage(named: "viewfinder.circle",color: NCBrandColor.shared.iconColor),
+//                        action: { menuAction in
+//                            NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
+//                        }
+//                    )
+//                )
+//            }
+//        }
         
         //
         // RENAME

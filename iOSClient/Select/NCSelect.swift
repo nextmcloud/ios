@@ -866,8 +866,8 @@ class NCSelectCommandView: UIView {
     
     override func awakeFromNib() {
         
-        separatorHeightConstraint.constant = 0.5
-        separatorView.backgroundColor = NCBrandColor.shared.separator
+        separatorHeightConstraint.constant = 1.0
+        separatorView.backgroundColor = NCBrandColor.shared.connectionNo
         
         overwriteLabel?.text = NSLocalizedString("_overwrite_", comment: "")
         overwriteSwitch?.onTintColor = NCBrandColor.shared.customer
