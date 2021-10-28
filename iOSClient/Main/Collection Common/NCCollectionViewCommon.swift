@@ -134,8 +134,12 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         
         //call new view
                
-        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed")){
+        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed") || isApplicationUpdated()){
             redirectToPrivacyViewController()
+            
+            //set current app version
+            let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String
+            UserDefaults.standard.set(appVersion, forKey: "CurrentAppVersion")
         }
         
         if(!UserDefaults.standard.bool(forKey: "isMediaPathSetToDefaultFolder")){
@@ -1114,6 +1118,19 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         let path = CCUtility.returnPathfromServerUrl(serverUrlPush, urlBase: appDelegate.urlBase, account: appDelegate.account) ?? ""
         NCManageDatabase.shared.setAccountMediaPath(path, account: appDelegate.account)
         UserDefaults.standard.set(true, forKey: "isMediaPathSetToDefaultFolder")
+    }
+    
+    func isApplicationUpdated() -> Bool{
+        
+        let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String ?? ""
+        let currentVersion = UserDefaults.standard.string(forKey: "CurrentAppVersion")
+
+        if (currentVersion != appVersion){
+            
+            return true
+        }else{
+            return false
+        }
     }
 }
 

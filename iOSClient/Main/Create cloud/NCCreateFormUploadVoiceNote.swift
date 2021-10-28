@@ -211,8 +211,10 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.label
-        row.cellConfig["fileNameTextField.placeholder"] = self.fileName
-        
+        row.cellConfig["fileNameTextField.text"] = self.fileName
+
+        //row.cellConfig["fileNameTextField.placeholder"] = self.fileName
+        //row.cellConfig["fileNameTextField.placeholderColor"] = NCBrandColor.shared.nmcGray1
         section.addFormRow(row)
 
         self.form = form
