@@ -70,6 +70,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         progressView.layer.cornerRadius = 5.0
         progressView.layer.borderColor = NCBrandColor.shared.customer.cgColor
         progressView.progressTintColor = NCBrandColor.shared.customer
+        progressView.trackTintColor = .white
 //        progressView.trackTintColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
 //        progressView.trackTintColor = NCBrandColor.shared.customer
         
@@ -132,7 +133,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         
         view.backgroundColor = NCBrandColor.shared.systemGroupedBackground
         tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground
-        cellBackgoundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        cellBackgoundColor = NCBrandColor.shared.systemGroupedBackground
         
         tableView.reloadData()
     }
@@ -173,18 +174,9 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         // Section: Destination Folder
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
-        form.addFormSection(section)
-//
-//        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: self.titleServerUrl)
-//        row.action.formSelector = #selector(changeDestinationFolder(_:))
-//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-//
-//        row.cellConfig["imageView.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
-//        
-//        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
+        section.footerTitle = "                                                                               "
         
+        form.addFormSection(section)
         
         //custom cell
         
@@ -195,26 +187,13 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")
         
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label //photos
         row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         row.cellConfig["textLabel.text"] = ""
-//=======
-//
-//        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: self.titleServerUrl)
-//        row.action.formSelector = #selector(changeDestinationFolder(_:))
-//        row.cellConfig["backgroundColor"] = cellBackgoundColor
-//
-//        row.cellConfig["imageView.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
-//
-//        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-//
-//>>>>>>> feature_branded_client_4
         section.addFormRow(row)
         
         // Section: File Name
@@ -228,31 +207,11 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
         row.cellClass = TextTableViewCell.self
 
-        //row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
         row.cellConfigAtConfigure["backgroundColor"] = NCBrandColor.shared.backgroundForm;
-        //row.cellConfig["labelFileName.font"] = UIFont.systemFont(ofSize: 15.0)
-        //row.cellConfig["labelFileName.textColor"] = NCBrandColor.shared.label
-        //row.cellConfig["labelFileName.text"] = NSLocalizedString("_filename_", comment: "")
-        
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.label
         row.cellConfig["fileNameTextField.placeholder"] = self.fileName
-//=======
-//        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
-//        form.addFormSection(section)
-//
-//        row = XLFormRowDescriptor(tag: "fileName", rowType: XLFormRowDescriptorTypeText, title: NSLocalizedString("_filename_", comment: ""))
-//        row.value = self.fileName
-//        row.cellConfig["backgroundColor"] = cellBackgoundColor
-//
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-//
-//        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
-//        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
-//>>>>>>> feature_branded_client_4
         
         section.addFormRow(row)
 
@@ -287,7 +246,14 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
         header.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
         header.textLabel?.textColor = .gray
-        header.tintColor = cellBackgoundColor
+        header.tintColor = NCBrandColor.shared.systemGroupedBackground
+    }
+    
+    override func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
+        let footer: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
+        footer.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
+        footer.textLabel?.textColor = .gray
+        footer.tintColor = NCBrandColor.shared.systemGroupedBackground
     }
     
 //    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

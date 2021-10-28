@@ -113,7 +113,7 @@
 "_error_parameter_schema_"  = "Wrong parameters, impossible to continue";
 "_comments_"                = "Comments";
 "_sharing_"                 = "Sharing";
-"_details_"                 = "Details";
+"_details_"                 = "Share";
 "_dark_mode_"               = "Dark mode";
 "_dark_mode_detect_"        = "Detect iOS dark mode";
 "_screen_"                  = "Screen";

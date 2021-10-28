@@ -515,14 +515,14 @@ class NCViewerImage: UIViewController {
         var itemMute = toolBar.items![2]
         
         if player?.rate == 1 {
-            itemPlay = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.pause, target: self, action: #selector(playerPause))
+            itemPlay = UIBarButtonItem(image: UIImage(named: "pauseBarButton")?.imageColor(NCBrandColor.shared.customer), style: UIBarButtonItem.Style.plain, target: self, action: #selector(playerPause))
         } else {
-            itemPlay = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.play, target: self, action: #selector(playerPlay))
+            itemPlay = UIBarButtonItem(image: UIImage(named: "playBarButton")?.imageColor(NCBrandColor.shared.customer), style: UIBarButtonItem.Style.plain, target: self, action: #selector(playerPlay))
         }
         if mute {
-            itemMute = UIBarButtonItem(image: UIImage(named: "audioOff"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(SetMute))
+            itemMute = UIBarButtonItem(image: UIImage(named: "audioOff")?.imageColor(NCBrandColor.shared.customer), style: UIBarButtonItem.Style.plain, target: self, action: #selector(SetMute))
         } else {
-            itemMute = UIBarButtonItem(image: UIImage(named: "audioOn"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(SetMute))
+            itemMute = UIBarButtonItem(image: UIImage(named: "audioOn")?.imageColor(NCBrandColor.shared.customer), style: UIBarButtonItem.Style.plain, target: self, action: #selector(SetMute))
         }
         
         toolBar.setItems([itemPlay, itemFlexibleSpace, itemMute], animated: true)

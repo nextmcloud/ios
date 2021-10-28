@@ -151,7 +151,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     // MARK: - NotificationCenter
 
     @objc func changeTheming() {
-        view.backgroundColor = NCBrandColor.shared.tabBar
+        view.backgroundColor = NCBrandColor.shared.nmcGray80
         seperator.backgroundColor = NCBrandColor.shared.seperatorRename
         fileNameWithoutExt.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         ext.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground

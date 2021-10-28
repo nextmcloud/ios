@@ -728,7 +728,7 @@ import Queuer
             titleSave = NSLocalizedString("_livephoto_save_", comment: "")
         }
         let titleFavorite = metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: "")
-        
+
         let serverUrl = metadata.serverUrl + "/" + metadata.fileName
         var isOffline = false
         if metadata.directory {
@@ -741,13 +741,13 @@ import Queuer
             }
         }
         let titleOffline = isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: "")
-        
+
         let copy = UIAction(title: NSLocalizedString("_copy_file_", comment: ""), image: UIImage(systemName: "doc.on.doc")) { action in
             self.appDelegate.pasteboardOcIds = [metadata.ocId]
             self.copyPasteboard()
         }
         
-        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(systemName: "info")) { action in
+        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(named: "details")?.imageColor(NCBrandColor.shared.nmcGray0)) { action in
             self.openShare(ViewController: viewController, metadata: metadata, indexPage: 0)
         }
         
@@ -769,7 +769,7 @@ import Queuer
                     }
                 }
             }
-            
+
             if viewController is NCCollectionViewCommon {
                 (viewController as! NCCollectionViewCommon).reloadDataSource()
             }

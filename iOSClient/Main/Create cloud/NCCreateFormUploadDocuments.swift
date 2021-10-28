@@ -100,7 +100,7 @@ import NCCommunication
         
         view.backgroundColor = NCBrandColor.shared.systemGroupedBackground
         collectionView.backgroundColor = NCBrandColor.shared.systemGroupedBackground
-        tableView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground
         
         tableView.reloadData()
         collectionView.reloadData()
@@ -119,6 +119,7 @@ import NCCommunication
         // Section: Destination Folder
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
+        section.footerTitle = "                                                                               "
         form.addFormSection(section)
         
 //        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: fileNameFolder)
@@ -137,7 +138,7 @@ import NCCommunication
         
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: "")
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")
         
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -184,7 +185,14 @@ import NCCommunication
         let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
         header.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
         header.textLabel?.textColor = .gray
-        header.tintColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        header.tintColor = NCBrandColor.shared.systemGroupedBackground
+    }
+    
+    override func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
+        let footer: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
+        footer.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
+        footer.textLabel?.textColor = .gray
+        footer.tintColor = NCBrandColor.shared.systemGroupedBackground
     }
 
     // MARK: - CollectionView

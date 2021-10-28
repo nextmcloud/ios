@@ -62,21 +62,23 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
         }
         
         if rowDescriptor.tag == "kNMCFilePermissionEditCellExpiration" {
+            self.seperator.isHidden = true
             setDatePicker(sender: self.cellTextField)
         }
         
         if rowDescriptor.tag == "kNMCFilePermissionEditPasswordCellWithText" {
             self.seperatorMiddle.isHidden = true
-//            self.seperatorBottom.isHidden = true
+            self.seperator.isHidden = true
         }
         
         if rowDescriptor.tag == "kNMCFilePermissionEditCellHideDownload" {
-            seperator.isHidden = false
+            self.seperator.isHidden = true
             self.seperatorMiddle.isHidden = true
         }
         
         if  rowDescriptor.tag == "kNMCFilePermissionEditCellEditingCanShare" {
             self.seperator.isHidden = true
+            self.seperatorBottom.isHidden = true
         }
     }
     

@@ -36,6 +36,8 @@ class TextTableViewCell: XLFormBaseCell, UITextFieldDelegate {
         super.update()
         if (rowDescriptor.tag == "maskFileName"){
             topLineView.isHidden = true
+        }else{
+            topLineView.isHidden = false
         }
     }
     

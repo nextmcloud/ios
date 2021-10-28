@@ -1,16 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "audioOffsmall.png",
+      "filename" : "playBarButton.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "audioOffsmall@2x.png",
+      "filename" : "playBarButton@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "playBarButton@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

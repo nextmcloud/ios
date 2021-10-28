@@ -1,8 +1,19 @@
 {
   "images" : [
     {
-      "filename" : "audioOn.pdf",
-      "idiom" : "universal"
+      "filename" : "audioOn.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "audioOn@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "audioOn@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {
