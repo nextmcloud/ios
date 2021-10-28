@@ -364,6 +364,7 @@
 "_key_reject_help_" = "reject";
 "_key_settings_help_" = "Settings";
 "_prefix_upload_path_" = "MagentaCLOUD/";
+"_privacy_settings_title_" = "Privacy Settings";
 
 
 // Manage AutoUpload
@@ -644,8 +645,8 @@
 "_enforce_password_protection_" = "Enforce password protection";
 "_password_obligatory_"         = "Enforce password protection enabled, password obligatory";
 "_shared_with_you_by_"          = "Shared with you by";
-"_share_reshare_allowed_"       = "Resharing is allowed";
-"_share_reshare_not_allowed_"   = "Resharing is not allowed";
+"_share_reshare_allowed_"       = "Resharing is allowed.";
+"_share_reshare_not_allowed_"   = "Resharing is not allowed.";
 "_shareLinksearch_placeholder_" = "Contact name or email address";
 "_new_comment_"                 = "New comment…";
 "_edit_comment_"                = "Edit comment";

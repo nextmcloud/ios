@@ -202,7 +202,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         } else {
             if metadata!.directory {
                 let image = UIImage.init(named: "folder")!
-                self.headerView.imageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
+                self.headerView.imageView.image = image
             } else if metadata!.iconName.count > 0 {
                 self.headerView.imageView.image = UIImage.init(named: metadata!.iconName)
             } else {

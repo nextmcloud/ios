@@ -22,6 +22,7 @@ class InitialPrivacySettingsViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        privacySettingsTitle.text = NSLocalizedString("_privacy_settings_title_", comment: "")
         privacyHelpText = NSLocalizedString("_privacy_help_text_after_login_", comment: "")
         
         privacySettingsHelpText.text = privacyHelpText
