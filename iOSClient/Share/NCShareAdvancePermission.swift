@@ -643,7 +643,8 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         dateFormatter.formatterBehavior = .behavior10_4
         dateFormatter.dateStyle = .medium
         dateFormatter.dateFormat = NCShareAdvancePermission.displayDateFormat
-        let expiryDate = dateFormatter.string(from: date)
+        var expiryDate = dateFormatter.string(from: date)
+        expiryDate = expiryDate.replacingOccurrences(of: "..", with: ".")
         return expiryDate
     }
     
