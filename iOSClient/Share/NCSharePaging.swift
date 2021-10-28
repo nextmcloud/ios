@@ -118,6 +118,8 @@ class NCSharePaging: UIViewController {
         pagingViewController.collectionView.isHidden = true
         
         changeTheming()
+        pagingViewController.indicatorColor = .clear
+        (pagingViewController.view as! NCSharePagingView).setupConstraints()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -158,9 +160,6 @@ class NCSharePaging: UIViewController {
         pagingViewController.selectedBackgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         pagingViewController.textColor = NCBrandColor.shared.secondarySystemGroupedBackground
         pagingViewController.selectedTextColor = NCBrandColor.shared.secondarySystemGroupedBackground
-//        pagingViewController.indicatorColor = NCBrandColor.shared.brandElement
-        pagingViewController.indicatorColor = .clear
-        (pagingViewController.view as! NCSharePagingView).setupConstraints()
         pagingViewController.reloadMenu()
     }
 }
@@ -528,7 +527,9 @@ class NCShareHeaderView: UIView {
             sharedByImageView.image = UIImage(named: "cloudUpload")?.image(color: .systemBlue, size: 26)
             let ownerName = metadata?.ownerDisplayName ?? ""
             sharedByLabel.text = NSLocalizedString("_shared_with_you_by_", comment: "") + " " + ownerName
-            resharingAllowedLabel.text = canReshare ? NSLocalizedString("_share_reshare_allowed_", comment: "") : NSLocalizedString("_share_reshare_not_allowed_", comment: "")
+            let resharingAllowedMessage =  NSLocalizedString("_share_reshare_allowed_", comment: "")
+            let resharingNotAllowedMessage = NSLocalizedString("_share_reshare_not_allowed_", comment: "")
+            resharingAllowedLabel.text = canReshare ? resharingAllowedMessage  : resharingNotAllowedMessage
         }
     }
     
