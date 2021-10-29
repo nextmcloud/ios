@@ -169,11 +169,15 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         XLFormViewController.cellClassesForRowDescriptorTypes()["NMCScanFolderPathCustomCell"] = ScanDocumentPathView.self
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "NMCScanFolderPathCustomCell", title: self.titleServerUrl)
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")?.imageColor(NCBrandColor.shared.customer)
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label
-        row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
+        if(self.titleServerUrl == "/"){
+            row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
+        }else{
+            row.cellConfig["photoLabel.text"] = self.titleServerUrl
+        }
         row.cellConfig["textLabel.text"] = ""
         
         section.addFormRow(row)
@@ -900,75 +904,34 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     
     @objc func save() {
         
-        // Request delete all image scanned
-        let alertController = UIAlertController(title: "", message: NSLocalizedString("_saved_info_alert_", comment: ""), preferredStyle: .alert)
-        let alertWindow = UIWindow(frame: UIScreen.main.bounds)
-        alertWindow.windowLevel = UIWindow.Level.alert
-        alertWindow.rootViewController = UIViewController()
-        alertWindow.makeKeyAndVisible()
-        let actionOk = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default) { (action:UIAlertAction) in
-            self.startProcessForSaving()
-            alertController.dismiss(animated: true, completion: nil)
+        if(!isAtleastOneFiletypeSelected()){
+            let alertController = UIAlertController(title: "", message: NSLocalizedString("_no_file_type_selection_error_", comment: ""), preferredStyle: .alert)
+            let alertWindow = UIWindow(frame: UIScreen.main.bounds)
+            alertWindow.windowLevel = UIWindow.Level.alert
+            alertWindow.rootViewController = UIViewController()
+            alertWindow.makeKeyAndVisible()
+            let actionOk = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default) { (action:UIAlertAction) in
+                alertController.dismiss(animated: true, completion: nil)
+            }
+            
+            alertController.addAction(actionOk)
+            self.present(alertController, animated: true)
+        }else{
+            // Request delete all image scanned
+            let alertController = UIAlertController(title: "", message: NSLocalizedString("_saved_info_alert_", comment: ""), preferredStyle: .alert)
+            let alertWindow = UIWindow(frame: UIScreen.main.bounds)
+            alertWindow.windowLevel = UIWindow.Level.alert
+            alertWindow.rootViewController = UIViewController()
+            alertWindow.makeKeyAndVisible()
+            let actionOk = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default) { (action:UIAlertAction) in
+                self.startProcessForSaving()
+                alertController.dismiss(animated: true, completion: nil)
+            }
+            
+            alertController.addAction(actionOk)
+            self.present(alertController, animated: true)
         }
-        
-        alertController.addAction(actionOk)
-        //alertWindow.addSubview(alertController)
-        self.present(alertController, animated: true)
-        
-        
-//        if (isPNGFormatSwitchOn){
-//            saveImages(fileNameSave: fileNameSave, fileType: "png",metadataConflict: nil,completion: { (success) -> Void in
-//                print("Second line of code executed")
-//                if success { // this will be equal to whatever value is set in this method call
-//                      print("true")
-//                } else {
-//                     print("false")
-//                }
-//            })
-//        }
-        
-//        if (isPDFWithOCRSwitchOn){
-//            savePDF(ocrSwitchOn: true)
-//        }
-//
-//        if (isPDFWithoutOCRSwitchOn){
-//            savePDF(ocrSwitchOn: false)
-//        }
-//
-//        if (isTextFileSwitchOn){
-//            saveTxtFile()
-//        }
-        
-        //        if fileType == "JPG" {
-        //        } else {
-        //        Create metadata for upload
-        //        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false, chunk: false)
-        //
-        //        metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
-        //        metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
-        //        metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-        //
-        //        if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: fileNameSave) != nil {
-        //
-        //            guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
-        //            conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
-        //            conflictViewController.serverUrl = serverUrl
-        //            conflictViewController.metadatasUploadInConflict = [metadataForUpload]
-        //            conflictViewController.delegate = self
-        //
-        //            self.present(conflictViewController, animated: true, completion: nil)
-        //
-        //        }
-        //
-        //         else {
-        //
-        //            NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
-        //
-        //            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-        //                self.dismissAndUpload(metadataForUpload)
-        //            }
-        //
-        //        }
+     
     }
     
     func showAlert(){
@@ -1792,6 +1755,20 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         return attributes
     }
+    
+    func isAtleastOneFiletypeSelected() -> Bool{
+        if(isPDFWithOCRSwitchOn
+            || isPDFWithoutOCRSwitchOn
+            || isTextFileSwitchOn
+            || isPNGFormatSwitchOn
+            || isJPGFormatSwitchOn){
+            
+            return true
+        }else{
+            return false
+        }
+    }
+    
 }
 
 @available(iOS 13.0, *)
@@ -1912,19 +1889,7 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
 
         }
     }
-//=======
-//                let storyboard = UIStoryboard(name: "Scan", bundle: nil)
-//                let controller = storyboard.instantiateInitialViewController()!
-//
-//                controller.modalPresentationStyle = UIModalPresentationStyle.pageSheet
-//                self.viewController?.present(controller, animated: true, completion: nil)
-//            }
-//        }
-//    }
-//
-//    func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
-//        controller.dismiss(animated: true, completion: nil)
-//    }
-//>>>>>>> feature_branded_client_4
+
+
 }
 

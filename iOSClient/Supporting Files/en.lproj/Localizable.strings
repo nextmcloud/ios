@@ -873,6 +873,7 @@
 "_set_password_"                    = "Set password";
 "_no_password_warn_"                 = "Please enter a password for the PDF you want to create or disable the function.";
 "_saved_info_alert_" = "Saving will take some time, espacially if you have selected several pages and file formats.";
+"_no_file_type_selection_error_" = "Please select at least one filetype";
 
 
 /* The title on the navigation bar of the Scanning screen. */

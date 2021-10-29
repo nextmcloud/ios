@@ -275,8 +275,8 @@
     
     if ([[CCUtility getPasscode] length] > 0) {
         
-        passcodeViewController = [[TOPasscodeViewController alloc] initWithStyle:TOPasscodeViewStyleOpaqueDark passcodeType:TOPasscodeTypeSixDigits];
         //passcodeViewController = [[TOPasscodeViewController alloc] initWithStyle:TOPasscodeViewStyleOpaqueDark passcodeType:TOPasscodeTypeSixDigits];
+        passcodeViewController = [[TOPasscodeViewController alloc] initPasscodeType:TOPasscodeTypeSixDigits allowCancel:true];
         passcodeViewController.delegate = self;
         passcodeViewController.keypadButtonShowLettering = false;
         
