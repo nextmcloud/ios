@@ -21,18 +21,20 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import NCCommunication
 
 class NCShares: NCCollectionViewCommon  {
     
+    // MARK: - View Life Cycle
+
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
         titleCurrentFolder = NSLocalizedString("_list_shares_", comment: "")
         layoutKey = NCGlobal.shared.layoutViewShares 
         enableSearchBar = false
-        emptyImage = UIImage.init(named: "share")?.image(color: .gray, size: UIScreen.main.bounds.width)
+        emptyImage = UIImage.init(named: "share")?.image(color: NCBrandColor.shared.nmcGray1, size: UIScreen.main.bounds.width)
         emptyTitle = "_list_shares_no_files_"
         emptyDescription = "_tutorial_list_shares_view_"
     }
@@ -51,7 +53,7 @@ class NCShares: NCCollectionViewCommon  {
                 }
             }
             
-            self.dataSource = NCDataSource.init(metadatasSource: self.metadatasSource, sort:self.sort, ascending: self.ascending, directoryOnTop: self.directoryOnTop, favoriteOnTop: true, filterLivePhoto: true)
+            self.dataSource = NCDataSource.init(metadatasSource: self.metadatasSource, sort: self.layoutForView?.sort, ascending: self.layoutForView?.ascending, directoryOnTop: self.layoutForView?.directoryOnTop, favoriteOnTop: true, filterLivePhoto: true)
             
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()

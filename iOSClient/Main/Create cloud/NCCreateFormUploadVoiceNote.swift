@@ -21,7 +21,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+
+import UIKit
 import NCCommunication
 
 class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAudioPlayerDelegate, NCCreateFormUploadConflictDelegate {
@@ -42,6 +43,100 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     private var timer = Timer()
 
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    
+    var cellBackgoundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+
+    // MARK: - View Life Cycle
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancel))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_save_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(save))
+        self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+
+        self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
+        self.navigationItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.brand
+
+        // title
+        self.title = NSLocalizedString("_voice_memo_title_", comment: "")
+        
+        // Button Play Stop
+        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
+        
+        // Progress view
+        progressView.progress = 0
+        progressView.layer.borderWidth = 1
+        progressView.layer.cornerRadius = 5.0
+        progressView.layer.borderColor = NCBrandColor.shared.customer.cgColor
+        progressView.progressTintColor = NCBrandColor.shared.customer
+        progressView.trackTintColor = .white
+//        progressView.trackTintColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
+//        progressView.trackTintColor = NCBrandColor.shared.customer
+        
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+
+        changeTheming()
+        initializeForm()
+//=======
+//        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.gray, size: 100), for: .normal)
+//
+//        // Progress view
+//        progressView.progress = 0
+//        progressView.progressTintColor = .green
+//        progressView.trackTintColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
+//
+//        labelTimer.textColor = NCBrandColor.shared.label
+//        labelDuration.textColor = NCBrandColor.shared.label
+//
+//        changeTheming()
+//
+//        initializeForm()
+//>>>>>>> feature_branded_client_4
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        updateTimerUI()
+    }
+    
+//<<<<<<< HEAD
+//    @objc func changeTheming() {
+//        view.backgroundColor = NCBrandColor.shared.backgroundForm
+//        tableView.backgroundColor = NCBrandColor.shared.backgroundForm
+//        tableView.reloadData()
+//
+//        labelTimer.textColor = NCBrandColor.shared.label
+//        labelDuration.textColor = NCBrandColor.shared.label
+//
+//        initializeForm()
+//=======
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        if audioPlayer.isPlaying {
+            stop()
+        }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        changeTheming()
+    }
+    
+    // MARK: - Theming
+    
+    @objc func changeTheming() {
+        
+        view.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        cellBackgoundColor = NCBrandColor.shared.systemGroupedBackground
+        
+        tableView.reloadData()
+    }
     
     public func setup(serverUrl: String, fileNamePath: String, fileName: String) {
     
@@ -66,54 +161,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         }
     }
     
-    // MARK: - View Life Cycle
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancel))
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_save_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(save))
-        
-        self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
-        
-        // title
-        self.title = NSLocalizedString("_voice_memo_title_", comment: "")
-        
-        // Button Play Stop
-        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
-        
-        // Progress view
-        progressView.progress = 0
-        progressView.layer.borderWidth = 1
-        progressView.layer.cornerRadius = 5.0
-        progressView.layer.borderColor = NCBrandColor.shared.customer.cgColor
-        progressView.progressTintColor = NCBrandColor.shared.customer
-//        progressView.trackTintColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
-//        progressView.trackTintColor = NCBrandColor.shared.customer
-        
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
-
-        changeTheming()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        updateTimerUI()
-    }
-    
-    @objc func changeTheming() {
-        view.backgroundColor = NCBrandColor.shared.backgroundForm
-        tableView.backgroundColor = NCBrandColor.shared.backgroundForm
-        tableView.reloadData()
-                
-        labelTimer.textColor = NCBrandColor.shared.textView
-        labelDuration.textColor = NCBrandColor.shared.textView
-        
-        initializeForm()
-    }
-    
     //MARK: XLForm
 
     func initializeForm() {
@@ -127,18 +174,9 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         // Section: Destination Folder
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
-        form.addFormSection(section)
-//
-//        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: self.titleServerUrl)
-//        row.action.formSelector = #selector(changeDestinationFolder(_:))
-//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-//
-//        row.cellConfig["imageView.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
-//        
-//        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.textView
+        section.footerTitle = "                                                                               "
         
+        form.addFormSection(section)
         
         //custom cell
         
@@ -147,12 +185,13 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         
         
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
+        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")
         
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.textView //photos
+        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label //photos
         row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         row.cellConfig["textLabel.text"] = ""
         section.addFormRow(row)
@@ -168,17 +207,14 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
         row.cellClass = TextTableViewCell.self
 
-        //row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
         row.cellConfigAtConfigure["backgroundColor"] = NCBrandColor.shared.backgroundForm;
-        //row.cellConfig["labelFileName.font"] = UIFont.systemFont(ofSize: 15.0)
-        //row.cellConfig["labelFileName.textColor"] = NCBrandColor.shared.textView
-        //row.cellConfig["labelFileName.text"] = NSLocalizedString("_filename_", comment: "")
-        
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.textView
-        row.cellConfig["fileNameTextField.placeholder"] = self.fileName
-        
+        row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.label
+        row.cellConfig["fileNameTextField.text"] = self.fileName
+
+        //row.cellConfig["fileNameTextField.placeholder"] = self.fileName
+        //row.cellConfig["fileNameTextField.placeholderColor"] = NCBrandColor.shared.nmcGray1
         section.addFormRow(row)
 
         self.form = form
@@ -198,6 +234,9 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             
             formRow.value = self.fileName
             //self.updateFormRow(formRow)
+//=======
+//            self.updateFormRow(formRow)
+//>>>>>>> feature_branded_client_4
             
             self.form.delegate = self
         }
@@ -209,7 +248,14 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
         header.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
         header.textLabel?.textColor = .gray
-        header.tintColor = NCBrandColor.shared.backgroundForm
+        header.tintColor = NCBrandColor.shared.systemGroupedBackground
+    }
+    
+    override func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
+        let footer: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
+        footer.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
+        footer.textLabel?.textColor = .gray
+        footer.tintColor = NCBrandColor.shared.systemGroupedBackground
     }
     
 //    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -229,7 +275,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 //    }
     // MARK: - Action
     
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], buttonType: String, overwrite: Bool) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
         
         if serverUrl != nil {
             
@@ -245,6 +291,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             let row : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!//
             //row.title = self.titleServerUrl
             row.cellConfig["photoLabel.text"] = self.titleServerUrl
+
             self.updateFormRow(row)
         }
     }
@@ -264,7 +311,22 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             fileNameSave = (self.fileName as! NSString).deletingPathExtension + ".m4a"
         }
         
-        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase ,url: "", contentType: "", livePhoto: false, chunk: false)
+        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase ,url: "", contentType: "", livePhoto: false)
+//=======
+//        guard let name = rowFileName.value else {
+//            return
+//        }
+//        let ext = (name as! NSString).pathExtension.uppercased()
+//        var fileNameSave = ""
+//
+//        if (ext == "") {
+//            fileNameSave = name as! String + ".m4a"
+//        } else {
+//            fileNameSave = (name as! NSString).deletingPathExtension + ".m4a"
+//        }
+//
+//        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase ,url: "", contentType: "", livePhoto: false)
+//>>>>>>> feature_branded_client_4
         
         metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
         metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
@@ -320,15 +382,11 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         let viewController = navigationController.topViewController as! NCSelect
         
         viewController.delegate = self
-        viewController.hideButtonCreateFolder = false
+        viewController.typeOfCommandView = .selectCreateFolder
         viewController.includeDirectoryE2EEncryption = true
-        viewController.includeImages = false
-        viewController.selectFile = false
-        viewController.titleButtonDone = NSLocalizedString("_select_", comment: "")
-        viewController.type = ""
         
-        navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
         self.present(navigationController, animated: true, completion: nil)
+
     }
     
     //MARK: Player - Timer
@@ -348,25 +406,58 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
         if audioPlayer.isPlaying {
             
-            audioPlayer.currentTime = 0.0
-            audioPlayer.stop()
-            
-            timer.invalidate()
-            counterSecondPlayer = 0
-            progressView.progress = 0
-            updateTimerUI()
-            
-            buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
+//<<<<<<< HEAD
+//            audioPlayer.currentTime = 0.0
+//            audioPlayer.stop()
+//
+//            timer.invalidate()
+//            counterSecondPlayer = 0
+//            progressView.progress = 0
+//            updateTimerUI()
+//
+//            buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
+//
+//        } else {
+//
+//            audioPlayer.prepareToPlay()
+//            audioPlayer.play()
+//
+//            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
+//
+//            buttonPlayStop.setImage(UIImage(named: "stop")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
+//        }
+//    }
+//
+//=======
+            stop()
             
         } else {
             
-            audioPlayer.prepareToPlay()
-            audioPlayer.play()
-            
-            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
-            
-            buttonPlayStop.setImage(UIImage(named: "stop")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
+            start()
         }
+    }
+    
+    func start() {
+        
+        audioPlayer.prepareToPlay()
+        audioPlayer.play()
+        
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
+        
+        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
+    }
+    
+    func stop() {
+        
+        audioPlayer.currentTime = 0.0
+        audioPlayer.stop()
+        
+        timer.invalidate()
+        counterSecondPlayer = 0
+        progressView.progress = 0
+        updateTimerUI()
+        
+        buttonPlayStop.setImage(UIImage(named: "stop")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
     }
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
@@ -376,7 +467,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         progressView.progress = 0
         updateTimerUI()
         
-        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
+        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
+
     }
 }
 

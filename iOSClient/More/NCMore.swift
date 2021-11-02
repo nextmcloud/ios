@@ -52,6 +52,12 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         tableView.dataSource = self
 
         self.navigationItem.title = NSLocalizedString("_more_", comment: "")
+        view.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        tableView.separatorColor = NCBrandColor.shared.separator
 
         tableView.register(UINib.init(nibName: "NCMoreUserCell", bundle: nil), forCellReuseIdentifier: "userCell")
         
@@ -61,19 +67,20 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 //        labelQuotaExternalSite.addGestureRecognizer(tapQuota)
 
         // Notification
-        NotificationCenter.default.addObserver(self, selector: #selector(changeUserProfile), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeUserProfile), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
-        
-        changeTheming()
+        NotificationCenter.default.addObserver(self, selector: #selector(initialize), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         tableView.alwaysBounceVertical = false
     }
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
+    
+    // MARK: - NotificationCenter
+
+    @objc func initialize() {
+        loadItems()
+    }
+    func loadItems() {
         var item = NCCommunicationExternalSite()
 
         // Clear
@@ -98,11 +105,11 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         functionMenu.append(item)
         
         // ITEM : Notification
-//        item = NCCommunicationExternalSite()
-//        item.name = "_notification_"
-//        item.icon = "notification"
-//        item.url = "segueNotification"
-//        functionMenu.append(item)
+        item = NCCommunicationExternalSite()
+        item.name = "_notification_"
+        item.icon = "notification"
+        item.url = "segueNotification"
+        functionMenu.append(item)
 
         // ITEM : Activity
 //        item = NCCommunicationExternalSite()
@@ -189,28 +196,29 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             tableView.reloadData()
         }
     }
-
-    @objc func changeTheming() {
-        view.backgroundColor = NCBrandColor.shared.backgroundForm
-        tableView.backgroundColor = NCBrandColor.shared.backgroundForm
-        tableView.separatorColor = NCBrandColor.shared.separator
-        tableView.reloadData()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        appDelegate.activeViewController = self
         
         viewQuota.backgroundColor = NCBrandColor.shared.memoryConsuptionBackground
         progressQuota.progressTintColor = NCBrandColor.shared.brandElement
-        progressQuota.trackTintColor = NCBrandColor.shared.systemGrayAndGray66
-        progressQuota.progressTintColor = NCBrandColor.shared.customer
-        quotaLabel1.textColor = NCBrandColor.shared.gray26AndGrayf2
-        quotalabel2.textColor = NCBrandColor.shared.gray26AndGrayf2
-        labelQuota.textColor = NCBrandColor.shared.gray26AndGrayf2
-        labelQuotaExternalSite.textColor = NCBrandColor.shared.gray26AndGrayf2
+        progressQuota.trackTintColor = NCBrandColor.shared.commonViewInfoText
+        progressQuota.layer.borderWidth = 2
+        progressQuota.layer.borderColor = UIColor(hex: "#CCCCCC")?.cgColor
+        quotaLabel1.textColor = NCBrandColor.shared.nmcGray0
+        quotalabel2.textColor = NCBrandColor.shared.nmcGray0
+        labelQuota.textColor = NCBrandColor.shared.nmcGray0
+        labelQuotaExternalSite.textColor = NCBrandColor.shared.nmcGray0
+        loadItems()
+ 
     }
 
     @objc func changeUserProfile() {
         // Display Name user & Quota
         var quota: String = ""
 
-        guard let tabAccount = NCManageDatabase.shared.getAccountActive() else {
+        guard let tabAccount = NCManageDatabase.shared.getActiveAccount() else {
             return
         }
         self.tabAccount = tabAccount
@@ -242,9 +250,13 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 //        let percentageUsed = "\((tabAccount.quotaUsed / tabAccount.quotaTotal) / (1024*1024))"
         let used = Double(tabAccount.quotaUsed)
         let allot = Double(tabAccount.quotaTotal)
-        let percentageUsed = String(format: "%.2f%%", (used * 100/allot) * 100)
+        let percentageUsed = (used/allot) * 100
+        let percentageUsedFormatted = "\(Int(percentageUsed))%"
 
-        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), (used * 100/allot) * 100)
+        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
+        labelQuota.textColor = NCBrandColor.shared.label
+        quotaLabel1.textColor = NCBrandColor.shared.label
+        quotalabel2.textColor = NCBrandColor.shared.label
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.tableView.reloadData()
@@ -323,30 +335,32 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             
             let fileNamePath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + appDelegate.user + ".png"
             
-            if let themingAvatarFile = UIImage.init(contentsOfFile: fileNamePath) {
-                cell.avatar?.image = UIImage.init(named: "user_settings")
+            if UIImage.init(contentsOfFile: fileNamePath) != nil {
+                //cell.avatar?.image = UIImage.init(named: "user_settings")
+                cell.avatar?.image = UIImage.init(named: "user_settings")?.image(color: NCBrandColor.shared.iconColor, size: 25)
             } else {
-                cell.avatar?.image = UIImage.init(named: "user_settings")
+                //cell.avatar?.image = UIImage.init(named: "user_settings")
+                cell.avatar?.image = UIImage.init(named: "user_settings")?.image(color: NCBrandColor.shared.iconColor, size: 25)
             }
             cell.avatar?.layer.masksToBounds = true
             cell.avatar?.layer.cornerRadius = cell.avatar.frame.size.width / 2
             if let account = tabAccount {
                 cell.displayName?.text = account.displayName
-                cell.displayName.textColor = NCBrandColor.shared.textView
+                cell.displayName.textColor = NCBrandColor.shared.label
             }
 
             cell.isUserInteractionEnabled = false
-            cell.selectedBackgroundView = selectionColor
-            cell.backgroundColor = NCBrandColor.shared.backgroundCell
 //            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
-            cell.accessoryType = UITableViewCell.AccessoryType.none
+            cell.selectedBackgroundView = selectionColor
+            cell.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+           // cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
             
             if NCManageDatabase.shared.getCapabilitiesServerBool(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesUserStatusEnabled, exists: false) {
                 if let account = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", appDelegate.account)) {
                     let status = NCUtility.shared.getUserStatus(userIcon: account.userStatusIcon, userStatus: account.userStatusStatus, userMessage: account.userStatusMessage)
                     cell.icon.image = status.onlineStatus
                     cell.status.text = status.statusMessage
-                    cell.status.textColor = NCBrandColor.shared.textView
+                    cell.status.textColor = NCBrandColor.shared.label
                 }
             }
             
@@ -371,12 +385,12 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                 item = settingsMenu[indexPath.row]
             }
 
-            cell.imageIcon?.image = UIImage.init(named: item.icon)?.image(color: NCBrandColor.shared.icon, size: 25)
+            cell.imageIcon?.image = UIImage.init(named: item.icon)?.image(color: NCBrandColor.shared.iconColor, size: 25)
             cell.labelText?.text = NSLocalizedString(item.name, comment: "")
-            cell.labelText.textColor = NCBrandColor.shared.textView
+            cell.labelText.textColor = NCBrandColor.shared.label
             
             cell.selectedBackgroundView = selectionColor
-            cell.backgroundColor = NCBrandColor.shared.backgroundCell
+            cell.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
             cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
             
             return cell

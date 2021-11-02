@@ -22,6 +22,7 @@
 //
 
 import Foundation
+import UIKit
 import Accelerate
 
 extension UIImage {
@@ -116,25 +117,27 @@ extension UIImage {
     
     @objc func image(color: UIColor, size: CGFloat) -> UIImage {
         
-        let size = CGSize(width: size, height: size)
-        
-        UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
-        color.setFill()
+        return autoreleasepool { () -> UIImage in
+            let size = CGSize(width: size, height: size)
+            
+            UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
+            color.setFill()
 
-        let context = UIGraphicsGetCurrentContext()
-        context?.translateBy(x: 0, y: size.height)
-        context?.scaleBy(x: 1.0, y: -1.0)
-        context?.setBlendMode(CGBlendMode.normal)
+            let context = UIGraphicsGetCurrentContext()
+            context?.translateBy(x: 0, y: size.height)
+            context?.scaleBy(x: 1.0, y: -1.0)
+            context?.setBlendMode(CGBlendMode.normal)
 
-        let rect = CGRect(origin: .zero, size: size)
-        guard let cgImage = self.cgImage else { return self }
-        context?.clip(to: rect, mask: cgImage)
-        context?.fill(rect)
+            let rect = CGRect(origin: .zero, size: size)
+            guard let cgImage = self.cgImage else { return self }
+            context?.clip(to: rect, mask: cgImage)
+            context?.fill(rect)
 
-        let newImage = UIGraphicsGetImageFromCurrentImageContext() ?? self
-        UIGraphicsEndImageContext()
-        
-        return newImage
+            let newImage = UIGraphicsGetImageFromCurrentImageContext() ?? self
+            UIGraphicsEndImageContext()
+            
+            return newImage
+        }
     }
     
     func imageColor(_ color: UIColor) -> UIImage {
@@ -148,4 +151,27 @@ extension UIImage {
             }
         }
     }
+    
+    func rotate(radians: CGFloat) -> UIImage {
+            let rotatedSize = CGRect(origin: .zero, size: size)
+                .applying(CGAffineTransform(rotationAngle: CGFloat(radians)))
+                .integral.size
+        
+            UIGraphicsBeginImageContext(rotatedSize)
+            if let context = UIGraphicsGetCurrentContext() {
+                let origin = CGPoint(x: rotatedSize.width / 2.0,
+                                     y: rotatedSize.height / 2.0)
+                context.translateBy(x: origin.x, y: origin.y)
+                context.rotate(by: radians)
+                draw(in: CGRect(x: -origin.y, y: -origin.x,
+                                width: size.width, height: size.height))
+                let rotatedImage = UIGraphicsGetImageFromCurrentImageContext()
+                UIGraphicsEndImageContext()
+
+                return rotatedImage ?? self
+            }
+
+            return self
+        }
+    
 }

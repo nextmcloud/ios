@@ -20,7 +20,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import Foundation
+import UIKit
 import FSCalendar
 import DropDown
 
@@ -77,12 +77,12 @@ class NCShareCommon: NSObject {
         
         shareLinkMenuView.width = 250
         if metadata.directory {
-            shareLinkMenuView.height = 540
+            shareLinkMenuView.height = 590
         } else {
-            shareLinkMenuView.height = 440
+            shareLinkMenuView.height = 490
         }
         
-        shareLinkMenuView.backgroundColor = NCBrandColor.shared.backgroundForm
+        shareLinkMenuView.backgroundColor = NCBrandColor.shared.systemBackground
         shareLinkMenuView.metadata = metadata
         shareLinkMenuView.viewWindow = viewWindow
         shareLinkMenuView.shareViewController = shareViewController
@@ -123,10 +123,10 @@ class NCShareCommon: NSObject {
         if metadata.directory {
             shareUserMenuView.height = 410
         } else {
-            shareUserMenuView.height = 260
+            shareUserMenuView.height = 370
         }
         
-        shareUserMenuView.backgroundColor = NCBrandColor.shared.backgroundForm
+        shareUserMenuView.backgroundColor = NCBrandColor.shared.systemBackground
         shareUserMenuView.metadata = metadata
         shareUserMenuView.viewWindow = viewWindow
         shareUserMenuView.shareViewController = shareViewController
@@ -144,6 +144,49 @@ class NCShareCommon: NSObject {
         return(shareUserMenuView: shareUserMenuView, viewWindow: viewWindow)
     }
     
+    func openQuickShare(shareViewController: NCShare, tableShare: tableShare?, metadata: tableMetadata) -> (sharePermissionMenuView: NCPermissionMenuView, viewWindow: UIView) {
+        var sharePermissionMenuView: NCPermissionMenuView
+        let window = UIApplication.shared.keyWindow!
+        let viewWindow = UIView(frame: window.bounds)
+//        let globalPoint = shareViewController.view.superview?.convert(shareViewController.view.frame.origin, to: nil)
+//        let constantTrailingAnchor = window.bounds.width - shareViewController.view.bounds.width - globalPoint!.x + 40
+//        var constantBottomAnchor: CGFloat = 10
+//        constantBottomAnchor = constantBottomAnchor + UIApplication.shared.keyWindow!.safeAreaInsets.bottom
+        
+        window.addSubview(viewWindow)
+        viewWindow.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+        if metadata.directory {
+            sharePermissionMenuView = Bundle.main.loadNibNamed("NCPermissionFolderMenuView", owner: self, options: nil)?.first as! NCPermissionMenuView
+        } else {
+            sharePermissionMenuView = Bundle.main.loadNibNamed("NCPermissionMenuView", owner: self, options: nil)?.first as! NCPermissionMenuView
+        }
+        
+        sharePermissionMenuView.width = 250
+        if metadata.directory {
+            sharePermissionMenuView.height = 153
+        } else {
+            sharePermissionMenuView.height = 112
+        }
+        
+        sharePermissionMenuView.backgroundColor = NCBrandColor.shared.backgroundForm
+        sharePermissionMenuView.metadata = metadata
+        sharePermissionMenuView.viewWindow = viewWindow
+        sharePermissionMenuView.shareViewController = shareViewController
+        sharePermissionMenuView.reloadData(idShare: tableShare?.idShare ?? 0)
+        sharePermissionMenuView.translatesAutoresizingMaskIntoConstraints = false
+        viewWindow.addSubview(sharePermissionMenuView)
+
+        NSLayoutConstraint.activate([
+            sharePermissionMenuView.widthAnchor.constraint(equalToConstant: sharePermissionMenuView.width),
+            sharePermissionMenuView.heightAnchor.constraint(equalToConstant: sharePermissionMenuView.height),
+            sharePermissionMenuView.centerXAnchor.constraint(equalTo: viewWindow.centerXAnchor),
+            sharePermissionMenuView.centerYAnchor.constraint(equalTo: viewWindow.centerYAnchor),
+        ])
+        
+        return(sharePermissionMenuView: sharePermissionMenuView, viewWindow: viewWindow)
+    }
+    
     func openCalendar(view: UIView, width: CGFloat, height: CGFloat) -> (calendarView: FSCalendar, viewWindow: UIView) {
         
         let globalPoint = view.superview?.convert(view.frame.origin, to: nil)
@@ -155,12 +198,11 @@ class NCShareCommon: NSObject {
         let calendar = FSCalendar(frame: CGRect(x: globalPoint!.x + 10, y: globalPoint!.y + 10, width: width - 20, height: 300))
         
         if #available(iOS 13.0, *) {
-            calendar.backgroundColor = .systemBackground
             calendar.appearance.headerTitleColor = .label
         } else {
-            calendar.backgroundColor = .white
             calendar.appearance.headerTitleColor = .black
         }
+        calendar.backgroundColor = NCBrandColor.shared.systemBackground
         calendar.placeholderType = .none
         calendar.appearance.headerMinimumDissolvedAlpha = 0.0
         
@@ -208,27 +250,72 @@ class NCShareCommon: NSObject {
         
         switch shareType {
         case SHARE_TYPE_USER:
-            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.textView)
+//            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_GROUP:
-            return UIImage(named: "shareTypeGroup")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeGroup")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_LINK:
-            return UIImage(named: "shareTypeLink")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeLink")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_EMAIL:
-            return UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.textView)
+//            return UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_CONTACT:
-            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_REMOTE:
-            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_CIRCLE:
-            return UIImage(named: "shareTypeCircles")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeCircles")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_GUEST:
-            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_REMOTE_GROUP:
-            return UIImage(named: "shareTypeGroup")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeGroup")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_ROOM:
-            return UIImage(named: "shareTypeRoom")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeRoom")?.imageColor(NCBrandColor.shared.label)
         default:
-            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.textView)
+            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         }
+    }
+        
+    func isLinkShare(shareType: Int) -> Bool {
+        return shareType == SHARE_TYPE_LINK
+    }
+    
+    func isExternalUserShare(shareType: Int) -> Bool {
+        return shareType == SHARE_TYPE_EMAIL
+    }
+    
+    func isInternalUser(shareType: Int) -> Bool {
+        return shareType == SHARE_TYPE_USER
+    }
+    
+    func isFileTypeAllowedForEditing(fileExtension: String, shareType: Int) -> Bool {
+        if fileExtension == "md" || fileExtension == "txt" {
+            return true
+        } else {
+            return isInternalUser(shareType: shareType)
+        }
+    }
+    
+    func isEditingEnabled(isDirectory: Bool, fileExtension: String, shareType: Int) -> Bool {
+        if !isDirectory {//file
+            return isFileTypeAllowedForEditing(fileExtension: fileExtension, shareType: shareType)
+        } else {
+            return true
+        }
+    }
+    
+    func isFileDropOptionVisible(isDirectory: Bool, shareType: Int) -> Bool {
+        return (isDirectory && (isLinkShare(shareType: shareType) || isExternalUserShare(shareType: shareType)))
+    }
+    
+    func isCurrentUserIsFileOwner(fileOwnerId: String) -> Bool {
+        if let currentUser = NCManageDatabase.shared.getActiveAccount(), currentUser.userId == fileOwnerId {
+            return true
+        }
+        return false
+    }
+    
+    func canReshare(withPermission permission: String) -> Bool {
+        return permission.contains(NCGlobal.shared.permissionCanShare)
     }
 }

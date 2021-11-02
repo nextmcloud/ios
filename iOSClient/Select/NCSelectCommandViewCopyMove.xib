@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina3_5" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="NCSelectCommandView" customModule="Nextcloud" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DhT-bZ-rgC" userLabel="Command View">
+                    <rect key="frame" x="0.0" y="166" width="320" height="148.5"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xmS-E7-44n">
+                            <rect key="frame" x="0.0" y="0.0" width="320" height="1"/>
+                            <color key="backgroundColor" systemColor="opaqueSeparatorColor"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="1" id="HLl-PW-5av"/>
+                            </constraints>
+                        </view>
+                        <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="h1j-Bi-at4">
+                            <rect key="frame" x="16" y="17" width="51" height="31"/>
+                            <connections>
+                                <action selector="valueChangedSwitchOverwrite:" destination="iN0-l3-epB" eventType="valueChanged" id="GaC-ye-b4N"/>
+                            </connections>
+                        </switch>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Overwrite" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tE2-bY-JfT">
+                            <rect key="frame" x="73" y="22" width="74" height="20.5"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mg4-vG-Xr7">
+                            <rect key="frame" x="168" y="12.5" width="136" height="40"/>
+                            <color key="backgroundColor" systemColor="systemGray4Color"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="40" id="aRa-Cb-dIJ"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <state key="normal" title="Copy">
+                                <color key="titleColor" systemColor="labelColor"/>
+                            </state>
+                            <connections>
+                                <action selector="copyButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="vrD-3Y-ANH"/>
+                            </connections>
+                        </button>
+                        <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="apz-d8-hiU">
+                            <rect key="frame" x="16" y="60.5" width="288" height="40"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WCL-bl-0j0">
+                                    <rect key="frame" x="0.0" y="0.0" width="136" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemGray4Color"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="AHg-gX-UT0"/>
+                                    </constraints>
+                                    <inset key="imageEdgeInsets" minX="-8" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                    <state key="normal" title="Create folder" image="addFolder">
+                                        <color key="titleColor" systemColor="labelColor"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="createFolderButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="ffk-c7-NT1"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Oq2-Kg-sDp">
+                                    <rect key="frame" x="152" y="0.0" width="136" height="40"/>
+                                    <color key="backgroundColor" systemColor="systemGray4Color"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="40" id="QAO-kF-IOZ"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <state key="normal" title="Move">
+                                        <color key="titleColor" systemColor="labelColor"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="moveButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YiA-iN-EwL"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </stackView>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstItem="xmS-E7-44n" firstAttribute="top" secondItem="DhT-bZ-rgC" secondAttribute="top" id="2zA-mY-uy8"/>
+                        <constraint firstItem="tE2-bY-JfT" firstAttribute="centerY" secondItem="h1j-Bi-at4" secondAttribute="centerY" id="9SE-vn-zmA"/>
+                        <constraint firstItem="h1j-Bi-at4" firstAttribute="leading" secondItem="DhT-bZ-rgC" secondAttribute="leading" constant="16" id="BK8-FJ-PCw"/>
+                        <constraint firstAttribute="trailing" secondItem="Mg4-vG-Xr7" secondAttribute="trailing" constant="16" id="Efe-Jl-OSp"/>
+                        <constraint firstItem="h1j-Bi-at4" firstAttribute="top" secondItem="xmS-E7-44n" secondAttribute="bottom" constant="16" id="Ocu-Uf-L5P"/>
+                        <constraint firstItem="Mg4-vG-Xr7" firstAttribute="centerY" secondItem="h1j-Bi-at4" secondAttribute="centerY" id="P2h-TK-YFC"/>
+                        <constraint firstItem="xmS-E7-44n" firstAttribute="leading" secondItem="DhT-bZ-rgC" secondAttribute="leading" id="Q7q-32-baC"/>
+                        <constraint firstAttribute="bottom" secondItem="apz-d8-hiU" secondAttribute="bottom" constant="48" id="TwQ-FG-b6f"/>
+                        <constraint firstAttribute="trailing" secondItem="xmS-E7-44n" secondAttribute="trailing" id="cqd-dv-tJd"/>
+                        <constraint firstItem="apz-d8-hiU" firstAttribute="top" secondItem="Mg4-vG-Xr7" secondAttribute="bottom" constant="8" id="l9n-jQ-krG"/>
+                        <constraint firstItem="tE2-bY-JfT" firstAttribute="leading" secondItem="h1j-Bi-at4" secondAttribute="trailing" constant="8" symbolic="YES" id="wyO-Fx-GNd"/>
+                        <constraint firstItem="Mg4-vG-Xr7" firstAttribute="width" secondItem="WCL-bl-0j0" secondAttribute="width" id="yWH-BX-BuU"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="apz-d8-hiU" secondAttribute="trailing" constant="16" id="1FI-fk-fBP"/>
+                <constraint firstItem="DhT-bZ-rgC" firstAttribute="centerY" secondItem="vUN-kp-3ea" secondAttribute="centerY" id="Cpf-hy-uuK"/>
+                <constraint firstItem="apz-d8-hiU" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="16" id="Z9e-Um-dyg"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="DhT-bZ-rgC" secondAttribute="trailing" id="fRj-jo-arf"/>
+                <constraint firstItem="DhT-bZ-rgC" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="kwq-qj-Dfr"/>
+            </constraints>
+            <connections>
+                <outlet property="copyButton" destination="Mg4-vG-Xr7" id="uVT-up-NYH"/>
+                <outlet property="createFolderButton" destination="WCL-bl-0j0" id="8oW-69-vDk"/>
+                <outlet property="moveButton" destination="Oq2-Kg-sDp" id="Ty9-NQ-ila"/>
+                <outlet property="overwriteLabel" destination="tE2-bY-JfT" id="c5h-hj-kZz"/>
+                <outlet property="overwriteSwitch" destination="h1j-Bi-at4" id="6xU-ME-qFd"/>
+                <outlet property="separatorHeightConstraint" destination="HLl-PW-5av" id="Zjf-UY-YAw"/>
+                <outlet property="separatorView" destination="xmS-E7-44n" id="9YB-B1-j8j"/>
+            </connections>
+            <point key="canvasLocation" x="-249" y="153"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="addFolder" width="25" height="25"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="opaqueSeparatorColor">
+            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray4Color">
+            <color red="0.81960784313725488" green="0.81960784313725488" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>

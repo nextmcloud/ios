@@ -21,11 +21,13 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import NCCommunication
 
 class NCRecent: NCCollectionViewCommon  {
     
+    // MARK: - View Life Cycle
+
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
@@ -51,7 +53,7 @@ class NCRecent: NCCollectionViewCommon  {
         DispatchQueue.global().async {
             
             self.metadatasSource = NCManageDatabase.shared.getAdvancedMetadatas(predicate: NSPredicate(format: "account == %@", self.appDelegate.account), page: 1, limit: 100, sorted: "date", ascending: false)
-            self.dataSource = NCDataSource.init(metadatasSource: self.metadatasSource)
+            self.dataSource = NCDataSource.init(metadatasSource: self.metadatasSource, directoryOnTop: false, favoriteOnTop: false)
             
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()
@@ -150,7 +152,7 @@ class NCRecent: NCCollectionViewCommon  {
                     // Update sub directories
                     for metadata in metadatasFolder {
                         let serverUrl = metadata.serverUrl + "/" + metadata.fileName
-                        NCManageDatabase.shared.addDirectory(encrypted: metadata.e2eEncrypted, favorite: metadata.favorite, ocId: metadata.ocId, fileId: metadata.fileId, etag: nil, permissions: metadata.permissions, serverUrl: serverUrl, richWorkspace: metadata.richWorkspace, account: account)
+                        NCManageDatabase.shared.addDirectory(encrypted: metadata.e2eEncrypted, favorite: metadata.favorite, ocId: metadata.ocId, fileId: metadata.fileId, etag: nil, permissions: metadata.permissions, serverUrl: serverUrl, account: account)
                     }
                     // Add metadatas
                     NCManageDatabase.shared.addMetadatas(metadatas)

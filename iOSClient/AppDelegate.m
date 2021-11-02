@@ -97,7 +97,7 @@
             tableAccount.urlBase = urlBase;
             [[NCManageDatabase shared] updateAccount:tableAccount];
             
-            tableAccount = [[NCManageDatabase shared] getAccountActive];
+            tableAccount = [[NCManageDatabase shared] getActiveAccount];
         }
         [self settingAccount:tableAccount.account urlBase:tableAccount.urlBase user:tableAccount.user userID:tableAccount.userID password:[CCUtility getPassword:tableAccount.account]];
     }
@@ -253,7 +253,7 @@
         
     // Brand
     #if defined(HC)
-    tableAccount *account = [[NCManageDatabase shared] getAccountActive];
+    tableAccount *account = [[NCManageDatabase shared] getActiveAccount];
     if (account.hcIsTrial == true || account.hcTrialExpired == true || account.hcNextGroupExpirationGroupExpired == true) {
         
         HCTrial *vc = [[UIStoryboard storyboardWithName:@"HCTrial" bundle:nil] instantiateInitialViewController];
@@ -704,7 +704,7 @@
                 
             } else {
             
-                tableAccount *account = [[NCManageDatabase shared] getAccountActive];
+                tableAccount *account = [[NCManageDatabase shared] getActiveAccount];
                 if (account) {
                     NSURL *accountURL = [NSURL URLWithString:account.urlBase];
                     NSString *accountUser = account.user;

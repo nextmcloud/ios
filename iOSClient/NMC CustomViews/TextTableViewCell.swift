@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TextTableViewCell: XLFormBaseCell,UITextFieldDelegate {
+class TextTableViewCell: XLFormBaseCell, UITextFieldDelegate {
 
     @IBOutlet weak var fileNameTextField: UITextField!
     @IBOutlet weak var topLineView: UIView!
@@ -18,6 +18,7 @@ class TextTableViewCell: XLFormBaseCell,UITextFieldDelegate {
         // Initialization code
         
         fileNameTextField.delegate = self
+        topLineView.backgroundColor = NCBrandColor.shared.secondarySystemBackground
         
     }
 
@@ -35,6 +36,8 @@ class TextTableViewCell: XLFormBaseCell,UITextFieldDelegate {
         super.update()
         if (rowDescriptor.tag == "maskFileName"){
             topLineView.isHidden = true
+        }else{
+            topLineView.isHidden = false
         }
     }
     
@@ -68,5 +71,18 @@ class TextTableViewCell: XLFormBaseCell,UITextFieldDelegate {
     
     override class func formDescriptorCellHeight(for rowDescriptor: XLFormRowDescriptor!) -> CGFloat {
         return 45
+    }
+}
+
+extension UITextField {
+    @IBInspectable var placeholderColor: UIColor {
+        get {
+            return attributedPlaceholder?.attribute(.foregroundColor, at: 0, effectiveRange: nil) as? UIColor ?? .clear
+        }
+        set {
+            guard let attributedPlaceholder = attributedPlaceholder else { return }
+            let attributes: [NSAttributedString.Key: UIColor] = [.foregroundColor: newValue]
+            self.attributedPlaceholder = NSAttributedString(string: attributedPlaceholder.string, attributes: attributes)
+        }
     }
 }

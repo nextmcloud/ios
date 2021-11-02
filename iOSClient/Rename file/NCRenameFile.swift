@@ -24,6 +24,15 @@
 import Foundation
 import NCCommunication
 
+public protocol NCRenameFileDelegate {
+    func rename(fileName: String, fileNameNew: String)
+}
+
+// optional func
+public extension NCRenameFileDelegate {
+    func rename(fileName: String, fileNameNew: String) {}
+}
+
 class NCRenameFile: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var titleLabel: UILabel!
@@ -36,12 +45,15 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var renameButton: UIButton!
     @IBOutlet weak var seperator: UIView!
-    
+    var delegate: NCRenameFileDelegate?
+
 
     var metadata: tableMetadata?
     var imagePreview: UIImage?
     var disableChangeExt: Bool = false
-    
+    var fileName: String?
+    let width: CGFloat = 300
+    let height: CGFloat = 350
     // MARK: - Life Cycle
     
     override func viewDidLoad() {
@@ -58,7 +70,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             
             fileNameWithoutExt.text = metadata.fileNameWithoutExt
             fileNameWithoutExt.delegate = self
-            fileNameWithoutExt.layer.borderColor = NCBrandColor.shared.icon.cgColor
+            fileNameWithoutExt.layer.borderColor = NCBrandColor.shared.iconColor.cgColor
             fileNameWithoutExt.becomeFirstResponder()
             
             ext.text = metadata.ext
@@ -96,12 +108,12 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
         }
         
         cancelButton.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
-        cancelButton.setTitleColor(NCBrandColor.shared.icon, for: .normal)
+        cancelButton.setTitleColor(NCBrandColor.shared.iconColor, for: .normal)
         cancelButton.layer.cornerRadius = 5
         cancelButton.layer.masksToBounds = true
 //        cancelButton.layer.backgroundColor =  NCBrandColor.shared.graySoft.withAlphaComponent(0.2).cgColor
         cancelButton.layer.borderWidth = 0.3
-        cancelButton.layer.borderColor = NCBrandColor.shared.icon.cgColor
+        cancelButton.layer.borderColor = NCBrandColor.shared.iconColor.cgColor
         
         renameButton.setTitle(NSLocalizedString("_rename_", comment: ""), for: .normal)
         renameButton.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
@@ -139,10 +151,10 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     // MARK: - NotificationCenter
 
     @objc func changeTheming() {
-        view.backgroundColor = NCBrandColor.shared.tabBar
+        view.backgroundColor = NCBrandColor.shared.nmcGray80TabBar
         seperator.backgroundColor = NCBrandColor.shared.seperatorRename
-        fileNameWithoutExt.backgroundColor = NCBrandColor.shared.backgroundCell
-        ext.backgroundColor = NCBrandColor.shared.backgroundCell
+        fileNameWithoutExt.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        ext.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
     }
     
     // MARK: - Action
@@ -202,6 +214,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             } else {
             
                 fileNameNew = fileNameWithoutExtNew + "." + extNew
+                self.delegate?.rename(fileName: self.fileName ?? "", fileNameNew: fileNameNew)
                 renameMetadata(metadata, fileNameNew: fileNameNew)
             }
         }
