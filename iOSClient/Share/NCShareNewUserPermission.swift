@@ -322,7 +322,6 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
             let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
             viewNewUserComment.metadata = self.metadata
             viewNewUserComment.sharee = sharee
-            viewNewUserComment.password = self.password
             viewNewUserComment.isUpdating = false
             self.navigationController!.pushViewController(viewNewUserComment, animated: true)
         } else {
