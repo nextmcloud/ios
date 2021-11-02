@@ -79,8 +79,8 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         self.pageControl.currentPageIndicatorTintColor = textColor
         self.pageControl.pageIndicatorTintColor = .lightGray
 
-        self.buttonLogin.layer.cornerRadius = 20
-        self.buttonLogin.setTitleColor(textColorOpponent, for: .normal)
+        self.buttonLogin.layer.cornerRadius = 4
+        self.buttonLogin.setTitleColor(NCBrandColor.shared.brand, for: .normal)
         self.buttonLogin.backgroundColor = textColor
         self.buttonLogin.setTitle(NSLocalizedString("_log_in_", comment: ""), for: .normal)
 
