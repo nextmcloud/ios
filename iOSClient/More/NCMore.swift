@@ -68,8 +68,23 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         // Notification
         NotificationCenter.default.addObserver(self, selector: #selector(initialize), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+
+        changeTheming()
     }
 
+    @objc func changeTheming() {
+        viewQuota.backgroundColor = NCBrandColor.shared.memoryConsuptionBackground
+        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
+        progressQuota.trackTintColor = NCBrandColor.shared.commonViewInfoText
+        progressQuota.layer.borderWidth = 2
+        progressQuota.layer.borderColor = UIColor(hex: "#CCCCCC")?.cgColor
+        quotaLabel1.textColor = NCBrandColor.shared.nmcGray0
+        quotalabel2.textColor = NCBrandColor.shared.nmcGray0
+        labelQuota.textColor = NCBrandColor.shared.nmcGray0
+        labelQuotaExternalSite.textColor = NCBrandColor.shared.nmcGray0
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         tableView.alwaysBounceVertical = false
