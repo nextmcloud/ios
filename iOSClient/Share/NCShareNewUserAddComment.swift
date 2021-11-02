@@ -31,7 +31,6 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var permission: Int = 0
     var hideDownload: Bool?
-    var password: String!
     var creatingShare = false
     var note = ""
     var shareeEmail: String?
@@ -220,9 +219,6 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     func shareCompleted() {
         if self.creatingShare {
             self.appDelegate.shares = NCManageDatabase.shared.getTableShares(account: self.metadata!.account)
-//            if let tableShare = NCManageDatabase.shared.getTableShares(metadata: metadata!) {
-//                networking?.updateShare(idShare: tableShare.idShare, password: self.password, permission: tableShare.permissions, note: self.note, expirationDate: nil, hideDownload: self.hideDownload!)
-//            }
         }
         popToShare()
     }

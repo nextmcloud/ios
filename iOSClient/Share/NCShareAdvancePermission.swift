@@ -536,7 +536,8 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                     let canReshare = CCUtility.isPermission(toCanShare: permissionValue)
                     cell?.switchControl.isOn = canReshare
                 } else {
-                    cell?.switchControl.isOn = false
+                    //new share
+                    cell?.switchControl.isOn = canReshare
                 }
             }
         }
@@ -564,7 +565,12 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         if let expiryRow : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionEditCellExpiration") {
             if let expiryIndexPath = self.form.indexPath(ofFormRow: expiryRow), indexPath == expiryIndexPath {
                 let cell = cell as? NCFilePermissionEditCell
-                cell?.switchControl.isOn = tableShare?.expirationDate != nil
+                if tableShare?.expirationDate != nil {
+                    cell?.switchControl.isOn = true
+                } else {
+                    //new share
+                    cell?.switchControl.isOn = setExpiration
+                }
             }
         }
     }
@@ -658,7 +664,11 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
     
     func canReshareValueChanged(isOn: Bool) {
-        guard let tableShare = self.tableShare else { return }
+        guard let tableShare = self.tableShare else {
+            //new share
+            canReshare = isOn
+            return
+        }
         guard let metadata = self.metadata else { return }
         
         let canEdit = CCUtility.isAnyPermission(toEdit: tableShare.permissions)
@@ -793,7 +803,6 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
             viewNewUserComment.metadata = self.metadata
             viewNewUserComment.sharee = sharee
-            viewNewUserComment.password = self.password
             viewNewUserComment.isUpdating = false
             self.navigationController!.pushViewController(viewNewUserComment, animated: true)
         } else {
