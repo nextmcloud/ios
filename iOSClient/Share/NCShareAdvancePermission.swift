@@ -454,7 +454,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         switch formRow.tag {
         case "NCFilePermissionCellRead":
             
-            let value = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata.directory)
+            let value = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: canReshareTheShare(), andIsFolder: metadata.directory)
             self.permissionInt = value
             self.tableShare?.permissions = value
             self.permissions = "RDNVCK"
@@ -472,7 +472,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             self.reloadForm()
             break
         case "kNMCFilePermissionCellEditing":
-             let value = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata.directory)
+             let value = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: canReshareTheShare(), andIsFolder: metadata.directory)
             self.permissionInt = value
             self.tableShare?.permissions = value
             self.permissions = "RGDNV"
@@ -507,6 +507,15 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             break
         default:
             break
+        }
+    }
+    
+    func canReshareTheShare() -> Bool {
+        if let permissionValue = tableShare?.permissions {
+            let canReshare = CCUtility.isPermission(toCanShare: permissionValue)
+            return canReshare
+        } else {
+            return false
         }
     }
     
@@ -676,6 +685,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 }
             }
         }
+        self.tableShare?.permissions = permission
         self.permissionInt = permission
         canReshare = isOn
     }

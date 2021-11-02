@@ -633,14 +633,22 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     @objc func statusReadOnlyClicked() {
         guard self.quickStatusTableShare != nil else { return }
-        let permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata!.directory)
+        var canReshare = false
+        if let value = self.tableShareSelected?.permissions {
+            canReshare = CCUtility.isPermission(toCanShare: value)
+        }
+        let permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: canReshare, andIsFolder: metadata!.directory)
         
         networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
     }
     
     @objc func statusEditingClicked() {
         guard self.quickStatusTableShare != nil else { return }
-        let permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata!.directory)
+        var canReshare = false
+        if let value = self.tableShareSelected?.permissions {
+            canReshare = CCUtility.isPermission(toCanShare: value)
+        }
+        let permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: canReshare, andIsFolder: metadata!.directory)
         
         networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
     }
