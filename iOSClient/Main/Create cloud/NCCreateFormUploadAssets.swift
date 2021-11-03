@@ -392,7 +392,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         }else{
             let asset = assets[0]
             let  placeHolderString =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
-            row.cellConfig["fileNameTextField.placeholder"] = placeHolderString
+            row.cellConfig["fileNameTextField.text"] = placeHolderString
             row.value = ""
         }
         row.hidden = "$\("maintainOriginalFileName") == 1"
@@ -575,7 +575,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 }
             }else{
                 let asset = assets[0]
-                formRow.cellConfig["fileNameTextField.placeholder"] =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal, forcedNewFileName: true)
+                formRow.cellConfig["fileNameTextField.text"] =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal, forcedNewFileName: true)
 //=======
 //                    NCContentPresenter.shared.messageNotification("_info_", description: "_forbidden_characters_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCharactersForbidden, forced: true)
 //                }
@@ -608,7 +608,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         }else{
             let asset = assets[0]
             let  placeHolderString =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
-            maskFileName.cellConfig["fileNameTextField.placeholder"] = placeHolderString
+            maskFileName.cellConfig["fileNameTextField.text"] = placeHolderString
         }
         
         self.tableView.reloadData()
