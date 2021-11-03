@@ -437,6 +437,13 @@ class tableShare: Object {
     override static func primaryKey() -> String {
         return "idShare"
     }
+    
+    func setPermission(value: Int) {
+        let realm = try! Realm()
+        try! realm.write {
+            permissions = value
+        }
+    }
 }
 
 class tableTag: Object {

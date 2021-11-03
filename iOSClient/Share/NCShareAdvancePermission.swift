@@ -454,9 +454,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         switch formRow.tag {
         case "NCFilePermissionCellRead":
             
-            let value = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata.directory)
+            let value = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: canReshareTheShare(), andIsFolder: metadata.directory)
             self.permissionInt = value
-            self.tableShare?.permissions = value
+            self.tableShare?.setPermission(value: value)
             self.permissions = "RDNVCK"
             metadata.permissions = "RDNVCK"
             if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
@@ -472,9 +472,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             self.reloadForm()
             break
         case "kNMCFilePermissionCellEditing":
-             let value = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: false, andIsFolder: metadata.directory)
+             let value = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: canReshareTheShare(), andIsFolder: metadata.directory)
             self.permissionInt = value
-            self.tableShare?.permissions = value
+            self.tableShare?.setPermission(value: value)
             self.permissions = "RGDNV"
             metadata.permissions = "RGDNV"
             if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
@@ -491,7 +491,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         case "NCFilePermissionCellFileDrop":
             self.permissionInt = NCGlobal.shared.permissionCreateShare
             
-            self.tableShare?.permissions = NCGlobal.shared.permissionCreateShare
+            self.tableShare?.setPermission(value: NCGlobal.shared.permissionCreateShare)
             self.permissions = "RGDNVCK"
             metadata.permissions = "RGDNVCK"
             if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
@@ -507,6 +507,15 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             break
         default:
             break
+        }
+    }
+    
+    func canReshareTheShare() -> Bool {
+        if let permissionValue = tableShare?.permissions {
+            let canReshare = CCUtility.isPermission(toCanShare: permissionValue)
+            return canReshare
+        } else {
+            return false
         }
     }
     
@@ -527,7 +536,8 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                     let canReshare = CCUtility.isPermission(toCanShare: permissionValue)
                     cell?.switchControl.isOn = canReshare
                 } else {
-                    cell?.switchControl.isOn = false
+                    //new share
+                    cell?.switchControl.isOn = canReshare
                 }
             }
         }
@@ -555,7 +565,12 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         if let expiryRow : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionEditCellExpiration") {
             if let expiryIndexPath = self.form.indexPath(ofFormRow: expiryRow), indexPath == expiryIndexPath {
                 let cell = cell as? NCFilePermissionEditCell
-                cell?.switchControl.isOn = tableShare?.expirationDate != nil
+                if tableShare?.expirationDate != nil {
+                    cell?.switchControl.isOn = true
+                } else {
+                    //new share
+                    cell?.switchControl.isOn = setExpiration
+                }
             }
         }
     }
@@ -649,7 +664,11 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
     
     func canReshareValueChanged(isOn: Bool) {
-        guard let tableShare = self.tableShare else { return }
+        guard let tableShare = self.tableShare else {
+            //new share
+            canReshare = isOn
+            return
+        }
         guard let metadata = self.metadata else { return }
         
         let canEdit = CCUtility.isAnyPermission(toEdit: tableShare.permissions)
@@ -676,6 +695,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 }
             }
         }
+        self.tableShare?.setPermission(value: permission)
         self.permissionInt = permission
         canReshare = isOn
     }
@@ -783,7 +803,6 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
             viewNewUserComment.metadata = self.metadata
             viewNewUserComment.sharee = sharee
-            viewNewUserComment.password = self.password
             viewNewUserComment.isUpdating = false
             self.navigationController!.pushViewController(viewNewUserComment, animated: true)
         } else {
