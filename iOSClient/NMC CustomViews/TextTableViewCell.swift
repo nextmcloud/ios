@@ -66,6 +66,9 @@ class TextTableViewCell: XLFormBaseCell, UITextFieldDelegate {
     
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
         self.formViewController()?.textFieldShouldClear(fileNameTextField)
+        rowDescriptor.value = nil
+
+        self.formViewController().textField(textField, shouldChangeCharactersIn: NSRange.init().self, replacementString: "")
         return true
     }
     

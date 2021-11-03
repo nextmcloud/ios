@@ -388,10 +388,12 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         if fileNameMask.count > 0 {
             //row.value = fileNameMask
             row.cellConfig["fileNameTextField.text"] = fileNameMask
+            row.value = fileNameMask
         }else{
             let asset = assets[0]
             let  placeHolderString =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
             row.cellConfig["fileNameTextField.placeholder"] = placeHolderString
+            row.value = ""
         }
         row.hidden = "$\("maintainOriginalFileName") == 1"
        // row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
@@ -837,12 +839,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         
         var returnString: String = ""
         let asset = assets[0]
-        
-//<<<<<<< HEAD
-//        if (CCUtility.getOriginalFileName(NCBrandGlobal.shared.keyFileNameOriginal)) {
-//=======
+
         if (CCUtility.getOriginalFileName(NCGlobal.shared.keyFileNameOriginal)) {
-//>>>>>>> feature_branded_client_4
             
             return (NSLocalizedString("_filename_", comment: "") + ": " + (asset.value(forKey: "filename") as! String))
             
@@ -853,42 +851,24 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
             if valueRenameTrimming.count > 0 {
                 
                 self.form.delegate = nil
-//<<<<<<< HEAD
-//                CCUtility.setFileNameMask(valueRename, key: NCBrandGlobal.shared.keyFileNameMask)
-//                self.form.delegate = self
-//
-//                returnString = CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: NCBrandGlobal.shared.keyFileNameMask, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal)
-//
-//            } else {
-//
-//                CCUtility.setFileNameMask("", key: NCBrandGlobal.shared.keyFileNameMask)
-//                returnString = CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal)
-//=======
-//                CCUtility.setFileNameMask(valueRename, key: NCGlobal.shared.keyFileNameMask)
                 self.form.delegate = self
                 
+                CCUtility.setFileNameMask(valueRenameTrimming, key: NCGlobal.shared.keyFileNameMask)
+
                 returnString = CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: NCGlobal.shared.keyFileNameMask, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
                 
             } else {
                 
                 CCUtility.setFileNameMask("", key: NCGlobal.shared.keyFileNameMask)
                 returnString = CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
-//>>>>>>> feature_branded_client_4
             }
             
         } else {
-            
-//<<<<<<< HEAD
-//            CCUtility.setFileNameMask("", key: NCBrandGlobal.shared.keyFileNameMask)
-//            returnString = CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal)
-//=======
             CCUtility.setFileNameMask("", key: NCGlobal.shared.keyFileNameMask)
-            //returnString = CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
             returnString = ""
-//>>>>>>> feature_branded_client_4
         }
         
-        return String(format: NSLocalizedString("_preview_filename_", comment: ""), "MM, MMM, DD, YY, YYYY, HH, hh, mm, ss, ampm") + "" + "\n\n" + returnString
+        return String(format: NSLocalizedString("_preview_filename_", comment: ""), "MM, MMM, DD, YY, YYYY, HH, hh, mm, ss, ampm") + "" + "\n\n"
     }
     
     @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {

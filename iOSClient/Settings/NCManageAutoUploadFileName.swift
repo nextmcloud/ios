@@ -31,29 +31,6 @@ class NCManageAutoUploadFileName: XLFormViewController {
 
     // MARK: - View Life Cycle
     
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//
-//        self.title = NSLocalizedString("_mode_filename_", comment: "")
-//
-//        // Theming view
-//        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationCenterChangeTheming), object: nil)
-//
-//        changeTheming()
-//    }
-    
-//    func reloadForm() {
-//
-//        self.form.delegate = nil
-//
-//        let maskFileName : XLFormRowDescriptor = self.form.formRow(withTag: "maskFileName")!
-//        let previewFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "previewFileName")!
-//        previewFileName.value = self.previewFileName(valueRename: maskFileName.value as? String)
-//
-//        self.tableView.reloadData()
-//        self.form.delegate = self
-//    }
-    
     @objc func changeTheming() {
         view.backgroundColor = NCBrandColor.shared.backgroundForm
         tableView.backgroundColor = NCBrandColor.shared.backgroundForm
@@ -97,13 +74,6 @@ class NCManageAutoUploadFileName: XLFormViewController {
         
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-//=======
-//        row.value = CCUtility.getOriginalFileName(NCGlobal.shared.keyFileNameOriginalAutoUpload)
-//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
-//
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-//>>>>>>> feature_branded_client_4
 
         section.addFormRow(row)
         
@@ -117,15 +87,6 @@ class NCManageAutoUploadFileName: XLFormViewController {
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand;
-//=======
-//        row.value = CCUtility.getFileNameType(NCGlobal.shared.keyFileNameAutoUploadType)
-//        row.hidden = "$\("maintainOriginalFileName") == 1"
-//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
-//
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-//
-//>>>>>>> feature_branded_client_4
         section.addFormRow(row)
                 
         // Section: Rename File Name
@@ -133,25 +94,39 @@ class NCManageAutoUploadFileName: XLFormViewController {
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: ""))
         form.addFormSection(section)
         
-        row = XLFormRowDescriptor(tag: "maskFileName", rowType: XLFormRowDescriptorTypeAccount, title: (NSLocalizedString("_filename_", comment: "")))
+        row = XLFormRowDescriptor(tag: "maskFileName", rowType: "NMCCustomInputFieldFileName", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = TextTableViewCell.self
+
         let fileNameMask : String = CCUtility.getFileNameMask(NCBrandGlobal.shared.keyFileNameAutoUploadMask)
-//=======
-//        row = XLFormRowDescriptor(tag: "maskFileName", rowType: XLFormRowDescriptorTypeText, title: (NSLocalizedString("_filename_", comment: "")))
-//        let fileNameMask : String = CCUtility.getFileNameMask(NCGlobal.shared.keyFileNameAutoUploadMask)
-//>>>>>>> feature_branded_client_4
         if fileNameMask.count > 0 {
+            row.cellConfig["fileNameTextField.text"] = fileNameMask
             row.value = fileNameMask
+            
+        }else{
+            
+            let  placeholderText = CCUtility.createFileName("IMG_0001.JPG", fileDate: dateExample, fileType: PHAssetMediaType.image, keyFileName: nil, keyFileNameType: NCGlobal.shared.keyFileNameAutoUploadType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginalAutoUpload, forcedNewFileName: false)
+            
+            row.cellConfig["fileNameTextField.text"] = placeholderText
+            row.value = ""
+
         }
         row.hidden = "$\("maintainOriginalFileName") == 1"
+       // row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+
+        //row.cellConfig["labelFileName.font"] = UIFont.systemFont(ofSize: 15.0)
+        //row.cellConfig["labelFileName.textColor"] = NCBrandColor.shared.label
+
+        row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.label
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-
-        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
-//=======
+//        row = XLFormRowDescriptor(tag: "maskFileName", rowType: XLFormRowDescriptorTypeAccount, title: (NSLocalizedString("_filename_", comment: "")))
+//        let fileNameMask : String = CCUtility.getFileNameMask(NCBrandGlobal.shared.keyFileNameAutoUploadMask)
+//        if fileNameMask.count > 0 {
+//            row.value = fileNameMask
+//        }
+//        row.hidden = "$\("maintainOriginalFileName") == 1"
 //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
 //
 //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -160,26 +135,20 @@ class NCManageAutoUploadFileName: XLFormViewController {
 //        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
 //        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
 //        row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
-//>>>>>>> feature_branded_client_4
 
         section.addFormRow(row)
         
         // Section: Preview File Name
         
         row = XLFormRowDescriptor(tag: "previewFileName", rowType: XLFormRowDescriptorTypeTextView, title: "")
-        row.height = 180
+        row.height = 200
         row.disabled = true
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
 
+        row.cellConfig["textView.backgroundColor"] = NCBrandColor.shared.systemGroupedBackground
         row.cellConfig["textView.font"] = UIFont.systemFont(ofSize: 14.0)
         row.cellConfig["textView.textColor"] = NCBrandColor.shared.label
-//=======
-//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
-//
-//        row.cellConfig["textView.backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
-//        row.cellConfig["textView.font"] = UIFont.systemFont(ofSize: 14.0)
-//        row.cellConfig["textView.textColor"] = NCBrandColor.shared.label
-//>>>>>>> feature_branded_client_4
+        row.cellConfig["backgroundColor"] = NCBrandColor.shared.systemGroupedBackground
+
 
         section.addFormRow(row)
         
@@ -217,6 +186,16 @@ class NCManageAutoUploadFileName: XLFormViewController {
         let previewFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "previewFileName")!
         previewFileName.value = self.previewFileName(valueRename: maskFileName.value as? String)
         
+        let  placeholderText = CCUtility.createFileName("IMG_0001.JPG", fileDate: dateExample, fileType: PHAssetMediaType.image, keyFileName: nil, keyFileNameType: NCGlobal.shared.keyFileNameAutoUploadType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginalAutoUpload, forcedNewFileName: false)
+        
+        let fileNameMask : String = CCUtility.getFileNameMask(NCBrandGlobal.shared.keyFileNameAutoUploadMask)
+
+        if fileNameMask.count > 0 {
+            maskFileName.cellConfig["fileNameTextField.text"] = fileNameMask
+        }else {
+            maskFileName.cellConfig["fileNameTextField.text"] = placeholderText
+        }
+        
         self.tableView.reloadData()
         self.form.delegate = self
     }
@@ -233,13 +212,6 @@ class NCManageAutoUploadFileName: XLFormViewController {
             CCUtility.setOriginalFileName((formRow.value! as AnyObject).boolValue, key:NCBrandGlobal.shared.keyFileNameOriginalAutoUpload)
             
                 CCUtility.setOriginalFileNamePrefsChanged(true, key:NCBrandGlobal.shared.keyFileNameOriginalAutoUploadPrefs)
-//=======
-//            CCUtility.setFileNameType((formRow.value! as AnyObject).boolValue, key: NCGlobal.shared.keyFileNameAutoUploadType)
-//            self.reloadForm()
-//        }
-//        else if formRow.tag == "maintainOriginalFileName" {
-//            CCUtility.setOriginalFileName((formRow.value! as AnyObject).boolValue, key:NCGlobal.shared.keyFileNameOriginalAutoUpload)
-//>>>>>>> feature_branded_client_4
             self.reloadForm()
         }
         else if formRow.tag == "maskFileName" {
@@ -307,13 +279,13 @@ class NCManageAutoUploadFileName: XLFormViewController {
             returnString = CCUtility.createFileName("IMG_0001.JPG", fileDate: dateExample, fileType: PHAssetMediaType.image, keyFileName: nil, keyFileNameType: NCGlobal.shared.keyFileNameAutoUploadType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginalAutoUpload, forcedNewFileName: false)
         }
         
-        return String(format: NSLocalizedString("_preview_filename_", comment: ""), "MM,MMM,DD,YY,YYYY and HH,hh,mm,ss,ampm") + ":" + "\n\n" + returnString
+        return String(format: NSLocalizedString("_preview_filename_", comment: ""), "MM,MMM,DD,YY,YYYY and HH,hh,mm,ss,ampm")
     }
 
     
     // MARK: -
 
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return NCGlobal.shared.heightCellSettings
-    }
+//    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        return NCGlobal.shared.heightCellSettings
+//    }
 }
