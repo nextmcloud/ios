@@ -337,13 +337,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
            privacyProtectionWindow = UIWindow(frame: UIScreen.main.bounds)
            //privacyProtectionWindow?.rootViewController = PrivacyProtectionViewController()
           
-        
-        let imageView = UIImageView(frame: privacyProtectionWindow!.bounds)
-        imageView.tag = 101
-        imageView.backgroundColor = NCBrandColor.shared.brand
-        imageView.contentMode = .center
-        imageView.image = UIImage(named: "logo")
-        privacyProtectionWindow?.addSubview(imageView)
+        let storyboard = UIStoryboard(name: "LaunchScreen", bundle: nil)
+
+        let initialViewController = storyboard.instantiateViewController(withIdentifier: "splashScreenVC")
+
+        self.privacyProtectionWindow?.rootViewController = initialViewController
+
         
         privacyProtectionWindow?.windowLevel = .alert + 1
         privacyProtectionWindow?.makeKeyAndVisible()
@@ -352,6 +351,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     private func hidePrivacyProtectionWindow() {
            privacyProtectionWindow?.isHidden = true
+        
            privacyProtectionWindow = nil
     }
     

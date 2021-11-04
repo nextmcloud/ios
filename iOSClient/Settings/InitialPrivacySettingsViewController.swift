@@ -43,6 +43,7 @@ class InitialPrivacySettingsViewController: UIViewController {
         acceptButton.layer.cornerRadius = 5
         acceptButton.layer.borderWidth = 1
         acceptButton.layer.borderColor = NCBrandColor.shared.brand.cgColor
+        acceptButton.setTitle(NSLocalizedString("_accept_button_title_", comment: ""), for: .normal)
         privacySettingsHelpText.centerText()
         privacySettingsHelpText.font = UIFont(name: privacySettingsHelpText.font!.fontName, size: 16)
         self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
