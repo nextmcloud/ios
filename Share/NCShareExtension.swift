@@ -449,7 +449,11 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_rename_file_", comment: ""), style: .default) { (action:UIAlertAction) in
 
                 if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
-
+                    let ocId = NSUUID().uuidString
+//                    let filePath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)!
+                    let serverUrl = NCUtilityFileSystem.shared.getHomeServer(urlBase: self.activeAccount.urlBase, account: self.activeAccount.account)
+                    let metadata = NCManageDatabase.shared.createMetadata(account: self.activeAccount.account, fileName: fileName, fileNameView: fileName, ocId: ocId, serverUrl: serverUrl, urlBase: self.activeAccount.urlBase, url: "", contentType: "", livePhoto: false)
+                    vcRename.metadata = metadata
                     vcRename.delegate = self
                     vcRename.fileName = fileName
                     vcRename.imagePreview = sender.image
@@ -584,6 +588,7 @@ extension NCShareExtension: UICollectionViewDataSource {
         cell.imageItem.backgroundColor = nil
         
         cell.progressView.progress = 0.0
+        cell.separator.backgroundColor = NCBrandColor.shared.separator
         
         if metadata.directory {
             
