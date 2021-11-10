@@ -123,15 +123,15 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         }
         
         if let image = image {
-            cell.icon.image = image.imageColor(NCBrandColor.shared.brandElement)
+            cell.icon.image = image.imageColor(NCBrandColor.shared.notificationAction)
         } else {
-            cell.icon.image = NCUtility.shared.loadImage(named: "bell", color: NCBrandColor.shared.brandElement)
+            cell.icon.image = NCUtility.shared.loadImage(named: "bell", color: NCBrandColor.shared.notificationAction)
         }
         
         // Avatar
         cell.avatar.isHidden = true
         cell.avatarLeadingMargin.constant = 10
-
+        /*
         if let subjectRichParameters = notification.subjectRichParameters {
             if let parameter = JSON(subjectRichParameters).dictionary {
                 if let user = JSON(parameter).dictionary {
@@ -159,7 +159,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
                     }
                 }
             }
-        }
+        }*/
         
         cell.date.text = DateFormatter.localizedString(from: notification.date as Date, dateStyle: .medium, timeStyle: .medium)
         cell.notification = notification
