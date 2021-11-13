@@ -136,7 +136,7 @@ class NCEndToEndInitialize : NSObject  {
                 
                 let alertController = UIAlertController(title: NSLocalizedString("_e2e_passphrase_request_title_", comment: ""), message: NSLocalizedString("_e2e_passphrase_request_message_", comment: ""), preferredStyle: .alert)
                 
-                let ok = UIAlertAction(title: "OK", style: .default, handler: { (action) -> Void in
+                let ok = UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { (action) -> Void in
                     
                     let passphrase = passphraseTextField?.text
                     
@@ -189,7 +189,7 @@ class NCEndToEndInitialize : NSObject  {
                     }
                 })
                 
-                let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (action) -> Void in
+                let cancel = UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel) { (action) -> Void in
                 }
                 
                 alertController.addAction(ok)

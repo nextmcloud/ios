@@ -93,8 +93,11 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             searchController?.obscuresBackgroundDuringPresentation = false
             searchController?.delegate = self
             searchController?.searchBar.delegate = self
+            searchController?.searchBar.placeholder = NSLocalizedString("_search_", comment: "")
+            UIBarButtonItem.appearance(whenContainedInInstancesOf: [UISearchBar.self]).title = NSLocalizedString("_cancel_", comment: "")
             navigationItem.searchController = searchController
             navigationItem.hidesSearchBarWhenScrolling = false
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_back_", comment: ""), style: .plain, target: nil, action: nil)
         }
         
         // Cell
