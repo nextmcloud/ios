@@ -92,7 +92,7 @@ extension NCViewer {
         // ROTATE
         // OFFLINE
         //
-        if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage {
+        if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage, !metadata.livePhoto {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_rotate_", comment: ""),
