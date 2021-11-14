@@ -56,7 +56,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         }
         return tableShare?.shareType ?? NCShareCommon.shared.SHARE_TYPE_USER
     }()
-    var permissionInt = 0
+    var permissionInt = NCGlobal.shared.permissionReadShare
     var rowInFirstSection = 0
     var canReshare = false
     var hideDownload = false
@@ -130,7 +130,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
 
         self.directory = self.metadata?.directory ?? false
         self.linkLabel = tableShare?.label ?? ""
-        self.permissionInt = tableShare?.permissions ?? 0
+        self.permissionInt = tableShare?.permissions ?? NCGlobal.shared.permissionReadShare
         self.hideDownload = tableShare?.hideDownload ?? false
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase,  view: self.view, delegate: self)
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
@@ -797,17 +797,23 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 return
             }
         }
+        let label = linkLabel.trimmingCharacters(in: .whitespacesAndNewlines)
+        let expirationDate = isExpiryEnabled ? getServerStyleDate(date: self.expirationDate as Date) : ""
         
         if newUser {
             let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
             let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
             viewNewUserComment.metadata = self.metadata
+            viewNewUserComment.permission = self.permissionInt
+            viewNewUserComment.password = self.password
+            viewNewUserComment.label = label
+            viewNewUserComment.expirationDate = expirationDate
+            viewNewUserComment.hideDownload = self.hideDownload
+            
             viewNewUserComment.sharee = sharee
             viewNewUserComment.isUpdating = false
             self.navigationController!.pushViewController(viewNewUserComment, animated: true)
         } else {
-            let label = linkLabel.trimmingCharacters(in: .whitespacesAndNewlines)
-            let expirationDate = isExpiryEnabled ? getServerStyleDate(date: self.expirationDate as Date) : ""
             networking?.updateShare(idShare: self.tableShare!.idShare, password: password, permission: self.permissionInt, note: nil, label: label, expirationDate: expirationDate, hideDownload: self.hideDownload)
         }
     }

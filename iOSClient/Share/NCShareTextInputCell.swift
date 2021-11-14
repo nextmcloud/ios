@@ -85,7 +85,7 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
     func setDatePicker(sender: UITextField) {
         //Format Date
         datePicker.datePickerMode = .date
-        datePicker.minimumDate = Date()
+        datePicker.minimumDate = Date.tomorrow
         if #available(iOS 13.4, *) {
             datePicker.preferredDatePickerStyle = .wheels
             datePicker.sizeToFit()
