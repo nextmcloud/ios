@@ -30,7 +30,11 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     private var networking: NCShareNetworking?
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var permission: Int = 0
-    var hideDownload: Bool?
+    var password: String?
+    var label: String?
+    var expirationDate: String?
+    var hideDownload = false
+    
     var creatingShare = false
     var note = ""
     var shareeEmail: String?
@@ -212,22 +216,31 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     //MARK: - NCShareNetworkingDelegate
     
     func popToShare() {
-        let controller = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 3]
-        self.navigationController?.popToViewController(controller!, animated: true)
+        self.navigationController?.popToRootViewController(animated: true)
     }
     
-    func readShareCompleted() {}
+    func readShareCompleted() {
+        popToShare()
+    }
     
-    func shareCompleted() {
+    func shareCompleted() {}
+    
+    func shareCompleted(createdShareId: Int?) {
         if self.creatingShare {
             self.appDelegate.shares = NCManageDatabase.shared.getTableShares(account: self.metadata!.account)
+            if let id = createdShareId {
+                networking?.updateShare(idShare: id, password: password, permission: permission, note: nil, label: label, expirationDate: expirationDate, hideDownload: hideDownload)
+            } else {
+                popToShare()
+            }
         }
-        popToShare()
     }
     
     func unShareCompleted() {}
     
-    func updateShareWithError(idShare: Int) {}
+    func updateShareWithError(idShare: Int) {
+        popToShare()
+    }
     
     func getSharees(sharees: [NCCommunicationSharee]?) {}
     

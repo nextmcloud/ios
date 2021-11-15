@@ -85,6 +85,7 @@ class NCShareNetworking: NSObject {
                 NCContentPresenter.shared.messageNotification("_share_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError, forced: true)
             }
             self.delegate?.shareCompleted()
+            self.delegate?.shareCompleted(createdShareId: share?.idShare)
         }
     }
     
@@ -132,8 +133,13 @@ class NCShareNetworking: NSObject {
 
 protocol NCShareNetworkingDelegate: class {
     func readShareCompleted()
+    func shareCompleted(createdShareId: Int?)
     func shareCompleted()
     func unShareCompleted()
     func updateShareWithError(idShare: Int)
     func getSharees(sharees: [NCCommunicationSharee]?)
+}
+
+extension NCShareNetworkingDelegate {
+    func shareCompleted(createdShareId: Int?) {}
 }
