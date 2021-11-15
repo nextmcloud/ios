@@ -807,7 +807,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             viewNewUserComment.permission = self.permissionInt
             viewNewUserComment.password = self.password
             viewNewUserComment.label = label
-            viewNewUserComment.expirationDate = expirationDate
+            viewNewUserComment.expirationDate = nil
             viewNewUserComment.hideDownload = self.hideDownload
             
             viewNewUserComment.sharee = sharee
