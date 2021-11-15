@@ -303,9 +303,10 @@ class NCViewerImageZoom: UIViewController {
     
     @objc func rotateImage() {
 
-        let rotatedImage = imageView.image?.rotate(radians: .pi/2)
+        let rotated = imageView.image?.rotate(radians: .pi/2)
+        guard let rotatedImage = rotated else { return }
 //        imageView.image = rotatedImage
-        let data = rotatedImage?.pngData()
+        let data = rotatedImage.pngData()
         let url = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileName)!)
         do {
             try data?.write(to: url)

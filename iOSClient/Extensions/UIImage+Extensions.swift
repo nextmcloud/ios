@@ -153,6 +153,7 @@ extension UIImage {
     }
     
     func rotate(radians: CGFloat) -> UIImage {
+        guard jpegData(compressionQuality: 1) != nil else { return UIImage() }
             let rotatedSize = CGRect(origin: .zero, size: size)
                 .applying(CGAffineTransform(rotationAngle: CGFloat(radians)))
                 .integral.size
