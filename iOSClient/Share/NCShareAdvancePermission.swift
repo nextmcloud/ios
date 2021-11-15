@@ -221,8 +221,11 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         }
         self.headerView.info.textColor = NCBrandColor.shared.optionItem
         self.headerView.info.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
-        self.headerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 250)
+        self.headerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 190)
         self.tableView.tableHeaderView = self.headerView
+        headerView.translatesAutoresizingMaskIntoConstraints = false
+        headerView.heightAnchor.constraint(equalToConstant: 190).isActive = true
+        headerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         
         //Sharing
         section = XLFormSectionDescriptor.formSection(withTitle: "")
