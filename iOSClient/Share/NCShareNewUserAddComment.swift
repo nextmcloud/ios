@@ -214,8 +214,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     //MARK: - NCShareNetworkingDelegate
     
     func popToShare() {
-        let controller = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 3]
-        self.navigationController?.popToViewController(controller!, animated: true)
+        self.navigationController?.popToRootViewController(animated: true)
     }
     
     func readShareCompleted() {
