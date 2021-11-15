@@ -65,7 +65,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 //        let tapQuota = UITapGestureRecognizer(target: self, action: #selector(tapLabelQuotaExternalSite))
 //        labelQuotaExternalSite.isUserInteractionEnabled = true
 //        labelQuotaExternalSite.addGestureRecognizer(tapQuota)
-
+        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
+        progressQuota.trackTintColor = NCBrandColor.shared.commonViewInfoText
         // Notification
         NotificationCenter.default.addObserver(self, selector: #selector(initialize), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
@@ -75,10 +76,10 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @objc func changeTheming() {
         viewQuota.backgroundColor = NCBrandColor.shared.memoryConsuptionBackground
-        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
-        progressQuota.trackTintColor = NCBrandColor.shared.commonViewInfoText
-        progressQuota.layer.borderWidth = 2
-        progressQuota.layer.borderColor = UIColor(hex: "#CCCCCC")?.cgColor
+//        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
+//        progressQuota.trackTintColor = NCBrandColor.shared.commonViewInfoText
+//        progressQuota.layer.borderWidth = 2
+//        progressQuota.layer.borderColor = UIColor(hex: "#CCCCCC")?.cgColor
         quotaLabel1.textColor = NCBrandColor.shared.nmcGray0
         quotalabel2.textColor = NCBrandColor.shared.nmcGray0
         labelQuota.textColor = NCBrandColor.shared.nmcGray0
@@ -217,10 +218,6 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         appDelegate.activeViewController = self
         
         viewQuota.backgroundColor = NCBrandColor.shared.memoryConsuptionBackground
-        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
-        progressQuota.trackTintColor = NCBrandColor.shared.commonViewInfoText
-        progressQuota.layer.borderWidth = 2
-        progressQuota.layer.borderColor = UIColor(hex: "#CCCCCC")?.cgColor
         quotaLabel1.textColor = NCBrandColor.shared.nmcGray0
         quotalabel2.textColor = NCBrandColor.shared.nmcGray0
         labelQuota.textColor = NCBrandColor.shared.nmcGray0
@@ -261,12 +258,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 //        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed, quota)
         quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
         quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
-//        let percentageUsed: String = CCUtility.transformedSize((tabAccount.quotaUsed / tabAccount.quotaTotal) * 100)
-//        let percentageUsed = "\((tabAccount.quotaUsed / tabAccount.quotaTotal) / (1024*1024))"
-        let used = Double(tabAccount.quotaUsed)
-        let allot = Double(tabAccount.quotaTotal)
-        let percentageUsed = (used/allot) * 100
-        let percentageUsedFormatted = "\(Int(percentageUsed))%"
+
+        let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
 
         labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
         labelQuota.textColor = NCBrandColor.shared.label

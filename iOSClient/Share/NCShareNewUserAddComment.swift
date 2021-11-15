@@ -74,6 +74,8 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         btnSendShare.setTitle(NSLocalizedString("_send_share_", comment: ""), for: .normal)
         btnSendShare.layer.cornerRadius = 10
         btnSendShare.layer.masksToBounds = true
+        
+        commentTextView.showsVerticalScrollIndicator = false
         setTitle()
         changeTheming()
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
