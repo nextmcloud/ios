@@ -26,6 +26,10 @@ import Foundation
 import NCCommunication
 
 class NCMedia: UIViewController, NCEmptyDataSetDelegate, NCSelectDelegate {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
+        
+    }
+    
     
     @IBOutlet weak var collectionView : UICollectionView!
     
@@ -465,8 +469,7 @@ extension NCMedia {
 
     @objc func reloadDataSource() {
         appDelegate.adjust.trackEvent(TriggerEvent(ResetsApp.rawValue))
-        TealiumHelper.shared.trackEvent(title: "NMC_Reset", data: ["": ""])
-        TealiumHelper.shared.trackView(title: "VIEW_Reset", data: ["": ""])
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.settings.reset", data: ["": ""])
         self.reloadDataSourceWithCompletion { (_) in }
     }
     

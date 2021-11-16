@@ -246,8 +246,8 @@ extension NCLoginWeb: WKNavigationDelegate {
         
         var urlBase = server
         
-        TealiumHelper.shared.trackEvent(title: "NMC_Login", data: ["": ""])
-        TealiumHelper.shared.trackView(title: "VIEW_Login", data: ["": ""])
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.login", data: ["": ""])
+        TealiumHelper.shared.trackView(title: "magentacloud-app.login", data: ["": ""])
         // NO account found, clear all
         if NCManageDatabase.shared.getAccounts() == nil { NCUtility.shared.removeAllSettings() }
             
@@ -289,8 +289,7 @@ extension NCLoginWeb: WKNavigationDelegate {
                         viewController.view.alpha = 1
                     }
                     appDelegate.adjust.trackEvent(TriggerEvent(Login.rawValue))
-                    TealiumHelper.shared.trackEvent(title: "NMC_Login_successful", data: ["": ""])
-                    TealiumHelper.shared.trackView(title: "VIEW_Login_successful", data: ["": ""])
+                    TealiumHelper.shared.trackEvent(title: "magentacloud-app.login.successful", data: ["": ""])
                 }
             } else {
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitializeMain)

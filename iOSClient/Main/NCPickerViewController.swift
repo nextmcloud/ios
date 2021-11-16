@@ -177,8 +177,7 @@ class NCDocumentPickerViewController: NSObject, UIDocumentPickerDelegate {
                             
                             appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
                             appDelegate.adjust.trackEvent(TriggerEvent(FileUpload.rawValue))
-                            TealiumHelper.shared.trackEvent(title: "NMC_Fileupload", data: ["": ""])
-                            TealiumHelper.shared.trackView(title: "VIEW_fileupload", data: ["": ""])
+                            TealiumHelper.shared.trackEvent(title: "magentacloud-app.plus.fileupload", data: ["": ""])
                         }
                         
                     } catch {

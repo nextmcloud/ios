@@ -25,6 +25,10 @@ import Foundation
 import NCCommunication
 
 @objc class NCFunctionCenter: NSObject, UIDocumentInteractionControllerDelegate, NCSelectDelegate {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
+        
+    }
+    
     @objc public static let shared: NCFunctionCenter = {
         let instance = NCFunctionCenter()
         
@@ -59,8 +63,8 @@ import NCCommunication
                         let fileNamePath = NSTemporaryDirectory() + metadata.fileNameView
                         CCUtility.copyFile(atPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView), toPath: fileNamePath)
 
-                        viewerQuickLook = NCViewerQuickLook.init()
-                        viewerQuickLook?.quickLook(url: URL(fileURLWithPath: fileNamePath))
+//                        viewerQuickLook = NCViewerQuickLook.init(coder: nil)
+//                        viewerQuickLook?.quickLook(url: URL(fileURLWithPath: fileNamePath))
                         
                     case NCGlobal.shared.selectorLoadFileView:
                         
