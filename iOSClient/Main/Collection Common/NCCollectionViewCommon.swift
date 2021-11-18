@@ -536,7 +536,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         if let ocId = userInfo["ocId"] as? String, let ocIdTemp = userInfo["ocIdTemp"] as? String, let _ = userInfo["errorCode"] as? Int, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
                 if metadata.serverUrl == serverUrl && metadata.account == appDelegate.account {
                     dataSource.reloadMetadata(ocId: metadata.ocId, ocIdTemp: ocIdTemp)
-                    collectionView?.reloadData()
+                    reloadDataSource()
                 }
             }
         }

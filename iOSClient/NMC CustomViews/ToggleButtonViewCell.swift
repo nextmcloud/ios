@@ -10,6 +10,8 @@ import Foundation
 
 class ToggleButtonViewCell: XLFormBaseCell{
     
+    @IBOutlet weak var topLine: UIView!
+    @IBOutlet weak var bottomLine: UIView!
     @IBOutlet weak var cellLabel: UILabel!
     @IBOutlet weak var switchControl: UISwitch!
     override func awakeFromNib() {
@@ -28,6 +30,10 @@ class ToggleButtonViewCell: XLFormBaseCell{
         let backgroundView = UIView()
         backgroundView.backgroundColor = UIColor.white
         self.selectedBackgroundView = backgroundView
+        if rowDescriptor.tag == "autoUpload" {
+            bottomLine.isHidden = true
+            topLine.isHidden = true
+        }
     }
     
     @objc func switchChanged(mySwitch: UISwitch) {

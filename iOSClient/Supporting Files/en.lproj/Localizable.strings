@@ -1019,6 +1019,8 @@
 "_used_space_"              = "Used space";
 "_open_in_onlyoffice_"      = "Open in ONLYOFFICE";
 "_open_in_collabora_"       = "Open with Collabora Online";
+"_save_changes_message_"    = "Do you want to save changes?";
+"_discard_"                 = "Discard";
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 // IM
