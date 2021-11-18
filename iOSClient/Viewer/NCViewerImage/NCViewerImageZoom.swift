@@ -23,7 +23,7 @@
 
 import UIKit
 
-protocol NCViewerImageZoomDelegate {
+protocol NCViewerImageZoomDelegate: NSObject {
     func didAppearImageZoom(viewerImageZoom: NCViewerImageZoom, metadata: tableMetadata)
     func willAppearImageZoom(viewerImageZoom: NCViewerImageZoom, metadata: tableMetadata)
     func dismissImageZoom()
@@ -44,8 +44,8 @@ class NCViewerImageZoom: UIViewController {
     @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var detailView: NCViewerImageDetailView!
     
-    var delegate: NCViewerImageZoomDelegate?
-    var viewerImage: NCViewerImage?
+    weak var delegate: NCViewerImageZoomDelegate?
+    weak var viewerImage: NCViewerImage?
     var image: UIImage?
     var metadata: tableMetadata = tableMetadata()
     var index: Int = 0
@@ -300,32 +300,68 @@ class NCViewerImageZoom: UIViewController {
         let contentHeight = yOffset * 2 + imageView.frame.height
         scrollView.contentSize = CGSize(width: scrollView.contentSize.width, height: contentHeight)
     }
+        
+    @objc func doneRotate(sender: Any) {
+        let message = NSLocalizedString("_save_changes_message_", comment: "")
+        let alertController = UIAlertController(title: NSLocalizedString("_save_", comment: ""), message: message, preferredStyle: .alert)
+            
+        let discard = NSLocalizedString("_discard_", comment: "")
+        alertController.addAction(UIAlertAction(title: discard, style: .cancel, handler: { [weak self] action in
+            self?.viewerImage?.navigationItem.leftBarButtonItem = nil
+            self?.imageView.image = self?.image
+            self?.scrollView.layoutIfNeeded()
+        }))
+        
+        let save = NSLocalizedString("_save_", comment: "")
+        alertController.addAction(UIAlertAction(title: save, style: .default, handler: { [weak self] action in
+            self?.viewerImage?.navigationItem.leftBarButtonItem = nil
+            if let image = self?.imageView.image {
+                self?.uploadRotatedImage(image: image)
+            }
+            self?.navigationController?.popViewController(animated: true)
+        }))
+        
+        self.present(alertController, animated: true)
+    }
     
     @objc func rotateImage() {
-
-        let rotated = imageView.image?.rotate(radians: .pi/2)
-        guard let rotatedImage = rotated else { return }
-//        imageView.image = rotatedImage
-        let data = rotatedImage.pngData()
-        let url = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileName)!)
-        do {
-            try data?.write(to: url)
-        } catch {
-            print("Unable to save file")
+        if viewerImage?.navigationItem.leftBarButtonItem == nil {
+            let leftButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneRotate(sender:)))
+            viewerImage?.navigationItem.leftBarButtonItem = leftButton
         }
-        NCManageDatabase.shared.updateMetadatas([metadata], metadatasResult: [metadata])
+        
+        let originalImage = imageView.image
+        let rotatedImage = originalImage?.rotateExif(orientation: .right)
+        imageView.image = rotatedImage
+        scrollView.layoutIfNeeded()
+    }
+    
+    func uploadRotatedImage(image: UIImage) {
+        guard let data = image.jpegData(compressionQuality: 0.9) else { return }
+        let url = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileName)!)
+        
+        do {
+            try data.write(to: url)
+        } catch {
+            print("Unable to save file: ", error.localizedDescription)
+            return
+        }
+        
         let ocId = NSUUID().uuidString
-//        let ocId = self.metadata.ocId
         let size = NCUtilityFileSystem.shared.getFileSize(filePath: url.path)
+        
         let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: metadata.fileNameView)!
+        
         if NCUtilityFileSystem.shared.copyFile(atPath: url.path, toPath: fileNamePath) {
+            
             let metadataForUpload = NCManageDatabase.shared.createMetadata(account: metadata.account, fileName: metadata.fileName, fileNameView: metadata.fileNameView, ocId: ocId, serverUrl: metadata.serverUrl, urlBase: metadata.urlBase, url: url.path, contentType: "", livePhoto: false)
+            
             metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
             metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
             metadataForUpload.size = size
             metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
+            
             appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
-            imageView.image = UIImage()
         }
     }
 }
