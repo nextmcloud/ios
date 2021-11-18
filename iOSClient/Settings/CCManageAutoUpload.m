@@ -52,12 +52,23 @@
     [form addFormSection:section];
     section.footerTitle = NSLocalizedString(@"_autoupload_description_", nil);
 
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"autoUpload" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_autoupload_", nil)];
+    //custom cell
+    
+    [[XLFormViewController cellClassesForRowDescriptorTypes] setObject:[ToggleButtonViewCell class] forKey:@"kNMCCustomCellType"];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"autoUpload" rowType:@"kNMCCustomCellType" title:NSLocalizedString(@"_autoupload_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
+    row.cellConfigAtConfigure[@"cellLabel.text"] = NSLocalizedString(@"_autoupload_", nil);
+    
     if (activeAccount.autoUpload) row.value = @1;
     else row.value = @0;
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"cellLabel.font"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"cellLabel.textColor"];
+    
+    if (NSLocalizedString(@"_autoupload_", nil).length > 30 ){
+        row.height = 65;
+    }
+    
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
 
     [section addFormRow:row];
