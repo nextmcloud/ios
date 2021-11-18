@@ -132,6 +132,7 @@ class NCBrandColor: NSObject {
         static var file = UIImage()
 
         static var shared = UIImage()
+        static var sharedWithMe = UIImage()
         static var canShare = UIImage()
         static var shareByLink = UIImage()
         
@@ -503,6 +504,7 @@ class NCBrandColor: NSObject {
         cacheImages.file = UIImage.init(named: "file")!
         
         cacheImages.shared = UIImage(named: "share")!.image(color: nmcGray1, size: 50)
+        cacheImages.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: nmcIconSharedWithMe, size: 50)
         cacheImages.canShare = UIImage(named: "share")!.image(color: nmcGray1, size: 50)
         cacheImages.shareByLink = UIImage(named: "sharebylink")!.image(color: nmcGray1, size: 50)
         

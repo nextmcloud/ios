@@ -1553,9 +1553,9 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             } else {
                 cell.imageShared.image = NCBrandColor.cacheImages.canShare
             }
-            if appDelegate.account != metadata.account {
-                cell.imageShared.image = NCBrandColor.cacheImages.shared
-            }
+//            if appDelegate.account != metadata.account {
+//                cell.imageShared.image = NCBrandColor.cacheImages.shared
+//            }
             
             
             let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
@@ -1563,12 +1563,12 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 cell.imageShared.image = cell.imageShared.image?.imageColor(NCBrandColor.shared.customer)
             }
             
-            if metadata.ownerId.count > 0 && metadata.ownerId != appDelegate.userId && appDelegate.account == metadata.account {
-                cell.imageShared.image = UIImage(named: "avatar")
+            if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+//                cell.imageShared.image = UIImage(named: "avatar")
 //                let fileNameUser = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + metadata.ownerId + ".png"
                 
-                cell.imageShared.image = UIImage.init(named: "cloudUpload")?.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)
-                
+//                cell.imageShared.image = UIImage.init(named: "cloudUpload")?.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)
+                cell.imageShared.image = NCBrandColor.cacheImages.sharedWithMe
 //                if FileManager.default.fileExists(atPath: fileNameUser) {
 ////                    if let image = UIImage(contentsOfFile: fileNameUser) {
 ////                        cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
@@ -1678,10 +1678,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             if appDelegate.disableSharesView {
                 cell.hideButtonShare(true)
             }
-//            let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
-//            if shares.share!.count > 0 {
-//                cell.imageShared.image = cell.imageShared.image?.imageColor(NCBrandColor.shared.customer)
-//            }
             
             return cell
         }

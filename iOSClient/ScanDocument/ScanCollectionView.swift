@@ -530,9 +530,7 @@ extension DragDropViewController : UICollectionViewDataSource {
 
 extension UIImage {
     func rotate(radians: Float) -> UIImage? {
-        if (self.size.height == 0.0 || self.size.height == 0.0) {
-            return UIImage()
-        }
+        guard jpegData(compressionQuality: 1) != nil else { return UIImage() }
         
         var newSize = CGRect(origin: CGPoint.zero, size: self.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
         // Trim off the extremely small float value to prevent core graphics from rounding it up
