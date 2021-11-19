@@ -1110,9 +1110,10 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     
     
     func redirectToPrivacyViewController(){
-            let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
-            let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
-                    self.present(newViewController, animated: true, completion: nil)
+        let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
+        newViewController.modalPresentationStyle = .fullScreen
+        self.present(newViewController, animated: true, completion: nil)
     }
     
     func setDefaultFolderPathToMediaView(){
