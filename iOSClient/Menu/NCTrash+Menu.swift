@@ -111,6 +111,16 @@ extension NCTrash {
 
         actions.append(
             NCMenuAction(
+                title: NSLocalizedString("_restore_", comment: ""),
+                icon: UIImage(named: "restore")!.image(color: NCBrandColor.shared.iconColor, size: 50),
+                action: { menuAction in
+                    self.restoreItem(with: objectId)
+                }
+            )
+        )
+        
+        actions.append(
+            NCMenuAction(
                 title: NSLocalizedString("_delete_", comment: ""),
                 icon: NCUtility.shared.loadImage(named: "trash"),
                 action: { menuAction in
