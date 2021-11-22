@@ -748,7 +748,7 @@ import Queuer
         }
         
         let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(named: "details")?.imageColor(NCBrandColor.shared.nmcGray0)) { action in
-            self.openShare(ViewController: viewController, metadata: metadata, indexPage: 0)
+            self.openShare(ViewController: viewController, metadata: metadata, indexPage: 2)
         }
         
         let offline = UIAction(title: titleOffline, image: UIImage(systemName: "tray.and.arrow.down")) { action in
