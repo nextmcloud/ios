@@ -64,7 +64,7 @@ import UIKit
     @objc public var folderBrandAutoUpload:             String = ""                                                 // example "_auto_upload_folder_"   Don't touch me !!
     
     // Auto Upload default folder
-    @objc public var folderDefaultAutoUpload:           String = "Photos"
+   // @objc public var folderDefaultAutoUpload:           String = "Photos"
     // Capabilities Group
 
 //    @objc public var capabilitiesGroups:                String = "group.in.t-systems.com"
@@ -97,15 +97,15 @@ import UIKit
     @objc public var disable_background_color:          Bool = true
     @objc public var disable_background_image:          Bool = true
 
-//    @objc public var folderDefaultAutoUpload: String {
-//        get {
-//            if Locale.current.languageCode == "de" {
-//                return "Kamera-Medien"
-//            } else {
-//                return "Camera-Media"
-//            }
-//        }
-//    }
+    @objc public var folderDefaultAutoUpload: String {
+        get {
+            if Locale.current.languageCode == "de" {
+                return "Kamera-Medien"
+            } else {
+                return "Camera-Media"
+            }
+        }
+    }
     
     override init() {
         
