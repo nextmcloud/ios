@@ -101,6 +101,7 @@ class NCMainTabBar: UITabBar {
     }
 
     override func draw(_ rect: CGRect) {
+        tintColor = NCBrandColor.shared.brand
         addShape()
         createButtons()
     }
@@ -191,7 +192,7 @@ class NCMainTabBar: UITabBar {
         
         centerButton.setTitle("", for: .normal)
         centerButton.setImage(UIImage(named: "tabBarPlus")?.image(color: .white, size: 100), for: .normal)
-        centerButton.backgroundColor = NCBrandColor.shared.brandElement
+        centerButton.backgroundColor = NCBrandColor.shared.brand
         centerButton.tintColor = UIColor.white
         centerButton.tag = 99
         centerButton.accessibilityLabel = NSLocalizedString("_accessibility_add_upload_", comment: "")
