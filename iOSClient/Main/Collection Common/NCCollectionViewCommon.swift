@@ -1502,7 +1502,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 }
                 
                 cell.labelInfo.text = CCUtility.dateDiff(metadata.date as Date)
-                cell.labelInfo.textColor = NCBrandColor.shared.nmcGray80
                 
                 
                 let lockServerUrl = CCUtility.stringAppendServerUrl(metadata.serverUrl, addFileName: metadata.fileName)!

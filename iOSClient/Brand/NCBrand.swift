@@ -502,9 +502,9 @@ class NCBrandColor: NSObject {
 
         cacheImages.file = UIImage.init(named: "file")!
         
-        cacheImages.shared = UIImage(named: "share")!.image(color: nmcGray1, size: 50)
+        cacheImages.shared = UIImage(named: "share")!.image(color: gray60, size: 50)
         cacheImages.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: nmcIconSharedWithMe, size: 50)
-        cacheImages.canShare = UIImage(named: "share")!.image(color: nmcGray1, size: 50)
+        cacheImages.canShare = UIImage(named: "share")!.image(color: gray60, size: 50)
         cacheImages.shareByLink = UIImage(named: "sharebylink")!.image(color: nmcGray1, size: 50)
         
         cacheImages.favorite = NCUtility.shared.loadImage(named: "star.fill", color: yellowFavorite)
@@ -527,7 +527,7 @@ class NCBrandColor: NSObject {
         cacheImages.checkedYes = UIImage(named: "checkedYes")!
         cacheImages.checkedNo = NCUtility.shared.loadImage(named: "circle", color: graySoft)
         
-        cacheImages.buttonMore = UIImage(named: "more")!.image(color: iconColor, size: 50)
+        cacheImages.buttonMore = UIImage(named: "more")!.image(color: gray60, size: 50)
         cacheImages.buttonStop = UIImage(named: "stop")!.image(color: iconColor, size: 50)
     }
     

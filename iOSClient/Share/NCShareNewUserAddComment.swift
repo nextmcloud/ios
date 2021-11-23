@@ -113,15 +113,6 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     
     @IBAction func sendShareClicked(_ sender: Any) {
         let message = commentTextView.text.trimmingCharacters(in: .whitespaces)
-        if message.count > 0 {
-            NCCommunication.shared.putComments(fileId: metadata!.fileId, message: message) { (account, errorCode, errorDescription) in
-                if errorCode == 0 {
-                    self.commentTextView.text = ""
-                } else {
-                    NCContentPresenter.shared.messageNotification("_share_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
-                }
-            }
-        }
         self.note = message
         if isUpdating {
             self.networking?.updateShare(idShare: tableShare!.idShare, password: nil, permission: self.tableShare!.permissions, note: message, label: nil, expirationDate: nil, hideDownload: tableShare!.hideDownload)
@@ -229,7 +220,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         if self.creatingShare {
             self.appDelegate.shares = NCManageDatabase.shared.getTableShares(account: self.metadata!.account)
             if let id = createdShareId {
-                networking?.updateShare(idShare: id, password: password, permission: permission, note: nil, label: label, expirationDate: expirationDate, hideDownload: hideDownload)
+                networking?.updateShare(idShare: id, password: password, permission: permission, note: self.note, label: label, expirationDate: expirationDate, hideDownload: hideDownload)
             } else {
                 popToShare()
             }
