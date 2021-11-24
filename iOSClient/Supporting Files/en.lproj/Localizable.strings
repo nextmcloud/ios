@@ -627,6 +627,8 @@
 "_share_expirationdate_"        = "Set expiration date for link";
 "_date_"                        = "Date";
 "_share_title_"                 = "Share";
+"_shared_"                      = "Shared";
+"_recieved_"                    = "Received";
 "_add_sharee_"                  = "Add users or groups";
 "_add_sharee_footer_"           = "You can share this resource by adding users or groups. To remove a share, remove all users and groups";
 "_find_sharee_title_"           = "Search";

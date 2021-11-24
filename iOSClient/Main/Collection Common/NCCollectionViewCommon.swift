@@ -1544,6 +1544,8 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             }
             
             // Share image
+            cell.labelShared.text = NSLocalizedString("_shared_", comment: "")
+            cell.labelShared.textColor = NCBrandColor.shared.customer
             if (isShare) {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else if (tableShare != nil && tableShare?.shareType == 3) {
@@ -1552,6 +1554,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else {
                 cell.imageShared.image = NCBrandColor.cacheImages.canShare
+                cell.labelShared.text = ""
             }
 //            if appDelegate.account != metadata.account {
 //                cell.imageShared.image = NCBrandColor.cacheImages.shared
@@ -1559,7 +1562,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             
             
             let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
-            if shares.share!.count > 0 {
+            if shares.share!.count > 0 || shares.firstShareLink != nil {
                 cell.imageShared.image = cell.imageShared.image?.imageColor(NCBrandColor.shared.customer)
             }
             
@@ -1569,6 +1572,8 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 
 //                cell.imageShared.image = UIImage.init(named: "cloudUpload")?.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)
                 cell.imageShared.image = NCBrandColor.cacheImages.sharedWithMe
+                cell.labelShared.text = NSLocalizedString("_recieved_", comment: "")
+                cell.labelShared.textColor = NCBrandColor.shared.notificationAction
 //                if FileManager.default.fileExists(atPath: fileNameUser) {
 ////                    if let image = UIImage(contentsOfFile: fileNameUser) {
 ////                        cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)
@@ -1649,8 +1654,10 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             //Hide lines on iPhone
             if !UIDevice.current.orientation.isLandscape && UIDevice.current.model.hasPrefix("iPhone") {
                 cell.separator.isHidden = true
+                cell.labelShared.isHidden = true
             }else{
                 cell.separator.isHidden = false
+                cell.labelShared.isHidden = false
                 // Remove last separator
                 if collectionView.numberOfItems(inSection: indexPath.section) == indexPath.row + 1 {
                     cell.separator.isHidden = true
