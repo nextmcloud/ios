@@ -201,7 +201,7 @@ class NCBrandColor: NSObject {
                     return  UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
                 }
             } else {
-                return  UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
+                return  UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
         }
     }
     
@@ -401,17 +401,16 @@ class NCBrandColor: NSObject {
         }
     }
     
-    @objc public var iconColor: UIColor{
-            if #available(iOS 13.0, *) {
-                if UITraitCollection.current.userInterfaceStyle == .dark {
-                    return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
-                }else {
-                    return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
-                }
-            }else{
-           return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+    @objc public var iconColor: UIColor{ 
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
+            }else {
+                return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+            }
+        } else {
+            return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
         }
-       
     }
         
     @objc public var nmcGray1: UIColor{
@@ -421,7 +420,7 @@ class NCBrandColor: NSObject {
                 }else {
                     return  UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
                 }
-            }else{
+            } else {
                 return  UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
         }
        
@@ -439,7 +438,7 @@ class NCBrandColor: NSObject {
                     return  UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
                 }
             }else{
-           return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+                return  UIColor(red: 25/255.0, green: 25/255.0, blue: 25/255.0, alpha: 1.0)
         }
        
     }
@@ -485,7 +484,7 @@ class NCBrandColor: NSObject {
                 return .white
             }
         } else {
-            return  UIColor(displayP3Red: 51.0/255.0, green: 51.0/255.0, blue: 51.0/255.0, alpha: 1.0)
+            return .white
         }
     }
     
