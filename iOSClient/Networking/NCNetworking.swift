@@ -1152,6 +1152,7 @@ import Queuer
                     
             if errorCode == 0 {
                         
+                NCManageDatabase.shared.updateFileNameForTableShare(metaData: metadata, newFileName: fileNameNew)
                 NCManageDatabase.shared.renameMetadata(fileNameTo: fileNameNew, ocId: ocId)
                         
                 if metadata.directory {
