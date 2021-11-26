@@ -405,7 +405,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         }
         row.cellConfig["cellTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["cellTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.textView
+        row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.label
         if let date = expirationDate {
             row.cellConfig["cellTextField.text"] = getDisplayStyleDate(date: date as Date)
         }
