@@ -14,7 +14,7 @@ class TextFileWithOcrSwitchView: XLFormBaseCell{
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+        self.selectionStyle = .none
         switchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
     }
     

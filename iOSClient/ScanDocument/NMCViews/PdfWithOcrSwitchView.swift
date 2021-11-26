@@ -15,6 +15,7 @@ class PdfWithOcrSwitchView: XLFormBaseCell{
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        self.selectionStyle = .none
         switchControl.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
         
     }
