@@ -534,6 +534,11 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
 //                }
                 
+                if let ocId = self?.metadata?.ocId {
+                    let metaData = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+                    self?.metadata = metaData
+                }
+                
                 viewNewUserPermission.metadata = self!.metadata
                 viewNewUserPermission.sharee = sharee
                 viewNewUserPermission.shareeEmail = self?.shareeEmail
@@ -585,6 +590,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //        viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserPermission") as! NCShareNewUserPermission
         var advancePermission: NCShareAdvancePermission
         advancePermission = storyboard.instantiateViewController(withIdentifier: "NCShareAdvancePermission") as! NCShareAdvancePermission
+        if let ocId = metadata?.ocId {
+            let metaData = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+            self.metadata = metaData
+        }
         advancePermission.metadata = self.metadata
         advancePermission.sharee = self.shareeSelected
 //        advancePermission.shareeEmail = self.shareeEmail
@@ -600,6 +609,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     @objc func shareMenuSendEmailClicked() {
         let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
         let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
+        if let ocId = metadata?.ocId {
+            let metaData = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+            self.metadata = metaData
+        }
         viewNewUserComment.metadata = self.metadata
         viewNewUserComment.tableShare = self.tableShareSelected
         viewNewUserComment.isUpdating = true
