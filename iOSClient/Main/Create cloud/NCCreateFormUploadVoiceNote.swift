@@ -187,7 +187,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
         
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -207,7 +207,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
         row.cellClass = TextTableViewCell.self
 
-        row.cellConfigAtConfigure["backgroundColor"] = NCBrandColor.shared.backgroundForm;
+        row.cellConfigAtConfigure["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["fileNameTextField.textColor"] = NCBrandColor.shared.label
@@ -405,30 +405,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     @IBAction func playStop(_ sender: Any) {
 
         if audioPlayer.isPlaying {
-            
-//<<<<<<< HEAD
-//            audioPlayer.currentTime = 0.0
-//            audioPlayer.stop()
-//
-//            timer.invalidate()
-//            counterSecondPlayer = 0
-//            progressView.progress = 0
-//            updateTimerUI()
-//
-//            buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
-//
-//        } else {
-//
-//            audioPlayer.prepareToPlay()
-//            audioPlayer.play()
-//
-//            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
-//
-//            buttonPlayStop.setImage(UIImage(named: "stop")!.image(color: NCBrandColor.shared.icon, size: 100), for: .normal)
-//        }
-//    }
-//
-//=======
             stop()
             
         } else {
