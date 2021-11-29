@@ -83,7 +83,7 @@ import UIKit
     @objc public var use_configuration:                 Bool = false                                                // Don't touch me !!
     @objc public var use_loginflowv2:                   Bool = false                                                // Don't touch me !!
 
-    @objc public var disable_intro:       Bool = true
+    @objc public var disable_intro:       Bool = false
     @objc public var disable_request_login_url:       Bool = true
     @objc public var disable_multiaccount:            Bool = true
     @objc public var disable_manage_account:          Bool = false
