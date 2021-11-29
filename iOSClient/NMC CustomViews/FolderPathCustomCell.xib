@@ -42,7 +42,6 @@
                         <color key="backgroundColor" systemColor="separatorColor"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="1" id="ZW0-np-clD"/>
-                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="1" id="otd-oI-IqI"/>
                         </constraints>
                     </view>
                 </subviews>
