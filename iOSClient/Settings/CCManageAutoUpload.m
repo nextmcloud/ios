@@ -32,7 +32,7 @@
 {
     AppDelegate *appDelegate;
     AdjustHelper *adjust;
-
+    TealiumHelper *tealium;
 }
 @end
 
@@ -243,7 +243,7 @@
     self.tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(initialize) name:NCGlobal.shared.notificationCenterInitialize object:nil];
-    
+    tealium = [[TealiumHelper alloc] init];
     [self initializeForm];
     [self reloadForm];
 }
@@ -315,7 +315,7 @@
             
             [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
             [adjust trackEvent:9];
-
+            [tealium trackEventWithTitle:@"magentacloud-app.settings.autoupload-on" data:nil];
         } else {
             
             [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUpload" state:NO];
@@ -324,7 +324,7 @@
             // remove
             [[NCManageDatabase shared] clearMetadatasUploadWithAccount:appDelegate.account];
             [adjust trackEvent:10];
-
+            [tealium trackEventWithTitle:@"magentacloud-app.settings.autoupload-off" data:nil];
         }
         
         [self reloadForm];

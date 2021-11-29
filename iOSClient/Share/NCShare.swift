@@ -131,10 +131,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                         if let image = UIImage(contentsOfFile: fileNameLocalPath) {
 //                            self.sharedWithYouByImage.image = NCUtility.shared.createAvatar(image: image, size: 40)
                         }
-                    } 
+                    }
                 }
             }
-        } 
+        }
         
         reloadData()
         
@@ -157,7 +157,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         NotificationCenter.default.addObserver(self, selector: #selector(statusReadOnlyClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusReadOnly), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(statusEditingClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusEditing), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(statusFileDropClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusFileDrop), object: nil)
-        
+        TealiumHelper.shared.trackView(title: "magentacloud-app.sharing", data: ["": ""])
         changeTheming()
         let isCurrentUser = NCShareCommon.shared.isCurrentUserIsFileOwner(fileOwnerId: metadata?.ownerId ?? "")
         let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
@@ -746,7 +746,7 @@ extension NCShare: UITableViewDataSource {
                 cell.contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
                 cell.imageItem.image = UIImage(named: "sharebylink")?.image(color: NCBrandColor.shared.label, size: 30)
                 if !tableShare.label.isEmpty {
-                    cell.labelTitle.text = String(format: NSLocalizedString("_share_linklabel_", comment: ""), tableShare.label) 
+                    cell.labelTitle.text = String(format: NSLocalizedString("_share_linklabel_", comment: ""), tableShare.label)
                 } else {
                     cell.labelTitle.text = directory ? NSLocalizedString("_share_link_folder_", comment: "") : NSLocalizedString("_share_link_file_", comment: "")
                 }

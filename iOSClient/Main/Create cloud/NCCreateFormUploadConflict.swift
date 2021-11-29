@@ -271,7 +271,7 @@ extension NCCreateFormUploadConflictDelegate {
             
             appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasNOConflict)
             appDelegate.adjust.trackEvent(TriggerEvent(FileUpload.rawValue))
-
+            TealiumHelper.shared.trackEvent(title: "magentacloud-app.plus.documentscan", data: ["": ""])
         }
                 
         dismiss(animated: true)
@@ -512,4 +512,5 @@ extension NCCreateFormUploadConflict: NCCreateFormUploadConflictCellDelegate {
         }
     }
 }
+
 

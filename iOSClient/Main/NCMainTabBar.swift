@@ -209,7 +209,7 @@ class NCMainTabBar: UITabBar {
     
     // Menu Button Touch Action
     @objc func centerButtonAction(sender: UIButton) {
-        
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.plus", data: ["": ""])
         if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, appDelegate.activeServerUrl)) {
             
             if !directory.permissions.contains("CK") {

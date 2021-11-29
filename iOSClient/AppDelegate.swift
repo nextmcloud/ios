@@ -219,7 +219,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         adjust.configAdjust()
         adjust.subsessionStart()
-        
+        TealiumHelper.shared.start()
         return true
     }
     

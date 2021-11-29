@@ -394,7 +394,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.value = 0
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
         
-        row.cellConfig["imageView.image"] = UIImage(named: "textRecognition")!.image(color: NCBrandColor.shared.brandElement, size: 25) 
+        row.cellConfig["imageView.image"] = UIImage(named: "textRecognition")!.image(color: NCBrandColor.shared.brandElement, size: 25)
         
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
@@ -1792,6 +1792,8 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
         controller.delegate = self
         
         appDelegate.adjust.trackEvent(TriggerEvent(DocumentScan.rawValue))
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.plus.documentscan", data: ["": ""])
+        TealiumHelper.shared.trackView(title: "magentacloud-app.plus", data: ["": ""])
         self.viewController?.present(controller, animated: true)
     }
     
@@ -1801,7 +1803,7 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
 //        for pageNumber in 0..<scan.pageCount {
 //            let fileName = CCUtility.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, keyFileName: NCGlobal.shared.keyFileNameMask, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal)!
 //=======
-                
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.plus.documentscan", data: ["": ""])
         for pageNumber in 0..<scan.pageCount {
             let fileName = CCUtility.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, keyFileName: NCGlobal.shared.keyFileNameMask, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal, forcedNewFileName: true)!
             let fileNamePath = CCUtility.getDirectoryScan() + "/" + fileName
@@ -1892,4 +1894,5 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
 
 
 }
+
 

@@ -467,6 +467,7 @@ extension NCMedia {
     // MARK: - Datasource
 
     @objc func reloadDataSource() {
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.settings.reset", data: ["": ""])
         self.reloadDataSourceWithCompletion { (_) in }
     }
     

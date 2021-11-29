@@ -746,6 +746,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         if isEditMode { return }
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId) else { return }
         appDelegate.adjust.trackEvent(TriggerEvent(Sharing.rawValue))
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.sharing", data: ["": ""])
+        TealiumHelper.shared.trackView(title: "magentacloud-app.sharing", data: ["": ""])
         NCFunctionCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 2)
     }
         
@@ -1364,7 +1366,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 //                    }
                     cell.imageShared.image = NCBrandColor.cacheImages.shared
                 } else {
-                    NCCommunication.shared.downloadAvatar(userID: metadata.ownerId, fileNameLocalPath: fileNameUser, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
+                    NCCommunication.shared.downloadAvatar(userID: metadata.ownerId, fileNameLocalPath: fileNameUser, size: CGFloat(Int(NCGlobal.shared.avatarSize))) { (account, data, errorCode, errorMessage) in
                         if errorCode == 0 && account == self.appDelegate.account {
 //                            if let image = UIImage(contentsOfFile: fileNameUser) {
 //                                cell.imageShared.image = NCUtility.shared.createAvatar(image: image, size: 30)

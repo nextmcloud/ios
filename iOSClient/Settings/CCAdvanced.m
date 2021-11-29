@@ -32,6 +32,7 @@
 {
     AppDelegate *appDelegate;
     XLFormSectionDescriptor *sectionSize;
+    TealiumHelper *tealium;
 }
 @end
 
@@ -92,7 +93,7 @@
 //    section = [XLFormSectionDescriptor formSection];
 //    [form addFormSection:section];
 //    section.footerTitle = NSLocalizedString(@"_disableLocalCacheAfterUpload_footer_", nil);
-//    
+//
 //    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disableLocalCacheAfterUpload" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_disableLocalCacheAfterUpload_", nil)];
 //    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
 //    if ([CCUtility getDisableLocalCacheAfterUpload]) row.value = @"1";
@@ -413,7 +414,7 @@
     
     if ([rowDescriptor.tag isEqualToString:@"showHiddenFiles"]) {
         
-        [CCUtility setShowHiddenFiles:[[rowDescriptor.value valueData] boolValue]];        
+        [CCUtility setShowHiddenFiles:[[rowDescriptor.value valueData] boolValue]];
     }
     
     if ([rowDescriptor.tag isEqualToString:@"formatCompatibility"]) {
@@ -559,7 +560,8 @@
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:NSLocalizedString(@"_want_exit_", nil) preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alertController addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"_ok_", nil) style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-                
+        tealium = [[TealiumHelper alloc] init];
+        [tealium trackEventWithTitle:@"magentacloud-app.settings.logout" data:nil];
         [[NSURLCache sharedURLCache] setMemoryCapacity:0];
         [[NSURLCache sharedURLCache] setDiskCapacity:0];
         [KTVHTTPCache cacheDeleteAllCaches];
@@ -600,3 +602,4 @@
 }
 
 @end
+

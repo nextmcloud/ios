@@ -636,7 +636,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                     if let metadata = NCManageDatabase.shared.getMetadataFromOcId(tableDirectory.ocId) {
                         titleServerUrl = metadata.fileNameView
                     } else { titleServerUrl = (self.serverUrl as NSString).lastPathComponent }
-                } else { titleServerUrl = (self.serverUrl as NSString).lastPathComponent }                
+                } else { titleServerUrl = (self.serverUrl as NSString).lastPathComponent }
             }
             
             // Update
@@ -718,7 +718,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 // Detect LivePhoto Upload
                 if asset.mediaSubtypes.contains(.photoLive) && CCUtility.getLivePhoto() {
                     livePhoto = true
-                } 
+                }
                 
                 // Create serverUrl if use sub folder
                 if useSubFolder {
@@ -821,7 +821,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 self.appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasNOConflict)
                 self.appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasMOV)
                 self.appDelegate.adjust.trackEvent(TriggerEvent(UseCamera.rawValue))
-
+                TealiumHelper.shared.trackEvent(title: "NMC_Cameraupload", data: ["": ""])
+                TealiumHelper.shared.trackView(title: "VIEW_Cameraupload", data: ["": ""])
             }
         
             DispatchQueue.main.async {self.dismiss(animated: true, completion: nil)  }

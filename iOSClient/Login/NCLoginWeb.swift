@@ -245,6 +245,9 @@ extension NCLoginWeb: WKNavigationDelegate {
         
         var urlBase = server
         
+        TealiumHelper.shared.trackView(title: "magentacloud-app.login", data: ["": ""])
+        // NO account found, clear all
+        if NCManageDatabase.shared.getAccounts() == nil { NCUtility.shared.removeAllSettings() }
         // Normalized
         if (urlBase.last == "/") {
             urlBase = String(urlBase.dropLast())
@@ -290,6 +293,8 @@ extension NCLoginWeb: WKNavigationDelegate {
                     UIView.animate(withDuration: 0.5) {
                         viewController.view.alpha = 1
                     }
+                    appDelegate.adjust.trackEvent(TriggerEvent(Login.rawValue))
+                    TealiumHelper.shared.trackEvent(title: "magentacloud-app.login.successful", data: ["": ""])
                 }
             } else {
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitialize)
