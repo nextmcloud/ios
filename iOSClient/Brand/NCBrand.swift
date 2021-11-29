@@ -457,7 +457,18 @@ class NCBrandColor: NSObject {
             }else{
            return  UIColor(red: 19.0/255.0, green: 19.0/255.0, blue: 19.0/255.0, alpha: 1.0)
         }
-       
+    }
+    
+    @objc public var nmcGray70CellSelection: UIColor{
+            if #available(iOS 13.0, *) {
+                if UITraitCollection.current.userInterfaceStyle == .dark {
+                    return  UIColor(red: 76.0/255.0, green: 76.0/255.0, blue: 76.0/255.0, alpha: 1.0)
+                }else {
+                    return  UIColor(red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+                }
+            }else{
+           return  UIColor(red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+        }
     }
 
     @objc public var nmcIconSharedWithMe: UIColor{

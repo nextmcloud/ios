@@ -675,10 +675,10 @@
 "_share_internal_link_des_"     = "Only works for users with access to this folder";
 "_permissions_"                 = "Permissions";
 "_advance_permissions_"         = "Advanced permissions";
-"_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCloud users, you have more opportunities for collaboration.";
+"_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
 "_your_shares_"                 = "Your Shares";
 "no_shares_created"             = "No shares created yet.";
-"_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCloud users, you have more opportunities for collaboration.";
+"_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
 "share_editing_message"         = "There are no editing functions for files unless you share them with MagentaCLOUD users.";
 "personal_share_by_mail"        = "Personal share by mail";
 "_file_drop_message_"           = "With File drop, only uploading is allowed. Only you can see files and folders that have been uploaded.";

@@ -145,12 +145,16 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
         if status {
             imageSelect.image = NCBrandColor.cacheImages.checkedYes
 
-            let blurEffect = UIBlurEffect(style: .extraLight)
-            let blurEffectView = UIVisualEffectView(effect: blurEffect)
-            blurEffectView.frame = self.bounds
-            blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            blurEffectView.backgroundColor = NCBrandColor.shared.nmcGray0.withAlphaComponent(0.2)
-            backgroundView = blurEffectView
+//            let blurEffect = UIBlurEffect(style: .extraLight)
+//            let blurEffectView = UIVisualEffectView(effect: blurEffect)
+//            blurEffectView.frame = self.bounds
+//            blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+////            blurEffectView.backgroundColor = NCBrandColor.shared.nmcGray0.withAlphaComponent(0.2)
+//            blurEffectView.backgroundColor = NCBrandColor.shared.nmcGray70CellSelection
+//            backgroundView = blurEffectView
+            let view = UIView()
+            view.backgroundColor = NCBrandColor.shared.nmcGray70CellSelection
+            backgroundView = view
             separator.isHidden = true
         } else {
             imageSelect.image = NCBrandColor.cacheImages.checkedNo
