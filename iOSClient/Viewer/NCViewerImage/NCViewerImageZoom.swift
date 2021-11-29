@@ -307,27 +307,40 @@ class NCViewerImageZoom: UIViewController {
             
         let discard = NSLocalizedString("_discard_", comment: "")
         alertController.addAction(UIAlertAction(title: discard, style: .cancel, handler: { [weak self] action in
-            self?.viewerImage?.navigationItem.leftBarButtonItem = nil
-            self?.imageView.image = self?.image
-            self?.scrollView.layoutIfNeeded()
+            self?.discardRotatedImage()
         }))
         
         let save = NSLocalizedString("_save_", comment: "")
         alertController.addAction(UIAlertAction(title: save, style: .default, handler: { [weak self] action in
-            self?.viewerImage?.navigationItem.leftBarButtonItem = nil
-            if let image = self?.imageView.image {
-                self?.uploadRotatedImage(image: image)
-            }
-            self?.navigationController?.popViewController(animated: true)
+            self?.saveRotatedImage()
         }))
         
         self.present(alertController, animated: true)
+    }
+    
+    func saveRotatedImage() {
+        viewerImage?.navigationItem.leftBarButtonItem = nil
+        if let image = imageView.image {
+            uploadRotatedImage(image: image)
+        }
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func discardRotatedImage() {
+        viewerImage?.navigationItem.leftBarButtonItem = nil
+        imageView.image = image
+        scrollView.layoutIfNeeded()
+        
+        viewerImage?.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: UIImage(named: "more")!.image(color: NCBrandColor.shared.label, size: 25), style: .plain, target: viewerImage, action: #selector(viewerImage?.openMenuMore))
     }
     
     @objc func rotateImage() {
         if viewerImage?.navigationItem.leftBarButtonItem == nil {
             let leftButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneRotate(sender:)))
             viewerImage?.navigationItem.leftBarButtonItem = leftButton
+
+            let rightButton = UIBarButtonItem(title: NSLocalizedString("_rotate_button_", comment: ""), style: .plain, target: self, action: #selector(rotateImage))
+            viewerImage?.navigationItem.rightBarButtonItem = rightButton
         }
         
         let originalImage = imageView.image
