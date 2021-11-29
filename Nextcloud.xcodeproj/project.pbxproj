@@ -42,6 +42,7 @@
 		7A875F18269470B900AF558D /* AnalysisDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7A875F17269470B900AF558D /* AnalysisDataCollectionSwitch.xib */; };
 		7A875F1E2694776F00AF558D /* SaveSettingsCustomButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A875F1D2694776F00AF558D /* SaveSettingsCustomButtonCell.swift */; };
 		7A875F242694777E00AF558D /* SaveSettingsCustomButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7A875F232694777E00AF558D /* SaveSettingsCustomButtonCell.xib */; };
+		7AD162D32754F8CE001A5DC4 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AD162D22754F8CD001A5DC4 /* TealiumHelper.swift */; };
 		7AE63A5F26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63A5E26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift */; };
 		7AE63A6526C64C7A00CEAAD5 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63A6426C64C7A00CEAAD5 /* NCCreateDocumentCustomTextField.xib */; };
 		7AE63AEB26D633BA00CEAAD5 /* NCGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63AE626D633BA00CEAAD5 /* NCGridCell.swift */; };
@@ -520,6 +521,7 @@
 		7A875F17269470B900AF558D /* AnalysisDataCollectionSwitch.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AnalysisDataCollectionSwitch.xib; sourceTree = "<group>"; };
 		7A875F1D2694776F00AF558D /* SaveSettingsCustomButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSettingsCustomButtonCell.swift; sourceTree = "<group>"; };
 		7A875F232694777E00AF558D /* SaveSettingsCustomButtonCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SaveSettingsCustomButtonCell.xib; sourceTree = "<group>"; };
+		7AD162D22754F8CD001A5DC4 /* TealiumHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
 		7AE63A5E26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
 		7AE63A6426C64C7A00CEAAD5 /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
 		7AE63AE626D633BA00CEAAD5 /* NCGridCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCGridCell.swift; sourceTree = "<group>"; };
@@ -1117,6 +1119,7 @@
 		C0ABA3D226A6BAF80049DE9A /* Helper */ = {
 			isa = PBXGroup;
 			children = (
+				7AD162D22754F8CD001A5DC4 /* TealiumHelper.swift */,
 				C0ABA3D326A6BB250049DE9A /* AdjustHelper.h */,
 				C0ABA3D426A6BB250049DE9A /* AdjustHelper.m */,
 			);
@@ -2561,6 +2564,7 @@
 				F7A0D1462592256F008F8A13 /* UIImageView+Extensions.swift in Sources */,
 				F749C10B23C4A5340027D966 /* NCIntroCollectionViewCell.swift in Sources */,
 				F718C24E254D507B00C5C256 /* NCViewerImageDetailView.swift in Sources */,
+				7AD162D32754F8CE001A5DC4 /* TealiumHelper.swift in Sources */,
 				C0D6063E26CBB12F00B67843 /* NCFilePermissionCell.swift in Sources */,
 				F7381EE1218218C9000B1560 /* NCOffline.swift in Sources */,
 				F78071091EDAB65800EAFFF6 /* NSNotificationCenter+MainThread.m in Sources */,
