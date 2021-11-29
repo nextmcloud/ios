@@ -173,6 +173,12 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         self.searchField.text = ""
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        tableView.beginUpdates()
+        tableView.endUpdates()
+    }
+    
     @objc func changeTheming() {
         view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         tableView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground

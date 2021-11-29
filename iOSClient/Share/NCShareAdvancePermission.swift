@@ -806,6 +806,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         if newUser {
             let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
             let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
+            if canReshare {
+                self.permissionInt = self.permissionInt + NCGlobal.shared.permissionShareShare
+            }
             viewNewUserComment.metadata = self.metadata
             viewNewUserComment.permission = self.permissionInt
             viewNewUserComment.password = self.password
