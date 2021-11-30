@@ -330,7 +330,7 @@ class NCViewerImageZoom: UIViewController {
         viewerImage?.navigationItem.leftBarButtonItem = nil
         imageView.image = image
         scrollView.layoutIfNeeded()
-        
+        viewerImage?.pageViewController.dataSource = viewerImage
         viewerImage?.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: UIImage(named: "more")!.image(color: NCBrandColor.shared.label, size: 25), style: .plain, target: viewerImage, action: #selector(viewerImage?.openMenuMore))
     }
     
@@ -341,6 +341,7 @@ class NCViewerImageZoom: UIViewController {
 
             let rightButton = UIBarButtonItem(title: NSLocalizedString("_rotate_button_", comment: ""), style: .plain, target: self, action: #selector(rotateImage))
             viewerImage?.navigationItem.rightBarButtonItem = rightButton
+            viewerImage?.pageViewController.dataSource = nil
         }
         
         let originalImage = imageView.image
