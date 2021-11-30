@@ -67,7 +67,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     var directory: Bool = false
     var typeFile: String!
     let tableViewBottomInset: CGFloat = 80.0
-    static let displayDateFormat = "dd. MMM. YYYY"
+    static let displayDateFormat = "dd. MMM. yyyy"
 
     override func viewDidLoad() {
         super.viewDidLoad()
