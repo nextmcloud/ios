@@ -49,6 +49,10 @@ class PrivacySettingsViewController: XLFormViewController{
         // Section: Destination Folder
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("", comment: "").uppercased())
+        section.footerTitle = "                             "
+        form.addFormSection(section)
+        
+        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("", comment: "").uppercased())
         section.footerTitle = NSLocalizedString("_privacy_settings_help_text_", comment: "")
         form.addFormSection(section)
         
