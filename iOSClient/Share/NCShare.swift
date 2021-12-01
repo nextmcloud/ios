@@ -736,6 +736,9 @@ extension NCShare: UITableViewDataSource {
             numOfRows = shares.share!.count
         }
         if numOfRows == 0 {
+            for messageView in self.tableView.subviews.filter({$0.tag == 999}){
+                messageView.removeFromSuperview()
+            }
             self.tableView.setEmptyMessage(NSLocalizedString("no_shares_created", comment: ""))
         } else {
             self.tableView.restore()
@@ -1076,6 +1079,7 @@ extension UITableView {
         messageLabel.numberOfLines = 0
         messageLabel.textAlignment = .center
         messageLabel.font = UIFont.systemFont(ofSize: 17)
+        messageLabel.tag = 999
         messageLabel.sizeToFit()
         self.addSubview(messageLabel)
     }
