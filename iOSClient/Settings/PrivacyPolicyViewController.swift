@@ -12,6 +12,8 @@ import UIKit
 import WebKit
 class PrivacyPolicyViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
     
+    var myWebView = WKWebView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -19,7 +21,7 @@ class PrivacyPolicyViewController: UIViewController, WKNavigationDelegate, WKUID
         
         // Do any additional setup after loading the view, typically from a nib.
         
-        let myWebView:WKWebView = WKWebView(frame: CGRect(x:0, y:0, width: UIScreen.main.bounds.width, height:UIScreen.main.bounds.height))
+        myWebView = WKWebView(frame: CGRect(x:0, y:0, width: UIScreen.main.bounds.width, height:UIScreen.main.bounds.height))
         myWebView.uiDelegate = self
         myWebView.navigationDelegate = self
         myWebView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -36,6 +38,11 @@ class PrivacyPolicyViewController: UIViewController, WKNavigationDelegate, WKUID
         
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        myWebView = WKWebView(frame: CGRect(x:0, y:0, width: UIScreen.main.bounds.width, height:UIScreen.main.bounds.height))
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
