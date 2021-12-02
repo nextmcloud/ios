@@ -35,16 +35,19 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
 
     @objc var delegate: NCIntroViewController?
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    private let titles = [NSLocalizedString("_intro_1_title_", comment: ""), NSLocalizedString("_intro_2_title_", comment: ""), NSLocalizedString("_intro_3_title_", comment: ""), NSLocalizedString("_intro_4_title_", comment: "")]
-    private let images = [UIImage(named: "intro1"), UIImage(named: "intro2"), UIImage(named: "intro3"), UIImage(named: "intro4")]
+    private let titles = [NSLocalizedString("", comment: ""), NSLocalizedString("", comment: ""), NSLocalizedString("", comment: "")]
+    private var images:[UIImage?] = []
     private var timerAutoScroll: Timer?
     private var textColor: UIColor = .white
     private var textColorOpponent: UIColor = .black
-    
+    private let imagesLandscape = [UIImage(named: "introSlideLand1"), UIImage(named: "introSlideLand2"), UIImage(named: "introSlideLand3")]
+    private let imagesPortrait = [UIImage(named: "introSlide1"), UIImage(named: "introSlide2"), UIImage(named: "introSlide3")]
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : imagesPortrait
         
         let isTooLight = NCBrandColor.shared.customer.isTooLight()
         let isTooDark = NCBrandColor.shared.customer.isTooDark()
@@ -101,6 +104,11 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         self.view.backgroundColor = NCBrandColor.shared.customer
         self.timerAutoScroll = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(NCIntroViewController.autoScroll)), userInfo: nil, repeats: true)
     }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         if #available(iOS 13.0, *) {
@@ -117,9 +125,11 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         timerAutoScroll?.invalidate()
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : imagesPortrait
         pageControl.currentPage = 0
         introCollectionView.collectionViewLayout.invalidateLayout()
     }
