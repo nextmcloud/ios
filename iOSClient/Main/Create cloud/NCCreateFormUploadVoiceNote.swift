@@ -80,20 +80,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         changeTheming()
         initializeForm()
 //=======
-//        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.gray, size: 100), for: .normal)
-//
-//        // Progress view
-//        progressView.progress = 0
-//        progressView.progressTintColor = .green
-//        progressView.trackTintColor = UIColor(red: 247.0/255.0, green: 247.0/255.0, blue: 247.0/255.0, alpha: 1.0)
-//
-//        labelTimer.textColor = NCBrandColor.shared.label
-//        labelDuration.textColor = NCBrandColor.shared.label
-//
-//        changeTheming()
-//
-//        initializeForm()
-//>>>>>>> feature_branded_client_4
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -102,17 +89,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         updateTimerUI()
     }
     
-//<<<<<<< HEAD
-//    @objc func changeTheming() {
-//        view.backgroundColor = NCBrandColor.shared.backgroundForm
-//        tableView.backgroundColor = NCBrandColor.shared.backgroundForm
-//        tableView.reloadData()
-//
-//        labelTimer.textColor = NCBrandColor.shared.label
-//        labelDuration.textColor = NCBrandColor.shared.label
-//
-//        initializeForm()
-//=======
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
@@ -258,21 +234,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         footer.tintColor = NCBrandColor.shared.systemGroupedBackground
     }
     
-//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = UITableViewCell();
-//
-//        if (cell == tableView.dequeueReusableCell(withIdentifier: "folderCustomCell")){
-//            if (cell.isSelected){
-//                cell.backgroundColor = NCBrandColor.shared.backgroundForm
-//
-//                return cell
-//            }else{
-//                return cell
-//            }
-//        }
-//
-//        return cell
-//    }
     // MARK: - Action
     
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
@@ -420,7 +381,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
         
-        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
+        buttonPlayStop.setImage(UIImage(named: "stop")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
     }
     
     func stop() {
@@ -433,7 +394,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         progressView.progress = 0
         updateTimerUI()
         
-        buttonPlayStop.setImage(UIImage(named: "stop")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
+        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
     }
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
