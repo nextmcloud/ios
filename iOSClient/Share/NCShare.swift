@@ -196,6 +196,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         self.btnCreateLink.backgroundColor = .clear
         searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
         labelYourShare.text = NSLocalizedString("_your_shares_", comment: "")
+        UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
 //        self.btnCreateLink.titleLabel?.textColor = NCBrandColor.shared.secondarySystemGroupedBackground
     }
         

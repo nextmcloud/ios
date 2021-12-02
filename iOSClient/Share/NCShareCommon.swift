@@ -234,7 +234,7 @@ class NCShareCommon: NSObject {
             let objectsToShare = [link]
             
             let activityViewController = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
-            
+            UINavigationBar.appearance().tintColor = NCBrandColor.shared.customerDefault
             if UIDevice.current.userInterfaceIdiom == .pad {
                 if activityViewController.responds(to: #selector(getter: UIViewController.popoverPresentationController)) {
                     activityViewController.popoverPresentationController?.sourceView = sender as? UIView
