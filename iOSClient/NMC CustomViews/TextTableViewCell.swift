@@ -39,6 +39,9 @@ class TextTableViewCell: XLFormBaseCell, UITextFieldDelegate {
         }else{
             topLineView.isHidden = false
         }
+        
+        fileNameTextField.tintColor = NCBrandColor.shared.systemGray
+        fileNameTextField.selectedTextRange = fileNameTextField.textRange(from: fileNameTextField.beginningOfDocument, to: fileNameTextField.endOfDocument)
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
