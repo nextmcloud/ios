@@ -43,6 +43,7 @@
 		7A875F1E2694776F00AF558D /* SaveSettingsCustomButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A875F1D2694776F00AF558D /* SaveSettingsCustomButtonCell.swift */; };
 		7A875F242694777E00AF558D /* SaveSettingsCustomButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7A875F232694777E00AF558D /* SaveSettingsCustomButtonCell.xib */; };
 		7AD162D32754F8CE001A5DC4 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AD162D22754F8CD001A5DC4 /* TealiumHelper.swift */; };
+		7AD16323275A33C3001A5DC4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7AD16325275A33C3001A5DC4 /* InfoPlist.strings */; };
 		7AE63A5F26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63A5E26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift */; };
 		7AE63A6526C64C7A00CEAAD5 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63A6426C64C7A00CEAAD5 /* NCCreateDocumentCustomTextField.xib */; };
 		7AE63AEB26D633BA00CEAAD5 /* NCGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63AE626D633BA00CEAAD5 /* NCGridCell.swift */; };
@@ -522,6 +523,8 @@
 		7A875F1D2694776F00AF558D /* SaveSettingsCustomButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSettingsCustomButtonCell.swift; sourceTree = "<group>"; };
 		7A875F232694777E00AF558D /* SaveSettingsCustomButtonCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SaveSettingsCustomButtonCell.xib; sourceTree = "<group>"; };
 		7AD162D22754F8CD001A5DC4 /* TealiumHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
+		7AD16324275A33C3001A5DC4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		7AD16329275A33D5001A5DC4 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		7AE63A5E26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
 		7AE63A6426C64C7A00CEAAD5 /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
 		7AE63AE626D633BA00CEAAD5 /* NCGridCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCGridCell.swift; sourceTree = "<group>"; };
@@ -1682,6 +1685,7 @@
 				F728B2BB23E83AD200E12DA0 /* Notification_Service_Extension.plist */,
 				F7C742D01E7BD35B00D9C973 /* Share.entitlements */,
 				F7496B83208F5652004B299C /* Share.plist */,
+				7AD16325275A33C3001A5DC4 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -2243,6 +2247,7 @@
 				F7C9555321F0C4CA0024296E /* NCActivity.storyboard in Resources */,
 				F78ACD54219047D40088454D /* NCSectionFooter.xib in Resources */,
 				950A647F264AACF4006ADE0E /* SubFolderCustomCell.xib in Resources */,
+				7AD16323275A33C3001A5DC4 /* InfoPlist.strings in Resources */,
 				B176BAB626F8F7A0009A0F33 /* NCShareTextInputCell.xib in Resources */,
 				F704B5E32430AA6F00632F5F /* NCCreateFormUploadConflict.storyboard in Resources */,
 				F77B0F611D118A16002130FE /* Acknowledgements.rtf in Resources */,
@@ -2665,6 +2670,15 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		7AD16325275A33C3001A5DC4 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7AD16324275A33C3001A5DC4 /* en */,
+				7AD16329275A33D5001A5DC4 /* de */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		F7E70DE91A24DE4100E1B66A /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
