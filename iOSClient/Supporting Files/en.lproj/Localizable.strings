@@ -663,6 +663,10 @@
 "_share_password_protect_"      = "Password protect";
 "_share_expiration_date_"       = "Set expiration date";
 "_share_expiration_date_placeholder_"       = "Expiration date for this share";
+"_share_download_limit_"        = "Download Limit";
+"_share_download_limit_placeholder_" = "Enter download limit";
+"_share_download_limit_alert_empty_" = "Download limit cannot be empty.";
+"_share_download_limit_alert_zero_" = "Download limit should be greater than 0.";
 "_share_note_recipient_"        = "YOUR MESSAGE";
 "_share_delete_sharelink_"      = "Delete share link";
 "_share_add_sharelink_"         = "Add another link";
