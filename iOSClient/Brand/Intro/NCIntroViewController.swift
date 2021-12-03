@@ -106,6 +106,9 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if (UIDevice.current.userInterfaceIdiom != .pad){
+            AppDelegate.AppUtility.lockOrientation(UIInterfaceOrientationMask.portrait, andRotateTo: UIInterfaceOrientation.portrait)
+        }
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
 
@@ -125,6 +128,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         timerAutoScroll?.invalidate()
+        AppDelegate.AppUtility.lockOrientation(UIInterfaceOrientationMask.all)
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
@@ -132,6 +136,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : imagesPortrait
         pageControl.currentPage = 0
         introCollectionView.collectionViewLayout.invalidateLayout()
+        self.introCollectionView.reloadData()
     }
 
     @objc func autoScroll() {
@@ -159,6 +164,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         cell.titleLabel.textColor = textColor
         cell.titleLabel.text = titles[indexPath.row]
         cell.imageView.image = images[indexPath.row]
+        cell.imageView.contentMode = .scaleToFill
         return cell
     }
 
@@ -168,7 +174,12 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         timerAutoScroll = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(NCIntroViewController.autoScroll)), userInfo: nil, repeats: true)
-        pageControl.currentPage = Int(scrollView.contentOffset.x) / Int(scrollView.frame.width)
+        if (pageControl.currentPage == (images.count - 1)){
+            pageControl.currentPage = 0
+            introCollectionView.scrollToItem(at: IndexPath(row: pageControl.currentPage, section: 0), at: .centeredHorizontally, animated: false)
+        }else {
+            pageControl.currentPage = Int(scrollView.contentOffset.x) / Int(scrollView.frame.width)
+        }
     }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {

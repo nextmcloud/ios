@@ -71,7 +71,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     let triggerEvent:TriggerEvent = Login
 
     var currentAuthorizationFlow: OIDExternalUserAgentSession?
-
+    var orientationLock = UIInterfaceOrientationMask.all
+    struct AppUtility {
+        static func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
+            if let delegate = UIApplication.shared.delegate as? AppDelegate {
+                delegate.orientationLock = orientation
+            }
+        }
+        
+        static func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation:UIInterfaceOrientation) {
+            self.lockOrientation(orientation)
+            UIDevice.current.setValue(rotateOrientation.rawValue, forKey: "orientation")
+        }
+    }
+    
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        return self.orientationLock
+    }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
@@ -801,7 +817,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         if passcodeViewController == nil {
             
              passcodeViewController = TOPasscodeViewController.init(passcodeType: .sixDigits, allowCancel: false)
-            //passcodeViewController = TOPasscodeViewController.init(style: .opaqueLight, passcodeType: .sixDigits)
+//            passcodeViewController = TOPasscodeViewController.init(style: .opaqueLight, passcodeType: .sixDigits)
             passcodeViewController?.delegate = self
             passcodeViewController?.keypadButtonShowLettering = false
             if CCUtility.getEnableTouchFaceID() && laContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
