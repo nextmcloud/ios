@@ -68,6 +68,7 @@ class InitialPrivacySettingsViewController: UIViewController {
     
     @IBAction func onAcceptButtonClicked(_ sender: Any) {
         UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
+        UserDefaults.standard.set(true, forKey: "isAnalysisDataCollectionSwitchOn")
         self.dismiss(animated: true, completion: nil)
     }
 }
