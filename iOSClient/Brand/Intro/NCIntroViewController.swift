@@ -174,10 +174,11 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         timerAutoScroll = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(NCIntroViewController.autoScroll)), userInfo: nil, repeats: true)
-        if (pageControl.currentPage == (images.count - 1)){
+        let page = Int(scrollView.contentOffset.x) / Int(scrollView.frame.width)
+        if pageControl.currentPage == (images.count - 1), pageControl.currentPage <= page {
             pageControl.currentPage = 0
             introCollectionView.scrollToItem(at: IndexPath(row: pageControl.currentPage, section: 0), at: .centeredHorizontally, animated: false)
-        }else {
+        } else {
             pageControl.currentPage = Int(scrollView.contentOffset.x) / Int(scrollView.frame.width)
         }
     }

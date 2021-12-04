@@ -38,7 +38,8 @@ class NCLoginWeb: UIViewController {
     @objc var loginFlowV2Token = ""
     @objc var loginFlowV2Endpoint = ""
     @objc var loginFlowV2Login = ""
-    
+    private var textColor: UIColor = .white
+    private var textColorOpponent: UIColor = .black
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -76,6 +77,19 @@ class NCLoginWeb: UIViewController {
             }
         }
         
+        if #available(iOS 13, *) {
+            let keyWindow = UIApplication.shared.connectedScenes
+                .filter({$0.activationState == .foregroundActive})
+                .map({$0 as? UIWindowScene})
+                .compactMap({$0})
+                .first?.windows
+                .filter({$0.isKeyWindow}).first
+            let statusBar = UIView(frame: (keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
+            statusBar.backgroundColor = NCBrandColor.shared.customer
+            keyWindow?.addSubview(statusBar)
+        }
+        self.navigationController!.navigationBar.backgroundColor = NCBrandColor.shared.customer
+        
         activityIndicator = UIActivityIndicatorView(style: .gray)
         activityIndicator.center = self.view.center
         activityIndicator.startAnimating()
@@ -90,10 +104,25 @@ class NCLoginWeb: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
         // Stop timer error network
         appDelegate.timerErrorNetworking?.invalidate()
     }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
+//    override var preferredStatusBarStyle: UIStatusBarStyle {
+//        if #available(iOS 13.0, *) {
+//            if traitCollection.userInterfaceStyle == .light {
+//                return .lightContent
+//            } else {
+//                return .darkContent
+//            }
+//        } else {
+//            return .lightContent
+//        }
+//    }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)

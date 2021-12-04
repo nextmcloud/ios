@@ -7,7 +7,8 @@
 //
 
 import Foundation
-
+import AppTrackingTransparency
+import AdSupport
 
 class InitialPrivacySettingsViewController: UIViewController {
     
@@ -47,7 +48,6 @@ class InitialPrivacySettingsViewController: UIViewController {
         privacySettingsHelpText.centerText()
         privacySettingsHelpText.font = UIFont(name: privacySettingsHelpText.font!.fontName, size: 16)
         self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
-
     }
     
     override func didReceiveMemoryWarning() {
@@ -67,8 +67,42 @@ class InitialPrivacySettingsViewController: UIViewController {
     }
     
     @IBAction func onAcceptButtonClicked(_ sender: Any) {
+        requestPermission()
+//        UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
+//        UserDefaults.standard.set(true, forKey: "isAnalysisDataCollectionSwitchOn")
+//        self.dismiss(animated: true, completion: nil)
+    }
+
+    //NEWLY ADDED PERMISSIONS FOR iOS 14
+    func requestPermission() {
         UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
         UserDefaults.standard.set(true, forKey: "isAnalysisDataCollectionSwitchOn")
+        if #available(iOS 14, *) {
+            ATTrackingManager.requestTrackingAuthorization { status in
+                switch status {
+                case .authorized:
+                    // Tracking authorization dialog was shown
+                    // and we are authorized
+                    print("Authorized")
+                    // Now that we are authorized we can get the IDFA
+                    print(ASIdentifierManager.shared().advertisingIdentifier)
+                case .denied:
+                    UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
+                    UserDefaults.standard.set(false, forKey: "isAnalysisDataCollectionSwitchOn")
+                    print("Denied")
+                case .notDetermined:
+                    // Tracking authorization dialog has not been shown
+                    print("Not Determined")
+                case .restricted:
+                    print("Restricted")
+                @unknown default:
+                    print("Unknown")
+                }
+            }
+        } else {
+            UserDefaults.standard.set(true, forKey: "isInitialPrivacySettingsShowed")
+            UserDefaults.standard.set(true, forKey: "isAnalysisDataCollectionSwitchOn")
+        }
         self.dismiss(animated: true, completion: nil)
     }
 }

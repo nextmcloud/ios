@@ -16,3 +16,4 @@
 "NSLocationAlwaysAndWhenInUseUsageDescription"  = "GPS wird verwendet, um neue Fotos zu erkennen, die fortgesetzte Verwendung von GPS im Hintergrund kann die Akkulaufzeit dramatisch verkürzen.";
 "NSLocationAlwaysUsageDescription"      = "GPS wird verwendet, um neue Fotos zu erkennen, die fortgesetzte Verwendung von GPS im Hintergrund kann die Akkulaufzeit dramatisch verkürzen.";
 "NSLocationWhenInUseUsageDescription"   = "GPS wird verwendet, um neue Fotos im Hintergrund zu erkennen. GPS wird nur verwendet, wenn die App im Hintergrund ist.";
+"NSUserTrackingUsageDescription"        = "Die Telekom verwendet die Apple-Advertising-ID, um die Funktionsweise der App anhand der Nutzerbedürfnisse zu optimieren und weiterzuentwickeln, etwaige Fehler zu beheben sowie um Ihnen bedarfsgerechte Werbung in der App und auf Drittseiten auszuspielen. Ihre Einwilligung können Sie jederzeit im Betriebssystem widerrufen.";

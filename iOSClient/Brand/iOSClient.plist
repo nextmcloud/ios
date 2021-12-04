@@ -18,7 +18,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
+	<string>7.4.0.7</string>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
@@ -101,5 +101,7 @@
 	<true/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>App would like to access IDFA for tracking purpose</string>
 </dict>
 </plist>

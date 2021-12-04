@@ -7,7 +7,8 @@
 //
 
 import Foundation
-
+import AppTrackingTransparency
+import AdSupport
 
 class PrivacySettingsViewController: XLFormViewController{
     
@@ -142,8 +143,21 @@ class PrivacySettingsViewController: XLFormViewController{
             
         }
         if formRow.tag == "AnalysisDataCollectionSwitch"{
+            if (formRow.value! as AnyObject).boolValue {
+                if #available(iOS 14, *) {
+                    ATTrackingManager.requestTrackingAuthorization(completionHandler: { (status) in
+                        if status == .denied {
+                            guard let url = URL(string: UIApplication.openSettingsURLString) else {
+                                return
+                            }
+                            if UIApplication.shared.canOpenURL(url) {
+                                UIApplication.shared.open(url, options: [:])
+                            }
+                        }
+                    })
+                }
+            }
             UserDefaults.standard.set((formRow.value! as AnyObject).boolValue, forKey: "isAnalysisDataCollectionSwitchOn")
-
         }
     
     }
