@@ -101,17 +101,17 @@
 
     [section addFormRow:row];
     // Lock no screen
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"notPasscodeAtStart" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_lock_protection_no_screen_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
-    row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
-    if([[CCUtility getPasscode] length]){
-        row.disabled = @NO;
-    }else{
-        row.disabled = @YES;
-    }
-    [section addFormRow:row];
+//    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"notPasscodeAtStart" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_lock_protection_no_screen_", nil)];
+//    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
+//    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+//    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
+//    row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
+//    if([[CCUtility getPasscode] length]){
+//        row.disabled = @NO;
+//    }else{
+//        row.disabled = @YES;
+//    }
+//    [section addFormRow:row];
     
     // EndToEnd Encryption
 //    NSString *title = [NSString stringWithFormat:@"%@ (%@)",NSLocalizedString(@"_e2e_settings_", nil), NSLocalizedString(@"_experimental_", nil)];
@@ -122,7 +122,7 @@
 //    [row.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
 //
 //    row.action.viewControllerClass = [NCManageEndToEndEncryption class];
-//    
+//
 //    [section addFormRow:row];
     
     // Section : Screen --------------------------------------------------------------
