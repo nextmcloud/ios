@@ -84,9 +84,19 @@ class NCAskAuthorization: NSObject {
                 viewController?.present(alert, animated: true, completion: nil)
             }
             break
+            
+        case PHAuthorizationStatus.limited:
+            if #available(iOS 14, *) {
+                PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: viewController!)
+            } else {
+                // Fallback on earlier versions
+            }
         case PHAuthorizationStatus.notDetermined:
+           let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.isPrivacyProtectionWindowNeedToShow = false
             PHPhotoLibrary.requestAuthorization { (allowed) in
                 DispatchQueue.main.async {
+                    appDelegate.isPrivacyProtectionWindowNeedToShow = true
                     if allowed == PHAuthorizationStatus.authorized {
                         completion(true)
                     } else {

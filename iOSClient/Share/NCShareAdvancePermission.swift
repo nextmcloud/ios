@@ -781,8 +781,8 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     @IBAction func nextClicked(_ sender: Any) {
         let isPasswordEnabled = self.isPasswordEnabled()
         if isPasswordEnabled {
-            let password = getPasswordFromField() ?? ""
-            if  password == "" {
+            let password = (getPasswordFromField() ?? "").trimmingCharacters(in: .whitespaces)
+                if  password == "" || password.count < 10 {
                 let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_password", comment: ""), preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
                 self.present(alert, animated: true)

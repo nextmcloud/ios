@@ -72,6 +72,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     var currentAuthorizationFlow: OIDExternalUserAgentSession?
     var orientationLock = UIInterfaceOrientationMask.all
+    
+    var isPrivacyProtectionWindowNeedToShow = true
+    
     struct AppUtility {
         static func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
             if let delegate = UIApplication.shared.delegate as? AppDelegate {
@@ -296,7 +299,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // L' applicazione si dimetterà dallo stato di attivo
     func applicationWillResignActive(_ application: UIApplication) {
         
-        showPrivacyProtectionWindow()
+        if(isPrivacyProtectionWindowNeedToShow){
+            showPrivacyProtectionWindow()
+        }
         if account == "" { return }
         
         // Dismiss FileViewInFolder
