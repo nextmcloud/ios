@@ -864,7 +864,7 @@
 "_file_creation_"                   = "File creation";
 "_delete_all_scanned_images_"       = "Do you want to delete all scanned images?";
 "_text_recognition_"                = "Text recognition";
-"_location_"                        = "SPEICHERORT";
+"_location_"                        = "Location";
 "_save_with_text_recognition_"      = "SAVE WITH TEXT RECOGNITION (OCR)";
 "_pdf_with_ocr_"                    = "PDF (OCR)";
 "_text_file_ocr_"                   = "Textfile (txt)";
@@ -872,7 +872,7 @@
 "_pdf_"                             = "PDF";
 "_jpg_"                             = "JPG";
 "_png_"                             = "PNG";
-"_pdf_password_"                    = "PDF-PASSWORT";
+"_pdf_password_"                    = "PDF-Password";
 "_set_password_"                    = "Set password";
 "_no_password_warn_"                 = "Please enter a password for the PDF you want to create or disable the function.";
 "_saved_info_alert_" = "Saving will take some time, espacially if you have selected several pages and file formats.";
