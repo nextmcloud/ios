@@ -155,6 +155,9 @@ class NCBrandColor: NSObject {
         static var buttonMore = UIImage()
         static var buttonStop = UIImage()
         static var buttonRestore = UIImage()
+        
+        static var imgShare = UIImage()
+        static var imgMore = UIImage()
     }
 
     // Color
@@ -539,6 +542,8 @@ class NCBrandColor: NSObject {
         
         cacheImages.buttonMore = UIImage(named: "more")!.image(color: gray60, size: 50)
         cacheImages.buttonStop = UIImage(named: "stop")!.image(color: iconColor, size: 50)
+        cacheImages.imgShare = UIImage(named: "share")!
+        cacheImages.imgMore = UIImage(named: "more")!
     }
     
 //    @objc public func setDarkMode() {

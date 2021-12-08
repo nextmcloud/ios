@@ -1553,7 +1553,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             } else if (tableShare != nil && tableShare?.shareType != 3) {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else {
-                cell.imageShared.image = NCBrandColor.cacheImages.canShare
+                cell.imageShared.image = NCBrandColor.cacheImages.imgShare.image(color: NCBrandColor.shared.gray60, size: 50)
                 cell.labelShared.text = ""
             }
 //            if appDelegate.account != metadata.account {
@@ -1604,7 +1604,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             } else {
                 cell.progressView.isHidden = true
                 cell.progressView.progress = progress
-                cell.setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCBrandColor.cacheImages.buttonMore)
+                cell.setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCBrandColor.cacheImages.imgMore.image(color: NCBrandColor.shared.gray60, size: 50))
             }
             // Write status on Label Info
             switch metadata.status {
@@ -1776,7 +1776,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             } else {
                 cell.progressView.isHidden = true
                 cell.progressView.progress = 0.0
-                cell.setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCBrandColor.cacheImages.buttonMore)
+                cell.setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCBrandColor.cacheImages.imgMore.image(color: NCBrandColor.shared.gray60, size: 50))
             }
             
             // Live Photo
