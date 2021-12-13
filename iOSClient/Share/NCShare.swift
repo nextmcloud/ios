@@ -64,7 +64,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var networking: NCShareNetworking?
     private var shareeSelected: NCCommunicationSharee?
     public  var tableShareSelected: tableShare?
-    private var quickStatusTableShare: tableShare!
+    public var quickStatusTableShare: tableShare!
     private var sendEmailSelected: Int!
     private var shareeEmail: String!
     
