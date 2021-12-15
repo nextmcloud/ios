@@ -175,6 +175,14 @@ class NCMenuPanelController: FloatingPanelController {
         self.isRemovalInteractionEnabled = true
         self.surfaceView.cornerRadius = 16
     }
+    
+    //Update layout after rotation
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        DispatchQueue.main.async {
+            self.updateLayout()
+        }
+    }
 }
 
 class NCMenuAction {
