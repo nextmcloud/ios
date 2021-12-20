@@ -254,9 +254,10 @@
 
     
     appDelegate.activeViewController = self;
-    
+    appDelegate.isPrivacyProtectionWindowNeedToShow = false;
     // Request permission for camera roll access
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        appDelegate.isPrivacyProtectionWindowNeedToShow = true;
         switch (status) {
             case PHAuthorizationStatusRestricted:
                 NSLog(@"[LOG] user can't grant access to camera roll");

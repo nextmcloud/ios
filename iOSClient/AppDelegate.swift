@@ -73,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var currentAuthorizationFlow: OIDExternalUserAgentSession?
     var orientationLock = UIInterfaceOrientationMask.all
     
-    var isPrivacyProtectionWindowNeedToShow = true
+    @objc var isPrivacyProtectionWindowNeedToShow = true
     
     struct AppUtility {
         static func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
