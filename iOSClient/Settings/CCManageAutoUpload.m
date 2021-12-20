@@ -60,8 +60,8 @@
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     row.cellConfigAtConfigure[@"cellLabel.text"] = NSLocalizedString(@"_autoupload_", nil);
     
-    if (activeAccount.autoUpload) row.value = @1;
-    else row.value = @0;
+    if (activeAccount.autoUpload) row.cellConfigAtConfigure[@"switchControl.on"] = @1;
+    else row.cellConfigAtConfigure[@"switchControl.on"] = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"cellLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"cellLabel.textColor"];
     
