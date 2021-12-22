@@ -820,8 +820,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 
                 self.appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasNOConflict)
                 self.appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: metadatasMOV)
-                self.appDelegate.adjust.trackEvent(TriggerEvent(UseCamera.rawValue))
-                TealiumHelper.shared.trackEvent(title: "NMC_Cameraupload", data: ["": ""])
+                self.appDelegate.adjust.trackEvent(TriggerEvent(CameraUpload.rawValue))
+                TealiumHelper.shared.trackEvent(title: "magentacloud-app.plus.fotovideoupload", data: ["": ""])
                 TealiumHelper.shared.trackView(title: "VIEW_Cameraupload", data: ["": ""])
             }
         

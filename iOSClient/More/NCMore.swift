@@ -461,7 +461,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
                 let manageAccount = CCManageAccount()
                 manageAccount.delete(self.appDelegate.account)
-
+                self.appDelegate.adjust.trackEvent(TriggerEvent(Logout.rawValue))
                 self.appDelegate.openLogin(viewController: self, selector: NCBrandGlobal.shared.introLogin, openLoginWeb: false)
             }
 
