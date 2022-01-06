@@ -161,7 +161,8 @@ extension NCLoginWeb: WKNavigationDelegate {
         let urlString: String = url.absoluteString.lowercased()
         
         if (urlString.hasPrefix(NCBrandOptions.shared.webLoginAutenticationProtocol) == true && urlString.contains("login") == true) {
-            
+            appDelegate.adjust.trackEvent(TriggerEvent(LoginSuccessful.rawValue))
+            TealiumHelper.shared.trackEvent(title: "magentacloud-app.login.successful", data: ["": ""])
             var server: String = ""
             var user: String = ""
             var password: String = ""
@@ -323,8 +324,6 @@ extension NCLoginWeb: WKNavigationDelegate {
                     UIView.animate(withDuration: 0.5) {
                         viewController.view.alpha = 1
                     }
-                    appDelegate.adjust.trackEvent(TriggerEvent(LoginSuccessful.rawValue))
-                    TealiumHelper.shared.trackEvent(title: "magentacloud-app.login.successful", data: ["": ""])
                 }
             } else {
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitialize)
