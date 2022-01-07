@@ -188,7 +188,7 @@
     }
     // sdk Adjust
     NSString *yourAppToken = @"1zfaxn19pd7k";
-    NSString *environment = ADJEnvironmentSandbox;
+    NSString *environment = ADJEnvironmentProduction;
     ADJConfig *adjustConfig = [ADJConfig configWithAppToken:yourAppToken
                                                 environment:environment];
 

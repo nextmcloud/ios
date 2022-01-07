@@ -315,7 +315,7 @@
             }
             
             [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
-            [adjust trackEvent:9];
+            [adjust trackEvent:AutomaticUploadPhotosOn];
             [tealium trackEventWithTitle:@"magentacloud-app.settings.autoupload-on" data:nil];
         } else {
             
@@ -324,7 +324,7 @@
 
             // remove
             [[NCManageDatabase shared] clearMetadatasUploadWithAccount:appDelegate.account];
-            [adjust trackEvent:10];
+            [adjust trackEvent:AutomaticUploadPhotosOff];
             [tealium trackEventWithTitle:@"magentacloud-app.settings.autoupload-off" data:nil];
         }
         

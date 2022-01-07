@@ -13,7 +13,7 @@
 
 -(void)configAdjust {
     self.yourAppToken = @"1zfaxn19pd7k";
-    self.environment = ADJEnvironmentSandbox;
+    self.environment = ADJEnvironmentProduction;
     self.adjustConfig = [ADJConfig configWithAppToken:self.yourAppToken
                                                 environment:self.environment];
     [self.adjustConfig setLogLevel:ADJLogLevelVerbose];
@@ -29,7 +29,7 @@
 }
 
 - (void)trackLogin {
-    self.eventLogin = [ADJEvent eventWithEventToken:@"gb97gb"];
+    self.eventLogin = [ADJEvent eventWithEventToken:@"p8hl78"];
     [Adjust trackEvent: self.eventLogin];
 }
 
@@ -43,15 +43,23 @@
     switch(event){
        case Login:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"abc123"];
+            ADJEvent *event = [ADJEvent eventWithEventToken:@"p8hl78"];
 //            event = [ADJEvent eventWithEventToken:@"gb97gb"];
 //            self.event = [ADJEvent eventWithEventToken:@"gb97gb"];
             [Adjust trackEvent:event];
         }
           break;
+        case LoginSuccessful:
+         {
+             ADJEvent *event = [ADJEvent eventWithEventToken:@"dowf81"];
+ //            event = [ADJEvent eventWithEventToken:@"gb97gb"];
+ //            self.event = [ADJEvent eventWithEventToken:@"gb97gb"];
+             [Adjust trackEvent:event];
+         }
+           break;
        case Sharing:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"fqtiu7"];
+            ADJEvent *event = [ADJEvent eventWithEventToken:@"mbeoyd"];
             [Adjust trackEvent:event];
             NSLog(@"%@", [event debugDescription]);
         }
@@ -59,28 +67,28 @@
           break;
         case CreateLink:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"qeyql3"];
+            ADJEvent *event = [ADJEvent eventWithEventToken:@"29b333"];
             [Adjust trackEvent:event];
         }
 //            self.event = [ADJEvent eventWithEventToken:@"qeyql3"];
            break;
         case DocumentScan:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"7fec8n"];
+            ADJEvent *event = [ADJEvent eventWithEventToken:@"im963g"];
             [Adjust trackEvent:event];
         }
 //            self.event = [ADJEvent eventWithEventToken:@"7fec8n"];
            break;
         case CameraUpload:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"v1g6ly"];
+            ADJEvent *event = [ADJEvent eventWithEventToken:@"hf9paq"];
             [Adjust trackEvent:event];
         }
 //            self.event = [ADJEvent eventWithEventToken:@"v1g6ly"];
            break;
         case FileUpload:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"4rd8r4"];
+            ADJEvent *event = [ADJEvent eventWithEventToken:@"hsbk2m"];
             [Adjust trackEvent:event];
         }
 //            self.event = [ADJEvent eventWithEventToken:@"4rd8r4"];
@@ -94,28 +102,28 @@
            break;
         case Logout:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"g6mj9y"];
+            ADJEvent *event = [ADJEvent eventWithEventToken:@"n5q2qu"];
             [Adjust trackEvent:event];
         }
 //            self.event = [ADJEvent eventWithEventToken:@"g6mj9y"];
            break;
         case ResetsApp:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"zi18r0"];
+            ADJEvent *event = [ADJEvent eventWithEventToken:@"3sj1xp"];
             [Adjust trackEvent:event];
         }
 //            self.event = [ADJEvent eventWithEventToken:@"zi18r0"];
            break;
         case AutomaticUploadPhotosOn:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"vwd9yk"];
+            ADJEvent *event = [ADJEvent eventWithEventToken:@"5lxz6h"];
             [Adjust trackEvent:event];
         }
 //            self.event = [ADJEvent eventWithEventToken:@"vwd9yk"];
            break;
         case AutomaticUploadPhotosOff:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"e95w5t"];
+            ADJEvent *event = [ADJEvent eventWithEventToken:@"176496"];
             [Adjust trackEvent:event];
         }
 //            self.event = [ADJEvent eventWithEventToken:@"e95w5t"];

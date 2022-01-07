@@ -26,6 +26,7 @@
 #import "NSNotificationCenter+MainThread.h"
 #import <KTVHTTPCache/KTVHTTPCache.h>
 #import "NCBridgeSwift.h"
+#import "AdjustHelper.h"
 
 
 @interface CCAdvanced ()
@@ -33,6 +34,7 @@
     AppDelegate *appDelegate;
     XLFormSectionDescriptor *sectionSize;
     TealiumHelper *tealium;
+    AdjustHelper *adjust;
 }
 @end
 
@@ -394,7 +396,7 @@
     self.view.backgroundColor = NCBrandColor.shared.backgroundForm;
     
     self.tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground;
-    
+    adjust = [[AdjustHelper alloc] init];
     [self initializeForm];
     [self calculateSize];
 }
@@ -507,7 +509,9 @@
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void) {
         [[NCUtility shared] stopActivityIndicator];
-
+        tealium = [[TealiumHelper alloc] init];
+        [tealium trackEventWithTitle:@"magentacloud-app.settings.reset" data:nil];
+        [adjust trackEvent:ResetsApp];
         [self calculateSize];
     });
 }
@@ -515,7 +519,7 @@
 - (void)clearCacheRequest:(XLFormRowDescriptor *)sender
 {
     [self deselectFormRow:sender];
-    
+//    adjust = [AdjustHelper all];
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:NSLocalizedString(@"_want_delete_cache_", nil) preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alertController addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"_yes_", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
@@ -562,6 +566,7 @@
     [alertController addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"_ok_", nil) style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
         tealium = [[TealiumHelper alloc] init];
         [tealium trackEventWithTitle:@"magentacloud-app.settings.logout" data:nil];
+        [adjust trackEvent:Logout];
         [[NSURLCache sharedURLCache] setMemoryCapacity:0];
         [[NSURLCache sharedURLCache] setDiskCapacity:0];
         [KTVHTTPCache cacheDeleteAllCaches];
