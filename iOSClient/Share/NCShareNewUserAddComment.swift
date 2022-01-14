@@ -117,7 +117,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         if isUpdating {
             self.networking?.updateShare(idShare: tableShare!.idShare, password: nil, permission: self.tableShare!.permissions, note: message, label: nil, expirationDate: nil, hideDownload: tableShare!.hideDownload)
         } else {
-            self.networking?.createShare(shareWith: sharee!.shareWith, shareType: sharee!.shareType, metadata: self.metadata!)
+            self.networking?.createShare(shareWith: sharee!.shareWith, shareType: sharee!.shareType, metadata: self.metadata!, note: message)
         }
         self.creatingShare = true
     }
@@ -220,7 +220,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         if self.creatingShare {
             self.appDelegate.shares = NCManageDatabase.shared.getTableShares(account: self.metadata!.account)
             if let id = createdShareId {
-                networking?.updateShare(idShare: id, password: password, permission: permission, note: self.note, label: label, expirationDate: expirationDate, hideDownload: hideDownload)
+                networking?.updateShare(idShare: id, password: password, permission: permission, note: nil, label: label, expirationDate: expirationDate, hideDownload: hideDownload)
             } else {
                 popToShare()
             }

@@ -29,7 +29,7 @@ class PrivacyPolicyViewController: UIViewController, WKNavigationDelegate, WKUID
         
         
         //1. Load web site into my web view
-        let myURL = URL(string: "https://static.magentacloud.de/privacy/datenschutzhinweise_app.htm")
+        let myURL = URL(string: "https://www.telekom.de/datenschutzhinweise/view/183.html")
         let myURLRequest:URLRequest = URLRequest(url: myURL!)
         NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: false)
         myWebView.load(myURLRequest)

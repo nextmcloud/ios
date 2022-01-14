@@ -59,7 +59,8 @@ class NCShareNetworking: NSObject {
     func createShareLink(password: String?) {
         NCUtility.shared.startActivityIndicator(backgroundView: view, blurEffect: false)
         let filenamePath = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, urlBase: urlBase, account: metadata.account)!
-        NCCommunication.shared.createShareLink(path: filenamePath, password: password) { (account, share, errorCode, errorDescription) in
+        let options = NCCCreateShareOptions(path: filenamePath, publicUpload: false, hideDownload: false, password: password, note: nil, permissions: 1)
+        NCCommunication.shared.createShare(options: options) { (account, share, errorCode, errorDescription) in
             NCUtility.shared.stopActivityIndicator()
             if errorCode == 0 && share != nil {
                 NCManageDatabase.shared.addShare(urlBase: self.urlBase, account: self.metadata.account, shares: [share!])
@@ -71,12 +72,13 @@ class NCShareNetworking: NSObject {
         }
     }
     
-    func createShare(shareWith: String, shareType: Int, metadata: tableMetadata) {
+    func createShare(shareWith: String, shareType: Int, metadata: tableMetadata, note: String?) {
         NCUtility.shared.startActivityIndicator(backgroundView: view, blurEffect: false)
         let filenamePath = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, urlBase: urlBase, account: metadata.account)!
         var permission: Int = 1
         if metadata.directory { permission = NCGlobal.shared.permissionMaxFolderShare } else { permission = NCGlobal.shared.permissionMaxFileShare }
-        NCCommunication.shared.createShare(path: filenamePath, shareType: shareType, shareWith: shareWith, permissions: permission) { (account, share, errorCode, errorDescription) in
+        let options = NCCCreateShareOptions(path: filenamePath, shareType: shareType, shareWith: shareWith, password: nil, note: note, permissions: permission)
+        NCCommunication.shared.createShare(options: options) { (account, share, errorCode, errorDescription) in
             NCUtility.shared.stopActivityIndicator()
             if errorCode == 0 && share != nil {
                 NCManageDatabase.shared.addShare(urlBase: self.urlBase, account: self.metadata.account, shares: [share!])

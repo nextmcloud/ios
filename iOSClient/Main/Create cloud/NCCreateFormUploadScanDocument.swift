@@ -1791,8 +1791,6 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
         let controller = VNDocumentCameraViewController()
         controller.delegate = self
         
-        appDelegate.adjust.trackEvent(TriggerEvent(DocumentScan.rawValue))
-        TealiumHelper.shared.trackEvent(title: "magentacloud-app.plus.documentscan", data: ["": ""])
         TealiumHelper.shared.trackView(title: "magentacloud-app.plus", data: ["": ""])
         self.viewController?.present(controller, animated: true)
     }
@@ -1803,7 +1801,7 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
 //        for pageNumber in 0..<scan.pageCount {
 //            let fileName = CCUtility.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, keyFileName: NCGlobal.shared.keyFileNameMask, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal)!
 //=======
-        TealiumHelper.shared.trackEvent(title: "magentacloud-app.plus.documentscan", data: ["": ""])
+
         for pageNumber in 0..<scan.pageCount {
             let fileName = CCUtility.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, keyFileName: NCGlobal.shared.keyFileNameMask, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal, forcedNewFileName: true)!
             let fileNamePath = CCUtility.getDirectoryScan() + "/" + fileName
@@ -1817,6 +1815,8 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
             if self.viewController is DragDropViewController {
                 (self.viewController as! DragDropViewController).loadImage()
             } else {
+                self.appDelegate.adjust.trackEvent(TriggerEvent(DocumentScan.rawValue))
+                TealiumHelper.shared.trackEvent(title: "magentacloud-app.plus.documentscan", data: ["": ""])
                 self.reDirectToSave()
 //                let storyboard = UIStoryboard(name: "Scan", bundle: nil)
 //                let controller = storyboard.instantiateInitialViewController()!

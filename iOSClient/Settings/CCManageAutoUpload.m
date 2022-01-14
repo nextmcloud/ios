@@ -60,8 +60,8 @@
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     row.cellConfigAtConfigure[@"cellLabel.text"] = NSLocalizedString(@"_autoupload_", nil);
     
-    if (activeAccount.autoUpload) row.value = @1;
-    else row.value = @0;
+    if (activeAccount.autoUpload) row.cellConfigAtConfigure[@"switchControl.on"] = @1;
+    else row.cellConfigAtConfigure[@"switchControl.on"] = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"cellLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"cellLabel.textColor"];
     
@@ -254,9 +254,10 @@
 
     
     appDelegate.activeViewController = self;
-    
+    appDelegate.isPrivacyProtectionWindowNeedToShow = false;
     // Request permission for camera roll access
     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+        appDelegate.isPrivacyProtectionWindowNeedToShow = true;
         switch (status) {
             case PHAuthorizationStatusRestricted:
                 NSLog(@"[LOG] user can't grant access to camera roll");
@@ -314,7 +315,7 @@
             }
             
             [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
-            [adjust trackEvent:9];
+            [adjust trackEvent:AutomaticUploadPhotosOn];
             [tealium trackEventWithTitle:@"magentacloud-app.settings.autoupload-on" data:nil];
         } else {
             
@@ -323,7 +324,7 @@
 
             // remove
             [[NCManageDatabase shared] clearMetadatasUploadWithAccount:appDelegate.account];
-            [adjust trackEvent:10];
+            [adjust trackEvent:AutomaticUploadPhotosOff];
             [tealium trackEventWithTitle:@"magentacloud-app.settings.autoupload-off" data:nil];
         }
         

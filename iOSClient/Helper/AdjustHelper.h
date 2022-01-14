@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef enum : NSUInteger {
     Login,
+    LoginSuccessful,
     Sharing,
     CreateLink,
     DocumentScan,

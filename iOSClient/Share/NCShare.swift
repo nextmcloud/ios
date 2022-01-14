@@ -553,6 +553,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     @IBAction func createLinkClicked(_ sender: Any) {
+        appDelegate.adjust.trackEvent(TriggerEvent(CreateLink.rawValue))
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.sharing.create", data: ["": ""])
         self.touchUpInsideButtonMenu(sender)
     }
     
