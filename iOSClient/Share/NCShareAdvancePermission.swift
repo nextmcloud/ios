@@ -153,6 +153,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         initializeForm()
         changeTheming()
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+        
+        // UITestCase Identifire
+        view.accessibilityIdentifier = "view_advance_sharing_screen"
     }
     
     func setTitle() {

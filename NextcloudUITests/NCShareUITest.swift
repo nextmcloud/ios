@@ -28,6 +28,13 @@ class NCShareUITest: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
     
+    func testCurrentScreen() throws {
+        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
+        let sharingScreen = app.otherElements["view_sharing_screen"]
+        let sharingScreenShow = sharingScreen.waitForExistence(timeout: 5)
+        XCTAssert(sharingScreenShow)
+    }
+    
     func testShareInfo() throws {
         app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
         let shareInfo = app.staticTexts.element(boundBy: 4).label
@@ -35,13 +42,57 @@ class NCShareUITest: XCTestCase {
         XCTAssertEqual(shareInfo, message, "Sharing message should be same")
     }
     
+    func testEmailDescription() throws{
+        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
+        let elementsQuery = app.scrollViews.otherElements
+        let emailDescription = elementsQuery.staticTexts.element(boundBy: 0).label
+        XCTAssertEqual(emailDescription, "Personal share by mail", "Email Description should match")
+    }
     
     func testCreateLink() throws {
         app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
         let elementsQuery = app.scrollViews.otherElements
         elementsQuery.buttons["Create Link"].tap()
+        sleep(10)
         let cell = app.tables.containing(.staticText, identifier: "Link to folder").element(boundBy: 0)
         XCTAssertTrue(cell.isHittable)
     }
 
+    func testTestfieldMessage() throws {
+        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
+        let elementsQuery = app.scrollViews.otherElements
+        let textFieldPlaceholder = elementsQuery.textFields.element(boundBy: 0).placeholderValue
+        XCTAssertEqual(textFieldPlaceholder, "Contact name or email address", "Textfiled placeholder message should match")
+    }
+    
+    func testCreateLinkButtonTitle() throws {
+        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
+        let elementsQuery = app.scrollViews.otherElements
+        let buttonTitle = elementsQuery.buttons.element(boundBy: 0).label
+        XCTAssertEqual(buttonTitle, "Create Link", "Button Title should match")
+    }
+
+    func testMenuButtonAction() throws {
+        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
+        let elementsQuery = app.scrollViews.otherElements
+        elementsQuery.tables.children(matching: .cell).element(boundBy: 0).buttons["shareLinkMenu"].tap()
+        app.tables/*@START_MENU_TOKEN@*/.cells.staticTexts["Advanced permissions"]/*[[".cells.staticTexts[\"Advanced permissions\"]",".staticTexts[\"Advanced permissions\"]"],[[[-1,1],[-1,0]]],[1]]@END_MENU_TOKEN@*/.tap()
+        let advancePermissionScreen = app.otherElements["view_advance_sharing_screen"]
+        let advancePermissionScreenShow = advancePermissionScreen.waitForExistence(timeout: 5)
+        XCTAssert(advancePermissionScreenShow)
+    }
+    
+    func testTextFieldAction() throws {
+        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
+        let elementsQuery = app.scrollViews.otherElements
+        let emailAddressTextField = elementsQuery.textFields["Contact name or email address"]
+        emailAddressTextField.tap()
+        emailAddressTextField.typeText("amrut.waghmare@t-systems.com")
+        app/*@START_MENU_TOKEN@*/.buttons["Return"]/*[[".keyboards",".buttons[\"return\"]",".buttons[\"Return\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.tap()
+        sleep(10)
+        app.otherElements["drop_down"].tables.staticTexts["amrut.waghmare@t-systems.com"].tap()
+        let advancePermissionScreen = app.otherElements["view_advance_sharing_screen"]
+        let advancePermissionScreenShow = advancePermissionScreen.waitForExistence(timeout: 5)
+        XCTAssert(advancePermissionScreenShow)
+    }
 }

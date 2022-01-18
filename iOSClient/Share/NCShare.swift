@@ -166,6 +166,9 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         } else {
             containerView.isHidden = true
         }
+        
+        // UITestCase Identifire
+        view.accessibilityIdentifier = "view_sharing_screen"
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -993,6 +996,9 @@ class NCShareLinkCell: UITableViewCell {
         buttonCopy.setImage(UIImage.init(named: "shareCopy")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
+        
+        // UITestCase Identifire
+        buttonMenu.accessibilityLabel = "shareLinkMenu"
     }
     
     @IBAction func touchUpInsideCopy(_ sender: Any) {
