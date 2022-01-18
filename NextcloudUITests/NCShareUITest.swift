@@ -40,7 +40,8 @@ class NCShareUITest: XCTestCase {
         app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
         let elementsQuery = app.scrollViews.otherElements
         elementsQuery.buttons["Create Link"].tap()
-        app.tables.containing(.staticText, identifier: "Link to folder")
+        let cell = app.tables.containing(.staticText, identifier: "Link to folder").element(boundBy: 0)
+        XCTAssertTrue(cell.isHittable)
     }
 
 }
