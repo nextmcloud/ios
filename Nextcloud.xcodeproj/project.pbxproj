@@ -17,6 +17,7 @@
 		371B5A2E23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift */; };
 		371B5A3323D0BD5500FAFAE9 /* FloatingPanel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */; };
 		568979DE279557F00002339E /* NCShareUITest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568979DD279557F00002339E /* NCShareUITest.swift */; };
+		56FF941C2797F1B000248040 /* NCShareAdvancePermissionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56FF941B2797F1B000248040 /* NCShareAdvancePermissionUITests.swift */; };
 		724A40E75F52C29D092470E2 /* Pods_Nextcloud.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3E8A85DCD6F57798011CA1C /* Pods_Nextcloud.framework */; };
 		7A29E0EF269873A600B239BA /* InitialPrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */; };
 		7A756F9726BA601B00E0CB38 /* NCCreateFormUploadConflict+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A756F9626BA601B00E0CB38 /* NCCreateFormUploadConflict+Alert.swift */; };
@@ -523,6 +524,7 @@
 		568979DD279557F00002339E /* NCShareUITest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareUITest.swift; sourceTree = "<group>"; };
 		569D38D727917D54005A21DB /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		569D38DB27917D54005A21DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		56FF941B2797F1B000248040 /* NCShareAdvancePermissionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareAdvancePermissionUITests.swift; sourceTree = "<group>"; };
 		75D9B76604BC04F7789A83AF /* Pods-Nextcloud.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Nextcloud.release.xcconfig"; path = "Target Support Files/Pods-Nextcloud/Pods-Nextcloud.release.xcconfig"; sourceTree = "<group>"; };
 		7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialPrivacySettingsViewController.swift; sourceTree = "<group>"; };
 		7A756F9626BA601B00E0CB38 /* NCCreateFormUploadConflict+Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCCreateFormUploadConflict+Alert.swift"; sourceTree = "<group>"; };
@@ -1062,6 +1064,7 @@
 			children = (
 				568979DD279557F00002339E /* NCShareUITest.swift */,
 				569D38DB27917D54005A21DB /* Info.plist */,
+				56FF941B2797F1B000248040 /* NCShareAdvancePermissionUITests.swift */,
 			);
 			path = NextcloudUITests;
 			sourceTree = "<group>";
@@ -2064,6 +2067,8 @@
 				569D38DD27917D54005A21DB /* PBXTargetDependency */,
 			);
 			name = NextcloudUITests;
+			packageProductDependencies = (
+			);
 			productName = NextcloudUITests;
 			productReference = 569D38D727917D54005A21DB /* NextcloudUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -2520,6 +2525,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56FF941C2797F1B000248040 /* NCShareAdvancePermissionUITests.swift in Sources */,
 				568979DE279557F00002339E /* NCShareUITest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
