@@ -74,9 +74,8 @@ class NCShareUITest: XCTestCase {
 
     func testMenuButtonAction() throws {
         app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
-        let elementsQuery = app.scrollViews.otherElements
-        elementsQuery.tables.children(matching: .cell).element(boundBy: 0).buttons["shareLinkMenu"].tap()
-        app.tables/*@START_MENU_TOKEN@*/.cells.staticTexts["Advanced permissions"]/*[[".cells.staticTexts[\"Advanced permissions\"]",".staticTexts[\"Advanced permissions\"]"],[[[-1,1],[-1,0]]],[1]]@END_MENU_TOKEN@*/.tap()
+        app/*@START_MENU_TOKEN@*/.otherElements["view_sharing_screen"].tables.buttons["shareLinkMenu"]/*[[".scrollViews.otherElements[\"view_sharing_screen\"].tables",".cells.buttons[\"shareLinkMenu\"]",".buttons[\"shareLinkMenu\"]",".otherElements[\"view_sharing_screen\"].tables"],[[[-1,3,1],[-1,0,1]],[[-1,2],[-1,1]]],[0,0]]@END_MENU_TOKEN@*/.tap()
+        app.tables/*@START_MENU_TOKEN@*/.staticTexts["Advanced permissions"]/*[[".cells.staticTexts[\"Advanced permissions\"]",".staticTexts[\"Advanced permissions\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
         let advancePermissionScreen = app.otherElements["view_advance_sharing_screen"]
         let advancePermissionScreenShow = advancePermissionScreen.waitForExistence(timeout: 5)
         XCTAssert(advancePermissionScreenShow)
