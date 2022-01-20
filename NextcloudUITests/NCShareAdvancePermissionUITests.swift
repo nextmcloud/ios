@@ -42,8 +42,24 @@ class NCShareAdvancePermissionUITests: XCTestCase {
         let advancePermissionScreenShow = advancePermissionScreen.waitForExistence(timeout: 5)
         XCTAssert(advancePermissionScreenShow)
     }
+    
+    func testPasswordField() throws {
+        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
+        let elementsQuery = app.scrollViews.otherElements
+        let emailAddressTextField = elementsQuery.textFields["Contact name or email address"]
+        emailAddressTextField.tap()
+        emailAddressTextField.typeText("amrut.waghmare@t-systems.com")
+        app/*@START_MENU_TOKEN@*/.buttons["Return"]/*[[".keyboards",".buttons[\"return\"]",".buttons[\"Return\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.tap()
+        app.otherElements["drop_down"].tables.staticTexts["amrut.waghmare@t-systems.com"].tap()
+        let passwordSwitch = app.switches.element(boundBy: 1)
+        passwordSwitch.swipeUp()
+        passwordSwitch.tap()
+        sleep(5)
+        let passwordField = app.secureTextFields.element(boundBy: 0)
+        XCTAssertTrue(passwordField.isEnabled)
+    }
 
-    func testPermissionTypeRow() throws {
+    func testReadOnlyPermissionTypeRow() throws {
         app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
         let elementsQuery = app.scrollViews.otherElements
         let emailAddressTextField = elementsQuery.textFields["Contact name or email address"]
@@ -52,8 +68,18 @@ class NCShareAdvancePermissionUITests: XCTestCase {
         app/*@START_MENU_TOKEN@*/.buttons["Return"]/*[[".keyboards",".buttons[\"return\"]",".buttons[\"Return\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.tap()
         app.otherElements["drop_down"].tables.staticTexts["amrut.waghmare@t-systems.com"].tap()
         let readOnlyLabel = app.staticTexts.element(boundBy: 8).label
-        let allowEditingLabel = app.staticTexts.element(boundBy: 11).label
         XCTAssertEqual(readOnlyLabel, "Read only", "Read only label should match")
+    }
+    
+    func testAllowEditingPermissionTypeRow() throws {
+        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
+        let elementsQuery = app.scrollViews.otherElements
+        let emailAddressTextField = elementsQuery.textFields["Contact name or email address"]
+        emailAddressTextField.tap()
+        emailAddressTextField.typeText("amrut.waghmare@t-systems.com")
+        app/*@START_MENU_TOKEN@*/.buttons["Return"]/*[[".keyboards",".buttons[\"return\"]",".buttons[\"Return\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.tap()
+        app.otherElements["drop_down"].tables.staticTexts["amrut.waghmare@t-systems.com"].tap()
+        let allowEditingLabel = app.staticTexts.element(boundBy: 11).label
         XCTAssertEqual(allowEditingLabel, "Allow editing", "Read only label should match")
     }
     
@@ -67,8 +93,19 @@ class NCShareAdvancePermissionUITests: XCTestCase {
         app.otherElements["drop_down"].tables.staticTexts["amrut.waghmare@t-systems.com"].tap()
         let passwordSwitch = app.switches.element(boundBy: 1)
         passwordSwitch.tap()
-        let title = passwordSwitch.label
         XCTAssertTrue((passwordSwitch.value as! String) == "1")
+    }
+    
+    func testPasswordSwitchTitle() throws {
+        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
+        let elementsQuery = app.scrollViews.otherElements
+        let emailAddressTextField = elementsQuery.textFields["Contact name or email address"]
+        emailAddressTextField.tap()
+        emailAddressTextField.typeText("amrut.waghmare@t-systems.com")
+        app/*@START_MENU_TOKEN@*/.buttons["Return"]/*[[".keyboards",".buttons[\"return\"]",".buttons[\"Return\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.tap()
+        app.otherElements["drop_down"].tables.staticTexts["amrut.waghmare@t-systems.com"].tap()
+        let passwordSwitch = app.switches.element(boundBy: 1)
+        let title = passwordSwitch.label
         XCTAssertEqual(title, "Set password", "Password title should match")
     }
     
@@ -82,8 +119,19 @@ class NCShareAdvancePermissionUITests: XCTestCase {
         app.otherElements["drop_down"].tables.staticTexts["amrut.waghmare@t-systems.com"].tap()
         let preventDownloadSwitch = app.switches.element(boundBy: 0)
         preventDownloadSwitch.tap()
-        let title = preventDownloadSwitch.label
         XCTAssertTrue((preventDownloadSwitch.value as! String) == "1")
+    }
+    
+    func testPreventDownloadSwitchTitle() throws {
+        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
+        let elementsQuery = app.scrollViews.otherElements
+        let emailAddressTextField = elementsQuery.textFields["Contact name or email address"]
+        emailAddressTextField.tap()
+        emailAddressTextField.typeText("amrut.waghmare@t-systems.com")
+        app/*@START_MENU_TOKEN@*/.buttons["Return"]/*[[".keyboards",".buttons[\"return\"]",".buttons[\"Return\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.tap()
+        app.otherElements["drop_down"].tables.staticTexts["amrut.waghmare@t-systems.com"].tap()
+        let preventDownloadSwitch = app.switches.element(boundBy: 0)
+        let title = preventDownloadSwitch.label
         XCTAssertEqual(title, "Prevent download", "Prevent Download title should match")
     }
     
@@ -97,8 +145,19 @@ class NCShareAdvancePermissionUITests: XCTestCase {
         app.otherElements["drop_down"].tables.staticTexts["amrut.waghmare@t-systems.com"].tap()
         let setExpirationSwitch = app.switches.element(boundBy: 2)
         setExpirationSwitch.tap()
+        XCTAssertTrue(( setExpirationSwitch.value as! String) == "1")
+    }
+    
+    func testSetExpirationSwitchTitle() throws {
+        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
+        let elementsQuery = app.scrollViews.otherElements
+        let emailAddressTextField = elementsQuery.textFields["Contact name or email address"]
+        emailAddressTextField.tap()
+        emailAddressTextField.typeText("amrut.waghmare@t-systems.com")
+        app/*@START_MENU_TOKEN@*/.buttons["Return"]/*[[".keyboards",".buttons[\"return\"]",".buttons[\"Return\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.tap()
+        app.otherElements["drop_down"].tables.staticTexts["amrut.waghmare@t-systems.com"].tap()
+        let setExpirationSwitch = app.switches.element(boundBy: 2)
         let title = setExpirationSwitch.label
-        XCTAssertTrue((setExpirationSwitch.value as! String) == "1")
         XCTAssertEqual(title, "Set expiration date", "Set expiration date title should match")
     }
 }

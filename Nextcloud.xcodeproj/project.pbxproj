@@ -17,6 +17,7 @@
 		371B5A2E23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift */; };
 		371B5A3323D0BD5500FAFAE9 /* FloatingPanel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */; };
 		568979DE279557F00002339E /* NCShareUITest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568979DD279557F00002339E /* NCShareUITest.swift */; };
+		5690255827997CDD005EADFF /* NCShareNewUserAddCommentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5690255727997CDD005EADFF /* NCShareNewUserAddCommentUITests.swift */; };
 		56FF941C2797F1B000248040 /* NCShareAdvancePermissionUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56FF941B2797F1B000248040 /* NCShareAdvancePermissionUITests.swift */; };
 		724A40E75F52C29D092470E2 /* Pods_Nextcloud.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3E8A85DCD6F57798011CA1C /* Pods_Nextcloud.framework */; };
 		7A29E0EF269873A600B239BA /* InitialPrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */; };
@@ -522,6 +523,7 @@
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
 		37ECC83A23D0C7400082EFA2 /* NCMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuAction.swift; sourceTree = "<group>"; };
 		568979DD279557F00002339E /* NCShareUITest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareUITest.swift; sourceTree = "<group>"; };
+		5690255727997CDD005EADFF /* NCShareNewUserAddCommentUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareNewUserAddCommentUITests.swift; sourceTree = "<group>"; };
 		569D38D727917D54005A21DB /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		569D38DB27917D54005A21DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		56FF941B2797F1B000248040 /* NCShareAdvancePermissionUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareAdvancePermissionUITests.swift; sourceTree = "<group>"; };
@@ -1065,6 +1067,7 @@
 				568979DD279557F00002339E /* NCShareUITest.swift */,
 				569D38DB27917D54005A21DB /* Info.plist */,
 				56FF941B2797F1B000248040 /* NCShareAdvancePermissionUITests.swift */,
+				5690255727997CDD005EADFF /* NCShareNewUserAddCommentUITests.swift */,
 			);
 			path = NextcloudUITests;
 			sourceTree = "<group>";
@@ -2525,6 +2528,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5690255827997CDD005EADFF /* NCShareNewUserAddCommentUITests.swift in Sources */,
 				56FF941C2797F1B000248040 /* NCShareAdvancePermissionUITests.swift in Sources */,
 				568979DE279557F00002339E /* NCShareUITest.swift in Sources */,
 			);
