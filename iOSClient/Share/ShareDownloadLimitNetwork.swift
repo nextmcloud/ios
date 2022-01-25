@@ -11,20 +11,29 @@ import SwiftyJSON
 import NCCommunication
 import Alamofire
 
-extension NCCommunication {
+class NMCCommunication: NSObject, XMLParserDelegate {
+    
+    public static let shared: NMCCommunication = {
+        let instance = NMCCommunication()
+        return instance
+    }()
+    
+    var message = ""
+    var foundCharacters = "";
+    var downloadLimit = DownloadLimit()
+    
     func getDownloadLimit(token: String, completion: @escaping (_ downloadLimit: DownloadLimit?, _ errorDescription: String) -> Void)  {
         let baseUrl = NCBrandOptions.shared.loginBaseUrl
         let endPoint = "ocs/v2.php/apps/files_downloadlimit/\(token)/limit"
         let path = baseUrl+endPoint
         do {
             var urlRequest = try URLRequest(url: URL(string: path)!, method: .get)
-            urlRequest.addValue("true", forHTTPHeaderField: "OCS-APIRequest")
-            urlRequest.addValue("true", forHTTPHeaderField: "Authorization")
+            urlRequest.addValue("true", forHTTPHeaderField: "OCS-APIREQUEST")
             
             let sessionConfiguration = URLSessionConfiguration.default
             let urlSession = URLSession(configuration: sessionConfiguration)
             
-            let task = urlSession.dataTask(with: urlRequest) { (data, response, error) in
+            let task = urlSession.dataTask(with: urlRequest) { [self] (data, response, error) in
                 guard error == nil else {
                     completion(nil, error?.localizedDescription ?? "")
                     return
@@ -34,16 +43,10 @@ extension NCCommunication {
                     let statusCode = httpResponse.statusCode
                     print("url: \(String(describing: httpResponse.url))\nStatus Code: \(statusCode)")
                     if  httpResponse.statusCode == 200 {
-                        do {
-                            let json = try JSON(data: data!)
-                            let message = json["ocs"]["meta"]["message"].string ?? NSLocalizedString("_invalid_data_format_", value: "Invalid data format", comment: "")
-                            
-                            let downloadLimit = try JSONDecoder().decode(DownloadLimit.self, from: data!)
-                            completion(downloadLimit, message)
-                            
-                        } catch {
-                            completion(nil, error.localizedDescription)
-                        }
+                        let parser = XMLParser(data: data!)
+                        parser.delegate = self
+                        parser.parse()
+                        completion(self.downloadLimit, self.message)
                     }  else {
                         completion(nil, "Invalid Response code: \(statusCode)")
                     }
@@ -66,7 +69,9 @@ extension NCCommunication {
             let method =  deleteLimit ? HTTPMethod.delete : .put
             var urlRequest = try URLRequest(url: URL(string: path)!, method: method)
             
-            urlRequest.addValue("true", forHTTPHeaderField: "OCS-APIRequest")
+            urlRequest.addValue("true", forHTTPHeaderField: "OCS-APIREQUEST")
+            urlRequest.addValue(authorizationToken(), forHTTPHeaderField: "Authorization")
+            urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
             
             let parameters = ["token": token, "limit": limit]
             
@@ -99,6 +104,38 @@ extension NCCommunication {
         } catch {
             completion(false, error.localizedDescription)
         }
+    }
+    
+    public func authorizationToken() -> String {
+        let accountDetails = NCManageDatabase.shared.getAllAccount().first
+        let password = CCUtility.getPassword(accountDetails?.account) ?? ""
+        let username = accountDetails?.user ?? ""
+        let credential = Data("\(username):\(password)".utf8).base64EncodedString()
+        return ("Basic \(credential)")
+    }
+
+    
+    // MARK:- XML Parser Delegate
+    public func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String] = [:]) {
+        
+    }
+    public func parser(_ parser: XMLParser, foundCharacters string: String) {
+        self.foundCharacters += string;
+    }
+    
+    public func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
+        if elementName == "limit" {
+            let limit =  self.foundCharacters.replacingOccurrences(of: "\n", with: "")
+            self.downloadLimit.limit = Int(limit.trimmingCharacters(in: .whitespaces))
+        }
+        if elementName == "count" {
+            let count =  self.foundCharacters.replacingOccurrences(of: "\n", with: "")
+            self.downloadLimit.count = Int(count.trimmingCharacters(in: .whitespaces))
+        }
+        if elementName == "message"{
+            self.message = self.foundCharacters
+        }
+        self.foundCharacters = ""
     }
 }
 

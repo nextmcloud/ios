@@ -433,7 +433,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             row.cellConfig["cellTextField.placeholder"] = NSLocalizedString("_share_download_limit_placeholder_", comment: "")
             row.cellConfig["cellTextField.textAlignment"] = NSTextAlignment.left.rawValue
             row.cellConfig["cellTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-            row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.textView
+            row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.label
             row.height = 44
             let downloadLimitSet = downloadLimit != nil
             row.hidden = NSNumber.init(booleanLiteral: !downloadLimitSet)
@@ -473,9 +473,10 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
     
     func getDownloadLimit() {
-        downloadLimit = 3
-        NCCommunication.shared.getDownloadLimit(token: tableShare?.token ?? "") { [weak self] (downloadLimit: DownloadLimit?, error: String) in
+        NCUtility.shared.startActivityIndicator(backgroundView: view, blurEffect: false)
+        NMCCommunication.shared.getDownloadLimit(token: tableShare?.token ?? "") { [weak self] (downloadLimit: DownloadLimit?, error: String) in
             DispatchQueue.main.async {
+                NCUtility.shared.stopActivityIndicator()
                 if let downloadLimit = downloadLimit {
                     self?.downloadLimit = downloadLimit.limit
                 }
@@ -485,7 +486,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
     
     func setDownloadLimit(deleteLimit: Bool, limit: String) {
-        NCCommunication.shared.setDownloadLimit(deleteLimit: deleteLimit, limit: limit, token: tableShare?.token ?? "") { (success, errorMessage) in
+        NMCCommunication.shared.setDownloadLimit(deleteLimit: deleteLimit, limit: limit, token: tableShare?.token ?? "") { (success, errorMessage) in
             print(success)
         }
     }
@@ -825,7 +826,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
     
     func isDownloadLimitVisible() -> Bool {
-        return isLinkShare()
+        return isLinkShare() && !(metadata?.directory ?? false)
     }
     
     func isLinkShare() -> Bool {
@@ -931,7 +932,6 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         } else {
             if let downloadSwitchCell = getDownloadLimitSwitchCell() {
                 let isDownloadLimitOn = downloadSwitchCell.switchControl.isOn
-                if downloadLimit != nil {
                     if !isDownloadLimitOn {
                         setDownloadLimit(deleteLimit: true, limit: "")
                     } else {
@@ -948,7 +948,6 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                         setDownloadLimit(deleteLimit: false, limit: enteredDownloadLimit)
                     }
                 }
-            }
             
             let label = linkLabel.trimmingCharacters(in: .whitespacesAndNewlines)
             let expirationDate = isExpiryEnabled ? getServerStyleDate(date: self.expirationDate as Date) : ""
