@@ -492,6 +492,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 let subfolderSwitchOption : XLFormRowDescriptor  = self.form.formRow(withTag: "useSubFolder")!
                 subfolderSwitchOption.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.label//isEnabled
                 subfolderSwitchOption.value = "enable_switch"
+                buttonDestinationFolder.disabled = true
                 self.reloadForm()
 
             } else{
@@ -505,6 +506,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 subfolderSwitchOption.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.graySoft
                 subfolderSwitchOption.disabled = true
                 subfolderSwitchOption.value = "disable_switch"
+                buttonDestinationFolder.disabled = false
                 self.reloadForm()
 
 //=======
