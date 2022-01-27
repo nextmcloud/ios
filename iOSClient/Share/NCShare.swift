@@ -166,6 +166,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         } else {
             containerView.isHidden = true
         }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -214,6 +216,11 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         }
         tableView.reloadData()
     }
+        
+    @objc func keyboardWillHide(_ notification:Notification) {
+        searchFieldDidEndOnExit(textField: searchField)
+    }
+
     
     // MARK: - IBAction
 
