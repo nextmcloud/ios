@@ -41,6 +41,9 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
         if rowDescriptor.tag == "NCShareTextInputCellExpiry" {
             seperator.isHidden = true
             setDatePicker(sender: self.cellTextField)
+        } else if rowDescriptor.tag == "NCShareTextInputCellDownloadLimit" {
+            seperator.isHidden = true
+            cellTextField.keyboardType = .numberPad
         }
     }
     
