@@ -344,6 +344,7 @@
     [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     row.selectorTitle = NSLocalizedString(@"_delete_old_files_", nil);
+    row.cellConfigForSelector[@"tintColor"] = NCBrandColor.shared.customer;
     row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:NSLocalizedString(@"_never_", nil)],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(365) displayText:NSLocalizedString(@"_1_year_", nil)],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(180) displayText:NSLocalizedString(@"_6_months_", nil)],
