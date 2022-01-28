@@ -32,7 +32,8 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     @IBOutlet weak var buttonHost: UIButton!
     @IBOutlet weak var introCollectionView: UICollectionView!
     @IBOutlet weak var pageControl: UIPageControl!
-
+    @IBOutlet weak var contstraintBottomLoginButton: NSLayoutConstraint!
+    
     @objc var delegate: NCIntroViewController?
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     private let titles = [NSLocalizedString("", comment: ""), NSLocalizedString("", comment: ""), NSLocalizedString("", comment: "")]
@@ -112,7 +113,11 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
 
-    
+    override func viewDidLayoutSubviews() {
+        if UIScreen.main.bounds.width < 350 {
+            contstraintBottomLoginButton.constant = 20
+        }
+    }
     override var preferredStatusBarStyle: UIStatusBarStyle {
         if #available(iOS 13.0, *) {
             if traitCollection.userInterfaceStyle == .light {

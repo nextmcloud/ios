@@ -105,6 +105,7 @@
                         <outlet property="buttonHost" destination="Z5d-gx-rTR" id="Ngu-DS-yLh"/>
                         <outlet property="buttonLogin" destination="Yyc-bK-mqW" id="LPF-TP-LmK"/>
                         <outlet property="buttonSignUp" destination="N4X-JQ-1c1" id="jz0-6S-IxP"/>
+                        <outlet property="contstraintBottomLoginButton" destination="Db9-Ua-TbM" id="Chl-ic-L43"/>
                         <outlet property="introCollectionView" destination="o6I-qu-IDh" id="DVx-Rt-VE8"/>
                         <outlet property="pageControl" destination="Eu1-Gv-7Jx" id="brQ-v9-knr"/>
                     </connections>
