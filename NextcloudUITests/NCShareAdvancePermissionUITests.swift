@@ -55,8 +55,17 @@ class NCShareAdvancePermissionUITests: XCTestCase {
         passwordSwitch.swipeUp()
         passwordSwitch.tap()
         sleep(5)
-        let passwordField = app.secureTextFields.element(boundBy: 0)
-        XCTAssertTrue(passwordField.isEnabled)
+       
+        if((passwordSwitch.value as! String) == "1"){
+            let passwordField = app.secureTextFields.element(boundBy: 0)
+            XCTAssertTrue(passwordField.isEnabled)
+        } else {
+            passwordSwitch.tap()
+            sleep(5)
+            let passwordField = app.secureTextFields.element(boundBy: 0)
+            XCTAssertTrue(passwordField.isEnabled)
+        }
+        
     }
 
     func testReadOnlyPermissionTypeRow() throws {
