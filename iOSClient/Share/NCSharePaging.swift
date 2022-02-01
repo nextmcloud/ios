@@ -502,6 +502,7 @@ class NCShareHeaderView: UIView {
     @IBOutlet weak var sharedByLabel: UILabel!
     @IBOutlet weak var resharingAllowedLabel: UILabel!
     @IBOutlet weak var sharedByImageView: UIImageView!
+    @IBOutlet weak var constraintTopSharingLabel: NSLayoutConstraint!
     
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var ocId = ""
@@ -514,6 +515,10 @@ class NCShareHeaderView: UIView {
     func setupUI() {
         labelSharing.text = NSLocalizedString("_sharing_", comment: "")
         labelSharingInfo.text = NSLocalizedString("_sharing_message_", comment: "")
+        
+        if UIScreen.main.bounds.width < 350 {
+            constraintTopSharingLabel.constant = 15
+        }
     }
     
     func updateCanReshareUI() {

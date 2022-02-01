@@ -152,6 +152,7 @@
             </constraints>
             <connections>
                 <outlet property="canShareInfoView" destination="9Gs-Cq-35h" id="feI-en-67v"/>
+                <outlet property="constraintTopSharingLabel" destination="dbK-Tr-5aq" id="3zJ-1I-f3z"/>
                 <outlet property="favorite" destination="EaW-fI-EmD" id="dv5-Qo-tPx"/>
                 <outlet property="fileName" destination="xOl-wG-SQb" id="gc8-MY-hqW"/>
                 <outlet property="fullWidthImageView" destination="scc-g5-o58" id="aYz-V5-Tkf"/>
