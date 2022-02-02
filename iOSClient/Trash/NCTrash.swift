@@ -42,7 +42,7 @@ class NCTrash: UIViewController, UIGestureRecognizerDelegate, NCTrashListCellDel
     private var layoutForView: NCGlobal.layoutForViewType?
     private var listLayout: NCListLayout!
     private var gridLayout: NCGridLayout!
-    private let highHeader: CGFloat = 50
+    private let highHeader: CGFloat = 100
     private let refreshControl = UIRefreshControl()
 
     // MARK: - View Life Cycle
