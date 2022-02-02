@@ -122,7 +122,7 @@ extension NCTrash {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_delete_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "trash"),
+                icon: NCUtility.shared.loadImage(named: "trash").image(color: NCBrandColor.shared.iconColor, size: 50),
                 action: { menuAction in
                     self.deleteItem(with: objectId)
                 }
