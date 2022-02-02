@@ -218,6 +218,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             self.tableView.setEmptyMessage(NSLocalizedString("", comment: ""))
         }
         tableView.reloadData()
+        tableView.isUserInteractionEnabled = true
     }
         
     @objc func keyboardWillHide(_ notification:Notification) {
@@ -634,6 +635,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     @objc func shareMenuUnshareClicked() {
         guard let tableShare = self.tableShareSelected else { return }
+        tableView.isUserInteractionEnabled = false
         networking?.unShare(idShare: tableShare.idShare)
     }
     

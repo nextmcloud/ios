@@ -186,7 +186,7 @@ class NCSectionFooter: UICollectionReusableView {
         } else if files == 1 {
             filesText = "1 " + NSLocalizedString("_file_", comment: "") + " " + CCUtility.transformedSize(size)
         }
-        
+        labelSection.textColor = NCBrandColor.shared.iconColor
         if foldersText == "" {
             labelSection.text = filesText
         } else if filesText == "" {
