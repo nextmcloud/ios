@@ -23,6 +23,7 @@
 
 import UIKit
 import FloatingPanel
+import NCCommunication
 
 extension NCMedia {
 
@@ -85,12 +86,11 @@ extension NCMedia {
                         viewController.delegate = self
                         viewController.typeOfCommandView = .select
                         viewController.type = "mediaFolder"
-                        
+                    
                         self.present(navigationController, animated: true, completion: nil)
                     }
                 )
             )
-            
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_modified_date_", comment: ""),
@@ -147,7 +147,7 @@ extension NCMedia {
                     }
                 )
             )
-            
+
             //
             // OPEN IN
             //
@@ -163,7 +163,7 @@ extension NCMedia {
                     }
                 )
             )
-            
+
             //
             // SAVE TO PHOTO GALLERY
             //
@@ -193,7 +193,7 @@ extension NCMedia {
                     }
                 )
             )
-            
+
             //
             // COPY - MOVE
             //
@@ -217,7 +217,7 @@ extension NCMedia {
                     }
                 )
             )
-            
+
             //
             // COPY
             //
@@ -237,7 +237,7 @@ extension NCMedia {
                     }
                 )
             )
-            
+
             //
             // DELETE
             //
@@ -263,14 +263,20 @@ extension NCMedia {
             )
         }
 
-        menuViewController.actions = actions
-        let menuPanelController = NCMenuPanelController()
-        menuPanelController.parentPresenter = self
-        menuPanelController.delegate = menuViewController
-        menuPanelController.set(contentViewController: menuViewController)
-        menuPanelController.track(scrollView: menuViewController.tableView)
-
-        self.present(menuPanelController, animated: true, completion: nil)
+//<<<<<<< HEAD
+//        menuViewController.actions = actions
+//        let menuPanelController = NCMenuPanelController()
+//        menuPanelController.parentPresenter = self
+//        menuPanelController.delegate = menuViewController
+//        menuPanelController.set(contentViewController: menuViewController)
+//        menuPanelController.track(scrollView: menuViewController.tableView)
+//
+//        self.present(menuPanelController, animated: true, completion: nil)
+//    }
+//}
+//
+//=======
+        presentMenu(with: actions)
     }
 }
 

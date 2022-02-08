@@ -46,3 +46,8 @@ Pods/Target Support Files/MoEngage-iOS-SDK/MoEngage-iOS-SDK.debug.xcconfig
 Pods/Target Support Files/MoEngage-iOS-SDK/MoEngage-iOS-SDK.release.xcconfig
 Pods/Target Support Files/MORichNotification/MORichNotification.debug.xcconfig
 Pods/Target Support Files/MORichNotification/MORichNotification.release.xcconfig
+
+
+### SwiftPackageManager ###
+.swiftpm
+

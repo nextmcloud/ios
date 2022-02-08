@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="P4P-kP-0dM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="P4P-kP-0dM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -86,102 +85,6 @@
             </objects>
             <point key="canvasLocation" x="12655" y="607"/>
         </scene>
-        <!--Initial Privacy Settings View Controller-->
-        <scene sceneID="Ly5-dm-LTN">
-            <objects>
-                <viewController storyboardIdentifier="privacyPolicyViewController" id="PY5-f7-e4T" customClass="InitialPrivacySettingsViewController" customModule="Nextcloud" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="hni-Ja-wnk">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="z8e-mQ-lov">
-                                <rect key="frame" x="0.0" y="88" width="414" height="774"/>
-                                <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zLb-KU-Sgn">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="595"/>
-                                        <subviews>
-                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="dataPrivacy" translatesAutoresizingMaskIntoConstraints="NO" id="FtM-jd-ZnZ">
-                                                <rect key="frame" x="177" y="70" width="60" height="60"/>
-                                                <color key="tintColor" systemColor="systemRedColor"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="60" id="KBI-24-269"/>
-                                                    <constraint firstAttribute="height" constant="60" id="bjJ-Jn-hyk"/>
-                                                </constraints>
-                                            </imageView>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Privacy Settings" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8xu-Ne-bL3">
-                                                <rect key="frame" x="124" y="150" width="166.5" height="29"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
-                                                <nil key="textColor"/>
-                                                <nil key="highlightedColor"/>
-                                            </label>
-                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" editable="NO" text="fjhfhjvhvhjkvhjk jhkjh" textAlignment="center" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nie-WT-tde" userLabel="privacy help text">
-                                                <rect key="frame" x="57" y="199" width="300" height="320"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="300" id="74m-fB-woG"/>
-                                                    <constraint firstAttribute="height" constant="320" id="8xm-9J-zub"/>
-                                                </constraints>
-                                                <color key="textColor" systemColor="labelColor"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
-                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                            </textView>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ctD-ho-2Qo" userLabel="AcceptButton">
-                                                <rect key="frame" x="122" y="535" width="170" height="40"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="40" id="GLd-mk-HjN"/>
-                                                    <constraint firstAttribute="width" constant="170" id="gfL-ro-VWd"/>
-                                                </constraints>
-                                                <state key="normal" title="Accept"/>
-                                                <connections>
-                                                    <action selector="onAcceptButtonClicked:" destination="PY5-f7-e4T" eventType="touchUpInside" id="dE5-Sn-MPD"/>
-                                                </connections>
-                                            </button>
-                                        </subviews>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                        <constraints>
-                                            <constraint firstItem="8xu-Ne-bL3" firstAttribute="centerX" secondItem="zLb-KU-Sgn" secondAttribute="centerX" id="0bO-Xz-Quy"/>
-                                            <constraint firstItem="nie-WT-tde" firstAttribute="centerX" secondItem="zLb-KU-Sgn" secondAttribute="centerX" id="9QM-xI-KkW"/>
-                                            <constraint firstItem="ctD-ho-2Qo" firstAttribute="top" secondItem="nie-WT-tde" secondAttribute="bottom" constant="16" id="HPM-2d-Y8Z"/>
-                                            <constraint firstItem="ctD-ho-2Qo" firstAttribute="centerX" secondItem="zLb-KU-Sgn" secondAttribute="centerX" id="Wna-An-30J"/>
-                                            <constraint firstAttribute="bottom" secondItem="ctD-ho-2Qo" secondAttribute="bottom" constant="20" id="eKh-VM-FgW"/>
-                                            <constraint firstItem="nie-WT-tde" firstAttribute="top" secondItem="8xu-Ne-bL3" secondAttribute="bottom" constant="20" id="jCu-zj-uZm"/>
-                                            <constraint firstItem="FtM-jd-ZnZ" firstAttribute="centerX" secondItem="zLb-KU-Sgn" secondAttribute="centerX" id="qI1-R1-v6B"/>
-                                            <constraint firstItem="8xu-Ne-bL3" firstAttribute="top" secondItem="zLb-KU-Sgn" secondAttribute="top" constant="150" id="s70-hU-WC5"/>
-                                            <constraint firstItem="8xu-Ne-bL3" firstAttribute="top" secondItem="FtM-jd-ZnZ" secondAttribute="bottom" constant="20" id="sub-Wr-Wt1"/>
-                                        </constraints>
-                                    </view>
-                                </subviews>
-                                <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="zLb-KU-Sgn" secondAttribute="trailing" id="40v-ZF-OKc"/>
-                                    <constraint firstAttribute="bottom" secondItem="zLb-KU-Sgn" secondAttribute="bottom" constant="20" symbolic="YES" id="FTE-e4-5uf"/>
-                                    <constraint firstItem="zLb-KU-Sgn" firstAttribute="width" secondItem="z8e-mQ-lov" secondAttribute="width" id="dc0-vg-sMC"/>
-                                    <constraint firstItem="zLb-KU-Sgn" firstAttribute="top" secondItem="z8e-mQ-lov" secondAttribute="top" id="nRL-4V-Ue0"/>
-                                    <constraint firstItem="zLb-KU-Sgn" firstAttribute="leading" secondItem="z8e-mQ-lov" secondAttribute="leading" id="rPi-Y0-GKO"/>
-                                </constraints>
-                                <viewLayoutGuide key="contentLayoutGuide" id="eHy-lC-0PE"/>
-                                <viewLayoutGuide key="frameLayoutGuide" id="Bbp-s7-ISL"/>
-                            </scrollView>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="90K-Ak-MHR"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstItem="z8e-mQ-lov" firstAttribute="leading" secondItem="90K-Ak-MHR" secondAttribute="leading" id="9P1-Dd-mwf"/>
-                            <constraint firstItem="z8e-mQ-lov" firstAttribute="top" secondItem="90K-Ak-MHR" secondAttribute="top" id="OPv-lm-oTj"/>
-                            <constraint firstItem="z8e-mQ-lov" firstAttribute="trailing" secondItem="90K-Ak-MHR" secondAttribute="trailing" id="dnr-pO-MME"/>
-                            <constraint firstItem="90K-Ak-MHR" firstAttribute="bottom" secondItem="z8e-mQ-lov" secondAttribute="bottom" id="kZR-ei-o7B"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" id="D53-Fi-rZA"/>
-                    <connections>
-                        <outlet property="acceptButton" destination="ctD-ho-2Qo" id="b7I-4d-syL"/>
-                        <outlet property="dataPrivacyImage" destination="FtM-jd-ZnZ" id="w4e-u3-9Cn"/>
-                        <outlet property="privacySettingsHelpText" destination="nie-WT-tde" id="Qm7-cB-NLs"/>
-                        <outlet property="privacySettingsTitle" destination="8xu-Ne-bL3" id="0j2-qh-qKS"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dpo-CR-pW3" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="14313.04347826087" y="608.70535714285711"/>
-        </scene>
         <!--Navigation Controller-->
         <scene sceneID="Zwa-9g-1qn">
             <objects>
@@ -201,35 +104,5 @@
             </objects>
             <point key="canvasLocation" x="11762" y="607"/>
         </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="VGf-bI-Gc7">
-            <objects>
-                <navigationController storyboardIdentifier="privacySettingsNavigation" automaticallyAdjustsScrollViewInsets="NO" id="no4-X5-VgN" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Cy3-8g-Mvp">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="PY5-f7-e4T" kind="relationship" relationship="rootViewController" id="KXE-g3-9nR"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="tbR-jV-rUF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="13402.898550724638" y="608.70535714285711"/>
-        </scene>
     </scenes>
-    <resources>
-        <image name="dataPrivacy" width="36" height="36"/>
-        <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-    </resources>
 </document>

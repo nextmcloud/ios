@@ -22,9 +22,10 @@
 //
 
 import Foundation
+import UIKit
 import NCCommunication
 
-public protocol NCRenameFileDelegate {
+public protocol NCRenameFileDelegate: AnyObject {
     func rename(fileName: String, fileNameNew: String)
 }
 
@@ -79,7 +80,6 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
                 ext.isEnabled = false
                 ext.textColor = .lightGray
             }
-            
             previewFile.image = imagePreview
             previewFile.layer.cornerRadius = 10
             previewFile.layer.masksToBounds = true
@@ -142,7 +142,6 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        
         textField.resignFirstResponder()
         rename(textField)
         return true
@@ -235,7 +234,6 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
                 self.dismiss(animated: true)
                 
             } else {
-                
                 NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
             }
         }

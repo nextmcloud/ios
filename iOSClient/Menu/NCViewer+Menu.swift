@@ -29,7 +29,6 @@ import NCCommunication
 extension NCViewer {
 
     func toggleMenu(viewController: UIViewController, metadata: tableMetadata, webView: Bool, imageIcon: UIImage?) {
-        
         let menuViewController = UIStoryboard.init(name: "NCMenu", bundle: nil).instantiateInitialViewController() as! NCMenu
         var actions = [NCMenuAction]()
         
@@ -43,7 +42,6 @@ extension NCViewer {
         } else {
             titleOffline = NSLocalizedString("_remove_available_offline_", comment: "")
         }
-        
         var titleDelete = NSLocalizedString("_delete_", comment: "")
         if NCManageDatabase.shared.isMetadataShareOrMounted(metadata: metadata, metadataFolder: nil) {
             titleDelete = NSLocalizedString("_leave_share_", comment: "")
@@ -52,7 +50,6 @@ extension NCViewer {
         } else {
             titleDelete = NSLocalizedString("_delete_file_", comment: "")
         }
-        
 
         let isFolderEncrypted = CCUtility.isFolderEncrypted(metadata.serverUrl, e2eEncrypted: metadata.e2eEncrypted, account: metadata.account, urlBase: metadata.urlBase)
         
@@ -63,8 +60,8 @@ extension NCViewer {
             NCMenuAction(
                 title: titleFavorite,
                 icon: NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite),
-                action: { menuAction in
-                    NCNetworking.shared.favoriteMetadata(metadata, urlBase: self.appDelegate.urlBase) { (errorCode, errorDescription) in
+                action: { _ in
+                    NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
                         if errorCode != 0 {
                             NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
                         }
@@ -166,23 +163,43 @@ extension NCViewer {
         }
         
         //
+        // CONVERSION VIDEO TO MPEG4 (MFFF Lib)
+        //
+        #if MFFFLIB
+        if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue {
+            
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_video_conversion_", comment: ""),
+                    icon: NCUtility.shared.loadImage(named: "film"),
+                    action: { menuAction in
+                        if let ncplayer = (viewController as? NCViewerMediaPage)?.currentViewController.ncplayer {
+                            ncplayer.convertVideo()
+                        }
+                    }
+                )
+            )
+        }
+        #endif
+        
+        //
         // SAVE IMAGE / VIDEO
         //
-        if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo {
-            
+        if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue {
+
             var title: String = NSLocalizedString("_save_selected_files_", comment: "")
             var icon = NCUtility.shared.loadImage(named: "save_files",color: NCBrandColor.shared.iconColor)
             let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
             if metadataMOV != nil {
                 title = NSLocalizedString("_livephoto_save_", comment: "")
-                icon = NCUtility.shared.loadImage(named: "livephoto",color: NCBrandColor.shared.iconColor)
+                icon = NCUtility.shared.loadImage(named: "livephoto")
             }
-            
+
             actions.append(
                 NCMenuAction(
                     title: title,
                     icon: icon,
-                    action: { menuAction in
+                    action: { _ in
                         if metadataMOV != nil {
                             NCFunctionCenter.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV!)
                         } else {
@@ -192,7 +209,24 @@ extension NCViewer {
                 )
             )
         }
-        
+
+        //
+        // SAVE AS SCAN
+        //
+        if #available(iOS 13.0, *) {
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml" {
+                actions.append(
+                    NCMenuAction(
+                        title: NSLocalizedString("_save_as_scan_", comment: ""),
+                        icon: NCUtility.shared.loadImage(named: "viewfinder.circle"),
+                        action: { _ in
+                            NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
+                        }
+                    )
+                )
+            }
+        }
+
         //
         // RENAME
         //
@@ -211,6 +245,7 @@ extension NCViewer {
                             
                             let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
                             
+
                             viewController.present(popup, animated: true)
                         }
                     }
@@ -315,24 +350,121 @@ extension NCViewer {
                 )
             )
         }
-        
+
+
+        //
+        // COPY
+        //
+        actions.append(
+            NCMenuAction(
+                title: NSLocalizedString("_copy_file_", comment: ""),
+                icon: NCUtility.shared.loadImage(named: "doc.on.doc"),
+                action: { _ in
+                    self.appDelegate.pasteboardOcIds = [metadata.ocId]
+                    NCFunctionCenter.shared.copyPasteboard()
+                }
+            )
+        )
+
+        //
+        // VIEW IN FOLDER
+        //
+        if !webView {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_view_in_folder_", comment: ""),
+                    icon: NCUtility.shared.loadImage(named: "arrow.forward.square"),
+                    action: { menuAction in
+                        NCFunctionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
+                    }
+                )
+            )
+        }
+
+        //
+        // DOWNLOAD IMAGE MAX RESOLUTION
+        //
+        if metadata.session == "" {
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.session == "" {
+                actions.append(
+                    NCMenuAction(
+                        title: NSLocalizedString("_download_image_max_", comment: ""),
+                        icon: NCUtility.shared.loadImage(named: "square.and.arrow.down"),
+                        action: { _ in
+                            NCNetworking.shared.download(metadata: metadata, selector: "") { _ in }
+                        }
+                    )
+                )
+            }
+        }
+
+        //
+        // PDF
+        //
+        if metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_search_", comment: ""),
+                    icon: UIImage(named: "search")!.image(color: NCBrandColor.shared.gray, size: 50),
+                    action: { _ in
+                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuSearchTextPDF)
+                    }
+                )
+            )
+
+            var title = ""
+            var icon = UIImage()
+
+            if CCUtility.getPDFDisplayDirection() == .horizontal {
+                title = NSLocalizedString("_pdf_vertical_", comment: "")
+                icon = UIImage(named: "pdf-vertical")!.image(color: NCBrandColor.shared.gray, size: 50)
+            } else {
+                title = NSLocalizedString("_pdf_horizontal_", comment: "")
+                icon = UIImage(named: "pdf-horizontal")!.image(color: NCBrandColor.shared.gray, size: 50)
+            }
+
+            actions.append(
+                NCMenuAction(
+                    title: title,
+                    icon: icon,
+                    action: { _ in
+                        if CCUtility.getPDFDisplayDirection() == .horizontal {
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.vertical])
+                        } else {
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.horizontal])
+                        }
+                    }
+                )
+            )
+
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_go_to_page_", comment: ""),
+                    icon: NCUtility.shared.loadImage(named: "repeat"),
+                    action: { _ in
+                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuGotToPageInPDF)
+                    }
+                )
+            )
+        }
+
         //
         // MODIFY
         //
         if #available(iOS 13.0, *) {
-            if !isFolderEncrypted && metadata.contentType != "image/gif" && (metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" || metadata.typeFile == NCGlobal.shared.metadataTypeFileImage) {
+            if !isFolderEncrypted && metadata.contentType != "image/gif" && (metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" || metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue) {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_modify_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "pencil.tip.crop.circle",color: NCBrandColor.shared.iconColor),
-                        action: { menuAction in
+                        icon: NCUtility.shared.loadImage(named: "pencil.tip.crop.circle"),
+                        action: { _ in
                             NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
                         }
                     )
                 )
             }
         }
-        
+
         //
         // DELETE
         //
@@ -361,15 +493,19 @@ extension NCViewer {
                 )
             )
         }
-        
-        menuViewController.actions = actions
-        
-        let menuPanelController = NCMenuPanelController()
-        menuPanelController.parentPresenter = viewController
-        menuPanelController.delegate = menuViewController
-        menuPanelController.set(contentViewController: menuViewController)
-        menuPanelController.track(scrollView: menuViewController.tableView)
+//<<<<<<< HEAD
+//        
+//        menuViewController.actions = actions
+//        
+//        let menuPanelController = NCMenuPanelController()
+//        menuPanelController.parentPresenter = viewController
+//        menuPanelController.delegate = menuViewController
+//        menuPanelController.set(contentViewController: menuViewController)
+//        menuPanelController.track(scrollView: menuViewController.tableView)
+//
+//        viewController.present(menuPanelController, animated: true, completion: nil)
+//=======
 
-        viewController.present(menuPanelController, animated: true, completion: nil)
+        viewController.presentMenu(with: actions)
     }
 }

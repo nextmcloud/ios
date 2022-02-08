@@ -25,7 +25,7 @@ import UIKit
 import TLPhotoPicker
 import MobileCoreServices
 
-//MARK: - Photo Picker
+// MARK: - Photo Picker
 
 class NCPhotosPickerViewController: NSObject {
 
@@ -38,6 +38,7 @@ class NCPhotosPickerViewController: NSObject {
     init(viewController: UIViewController, maxSelectedAssets: Int, singleSelectedMode: Bool) {
         sourceViewController = viewController
         super.init()
+
         
         self.maxSelectedAssets = maxSelectedAssets
         self.singleSelectedMode = singleSelectedMode
@@ -56,32 +57,29 @@ class NCPhotosPickerViewController: NSObject {
             }
         }
     }
-    
+
     private func openPhotosPickerViewController(completition: @escaping ([PHAsset]?) -> ()) {
         
         var selectedAssets: [PHAsset] = []
         var configure = TLPhotosPickerConfigure()
-        
         configure.cancelTitle = NSLocalizedString("_cancel_", comment: "")
         configure.doneTitle = NSLocalizedString("_done_", comment: "")
         configure.emptyMessage = NSLocalizedString("_no_albums_", comment: "")
         configure.tapHereToChange = NSLocalizedString("_tap_here_to_change_", comment: "")
-        
         if maxSelectedAssets > 0 {
             configure.maxSelectedAssets = maxSelectedAssets
         }
         configure.selectedColor = NCBrandColor.shared.brandElement
         configure.singleSelectedMode = singleSelectedMode
-
         configure.allowedAlbumCloudShared = true
         
         let viewController = customPhotoPickerViewController(withTLPHAssets: { (assets) in
-            
             for asset: TLPHAsset in assets {
                 if asset.phAsset != nil {
                     selectedAssets.append(asset.phAsset!)
                 }
             }
+
             
             completition(selectedAssets)
             
@@ -124,72 +122,58 @@ class customPhotoPickerViewController: TLPhotosPickerViewController {
 class NCDocumentPickerViewController: NSObject, UIDocumentPickerDelegate {
 
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    
     @discardableResult
     init (tabBarController: UITabBarController) {
         super.init()
-          
+
         let documentProviderMenu = UIDocumentPickerViewController(documentTypes: ["public.data"], in: .import)
-        
+
         documentProviderMenu.modalPresentationStyle = .formSheet
+        documentProviderMenu.allowsMultipleSelection = true
         documentProviderMenu.popoverPresentationController?.sourceView = tabBarController.tabBar
         documentProviderMenu.popoverPresentationController?.sourceRect = tabBarController.tabBar.bounds
         documentProviderMenu.delegate = self
-        
+
         appDelegate.window?.rootViewController?.present(documentProviderMenu, animated: true, completion: nil)
     }
-    
-    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentAt url: URL) {
-            
-        if controller.documentPickerMode == .import {
-            
-            let coordinator = NSFileCoordinator.init(filePresenter: nil)
 
-            coordinator.coordinate(readingItemAt: url, options: NSFileCoordinator.ReadingOptions.forUploading, error: nil) { (url) in
-                
-                let fileName = url.lastPathComponent
-                let serverUrl = appDelegate.activeServerUrl
-                let ocId = NSUUID().uuidString
-                let data = try? Data.init(contentsOf: url)
-                let path = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)!)
-                
-                if data != nil {
-                    
-                    do {
-                        try data?.write(to: path)
-                        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: fileName, fileNameView: fileName, ocId: ocId, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
-                        
-                        metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
-                        metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
-                        metadataForUpload.size = Int64(data?.count ?? 0)
-                        metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-                        
-                        if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: fileName) != nil {
-                            
-                            if let conflict = UIStoryboard.init(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict {
-                                
-                                conflict.serverUrl = serverUrl
-                                conflict.metadatasUploadInConflict = [metadataForUpload]
-                            
-                                appDelegate.window?.rootViewController?.present(conflict, animated: true, completion: nil)
-                            }
-                        
-                        } else {
-                            
-                            appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
-                            appDelegate.adjust.trackEvent(TriggerEvent(FileUpload.rawValue))
-                            TealiumHelper.shared.trackEvent(title: "magentacloud-app.plus.fileupload", data: ["": ""])
-                        }
-                        
-                    } catch {
-                        NCContentPresenter.shared.messageNotification("_error_", description: "_write_file_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+
+        for url in urls {
+
+            let fileName = url.lastPathComponent
+            let serverUrl = appDelegate.activeServerUrl
+            let ocId = NSUUID().uuidString
+            let atPath = url.path
+            let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)!
+
+            if NCUtilityFileSystem.shared.copyFile(atPath: atPath, toPath: toPath) {
+
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileName, fileNameView: fileName, ocId: ocId, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+
+                metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
+                metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
+                metadataForUpload.size = NCUtilityFileSystem.shared.getFileSize(filePath: toPath)
+                metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
+
+                if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: fileName) != nil {
+
+                    if let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict {
+                        conflict.delegate = appDelegate
+                        conflict.serverUrl = serverUrl
+                        conflict.metadatasUploadInConflict = [metadataForUpload]
+
+                        appDelegate.window?.rootViewController?.present(conflict, animated: true, completion: nil)
                     }
+
                 } else {
-                    NCContentPresenter.shared.messageNotification("_error_", description: "_read_file_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
+                    appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
                 }
+
+            } else {
+                NCContentPresenter.shared.messageNotification("_error_", description: "_read_file_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
             }
         }
     }
 }
-
 

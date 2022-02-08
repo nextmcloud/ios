@@ -24,6 +24,8 @@
 
 import UIKit
 import NCCommunication
+import XLForm
+
 
 // MARK: -
 
@@ -33,7 +35,6 @@ import NCCommunication
     @IBOutlet weak var indicator: UIActivityIndicatorView!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var collectionViewHeigth: NSLayoutConstraint!
-    
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
     var editorId = ""
@@ -47,7 +48,6 @@ import NCCommunication
     var titleForm = ""
     var listOfTemplate: [NCCommunicationEditorTemplates] = []
     var selectTemplate: NCCommunicationEditorTemplates?
-    
     // Layout
     let numItems = 2
     let sectionInsets: CGFloat = 10
@@ -209,6 +209,7 @@ import NCCommunication
 
         let itemWidth: CGFloat = (collectionView.frame.width - (sectionInsets * 4) - CGFloat(numItems)) / CGFloat(numItems)
         let itemHeight: CGFloat = itemWidth + highLabelName
+
         
         collectionViewHeigth.constant = itemHeight + sectionInsets
         
@@ -234,7 +235,7 @@ import NCCommunication
                 getImageFromTemplate(name: template.name, preview: template.preview, indexPath: indexPath)
             }
         }
-        
+
         // name
         let name = cell.viewWithTag(200) as! UILabel
         name.text = template.name
@@ -250,6 +251,7 @@ import NCCommunication
             cell.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
             imageSelect.isHidden = true
         }
+<<<<<<< .merge_file_DuOJIc
         
         return cell
     }
@@ -328,9 +330,9 @@ import NCCommunication
 
         self.present(navigationController, animated: true, completion: nil)
     }
-    
+
     @objc func save() {
-        
+    
         guard let selectTemplate = self.selectTemplate else {
             return
         }
@@ -379,7 +381,7 @@ import NCCommunication
                 conflictViewController.serverUrl = serverUrl
                 conflictViewController.metadatasUploadInConflict = [metadataForUpload]
                 conflictViewController.delegate = self
-                
+
                 self.present(conflictViewController, animated: true, completion: nil)
                 
             } else {
@@ -426,13 +428,12 @@ import NCCommunication
                         
                         self.dismiss(animated: true, completion: {
                             let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileName, fileNameView: fileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url ?? "", contentType: results.mimeType, livePhoto: false)
-                            
                             if let viewController = self.appDelegate.activeViewController {
                                 NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata], imageIcon: nil)
                             }
                         })
                     }
-                    
+
                 } else if errorCode != 0 {
                     NCContentPresenter.shared.messageNotification("_error_", description: errorMessage, delay: NCGlobal.shared.dismissAfterSecond, type:NCContentPresenter.messageType.error, errorCode: errorCode)
                 } else {
@@ -457,8 +458,7 @@ import NCCommunication
                             NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata], imageIcon: nil)
                         }
                    })
-                   
-                    
+
                 } else if errorCode != 0 {
                     NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
                 } else {
@@ -500,7 +500,7 @@ import NCCommunication
                         temp.ext = template.ext
                         temp.name = template.name
                         temp.preview = template.preview
-                                               
+                   
                         self.listOfTemplate.append(temp)
                                                
                         // default: template empty
@@ -528,7 +528,7 @@ import NCCommunication
                     }
                     temp.name = "Empty"
                     temp.preview = ""
-                                                                  
+                                         
                     self.listOfTemplate.append(temp)
                     
                     self.selectTemplate = temp
@@ -561,7 +561,6 @@ import NCCommunication
                         temp.type = template.type
                         
                         self.listOfTemplate.append(temp)
-                        
                         // default: template empty
                         if temp.preview == "" {
                             self.selectTemplate = temp
@@ -570,7 +569,7 @@ import NCCommunication
                         }
                     }
                 }
-                
+
                 if self.listOfTemplate.count == 0 {
                     
                     let temp = NCCommunicationEditorTemplates()
@@ -592,7 +591,7 @@ import NCCommunication
                     self.fileNameExtension = temp.ext
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
                 }
-                
+
                 self.collectionView.reloadData()
             }
         }
@@ -610,6 +609,7 @@ import NCCommunication
             
         }) { (account, etag, date, lenght, allHeaderFields, error, errorCode, errorDescription) in
             
+
             if errorCode == 0 && account == self.appDelegate.account {
                 self.collectionView.reloadItems(at: [indexPath])
             } else if errorCode != 0 {

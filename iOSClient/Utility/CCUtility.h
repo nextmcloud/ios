@@ -28,7 +28,9 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <MessageUI/MessageUI.h>
 #import <UICKeyChainStore/UICKeyChainStore.h>
+#import <UICKeyChainStore.h>
 #import <Photos/Photos.h>
+#import <PDFKit/PDFKit.h>
 
 @class tableMetadata;
 
@@ -49,6 +51,8 @@
 
 + (BOOL)getEnableTouchFaceID;
 + (void)setEnableTouchFaceID:(BOOL)set;
+
++ (BOOL)isPasscodeAtStartEnabled;
 
 + (NSString *)getGroupBySettings;
 + (void)setGroupBySettings:(NSString *)groupby;
@@ -82,7 +86,6 @@
 + (void)setOriginalFileNamePrefsChanged:(BOOL)value key:(NSString *)key;
 + (BOOL)getOriginalFileNamePrefsChanged:(NSString *)key;
 
-
 + (NSString *)getFileNameMask:(NSString *)key;
 + (void)setFileNameMask:(NSString *)mask key:(NSString *)key;
 
@@ -108,11 +111,11 @@
 + (NSString *)getEndToEndPrivateKey:(NSString *)account;
 + (void)setEndToEndPrivateKey:(NSString *)account privateKey:(NSString *)privateKey;
 
++ (NSString *)getEndToEndPublicKey:(NSString *)account;
++ (void)setEndToEndPublicKey:(NSString *)account publicKey:(NSString *)publicKey;
+
 + (NSString *)getEndToEndPassphrase:(NSString *)account;
 + (void)setEndToEndPassphrase:(NSString *)account passphrase:(NSString *)passphrase;
-
-+ (NSString *)getEndToEndPublicKeyServer:(NSString *)account;
-+ (void)setEndToEndPublicKeyServer:(NSString *)account publicKey:(NSString *)publicKey;
 
 + (BOOL)isEndToEndEnabled:(NSString *)account;
 
@@ -188,12 +191,17 @@
 + (NSInteger)getCleanUpDay;
 + (void)setCleanUpDay:(NSInteger)days;
 
++ (PDFDisplayDirection)getPDFDisplayDirection;
++ (void)setPDFDisplayDirection:(PDFDisplayDirection)direction;
+
++ (BOOL)getPrivacyScreenEnabled;
++ (void)setPrivacyScreenEnabled:(BOOL)set;
+
 // ===== Varius =====
 
 + (BOOL)addSkipBackupAttributeToItemAtURL:(NSURL *)URL;
 
 + (NSString *)getUserAgent;
-
 
 + (NSString *)dateDiff:(NSDate *)convertedDate;
 + (NSString *)transformedSize:(int64_t)value;
@@ -211,7 +219,9 @@
 + (void)createDirectoryStandard;
 
 + (NSURL *)getDirectoryGroup;
+
 + (NSString *)getStringUser:(NSString *)user urlBase:(NSString *)urlBase;
+
 + (NSString *)getDirectoryDocuments;
 + (NSString *)getDirectoryReaderMetadata;
 + (NSString *)getDirectoryAudio;

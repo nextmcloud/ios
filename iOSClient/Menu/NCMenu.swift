@@ -5,9 +5,11 @@
 //  Created by Philippe Weidmann on 16.01.20.
 //  Copyright © 2020 Philippe Weidmann. All rights reserved.
 //  Copyright © 2020 Marino Faggiana All rights reserved.
+//  Copyright © 2021 Henrik Storch All rights reserved.
 //
 //  Author Philippe Weidmann <philippe.weidmann@infomaniak.com>
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//  Author Henrik Storch <henrik.storch@nextcloud.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -29,6 +31,12 @@ import FloatingPanel
 class NCMenu: UITableViewController {
 
     var actions = [NCMenuAction]()
+    
+    static func makeNCMenu(with actions: [NCMenuAction]) -> NCMenu? {
+        let menuViewController = UIStoryboard(name: "NCMenu", bundle: nil).instantiateInitialViewController() as? NCMenu
+        menuViewController?.actions = actions
+        return menuViewController
+    }
 
     // MARK: - View Life Cycle
 
@@ -81,28 +89,33 @@ class NCMenu: UITableViewController {
         return cell
     }
 
-    // MARK: - Accessibility
-    
-    open override func accessibilityPerformEscape() -> Bool {
-        dismiss(animated: true)
-        return true
-    }
+    // MARK: - Tabel View Layout
 
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
+    }
 }
 extension NCMenu: FloatingPanelControllerDelegate {
 
-    func floatingPanel(_ vc: FloatingPanelController, layoutFor newCollection: UITraitCollection) -> FloatingPanelLayout? {
-        return NCMenuFloatingPanelLayout(height: self.actions.count * 60 + Int((UIApplication.shared.keyWindow?.rootViewController!.view.safeAreaInsets.bottom)!))
-    }
-    
-    func floatingPanel(_ vc: FloatingPanelController, behaviorFor newCollection: UITraitCollection) -> FloatingPanelBehavior? {
-        return NCMenuFloatingPanelBehavior()
+    func floatingPanel(_ fpc: FloatingPanelController, layoutFor size: CGSize) -> FloatingPanelLayout {
+        return NCMenuFloatingPanelLayout(numberOfActions: self.actions.count)
     }
 
-    func floatingPanelDidEndDecelerating(_ vc: FloatingPanelController) {
-        if vc.position == .hidden {
-            vc.dismiss(animated: false, completion: nil)
-        }
+    func floatingPanel(_ fpc: FloatingPanelController, layoutFor newCollection: UITraitCollection) -> FloatingPanelLayout {
+        return NCMenuFloatingPanelLayout(numberOfActions: self.actions.count)
+    }
+
+    func floatingPanel(_ fpc: FloatingPanelController, animatorForDismissingWith velocity: CGVector) -> UIViewPropertyAnimator {
+        return UIViewPropertyAnimator(duration: 0.1, curve: .easeInOut)
+    }
+
+    func floatingPanel(_ fpc: FloatingPanelController, animatorForPresentingTo state: FloatingPanelState) -> UIViewPropertyAnimator {
+        return UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut)
+    }
+
+    func floatingPanelWillEndDragging(_ fpc: FloatingPanelController, withVelocity velocity: CGPoint, targetState: UnsafeMutablePointer<FloatingPanelState>) {
+        guard velocity.y > 750 else { return }
+        fpc.dismiss(animated: true, completion: nil)
     }
 }
 
@@ -161,6 +174,7 @@ public class NCMenuFloatingPanelBehavior: FloatingPanelBehavior {
     }
 
 }
+
 
 class NCMenuPanelController: FloatingPanelController {
 

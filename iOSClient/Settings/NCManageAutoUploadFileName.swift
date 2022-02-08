@@ -22,6 +22,7 @@
 //
 
 
+
 import UIKit
 
 class NCManageAutoUploadFileName: XLFormViewController {
@@ -81,6 +82,7 @@ class NCManageAutoUploadFileName: XLFormViewController {
         
         row = XLFormRowDescriptor(tag: "addFileNameType", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_add_filenametype_", comment: ""))
         row.value = CCUtility.getFileNameType(NCBrandGlobal.shared.keyFileNameAutoUploadType)
+
         row.hidden = "$\("maintainOriginalFileName") == 1"
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
 

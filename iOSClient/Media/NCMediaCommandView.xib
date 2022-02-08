@@ -170,7 +170,7 @@
     <resources>
         <image name="more" width="425" height="425"/>
         <image name="plus-slash-minus" width="512" height="512"/>
-        <image name="zoomInMedia" width="24" height="24"/>
-        <image name="zoomOutMedia" width="24" height="24"/>
+        <image name="zoomInMedia" width="512" height="512"/>
+        <image name="zoomOutMedia" width="512" height="512"/>
     </resources>
 </document>

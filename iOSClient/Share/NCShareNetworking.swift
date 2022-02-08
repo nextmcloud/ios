@@ -24,28 +24,35 @@ import UIKit
 import NCCommunication
 
 class NCShareNetworking: NSObject {
-    
+
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    
+
     var urlBase: String
     weak var delegate: NCShareNetworkingDelegate?
     var view: UIView
     var metadata: tableMetadata
-    
+
     init(metadata: tableMetadata, urlBase: String, view: UIView, delegate: NCShareNetworkingDelegate?) {
         self.metadata = metadata
         self.urlBase = urlBase
         self.view = view
         self.delegate = delegate
-        
+
         super.init()
     }
-    
-    func readShare() {
-        NCUtility.shared.startActivityIndicator(backgroundView: view, blurEffect: false)
+
+    func readShare(showLoadingIndicator: Bool) {
+        if showLoadingIndicator {
+            NCUtility.shared.startActivityIndicator(backgroundView: view, blurEffect: false)
+        }
+
         let filenamePath = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, urlBase: urlBase, account: metadata.account)!
-        NCCommunication.shared.readShares(path: filenamePath) { (account, shares, errorCode, errorDescription) in
-            NCUtility.shared.stopActivityIndicator()
+        let parameter = NCCShareParameter(path: filenamePath)
+        NCCommunication.shared.readShares(parameters: parameter) { account, shares, errorCode, errorDescription in
+            if showLoadingIndicator {
+                NCUtility.shared.stopActivityIndicator()
+            }
+
              if errorCode == 0 && shares != nil {
                 NCManageDatabase.shared.addShare(urlBase: self.urlBase, account: self.metadata.account, shares: shares!)
                 self.appDelegate.shares = NCManageDatabase.shared.getTableShares(account: self.metadata.account)
@@ -61,6 +68,7 @@ class NCShareNetworking: NSObject {
         let filenamePath = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, urlBase: urlBase, account: metadata.account)!
         let options = NCCCreateShareOptions(path: filenamePath, publicUpload: false, hideDownload: false, password: password, note: nil, permissions: 1)
         NCCommunication.shared.createShare(options: options) { (account, share, errorCode, errorDescription) in
+
             NCUtility.shared.stopActivityIndicator()
             if errorCode == 0 && share != nil {
                 NCManageDatabase.shared.addShare(urlBase: self.urlBase, account: self.metadata.account, shares: [share!])
@@ -79,6 +87,7 @@ class NCShareNetworking: NSObject {
         if metadata.directory { permission = NCGlobal.shared.permissionMaxFolderShare } else { permission = NCGlobal.shared.permissionMaxFileShare }
         let options = NCCCreateShareOptions(path: filenamePath, shareType: shareType, shareWith: shareWith, password: nil, note: note, permissions: permission)
         NCCommunication.shared.createShare(options: options) { (account, share, errorCode, errorDescription) in
+
             NCUtility.shared.stopActivityIndicator()
             if errorCode == 0 && share != nil {
                 NCManageDatabase.shared.addShare(urlBase: self.urlBase, account: self.metadata.account, shares: [share!])

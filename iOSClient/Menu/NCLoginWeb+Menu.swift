@@ -27,22 +27,21 @@ import FloatingPanel
 extension NCLoginWeb {
 
     func toggleMenu() {
-        
-        let menuViewController = UIStoryboard.init(name: "NCMenu", bundle: nil).instantiateInitialViewController() as! NCMenu
+
         var actions = [NCMenuAction]()
-        
+
         let accounts = NCManageDatabase.shared.getAllAccount()
         var avatar = NCUtility.shared.loadImage(named: "person.crop.circle")
-        
-        for account in accounts {
-            
-            let title = account.user + " " + (URL(string: account.urlBase)?.host ?? "")
-            let fileNamePath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(account.user, urlBase: account.urlBase)) + "-" + account.user + ".png"
 
-            if let image = UIImage(contentsOfFile: fileNamePath) {
-                avatar = NCUtility.shared.createAvatar(image: image, size: 50)
-            }
-            
+        for account in accounts {
+
+            let title = account.user + " " + (URL(string: account.urlBase)?.host ?? "")
+
+            avatar = NCUtility.shared.loadUserImage(
+                for: account.user,
+                   displayName: account.displayName,
+                   userBaseUrl: account)
+
             actions.append(
                 NCMenuAction(
                     title: title,
@@ -51,28 +50,41 @@ extension NCLoginWeb {
                     onIcon: avatar,
                     selected: account.active == true,
                     on: account.active == true,
-                    action: { menuAction in
+                    action: { _ in
                         if self.appDelegate.account != account.account {
                             NCManageDatabase.shared.setAccountActive(account.account)
                             self.dismiss(animated: true) {
                                 self.appDelegate.settingAccount(account.account, urlBase: account.urlBase, user: account.user, userId: account.userId, password: CCUtility.getPassword(account.account))
-                                self.appDelegate.initialize()
+                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitialize)
                             }
                         }
                     }
                 )
             )
         }
-       
-        menuViewController.actions = actions
 
-        let menuPanelController = NCMenuPanelController()
-        menuPanelController.parentPresenter = self
-        menuPanelController.delegate = menuViewController
-        menuPanelController.set(contentViewController: menuViewController)
-        menuPanelController.track(scrollView: menuViewController.tableView)
+        actions.append(
+            NCMenuAction(
+                title: NSLocalizedString("_delete_active_account_", comment: ""),
+                icon: NCUtility.shared.loadImage(named: "trash", color: NCBrandColor.shared.gray),
+                onTitle: NSLocalizedString("_delete_active_account_", comment: ""),
+                onIcon: avatar,
+                selected: false,
+                on: false,
+                action: { _ in
+                    self.appDelegate.deleteAccount(self.appDelegate.account, wipe: false)
+                    self.dismiss(animated: true) {
+                        let accounts = NCManageDatabase.shared.getAllAccount()
+                        if accounts.count > 0 {
+                            self.appDelegate.changeAccount(accounts.first!.account)
+                        } else {
+                            self.appDelegate.openLogin(viewController: nil, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+                        }
+                    }
+                }
+            )
+        )
 
-        self.present(menuPanelController, animated: true, completion: nil)
+        presentMenu(with: actions)
     }
 }
-

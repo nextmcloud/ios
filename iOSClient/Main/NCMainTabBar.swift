@@ -21,7 +21,6 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 import UIKit
 
 class NCMainTabBar: UITabBar {
@@ -30,25 +29,22 @@ class NCMainTabBar: UITabBar {
     private var shapeLayer: CALayer?
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     private var timer: Timer?
-    
 
     public var menuRect: CGRect {
         get {
             let tabBarItemWidth = Int(self.frame.size.width) / (self.items?.count ?? 0)
             let rect = CGRect(x: 0, y: -5, width: tabBarItemWidth, height: Int(self.frame.size.height))
-            
             return rect
         }
     }
-    
+
     // MARK: - Life Cycle
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        
+
         appDelegate.mainTabBar = self
         timer = Timer.scheduledTimer(timeInterval: 3, target: self, selector: (#selector(updateBadgeNumber)), userInfo: nil, repeats: true)
-            
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(updateBadgeNumber), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUpdateBadgeNumber), object: nil)
 
@@ -81,7 +77,7 @@ class NCMainTabBar: UITabBar {
             self.setNeedsDisplay()
         }
     }
-        
+
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         let button = self.viewWithTag(99)
         if self.bounds.contains(point) || (button != nil && button!.frame.contains(point)) {
@@ -93,7 +89,6 @@ class NCMainTabBar: UITabBar {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        
         layer.shadowPath = createPath()
         layer.shadowRadius = 5
         layer.shadowOffset = .zero
@@ -107,7 +102,6 @@ class NCMainTabBar: UITabBar {
     }
 
     private func addShape() {
-        
         let shapeLayer = CAShapeLayer()
         shapeLayer.path = createPath()
         shapeLayer.fillColor = backgroundColor?.cgColor
@@ -123,7 +117,6 @@ class NCMainTabBar: UITabBar {
     }
     
     private func createPath() -> CGPath {
-        
         let height: CGFloat = 28
         let margin: CGFloat = 6
         let path = UIBezierPath()
@@ -141,9 +134,8 @@ class NCMainTabBar: UITabBar {
 
         return path.cgPath
     }
-    
+
     private func createButtons() {
-       
         // File
         if let item = items?[0] {
             item.title = NSLocalizedString("_home_", comment: "")
@@ -181,13 +173,12 @@ class NCMainTabBar: UITabBar {
         }
         
         // Center button
-        
         if let centerButton = self.viewWithTag(99) {
             centerButton.removeFromSuperview()
         }
         let centerButtonHeight: CGFloat = 57
         let centerButtonY: CGFloat = -28
-        
+
         let centerButton = UIButton(frame: CGRect(x: (self.bounds.width / 2)-(centerButtonHeight/2), y: centerButtonY, width: centerButtonHeight, height: centerButtonHeight))
         
         centerButton.setTitle("", for: .normal)
@@ -241,7 +232,6 @@ class NCMainTabBar: UITabBar {
             }
         }
     }
-    
     func getCenterButton() -> UIView? {
         if let centerButton = self.viewWithTag(99) {
             return centerButton

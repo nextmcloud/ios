@@ -21,12 +21,12 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 import UIKit
 import FloatingPanel
 import NCCommunication
 
 class NCSortMenu: NSObject {
+
     
     private var sortButton: UIButton?
     private var serverUrl: String = ""
@@ -49,7 +49,6 @@ class NCSortMenu: NSObject {
         
         var title = ""
         var icon = UIImage()
-        
         if layoutForView.ascending {
             title = NSLocalizedString("_order_by_name_z_a_", comment: "")
             icon = UIImage(named: "sortFileNameZA")!.image(color: NCBrandColor.shared.gray, size: 50)
@@ -71,7 +70,6 @@ class NCSortMenu: NSObject {
                 }
             )
         )
-        
         if layoutForView.ascending {
             title = NSLocalizedString("_order_by_date_more_recent_", comment: "")
             icon = UIImage(named: "sortDateMoreRecent")!.image(color: NCBrandColor.shared.gray, size: 50)
@@ -79,8 +77,7 @@ class NCSortMenu: NSObject {
             title = NSLocalizedString("_order_by_date_less_recent_", comment: "")
             icon = UIImage(named: "sortDateLessRecent")!.image(color: NCBrandColor.shared.gray, size: 50)
         }
-        
-        
+
         actions.append(
             NCMenuAction(
                 title: title,
@@ -102,7 +99,6 @@ class NCSortMenu: NSObject {
             title = NSLocalizedString("_order_by_size_largest_", comment: "")
             icon = UIImage(named: "sortLargest")!.image(color: NCBrandColor.shared.gray, size: 50)
         }
-        
         
         actions.append(
             NCMenuAction(
@@ -133,7 +129,7 @@ class NCSortMenu: NSObject {
                 )
             )
         }
-        
+
         menuViewController.actions = actions
 
         let menuPanelController = NCMenuPanelController()
@@ -149,7 +145,7 @@ class NCSortMenu: NSObject {
     func actionMenu(layoutForView: NCGlobal.layoutForViewType) {
                 
         var layoutForView = layoutForView
-        
+
         switch layoutForView.sort {
         case "fileName":
             layoutForView.titleButtonHeader = layoutForView.ascending ? "_sorted_by_name_a_z_" : "_sorted_by_name_z_a_"

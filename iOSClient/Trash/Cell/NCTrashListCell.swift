@@ -32,19 +32,16 @@ class NCTrashListCell: UICollectionViewCell {
 
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var labelInfo: UILabel!
-    
     @IBOutlet weak var imageRestore: UIImageView!
     @IBOutlet weak var imageMore: UIImageView!
 
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var buttonRestore: UIButton!
-    
     @IBOutlet weak var separator: UIView!
-
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
 
-    var delegate: NCTrashListCellDelegate?
-    
+    weak var delegate: NCTrashListCellDelegate?
+
     var objectId = ""
     var indexPath = IndexPath()
 
@@ -80,18 +77,17 @@ class NCTrashListCell: UICollectionViewCell {
             backgroundView = nil
         }
     }
-    
+
+
     func selected(_ status: Bool) {
         if status {
             imageSelect.image = NCBrandColor.cacheImages.checkedYes
-            
             let blurEffect = UIBlurEffect(style: .extraLight)
             let blurEffectView = UIVisualEffectView(effect: blurEffect)
             blurEffectView.frame = self.bounds
             blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             blurEffectView.backgroundColor = NCBrandColor.shared.brandElement.withAlphaComponent(0.2)
             backgroundView = blurEffectView
-            
         } else {
             imageSelect.image = NCBrandColor.cacheImages.checkedNo
             backgroundView = nil
@@ -99,7 +95,7 @@ class NCTrashListCell: UICollectionViewCell {
     }
 }
 
-protocol NCTrashListCellDelegate {
+protocol NCTrashListCellDelegate: AnyObject {
     func tapRestoreListItem(with objectId: String, image: UIImage?, sender: Any)
     func tapMoreListItem(with objectId: String, image: UIImage?, sender: Any)
 }

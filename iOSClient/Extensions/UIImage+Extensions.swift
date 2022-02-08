@@ -64,11 +64,11 @@ extension UIImage {
                 newSize.height = size.height
                 newSize.width = size.height * originRatio
             } else {
-                newSize.width = size.width;
+                newSize.width = size.width
                 newSize.height = size.width / originRatio
             }
         }
-        
+
         UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
         self.draw(in: CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
@@ -78,14 +78,13 @@ extension UIImage {
         }
         return self
     }
-    
+
     func fixedOrientation() -> UIImage? {
-        
+
         guard imageOrientation != UIImage.Orientation.up else {
             // This is default orientation, don't need to do anything
             return self.copy() as? UIImage
         }
-        
         guard let cgImage = self.cgImage else {
             // CGImage is not available
             return nil
@@ -112,7 +111,7 @@ extension UIImage {
         @unknown default:
             break
         }
-        
+
         // Flip image one more time if needed to, this is to prevent flipped image
         switch imageOrientation {
         case .upMirrored, .downMirrored:
@@ -136,16 +135,14 @@ extension UIImage {
             ctx.draw(cgImage, in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
             break
         }
-        
         guard let newCGImage = ctx.makeImage() else { return nil }
-        return UIImage.init(cgImage: newCGImage, scale: 1, orientation: .up)
+        return UIImage(cgImage: newCGImage, scale: 1, orientation: .up)
     }
-    
+
     @objc func image(color: UIColor, size: CGFloat) -> UIImage {
-        
+
         return autoreleasepool { () -> UIImage in
             let size = CGSize(width: size, height: size)
-            
             UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
             color.setFill()
 
@@ -161,13 +158,11 @@ extension UIImage {
 
             let newImage = UIGraphicsGetImageFromCurrentImageContext() ?? self
             UIGraphicsEndImageContext()
-            
             return newImage
         }
     }
-    
+
     func imageColor(_ color: UIColor) -> UIImage {
-                
         if #available(iOS 13.0, *) {
             return self.withTintColor(color, renderingMode: .alwaysOriginal)
         } else {
@@ -244,4 +239,57 @@ extension UIImage {
         return UIImage(cgImage: self.cgImage!, scale: 1.0, orientation: newOrientation)
     }
     
+
+    func isEqualToImage(image: UIImage?) -> Bool {
+        if image == nil { return false }
+        let data1: NSData = self.pngData()! as NSData
+        let data2: NSData = image!.pngData()! as NSData
+        return data1.isEqual(data2)
+    }
+
+    class func imageWithView(_ view: UIView) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.isOpaque, 0)
+        defer { UIGraphicsEndImageContext() }
+        view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+        return UIGraphicsGetImageFromCurrentImageContext() ?? UIImage()
+    }
+
+    func image(alpha: CGFloat) -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        draw(at: .zero, blendMode: .normal, alpha: alpha)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return newImage
+    }
+
+    /// Downsamles a image using ImageIO. Has better memory perfomance than redrawing using UIKit
+    ///
+    /// - [Source](https://swiftsenpai.com/development/reduce-uiimage-memory-footprint/)
+    /// - [Original Source, WWDC18](https://developer.apple.com/videos/play/wwdc2018/416/?time=1352)
+    /// - Parameters:
+    ///   - imageURL: The URL path of the image
+    ///   - pointSize: The target point size
+    ///   - scale: The point to pixel scale (Pixeld per point)
+    /// - Returns: The downsampled image, if successful
+    static func downsample(imageAt imageURL: URL, to pointSize: CGSize, scale: CGFloat = UIScreen.main.scale) -> UIImage? {
+
+        // Create an CGImageSource that represent an image
+        let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
+        guard let imageSource = CGImageSourceCreateWithURL(imageURL as CFURL, imageSourceOptions) else { return nil }
+
+        // Calculate the desired dimension
+        let maxDimensionInPixels = max(pointSize.width, pointSize.height) * scale
+
+        // Perform downsampling
+        let downsampleOptions = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: maxDimensionInPixels
+        ] as CFDictionary
+        guard let downsampledImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, downsampleOptions) else { return nil }
+
+        // Return the downsampled image as UIImage
+        return UIImage(cgImage: downsampledImage)
+    }
 }

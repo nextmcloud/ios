@@ -23,25 +23,45 @@
 
 import UIKit
 
-class NCGridMediaCell: UICollectionViewCell, NCImageCellProtocol {
+class NCGridMediaCell: UICollectionViewCell, NCCellProtocol {
 
     @IBOutlet weak var imageItem: UIImageView!
-
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
-
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!
-    @IBOutlet weak var imageFavorite: UIImageView!
-    @IBOutlet weak var imageLocal: UIImageView!
-    
+
+    private var objectId: String = ""
+    private var user: String = ""
+
     var date: Date?
 
-    var filePreviewImageView: UIImageView {
+    var filePreviewImageView: UIImageView? {
         get {
             return imageItem
         }
     }
-    
+    var fileAvatarImageView: UIImageView? {
+        get {
+            return nil
+        }
+    }
+    var fileObjectId: String? {
+        get {
+            return objectId
+        }
+        set {
+            objectId = newValue ?? ""
+        }
+    }
+    var fileUser: String? {
+        get {
+            return user
+        }
+        set {
+            user = newValue ?? ""
+        }
+    }
+
     override func awakeFromNib() {
         super.awakeFromNib()
         initCell()
@@ -51,19 +71,17 @@ class NCGridMediaCell: UICollectionViewCell, NCImageCellProtocol {
         super.prepareForReuse()
         initCell()
     }
-    
+
     func initCell() {
         imageItem.backgroundColor = UIColor.lightGray
         imageStatus.image = nil
-        imageLocal.image = nil
-        imageFavorite.image = nil
         imageItem.image = nil
         imageItem.layer.masksToBounds = true
         imageItem.layer.cornerRadius = 6
         imageVisualEffect.layer.cornerRadius = 6
         imageVisualEffect.clipsToBounds = true
     }
-    
+
     func selectMode(_ status: Bool) {
         if status {
             imageSelect.isHidden = false
@@ -72,7 +90,7 @@ class NCGridMediaCell: UICollectionViewCell, NCImageCellProtocol {
             imageVisualEffect.isHidden = true
         }
     }
-    
+
     func selected(_ status: Bool) {
         if status {
             imageSelect.image = NCBrandColor.cacheImages.checkedYes
@@ -84,4 +102,3 @@ class NCGridMediaCell: UICollectionViewCell, NCImageCellProtocol {
         }
     }
 }
-

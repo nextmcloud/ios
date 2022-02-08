@@ -21,16 +21,17 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 import UIKit
 import NCCommunication
 
 class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAudioPlayerDelegate, NCCreateFormUploadConflictDelegate {
-    
+
     @IBOutlet weak var buttonPlayStop: UIButton!
     @IBOutlet weak var labelTimer: UILabel!
     @IBOutlet weak var labelDuration: UILabel!
     @IBOutlet weak var progressView: UIProgressView!
+
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
     private var serverUrl = ""
     private var titleServerUrl = ""
@@ -38,12 +39,10 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     private var fileNamePath = ""
     private var durationPlayer: TimeInterval = 0
     private var counterSecondPlayer: TimeInterval = 0
-    
+
     private var audioPlayer: AVAudioPlayer!
     private var timer = Timer()
 
-    let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    
     var cellBackgoundColor = NCBrandColor.shared.secondarySystemGroupedBackground
 
     // MARK: - View Life Cycle
@@ -96,36 +95,36 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             stop()
         }
     }
-    
+
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
+
         changeTheming()
     }
-    
+
     // MARK: - Theming
-    
+
     @objc func changeTheming() {
-        
+
         view.backgroundColor = NCBrandColor.shared.systemGroupedBackground
         tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground
-        cellBackgoundColor = NCBrandColor.shared.systemGroupedBackground
-        
+        cellBackgoundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+
         tableView.reloadData()
     }
-    
+
     public func setup(serverUrl: String, fileNamePath: String, fileName: String) {
-    
-        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account) {
+
+        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account) {
             titleServerUrl = "/"
         } else {
             titleServerUrl = (serverUrl as NSString).lastPathComponent
         }
-    
+
         self.fileName = fileName
         self.serverUrl = serverUrl
         self.fileNamePath = fileNamePath
-        
+
         // player
         do {
             try audioPlayer = AVAudioPlayer(contentsOf: URL(fileURLWithPath: fileNamePath))
@@ -191,6 +190,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
         //row.cellConfig["fileNameTextField.placeholder"] = self.fileName
         //row.cellConfig["fileNameTextField.placeholderColor"] = NCBrandColor.shared.nmcGray1
+
         section.addFormRow(row)
 
         self.form = form
@@ -219,6 +219,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     }
     
     //MARK: TableViewDelegate
+
 
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
@@ -300,7 +301,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             conflictViewController.serverUrl = serverUrl
             conflictViewController.metadatasUploadInConflict = [metadataForUpload]
             conflictViewController.delegate = self
-            
+
             self.present(conflictViewController, animated: true, completion: nil)
             
         } else {
@@ -318,50 +319,50 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             }
         }
     }
-    
+
     func dismissAndUpload(_ metadata: tableMetadata) {
-        
+
         CCUtility.copyFile(atPath: self.fileNamePath, toPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
-                   
+
         appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadata])
 
         self.dismiss(animated: true, completion: nil)
     }
-    
+
     @objc func cancel() {
-        
+
         try? FileManager.default.removeItem(atPath: fileNamePath)
         self.dismiss(animated: true, completion: nil)
     }
-    
+
     @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {
-        
+
         self.deselectFormRow(sender)
-        
+
         let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
         let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
         let viewController = navigationController.topViewController as! NCSelect
-        
+
         viewController.delegate = self
         viewController.typeOfCommandView = .selectCreateFolder
         viewController.includeDirectoryE2EEncryption = true
-        
-        self.present(navigationController, animated: true, completion: nil)
 
+        self.present(navigationController, animated: true, completion: nil)
     }
-    
-    //MARK: Player - Timer
+
+    // MARK: Player - Timer
 
     func updateTimerUI() {
-        labelTimer.text =  String.init().formatSecondsToString(counterSecondPlayer)
-        labelDuration.text = String.init().formatSecondsToString(durationPlayer)
+        labelTimer.text =  String().formatSecondsToString(counterSecondPlayer)
+        labelDuration.text = String().formatSecondsToString(durationPlayer)
         progressView.progress = Float(counterSecondPlayer / durationPlayer)
     }
-    
+
     @objc func updateTimer() {
         counterSecondPlayer += 1
         updateTimerUI()
     }
+
     
     @IBAction func playStop(_ sender: Any) {
 
@@ -388,12 +389,10 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         
         audioPlayer.currentTime = 0.0
         audioPlayer.stop()
-        
         timer.invalidate()
         counterSecondPlayer = 0
         progressView.progress = 0
         updateTimerUI()
-        
         buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
     }
     
@@ -403,7 +402,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         counterSecondPlayer = 0
         progressView.progress = 0
         updateTimerUI()
-        
         buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
 
     }

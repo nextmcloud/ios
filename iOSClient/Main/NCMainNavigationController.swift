@@ -24,42 +24,41 @@
 import UIKit
 
 class NCMainNavigationController: UINavigationController {
-    
+
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
     // MARK: - View Life Cycle
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
-        
+
         changeTheming()
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
     }
-    
+
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        
+
         changeTheming()
     }
-    
+
     // MARK: - Theming
-    
+
     @objc func changeTheming() {
-        
+
         if #available(iOS 13.0, *) {
-            
+
             let appearance = UINavigationBarAppearance()
-            
+
             appearance.configureWithOpaqueBackground()
-            appearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : NCBrandColor.shared.label]
+            appearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.label]
             appearance.backgroundColor = NCBrandColor.shared.systemBackground
             appearance.configureWithOpaqueBackground()
-            appearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor : NCBrandColor.shared.label]
+            appearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.label]
             appearance.backgroundColor = NCBrandColor.shared.systemBackground
 
             navigationBar.scrollEdgeAppearance = appearance

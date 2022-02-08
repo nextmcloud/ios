@@ -23,6 +23,11 @@
 
 import UIKit
 import NCCommunication
+import JGProgressHUD
+
+enum NCShareExtensionError: Error {
+    case cancel, fileUpload, noAccount, noFiles
+}
 
 
 class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDelegate, NCRenameFileDelegate, NCAccountRequestDelegate {
@@ -34,38 +39,38 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
     @IBOutlet weak var commandView: UIView!
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var commandViewHeightConstraint: NSLayoutConstraint!
-    
     @IBOutlet weak var createFolderView: UIView!
     @IBOutlet weak var createFolderImage: UIImageView!
     @IBOutlet weak var createFolderLabel: UILabel!
-
     @IBOutlet weak var uploadView: UIView!
     @IBOutlet weak var uploadImage: UIImageView!
     @IBOutlet weak var uploadLabel: UILabel!
-    
+
     // -------------------------------------------------------------
     var serverUrl = ""
     var filesName: [String] = []
     // -------------------------------------------------------------
-        
-    private var emptyDataSet: NCEmptyDataSet?
-    private let keyLayout = NCGlobal.shared.layoutViewShareExtension
-    private var metadataFolder: tableMetadata?
-    private var networkInProgress = false
-    private var dataSource = NCDataSource()
 
-    private var layoutForView: NCGlobal.layoutForViewType?
-  
-    private var heightRowTableView: CGFloat = 50
-    private var heightCommandView: CGFloat = 170
-    
-    private var autoUploadFileName = ""
-    private var autoUploadDirectory = ""
-    
-    private let refreshControl = UIRefreshControl()
-    private var activeAccount: tableAccount!
-    private let chunckSize = CCUtility.getChunkSize() * 1000000
-    
+    var emptyDataSet: NCEmptyDataSet?
+    let keyLayout = NCGlobal.shared.layoutViewShareExtension
+    var metadataFolder: tableMetadata?
+    var networkInProgress = false
+    var dataSource = NCDataSource()
+    var layoutForView: NCGlobal.layoutForViewType?
+    let heightRowTableView: CGFloat = 50
+    let heightCommandView: CGFloat = 170
+    var autoUploadFileName = ""
+    var autoUploadDirectory = ""
+    let refreshControl = UIRefreshControl()
+    var activeAccount: tableAccount!
+    let chunckSize = CCUtility.getChunkSize() * 1000000
+    var progress: CGFloat = 0
+    var counterUploaded: Int = 0
+    var uploadErrors: [tableMetadata] = []
+    var uploadMetadata: [tableMetadata] = []
+    var uploadStarted = false
+    let hud = JGProgressHUD()
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -82,7 +87,7 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
         refreshControl.tintColor = NCBrandColor.shared.brandText
         refreshControl.backgroundColor = NCBrandColor.shared.systemBackground
         refreshControl.addTarget(self, action: #selector(reloadDatasource), for: .valueChanged)
-        
+
         // Command view
         commandView.backgroundColor = NCBrandColor.shared.secondarySystemBackground
         separatorView.backgroundColor = NCBrandColor.shared.separator
@@ -93,7 +98,7 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
         tableView.layer.cornerRadius = 10
         tableView.tableFooterView = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 0, height: 1)))
         commandViewHeightConstraint.constant = heightCommandView
-        
+
         // Create folder
         createFolderView.layer.cornerRadius = 10
         createFolderImage.image = NCUtility.shared.loadImage(named: "folder.badge.plus", color: NCBrandColor.shared.label)
@@ -108,12 +113,12 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
         uploadLabel.textColor = NCBrandColor.shared.customer
         let uploadGesture = UITapGestureRecognizer(target: self, action:  #selector(actionUpload))
         uploadView.addGestureRecognizer(uploadGesture)
-                
+
         // LOG
         let levelLog = CCUtility.getLogLevel()
         let isSimulatorOrTestFlight = NCUtility.shared.isSimulatorOrTestFlight()
         let versionNextcloudiOS = String(format: NCBrandOptions.shared.textCopyrightNextcloudiOS, NCUtility.shared.getVersionApp())
-        
+
         NCCommunicationCommon.shared.levelLog = levelLog
         if let pathDirectoryGroup = CCUtility.getDirectoryGroup()?.path {
             NCCommunicationCommon.shared.pathLog = pathDirectoryGroup
@@ -123,6 +128,13 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
         } else {
             NCCommunicationCommon.shared.writeLog("Start session with level \(levelLog) " + versionNextcloudiOS)
         }
+        
+        hud.indicatorView = JGProgressHUDRingIndicatorView()
+        if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
+            indicatorView.ringWidth = 1.5
+        }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(triggerProgressTask(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterProgressTask), object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -175,7 +187,6 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        
         coordinator.animate(alongsideTransition: nil) { _ in
             self.collectionView?.collectionViewLayout.invalidateLayout()
         }
@@ -1006,4 +1017,73 @@ class NCShareExtensionButtonWithIndexPath: UIButton {
     var indexPath:IndexPath?
     var fileName: String?
     var image: UIImage?
+
+    // MARK: -
+
+    func cancel(with error: NCShareExtensionError) {
+        // make sure no uploads are continued
+        uploadStarted = false
+        extensionContext?.cancelRequest(withError: error)
+    }
+
+    func showAlert(title: String = "_error_", description: String, onDismiss: (() -> Void)? = nil) {
+        let alertController = UIAlertController(title: NSLocalizedString(title, comment: ""), message: NSLocalizedString(description, comment: ""), preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in
+            onDismiss?()
+        }))
+        self.present(alertController, animated: true)
+    }
+
+    @objc func triggerProgressTask(_ notification: NSNotification) {
+        guard let progress = notification.userInfo?["progress"] as? Float else { return }
+        hud.progress = progress
+    }
+}
+
+// MARK: - Upload
+extension NCShareExtension {
+    
+    func upload() {
+        guard uploadStarted else { return }
+        guard uploadMetadata.count > counterUploaded else { return finishedUploading() }
+        let metadata = uploadMetadata[counterUploaded]
+
+        // E2EE
+        metadata.e2eEncrypted = CCUtility.isFolderEncrypted(metadata.serverUrl, e2eEncrypted: metadata.e2eEncrypted, account: metadata.account, urlBase: metadata.urlBase)
+        // CHUNCK
+        metadata.chunk = chunckSize != 0 && metadata.size > chunckSize
+
+        hud.textLabel.text = NSLocalizedString("_upload_file_", comment: "") + " \(counterUploaded + 1) " + NSLocalizedString("_of_", comment: "") + " \(filesName.count)"
+        hud.progress = 0
+        hud.show(in: self.view)
+        
+        NCNetworking.shared.upload(metadata: metadata) { } completion: { errorCode, _ in
+            if errorCode == 0 {
+                self.counterUploaded += 1
+                self.upload()
+            } else {
+                let path = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId)!
+                NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
+                NCManageDatabase.shared.deleteChunks(account: metadata.account, ocId: metadata.ocId)
+                NCUtilityFileSystem.shared.deleteFile(filePath: path)
+                self.uploadErrors.append(metadata)
+            }
+        }
+    }
+
+    func finishedUploading() {
+        uploadStarted = false
+        if !uploadErrors.isEmpty {
+            let fileList = "- " + uploadErrors.map({ $0.fileName }).joined(separator: "\n  - ")
+            showAlert(title: "_error_files_upload_", description: fileList) {
+                self.extensionContext?.cancelRequest(withError: NCShareExtensionError.fileUpload)
+            }
+        } else {
+            hud.indicatorView = JGProgressHUDSuccessIndicatorView()
+            hud.textLabel.text = NSLocalizedString("_success_", comment: "")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self.extensionContext?.completeRequest(returningItems: self.extensionContext?.inputItems, completionHandler: nil)
+            }
+        }
+    }
 }

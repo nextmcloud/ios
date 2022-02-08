@@ -24,35 +24,36 @@
 import UIKit
 import NCCommunication
 import Queuer
+import JGProgressHUD
 
 @objc class NCFunctionCenter: NSObject, UIDocumentInteractionControllerDelegate, NCSelectDelegate {
+  
     @objc public static let shared: NCFunctionCenter = {
         let instance = NCFunctionCenter()
-        
         NotificationCenter.default.addObserver(instance, selector: #selector(downloadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
         NotificationCenter.default.addObserver(instance, selector: #selector(uploadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadedFile), object: nil)
-        
+
         return instance
     }()
-    
+
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var viewerQuickLook: NCViewerQuickLook?
     var documentController: UIDocumentInteractionController?
-    
-    //MARK: - Download
+
+    // MARK: - Download
 
     @objc func downloadedFile(_ notification: NSNotification) {
-            
+
         if let userInfo = notification.userInfo as NSDictionary? {
             if let ocId = userInfo["ocId"] as? String, let selector = userInfo["selector"] as? String, let errorCode = userInfo["errorCode"] as? Int, let errorDescription = userInfo["errorDescription"] as? String, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                
+
                 if metadata.account != appDelegate.account { return }
-                
+
                 if errorCode == 0 {
-                    
+
                     switch selector {
                     case NCGlobal.shared.selectorLoadFileQuickLook:
-                        
+
                         let fileNamePath = NSTemporaryDirectory() + metadata.fileNameView
                         CCUtility.copyFile(atPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView), toPath: fileNamePath)
 
@@ -60,130 +61,132 @@ import Queuer
                         if #available(iOS 13.0, *) {
                             editingMode = true
                         }
-                        
+
                         let viewerQuickLook = NCViewerQuickLook(with: URL(fileURLWithPath: fileNamePath), editingMode: editingMode, metadata: metadata)
                         let navigationController = UINavigationController(rootViewController: viewerQuickLook)
                         navigationController.modalPresentationStyle = .overFullScreen
-                        
+
                         self.appDelegate.window?.rootViewController?.present(navigationController, animated: true)
-                        
+
                     case NCGlobal.shared.selectorLoadFileView:
-                        
+
                         if UIApplication.shared.applicationState == UIApplication.State.active {
-                                                        
+
                             if metadata.contentType.contains("opendocument") && !NCUtility.shared.isRichDocument(metadata) {
-                                
-                                self.openDocumentController(metadata: metadata)
-                                
-                            } else if metadata.typeFile == NCGlobal.shared.metadataTypeFileCompress || metadata.typeFile == NCGlobal.shared.metadataTypeFileUnknown {
 
                                 self.openDocumentController(metadata: metadata)
-                                
-                            } else if metadata.typeFile == NCGlobal.shared.metadataTypeFileImagemeter {
-                                
+
+                            } else if metadata.classFile == NCCommunicationCommon.typeClassFile.compress.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.unknow.rawValue {
+
                                 self.openDocumentController(metadata: metadata)
-                                
+
                             } else {
-                                
+
                                 if let viewController = self.appDelegate.activeViewController {
                                     let imageIcon = UIImage(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag))
                                     NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata], imageIcon: imageIcon)
                                 }
                             }
                         }
-                        
+
                     case NCGlobal.shared.selectorOpenIn:
-                        
+
                         if UIApplication.shared.applicationState == UIApplication.State.active {
-                            
+
                             self.openDocumentController(metadata: metadata)
                         }
-                        
+
                     case NCGlobal.shared.selectorLoadCopy:
-                        
+
                         copyPasteboard()
-                        
+
                     case NCGlobal.shared.selectorLoadOffline:
-                        
+
                         NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: true)
-                       
+
                     case NCGlobal.shared.selectorPrint:
-                        
+
                         printDocument(metadata: metadata)
-                        
+
                     case NCGlobal.shared.selectorSaveAlbum:
-                        
+
                         saveAlbum(metadata: metadata)
-                       
+
                     case NCGlobal.shared.selectorSaveBackground:
-                        
+
                         saveBackground(metadata: metadata)
-                        
+
                     case NCGlobal.shared.selectorSaveAlbumLivePhotoIMG, NCGlobal.shared.selectorSaveAlbumLivePhotoMOV:
-                        
+
                         var metadata = metadata
                         var metadataMOV = metadata
                         guard let metadataTMP = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) else { break }
-                        
+
                         if selector == NCGlobal.shared.selectorSaveAlbumLivePhotoIMG {
                             metadataMOV = metadataTMP
                         }
-                        
+
                         if selector == NCGlobal.shared.selectorSaveAlbumLivePhotoMOV {
                             metadata = metadataTMP
                         }
-                            
+
                         if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
-                            saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV, progressView: nil, viewActivity: self.appDelegate.window?.rootViewController?.view)
+                            saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV)
                         }
-                    
+
                     case NCGlobal.shared.selectorSaveAsScan:
-                        
+
                         saveAsScan(metadata: metadata)
-                        
+
+                    case NCGlobal.shared.selectorOpenDetail:
+
+                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterOpenMediaDetail, userInfo: ["ocId": metadata.ocId])
+
                     default:
-                        
+
                         break
                     }
-                            
+
                 } else {
-                    
+
                     // File do not exists on server, remove in local
-                    if (errorCode == NCGlobal.shared.errorResourceNotFound || errorCode == NCGlobal.shared.errorBadServerResponse) {
-                        
+                    if errorCode == NCGlobal.shared.errorResourceNotFound || errorCode == NCGlobal.shared.errorBadServerResponse {
+
                         do {
                             try FileManager.default.removeItem(atPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId))
                         } catch { }
-                        
+
                         NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
                         NCManageDatabase.shared.deleteLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
-                        
+
                     } else {
-                        
-                        NCContentPresenter.shared.messageNotification("_download_file_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+
+                        NCContentPresenter.shared.messageNotification("_download_file_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode, priority: .max)
                     }
                 }
             }
         }
     }
-    
-    //MARK: - Upload
+
+
+    // MARK: - Upload
 
     @objc func uploadedFile(_ notification: NSNotification) {
-    
+
         if let userInfo = notification.userInfo as NSDictionary? {
             if let ocId = userInfo["ocId"] as? String, let errorCode = userInfo["errorCode"] as? Int, let errorDescription = userInfo["errorDescription"] as? String, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                
+
                 if metadata.account == appDelegate.account {
                     if errorCode != 0 {
                         if errorCode != -999 && errorDescription != "" {
-                            NCContentPresenter.shared.messageNotification("_upload_file_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                            NCContentPresenter.shared.messageNotification("_upload_file_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode, priority: .max)
                         }
                     }
                 }
             }
         }
     }
+
     
     // MARK: -
 
@@ -282,25 +285,24 @@ import Queuer
         let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
         let fileNameDestination = CCUtility.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, keyFileName: NCGlobal.shared.keyFileNameMask, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal, forcedNewFileName: true)!
         let fileNamePathDestination = CCUtility.getDirectoryScan() + "/" + fileNameDestination
-        
         NCUtilityFileSystem.shared.copyFile(atPath: fileNamePath, toPath: fileNamePathDestination)
-        
+
         let storyboard = UIStoryboard(name: "Scan", bundle: nil)
         let navigationController = storyboard.instantiateInitialViewController()!
-        
+
         navigationController.modalPresentationStyle = UIModalPresentationStyle.pageSheet
-        
+
         appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
     }
-    
+
     // MARK: - Print
-    
+
     func printDocument(metadata: tableMetadata) {
-    
+
         let fileNameURL = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!)
-        
+
         if UIPrintInteractionController.canPrint(fileNameURL) {
-            
+
             let printInfo = UIPrintInfo(dictionary: nil)
             printInfo.jobName = fileNameURL.lastPathComponent
             printInfo.outputType = .photo
@@ -312,93 +314,106 @@ import Queuer
             printController.present(animated: true, completionHandler: nil)
         }
     }
-    
+
     // MARK: - Save photo
-    
+
     func saveAlbum(metadata: tableMetadata) {
-        
+
         let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
         let status = PHPhotoLibrary.authorizationStatus()
 
-        if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage && status == PHAuthorizationStatus.authorized {
-            
-            if let image = UIImage.init(contentsOfFile: fileNamePath) {
-                UIImageWriteToSavedPhotosAlbum(image, self, #selector(SaveAlbum(_:didFinishSavingWithError:contextInfo:)), nil)
+        if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && status == PHAuthorizationStatus.authorized {
+
+            if let image = UIImage(contentsOfFile: fileNamePath) {
+                UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveAlbum(_:didFinishSavingWithError:contextInfo:)), nil)
             } else {
                 NCContentPresenter.shared.messageNotification("_save_selected_files_", description: "_file_not_saved_cameraroll_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
             }
-            
-        } else if metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo && status == PHAuthorizationStatus.authorized {
-            
+
+        } else if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue && status == PHAuthorizationStatus.authorized {
+
             if UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(fileNamePath) {
-                UISaveVideoAtPathToSavedPhotosAlbum(fileNamePath, self, #selector(SaveAlbum(_:didFinishSavingWithError:contextInfo:)), nil)
+                UISaveVideoAtPathToSavedPhotosAlbum(fileNamePath, self, #selector(saveAlbum(_:didFinishSavingWithError:contextInfo:)), nil)
             } else {
                 NCContentPresenter.shared.messageNotification("_save_selected_files_", description: "_file_not_saved_cameraroll_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
             }
-            
+
         } else if status != PHAuthorizationStatus.authorized {
-            
+
             NCContentPresenter.shared.messageNotification("_access_photo_not_enabled_", description: "_access_photo_not_enabled_msg_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
         }
     }
-    
-    @objc private func SaveAlbum(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        
+
+    @objc private func saveAlbum(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+
         if error != nil {
             NCContentPresenter.shared.messageNotification("_save_selected_files_", description: "_file_not_saved_cameraroll_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
         }
     }
-    
+
+
     func saveLivePhoto(metadata: tableMetadata, metadataMOV: tableMetadata) {
-        
+
         if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
             NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbumLivePhotoIMG)
         }
-        
+
         if !CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
             NCOperationQueue.shared.download(metadata: metadataMOV, selector: NCGlobal.shared.selectorSaveAlbumLivePhotoMOV)
         }
-        
+
         if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
-            saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV, progressView: nil, viewActivity: self.appDelegate.window?.rootViewController?.view)
+            saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV)
         }
     }
-    
-    func saveLivePhotoToDisk(metadata: tableMetadata, metadataMov: tableMetadata, progressView: UIProgressView?, viewActivity: UIView?) {
-        
+
+    func saveLivePhotoToDisk(metadata: tableMetadata, metadataMov: tableMetadata) {
+
         let fileNameImage = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!)
         let fileNameMov = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadataMov.ocId, fileNameView: metadataMov.fileNameView)!)
+        let hud = JGProgressHUD()
         
-        if let view = viewActivity {
-            NCUtility.shared.startActivityIndicator(backgroundView: view, blurEffect: true)
+        hud.indicatorView = JGProgressHUDRingIndicatorView()
+        if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
+            indicatorView.ringWidth = 1.5
         }
+        hud.show(in: (appDelegate.window?.rootViewController?.view)!)
+        hud.textLabel.text = NSLocalizedString("_saving_", comment: "")
         
         NCLivePhoto.generate(from: fileNameImage, videoURL: fileNameMov, progress: { progress in
-            DispatchQueue.main.async {
-                progressView?.progress = Float(progress)
-            }
-        }, completion: { livePhoto, resources in
-            NCUtility.shared.stopActivityIndicator()
-            progressView?.progress = 0
+            
+            hud.progress = Float(progress)
+
+        }, completion: { _, resources in
+
             if resources != nil {
-                NCLivePhoto.saveToLibrary(resources!) { (result) in
-                    if !result {
-                        NCContentPresenter.shared.messageNotification("_error_", description: "_livephoto_save_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
+                NCLivePhoto.saveToLibrary(resources!) { result in
+                    DispatchQueue.main.async {
+                        if !result {
+                            hud.indicatorView = JGProgressHUDErrorIndicatorView()
+                            hud.textLabel.text = NSLocalizedString("_livephoto_save_error_", comment: "")
+                        } else {
+                            hud.indicatorView = JGProgressHUDSuccessIndicatorView()
+                            hud.textLabel.text = NSLocalizedString("_success_", comment: "")
+                        }
+                        hud.dismiss(afterDelay: 1)
                     }
                 }
             } else {
-                NCContentPresenter.shared.messageNotification("_error_", description: "_livephoto_save_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
+                hud.indicatorView = JGProgressHUDErrorIndicatorView()
+                hud.textLabel.text = NSLocalizedString("_livephoto_save_error_", comment: "")
+                hud.dismiss(afterDelay: 1)
             }
         })
     }
-    
+
     func saveBackground(metadata: tableMetadata) {
-        
+
         let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
         let destination = CCUtility.getDirectoryGroup().appendingPathComponent(NCGlobal.shared.appBackground).path + "/" + metadata.fileNameView
-        
+
         if NCUtilityFileSystem.shared.copyFile(atPath: fileNamePath, toPath: destination) {
-            
+
             if appDelegate.activeViewController is NCCollectionViewCommon {
                 let viewController: NCCollectionViewCommon = appDelegate.activeViewController as! NCCollectionViewCommon
                 let layoutKey = viewController.layoutKey
@@ -410,209 +425,121 @@ import Queuer
             }
         }
     }
-    
+
+
     // MARK: - Copy & Paste
-    
+
     func copyPasteboard() {
-        
+
         var metadatas: [tableMetadata] = []
-        var items = [[String : Any]]()
-        
+        var items = [[String: Any]]()
+
         for ocId in appDelegate.pasteboardOcIds {
             if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
                 metadatas.append(metadata)
             }
         }
-        
+
         for metadata in metadatas {
-            
+
             if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                 do {
                     // Get Data
-                    let data = try Data.init(contentsOf: URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)))
+                    let data = try Data(contentsOf: URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)))
                     // Pasteboard item
                     if let unmanagedFileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (metadata.fileNameView as NSString).pathExtension as CFString, nil) {
                         let fileUTI = unmanagedFileUTI.takeRetainedValue() as String
-                        items.append([fileUTI:data])
+                        items.append([fileUTI: data])
                     }
                 } catch {
                     print("error")
                 }
             } else {
-                NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorLoadCopy) { (_) in }
+                NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorLoadCopy) { _ in }
             }
         }
-        
+
         UIPasteboard.general.setItems(items, options: [:])
     }
 
     func pastePasteboard(serverUrl: String) {
-    
+
         var pasteboardTypes: [String] = []
-        
-        func upload(pasteboardType : String?, data: Data?) -> Bool {
-            
+
+        func upload(pasteboardType: String?, data: Data?) -> Bool {
+
             guard let data = data else { return false}
             guard let pasteboardType = pasteboardType else { return false }
-            
-            let results = NCCommunicationCommon.shared.getDescriptionFile(inUTI: pasteboardType as CFString)
-            if results.resultExtension == "" { return false }
-            if results.resultTypeFile != NCCommunicationCommon.typeFile.unknow.rawValue {
+
+            let results = NCCommunicationCommon.shared.getFileProperties(inUTI: pasteboardType as CFString)
+            if results.ext == "" { return false }
+
+            do {
+                let fileName = results.name + "_" + CCUtility.getIncrementalNumber() + "." + results.ext
+                let serverUrlFileName = serverUrl + "/" + fileName
+                let ocIdUpload = UUID().uuidString
+                let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(ocIdUpload, fileNameView: fileName)!
+                try data.write(to: URL(fileURLWithPath: fileNameLocalPath))
+                let hud = JGProgressHUD()
                 
-                do {
-                    let fileName = results.resultFilename + "_" + CCUtility.getIncrementalNumber() + "." + results.resultExtension
-                    let serverUrlFileName = serverUrl + "/" + fileName
-                    let ocIdUpload = UUID().uuidString
-                    let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(ocIdUpload, fileNameView: fileName)!
-                    try data.write(to: URL(fileURLWithPath: fileNameLocalPath))
-                   
-                    NCUtility.shared.startActivityIndicator(backgroundView: nil, blurEffect: true)
-                    NCCommunication.shared.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath) { account, ocId, etag, date, size, allHeaderFields, errorCode, errorDescription in
-                        if errorCode == 0 && etag != nil && ocId != nil {
-                            let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId!, fileNameView: fileName)!
-                            NCUtilityFileSystem.shared.moveFile(atPath: fileNameLocalPath, toPath: toPath)
-                            NCManageDatabase.shared.addLocalFile(account: account, etag: etag!, ocId: ocId!, fileName: fileName)
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSourceNetworkForced, userInfo: ["serverUrl": serverUrl])
-                        } else {
-                            NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode, forced: false)
-                        }
-                        NCUtility.shared.stopActivityIndicator()
-                    }
-                } catch {
-                    return false
+                hud.indicatorView = JGProgressHUDRingIndicatorView()
+                if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
+                    indicatorView.ringWidth = 1.5
                 }
+                hud.show(in: (appDelegate.window?.rootViewController?.view)!)
+                hud.textLabel.text = fileName
+
+                NCCommunication.shared.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath) { _ in
+                } progressHandler: { progress in
+                    hud.progress = Float(progress.fractionCompleted)
+                } completionHandler: { account, ocId, etag, _, _, _, errorCode, errorDescription in
+                    if errorCode == 0 && etag != nil && ocId != nil {
+                        let toPath = CCUtility.getDirectoryProviderStorageOcId(ocId!, fileNameView: fileName)!
+                        NCUtilityFileSystem.shared.moveFile(atPath: fileNameLocalPath, toPath: toPath)
+                        NCManageDatabase.shared.addLocalFile(account: account, etag: etag!, ocId: ocId!, fileName: fileName)
+                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSourceNetworkForced, userInfo: ["serverUrl": serverUrl])
+                        hud.indicatorView = JGProgressHUDSuccessIndicatorView()
+                        hud.textLabel.text = NSLocalizedString("_success_", comment: "")
+                    } else {
+                        hud.indicatorView = JGProgressHUDErrorIndicatorView()
+                        hud.textLabel.text = NSLocalizedString(errorDescription, comment: "")
+                    }
+                    hud.dismiss(afterDelay: 1)
+                }
+            } catch {
+                return false
             }
             return true
         }
-                
+
         for (index, items) in UIPasteboard.general.items.enumerated() {
 
             for item in items { pasteboardTypes.append(item.key) }
-            
-            // image
-            var filter = pasteboardTypes.filter({ UTTypeConformsTo($0 as CFString, kUTTypeImage) })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first) { continue }
-            }
 
-            // movie
-            filter = pasteboardTypes.filter({ UTTypeConformsTo($0 as CFString, kUTTypeMovie) })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // audio
-            filter = pasteboardTypes.filter({ UTTypeConformsTo($0 as CFString, kUTTypeAudio) })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // PDF
-            filter = pasteboardTypes.filter({ UTTypeConformsTo($0 as CFString, kUTTypePDF) })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // ARCHIVE
-            filter = pasteboardTypes.filter({ UTTypeConformsTo($0 as CFString, kUTTypeZipArchive) })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // DOCX
-            filter = pasteboardTypes.filter({ $0 == "org.openxmlformats.wordprocessingml.document" })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // DOC
-            filter = pasteboardTypes.filter({ $0 == "com.microsoft.word.doc" })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // PAGES
-            filter = pasteboardTypes.filter({ $0 == "com.apple.iwork.pages.pages" })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // XLSX
-            filter = pasteboardTypes.filter({ $0 == "org.openxmlformats.spreadsheetml.sheet" })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // XLS
-            filter = pasteboardTypes.filter({ $0 == "com.microsoft.excel.xls" })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // NUMBERS
-            filter = pasteboardTypes.filter({ $0 == "com.apple.iwork.numbers.numbers" })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // PPTX
-            filter = pasteboardTypes.filter({ $0 == "org.openxmlformats.presentationml.presentation" })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // PPT
-            filter = pasteboardTypes.filter({ $0 == "com.microsoft.powerpoint.ppt" })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // KEYNOTE
-            filter = pasteboardTypes.filter({ $0 == "com.apple.iwork.keynote.key" })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // MARKDOWN
-            filter = pasteboardTypes.filter({ $0 == "net.daringfireball.markdown" })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // RTF
-            filter = pasteboardTypes.filter({ UTTypeConformsTo($0 as CFString, kUTTypeRTF) })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            // TEXT
-            filter = pasteboardTypes.filter({ UTTypeConformsTo($0 as CFString, kUTTypeText) })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
-            }
-            
-            //HTML
-            filter = pasteboardTypes.filter({ UTTypeConformsTo($0 as CFString, kUTTypeHTML) })
-            if filter.count > 0 {
-                if upload(pasteboardType: filter.first, data: UIPasteboard.general.data(forPasteboardType: filter.first!, inItemSet: IndexSet([index]))?.first)  { continue }
+            for typeIdentifier in pasteboardTypes {
+                let data = UIPasteboard.general.data(forPasteboardType: typeIdentifier, inItemSet: IndexSet([index]))?.first
+                if upload(pasteboardType: typeIdentifier, data: data) {
+                    continue
+                }
             }
         }
     }
-    
+
     // MARK: -
-    
+
     func openFileViewInFolder(serverUrl: String, fileName: String) {
-        
+
         let viewController = UIStoryboard(name: "NCFileViewInFolder", bundle: nil).instantiateInitialViewController() as! NCFileViewInFolder
-        let navigationController = UINavigationController.init(rootViewController: viewController)
+        let navigationController = UINavigationController(rootViewController: viewController)
 
         let topViewController = viewController
         var listViewController = [NCFileViewInFolder]()
         var serverUrl = serverUrl
-        let homeUrl = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account)
-        
+
+        let homeUrl = NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account)
+
         while true {
-            
+
             var viewController: NCFileViewInFolder?
             if serverUrl != homeUrl {
                 viewController = UIStoryboard(name: "NCFileViewInFolder", bundle: nil).instantiateInitialViewController() as? NCFileViewInFolder
@@ -624,30 +551,30 @@ import Queuer
                 viewController = topViewController
             }
             guard let vc = viewController else { return }
-            
+
             vc.serverUrl = serverUrl
             vc.fileName = fileName
-            
+
             vc.navigationItem.backButtonTitle = vc.titleCurrentFolder
             listViewController.insert(vc, at: 0)
-            
+
             if serverUrl != homeUrl {
-                serverUrl = NCUtilityFileSystem.shared.deletingLastPathComponent(serverUrl: serverUrl, urlBase: appDelegate.urlBase, account: appDelegate.account)
+                serverUrl = NCUtilityFileSystem.shared.deletingLastPathComponent(account: appDelegate.account, serverUrl: serverUrl)
             } else {
                 break
             }
         }
-        
+
         navigationController.setViewControllers(listViewController, animated: false)
         navigationController.modalPresentationStyle = .formSheet
-        
+
         appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
     }
-    
+
     // MARK: - NCSelect + Delegate
-    
+
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
-        if (serverUrl != nil && items.count > 0) {
+        if serverUrl != nil && items.count > 0 {
             if copy {
                 for metadata in items as! [tableMetadata] {
                     NCOperationQueue.shared.copyMove(metadata: metadata, serverUrl: serverUrl!, overwrite: overwrite, move: false)
@@ -661,19 +588,19 @@ import Queuer
     }
 
     func openSelectView(items: [Any], viewController: UIViewController) {
-        
-        let navigationController = UIStoryboard.init(name: "NCSelect", bundle: nil).instantiateInitialViewController() as! UINavigationController
+
+        let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as! UINavigationController
         let topViewController = navigationController.topViewController as! NCSelect
         var listViewController = [NCSelect]()
-        
+
         var copyItems: [Any] = []
         for item in items {
             copyItems.append(item)
         }
-        
-        let homeUrl = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account)
+
+        let homeUrl = NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account)
         var serverUrl = (copyItems[0] as! Nextcloud.tableMetadata).serverUrl
-        
+
         // Setup view controllers such that the current view is of the same directory the items to be copied are in
         while true {
             // If not in the topmost directory, create a new view controller and set correct title.
@@ -694,28 +621,28 @@ import Queuer
             vc.typeOfCommandView = .copyMove
             vc.items = copyItems
             vc.serverUrl = serverUrl
-            
+
             vc.navigationItem.backButtonTitle = vc.titleCurrentFolder
             listViewController.insert(vc, at: 0)
-            
+
             if serverUrl != homeUrl {
-                serverUrl = NCUtilityFileSystem.shared.deletingLastPathComponent(serverUrl: serverUrl, urlBase: appDelegate.urlBase, account: appDelegate.account)
+                serverUrl = NCUtilityFileSystem.shared.deletingLastPathComponent(account: appDelegate.account, serverUrl: serverUrl)
             } else {
                 break
             }
         }
-        
+
         navigationController.setViewControllers(listViewController, animated: false)
         navigationController.modalPresentationStyle = .formSheet
-        
+
         viewController.present(navigationController, animated: true, completion: nil)
     }
-    
+
     // MARK: - Context Menu Configuration
-    
+
     @available(iOS 13.0, *)
     func contextMenuConfiguration(ocId: String, viewController: UIViewController, enableDeleteLocal: Bool, enableViewInFolder: Bool, image: UIImage?) -> UIMenu {
-        
+
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else {
             return UIMenu()
         }
@@ -752,6 +679,7 @@ import Queuer
         }
         
         let offline = UIAction(title: titleOffline, image: UIImage(systemName: "tray.and.arrow.down")) { action in
+
             if isOffline {
                 if metadata.directory {
                     NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, offline: false, account: self.appDelegate.account)
@@ -774,7 +702,7 @@ import Queuer
                 (viewController as! NCCollectionViewCommon).reloadDataSource()
             }
         }
-        
+
         let save = UIAction(title: titleSave, image: UIImage(systemName: "square.and.arrow.down")) { action in
             if metadataMOV != nil {
                 self.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV!)
@@ -794,7 +722,7 @@ import Queuer
                 NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveBackground)
             }
         }
-        
+
         let viewInFolder = UIAction(title: NSLocalizedString("_view_in_folder_", comment: ""), image: UIImage(systemName: "arrow.forward.square")) { action in
             self.openFileViewInFolder(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
         }
@@ -824,7 +752,6 @@ import Queuer
         let rename = UIAction(title: NSLocalizedString("_rename_", comment: ""), image: UIImage(systemName: "pencil")) { action in
             
             if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
-                
                 vcRename.metadata = metadata
                 vcRename.imagePreview = image
 
@@ -850,6 +777,7 @@ import Queuer
                 }
             }
         }
+
         
         let deleteConfirmLocal = UIAction(title: NSLocalizedString("_remove_local_file_", comment: ""), image: UIImage(systemName: "trash"), attributes: .destructive) { action in
             NCNetworking.shared.deleteMetadata(metadata, account: self.appDelegate.account, urlBase: self.appDelegate.urlBase, onlyLocal: true) { (errorCode, errorDescription) in
@@ -907,7 +835,7 @@ import Queuer
                 children.insert(saveBackground, at: children.count-1)
             }
         }
-        
+
         let submenu = UIMenu(title: "", options: .displayInline, children: children)
         return UIMenu(title: "", children: [detail, submenu])
     }

@@ -24,8 +24,8 @@
 import UIKit
 import NCCommunication
 
-class NCFavorite: NCCollectionViewCommon  {
-    
+class NCFavorite: NCCollectionViewCommon {
+
     // MARK: - View Life Cycle
 
     required init?(coder aDecoder: NSCoder) {
@@ -54,42 +54,44 @@ class NCFavorite: NCCollectionViewCommon  {
                     self.metadatasSource = NCManageDatabase.shared.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", self.appDelegate.account, self.serverUrl))
                 }
             }
-            
-            self.dataSource = NCDataSource.init(metadatasSource: self.metadatasSource, sort:self.layoutForView?.sort, ascending: self.layoutForView?.ascending, directoryOnTop: self.layoutForView?.directoryOnTop, favoriteOnTop: true, filterLivePhoto: true)
-            
+
+            self.dataSource = NCDataSource(metadatasSource: self.metadatasSource, sort: self.layoutForView?.sort, ascending: self.layoutForView?.ascending, directoryOnTop: self.layoutForView?.directoryOnTop, favoriteOnTop: true, filterLivePhoto: true)
+
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()
                 self.collectionView.reloadData()
             }
         }
     }
-    
+
     override func reloadDataSourceNetwork(forced: Bool = false) {
         super.reloadDataSourceNetwork(forced: forced)
-        
+
         if isSearching {
             networkSearch()
             return
         }
-        
+
         isReloadDataSourceNetworkInProgress = true
         collectionView?.reloadData()
-        
+
         if serverUrl == "" {
-            
-            NCNetworking.shared.listingFavoritescompletion(selector: NCGlobal.shared.selectorListingFavorite) { (account, metadatas, errorCode, errorDescription) in
+
+            NCNetworking.shared.listingFavoritescompletion(selector: NCGlobal.shared.selectorListingFavorite) { _, _, errorCode, errorDescription in
                 if errorCode != 0 {
                     NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
                 }
-                
-                self.refreshControl.endRefreshing()
-                self.isReloadDataSourceNetworkInProgress = false
-                self.reloadDataSource()
+
+                DispatchQueue.main.async {
+                    self.refreshControl.endRefreshing()
+                    self.isReloadDataSourceNetworkInProgress = false
+                    self.reloadDataSource()
+                }
             }
-            
+
         } else {
-            
-            networkReadFolder(forced: forced) { (tableDirectory, metadatas, metadatasUpdate, metadatasDelete, errorCode, errorDescription) in
+
+            networkReadFolder(forced: forced) { tableDirectory, metadatas, metadatasUpdate, metadatasDelete, errorCode, _ in
                 if errorCode == 0 {
                     for metadata in metadatas ?? [] {
                         if !metadata.directory {
@@ -99,14 +101,16 @@ class NCFavorite: NCCollectionViewCommon  {
                         }
                     }
                 }
-                
-                self.refreshControl.endRefreshing()
-                self.isReloadDataSourceNetworkInProgress = false
-                self.richWorkspaceText = tableDirectory?.richWorkspace
-                if metadatasUpdate?.count ?? 0 > 0 || metadatasDelete?.count ?? 0 > 0 || forced {
-                    self.reloadDataSource()
-                } else {
-                    self.collectionView?.reloadData()
+
+                DispatchQueue.main.async {
+                    self.refreshControl.endRefreshing()
+                    self.isReloadDataSourceNetworkInProgress = false
+                    self.richWorkspaceText = tableDirectory?.richWorkspace
+                    if metadatasUpdate?.count ?? 0 > 0 || metadatasDelete?.count ?? 0 > 0 || forced {
+                        self.reloadDataSource()
+                    } else {
+                        self.collectionView?.reloadData()
+                    }
                 }
             }
         }
