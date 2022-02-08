@@ -93,6 +93,42 @@
 		569625F027B29B07003F774D /* ChromaColorPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 569625EF27B29B07003F774D /* ChromaColorPicker */; };
 		569625F327B29B57003F774D /* Parchment in Frameworks */ = {isa = PBXBuildFile; productRef = 569625F227B29B57003F774D /* Parchment */; };
 		569625F627B29BA7003F774D /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 569625F527B29BA7003F774D /* JGProgressHUD */; };
+		56A5107727B2C4B800D9F3E6 /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
+		56A5107827B2C5DA00D9F3E6 /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
+		56A5107927B2C5DB00D9F3E6 /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
+		56A5107A27B2C5DC00D9F3E6 /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
+		56A5107C27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; };
+		56A5107D27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; };
+		56A5107E27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; };
+		56A5107F27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; };
+		56A5108127B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; };
+		56A5108227B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; };
+		56A5108327B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; };
+		56A5108427B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; };
+		56A5108627B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */; };
+		56A5108727B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */; };
+		56A5108827B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */; };
+		56A5108927B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */; };
+		56A5109927B2D09E00D9F3E6 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109027B2D09E00D9F3E6 /* NSData+Base64.m */; };
+		56A5109A27B2D09E00D9F3E6 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109027B2D09E00D9F3E6 /* NSData+Base64.m */; };
+		56A5109B27B2D09E00D9F3E6 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109027B2D09E00D9F3E6 /* NSData+Base64.m */; };
+		56A5109C27B2D09E00D9F3E6 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109027B2D09E00D9F3E6 /* NSData+Base64.m */; };
+		56A510A027B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109D27B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift */; };
+		56A510A127B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109D27B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift */; };
+		56A510A227B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109D27B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift */; };
+		56A510A327B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109D27B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift */; };
+		56A510A427B2D5D700D9F3E6 /* NCManageDatabase+Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109E27B2D5D700D9F3E6 /* NCManageDatabase+Account.swift */; };
+		56A510A527B2D5D700D9F3E6 /* NCManageDatabase+Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109E27B2D5D700D9F3E6 /* NCManageDatabase+Account.swift */; };
+		56A510A627B2D5D700D9F3E6 /* NCManageDatabase+Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109E27B2D5D700D9F3E6 /* NCManageDatabase+Account.swift */; };
+		56A510A727B2D5D700D9F3E6 /* NCManageDatabase+Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109E27B2D5D700D9F3E6 /* NCManageDatabase+Account.swift */; };
+		56A510A827B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109F27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift */; };
+		56A510A927B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109F27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift */; };
+		56A510AA27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109F27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift */; };
+		56A510AB27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5109F27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift */; };
+		56A510AD27B2E66700D9F3E6 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A510AC27B2E66700D9F3E6 /* NCCellProtocol.swift */; };
+		56A510AE27B2E66700D9F3E6 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A510AC27B2E66700D9F3E6 /* NCCellProtocol.swift */; };
+		56A510AF27B2E66700D9F3E6 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A510AC27B2E66700D9F3E6 /* NCCellProtocol.swift */; };
+		56A510B027B2E66700D9F3E6 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A510AC27B2E66700D9F3E6 /* NCCellProtocol.swift */; };
 		7A29E0EF269873A600B239BA /* InitialPrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */; };
 		7A756F9726BA601B00E0CB38 /* NCCreateFormUploadConflict+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A756F9626BA601B00E0CB38 /* NCCreateFormUploadConflict+Alert.swift */; };
 		7A82A17D26F3520B00D52790 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A875EC926942C5A00AF558D /* GoogleService-Info.plist */; };
@@ -529,6 +565,16 @@
 		3757A35423D9D76300EC369E /* NCMenuPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuPanelController.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
 		37ECC83A23D0C7400082EFA2 /* NCMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuAction.swift; sourceTree = "<group>"; };
+		56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = NCCommunication.xcframework; path = Carthage/Build/NCCommunication.xcframework; sourceTree = "<group>"; };
+		56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Alamofire.xcframework; path = Carthage/Build/Alamofire.xcframework; sourceTree = "<group>"; };
+		56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = KTVHTTPCache.xcframework; path = Carthage/Build/KTVHTTPCache.xcframework; sourceTree = "<group>"; };
+		56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCUserBaseUrl.swift; sourceTree = "<group>"; };
+		56A5108A27B2D09D00D9F3E6 /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base64.h"; sourceTree = "<group>"; };
+		56A5109027B2D09E00D9F3E6 /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base64.m"; sourceTree = "<group>"; };
+		56A5109D27B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCManageDatabse+Metadata.swift"; sourceTree = "<group>"; };
+		56A5109E27B2D5D700D9F3E6 /* NCManageDatabase+Account.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCManageDatabase+Account.swift"; sourceTree = "<group>"; };
+		56A5109F27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCManageDatabase+Activity.swift"; sourceTree = "<group>"; };
+		56A510AC27B2E66700D9F3E6 /* NCCellProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCellProtocol.swift; sourceTree = "<group>"; };
 		75D9B76604BC04F7789A83AF /* Pods-Nextcloud.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Nextcloud.release.xcconfig"; path = "Target Support Files/Pods-Nextcloud/Pods-Nextcloud.release.xcconfig"; sourceTree = "<group>"; };
 		7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialPrivacySettingsViewController.swift; sourceTree = "<group>"; };
 		7A756F9626BA601B00E0CB38 /* NCCreateFormUploadConflict+Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCCreateFormUploadConflict+Alert.swift"; sourceTree = "<group>"; };
@@ -934,11 +980,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56A5108427B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */,
 				5696258927B289C6003F774D /* RealmSwift in Frameworks */,
 				5696258B27B289C6003F774D /* Queuer in Frameworks */,
 				5696258827B289C6003F774D /* Realm in Frameworks */,
 				5696258A27B289C6003F774D /* UICKeyChainStore in Frameworks */,
 				F75E57C325BF0ED2002B72C2 /* SVGKit in Frameworks */,
+				56A5107A27B2C5DC00D9F3E6 /* NCCommunication.xcframework in Frameworks */,
+				56A5107F27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -946,14 +995,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56A5107D27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */,
 				5696257F27B289C6003F774D /* RealmSwift in Frameworks */,
 				5696257D27B289C6003F774D /* SwiftEntryKit in Frameworks */,
+				56A5107827B2C5DA00D9F3E6 /* NCCommunication.xcframework in Frameworks */,
 				5696258027B289C6003F774D /* UICKeyChainStore in Frameworks */,
 				F75E57BF25BF0EC8002B72C2 /* SVGKit in Frameworks */,
 				5696257C27B289C6003F774D /* MarkdownKit in Frameworks */,
 				5696258127B289C6003F774D /* Queuer in Frameworks */,
 				5696258227B289C6003F774D /* JGProgressHUD in Frameworks */,
 				5696257E27B289C6003F774D /* Realm in Frameworks */,
+				56A5108227B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -965,6 +1017,9 @@
 				F75E57C125BF0ECD002B72C2 /* SVGKit in Frameworks */,
 				5696258727B289C6003F774D /* Queuer in Frameworks */,
 				5696258427B289C6003F774D /* Realm in Frameworks */,
+				56A5107E27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */,
+				56A5108327B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */,
+				56A5107927B2C5DB00D9F3E6 /* NCCommunication.xcframework in Frameworks */,
 				5696258527B289C6003F774D /* RealmSwift in Frameworks */,
 				5696258327B289C6003F774D /* SwiftEntryKit in Frameworks */,
 			);
@@ -978,6 +1033,7 @@
 				5696257B27B289C6003F774D /* JGProgressHUD in Frameworks */,
 				569625CC27B29142003F774D /* FirebaseStorage in Frameworks */,
 				5696257227B289C6003F774D /* Queuer in Frameworks */,
+				56A5108127B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */,
 				5696258F27B28DB8003F774D /* QRCodeReader in Frameworks */,
 				5696259C27B29142003F774D /* FirebaseAnalytics in Frameworks */,
 				569625AE27B29142003F774D /* FirebaseDatabaseSwift-Beta in Frameworks */,
@@ -998,6 +1054,7 @@
 				5696259527B28E9E003F774D /* FloatingPanel in Frameworks */,
 				569625A027B29142003F774D /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				5696257A27B289C6003F774D /* Parchment in Frameworks */,
+				56A5107C27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */,
 				569625BA27B29142003F774D /* FirebaseFunctionsCombine-Community in Frameworks */,
 				5696259E27B29142003F774D /* FirebaseAnalyticsSwift-Beta in Frameworks */,
 				5696256C27B289C6003F774D /* FloatingPanel in Frameworks */,
@@ -1010,6 +1067,7 @@
 				5696257027B289C6003F774D /* MarqueeLabel in Frameworks */,
 				5696259227B28E46003F774D /* SwiftRichString in Frameworks */,
 				5696257727B289C6003F774D /* Realm in Frameworks */,
+				56A5107727B2C4B800D9F3E6 /* NCCommunication.xcframework in Frameworks */,
 				569625E227B29736003F774D /* DropDown in Frameworks */,
 				569625D027B29142003F774D /* FirebaseStorageSwift-Beta in Frameworks */,
 				569625B027B29142003F774D /* FirebaseDynamicLinks in Frameworks */,
@@ -1192,6 +1250,7 @@
 		F70211F31BAC56E9003FC03E /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				56A510AC27B2E66700D9F3E6 /* NCCellProtocol.swift */,
 				7AE63AE526D633BA00CEAAD5 /* Collection Common */,
 				95BB20C2265FF37300AF4344 /* NCFunctionCenter.swift */,
 				F710D1FA24057E5E00A6033D /* ActionSheetHeaderView */,
@@ -1659,6 +1718,9 @@
 		F7BAAD951ED5A63D00B7EAD4 /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				56A5109E27B2D5D700D9F3E6 /* NCManageDatabase+Account.swift */,
+				56A5109F27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift */,
+				56A5109D27B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift */,
 				F7C1EEA425053A9C00866ACC /* NCDataSource.swift */,
 				F7BAADB41ED5A87C00B7EAD4 /* NCDatabase.swift */,
 				F7BAADB51ED5A87C00B7EAD4 /* NCManageDatabase.swift */,
@@ -1685,6 +1747,9 @@
 		F7BFFA991A24D7BB0044ED85 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				56A5108A27B2D09D00D9F3E6 /* NSData+Base64.h */,
+				56A5109027B2D09E00D9F3E6 /* NSData+Base64.m */,
+				56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */,
 				7AE63B3526DCFB6300CEAAD5 /* NCContentPresenter.swift */,
 				95BB20F12660E25200AF4344 /* NCPopupViewController.swift */,
 				F7514EDA1C7B1336008F3338 /* CCHud.h */,
@@ -1916,6 +1981,7 @@
 			isa = PBXGroup;
 			children = (
 				F7B1076C25D3CF2800E72DE2 /* BackgroundTasks.framework */,
+				56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */,
 				F7F35B592578FB63003F5589 /* CollaboraOnlineWebViewKeyboardManager.framework */,
 				F7176DDA256672D90017E83C /* libsqlite3.tbd */,
 				F7176DB9256672640017E83C /* FIRAnalyticsConnector.framework */,
@@ -1961,6 +2027,7 @@
 				F7C40C0F2199BA5D0004137E /* Realm.framework */,
 				F7C40BF22199978B0004137E /* MBProgressHUD.framework */,
 				F7C40BF0219994F20004137E /* KTVHTTPCache.framework */,
+				56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */,
 				F7C40BEE219994ED0004137E /* KTVCocoaHTTPServer.framework */,
 				F7C40BEC219993330004137E /* JDStatusBarNotification.framework */,
 				F7C40BEA219991AC0004137E /* EARestrictedScrollView.framework */,
@@ -1972,6 +2039,7 @@
 				F79918A021997F9000C2E308 /* UICKeyChainStore.framework */,
 				F733B65121997CC1001C1FFA /* TLPhotoPicker.framework */,
 				F75EDFBE1E8C116D00E6F369 /* libstdc++.tbd */,
+				56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */,
 				F75EDFBC1E8C112F00E6F369 /* libsqlite3.0.tbd */,
 				08EA97441E6554FC004C83FA /* FirebaseAnalytics.framework */,
 				08EA97451E6554FC004C83FA /* FirebaseCore.framework */,
@@ -2255,7 +2323,6 @@
 				569625EE27B29B07003F774D /* XCRemoteSwiftPackageReference "ChromaColorPicker" */,
 				569625F127B29B57003F774D /* XCRemoteSwiftPackageReference "Parchment" */,
 				569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */,
-				569625FD27B2AC46003F774D /* XCRemoteSwiftPackageReference "ios-communication-library" */,
 			);
 			productRefGroup = F7F67B9F1A24D27800EE80DA;
 			projectDirPath = "";
@@ -2508,15 +2575,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56A5108927B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */,
 				F7A0D1492592256F008F8A13 /* UIImageView+Extensions.swift in Sources */,
+				56A510B027B2E66700D9F3E6 /* NCCellProtocol.swift in Sources */,
+				56A510A727B2D5D700D9F3E6 /* NCManageDatabase+Account.swift in Sources */,
 				F785EEA52461A4CF00B3F945 /* CCUtility.m in Sources */,
+				56A510AB27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift in Sources */,
 				2C1D5D7923E2DE9100334ABB /* NCBrand.swift in Sources */,
+				56A5109C27B2D09E00D9F3E6 /* NSData+Base64.m in Sources */,
 				95BB2068265FE90F00AF4344 /* NCGlobal.swift in Sources */,
 				F7A76DCE256A71CF00119AB3 /* UIImage+Extensions.swift in Sources */,
 				2C1D5D7523E2DE3300334ABB /* NCDatabase.swift in Sources */,
 				F7A0D1382591FBC5008F8A13 /* String+Extensions.swift in Sources */,
 				2C1D5D7623E2DE3300334ABB /* NCManageDatabase.swift in Sources */,
 				2C33C48223E2C475005F963B /* NotificationService.swift in Sources */,
+				56A510A327B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift in Sources */,
 				F73D5E4A246DE09200DF6467 /* NCElementsJSON.swift in Sources */,
 				F798F0EC2588060A000DAFFD /* UIColor+Extensions.swift in Sources */,
 				F74AF3A7247FB6AE00AC767B /* NCUtilityFileSystem.swift in Sources */,
@@ -2532,10 +2605,12 @@
 				7AE63B6926DCFE3000CEAAD5 /* NCRenameFile.swift in Sources */,
 				7AE63B8126DD01BF00CEAAD5 /* NCDataSource.swift in Sources */,
 				F73D5E48246DE09200DF6467 /* NCElementsJSON.swift in Sources */,
+				56A510A127B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift in Sources */,
 				F7A0D1362591FBC5008F8A13 /* String+Extensions.swift in Sources */,
 				F7A0D1472592256F008F8A13 /* UIImageView+Extensions.swift in Sources */,
 				F70460532499095400BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
 				F70BFC7520E0FA7D00C67599 /* NCUtility.swift in Sources */,
+				56A510A927B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift in Sources */,
 				7AE63B5F26DCFC9E00CEAAD5 /* NCEmptyDataSet.swift in Sources */,
 				7AE63B8B26DD039000CEAAD5 /* NCOperationQueue.swift in Sources */,
 				F798F0E225880608000DAFFD /* UIColor+Extensions.swift in Sources */,
@@ -2545,8 +2620,10 @@
 				F7F878AF1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */,
 				7AE63BAB26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift in Sources */,
 				95BB2056265FE2AE00AF4344 /* NCGlobal.swift in Sources */,
+				56A5109A27B2D09E00D9F3E6 /* NSData+Base64.m in Sources */,
 				7AE63B5A26DCFC8E00CEAAD5 /* NCListCell.swift in Sources */,
 				7AE63B9C26DD104000CEAAD5 /* NSMutableAttributedString+Extensions.swift in Sources */,
+				56A510A527B2D5D700D9F3E6 /* NCManageDatabase+Account.swift in Sources */,
 				7AE63B2426DCF9ED00CEAAD5 /* NCNetworkingE2EE.swift in Sources */,
 				F71459D21D12E3B700CAFEEC /* CCUtility.m in Sources */,
 				F71459E11D12E3B700CAFEEC /* CCHud.m in Sources */,
@@ -2556,10 +2633,12 @@
 				F7A76DC8256A71CD00119AB3 /* UIImage+Extensions.swift in Sources */,
 				F7BAADC91ED5A87C00B7EAD4 /* NCDatabase.swift in Sources */,
 				F780710A1EDAB65800EAFFF6 /* NSNotificationCenter+MainThread.m in Sources */,
+				56A5108727B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */,
 				7AE63B6426DCFDC300CEAAD5 /* NCImageCellProtocol.swift in Sources */,
 				7AE63B7C26DCFFEA00CEAAD5 /* NCAccountRequest.swift in Sources */,
 				F76B3CCF1EAE01BD00921AC9 /* NCBrand.swift in Sources */,
 				F7BAADCC1ED5A87C00B7EAD4 /* NCManageDatabase.swift in Sources */,
+				56A510AE27B2E66700D9F3E6 /* NCCellProtocol.swift in Sources */,
 				7AE63B8626DD01F000CEAAD5 /* NCPopupViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2569,6 +2648,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F771E3F720E239B500AFB62D /* FileProviderExtension+Actions.swift in Sources */,
+				56A510A227B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift in Sources */,
 				F76673F022C90434007ED366 /* FileProviderUtility.swift in Sources */,
 				7AE63B3026DCFB2A00CEAAD5 /* NCNetworkingChunkedUpload.swift in Sources */,
 				F7434B3420E23FD700417916 /* NCDatabase.swift in Sources */,
@@ -2578,17 +2658,22 @@
 				F771E3D320E2392D00AFB62D /* FileProviderExtension.swift in Sources */,
 				F73D5E49246DE09200DF6467 /* NCElementsJSON.swift in Sources */,
 				F771E3D520E2392D00AFB62D /* FileProviderItem.swift in Sources */,
+				56A5109B27B2D09E00D9F3E6 /* NSData+Base64.m in Sources */,
+				56A510AF27B2E66700D9F3E6 /* NCCellProtocol.swift in Sources */,
 				F7434B3620E23FE000417916 /* NCManageDatabase.swift in Sources */,
 				7AE63B3B26DCFB7100CEAAD5 /* NCContentPresenter.swift in Sources */,
+				56A5108827B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */,
 				F798F0E725880609000DAFFD /* UIColor+Extensions.swift in Sources */,
 				F7A0D1482592256F008F8A13 /* UIImageView+Extensions.swift in Sources */,
 				F70460542499095400BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
 				F785EEA42461A4A600B3F945 /* NCUtility.swift in Sources */,
 				F771E3F320E239A600AFB62D /* FileProviderData.swift in Sources */,
+				56A510A627B2D5D700D9F3E6 /* NCManageDatabase+Account.swift in Sources */,
 				F7A0D1372591FBC5008F8A13 /* String+Extensions.swift in Sources */,
 				F771E3D720E2392D00AFB62D /* FileProviderEnumerator.swift in Sources */,
 				F74AF3A6247FB6AE00AC767B /* NCUtilityFileSystem.swift in Sources */,
 				F7A76DCD256A71CE00119AB3 /* UIImage+Extensions.swift in Sources */,
+				56A510AA27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift in Sources */,
 				F771E3F820E239B500AFB62D /* FileProviderExtension+Thumbnail.swift in Sources */,
 				F785EEA62461A4FB00B3F945 /* CCUtility.m in Sources */,
 			);
@@ -2625,10 +2710,12 @@
 				7A756F9726BA601B00E0CB38 /* NCCreateFormUploadConflict+Alert.swift in Sources */,
 				7A875EE026943DB100AF558D /* HelpViewController.swift in Sources */,
 				371B5A2E23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift in Sources */,
+				56A5108627B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */,
 				F77444F8222816D5000D5EB0 /* NCPickerViewController.swift in Sources */,
 				F72A47EC2487B06B005AD489 /* NCOperationQueue.swift in Sources */,
 				7AE63B2A26DCFB2600CEAAD5 /* NCNetworkingChunkedUpload.swift in Sources */,
 				F769454622E9F1B0000A798A /* NCShareCommon.swift in Sources */,
+				56A510A427B2D5D700D9F3E6 /* NCManageDatabase+Account.swift in Sources */,
 				958C87F926382B6C006C8923 /* ToggleButtonViewCell.swift in Sources */,
 				7A875F122694704E00AF558D /* AnalysisDataCollectionSwitch.swift in Sources */,
 				F738E8421F90FFD100F95C8E /* NCManageEndToEndEncryption.m in Sources */,
@@ -2698,6 +2785,7 @@
 				F70BFC7420E0FA7D00C67599 /* NCUtility.swift in Sources */,
 				7A875ED42694392800AF558D /* PrivacyPolicyViewController.swift in Sources */,
 				F7C1EEA525053A9C00866ACC /* NCDataSource.swift in Sources */,
+				56A510AD27B2E66700D9F3E6 /* NCCellProtocol.swift in Sources */,
 				F713FF002472764100214AF6 /* UIImage+animatedGIF.m in Sources */,
 				F7A0D1462592256F008F8A13 /* UIImageView+Extensions.swift in Sources */,
 				F749C10B23C4A5340027D966 /* NCIntroCollectionViewCell.swift in Sources */,
@@ -2716,6 +2804,7 @@
 				F7EFA47825ADBA500083159A /* NCViewerProviderContextMenu.swift in Sources */,
 				F755BD9B20594AC7008C5FBB /* NCService.swift in Sources */,
 				95353B85267137F400E5F8B0 /* PNGImageSaveSwitchView.swift in Sources */,
+				56A510A827B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift in Sources */,
 				F7B7504B2397D38F004E13EC /* UIImage+Extensions.swift in Sources */,
 				7AE63BBE26DDFC8500CEAAD5 /* NCBackgroundImageColor.swift in Sources */,
 				958C8817263990D6006C8923 /* FolderPathCustomCell.swift in Sources */,
@@ -2733,6 +2822,7 @@
 				95BB208A265FEF3F00AF4344 /* NCSortMenu.swift in Sources */,
 				C0ABA3C526A142F70049DE9A /* NCShareQuickStatusMenu.swift in Sources */,
 				F7E0E1DC22327885006B0911 /* NCAudioRecorderViewController.swift in Sources */,
+				56A5109927B2D09E00D9F3E6 /* NSData+Base64.m in Sources */,
 				F70CAE3A1F8CF31A008125FD /* NCEndToEndEncryption.m in Sources */,
 				C0D788CC268C656C00B876BB /* NCShareQuickStatusMenu.swift in Sources */,
 				F70753EB2542A99800972D44 /* NCViewerImage.swift in Sources */,
@@ -2759,6 +2849,7 @@
 				95353B9D2672328600E5F8B0 /* PasswordInputField.swift in Sources */,
 				C0D6060C26C2A12300B67843 /* NCShareAdvancePermissionHeader.swift in Sources */,
 				F765608F23BF813600765969 /* NCContentPresenter.swift in Sources */,
+				56A510A027B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift in Sources */,
 				7A875F002694650900AF558D /* PrivacySettingsViewController.swift in Sources */,
 				950A6483264AACF4006ADE0E /* SubFolderCustomCell.swift in Sources */,
 				F70CEF5623E9C7E50007035B /* UIColor+Extensions.swift in Sources */,
@@ -3170,7 +3261,7 @@
 				"EXCLUDED_ARCHS[sdk=*]" = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Carthage/Build/iOS/**",
 					"$(PROJECT_DIR)/Carthage/Build/iOS/ChromaColorPicker.xcframework/ios-arm64",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -3232,7 +3323,7 @@
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(PROJECT_DIR)/Carthage/Build/iOS/**",
 					"$(PROJECT_DIR)/Carthage/Build/iOS/ChromaColorPicker.xcframework/ios-arm64",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -3583,14 +3674,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.0.0;
-			};
-		};
-		569625FD27B2AC46003F774D /* XCRemoteSwiftPackageReference "ios-communication-library" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/tsdimobile/ios-communication-library.git";
-			requirement = {
-				branch = "v0.99.4\n";
-				kind = branch;
 			};
 		};
 		F70B86732642CE3B00ED5349 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {

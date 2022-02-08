@@ -16,38 +16,6 @@ extension NCManageDatabase {
         return tableAccount.init(value: account)
     }
 
-    @objc func addAccount(_ account: String, urlBase: String, user: String, password: String) {
-
-        let realm = try! Realm()
-
-        do {
-            try realm.safeWrite {
-                let addObject = tableAccount()
-
-                addObject.account = account
-
-                // Brand
-                if NCBrandOptions.shared.use_default_auto_upload {
-
-                    addObject.autoUpload = true
-                    addObject.autoUploadImage = true
-                    addObject.autoUploadVideo = true
-                    addObject.autoUploadWWAnVideo = true
-                }
-
-                CCUtility.setPassword(account, password: password)
-
-                addObject.urlBase = urlBase
-                addObject.user = user
-                addObject.userId = user
-
-                realm.add(addObject, update: .all)
-            }
-        } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
-        }
-    }
-
     @objc func updateAccount(_ account: tableAccount) {
 
         let realm = try! Realm()

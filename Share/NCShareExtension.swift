@@ -216,7 +216,7 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
         autoUploadFileName = NCManageDatabase.shared.getAccountAutoUploadFileName()
         autoUploadDirectory = NCManageDatabase.shared.getAccountAutoUploadDirectory(urlBase: activeAccount.urlBase, account: activeAccount.account)
         
-        serverUrl = NCUtilityFileSystem.shared.getHomeServer(urlBase: activeAccount.urlBase, account: activeAccount.account)
+        serverUrl = NCUtilityFileSystem.shared.getHomeServer(account: activeAccount.account)
         
         layoutForView = NCUtility.shared.getLayoutForView(key: keyLayout,serverUrl: serverUrl)
             
@@ -423,7 +423,7 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
         reloadDatasource(withLoadFolder: true)
         
         var navigationTitle = (serverUrl as NSString).lastPathComponent
-        if NCUtilityFileSystem.shared.getHomeServer(urlBase: activeAccount.urlBase, account: activeAccount.account) == serverUrl {
+        if NCUtilityFileSystem.shared.getHomeServer(account: activeAccount.account) == serverUrl {
             navigationTitle = NCBrandOptions.shared.brand
         }
         setNavigationBar(navigationTitle: navigationTitle)
@@ -462,7 +462,7 @@ class NCShareExtension: UIViewController, NCListCellDelegate, NCEmptyDataSetDele
                 if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
                     let ocId = NSUUID().uuidString
 //                    let filePath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileName)!
-                    let serverUrl = NCUtilityFileSystem.shared.getHomeServer(urlBase: self.activeAccount.urlBase, account: self.activeAccount.account)
+                    let serverUrl = NCUtilityFileSystem.shared.getHomeServer(account: self.activeAccount.account)
                     let metadata = NCManageDatabase.shared.createMetadata(account: self.activeAccount.account, fileName: fileName, fileNameView: fileName, ocId: ocId, serverUrl: serverUrl, urlBase: self.activeAccount.urlBase, url: "", contentType: "", livePhoto: false)
                     vcRename.metadata = metadata
                     vcRename.delegate = self
