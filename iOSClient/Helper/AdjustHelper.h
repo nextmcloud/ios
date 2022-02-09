@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <AdjustSdk/Adjust.h>
+#import <Adjust.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

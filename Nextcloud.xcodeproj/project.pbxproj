@@ -15,7 +15,6 @@
 		2CB7D1CA23E2EDCB00376EF9 /* NCPushNotificationEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F72D1005210B6882009C96B7 /* NCPushNotificationEncryption.m */; };
 		370D26AF248A3D7A00121797 /* NCImageCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCImageCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift */; };
-		5645C2AA27B3F61300553117 /* DropDown.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; };
 		567EDE1927B3DC1600181E7E /* NCEndToEndEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F70CAE391F8CF31A008125FD /* NCEndToEndEncryption.m */; };
 		5696256A27B289C6003F774D /* QRCodeReader in Frameworks */ = {isa = PBXBuildFile; productRef = F7ED547B25EEA65400956C55 /* QRCodeReader */; };
 		5696256B27B289C6003F774D /* SwiftRichString in Frameworks */ = {isa = PBXBuildFile; productRef = F72DA9B325F53E4E00B87DB1 /* SwiftRichString */; };
@@ -70,7 +69,6 @@
 		56A229E727B3BE1F00C35F8B /* NCCreateFormUploadConflictCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F704B5E82430C0B800632F5F /* NCCreateFormUploadConflictCell.swift */; };
 		56A229EA27B3C7F900C35F8B /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
 		56A229EB27B3C81100C35F8B /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
-		56A229ED27B3CE3C00C35F8B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56A229EC27B3CE3A00C35F8B /* GoogleService-Info.plist */; };
 		56A5107727B2C4B800D9F3E6 /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
 		56A5107827B2C5DA00D9F3E6 /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
 		56A5107927B2C5DB00D9F3E6 /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
@@ -123,6 +121,14 @@
 		56E9B9FC27B39DFC007B1772 /* english.txt in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B9F827B39DFC007B1772 /* english.txt */; };
 		56E9B9FD27B39DFC007B1772 /* english.txt in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B9F827B39DFC007B1772 /* english.txt */; };
 		7A29E0EF269873A600B239BA /* InitialPrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */; };
+		7A70DD1B27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
+		7A70DD1C27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
+		7A70DD1D27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
+		7A70DD1E27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
+		7A70DD2B27B42B7F0018F47E /* DropDown.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; };
+		7A70DD2C27B42B7F0018F47E /* DropDown.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7A70DD3027B42C190018F47E /* DropDown.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; };
+		7A70DD5427B4301A0018F47E /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = 7A70DD5327B4301A0018F47E /* Adjust */; };
 		7A82A18126F3529100D52790 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7239876253D86D300257F49 /* NCEmptyView.xib */; };
 		7A82A18526F352AC00D52790 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB20E92660DFA200AF4344 /* NCRenameFile.storyboard */; };
 		7A82A18926F352DA00D52790 /* NCSectionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = F78ACD53219047D40088454D /* NCSectionFooter.xib */; };
@@ -507,6 +513,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		7A70DD2D27B42B7F0018F47E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				7A70DD2C27B42B7F0018F47E /* DropDown.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7A82A1BD26F35CB000D52790 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 8;
@@ -551,7 +568,6 @@
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
 		37ECC83A23D0C7400082EFA2 /* NCMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuAction.swift; sourceTree = "<group>"; };
 		5645C2A927B3F61300553117 /* DropDown.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DropDown.xcframework; path = Carthage/Build/DropDown.xcframework; sourceTree = "<group>"; };
-		56A229EC27B3CE3A00C35F8B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = NCCommunication.xcframework; path = Carthage/Build/NCCommunication.xcframework; sourceTree = "<group>"; };
 		56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Alamofire.xcframework; path = Carthage/Build/Alamofire.xcframework; sourceTree = "<group>"; };
 		56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = KTVHTTPCache.xcframework; path = Carthage/Build/KTVHTTPCache.xcframework; sourceTree = "<group>"; };
@@ -577,6 +593,7 @@
 		56E9B9F927B39DFC007B1772 /* NYMnemonic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NYMnemonic.h; sourceTree = "<group>"; };
 		75D9B76604BC04F7789A83AF /* Pods-Nextcloud.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Nextcloud.release.xcconfig"; path = "Target Support Files/Pods-Nextcloud/Pods-Nextcloud.release.xcconfig"; sourceTree = "<group>"; };
 		7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialPrivacySettingsViewController.swift; sourceTree = "<group>"; };
+		7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7A82A1A926F35C5000D52790 /* OpenSSL.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = OpenSSL.xcframework; path = Carthage/Build/OpenSSL.xcframework; sourceTree = "<group>"; };
 		7A82A1B226F35C8400D52790 /* MarkdownKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MarkdownKit.xcframework; path = Carthage/Build/MarkdownKit.xcframework; sourceTree = "<group>"; };
 		7A875ED32694392800AF558D /* PrivacyPolicyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyViewController.swift; sourceTree = "<group>"; };
@@ -997,6 +1014,7 @@
 				5696257C27B289C6003F774D /* MarkdownKit in Frameworks */,
 				5696258127B289C6003F774D /* Queuer in Frameworks */,
 				5696258227B289C6003F774D /* JGProgressHUD in Frameworks */,
+				7A70DD3027B42C190018F47E /* DropDown.xcframework in Frameworks */,
 				5696257E27B289C6003F774D /* Realm in Frameworks */,
 				56A5108227B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */,
 				56E9B9F427B39218007B1772 /* TOPasscodeViewController.xcframework in Frameworks */,
@@ -1031,7 +1049,7 @@
 				5696256D27B289C6003F774D /* MarkdownKit in Frameworks */,
 				5696256B27B289C6003F774D /* SwiftRichString in Frameworks */,
 				569625F627B29BA7003F774D /* JGProgressHUD in Frameworks */,
-				5645C2AA27B3F61300553117 /* DropDown.xcframework in Frameworks */,
+				7A70DD2B27B42B7F0018F47E /* DropDown.xcframework in Frameworks */,
 				569625D327B291E6003F774D /* SwiftEntryKit in Frameworks */,
 				569625F027B29B07003F774D /* ChromaColorPicker in Frameworks */,
 				5696256A27B289C6003F774D /* QRCodeReader in Frameworks */,
@@ -1041,6 +1059,7 @@
 				56A5107C27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */,
 				5696256C27B289C6003F774D /* FloatingPanel in Frameworks */,
 				56E9B9F327B39218007B1772 /* TOPasscodeViewController.xcframework in Frameworks */,
+				7A70DD5427B4301A0018F47E /* Adjust in Frameworks */,
 				5696256F27B289C6003F774D /* SwiftEntryKit in Frameworks */,
 				569625DF27B29670003F774D /* UICKeyChainStore in Frameworks */,
 				5696257027B289C6003F774D /* MarqueeLabel in Frameworks */,
@@ -1754,7 +1773,7 @@
 		F7C1CDD91E6DFC6F005D92BE /* Brand */ = {
 			isa = PBXGroup;
 			children = (
-				56A229EC27B3CE3A00C35F8B /* GoogleService-Info.plist */,
+				7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */,
 				F7C742D31E7BD36600D9C973 /* Supporting Files */,
 				F710E80C1EF95C9C00DC2427 /* Intro */,
 				F700222B1EC479840080073F /* Custom.xcassets */,
@@ -2149,6 +2168,7 @@
 				F77B0F981D118A16002130FE /* Embed App Extensions */,
 				F75A40001EBCB82B00B213E8 /* Run Script */,
 				29C8CA4BB2EACD8DFED0164E /* [CP] Embed Pods Frameworks */,
+				7A70DD2D27B42B7F0018F47E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2193,6 +2213,7 @@
 				569625EF27B29B07003F774D /* ChromaColorPicker */,
 				569625F227B29B57003F774D /* Parchment */,
 				569625F527B29BA7003F774D /* JGProgressHUD */,
+				7A70DD5327B4301A0018F47E /* Adjust */,
 			);
 			productName = "Crypto Cloud";
 			productReference = F7CE8AFA1DC1F8D8009CAE48 /* Nextcloud.app */;
@@ -2268,6 +2289,7 @@
 				569625F127B29B57003F774D /* XCRemoteSwiftPackageReference "Parchment" */,
 				569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */,
 				56A229E527B3B57400C35F8B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				7A70DCFF27B429B70018F47E /* XCRemoteSwiftPackageReference "ios_sdk" */,
 			);
 			productRefGroup = F7F67B9F1A24D27800EE80DA;
 			projectDirPath = "";
@@ -2286,6 +2308,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A70DD1E27B42A3D0018F47E /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2293,6 +2316,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A70DD1C27B42A3D0018F47E /* GoogleService-Info.plist in Resources */,
 				7A82A18926F352DA00D52790 /* NCSectionFooter.xib in Resources */,
 				7A82A18526F352AC00D52790 /* NCRenameFile.storyboard in Resources */,
 				7A82A18126F3529100D52790 /* NCEmptyView.xib in Resources */,
@@ -2312,6 +2336,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A70DD1D27B42A3D0018F47E /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2348,7 +2373,7 @@
 				7A875F0C26946D0B00AF558D /* RequiredDataCollectionSwitch.xib in Resources */,
 				F7E0E1DE22327DBA006B0911 /* NCAudioRecorderViewController.storyboard in Resources */,
 				C0D6060226C299BF00B67843 /* NCFilePermissionEditCell.xib in Resources */,
-				56A229ED27B3CE3C00C35F8B /* GoogleService-Info.plist in Resources */,
+				7A70DD1B27B42A3D0018F47E /* GoogleService-Info.plist in Resources */,
 				7AE63BFE26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect.xib in Resources */,
 				F7F1E54C2492369A00E42386 /* NCMediaCommandView.xib in Resources */,
 				F710E8111EF95C9C00DC2427 /* ImagesIntro.xcassets in Resources */,
@@ -3605,8 +3630,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rechsteiner/Parchment";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = exactVersion;
+				version = 2.4.0;
 			};
 		};
 		569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */ = {
@@ -3623,6 +3648,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 8.0.0;
+			};
+		};
+		7A70DCFF27B429B70018F47E /* XCRemoteSwiftPackageReference "ios_sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/adjust/ios_sdk";
+			requirement = {
+				kind = exactVersion;
+				version = 4.29.5;
 			};
 		};
 		F70B86732642CE3B00ED5349 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
@@ -3843,6 +3876,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
 			productName = JGProgressHUD;
+		};
+		7A70DD5327B4301A0018F47E /* Adjust */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7A70DCFF27B429B70018F47E /* XCRemoteSwiftPackageReference "ios_sdk" */;
+			productName = Adjust;
 		};
 		F70B86742642CE3B00ED5349 /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
