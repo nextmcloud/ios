@@ -251,8 +251,6 @@ import XLForm
             cell.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
             imageSelect.isHidden = true
         }
-<<<<<<< .merge_file_DuOJIc
-        
         return cell
     }
     
