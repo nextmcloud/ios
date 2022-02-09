@@ -75,7 +75,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
             user = newValue ?? ""
         }
     }
-    
+    private var user = ""
     var delegate: NCListCellDelegate?
     var objectId = ""
     var indexPath = IndexPath()

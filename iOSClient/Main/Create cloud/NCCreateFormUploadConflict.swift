@@ -51,7 +51,6 @@ extension NCCreateFormUploadConflictDelegate {
     @IBOutlet weak var buttonCancel: UIButton!
     @IBOutlet weak var buttonContinue: UIButton!
     
-    let appDelegate = UIApplication.shared.delegate as! AppDelegate
     @IBOutlet weak var viewButton: UIView!
 
     @objc var metadatasNOConflict: [tableMetadata]
@@ -113,20 +112,11 @@ extension NCCreateFormUploadConflictDelegate {
         buttonContinue.setTitleColor(.lightGray, for: .normal)
         buttonContinue.layer.backgroundColor = NCBrandColor.shared.graySoft.withAlphaComponent(0.5).cgColor
         
-        if(metadatasUploadInConflict.count == 1){
-                    let blurEffect = UIBlurEffect(style: .light)
-                    let blurVisualEffectView = UIVisualEffectView(effect: blurEffect)
-                    blurVisualEffectView.frame = self.view.bounds
-                    self.view.addSubview(blurVisualEffectView)
-                    self.showSingleFileConflictAlert()
-        }else{
-                    //TODO share dialog for multiple files
-            let blurEffect = UIBlurEffect(style: .light)
-            blurVisualEffectView = UIVisualEffectView(effect: blurEffect)
-            blurVisualEffectView.frame = self.view.bounds
-            self.view.addSubview(blurVisualEffectView)
-            self.multiFilesConflictDialog(fileCount: metadatasUploadInConflict.count)
-        }
+        let blurEffect = UIBlurEffect(style: .light)
+        blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.frame = view.bounds
+        blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.addSubview(blurView)
         
         changeTheming()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

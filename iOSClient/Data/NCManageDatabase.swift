@@ -1519,7 +1519,31 @@ class NCManageDatabase: NSObject {
             return(firstShareLink: firstShareLink, share: Array(results.map { tableShare.init(value: $0) }))
         }
     }
-
+    
+    func getTableShares(for metadata: tableMetadata) -> [tableShare]? {
+        let realm = try! Realm()
+        
+        let sortProperties = [SortDescriptor(keyPath: "shareType", ascending: false), SortDescriptor(keyPath: "idShare", ascending: false)]
+        
+        let results = realm.objects(tableShare.self).filter("account == %@ AND serverUrl == %@ AND fileName == %@", metadata.account, metadata.serverUrl, metadata.fileName).sorted(by: sortProperties)
+        return Array(results.map { tableShare.init(value:$0) })
+    }
+    
+    func updateFileNameForTableShare(metaData: tableMetadata, newFileName: String) {
+        let realm = try! Realm()
+        do {
+            try realm.safeWrite {
+                let shares = getTableShares(for: metaData) ?? []
+                for share in shares {
+                    share.fileName = newFileName
+                    realm.add(share, update: .modified)
+                }
+            }
+        } catch let error {
+            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+        }
+    }
+    
     func getTableShare(account: String, idShare: Int) -> tableShare? {
 
         let realm = try! Realm()
