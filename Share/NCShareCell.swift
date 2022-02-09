@@ -72,7 +72,7 @@ class NCShareCell: UITableViewCell {
             self.delegate?.renameFile(named: self.fileName)
         })
 
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_file_", comment: ""), style: .default) { _ in
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_delete_file_", comment: ""), style: .default) { _ in
             self.delegate?.removeFile(named: self.fileName)
         })
 

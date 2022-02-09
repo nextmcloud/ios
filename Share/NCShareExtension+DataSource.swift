@@ -79,6 +79,7 @@ extension NCShareExtension: UICollectionViewDataSource {
         cell.imageItem.backgroundColor = nil
 
         cell.progressView.progress = 0.0
+        cell.separator.backgroundColor = NCBrandColor.shared.separator
 
         if metadata.directory {
             setupDirectoryCell(cell, with: metadata)

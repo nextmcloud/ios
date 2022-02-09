@@ -57,7 +57,25 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
          return imageItem
         }
     }
-  
+    
+    var fileObjectId: String? {
+        get {
+            return objectId
+        }
+        set {
+            objectId = newValue ?? ""
+        }
+    }
+    
+    var fileUser: String? {
+        get {
+            return user
+        }
+        set {
+            user = newValue ?? ""
+        }
+    }
+    
     var delegate: NCListCellDelegate?
     var objectId = ""
     var indexPath = IndexPath()
