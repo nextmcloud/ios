@@ -15,6 +15,7 @@
 		2CB7D1CA23E2EDCB00376EF9 /* NCPushNotificationEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F72D1005210B6882009C96B7 /* NCPushNotificationEncryption.m */; };
 		370D26AF248A3D7A00121797 /* NCImageCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCImageCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift */; };
+		5645C2AA27B3F61300553117 /* DropDown.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; };
 		567EDE1927B3DC1600181E7E /* NCEndToEndEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F70CAE391F8CF31A008125FD /* NCEndToEndEncryption.m */; };
 		5696256A27B289C6003F774D /* QRCodeReader in Frameworks */ = {isa = PBXBuildFile; productRef = F7ED547B25EEA65400956C55 /* QRCodeReader */; };
 		5696256B27B289C6003F774D /* SwiftRichString in Frameworks */ = {isa = PBXBuildFile; productRef = F72DA9B325F53E4E00B87DB1 /* SwiftRichString */; };
@@ -26,7 +27,6 @@
 		5696257127B289C6003F774D /* XLForm in Frameworks */ = {isa = PBXBuildFile; productRef = F74E771F277A2EF40013B958 /* XLForm */; };
 		5696257227B289C6003F774D /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = F76DA962277B760E0082465B /* Queuer */; };
 		5696257327B289C6003F774D /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = F76DA965277B76F30082465B /* UICKeyChainStore */; };
-		5696257427B289C6003F774D /* DropDown in Frameworks */ = {isa = PBXBuildFile; productRef = F76DA968277B77EA0082465B /* DropDown */; };
 		5696257527B289C6003F774D /* FSCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = F76DA96B277B78400082465B /* FSCalendar */; };
 		5696257627B289C6003F774D /* TLPhotoPicker in Frameworks */ = {isa = PBXBuildFile; productRef = F76DA96E277B78AE0082465B /* TLPhotoPicker */; };
 		5696257727B289C6003F774D /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC79277B7D0000AA9FBF /* Realm */; };
@@ -59,7 +59,6 @@
 		569625D927B29589003F774D /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 569625D827B29589003F774D /* MarqueeLabel */; };
 		569625DC27B295ED003F774D /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = 569625DB27B295ED003F774D /* Queuer */; };
 		569625DF27B29670003F774D /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = 569625DE27B29670003F774D /* UICKeyChainStore */; };
-		569625E227B29736003F774D /* DropDown in Frameworks */ = {isa = PBXBuildFile; productRef = 569625E127B29736003F774D /* DropDown */; };
 		569625E527B29844003F774D /* FSCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = 569625E427B29844003F774D /* FSCalendar */; };
 		569625E827B2991A003F774D /* TLPhotoPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 569625E727B2991A003F774D /* TLPhotoPicker */; };
 		569625EB27B299A0003F774D /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 569625EA27B299A0003F774D /* Realm */; };
@@ -551,6 +550,7 @@
 		3757A35423D9D76300EC369E /* NCMenuPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuPanelController.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
 		37ECC83A23D0C7400082EFA2 /* NCMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuAction.swift; sourceTree = "<group>"; };
+		5645C2A927B3F61300553117 /* DropDown.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DropDown.xcframework; path = Carthage/Build/DropDown.xcframework; sourceTree = "<group>"; };
 		56A229EC27B3CE3A00C35F8B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = NCCommunication.xcframework; path = Carthage/Build/NCCommunication.xcframework; sourceTree = "<group>"; };
 		56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Alamofire.xcframework; path = Carthage/Build/Alamofire.xcframework; sourceTree = "<group>"; };
@@ -1031,6 +1031,7 @@
 				5696256D27B289C6003F774D /* MarkdownKit in Frameworks */,
 				5696256B27B289C6003F774D /* SwiftRichString in Frameworks */,
 				569625F627B29BA7003F774D /* JGProgressHUD in Frameworks */,
+				5645C2AA27B3F61300553117 /* DropDown.xcframework in Frameworks */,
 				569625D327B291E6003F774D /* SwiftEntryKit in Frameworks */,
 				569625F027B29B07003F774D /* ChromaColorPicker in Frameworks */,
 				5696256A27B289C6003F774D /* QRCodeReader in Frameworks */,
@@ -1046,7 +1047,6 @@
 				5696259227B28E46003F774D /* SwiftRichString in Frameworks */,
 				5696257727B289C6003F774D /* Realm in Frameworks */,
 				56A5107727B2C4B800D9F3E6 /* NCCommunication.xcframework in Frameworks */,
-				569625E227B29736003F774D /* DropDown in Frameworks */,
 				569625D927B29589003F774D /* MarqueeLabel in Frameworks */,
 				569625DC27B295ED003F774D /* Queuer in Frameworks */,
 				5696257327B289C6003F774D /* UICKeyChainStore in Frameworks */,
@@ -1057,7 +1057,6 @@
 				569625E827B2991A003F774D /* TLPhotoPicker in Frameworks */,
 				569625E527B29844003F774D /* FSCalendar in Frameworks */,
 				F75E57BD25BF0EC1002B72C2 /* SVGKit in Frameworks */,
-				5696257427B289C6003F774D /* DropDown in Frameworks */,
 				5696259827B28ED4003F774D /* MarkdownKit in Frameworks */,
 				C970193FFBCF83131028E4BC /* Pods_Nextcloud.framework in Frameworks */,
 				5696257527B289C6003F774D /* FSCalendar in Frameworks */,
@@ -1990,6 +1989,7 @@
 				F7421EAE2294044B00C4B7C1 /* Accelerate.framework */,
 				F70F2BA4225F2D8900EBB73E /* ZIPFoundation.framework */,
 				F7267A81225DFCE100D6DB7D /* AFNetworking.framework */,
+				5645C2A927B3F61300553117 /* DropDown.xcframework */,
 				F76E71E42244DF6900690001 /* Zip.framework */,
 				F745B250222D871800346520 /* QRCodeReader.framework */,
 				F75153232226920200323DDC /* FastScroll.framework */,
@@ -2170,7 +2170,6 @@
 				F74E771F277A2EF40013B958 /* XLForm */,
 				F76DA962277B760E0082465B /* Queuer */,
 				F76DA965277B76F30082465B /* UICKeyChainStore */,
-				F76DA968277B77EA0082465B /* DropDown */,
 				F76DA96B277B78400082465B /* FSCalendar */,
 				F76DA96E277B78AE0082465B /* TLPhotoPicker */,
 				F710FC79277B7D0000AA9FBF /* Realm */,
@@ -2187,7 +2186,6 @@
 				569625D827B29589003F774D /* MarqueeLabel */,
 				569625DB27B295ED003F774D /* Queuer */,
 				569625DE27B29670003F774D /* UICKeyChainStore */,
-				569625E127B29736003F774D /* DropDown */,
 				569625E427B29844003F774D /* FSCalendar */,
 				569625E727B2991A003F774D /* TLPhotoPicker */,
 				569625EA27B299A0003F774D /* Realm */,
@@ -2263,7 +2261,6 @@
 				569625D727B29588003F774D /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
 				569625DA27B295ED003F774D /* XCRemoteSwiftPackageReference "Queuer" */,
 				569625DD27B29670003F774D /* XCRemoteSwiftPackageReference "UICKeyChainStore" */,
-				569625E027B29736003F774D /* XCRemoteSwiftPackageReference "DropDown" */,
 				569625E327B29844003F774D /* XCRemoteSwiftPackageReference "FSCalendar" */,
 				569625E627B2991A003F774D /* XCRemoteSwiftPackageReference "TLPhotoPicker" */,
 				569625E927B299A0003F774D /* XCRemoteSwiftPackageReference "realm-swift" */,
@@ -2499,7 +2496,6 @@
 				"$(SRCROOT)/Carthage/Build/iOS/QRCodeReader.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/ZIPFoundation.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/FSCalendar.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/DropDown.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/OpenSSL.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/QuickLayout.framework",
 				"$(SRCROOT)/Carthage/Build/iOS/SwiftEntryKit.framework",
@@ -3573,14 +3569,6 @@
 				kind = branch;
 			};
 		};
-		569625E027B29736003F774D /* XCRemoteSwiftPackageReference "DropDown" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AssistoLab/DropDown";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		569625E327B29844003F774D /* XCRemoteSwiftPackageReference "FSCalendar" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/WenchaoD/FSCalendar";
@@ -3725,14 +3713,6 @@
 				kind = branch;
 			};
 		};
-		F76DA967277B77E90082465B /* XCRemoteSwiftPackageReference "DropDown" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AssistoLab/DropDown";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		F76DA96A277B78400082465B /* XCRemoteSwiftPackageReference "FSCalendar" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/WenchaoD/FSCalendar";
@@ -3828,11 +3808,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 569625DD27B29670003F774D /* XCRemoteSwiftPackageReference "UICKeyChainStore" */;
 			productName = UICKeyChainStore;
-		};
-		569625E127B29736003F774D /* DropDown */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 569625E027B29736003F774D /* XCRemoteSwiftPackageReference "DropDown" */;
-			productName = DropDown;
 		};
 		569625E427B29844003F774D /* FSCalendar */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -3993,11 +3968,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F76DA964277B76F10082465B /* XCRemoteSwiftPackageReference "UICKeyChainStore" */;
 			productName = UICKeyChainStore;
-		};
-		F76DA968277B77EA0082465B /* DropDown */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F76DA967277B77E90082465B /* XCRemoteSwiftPackageReference "DropDown" */;
-			productName = DropDown;
 		};
 		F76DA96B277B78400082465B /* FSCalendar */ = {
 			isa = XCSwiftPackageProductDependency;
