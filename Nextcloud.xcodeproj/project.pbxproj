@@ -148,6 +148,7 @@
 		7A70DDFA27B567C50018F47E /* TOPasscodeViewController.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56E9B9F227B39218007B1772 /* TOPasscodeViewController.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7A70DE1A27B56B040018F47E /* KTVCocoaHTTPServer.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; };
 		7A70DE1D27B56B0E0018F47E /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7A70DE2327B5736E0018F47E /* NCSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DE2227B5736E0018F47E /* NCSettings.storyboard */; };
 		7A82A18126F3529100D52790 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7239876253D86D300257F49 /* NCEmptyView.xib */; };
 		7A82A18526F352AC00D52790 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB20E92660DFA200AF4344 /* NCRenameFile.storyboard */; };
 		7A82A18926F352DA00D52790 /* NCSectionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = F78ACD53219047D40088454D /* NCSectionFooter.xib */; };
@@ -483,7 +484,6 @@
 		F7C9555321F0C4CA0024296E /* NCActivity.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7C9555221F0C4CA0024296E /* NCActivity.storyboard */; };
 		F7C9555521F0C5470024296E /* NCActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C9555421F0C5470024296E /* NCActivity.swift */; };
 		F7CB689A2541676B0050EC94 /* NCMore.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7CB68992541676B0050EC94 /* NCMore.storyboard */; };
-		F7CB68A0254169530050EC94 /* NCSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7CB689F254169530050EC94 /* NCSettings.storyboard */; };
 		F7D1612023CF19E30039EBBF /* NCViewerRichWorkspace.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7D1611F23CF19E30039EBBF /* NCViewerRichWorkspace.storyboard */; };
 		F7D96FCC246ED7E200536D73 /* NCNetworkingCheckRemoteUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7D96FCB246ED7E100536D73 /* NCNetworkingCheckRemoteUser.swift */; };
 		F7DBC37C23325E02001A85BA /* NCAppConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7DBC37B23325E01001A85BA /* NCAppConfigView.swift */; };
@@ -624,6 +624,7 @@
 		7A70DD9B27B4D9B70018F47E /* NCViewerMediaPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCViewerMediaPage.swift; sourceTree = "<group>"; };
 		7A70DD9C27B4D9B70018F47E /* NCViewerMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCViewerMedia.swift; sourceTree = "<group>"; };
 		7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = KTVCocoaHTTPServer.xcframework; path = Carthage/Build/KTVCocoaHTTPServer.xcframework; sourceTree = "<group>"; };
+		7A70DE2227B5736E0018F47E /* NCSettings.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCSettings.storyboard; sourceTree = "<group>"; };
 		7A82A1A926F35C5000D52790 /* OpenSSL.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = OpenSSL.xcframework; path = Carthage/Build/OpenSSL.xcframework; sourceTree = "<group>"; };
 		7A82A1B226F35C8400D52790 /* MarkdownKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MarkdownKit.xcframework; path = Carthage/Build/MarkdownKit.xcframework; sourceTree = "<group>"; };
 		7A875ED32694392800AF558D /* PrivacyPolicyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyViewController.swift; sourceTree = "<group>"; };
@@ -983,7 +984,6 @@
 		F7C9555221F0C4CA0024296E /* NCActivity.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCActivity.storyboard; sourceTree = "<group>"; };
 		F7C9555421F0C5470024296E /* NCActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivity.swift; sourceTree = "<group>"; };
 		F7CB68992541676B0050EC94 /* NCMore.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCMore.storyboard; sourceTree = "<group>"; };
-		F7CB689F254169530050EC94 /* NCSettings.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCSettings.storyboard; sourceTree = "<group>"; };
 		F7CBC31B24F78E79004D3812 /* NCSortMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSortMenu.swift; sourceTree = "<group>"; };
 		F7CE8AFA1DC1F8D8009CAE48 /* Nextcloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nextcloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F7CE8AFB1DC1F8D8009CAE48 /* Share.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Share.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1713,9 +1713,9 @@
 		F7ACE4281BAC0268006C0017 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				7A70DE2227B5736E0018F47E /* NCSettings.storyboard */,
 				F77910A425DD517B00CEDB9E /* Settings.bundle */,
 				F77910AA25DD53C700CEDB9E /* NCSettingsBundleHelper.swift */,
-				F7CB689F254169530050EC94 /* NCSettings.storyboard */,
 				F7ACE4291BAC0268006C0017 /* Acknowledgements.h */,
 				F7ACE42B1BAC0268006C0017 /* Acknowledgements.rtf */,
 				F7ACE42A1BAC0268006C0017 /* Acknowledgements.m */,
@@ -2423,6 +2423,7 @@
 				7AE63BFD26DE5FCE00CEAAD5 /* NCSelectCommandViewCopyMove.xib in Resources */,
 				F79A65C32191D90F00FF6DCC /* NCSelect.storyboard in Resources */,
 				F7226EDC1EE4089300EBECB1 /* Main.storyboard in Resources */,
+				7A70DE2327B5736E0018F47E /* NCSettings.storyboard in Resources */,
 				F7EFC0C6256BC77700461AAD /* NCMoreUserCell.xib in Resources */,
 				F7632FBF21832F8700721B71 /* NCTrashSectionHeaderMenu.xib in Resources */,
 				7A875F0C26946D0B00AF558D /* RequiredDataCollectionSwitch.xib in Resources */,
@@ -2500,7 +2501,6 @@
 				C07020EC267B45AE00E094AD /* NCPermissionMenuView.xib in Resources */,
 				F74DE14425135B6800917068 /* NCTransfers.storyboard in Resources */,
 				F77910A525DD517B00CEDB9E /* Settings.bundle in Resources */,
-				F7CB68A0254169530050EC94 /* NCSettings.storyboard in Resources */,
 				95BB21172660F55900AF4344 /* NCLogin.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
