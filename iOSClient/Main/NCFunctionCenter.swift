@@ -190,7 +190,7 @@ import JGProgressHUD
     
     // MARK: -
 
-    func openShare(ViewController: UIViewController, metadata: tableMetadata, indexPage: Int) {
+    func openShare(viewController: UIViewController, metadata: tableMetadata, indexPage: NCGlobal.NCSharePagingIndex) {
         
         let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as! UINavigationController
         let shareViewController = shareNavigationController.topViewController as! NCSharePaging
@@ -203,7 +203,7 @@ import JGProgressHUD
         } else {
             shareNavigationController.modalPresentationStyle = .pageSheet
         }
-        ViewController.present(shareNavigationController, animated: true, completion: nil)
+        viewController.present(shareNavigationController, animated: true, completion: nil)
     }
      
     // MARK: -
@@ -675,7 +675,7 @@ import JGProgressHUD
         }
         
         let detail = UIAction(title: NSLocalizedString("_details_", comment: ""), image: UIImage(named: "details")?.imageColor(NCBrandColor.shared.nmcGray0)) { action in
-            self.openShare(ViewController: viewController, metadata: metadata, indexPage: 2)
+            self.openShare(viewController: viewController, metadata: metadata, indexPage: NCGlobal.NCSharePagingIndex.sharing)
         }
         
         let offline = UIAction(title: titleOffline, image: UIImage(systemName: "tray.and.arrow.down")) { action in

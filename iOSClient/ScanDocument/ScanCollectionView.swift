@@ -402,7 +402,6 @@ extension DragDropViewController: UICollectionViewDataSource {
 
             cell.customImageView?.image = image
             cell.delete.action(for: .touchUpInside) { sender in
-
                 let buttonPosition: CGPoint = (sender as! UIButton).convert(.zero, to: self.collectionViewSource)
                 if let indexPath = self.collectionViewSource.indexPathForItem(at: buttonPosition) {
 
@@ -432,8 +431,8 @@ extension DragDropViewController: UICollectionViewDataSource {
 
             cell.customImageView?.image = self.filter(image: image)
             cell.customLabel.text = NSLocalizedString("_scan_document_pdf_page_", comment: "") + " " + "\(indexPath.row+1)"
-            cell.delete.action(for: .touchUpInside) { sender in
-
+            
+                cell.delete.action(for: .touchUpInside) { sender in
                 let buttonPosition: CGPoint = (sender as! UIButton).convert(.zero, to: self.collectionViewDestination)
                 if let indexPath = self.collectionViewDestination.indexPathForItem(at: buttonPosition) {
 
@@ -450,6 +449,7 @@ extension DragDropViewController: UICollectionViewDataSource {
                     }
                 }
             }
+            
             cell.rotate.action(for: .touchUpInside) { sender in
 
                 let buttonPosition: CGPoint = (sender as! UIButton).convert(.zero, to: self.collectionViewDestination)

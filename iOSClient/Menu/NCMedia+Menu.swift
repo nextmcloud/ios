@@ -48,29 +48,29 @@ extension NCMedia {
 
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString(filterTypeFileImage ? "_media_viewimage_show_" : "_media_viewimage_hide_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: filterTypeFileImage ? "nocamera" : "file_photo_menu",color: NCBrandColor.shared.iconColor),
+                    title: NSLocalizedString(filterClassTypeImage ? "_media_viewimage_show_" : "_media_viewimage_hide_", comment: ""),
+                    icon: NCUtility.shared.loadImage(named: filterClassTypeImage ? "nocamera" : "file_photo_menu",color: NCBrandColor.shared.iconColor),
 
-                    selected: filterTypeFileImage,
+                    selected: filterClassTypeImage,
                     on: true,
                     action: { menuAction in
-                        self.filterTypeFileImage = !self.filterTypeFileImage
-                        self.filterTypeFileVideo = false
-                        self.reloadDataSource()
+                        self.filterClassTypeImage = !self.filterClassTypeImage
+                        self.filterClassTypeVideo = false
+                        self.reloadDataSourceWithCompletion { _ in }
                     }
                 )
             )
 
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString(filterTypeFileVideo ? "_media_viewvideo_show_" : "_media_viewvideo_hide_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: filterTypeFileVideo ? "videono" : "videoyes",color: NCBrandColor.shared.iconColor),
-                    selected: filterTypeFileVideo,
+                    title: NSLocalizedString(filterClassTypeVideo ? "_media_viewvideo_show_" : "_media_viewvideo_hide_", comment: ""),
+                    icon: NCUtility.shared.loadImage(named: filterClassTypeVideo ? "videono" : "videoyes",color: NCBrandColor.shared.iconColor),
+                    selected: filterClassTypeVideo,
                     on: true,
                     action: { menuAction in
-                        self.filterTypeFileVideo = !self.filterTypeFileVideo
-                        self.filterTypeFileImage = false
-                        self.reloadDataSource()
+                        self.filterClassTypeVideo = !self.filterClassTypeVideo
+                        self.filterClassTypeImage = false
+                        self.reloadDataSourceWithCompletion { _ in }
                     }
                 )
             )
@@ -100,7 +100,7 @@ extension NCMedia {
                     on: true,
                     action: { menuAction in
                         CCUtility.setMediaSortDate("date")
-                        self.reloadDataSource()
+                        self.reloadDataSourceWithCompletion { _ in }
                     }
                 )
             )
@@ -113,7 +113,7 @@ extension NCMedia {
                     on: true,
                     action: { menuAction in
                         CCUtility.setMediaSortDate("creationDate")
-                        self.reloadDataSource()
+                        self.reloadDataSourceWithCompletion { _ in }
                     }
                 )
             )
@@ -126,7 +126,7 @@ extension NCMedia {
                     on: true,
                     action: { menuAction in
                         CCUtility.setMediaSortDate("uploadDate")
-                        self.reloadDataSource()
+                        self.reloadDataSourceWithCompletion { _ in }
                     }
                 )
             )
@@ -249,7 +249,7 @@ extension NCMedia {
                         self.isEditMode = false
                         for ocId in self.selectOcId {
                             if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                                NCNetworking.shared.deleteMetadata(metadata, account: self.appDelegate.account, urlBase: self.appDelegate.urlBase, onlyLocal: false) { (errorCode, errorDescription) in
+                                NCNetworking.shared.deleteMetadata(metadata, onlyLocalCache: false) { (errorCode, errorDescription) in
                                     if errorCode != 0 {
                                         NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
                                     }

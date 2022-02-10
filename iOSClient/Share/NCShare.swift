@@ -116,21 +116,32 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadDataNCShare), object: nil)
         
         // Shared with you by ...
-        if metadata!.ownerId != "" && metadata!.ownerId != self.appDelegate.userId {
-            
-//            searchFieldTopConstraint.constant = 65
+        if let metadata = metadata, !metadata.ownerId.isEmpty, metadata.ownerId != self.appDelegate.userId {
 
-            let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + metadata!.ownerId + ".png"
-            if FileManager.default.fileExists(atPath: fileNameLocalPath) {
-                if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-//                    sharedWithYouByImage.image = NCUtility.shared.createAvatar(image: image, size: 40)
-                }
-            } else {
-                NCCommunication.shared.downloadAvatar(userId: metadata!.ownerId, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
-                    if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
-                        if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-//                            self.sharedWithYouByImage.image = NCUtility.shared.createAvatar(image: image, size: 40)
-                        }
+            searchFieldTopConstraint.constant = 65
+            sharedWithYouByView.isHidden = false
+            sharedWithYouByLabel.text = NSLocalizedString("_shared_with_you_by_", comment: "") + " " + metadata.ownerDisplayName
+            sharedWithYouByImage.image = NCUtility.shared.loadUserImage(
+                for: metadata.ownerId,
+                   displayName: metadata.ownerDisplayName,
+                   userBaseUrl: appDelegate)
+            
+            let fileName = appDelegate.userBaseUrl + "-" + metadata.ownerId + ".png"
+
+            if NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName) == nil {
+                let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + fileName
+                let etag = NCManageDatabase.shared.getTableAvatar(fileName: fileName)?.etag
+
+                NCCommunication.shared.downloadAvatar(user: metadata.ownerId, fileNameLocalPath: fileNameLocalPath, sizeImage: NCGlobal.shared.avatarSize, avatarSizeRounded: NCGlobal.shared.avatarSizeRounded, etag: etag) { _, imageAvatar, _, etag, errorCode, _ in
+
+                    if errorCode == 0, let etag = etag, let imageAvatar = imageAvatar {
+
+                        NCManageDatabase.shared.addAvatar(fileName: fileName, etag: etag)
+                        self.sharedWithYouByImage.image = imageAvatar
+
+                    } else if errorCode == NCGlobal.shared.errorNotModified, let imageAvatar = NCManageDatabase.shared.setAvatarLoaded(fileName: fileName) {
+
+                        self.sharedWithYouByImage.image = imageAvatar
                     }
                 }
             }
@@ -143,7 +154,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
         if sharingEnabled {
-            networking?.readShare()
+            networking?.readShare(showLoadingIndicator: true)
         }
         
         // changeTheming
@@ -509,12 +520,21 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                     cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
                 }
             } else {
-                NCCommunication.shared.downloadAvatar(userId: sharee.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
-                    if errorCode == 0 && account == self?.appDelegate.account && UIImage(data: data!) != nil {
-                        if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-                            DispatchQueue.main.async {
-                                cell.imageItem.image = NCUtility.shared.createAvatar(image: image, size: 30)
-                            }
+                let fileName = self?.appDelegate.userBaseUrl ?? "" + "-" + sharee.shareWith + ".png"
+                if NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName) == nil {
+                    let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + fileName
+                    let etag = NCManageDatabase.shared.getTableAvatar(fileName: fileName)?.etag
+                    
+                    NCCommunication.shared.downloadAvatar(user: sharee.shareWith, fileNameLocalPath: fileNameLocalPath, sizeImage: NCGlobal.shared.avatarSize, avatarSizeRounded: NCGlobal.shared.avatarSizeRounded, etag: etag) { _, imageAvatar, _, etag, errorCode, _ in
+                        
+                        if errorCode == 0, let etag = etag, let imageAvatar = imageAvatar {
+                            
+                            NCManageDatabase.shared.addAvatar(fileName: fileName, etag: etag)
+                            cell.imageItem.image = imageAvatar
+                            
+                        } else if errorCode == NCGlobal.shared.errorNotModified, let imageAvatar = NCManageDatabase.shared.setAvatarLoaded(fileName: fileName) {
+                            
+                            cell.imageItem.image = imageAvatar
                         }
                     }
                 }
@@ -647,7 +667,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         if editingAllowed {
             self.quickStatusTableShare = tableShare
             let quickStatusMenu = NCShareQuickStatusMenu()
-            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, fileExtension: self.metadata?.ext, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
+            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, tableShare: tableShare)
         } else {
             return
         }
@@ -661,7 +681,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         if directory {
             self.quickStatusTableShare = tableShare
             let quickStatusMenu = NCShareQuickStatusMenu()
-            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: metadata!.typeFile, fileExtension: self.metadata?.ext, status: self.quickStatusTableShare.permissions, shareType: self.quickStatusTableShare.shareType)
+            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, tableShare: tableShare)
         }
     }
     
@@ -843,13 +863,6 @@ extension NCShare: UITableViewDataSource {
                 if FileManager.default.fileExists(atPath: fileNameLocalPath) {
                     if let image = UIImage(contentsOfFile: fileNameLocalPath) {
                     }
-                } else {
-                    NCCommunication.shared.downloadAvatar(userId: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
-                        if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
-                            if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-                            }
-                        }
-                    }
                 }
                 
                 if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
@@ -923,14 +936,7 @@ extension NCShare: UITableViewDataSource {
                     if let image = UIImage(contentsOfFile: fileNameLocalPath) {
 
                     }
-                } else {
-                    NCCommunication.shared.downloadAvatar(userId: tableShare.shareWith, fileNameLocalPath: fileNameLocalPath, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
-                        if errorCode == 0 && account == self.appDelegate.account && UIImage(data: data!) != nil {
-                            if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-                            }
-                        }
-                    }
-                }
+                } 
                 
                 if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
                     cell.switchCanEdit.setOn(true, animated: false)

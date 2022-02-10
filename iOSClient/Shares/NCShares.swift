@@ -76,7 +76,7 @@ class NCShares: NCCollectionViewCommon {
         collectionView?.reloadData()
 
         // Shares network
-        NCCommunication.shared.readShares(parameters: NCCShareParameter(), queue: NCCommunicationCommon.shared.backgroundQueue) { account, shares, errorCode, errorDescription in
+        NCCommunication.shared.readShares { account, shares, errorCode, errorDescription in
 
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()

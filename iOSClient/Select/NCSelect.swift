@@ -524,24 +524,11 @@ extension NCSelect: UICollectionViewDataSource {
             if (isShare) {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else if (tableShare != nil && tableShare?.shareType == 3) {
-//                cell.imageShared.image = NCBrandColor.cacheImages.shareByLink
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else if (tableShare != nil && tableShare?.shareType != 3) {
                 cell.imageShared.image = NCBrandColor.cacheImages.shared
             } else {
                 cell.imageShared.image = NCBrandColor.cacheImages.canShare
-            }
-            if metadata.ownerId.count > 0 && metadata.ownerId != activeAccount.userId {
-                let fileNameUser = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(activeAccount.user, urlBase: activeAccount.urlBase)) + "-" + metadata.ownerId + ".png"
-                if FileManager.default.fileExists(atPath: fileNameUser) {
-                    cell.imageShared.image = UIImage(contentsOfFile: fileNameUser)
-                } else {
-                    NCCommunication.shared.downloadAvatar(userId: metadata.ownerId, fileNameLocalPath: fileNameUser, size: NCGlobal.shared.avatarSize) { (account, data, errorCode, errorMessage) in
-                        if errorCode == 0 && account == self.activeAccount.account {
-                            cell.imageShared.image = UIImage(contentsOfFile: fileNameUser)
-                        }
-                    }
-                }
             }
             
             cell.imageSelect.isHidden = true

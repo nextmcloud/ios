@@ -58,38 +58,40 @@ extension UIViewController {
     }
 
     func showProfileMenu(userId: String) {
+        
+        //Commented For NCCommunication Library Dependancy
 
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        let serverVersionMajor = NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesVersionMajor)
-        guard serverVersionMajor >= NCGlobal.shared.nextcloudVersion23 else { return }
-
-        NCCommunication.shared.getHovercard(for: userId) { card, _, _ in
-            guard let card = card else { return }
-
-            let personHeader = NCMenuAction(
-                title: card.displayName,
-                icon: NCUtility.shared.loadUserImage(
-                    for: userId,
-                       displayName: card.displayName,
-                       userBaseUrl: appDelegate),
-                action: nil)
-
-            let actions = card.actions.map { action -> NCMenuAction in
-                var image = NCUtility.shared.loadImage(named: "user", color: NCBrandColor.shared.label)
-                if let url = URL(string: action.icon),
-                   let svgSource = SVGKSourceURL.source(from: url),
-                   let svg = SVGKImage(source: svgSource) {
-                    image = svg.uiImage.imageColor(NCBrandColor.shared.label)
-                }
-                return NCMenuAction(
-                    title: action.title,
-                    icon: image,
-                    action: { _ in self.handleProfileAction(action, for: userId) })
-            }
-
-            let allActions = [personHeader] + actions
-            self.presentMenu(with: allActions)
-        }
+//        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+//        let serverVersionMajor = NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesVersionMajor)
+//        guard serverVersionMajor >= NCGlobal.shared.nextcloudVersion23 else { return }
+//
+//        NCCommunication.shared.getHovercard(for: userId) { card, _, _ in
+//            guard let card = card else { return }
+//
+//            let personHeader = NCMenuAction(
+//                title: card.displayName,
+//                icon: NCUtility.shared.loadUserImage(
+//                    for: userId,
+//                       displayName: card.displayName,
+//                       userBaseUrl: appDelegate),
+//                action: nil)
+//
+//            let actions = card.actions.map { action -> NCMenuAction in
+//                var image = NCUtility.shared.loadImage(named: "user", color: NCBrandColor.shared.label)
+//                if let url = URL(string: action.icon),
+//                   let svgSource = SVGKSourceURL.source(from: url),
+//                   let svg = SVGKImage(source: svgSource) {
+//                    image = svg.uiImage.imageColor(NCBrandColor.shared.label)
+//                }
+//                return NCMenuAction(
+//                    title: action.title,
+//                    icon: image,
+//                    action: { _ in self.handleProfileAction(action, for: userId) })
+//            }
+//
+//            let allActions = [personHeader] + actions
+//            self.presentMenu(with: allActions)
+//        }
     }
 
     func sendEmail(to email: String) {

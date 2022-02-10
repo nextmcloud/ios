@@ -352,14 +352,21 @@ import XLForm
 //            return
 //        }
         
+        let rowFileName: XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
+        guard var fileNameForm = rowFileName.value else {
+            return
+        }
+
+        
         if fileName as! String == "" {
             return
         } else {
             
-            let result = NCCommunicationCommon.shared.getInternalType(fileName: fileName as! String, mimeType: "", directory: false)
+            let result = NCCommunicationCommon.shared.getInternalType(fileName: fileNameForm as! String, mimeType: "", directory: false)
             if NCUtility.shared.isDirectEditing(account: appDelegate.account, contentType: result.mimeType).count == 0 {
-                fileName = (fileName as! NSString).deletingPathExtension + "." + fileNameExtension
+                fileNameForm = (fileNameForm as! NSString).deletingPathExtension + "." + fileNameExtension
             }
+
             
             if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: String(describing: fileName)) != nil {
                 

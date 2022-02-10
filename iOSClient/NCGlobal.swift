@@ -390,4 +390,8 @@ class NCGlobal: NSObject {
     let notificationCenterReloadMediaPage                       = "reloadMediaPage"
     let notificationCenterPlayMedia                             = "playMedia"
     let notificationCenterPauseMedia                            = "pauseMedia"
+    
+    let notificationCenterStatusReadOnly                        = "statusReadOnly"
+    let notificationCenterStatusEditing                         = "statusEditing"
+    let notificationCenterStatusFileDrop                        = "statusFileDrop"
 }

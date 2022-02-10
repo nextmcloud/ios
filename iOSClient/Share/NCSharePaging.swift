@@ -37,7 +37,7 @@ class NCSharePaging: UIViewController {
     private var sharingEnabled = true
     
     @objc var metadata = tableMetadata()
-    @objc var indexPage: Int = 2
+    var indexPage = NCGlobal.NCSharePagingIndex.sharing
         
     // MARK: - View Life Cycle
 
@@ -58,18 +58,11 @@ class NCSharePaging: UIViewController {
         if activity == nil {
             activityEnabled = false
         }
-        if indexPage == NCGlobal.shared.indexPageComments && !commentsEnabled {
-            indexPage = NCGlobal.shared.indexPageActivity
+        if indexPage == .sharing && !sharingEnabled {
+            indexPage = .activity
         }
-        if indexPage == NCGlobal.shared.indexPageSharing && !sharingEnabled {
-            indexPage = NCGlobal.shared.indexPageActivity
-        }
-        if indexPage == NCGlobal.shared.indexPageActivity && !activityEnabled {
-            if sharingEnabled {
-                indexPage = NCGlobal.shared.indexPageSharing
-            } else if commentsEnabled {
-                indexPage = NCGlobal.shared.indexPageComments
-            }
+        if indexPage == .activity && !activityEnabled && sharingEnabled {
+            indexPage = .sharing
         }
         
 //        pagingViewController.activityEnabled = activityEnabled
@@ -111,8 +104,8 @@ class NCSharePaging: UIViewController {
         
         pagingViewController.dataSource = self
         pagingViewController.delegate = self
-        pagingViewController.select(index: indexPage)
-        let pagingIndexItem = self.pagingViewController(pagingViewController, pagingItemAt: indexPage) as! PagingIndexItem
+        pagingViewController.select(index: indexPage.rawValue)
+        let pagingIndexItem = self.pagingViewController(pagingViewController, pagingItemAt: indexPage.rawValue) as! PagingIndexItem
 //        let pagingIndexItem = self.pagingViewController(pagingViewController, pagingItemAt: 0) as! PagingIndexItem
         self.title = pagingIndexItem.title
         pagingViewController.collectionView.isHidden = true
@@ -191,9 +184,7 @@ extension NCSharePaging: PagingViewControllerDataSource {
     func pagingViewController(_: PagingViewController, viewControllerAt index: Int) -> UIViewController {
     
         let height = pagingViewController.options.menuHeight + NCSharePagingView.HeaderHeight
-        let topSafeArea = UIApplication.shared.keyWindow?.safeAreaInsets.top ?? 0
 
-        switch index {
 //        case 0:
 //            let viewController = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "sharing") as! NCShare
 //            viewController.sharingEnabled = sharingEnabled
@@ -202,27 +193,24 @@ extension NCSharePaging: PagingViewControllerDataSource {
 //            return viewController
         
         
-        case NCGlobal.shared.indexPageActivity:
-            let viewController = UIStoryboard(name: "NCActivity", bundle: nil).instantiateInitialViewController() as! NCActivity
-            viewController.insets = UIEdgeInsets(top: height - topSafeArea, left: 0, bottom: 0, right: 0)
-            viewController.didSelectItemEnable = false
-            viewController.filterFileId = metadata.fileId
-            viewController.objectType = "files"
-            return viewController
-        case NCGlobal.shared.indexPageComments:
-            let viewController = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "comments") as! NCShareComments
-            viewController.metadata = metadata
-            viewController.height = height
-            return viewController
-        case NCGlobal.shared.indexPageSharing:
-            let viewController = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "sharing") as! NCShare
-            viewController.sharingEnabled = sharingEnabled
-            viewController.metadata = metadata
-            viewController.height = height
-            return viewController
-        default:
-            return UIViewController()
-        }
+            switch NCGlobal.NCSharePagingIndex(rawValue: index) {
+            case .activity:
+                let viewController = UIStoryboard(name: "NCActivity", bundle: nil).instantiateInitialViewController() as! NCActivity
+                viewController.height = height
+                viewController.showComments = true
+                viewController.didSelectItemEnable = false
+                viewController.metadata = metadata
+                viewController.objectType = "files"
+                return viewController
+            case .sharing:
+                let viewController = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "sharing") as! NCShare
+                viewController.sharingEnabled = sharingEnabled
+                viewController.metadata = metadata
+                viewController.height = height
+                return viewController
+            default:
+                return UIViewController()
+            }
     }
     
     func pagingViewController(_: PagingViewController, pagingItemAt index: Int) -> PagingItem {
@@ -397,7 +385,7 @@ class NCSharePagingView: PagingView {
             
             if ext == "GIF" {
                 if !FileManager().fileExists(atPath: previewPath) {
-                    NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+                    NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
                 }
                 image = UIImage.animatedImage(withAnimatedGIFURL: URL(fileURLWithPath: imagePath))
             } else if ext == "SVG" {
@@ -418,7 +406,7 @@ class NCSharePagingView: PagingView {
                     return nil
                 }
             } else {
-                NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+                NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
                 image = UIImage.init(contentsOfFile: imagePath)
             }
         }
@@ -435,7 +423,7 @@ class NCSharePagingView: PagingView {
         }
         
         if metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo && !metadata.hasPreview {
-            NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+            NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
         }
         
         if CCUtility.fileProviderStoragePreviewIconExists(metadata.ocId, etag: metadata.etag) {
@@ -543,7 +531,7 @@ class NCShareHeaderView: UIView {
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-            NCNetworking.shared.favoriteMetadata(metadata, urlBase: appDelegate.urlBase) { (errorCode, errorDescription) in
+            NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
                 if errorCode == 0 {
                     if !metadata.favorite {
                         self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)

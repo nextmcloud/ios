@@ -827,7 +827,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId) else { return }
         TealiumHelper.shared.trackEvent(title: "magentacloud-app.filebrowser.sharing", data: ["": ""])
         appDelegate.adjust.trackEvent(TriggerEvent(Sharing.rawValue))
-        NCFunctionCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 2)
+        NCFunctionCenter.shared.openShare(viewController: self, metadata: metadata, indexPage: NCGlobal.NCSharePagingIndex.sharing)
     }
         
     func tapMoreGridItem(with objectId: String, namedButtonMore: String, image: UIImage?, sender: Any) {
