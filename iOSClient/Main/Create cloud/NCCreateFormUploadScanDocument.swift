@@ -1000,7 +1000,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             }
             
             
-            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
             
             metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
             metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
@@ -1104,7 +1104,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         }
         
         
-        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
 //=======
 //        //Create metadata for upload
 //        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
@@ -1274,7 +1274,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 
                 let image = changeCompressionImage(arrayImages[count])
                 
-                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: fileNameSave,fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
                 
                 metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
                 metadataForUpload.sessionSelector = NCBrandGlobal.shared.selectorUploadFile
@@ -1646,20 +1646,12 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {
         
         self.deselectFormRow(sender)
-        
+
         let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
         let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
         let viewController = navigationController.topViewController as! NCSelect
-        
+
         viewController.delegate = self
-        viewController.hideButtonCreateFolder = false
-        viewController.includeDirectoryE2EEncryption = true
-        viewController.includeImages = false
-        viewController.selectFile = false
-        viewController.titleButtonDone = NSLocalizedString("_select_", comment: "")
-        viewController.type = ""
-        
-        navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
         viewController.typeOfCommandView = .selectCreateFolder
         viewController.includeDirectoryE2EEncryption = true
 

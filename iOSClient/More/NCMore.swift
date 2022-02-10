@@ -197,7 +197,6 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             labelQuotaExternalSite.text = item.name
         }
         
-        changeUserProfile()
 
         // ITEM: Test API
         if NCUtility.shared.isSimulator() {

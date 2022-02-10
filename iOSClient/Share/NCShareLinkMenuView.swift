@@ -292,7 +292,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
             permissions = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: false, andIsFolder: metadata.directory)
         }
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
 
     // Read Only (directory)
@@ -305,7 +305,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
         if sender.isOn && permissions != tableShare.permissions {
             switchAllowUploadAndEditing.setOn(false, animated: false)
             switchFileDrop.setOn(false, animated: false)
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
             sender.setOn(true, animated: false)
         }
@@ -321,7 +321,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
         if sender.isOn && permissions != tableShare.permissions {
             switchReadOnly.setOn(false, animated: false)
             switchFileDrop.setOn(false, animated: false)
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
             sender.setOn(true, animated: false)
         }
@@ -336,7 +336,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
         if sender.isOn && permissions != tableShare.permissions {
             switchReadOnly.setOn(false, animated: false)
             switchAllowUploadAndEditing.setOn(false, animated: false)
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         } else {
             sender.setOn(true, animated: false)
         }
@@ -347,7 +347,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
 
         guard let tableShare = self.tableShare else { return }
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: tableShare.permissions, note: nil, label: nil, expirationDate: nil, hideDownload: sender.isOn)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, label: nil, expirationDate: nil, hideDownload: sender.isOn)
     }
 
     // Password protect
@@ -360,7 +360,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
             fieldPasswordProtect.text = ""
             fieldPasswordProtect.becomeFirstResponder()
         } else {
-            networking?.updateShare(idShare: tableShare.idShare, password: "", permissions: tableShare.permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: "", permission: tableShare.permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
         }
     }
 
@@ -368,7 +368,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
 
         guard let tableShare = self.tableShare else { return }
 
-        networking?.updateShare(idShare: tableShare.idShare, password: fieldPasswordProtect.text, permissions: tableShare.permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: fieldPasswordProtect.text, permission: tableShare.permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
 
     // Set expiration date
@@ -380,7 +380,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
             fieldSetExpirationDate.isEnabled = true
             fieldSetExpirationDate(sender: fieldSetExpirationDate)
         } else {
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: tableShare.permissions, note: nil, label: nil, expirationDate: "", hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, label: nil, expirationDate: "", hideDownload: tableShare.hideDownload)
         }
     }
 
@@ -402,7 +402,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
         guard let tableShare = self.tableShare else { return }
         if fieldNoteToRecipient.text == nil { return }
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: tableShare.permissions, note: fieldNoteToRecipient.text, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: fieldNoteToRecipient.text, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
 
     // Label
@@ -411,7 +411,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
         guard let tableShare = self.tableShare else { return }
         if fieldLabel.text == nil { return }
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: tableShare.permissions, note: nil, label: fieldLabel.text, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, label: fieldLabel.text, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
 
     // Delete share link
@@ -470,7 +470,7 @@ class NCShareLinkMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
             dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
             let expirationDate = dateFormatter.string(from: date)
 
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: tableShare.permissions, note: nil, label: nil, expirationDate: expirationDate, hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, label: nil, expirationDate: expirationDate, hideDownload: tableShare.hideDownload)
         }
     }
 

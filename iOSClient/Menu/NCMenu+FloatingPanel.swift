@@ -76,4 +76,12 @@ class NCMenuPanelController: FloatingPanelController {
         self.backdropView.dismissalTapGestureRecognizer.isEnabled = true
         self.surfaceView.layer.cornerRadius = 16
     }
+    
+    //Update layout after rotation
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        DispatchQueue.main.async {
+            self.updateLayout()
+        }
+    }
 }

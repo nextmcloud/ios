@@ -143,7 +143,8 @@ class NCEndToEndInitialize: NSObject {
                     
                     guard let privateKey = (NCEndToEndEncryption.sharedManager().decryptPrivateKey(privateKeyChiper, passphrase: passphrase, publicKey: publicKey)) else {
                         
-                        NCContentPresenter.shared.messageNotification("E2E decrypt privateKey", description: "Serious internal error to decrypt Private Key", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError, forced: true)
+                        NCContentPresenter.shared.messageNotification("E2E decrypt privateKey", description: "Serious internal error to decrypt Private Key", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError, priority: .max)
+
                         
                         return
                     }
@@ -205,7 +206,7 @@ class NCEndToEndInitialize: NSObject {
                 switch errorCode {
                     
                 case NCGlobal.shared.errorBadRequest:
-                    NCContentPresenter.shared.messageNotification("E2E get privateKey", description: "bad request: unpredictable internal error", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode, forced: true)
+                    NCContentPresenter.shared.messageNotification("E2E Server publicKey", description: "bad request: unpredictable internal error", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode, priority: .max)
                     
                 case NCGlobal.shared.errorResourceNotFound:
                     // message

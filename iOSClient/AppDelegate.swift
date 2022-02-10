@@ -49,7 +49,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     @objc var activeMedia: NCMedia?
     var activeServerUrl: String = ""
     @objc var activeViewController: UIViewController?
-    var activeViewerVideo: NCViewerVideo?
     
     var mainTabBar: NCMainTabBar?
     var activeMetadata: tableMetadata?
@@ -73,6 +72,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var orientationLock = UIInterfaceOrientationMask.all
     
     @objc var isPrivacyProtectionWindowNeedToShow = true
+    
+    private var privacyProtectionWindow: UIWindow?
     
     struct AppUtility {
         static func lockOrientation(_ orientation: UIInterfaceOrientationMask) {
@@ -676,7 +677,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         NCCommunicationCommon.shared.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase)
         NCCommunicationCommon.shared.setup(webDav: NCUtilityFileSystem.shared.getWebDAV(account: account))
-        NCCommunicationCommon.shared.setup(dav: NCUtilityFileSystem.shared.getDAV())
         let serverVersionMajor = NCManageDatabase.shared.getCapabilitiesServerInt(account: account, elements: NCElementsJSON.shared.capabilitiesVersionMajor)
         if serverVersionMajor > 0 {
             NCCommunicationCommon.shared.setup(nextcloudVersion: serverVersionMajor)
@@ -739,35 +739,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         changeAccount(account)
     }
     
-    func requestAccount(startTimer: Bool) {
+    func requestAccount() {
+              
+        if isPasscodePresented() { return }
+        if !CCUtility.getAccountRequest() { return }
         
         let accounts = NCManageDatabase.shared.getAllAccount()
         
-        if CCUtility.getAccountRequest() && accounts.count > 1 {
+        if accounts.count > 1 {
             
             if let vcAccountRequest = UIStoryboard(name: "NCAccountRequest", bundle: nil).instantiateInitialViewController() as? NCAccountRequest {
-                
+
                 vcAccountRequest.activeAccount = NCManageDatabase.shared.getActiveAccount()
                 vcAccountRequest.accounts = accounts
                 vcAccountRequest.enableTimerProgress = true
                 vcAccountRequest.enableAddAccount = false
                 vcAccountRequest.dismissDidEnterBackground = false
-                
-                
                 vcAccountRequest.delegate = self
-                
+
                 let screenHeighMax = UIScreen.main.bounds.height - (UIScreen.main.bounds.height/5)
                 let numberCell = accounts.count
                 let height = min(CGFloat(numberCell * Int(vcAccountRequest.heightCell) + 45), screenHeighMax)
-                
+
                 let popup = NCPopupViewController(contentController: vcAccountRequest, popupWidth: 300, popupHeight: height+20)
                 popup.backgroundAlpha = 0.8
-                
+
                 UIApplication.shared.keyWindow?.rootViewController?.present(popup, animated: true)
                 
-                if startTimer {
-                    vcAccountRequest.startTimer()
-                }
+                vcAccountRequest.startTimer()
             }
         }
     }
@@ -782,11 +781,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         if account == "" { return }
         
         guard let passcode = CCUtility.getPasscode() else {
-            requestAccount(startTimer: false)
+            requestAccount()
             return
         }
         if passcode.count == 0 || CCUtility.getNotPasscodeAtStart() {
-            requestAccount(startTimer: false)
+            requestAccount()
             return
         }
         
@@ -825,7 +824,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     passcodeViewController.dismiss(animated: true) {
                         self.passcodeViewController = nil
-                        self.requestAccount(startTimer: true)
+                        self.requestAccount()
                     }
                 }
             }
@@ -839,7 +838,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.passcodeViewController?.dismiss(animated: true) {
                             self.passcodeViewController = nil
-                            self.requestAccount(startTimer: true)
+                            self.requestAccount()
                         }
                     }
                 }
@@ -870,7 +869,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         } else {
             presentedViewController?.dismiss(animated: false)
         }
-        
+
         let passcodeViewController = TOPasscodeViewController.init(passcodeType: .sixDigits, allowCancel: false)
         passcodeViewController.delegate = self
         passcodeViewController.keypadButtonShowLettering = false

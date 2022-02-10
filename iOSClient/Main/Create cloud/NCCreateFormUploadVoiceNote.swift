@@ -243,7 +243,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             
             self.serverUrl = serverUrl!
             
-            if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account) {
+            if serverUrl == NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account) {
                 self.titleServerUrl = "/"
             } else {
                 self.titleServerUrl = (serverUrl! as NSString).lastPathComponent
@@ -273,7 +273,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             fileNameSave = (self.fileName as! NSString).deletingPathExtension + ".m4a"
         }
         
-        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase ,url: "", contentType: "", livePhoto: false)
+        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
 //=======
 //        guard let name = rowFileName.value else {
 //            return

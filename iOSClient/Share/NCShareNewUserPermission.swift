@@ -360,7 +360,7 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         if let metadata = self.metadata {
-            NCNetworking.shared.favoriteMetadata(metadata, urlBase: appDelegate.urlBase) { (errorCode, errorDescription) in
+            NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
                 if errorCode == 0 {
                     if !metadata.favorite {
                         self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
@@ -553,7 +553,7 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
         }
         
         if metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo && !metadata.hasPreview {
-            NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+            NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
         }
         
         if CCUtility.fileProviderStoragePreviewIconExists(metadata.ocId, etag: metadata.etag) {
@@ -577,7 +577,7 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
             
             if ext == "GIF" {
                 if !FileManager().fileExists(atPath: previewPath) {
-                    NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+                    NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
                 }
                 image = UIImage.animatedImage(withAnimatedGIFURL: URL(fileURLWithPath: imagePath))
             } else if ext == "SVG" {
@@ -598,7 +598,7 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
                     return nil
                 }
             } else {
-                NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+                NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
                 image = UIImage.init(contentsOfFile: imagePath)
             }
         }

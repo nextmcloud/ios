@@ -340,7 +340,14 @@ class NCGlobal: NSObject {
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
     let notificationCenterUpdateBadgeNumber                     = "updateBadgeNumber"
     let notificationCenterReloadAvatar                          = "reloadAvatar"
-    let notificationCenterOpenFileViewInFolder                  = "openFileViewInFolder"            // userInfo: serverUrl, fileName
+    let notificationCenterOpenFileViewInFolder                  = "openFileViewInFolder"
+    
+    let notificationCenterShareViewIn                           = "ShareViewIn"
+    let notificationCenterShareAdvancePermission                = "ShareAdvancePermission"
+    let notificationCenterShareSendEmail                        = "ShareSendEmail"
+    let notificationCenterShareUnshare                          = "ShareUnshare"
+    
+    // userInfo: serverUrl, fileName
 
     @objc let notificationCenterReloadDataSource                = "reloadDataSource"                // userInfo: ocId?, serverUrl?
     let notificationCenterReloadDataSourceNetworkForced         = "reloadDataSourceNetworkForced"   // userInfo: serverUrl?

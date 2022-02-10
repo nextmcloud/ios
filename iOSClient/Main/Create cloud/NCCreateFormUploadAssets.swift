@@ -54,7 +54,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         
         self.init()
         
-        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account) {
+        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account) {
             titleServerUrl = "/"
         } else {
             if let tableDirectory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl)) {
@@ -573,7 +573,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                     
                     self.reloadFormRow(formRow)
                     
-                    NCContentPresenter.shared.messageNotification("_info_", description: "_forbidden_characters_", delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCBrandGlobal.shared.ErrorCharactersForbidden, forced: true)
+                    NCContentPresenter.shared.messageNotification("_info_", description: "_forbidden_characters_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCharactersForbidden)
                 }
             }else{
                 let asset = assets[0]
@@ -630,7 +630,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
             
             self.serverUrl = serverUrl!
             
-            if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account) {
+            if serverUrl == NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account) {
                 self.titleServerUrl = "/"
             } else {
                 if let tableDirectory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account
@@ -697,7 +697,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
             if autoUploadPath == self.serverUrl {
 //<<<<<<< HEAD
                 if !NCNetworking.shared.createFolder(assets: self.assets, selector: NCBrandGlobal.shared.selectorUploadFile, useSubFolder: useSubFolder, account: self.appDelegate.account, urlBase: self.appDelegate.urlBase) {
-                    NCContentPresenter.shared.messageNotification("_error_", description: "_error_createsubfolders_upload_", delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCBrandGlobal.shared.ErrorInternalError, forced: true)
+                    NCContentPresenter.shared.messageNotification("_info_", description: "_forbidden_characters_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCharactersForbidden)
 //=======
 //                if !NCNetworking.shared.createFolder(assets: self.assets, selector: NCGlobal.shared.selectorUploadFile, useSubFolder: useSubFolder, account: self.appDelegate.account, urlBase: self.appDelegate.urlBase) {
 //                    NCContentPresenter.shared.messageNotification("_error_", description: "_error_createsubfolders_upload_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError, forced: true)
@@ -749,7 +749,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 //                metadataForUpload.size = NCUtilityFileSystem.shared.getFileSize(asset: asset)
 //                metadataForUpload.status = NCBrandGlobal.shared.metadataStatusWaitUpload
 //=======
-                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileName, fileNameView: fileName, ocId: NSUUID().uuidString, serverUrl: serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", livePhoto: livePhoto)
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileName, fileNameView: fileName, ocId: NSUUID().uuidString, serverUrl: serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", livePhoto: livePhoto)
                 
                 metadataForUpload.assetLocalIdentifier = asset.localIdentifier
                 metadataForUpload.session = self.session
@@ -771,7 +771,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 //<<<<<<< HEAD
 //                            let metadataMOVForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileNameMove,fileNameView: fileName, ocId:ocId, serverUrl: serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", livePhoto: livePhoto, chunk: false)
 //=======
-                            let metadataMOVForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileNameMove, fileNameView: fileNameMove, ocId:ocId, serverUrl: serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", livePhoto: livePhoto)
+                            let metadataMOVForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameMove, fileNameView: fileNameMove, ocId: ocId, serverUrl: serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", livePhoto: livePhoto)
 //>>>>>>> feature_branded_client_4
 
                             metadataForUpload.livePhoto = true

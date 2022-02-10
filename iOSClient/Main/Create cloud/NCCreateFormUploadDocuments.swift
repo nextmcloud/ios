@@ -57,7 +57,7 @@ import XLForm
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account) {
+        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account) {
             fileNameFolder = "/"
         } else {
             fileNameFolder = (serverUrl as NSString).lastPathComponent
@@ -273,7 +273,7 @@ import XLForm
         }
         
         self.serverUrl = serverUrl
-        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, account: appDelegate.account) {
+        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account) {
             fileNameFolder = "/"
         } else {
             fileNameFolder = (serverUrl as NSString).lastPathComponent
@@ -308,22 +308,14 @@ import XLForm
     }
     
     @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {
-        
+      
         self.deselectFormRow(sender)
-        
+
         let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
         let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
         let viewController = navigationController.topViewController as! NCSelect
-        
-        viewController.delegate = self
-        viewController.hideButtonCreateFolder = false
-        viewController.includeDirectoryE2EEncryption = false
-        viewController.includeImages = false
-        viewController.selectFile = false
-        viewController.titleButtonDone = NSLocalizedString("_select_", comment: "")
-        viewController.type = ""
 
-        navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
+        viewController.delegate = self
         viewController.typeOfCommandView = .selectCreateFolder
 
         self.present(navigationController, animated: true, completion: nil)
@@ -371,7 +363,7 @@ import XLForm
             
             if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: String(describing: fileName)) != nil {
                 
-                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: String(describing: fileName), fileNameView: String(fileName), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: String(describing: fileNameForm), fileNameView: String(describing: fileNameForm), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
                 
                 guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
                 conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
@@ -425,7 +417,7 @@ import XLForm
                         let results = NCCommunicationCommon.shared.getInternalType(fileName: fileName, mimeType: "", directory: false)
                         
                         self.dismiss(animated: true, completion: {
-                            let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileName, fileNameView: fileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url ?? "", contentType: results.mimeType, livePhoto: false)
+                            let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileName, fileNameView: fileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url ?? "", contentType: results.mimeType, livePhoto: false)
                             if let viewController = self.appDelegate.activeViewController {
                                 NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata], imageIcon: nil)
                             }
@@ -433,7 +425,7 @@ import XLForm
                     }
 
                 } else if errorCode != 0 {
-                    NCContentPresenter.shared.messageNotification("_error_", description: errorMessage, delay: NCGlobal.shared.dismissAfterSecond, type:NCContentPresenter.messageType.error, errorCode: errorCode)
+                    NCContentPresenter.shared.messageNotification("_error_", description: errorMessage, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
                 } else {
                    print("[LOG] It has been changed user during networking process, error.")
                 }
@@ -450,7 +442,7 @@ import XLForm
                     
                         let createFileName = (fileName as NSString).deletingPathExtension + "." + self.fileNameExtension
 
-                        let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: createFileName, fileNameView: createFileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url!, contentType: "", livePhoto: false)
+                        let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: createFileName, fileNameView: createFileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url!, contentType: "", livePhoto: false)
                     
                         if let viewController = self.appDelegate.activeViewController {
                             NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata], imageIcon: nil)

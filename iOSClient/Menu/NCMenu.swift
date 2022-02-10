@@ -119,46 +119,6 @@ extension NCMenu: FloatingPanelControllerDelegate {
     }
 }
 
-class NCMenuFloatingPanelLayout: FloatingPanelLayout {
-
-    let height: CGFloat
-
-    init(height: Int) {
-        self.height = CGFloat(height)
-    }
-
-    var initialPosition: FloatingPanelPosition {
-        return .full
-    }
-
-    var supportedPositions: Set<FloatingPanelPosition> {
-        return [.full, .hidden]
-    }
-
-    func insetFor(position: FloatingPanelPosition) -> CGFloat? {
-        if (position == .full) {
-            return max(48, UIScreen.main.bounds.size.height - height)
-        } else {
-            return nil
-        }
-    }
-
-    var positionReference: FloatingPanelLayoutReference {
-        return .fromSuperview
-    }
-
-    public func prepareLayout(surfaceView: UIView, in view: UIView) -> [NSLayoutConstraint] {
-        return [
-            surfaceView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
-            surfaceView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0),
-        ]
-    }
-
-    func backdropAlphaFor(position: FloatingPanelPosition) -> CGFloat {
-        return 0.2
-    }
-}
-
 public class NCMenuFloatingPanelBehavior: FloatingPanelBehavior {
 
     public func addAnimator(_ fpc: FloatingPanelController, to: FloatingPanelPosition) -> UIViewPropertyAnimator {
@@ -173,30 +133,6 @@ public class NCMenuFloatingPanelBehavior: FloatingPanelBehavior {
         return UIViewPropertyAnimator(duration: 0.1, curve: .easeInOut)
     }
 
-}
-
-
-class NCMenuPanelController: FloatingPanelController {
-
-    var parentPresenter: UIViewController?
-
-    // MARK: - View Life Cycle
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        self.surfaceView.backgroundColor = NCBrandColor.shared.systemBackground
-        self.isRemovalInteractionEnabled = true
-        self.surfaceView.cornerRadius = 16
-    }
-    
-    //Update layout after rotation
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        DispatchQueue.main.async {
-            self.updateLayout()
-        }
-    }
 }
 
 class NCMenuAction {

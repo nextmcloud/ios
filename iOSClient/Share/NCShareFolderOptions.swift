@@ -120,7 +120,7 @@ class NCShareFolderOptions: UIViewController ,UIGestureRecognizerDelegate, NCSha
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-            NCNetworking.shared.favoriteMetadata(metadata, urlBase: appDelegate.urlBase) { (errorCode, errorDescription) in
+            NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
                 if errorCode == 0 {
                     if !metadata.favorite {
                         self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)

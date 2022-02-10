@@ -252,7 +252,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
             }
         }
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
 
     @IBAction func switchCanCreate(sender: UISwitch) {
@@ -267,7 +267,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
 
         let permissions = CCUtility.getPermissionsValue(byCanEdit: canEdit, andCanCreate: sender.isOn, andCanChange: canChange, andCanDelete: canDelete, andCanShare: canShare, andIsFolder: metadata.directory)
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
 
     @IBAction func switchCanChange(sender: UISwitch) {
@@ -282,7 +282,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
 
         let permissions = CCUtility.getPermissionsValue(byCanEdit: canEdit, andCanCreate: canCreate, andCanChange: sender.isOn, andCanDelete: canDelete, andCanShare: canShare, andIsFolder: metadata.directory)
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
 
     @IBAction func switchCanDelete(sender: UISwitch) {
@@ -297,7 +297,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
 
         let permissions = CCUtility.getPermissionsValue(byCanEdit: canEdit, andCanCreate: canCreate, andCanChange: canChange, andCanDelete: sender.isOn, andCanShare: canShare, andIsFolder: metadata.directory)
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permissions, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
 
     // Set expiration date
@@ -309,7 +309,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
             fieldSetExpirationDate.isEnabled = true
             fieldSetExpirationDate(sender: fieldSetExpirationDate)
         } else {
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: tableShare.permissions, note: nil, label: nil, expirationDate: "", hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, label: nil, expirationDate: "", hideDownload: tableShare.hideDownload)
         }
     }
 
@@ -331,7 +331,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
         guard let tableShare = self.tableShare else { return }
         if fieldNoteToRecipient.text == nil { return }
 
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: tableShare.permissions, note: fieldNoteToRecipient.text, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: fieldNoteToRecipient.text, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
     }
 
     // Unshare
@@ -384,7 +384,7 @@ class NCShareUserMenuView: UIView, UIGestureRecognizerDelegate, UITextFieldDeleg
             dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
             let expirationDate = dateFormatter.string(from: date)
 
-            networking?.updateShare(idShare: tableShare.idShare, password: nil, permissions: tableShare.permissions, note: nil, label: nil, expirationDate: expirationDate, hideDownload: tableShare.hideDownload)
+            networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: tableShare.permissions, note: nil, label: nil, expirationDate: expirationDate, hideDownload: tableShare.hideDownload)
         }
     }
 
