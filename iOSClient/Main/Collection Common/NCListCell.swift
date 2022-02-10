@@ -24,8 +24,7 @@
 import Foundation
 import UIKit
 
-class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCellProtocol {
-    
+class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProtocol {
     
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageItemLeftConstraint: NSLayoutConstraint!
@@ -52,9 +51,15 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCImageCell
 
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
 
-    var filePreviewImageView : UIImageView {
-        get{
-         return imageItem
+    var fileAvatarImageView: UIImageView? {
+        get {
+            return imageShared
+        }
+    }
+    
+    var filePreviewImageView: UIImageView? {
+        get {
+            return imageItem
         }
     }
     
