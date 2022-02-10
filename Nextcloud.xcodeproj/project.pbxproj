@@ -129,6 +129,8 @@
 		7A70DD2C27B42B7F0018F47E /* DropDown.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7A70DD3027B42C190018F47E /* DropDown.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; };
 		7A70DD5427B4301A0018F47E /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = 7A70DD5327B4301A0018F47E /* Adjust */; };
+		7A70DD9027B4D5570018F47E /* NCMenu+FloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A70DD8E27B4D5570018F47E /* NCMenu+FloatingPanel.swift */; };
+		7A70DD9127B4D5570018F47E /* UIViewController+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A70DD8F27B4D5570018F47E /* UIViewController+Menu.swift */; };
 		7A82A18126F3529100D52790 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7239876253D86D300257F49 /* NCEmptyView.xib */; };
 		7A82A18526F352AC00D52790 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB20E92660DFA200AF4344 /* NCRenameFile.storyboard */; };
 		7A82A18926F352DA00D52790 /* NCSectionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = F78ACD53219047D40088454D /* NCSectionFooter.xib */; };
@@ -594,6 +596,8 @@
 		75D9B76604BC04F7789A83AF /* Pods-Nextcloud.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Nextcloud.release.xcconfig"; path = "Target Support Files/Pods-Nextcloud/Pods-Nextcloud.release.xcconfig"; sourceTree = "<group>"; };
 		7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialPrivacySettingsViewController.swift; sourceTree = "<group>"; };
 		7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		7A70DD8E27B4D5570018F47E /* NCMenu+FloatingPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCMenu+FloatingPanel.swift"; sourceTree = "<group>"; };
+		7A70DD8F27B4D5570018F47E /* UIViewController+Menu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Menu.swift"; sourceTree = "<group>"; };
 		7A82A1A926F35C5000D52790 /* OpenSSL.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = OpenSSL.xcframework; path = Carthage/Build/OpenSSL.xcframework; sourceTree = "<group>"; };
 		7A82A1B226F35C8400D52790 /* MarkdownKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MarkdownKit.xcframework; path = Carthage/Build/MarkdownKit.xcframework; sourceTree = "<group>"; };
 		7A875ED32694392800AF558D /* PrivacyPolicyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyViewController.swift; sourceTree = "<group>"; };
@@ -1209,6 +1213,8 @@
 		95BB2078265FEF3F00AF4344 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
+				7A70DD8E27B4D5570018F47E /* NCMenu+FloatingPanel.swift */,
+				7A70DD8F27B4D5570018F47E /* UIViewController+Menu.swift */,
 				95BB2079265FEF3F00AF4344 /* NCShareComments+Menu.swift */,
 				95BB207A265FEF3F00AF4344 /* AppDelegate+Menu.swift */,
 				95BB207B265FEF3F00AF4344 /* NCMedia+Menu.swift */,
@@ -2687,6 +2693,7 @@
 				F72CD63A25C19EBF00F46F9A /* NCAutoUpload.swift in Sources */,
 				F7DFB7F0219C5B8000680748 /* NCCreateFormUploadAssets.swift in Sources */,
 				F73B422C2476764F00A30FD3 /* NCNotification.swift in Sources */,
+				7A70DD9127B4D5570018F47E /* UIViewController+Menu.swift in Sources */,
 				956E0D81266A4C7F00DA4F91 /* TextFileWithOcrSwitchView.swift in Sources */,
 				7A875EE026943DB100AF558D /* HelpViewController.swift in Sources */,
 				371B5A2E23D0B04500FAFAE9 /* NCMainMenuTableViewController.swift in Sources */,
@@ -2762,6 +2769,7 @@
 				F7501C332212E57500FB1415 /* NCMedia.swift in Sources */,
 				95BB2089265FEF3F00AF4344 /* NCViewer+Menu.swift in Sources */,
 				F70BFC7420E0FA7D00C67599 /* NCUtility.swift in Sources */,
+				7A70DD9027B4D5570018F47E /* NCMenu+FloatingPanel.swift in Sources */,
 				7A875ED42694392800AF558D /* PrivacyPolicyViewController.swift in Sources */,
 				F7C1EEA525053A9C00866ACC /* NCDataSource.swift in Sources */,
 				56A510AD27B2E66700D9F3E6 /* NCCellProtocol.swift in Sources */,
