@@ -234,7 +234,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
             labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed, quota)
         }
-
+        changeUserProfile()
         // ITEM : External
         if NCBrandOptions.shared.disable_more_external_site == false {
             if let externalSites = NCManageDatabase.shared.getAllExternalSites(account: appDelegate.account) {
@@ -288,6 +288,51 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         self.navigationController?.pushViewController(controller, animated: true)
     }
 
+    @objc func changeUserProfile() {
+        // Display Name user & Quota
+        var quota: String = ""
+
+        guard let tabAccount = NCManageDatabase.shared.getActiveAccount() else {
+            return
+        }
+        self.tabAccount = tabAccount
+
+        if (tabAccount.quotaRelative > 0) {
+            progressQuota.progress = Float(tabAccount.quotaRelative) / 100
+        } else {
+            progressQuota.progress = 0
+        }
+
+        switch tabAccount.quotaTotal {
+        case -1:
+            quota = "0"
+        case -2:
+            quota = NSLocalizedString("_quota_space_unknown_", comment: "")
+        case -3:
+            quota = NSLocalizedString("_quota_space_unlimited_", comment: "")
+        default:
+            quota = CCUtility.transformedSize(tabAccount.quotaTotal)
+        }
+
+        let quotaUsed: String = CCUtility.transformedSize(tabAccount.quotaUsed)
+        let quota2: String = CCUtility.transformedSize(tabAccount.quotaTotal)
+
+//        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed, quota)
+        quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
+        quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
+
+        let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
+
+        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
+        labelQuota.textColor = NCBrandColor.shared.label
+        quotaLabel1.textColor = NCBrandColor.shared.label
+        quotalabel2.textColor = NCBrandColor.shared.label
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.tableView.reloadData()
+        }
+    }
+    
     // MARK: -
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -356,10 +401,13 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             cell.displayName.text = ""
 
             if let account = tabAccount {
-                cell.avatar.image = NCUtility.shared.loadUserImage(
-                    for: account.user,
-                       displayName: account.displayName,
-                       userBaseUrl: appDelegate)
+                let fileNamePath = String(CCUtility.getDirectoryUserData()) + "/" + String(CCUtility.getStringUser(appDelegate.user, urlBase: appDelegate.urlBase)) + "-" + appDelegate.user + ".png"
+                
+                if UIImage.init(contentsOfFile: fileNamePath) != nil {
+                    cell.avatar?.image = UIImage.init(named: "user_settings")?.image(color: NCBrandColor.shared.iconColor, size: 25)
+                } else {
+                    cell.avatar?.image = UIImage.init(named: "user_settings")?.image(color: NCBrandColor.shared.iconColor, size: 25)
+                }
 
                 if account.alias == "" {
                     cell.displayName?.text = account.displayName
@@ -370,7 +418,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             }
             cell.selectedBackgroundView = selectionColor
             cell.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+//            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
 
             if NCManageDatabase.shared.getCapabilitiesServerBool(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesUserStatusEnabled, exists: false) {
                 if let account = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", appDelegate.account)) {
@@ -425,7 +473,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         var item = NCCommunicationExternalSite()
 
         if indexPath.section == 0 {
-            tapImageLogoManageAccount()
+//            tapImageLogoManageAccount()
             return
         }
 

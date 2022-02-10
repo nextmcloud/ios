@@ -41,7 +41,7 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_upload_photos_videos_", comment: ""), icon: UIImage(named: "file_photo")!.image(color: NCBrandColor.shared.gray, size: 50), action: { _ in
+                title: NSLocalizedString("_upload_photos_videos_", comment: ""), icon: UIImage(named: "file_photo_menu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     NCAskAuthorization.shared.askAuthorizationPhotoLibrary(viewController: viewController) { hasPermission in
                         if hasPermission {
                             NCPhotosPickerViewController.init(viewController: viewController, maxSelectedAssets: 0, singleSelectedMode: false)
@@ -53,7 +53,7 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_upload_file_", comment: ""), icon: UIImage(named: "file")!.image(color: NCBrandColor.shared.gray, size: 50), action: { _ in
+                title: NSLocalizedString("_upload_file_", comment: ""), icon: UIImage(named: "uploadFile")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     if let tabBarController = self.window?.rootViewController as? UITabBarController {
                         self.documentPickerViewController = NCDocumentPickerViewController(tabBarController: tabBarController)
                     }
@@ -64,7 +64,7 @@ extension AppDelegate {
         if NCCommunication.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorText}) && !isEncrypted {
             let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorText})!
             actions.append(
-                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt")!.image(color: NCBrandColor.shared.gray, size: 50), action: { _ in
+                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt_menu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
                         return
                     }
@@ -85,7 +85,7 @@ extension AppDelegate {
         if #available(iOS 13.0, *) {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility.shared.loadImage(named: "doc.text.viewfinder"), action: { _ in
+                    title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility.shared.loadImage(named: "scan").image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                         if let viewController = appDelegate.window?.rootViewController {
                             NCCreateScanDocument.shared.openScannerDocument(viewController: viewController)
                         }
@@ -96,7 +96,7 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_create_voice_memo_", comment: ""), icon: UIImage(named: "microphone")!.image(color: NCBrandColor.shared.gray, size: 50), action: { _ in
+                title: NSLocalizedString("_create_voice_memo_", comment: ""), icon: UIImage(named: "microphoneMenu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
 
                     NCAskAuthorization.shared.askAuthorizationAudioRecord(viewController: viewController) { hasPermission in
                         if hasPermission {
@@ -117,7 +117,7 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(title: NSLocalizedString("_create_folder_", comment: ""),
-                icon: UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 50), action: { _ in
+                icon: UIImage(named: "addFolder")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
 
                     if appDelegate.activeServerUrl == "" { return }
 
