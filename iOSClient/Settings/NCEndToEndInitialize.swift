@@ -173,16 +173,16 @@ class NCEndToEndInitialize: NSObject {
                             switch (errorCode) {
                                 
                             case NCGlobal.shared.errorBadRequest:
-                                NCContentPresenter.shared.messageNotification("E2E Server publicKey", description: "bad request: unpredictable internal error", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode, forced: true)
+                                NCContentPresenter.shared.messageNotification("E2E Server publicKey", description: "bad request: unpredictable internal error", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
                                 
                             case NCGlobal.shared.errorResourceNotFound:
-                                NCContentPresenter.shared.messageNotification("E2E Server publicKey", description: "Server publickey doesn't exists", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode, forced: true)
+                                NCContentPresenter.shared.messageNotification("E2E Server publicKey", description: "Server publickey doesn't exists", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
                                 
                             case NCGlobal.shared.errorConflict:
-                                NCContentPresenter.shared.messageNotification("E2E Server publicKey", description: "forbidden: the user can't access the Server publickey", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode, forced: true)
+                                NCContentPresenter.shared.messageNotification("E2E Server publicKey", description: "forbidden: the user can't access the Server publickey", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
                                 
                             default:
-                                NCContentPresenter.shared.messageNotification("E2E Server publicKey", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode, forced: true)
+                                NCContentPresenter.shared.messageNotification("E2E Server publicKey", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
                             }
                         }
                     }
