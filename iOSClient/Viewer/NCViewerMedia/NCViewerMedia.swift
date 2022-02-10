@@ -201,43 +201,6 @@ class NCViewerMedia: UIViewController {
 
     func loadImage(metadata: tableMetadata, completion: @escaping (_ ocId: String, _ image: UIImage?) -> Void) {
 
-        // Download preview
-        if metadata.hasPreview && !CCUtility.fileProviderStoragePreviewIconExists(metadata.ocId, etag: metadata.etag) {
-
-            var etagResource: String?
-            let fileNamePath = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, urlBase: metadata.urlBase, account: metadata.account)!
-            let fileNamePreviewLocalPath = CCUtility.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)!
-            let fileNameIconLocalPath = CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)!
-            if FileManager.default.fileExists(atPath: fileNameIconLocalPath) && FileManager.default.fileExists(atPath: fileNamePreviewLocalPath) {
-                etagResource = metadata.etagResource
-            }
-
-            NCCommunication.shared.downloadPreview(
-                fileNamePathOrFileId: fileNamePath,
-                fileNamePreviewLocalPath: fileNamePreviewLocalPath,
-                widthPreview: NCGlobal.shared.sizePreview,
-                heightPreview: NCGlobal.shared.sizePreview,
-                fileNameIconLocalPath: fileNameIconLocalPath,
-                sizeIcon: NCGlobal.shared.sizeIcon, etag: etagResource,
-                queue: NCCommunicationCommon.shared.backgroundQueue) { _, _, imageIcon, _, etag, errorCode, _ in
-
-                    if errorCode == 0 && imageIcon != nil {
-                        NCManageDatabase.shared.setMetadataEtagResource(ocId: metadata.ocId, etagResource: etag)
-                    }
-
-                    // Download file max resolution
-                    downloadFile(metadata: metadata)
-                    // Download file live photo
-                    if metadata.livePhoto { downloadFileLivePhoto(metadata: metadata) }
-                }
-        } else {
-
-            // Download file max resolution
-            downloadFile(metadata: metadata)
-            // Download file live photo
-            if metadata.livePhoto { downloadFileLivePhoto(metadata: metadata) }
-        }
-
         // Download file max resolution
         func downloadFile(metadata: tableMetadata) {
 
@@ -298,6 +261,45 @@ class NCViewerMedia: UIViewController {
                 return UIImage(named: "noPreview")!.image(color: .gray, size: view.frame.width)
             }
         }
+        
+        // Download preview
+        if metadata.hasPreview && !CCUtility.fileProviderStoragePreviewIconExists(metadata.ocId, etag: metadata.etag) {
+
+            var etagResource: String?
+            let fileNamePath = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, urlBase: metadata.urlBase, account: metadata.account)!
+            let fileNamePreviewLocalPath = CCUtility.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)!
+            let fileNameIconLocalPath = CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)!
+            if FileManager.default.fileExists(atPath: fileNameIconLocalPath) && FileManager.default.fileExists(atPath: fileNamePreviewLocalPath) {
+                etagResource = metadata.etagResource
+            }
+
+            NCCommunication.shared.downloadPreview(
+                fileNamePathOrFileId: fileNamePath,
+                fileNamePreviewLocalPath: fileNamePreviewLocalPath,
+                widthPreview: NCGlobal.shared.sizePreview,
+                heightPreview: NCGlobal.shared.sizePreview,
+                fileNameIconLocalPath: fileNameIconLocalPath,
+                sizeIcon: NCGlobal.shared.sizeIcon, etag: etagResource,
+                queue: NCCommunicationCommon.shared.backgroundQueue) { _, _, imageIcon, _, etag, errorCode, _ in
+
+                    if errorCode == 0 && imageIcon != nil {
+                        NCManageDatabase.shared.setMetadataEtagResource(ocId: metadata.ocId, etagResource: etag)
+                    }
+
+                    // Download file max resolution
+                    downloadFile(metadata: metadata)
+                    // Download file live photo
+                    if metadata.livePhoto { downloadFileLivePhoto(metadata: metadata) }
+                }
+        } else {
+
+            // Download file max resolution
+            downloadFile(metadata: metadata)
+            // Download file live photo
+            if metadata.livePhoto { downloadFileLivePhoto(metadata: metadata) }
+        }
+
+       
 
         func getImage(metadata: tableMetadata) -> UIImage? {
 

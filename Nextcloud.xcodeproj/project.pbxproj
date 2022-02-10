@@ -142,6 +142,12 @@
 		7A70DDA127B4D9B70018F47E /* NCPlayerToolBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A70DD9A27B4D9B70018F47E /* NCPlayerToolBar.swift */; };
 		7A70DDA227B4D9B80018F47E /* NCViewerMediaPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A70DD9B27B4D9B70018F47E /* NCViewerMediaPage.swift */; };
 		7A70DDA327B4D9B80018F47E /* NCViewerMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A70DD9C27B4D9B70018F47E /* NCViewerMedia.swift */; };
+		7A70DDE727B567920018F47E /* KTVHTTPCache.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7A70DDF227B567AA0018F47E /* NCCommunication.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7A70DDF527B567B30018F47E /* Alamofire.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7A70DDFA27B567C50018F47E /* TOPasscodeViewController.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56E9B9F227B39218007B1772 /* TOPasscodeViewController.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7A70DE1A27B56B040018F47E /* KTVCocoaHTTPServer.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; };
+		7A70DE1D27B56B0E0018F47E /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7A82A18126F3529100D52790 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7239876253D86D300257F49 /* NCEmptyView.xib */; };
 		7A82A18526F352AC00D52790 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB20E92660DFA200AF4344 /* NCRenameFile.storyboard */; };
 		7A82A18926F352DA00D52790 /* NCSectionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = F78ACD53219047D40088454D /* NCSectionFooter.xib */; };
@@ -526,6 +532,11 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				7A70DE1D27B56B0E0018F47E /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */,
+				7A70DDFA27B567C50018F47E /* TOPasscodeViewController.xcframework in Embed Frameworks */,
+				7A70DDF527B567B30018F47E /* Alamofire.xcframework in Embed Frameworks */,
+				7A70DDF227B567AA0018F47E /* NCCommunication.xcframework in Embed Frameworks */,
+				7A70DDE727B567920018F47E /* KTVHTTPCache.xcframework in Embed Frameworks */,
 				7A70DD2C27B42B7F0018F47E /* DropDown.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -612,6 +623,7 @@
 		7A70DD9A27B4D9B70018F47E /* NCPlayerToolBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCPlayerToolBar.swift; sourceTree = "<group>"; };
 		7A70DD9B27B4D9B70018F47E /* NCViewerMediaPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCViewerMediaPage.swift; sourceTree = "<group>"; };
 		7A70DD9C27B4D9B70018F47E /* NCViewerMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCViewerMedia.swift; sourceTree = "<group>"; };
+		7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = KTVCocoaHTTPServer.xcframework; path = Carthage/Build/KTVCocoaHTTPServer.xcframework; sourceTree = "<group>"; };
 		7A82A1A926F35C5000D52790 /* OpenSSL.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = OpenSSL.xcframework; path = Carthage/Build/OpenSSL.xcframework; sourceTree = "<group>"; };
 		7A82A1B226F35C8400D52790 /* MarkdownKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MarkdownKit.xcframework; path = Carthage/Build/MarkdownKit.xcframework; sourceTree = "<group>"; };
 		7A875ED32694392800AF558D /* PrivacyPolicyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyViewController.swift; sourceTree = "<group>"; };
@@ -1089,6 +1101,7 @@
 				5696256E27B289C6003F774D /* FirebaseCrashlytics in Frameworks */,
 				5696257827B289C6003F774D /* RealmSwift in Frameworks */,
 				569625D627B292EF003F774D /* XLForm in Frameworks */,
+				7A70DE1A27B56B040018F47E /* KTVCocoaHTTPServer.xcframework in Frameworks */,
 				569625E827B2991A003F774D /* TLPhotoPicker in Frameworks */,
 				569625E527B29844003F774D /* FSCalendar in Frameworks */,
 				F75E57BD25BF0EC1002B72C2 /* SVGKit in Frameworks */,
@@ -2061,6 +2074,7 @@
 				F7C40C112199BA620004137E /* RealmSwift.framework */,
 				F7C40C0F2199BA5D0004137E /* Realm.framework */,
 				F7C40BF22199978B0004137E /* MBProgressHUD.framework */,
+				7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */,
 				F7C40BF0219994F20004137E /* KTVHTTPCache.framework */,
 				56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */,
 				F7C40BEE219994ED0004137E /* KTVCocoaHTTPServer.framework */,
@@ -2554,30 +2568,13 @@
 			files = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/iOS/TLPhotoPicker.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/UICKeyChainStore.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/KTVHTTPCache.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/KTVCocoaHTTPServer.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/MBProgressHUD.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/SwiftRichString.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/QRCodeReader.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/ZIPFoundation.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/FSCalendar.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/OpenSSL.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/QuickLayout.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/SwiftEntryKit.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/FloatingPanel.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/MarkdownKit.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/XLForm.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/TOPasscodeViewController.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/Queuer.framework",
 			);
 			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "rm -rf ${TMPDIR}/TemporaryItems/*carthage*\n/usr/local/bin/carthage copy-frameworks\n";
+			shellScript = "\nrm -rf ${TMPDIR}/TemporaryItems/*carthage*\n/usr/local/bin/carthage copy-frameworks\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
