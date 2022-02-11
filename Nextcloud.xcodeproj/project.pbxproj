@@ -125,6 +125,7 @@
 		56E9B9FC27B39DFC007B1772 /* english.txt in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B9F827B39DFC007B1772 /* english.txt */; };
 		56E9B9FD27B39DFC007B1772 /* english.txt in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B9F827B39DFC007B1772 /* english.txt */; };
 		7A29E0EF269873A600B239BA /* InitialPrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */; };
+		7A5F80DE27B62993008B90E8 /* OpenSSL.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7A82A1A926F35C5000D52790 /* OpenSSL.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7A70DD1B27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
 		7A70DD1C27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
 		7A70DD1D27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
@@ -532,6 +533,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				7A5F80DE27B62993008B90E8 /* OpenSSL.xcframework in Embed Frameworks */,
 				7A70DE1D27B56B0E0018F47E /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */,
 				7A70DDFA27B567C50018F47E /* TOPasscodeViewController.xcframework in Embed Frameworks */,
 				7A70DDF527B567B30018F47E /* Alamofire.xcframework in Embed Frameworks */,
