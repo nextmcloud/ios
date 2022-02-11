@@ -199,13 +199,13 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
 
         // ITEM: Test API
-        if NCUtility.shared.isSimulator() {
-            item = NCCommunicationExternalSite()
-            item.name = "Test API"
-            item.icon = "swift"
-            item.url = "test"
-            settingsMenu.append(item)
-        }
+//        if NCUtility.shared.isSimulator() {
+//            item = NCCommunicationExternalSite()
+//            item.name = "Test API"
+//            item.icon = "swift"
+//            item.url = "test"
+//            settingsMenu.append(item)
+//        }
 
         // Display Name user & Quota
 
