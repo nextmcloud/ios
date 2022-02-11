@@ -89,7 +89,7 @@ extension NCViewer {
         // ROTATE
         // OFFLINE
         //
-        if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage, !metadata.livePhoto {
+        if (metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml"), !metadata.livePhoto {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_rotate_", comment: ""),
@@ -150,7 +150,7 @@ extension NCViewer {
         //
         // PRINT
         //
-        if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.contentType == "application/pdf" || metadata.contentType == "com.adobe.pdf" {
+        if (metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml") || metadata.contentType == "application/pdf" || metadata.contentType == "com.adobe.pdf" {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_print_", comment: ""),
@@ -213,19 +213,19 @@ extension NCViewer {
         //
         // SAVE AS SCAN
         //
-        if #available(iOS 13.0, *) {
-            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml" {
-                actions.append(
-                    NCMenuAction(
-                        title: NSLocalizedString("_save_as_scan_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "viewfinder.circle"),
-                        action: { _ in
-                            NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
-                        }
-                    )
-                )
-            }
-        }
+//        if #available(iOS 13.0, *) {
+//            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml" {
+//                actions.append(
+//                    NCMenuAction(
+//                        title: NSLocalizedString("_save_as_scan_", comment: ""),
+//                        icon: NCUtility.shared.loadImage(named: "viewfinder.circle"),
+//                        action: { _ in
+//                            NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
+//                        }
+//                    )
+//                )
+//            }
+//        }
 
         //
         // RENAME
@@ -322,7 +322,7 @@ extension NCViewer {
         // DOWNLOAD IMAGE MAX RESOLUTION
         //
         if metadata.session == "" {
-            if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage && !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.session == "" {
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.session == "" {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_download_image_max_", comment: ""),
@@ -349,78 +349,16 @@ extension NCViewer {
                     }
                 )
             )
-        }
-
-
-        //
-        // COPY
-        //
-        actions.append(
-            NCMenuAction(
-                title: NSLocalizedString("_copy_file_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "doc.on.doc"),
-                action: { _ in
-                    self.appDelegate.pasteboardOcIds = [metadata.ocId]
-                    NCFunctionCenter.shared.copyPasteboard()
-                }
-            )
-        )
-
-        //
-        // VIEW IN FOLDER
-        //
-        if !webView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_view_in_folder_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "arrow.forward.square"),
-                    action: { menuAction in
-                        NCFunctionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
-                    }
-                )
-            )
-        }
-
-        //
-        // DOWNLOAD IMAGE MAX RESOLUTION
-        //
-        if metadata.session == "" {
-            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.session == "" {
-                actions.append(
-                    NCMenuAction(
-                        title: NSLocalizedString("_download_image_max_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "square.and.arrow.down"),
-                        action: { _ in
-                            NCNetworking.shared.download(metadata: metadata, selector: "") { _ in }
-                        }
-                    )
-                )
-            }
-        }
-
-        //
-        // PDF
-        //
-        if metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_search_", comment: ""),
-                    icon: UIImage(named: "search")!.image(color: NCBrandColor.shared.gray, size: 50),
-                    action: { _ in
-                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuSearchTextPDF)
-                    }
-                )
-            )
-
+            
             var title = ""
             var icon = UIImage()
 
             if CCUtility.getPDFDisplayDirection() == .horizontal {
                 title = NSLocalizedString("_pdf_vertical_", comment: "")
-                icon = UIImage(named: "pdf-vertical")!.image(color: NCBrandColor.shared.gray, size: 50)
+                icon = UIImage(named: "pdf-vertical")!.image(color: NCBrandColor.shared.iconColor, size: 50)
             } else {
                 title = NSLocalizedString("_pdf_horizontal_", comment: "")
-                icon = UIImage(named: "pdf-horizontal")!.image(color: NCBrandColor.shared.gray, size: 50)
+                icon = UIImage(named: "pdf-horizontal")!.image(color: NCBrandColor.shared.iconColor, size: 50)
             }
 
             actions.append(
@@ -440,7 +378,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_go_to_page_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "repeat"),
+                    icon: NCUtility.shared.loadImage(named: "repeat").image(color: NCBrandColor.shared.iconColor, size: 50),
                     action: { _ in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuGotToPageInPDF)
                     }
@@ -456,7 +394,7 @@ extension NCViewer {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_modify_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "pencil.tip.crop.circle"),
+                        icon: NCUtility.shared.loadImage(named: "pencil.tip.crop.circle",color: NCBrandColor.shared.iconColor),
                         action: { _ in
                             NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
                         }
