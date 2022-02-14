@@ -71,7 +71,7 @@ import UIKit
     @objc public var capabilitiesGroups:                String = "group.com.t-systems.pu-ds.magentacloud.qa"
     
     // User Agent
-    @objc public var userAgent:                         String = "Nextcloud-iOS"                                    // Don't touch me !!
+    @objc public var userAgent:                         String = "Magenta-iOS"                                    // Don't touch me !!
     
     // Options
     @objc public var use_login_web_personalized:        Bool = true                                                // Don't touch me !!
