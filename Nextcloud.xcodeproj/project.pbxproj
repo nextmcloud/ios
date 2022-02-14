@@ -23,6 +23,9 @@
 		5672097627B54A2000413A96 /* UIControl+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9E327B37FFC007B1772 /* UIControl+Extensions.swift */; };
 		5672097727B54A2100413A96 /* UIControl+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9E327B37FFC007B1772 /* UIControl+Extensions.swift */; };
 		567EDE1927B3DC1600181E7E /* NCEndToEndEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F70CAE391F8CF31A008125FD /* NCEndToEndEncryption.m */; };
+		568012CB27BA286300BEEE4D /* NCViewerImageZoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70753F02542A9A200972D44 /* NCViewerImageZoom.swift */; };
+		568012CC27BA28E600BEEE4D /* NCViewerImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70753EA2542A99800972D44 /* NCViewerImage.swift */; };
+		568012CD27BA554C00BEEE4D /* NCViewerVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F752011C25480387000BF3A7 /* NCViewerVideo.swift */; };
 		5696256A27B289C6003F774D /* QRCodeReader in Frameworks */ = {isa = PBXBuildFile; productRef = F7ED547B25EEA65400956C55 /* QRCodeReader */; };
 		5696256B27B289C6003F774D /* SwiftRichString in Frameworks */ = {isa = PBXBuildFile; productRef = F72DA9B325F53E4E00B87DB1 /* SwiftRichString */; };
 		5696256C27B289C6003F774D /* FloatingPanel in Frameworks */ = {isa = PBXBuildFile; productRef = F770768D263A8C3400A1BA94 /* FloatingPanel */; };
@@ -2716,6 +2719,7 @@
 				370D26AF248A3D7A00121797 /* NCImageCellProtocol.swift in Sources */,
 				7AE63A5F26C64C6B00CEAAD5 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				F77B0DF51D118A16002130FE /* CCUtility.m in Sources */,
+				568012CB27BA286300BEEE4D /* NCViewerImageZoom.swift in Sources */,
 				C00CF3F426C13B8D00DB959F /* NCShareAdvancePermission.swift in Sources */,
 				F710D1FE24057E5E00A6033D /* NCActionSheetHeader.swift in Sources */,
 				F790110E21415BF600D7B136 /* NCViewerRichdocument.swift in Sources */,
@@ -2728,6 +2732,7 @@
 				F72CD63A25C19EBF00F46F9A /* NCAutoUpload.swift in Sources */,
 				F7DFB7F0219C5B8000680748 /* NCCreateFormUploadAssets.swift in Sources */,
 				F73B422C2476764F00A30FD3 /* NCNotification.swift in Sources */,
+				568012CC27BA28E600BEEE4D /* NCViewerImage.swift in Sources */,
 				7A70DD9127B4D5570018F47E /* UIViewController+Menu.swift in Sources */,
 				956E0D81266A4C7F00DA4F91 /* TextFileWithOcrSwitchView.swift in Sources */,
 				7A875EE026943DB100AF558D /* HelpViewController.swift in Sources */,
@@ -2859,6 +2864,7 @@
 				F707C26521A2DC5200F6181E /* NCStoreReview.swift in Sources */,
 				7AE63AEF26D633BA00CEAAD5 /* NCCollectionViewCommon.swift in Sources */,
 				7A875F0626946CDE00AF558D /* RequiredDataCollectionSwitch.swift in Sources */,
+				568012CD27BA554C00BEEE4D /* NCViewerVideo.swift in Sources */,
 				F7BAADCB1ED5A87C00B7EAD4 /* NCManageDatabase.swift in Sources */,
 				F70968A424212C4E00ED60E5 /* NCLivePhoto.swift in Sources */,
 				C0D6064426CCDCFF00B67843 /* NCFilePermissionEditPasswordCell.swift in Sources */,
@@ -3677,8 +3683,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rechsteiner/Parchment";
 			requirement = {
-				kind = exactVersion;
-				version = 2.4.0;
+				branch = main;
+				kind = branch;
 			};
 		};
 		569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */ = {

@@ -49,7 +49,7 @@ class NCViewerVideo: AVPlayerViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        NCKTVHTTPCache.shared.startProxy(user: appDelegate.user, password: appDelegate.password, metadata: metadata)
+        NCKTVHTTPCache.shared.restartProxy(user: appDelegate.user, password: appDelegate.password)
         
         if let url = NCKTVHTTPCache.shared.getVideoURL(metadata: metadata) {
             
@@ -98,7 +98,7 @@ class NCViewerVideo: AVPlayerViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        NCManageDatabase.shared.addVideoTime(metadata: metadata, time: player?.currentTime())
+        NCManageDatabase.shared.addVideoTime(metadata: metadata, time: player?.currentTime(), durationTime: nil)
         
         if let player = self.player {
             CCUtility.setAudioMute(player.isMuted)
@@ -136,7 +136,7 @@ extension NCViewerVideo: AVPlayerViewControllerDelegate {
     }
     
     func playerViewControllerWillStopPictureInPicture(_ playerViewController: AVPlayerViewController) {
-        NCManageDatabase.shared.addVideoTime(metadata: metadata, time: player?.currentTime())
+        NCManageDatabase.shared.addVideoTime(metadata: metadata, time: player?.currentTime(), durationTime: nil)
         pictureInPicture = false
         let playing = player?.timeControlStatus == .playing
         delegateViewerVideo?.stopPictureInPicture(metadata: metadata, playing: playing)

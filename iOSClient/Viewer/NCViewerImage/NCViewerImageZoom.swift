@@ -368,7 +368,7 @@ class NCViewerImageZoom: UIViewController {
         
         if NCUtilityFileSystem.shared.copyFile(atPath: url.path, toPath: fileNamePath) {
             
-            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: metadata.account, fileName: metadata.fileName, fileNameView: metadata.fileNameView, ocId: ocId, serverUrl: metadata.serverUrl, urlBase: metadata.urlBase, url: url.path, contentType: "", livePhoto: false)
+            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: metadata.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: metadata.fileName, fileNameView: metadata.fileNameView, ocId: ocId, serverUrl: metadata.serverUrl, urlBase: self.appDelegate.urlBase, url: url.path, contentType: "", livePhoto: false)
             
             metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
             metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile

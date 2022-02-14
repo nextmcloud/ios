@@ -75,6 +75,19 @@ class NCLoginWeb: UIViewController {
                 urlBase += "/index.php/login/flow"
             }
         }
+        
+        if #available(iOS 13, *) {
+            let keyWindow = UIApplication.shared.connectedScenes
+                .filter({$0.activationState == .foregroundActive})
+                .map({$0 as? UIWindowScene})
+                .compactMap({$0})
+                .first?.windows
+                .filter({$0.isKeyWindow}).first
+            let statusBar = UIView(frame: (keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
+            statusBar.backgroundColor = NCBrandColor.shared.customer
+            keyWindow?.addSubview(statusBar)
+        }
+        self.navigationController!.navigationBar.backgroundColor = NCBrandColor.shared.customer
 
         activityIndicator = UIActivityIndicatorView(style: .gray)
         activityIndicator.center = self.view.center

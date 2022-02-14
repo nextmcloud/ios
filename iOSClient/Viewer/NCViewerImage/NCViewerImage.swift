@@ -344,7 +344,7 @@ class NCViewerImage: UIViewController {
         }
         
         if metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo && !metadata.hasPreview {
-            NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+            NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
         }
         
         if CCUtility.fileProviderStoragePreviewIconExists(metadata.ocId, etag: metadata.etag) {
@@ -368,7 +368,7 @@ class NCViewerImage: UIViewController {
             
             if ext == "GIF" {
                 if !FileManager().fileExists(atPath: previewPath) {
-                    NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+                    NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
                 }
                 image = UIImage.animatedImage(withAnimatedGIFURL: URL(fileURLWithPath: imagePath))
             } else if ext == "SVG" {
@@ -388,7 +388,7 @@ class NCViewerImage: UIViewController {
                     return nil
                 }
             } else {
-                NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
+                NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
                 image = UIImage.init(contentsOfFile: imagePath)
             }
         }
@@ -400,7 +400,7 @@ class NCViewerImage: UIViewController {
     
     func videoPlay(metadata: tableMetadata) {
                                 
-        NCKTVHTTPCache.shared.startProxy(user: appDelegate.user, password: appDelegate.password, metadata: metadata)
+        NCKTVHTTPCache.shared.restartProxy(user: appDelegate.user, password: appDelegate.password)
 
         if let url = NCKTVHTTPCache.shared.getVideoURL(metadata: metadata) {
             
@@ -420,7 +420,7 @@ class NCViewerImage: UIViewController {
                     if let item = notification.object as? AVPlayerItem, let currentItem = self.player?.currentItem, item == currentItem {
                         self.player?.seek(to: .zero)
                         if !self.currentMetadata.livePhoto {
-                            NCManageDatabase.shared.deleteVideoTime(metadata: self.currentMetadata)
+                            NCManageDatabase.shared.deleteVideo(metadata: self.currentMetadata)
                         }
                     }
                 }
@@ -497,7 +497,7 @@ class NCViewerImage: UIViewController {
                     let timeSecond = Double(CMTimeGetSeconds(time))
                     let durationSeconds = Double(CMTimeGetSeconds(duration))
                     if timeSecond < durationSeconds {
-                        NCManageDatabase.shared.addVideoTime(metadata: self.currentMetadata, time: player?.currentTime())
+                        NCManageDatabase.shared.addVideoTime(metadata: self.currentMetadata, time: player?.currentTime(), durationTime: nil)
                     }
                 }
             }
@@ -798,8 +798,16 @@ extension NCViewerImage: NCViewerImageZoomDelegate {
             let fileNamePath = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, urlBase: metadata.urlBase, account: metadata.account)!
             let fileNamePreviewLocalPath = CCUtility.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)!
             let fileNameIconLocalPath = CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)!
-            
-            NCCommunication.shared.downloadPreview(fileNamePathOrFileId: fileNamePath, fileNamePreviewLocalPath: fileNamePreviewLocalPath, widthPreview: NCGlobal.shared.sizePreview, heightPreview: NCGlobal.shared.sizePreview, fileNameIconLocalPath: fileNameIconLocalPath, sizeIcon: NCGlobal.shared.sizeIcon) { (account, imagePreview, imageIcon,  errorCode, errorMessage) in
+    
+                NCCommunication.shared.downloadPreview(
+                    fileNamePathOrFileId: fileNamePath,
+                    fileNamePreviewLocalPath: fileNamePreviewLocalPath,
+                    widthPreview: NCGlobal.shared.sizePreview,
+                    heightPreview: NCGlobal.shared.sizePreview,
+                    fileNameIconLocalPath: fileNameIconLocalPath,
+                    sizeIcon: NCGlobal.shared.sizeIcon,
+                    etag: metadata.etag) { _, _, imageIcon, _, etag, errorCode, _ in
+                
                 if errorCode == 0 && metadata.ocId == self.currentMetadata.ocId {
                     self.reloadCurrentPage()
                 }

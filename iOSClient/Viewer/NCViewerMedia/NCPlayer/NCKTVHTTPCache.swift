@@ -70,7 +70,7 @@ class NCKTVHTTPCache: NSObject {
         }
     }
 
-    private func stopProxy() {
+    func stopProxy() {
 
         if KTVHTTPCache.proxyIsRunning() {
             KTVHTTPCache.proxyStop()
