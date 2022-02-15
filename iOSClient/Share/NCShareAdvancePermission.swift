@@ -636,6 +636,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             if let hideDownloadRowIndexPath = form.indexPath(ofFormRow: hideDownloadRow), indexPath == hideDownloadRowIndexPath {
                 let cell = cell as? NCFilePermissionEditCell
                 cell?.switchControl.isOn = tableShare?.hideDownload ?? false
+                cell?.titleLabel.isEnabled = !(tableShare?.permissions == NCGlobal.shared.permissionCreateShare)
+                cell?.switchControl.isEnabled = !(tableShare?.permissions == NCGlobal.shared.permissionCreateShare)
+                cell?.isUserInteractionEnabled = !(tableShare?.permissions == NCGlobal.shared.permissionCreateShare)
             }
             
             // set password
