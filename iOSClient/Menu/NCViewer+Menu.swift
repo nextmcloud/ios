@@ -355,10 +355,10 @@ extension NCViewer {
 
             if CCUtility.getPDFDisplayDirection() == .horizontal {
                 title = NSLocalizedString("_pdf_vertical_", comment: "")
-                icon = UIImage(named: "pdf-vertical")!.image(color: NCBrandColor.shared.iconColor, size: 50)
+                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
             } else {
                 title = NSLocalizedString("_pdf_horizontal_", comment: "")
-                icon = UIImage(named: "pdf-horizontal")!.image(color: NCBrandColor.shared.iconColor, size: 50)
+                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
             }
 
             actions.append(
@@ -378,7 +378,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_go_to_page_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "repeat").image(color: NCBrandColor.shared.iconColor, size: 50),
+                    icon: NCUtility.shared.loadImage(named: "go-to-page").image(color: NCBrandColor.shared.iconColor, size: 50),
                     action: { _ in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuGotToPageInPDF)
                     }
