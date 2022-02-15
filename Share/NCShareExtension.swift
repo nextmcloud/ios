@@ -197,7 +197,7 @@ class NCShareExtension: UIViewController {
 
         // BACK BUTTON
         let backButton = UIButton(type: .custom)
-        backButton.setImage(UIImage(named: "back"), for: .normal)
+        backButton.setImage(UIImage(named: "back")?.imageColor(NCBrandColor.shared.customer), for: .normal)
         backButton.tintColor = NCBrandColor.shared.customer
         backButton.semanticContentAttribute = .forceLeftToRight
         backButton.setTitle(" "+NSLocalizedString("_back_", comment: ""), for: .normal)
@@ -215,6 +215,12 @@ class NCShareExtension: UIViewController {
                 }
                 self.setNavigationBar(navigationTitle: navigationTitle)
             }
+        }
+        
+        if serverUrl != NCUtilityFileSystem.shared.getHomeServer(account: activeAccount.account) {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        } else {
+            navigationItem.leftBarButtonItem = nil
         }
 
 //        let image = NCUtility.shared.loadUserImage(
