@@ -104,6 +104,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         self.pageControl.numberOfPages = self.titles.count
         self.view.backgroundColor = NCBrandColor.shared.customer
         self.timerAutoScroll = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(NCIntroViewController.autoScroll)), userInfo: nil, repeats: true)
+        NotificationCenter.default.addObserver(self, selector: #selector(resetPageController(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -142,6 +143,11 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         pageControl.currentPage = 0
         introCollectionView.collectionViewLayout.invalidateLayout()
         self.introCollectionView.reloadData()
+    }
+    
+    @objc func resetPageController(_ notification: NSNotification){
+        pageControl.currentPage = 0
+        introCollectionView.scrollToItem(at: IndexPath(row: pageControl.currentPage, section: 0), at: .centeredHorizontally, animated: true)
     }
 
     @objc func autoScroll() {
