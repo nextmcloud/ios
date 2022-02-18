@@ -30,6 +30,13 @@ import Queuer
 
 extension NCCollectionViewCommon {
     
+    fileprivate func setMetadatasAvalableOffline(_ metadatas: [tableMetadata], isOffline: Bool) {
+            metadatas.forEach { metadata in
+                NCFunctionCenter.shared.setMetadataAvalableOffline(metadata, isOffline: isOffline)
+            }
+            self.reloadDataSource()
+        }
+
     func toggleMenu(metadata: tableMetadata, imageIcon: UIImage?) {
         
         var actions = [NCMenuAction]()
@@ -131,24 +138,7 @@ extension NCCollectionViewCommon {
                     //icon: NCUtility.shared.loadImage(named: "offlineMenu"),
                     icon:  NCUtility.shared.loadImage(named: "offlineMenu", color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
-                        if isOffline {
-                            if metadata.directory {
-                                NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, offline: false, account: self.appDelegate.account)
-                            } else {
-                                NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: false)
-                            }
-                        } else {
-                            if metadata.directory {
-                                NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, offline: true, account: self.appDelegate.account)
-                                NCOperationQueue.shared.synchronizationMetadata(metadata, selector: NCGlobal.shared.selectorDownloadAllFile)
-                            } else {
-                                NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorLoadOffline) { _ in }
-                                if let metadataLivePhoto = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
-                                    NCNetworking.shared.download(metadata: metadataLivePhoto, selector: NCGlobal.shared.selectorLoadOffline) { _ in }
-                                }
-                            }
-                        }
-                        self.reloadDataSource()
+                        self.setMetadatasAvalableOffline([metadata], isOffline: isOffline)
                     }
                 )
             )
@@ -486,6 +476,5 @@ extension NCCollectionViewCommon {
         
         presentMenu(with: actions)
     }
-    
 }
 

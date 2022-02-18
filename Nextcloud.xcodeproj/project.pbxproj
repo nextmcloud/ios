@@ -131,6 +131,7 @@
 		7A4619A227BF71F40042D595 /* NCTrash+CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4619A127BF71F40042D595 /* NCTrash+CollectionView.swift */; };
 		7A4619A627BF72440042D595 /* UIBarButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4619A527BF72440042D595 /* UIBarButton+Extension.swift */; };
 		7A4619AA27BF72810042D595 /* NCSelectableNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4619A927BF72810042D595 /* NCSelectableNavigationView.swift */; };
+		7A4619CE27BFA2C00042D595 /* NCFunctionCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4619CD27BFA2C00042D595 /* NCFunctionCenter.swift */; };
 		7A5F80DE27B62993008B90E8 /* OpenSSL.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7A82A1A926F35C5000D52790 /* OpenSSL.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7A70DD1B27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
 		7A70DD1C27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
@@ -256,7 +257,6 @@
 		95BB208A265FEF3F00AF4344 /* NCSortMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB2080265FEF3F00AF4344 /* NCSortMenu.swift */; };
 		95BB208B265FEF3F00AF4344 /* NCCollectionViewCommon+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB2081265FEF3F00AF4344 /* NCCollectionViewCommon+Menu.swift */; };
 		95BB208C265FEF3F00AF4344 /* NCLoginWeb+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB2082265FEF3F00AF4344 /* NCLoginWeb+Menu.swift */; };
-		95BB20C3265FF37300AF4344 /* NCFunctionCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20C2265FF37300AF4344 /* NCFunctionCenter.swift */; };
 		95BB20CD26600F6100AF4344 /* NCLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20CC26600F6100AF4344 /* NCLogin.swift */; };
 		95BB20D326600FB900AF4344 /* NCNetworkingProcessUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20D226600FB900AF4344 /* NCNetworkingProcessUpload.swift */; };
 		95BB20EB2660DFA200AF4344 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB20E92660DFA200AF4344 /* NCRenameFile.storyboard */; };
@@ -624,6 +624,7 @@
 		7A4619A127BF71F40042D595 /* NCTrash+CollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCTrash+CollectionView.swift"; sourceTree = "<group>"; };
 		7A4619A527BF72440042D595 /* UIBarButton+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIBarButton+Extension.swift"; sourceTree = "<group>"; };
 		7A4619A927BF72810042D595 /* NCSelectableNavigationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCSelectableNavigationView.swift; sourceTree = "<group>"; };
+		7A4619CD27BFA2C00042D595 /* NCFunctionCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NCFunctionCenter.swift; path = ../../../../Downloads/NCFunctionCenter.swift; sourceTree = "<group>"; };
 		7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7A70DD8E27B4D5570018F47E /* NCMenu+FloatingPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCMenu+FloatingPanel.swift"; sourceTree = "<group>"; };
 		7A70DD8F27B4D5570018F47E /* UIViewController+Menu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Menu.swift"; sourceTree = "<group>"; };
@@ -715,7 +716,6 @@
 		95BB2080265FEF3F00AF4344 /* NCSortMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCSortMenu.swift; sourceTree = "<group>"; };
 		95BB2081265FEF3F00AF4344 /* NCCollectionViewCommon+Menu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCCollectionViewCommon+Menu.swift"; sourceTree = "<group>"; };
 		95BB2082265FEF3F00AF4344 /* NCLoginWeb+Menu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCLoginWeb+Menu.swift"; sourceTree = "<group>"; };
-		95BB20C2265FF37300AF4344 /* NCFunctionCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCFunctionCenter.swift; sourceTree = "<group>"; };
 		95BB20CC26600F6100AF4344 /* NCLogin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCLogin.swift; sourceTree = "<group>"; };
 		95BB20D226600FB900AF4344 /* NCNetworkingProcessUpload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCNetworkingProcessUpload.swift; sourceTree = "<group>"; };
 		95BB20E92660DFA200AF4344 /* NCRenameFile.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCRenameFile.storyboard; sourceTree = "<group>"; };
@@ -1318,9 +1318,9 @@
 		F70211F31BAC56E9003FC03E /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				7A4619CD27BFA2C00042D595 /* NCFunctionCenter.swift */,
 				56A510AC27B2E66700D9F3E6 /* NCCellProtocol.swift */,
 				7AE63AE526D633BA00CEAAD5 /* Collection Common */,
-				95BB20C2265FF37300AF4344 /* NCFunctionCenter.swift */,
 				F710D1FA24057E5E00A6033D /* ActionSheetHeaderView */,
 				371B5A2F23D0B04B00FAFAE9 /* Menu */,
 				F7DFB7E9219C5A0500680748 /* Create cloud */,
@@ -2870,6 +2870,7 @@
 				F70CAE3A1F8CF31A008125FD /* NCEndToEndEncryption.m in Sources */,
 				C0D788CC268C656C00B876BB /* NCShareQuickStatusMenu.swift in Sources */,
 				F74C0436253F1CDC009762AB /* NCShares.swift in Sources */,
+				7A4619CE27BFA2C00042D595 /* NCFunctionCenter.swift in Sources */,
 				7A875F1E2694776F00AF558D /* SaveSettingsCustomButtonCell.swift in Sources */,
 				F7AE00F5230D5F9E007ACF8A /* NCLoginWeb.swift in Sources */,
 				7A70DD9D27B4D9B70018F47E /* NCViewerMediaDetailView.swift in Sources */,
@@ -2882,7 +2883,6 @@
 				C0D6064426CCDCFF00B67843 /* NCFilePermissionEditPasswordCell.swift in Sources */,
 				95BB2088265FEF3F00AF4344 /* NCMenu.swift in Sources */,
 				5672097227B537C400413A96 /* NCLoginNavigationController.swift in Sources */,
-				95BB20C3265FF37300AF4344 /* NCFunctionCenter.swift in Sources */,
 				F704FA5C232A343F00BBA952 /* IMImagemeterViewer.swift in Sources */,
 				95BB2086265FEF3F00AF4344 /* NCTrash+Menu.swift in Sources */,
 				F745B253222D88AE00346520 /* NCLoginQRCode.swift in Sources */,
