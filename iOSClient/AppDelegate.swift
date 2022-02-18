@@ -63,7 +63,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var documentPickerViewController: NCDocumentPickerViewController?
     var networkingProcessUpload: NCNetworkingProcessUpload?
     var passcodeViewController: TOPasscodeViewController?
-    var pasteboardOcIds: [String] = []
     var shares: [tableShare] = []
     var timerErrorNetworking: Timer?
     @objc let adjust = AdjustHelper()

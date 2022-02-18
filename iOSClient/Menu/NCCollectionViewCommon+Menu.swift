@@ -234,7 +234,7 @@ extension NCCollectionViewCommon {
                         if metadataMOV != nil {
                             NCFunctionCenter.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV!)
                         } else {
-                            if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+                            if CCUtility.fileProviderStorageExists(metadata) {
                                 NCFunctionCenter.shared.saveAlbum(metadata: metadata)
                             } else {
                                 NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum)
@@ -311,8 +311,7 @@ extension NCCollectionViewCommon {
                     icon: NCUtility.shared.loadImage(named: "copy",color: NCBrandColor.shared.iconColor),
                     
                     action: { menuAction in
-                        self.appDelegate.pasteboardOcIds = [metadata.ocId];
-                        NCFunctionCenter.shared.copyPasteboard()
+                        NCFunctionCenter.shared.copyPasteboard(pasteboardOcIds: [metadata.ocId], hudView: self.view)
                     }
                 )
             )
