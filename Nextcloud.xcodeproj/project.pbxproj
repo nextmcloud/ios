@@ -128,6 +128,9 @@
 		56E9B9FC27B39DFC007B1772 /* english.txt in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B9F827B39DFC007B1772 /* english.txt */; };
 		56E9B9FD27B39DFC007B1772 /* english.txt in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B9F827B39DFC007B1772 /* english.txt */; };
 		7A29E0EF269873A600B239BA /* InitialPrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */; };
+		7A4619A227BF71F40042D595 /* NCTrash+CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4619A127BF71F40042D595 /* NCTrash+CollectionView.swift */; };
+		7A4619A627BF72440042D595 /* UIBarButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4619A527BF72440042D595 /* UIBarButton+Extension.swift */; };
+		7A4619AA27BF72810042D595 /* NCSelectableNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4619A927BF72810042D595 /* NCSelectableNavigationView.swift */; };
 		7A5F80DE27B62993008B90E8 /* OpenSSL.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7A82A1A926F35C5000D52790 /* OpenSSL.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7A70DD1B27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
 		7A70DD1C27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
@@ -618,6 +621,9 @@
 		56E9B9F927B39DFC007B1772 /* NYMnemonic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NYMnemonic.h; sourceTree = "<group>"; };
 		75D9B76604BC04F7789A83AF /* Pods-Nextcloud.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Nextcloud.release.xcconfig"; path = "Target Support Files/Pods-Nextcloud/Pods-Nextcloud.release.xcconfig"; sourceTree = "<group>"; };
 		7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialPrivacySettingsViewController.swift; sourceTree = "<group>"; };
+		7A4619A127BF71F40042D595 /* NCTrash+CollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCTrash+CollectionView.swift"; sourceTree = "<group>"; };
+		7A4619A527BF72440042D595 /* UIBarButton+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIBarButton+Extension.swift"; sourceTree = "<group>"; };
+		7A4619A927BF72810042D595 /* NCSelectableNavigationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCSelectableNavigationView.swift; sourceTree = "<group>"; };
 		7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7A70DD8E27B4D5570018F47E /* NCMenu+FloatingPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCMenu+FloatingPanel.swift"; sourceTree = "<group>"; };
 		7A70DD8F27B4D5570018F47E /* UIViewController+Menu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Menu.swift"; sourceTree = "<group>"; };
@@ -1198,6 +1204,7 @@
 		7AE63AE526D633BA00CEAAD5 /* Collection Common */ = {
 			isa = PBXGroup;
 			children = (
+				7A4619A927BF72810042D595 /* NCSelectableNavigationView.swift */,
 				7AE63AE626D633BA00CEAAD5 /* NCGridCell.swift */,
 				7AE63AE726D633BA00CEAAD5 /* NCListCell.xib */,
 				7AE63AE826D633BA00CEAAD5 /* NCGridCell.xib */,
@@ -1611,6 +1618,7 @@
 		F78F74322163753B00C2ADAD /* Trash */ = {
 			isa = PBXGroup;
 			children = (
+				7A4619A127BF71F40042D595 /* NCTrash+CollectionView.swift */,
 				F78ACD4721903F850088454D /* Cell */,
 				F7632FC32183667400721B71 /* Section */,
 				F78F74332163757000C2ADAD /* NCTrash.storyboard */,
@@ -1661,6 +1669,7 @@
 		F7A0D14E259229FA008F8A13 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				7A4619A527BF72440042D595 /* UIBarButton+Extension.swift */,
 				56E9B9E227B37FFC007B1772 /* UIApplication+Orientation.swift */,
 				56E9B9E327B37FFC007B1772 /* UIControl+Extensions.swift */,
 				7AE63B9B26DD104000CEAAD5 /* NSMutableAttributedString+Extensions.swift */,
@@ -2727,6 +2736,7 @@
 				95BB2085265FEF3F00AF4344 /* NCMedia+Menu.swift in Sources */,
 				95BB2084265FEF3F00AF4344 /* AppDelegate+Menu.swift in Sources */,
 				F76D3CF12428B40E005DFA87 /* NCViewerPDFSearch.swift in Sources */,
+				7A4619A627BF72440042D595 /* UIBarButton+Extension.swift in Sources */,
 				F73F537F1E929C8500F8678D /* NCMore.swift in Sources */,
 				F78E7065219F096B006F23E4 /* NCAvatar.swift in Sources */,
 				F72CD63A25C19EBF00F46F9A /* NCAutoUpload.swift in Sources */,
@@ -2796,6 +2806,7 @@
 				F70460522499061800BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
 				7A875EDA26943BC200AF558D /* OpenSourceSoftwareViewController.swift in Sources */,
 				F78F74362163781100C2ADAD /* NCTrash.swift in Sources */,
+				7A4619A227BF71F40042D595 /* NCTrash+CollectionView.swift in Sources */,
 				B176BA9926F8B83A009A0F33 /* NCShareTextInputCell.swift in Sources */,
 				C07020E5267B459500E094AD /* NCPermissionMenuView.swift in Sources */,
 				F7651A8B23A2A3F2001403D2 /* NCCreateFormUploadDocuments.swift in Sources */,
@@ -2819,6 +2830,7 @@
 				F713FF002472764100214AF6 /* UIImage+animatedGIF.m in Sources */,
 				F7A0D1462592256F008F8A13 /* UIImageView+Extensions.swift in Sources */,
 				F749C10B23C4A5340027D966 /* NCIntroCollectionViewCell.swift in Sources */,
+				7A4619AA27BF72810042D595 /* NCSelectableNavigationView.swift in Sources */,
 				B15AD4B6273D940D00490E0B /* ShareDownloadLimitNetwork.swift in Sources */,
 				F718C24E254D507B00C5C256 /* NCViewerImageDetailView.swift in Sources */,
 				7AD162D32754F8CE001A5DC4 /* TealiumHelper.swift in Sources */,
@@ -3683,8 +3695,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rechsteiner/Parchment";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = exactVersion;
+				version = 2.4.0;
 			};
 		};
 		569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */ = {
