@@ -42,6 +42,9 @@ Cartfile.resolved
 
 IDEWorkspaceChecks.plist
 install.sh
+Pods/*
+Pods/Target Support Files/*
+Pods/Target Support Files/Pods-Nextcloud/Pods-Nextcloud-frameworks.sh
 Pods/Target Support Files/MoEngage-iOS-SDK/MoEngage-iOS-SDK.debug.xcconfig
 Pods/Target Support Files/MoEngage-iOS-SDK/MoEngage-iOS-SDK.release.xcconfig
 Pods/Target Support Files/MORichNotification/MORichNotification.debug.xcconfig
