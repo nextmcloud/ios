@@ -66,7 +66,7 @@ class NCPlayer: NSObject {
         }
         
         // Exists the file video encoded
-        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: NCGlobal.shared.fileNameVideoEncoded) {
+        if CCUtility.fileProviderStorageExists(metadata) {
             self.url = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: NCGlobal.shared.fileNameVideoEncoded))
         }
 

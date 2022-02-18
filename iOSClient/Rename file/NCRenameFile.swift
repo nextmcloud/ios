@@ -74,7 +74,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             fileNameWithoutExt.layer.borderColor = NCBrandColor.shared.iconColor.cgColor
             fileNameWithoutExt.becomeFirstResponder()
             
-            ext.text = metadata.ext
+            ext.text = metadata.fileExtension
             ext.delegate = self
             if disableChangeExt {
                 ext.isEnabled = false
@@ -185,7 +185,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
         } else {
             
             if ext.text == nil || ext.text?.count == 0 {
-                self.ext.text = metadata.ext
+                self.ext.text = metadata.fileExtension
                 return
             } else {
                 extNew = ext.text!
@@ -205,7 +205,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
                 
                 title = NSLocalizedString("_keep_", comment: "") + " ." + metadata.ext
                 alertController.addAction(UIAlertAction(title: title, style: .default, handler: { action in
-                    self.ext.text = metadata.ext
+                    self.ext.text = metadata.fileExtension
                 }))
                 
                 self.present(alertController, animated: true)

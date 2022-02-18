@@ -179,7 +179,7 @@ extension NCMedia {
                                     if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
                                         NCFunctionCenter.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV)
                                     } else {
-                                        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+                                        if CCUtility.fileProviderStorageExists(metadata) {
                                             NCFunctionCenter.shared.saveAlbum(metadata: metadata)
                                         } else {
                                             NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum)
@@ -227,11 +227,7 @@ extension NCMedia {
                     icon: NCUtility.shared.loadImage(named: "copy",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         self.isEditMode = false
-                        self.appDelegate.pasteboardOcIds.removeAll()
-                        for ocId in self.selectOcId {
-                            self.appDelegate.pasteboardOcIds.append(ocId)
-                        }
-                        NCFunctionCenter.shared.copyPasteboard()
+                        NCFunctionCenter.shared.copyPasteboard(pasteboardOcIds: self.selectOcId, hudView: self.view)
                         self.selectOcId.removeAll()
                         self.reloadDataThenPerform { }
                     }

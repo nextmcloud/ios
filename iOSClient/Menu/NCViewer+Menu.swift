@@ -96,7 +96,7 @@ extension NCViewer {
                         icon: NCUtility.shared.loadImage(named: "rotate",color: NCBrandColor.shared.iconColor),
                         action: { menuAction in
                             NotificationCenter.default.postOnMainThread(name: NCBrandGlobal.shared.notificationImagePreviewRotateImage)
-                            if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
+                            if (localFile == nil || !CCUtility.fileProviderStorageExists(metadata)) && metadata.session == "" {
                                 
 //                                NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
 //                                NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
@@ -295,8 +295,7 @@ extension NCViewer {
 //                title: NSLocalizedString("_copy_file_", comment: ""),
 //                icon: NCUtility.shared.loadImage(named: "copy"),
 //                action: { menuAction in
-//                    self.appDelegate.pasteboardOcIds = [metadata.ocId];
-//                    NCFunctionCenter.shared.copyPasteboard()
+//                    NCFunctionCenter.shared.copyPasteboard(pasteboardOcIds: [metadata.ocId], hudView: viewController.view)
 //                }
 //            )
 //        )
@@ -322,7 +321,7 @@ extension NCViewer {
         // DOWNLOAD IMAGE MAX RESOLUTION
         //
         if metadata.session == "" {
-            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.session == "" {
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && !CCUtility.fileProviderStorageExists(metadata) && metadata.session == "" {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_download_image_max_", comment: ""),

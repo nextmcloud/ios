@@ -291,7 +291,6 @@ class NCGlobal: NSObject {
     let selectorListingFavorite                     = "listingFavorite"
     let selectorLoadFileView                        = "loadFileView"
     let selectorLoadFileQuickLook                   = "loadFileQuickLook"
-    let selectorLoadCopy                            = "loadCopy"
     let selectorLoadOffline                         = "loadOffline"
     let selectorOpenIn                              = "openIn"
     let selectorPrint                               = "print"
