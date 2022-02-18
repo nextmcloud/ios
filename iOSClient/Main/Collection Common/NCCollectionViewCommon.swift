@@ -1363,14 +1363,14 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             }
         }
 
-        // Avatar
-        if metadata.ownerId.count > 0,
-           metadata.ownerId != appDelegate.userId,
-           appDelegate.account == metadata.account,
-           let cell = cell as? NCCellProtocol {
-            let fileName = metadata.userBaseUrl + "-" + metadata.ownerId + ".png"
-            NCOperationQueue.shared.downloadAvatar(user: metadata.ownerId, dispalyName: metadata.ownerDisplayName, fileName: fileName, cell: cell, view: collectionView)
-        }
+//        // Avatar
+//        if metadata.ownerId.count > 0,
+//           metadata.ownerId != appDelegate.userId,
+//           appDelegate.account == metadata.account,
+//           let cell = cell as? NCCellProtocol {
+//            let fileName = metadata.userBaseUrl + "-" + metadata.ownerId + ".png"
+//            NCOperationQueue.shared.downloadAvatar(user: metadata.ownerId, dispalyName: metadata.ownerDisplayName, fileName: fileName, cell: cell, view: collectionView)
+//        }
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
