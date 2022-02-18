@@ -30,6 +30,13 @@ import Queuer
 
 extension NCCollectionViewCommon {
     
+    fileprivate func setMetadatasAvalableOffline(_ metadatas: [tableMetadata], isOffline: Bool) {
+            metadatas.forEach { metadata in
+                NCFunctionCenter.shared.setMetadataAvalableOffline(metadata, isOffline: isOffline)
+            }
+            self.reloadDataSource()
+        }
+
     func toggleMenu(metadata: tableMetadata, imageIcon: UIImage?) {
         
         var actions = [NCMenuAction]()
@@ -131,24 +138,7 @@ extension NCCollectionViewCommon {
                     //icon: NCUtility.shared.loadImage(named: "offlineMenu"),
                     icon:  NCUtility.shared.loadImage(named: "offlineMenu", color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
-                        if isOffline {
-                            if metadata.directory {
-                                NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, offline: false, account: self.appDelegate.account)
-                            } else {
-                                NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: false)
-                            }
-                        } else {
-                            if metadata.directory {
-                                NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, offline: true, account: self.appDelegate.account)
-                                NCOperationQueue.shared.synchronizationMetadata(metadata, selector: NCGlobal.shared.selectorDownloadAllFile)
-                            } else {
-                                NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorLoadOffline) { _ in }
-                                if let metadataLivePhoto = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
-                                    NCNetworking.shared.download(metadata: metadataLivePhoto, selector: NCGlobal.shared.selectorLoadOffline) { _ in }
-                                }
-                            }
-                        }
-                        self.reloadDataSource()
+                        self.setMetadatasAvalableOffline([metadata], isOffline: isOffline)
                     }
                 )
             )
@@ -490,7 +480,15 @@ extension NCCollectionViewCommon {
     func toggleMenuSelect() {
         
         var actions = [NCMenuAction]()
-        
+        let selectedMetadatas = selectOcId.compactMap(NCManageDatabase.shared.getMetadataFromOcId)
+               let isAnyOffline = selectedMetadatas.contains(where: { metadata in
+                   if metadata.directory,
+                      let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, metadata.serverUrl + "/" + metadata.fileName)) {
+                           return directory.offline
+                   } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
+                           return localFile.offline
+                   } else { return false }
+               })
         //
         // SELECT ALL
         //
@@ -500,6 +498,32 @@ extension NCCollectionViewCommon {
                 icon: NCUtility.shared.loadImage(named: "selectAll",color: NCBrandColor.shared.iconColor),
                 action: { menuAction in
                     self.collectionViewSelectAll()
+                }
+            )
+        )
+        
+        //
+        // Avaliable Offline
+        //
+        actions.append(
+            NCMenuAction(
+                title: isAnyOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: ""),
+                icon: NCUtility.shared.loadImage(named: "tray.and.arrow.down"),
+                action: { _ in
+                    if !isAnyOffline, selectedMetadatas.count > 3 {
+                        let alert = UIAlertController(
+                            title: NSLocalizedString("_set_available_offline_", comment: ""),
+                            message: NSLocalizedString("_select_offline_warning_", comment: ""),
+                            preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { _ in
+                            self.setMetadatasAvalableOffline(selectedMetadatas, isOffline: isAnyOffline)
+                        }))
+                        alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
+                        self.present(alert, animated: true)
+                    } else {
+                        self.setMetadatasAvalableOffline(selectedMetadatas, isOffline: isAnyOffline)
+                    }
+                    self.tapSelect(sender: self)
                 }
             )
         )
@@ -526,19 +550,14 @@ extension NCCollectionViewCommon {
                 title: NSLocalizedString("_save_selected_files_", comment: ""),
                 icon: NCUtility.shared.loadImage(named: "save_files",color: NCBrandColor.shared.iconColor),
                 action: { menuAction in
-                    for ocId in self.selectOcId {
-                        
-                        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                            if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo {
-                                if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
-                                    NCFunctionCenter.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV)
-                                } else {
-                                    if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
-                                        NCFunctionCenter.shared.saveAlbum(metadata: metadata)
-                                    } else {
-                                        NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum)
-                                    }
-                                }
+                    selectedMetadatas.forEach { metadata in
+                                            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue {
+                                                if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
+                                                    NCFunctionCenter.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV)
+                                                } else if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+                                                    NCFunctionCenter.shared.saveAlbum(metadata: metadata)
+                                                } else {
+                                                    NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum)
                             }
                         }
                     }
@@ -554,15 +573,8 @@ extension NCCollectionViewCommon {
                 title: NSLocalizedString("_move_or_copy_selected_files_", comment: ""),
                 icon: NCUtility.shared.loadImage(named: "move",color: NCBrandColor.shared.iconColor),
                 action: { menuAction in
-                    var meradatasSelect = [tableMetadata]()
-                    for ocId in self.selectOcId {
-                        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                            meradatasSelect.append(metadata)
-                        }
-                    }
-                    if meradatasSelect.count > 0 {
-                        NCFunctionCenter.shared.openSelectView(items: meradatasSelect, viewController: self)
-                    }
+                    guard !selectedMetadatas.isEmpty else { return }
+                                        NCFunctionCenter.shared.openSelectView(items: selectedMetadatas, viewController: self)
                     self.tapSelect(sender: self)
                 }
             )
@@ -596,18 +608,14 @@ extension NCCollectionViewCommon {
                     let alertController = UIAlertController(title: "", message: NSLocalizedString("_want_delete_", comment: ""), preferredStyle: .alert)
                     alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_delete_", comment: ""), style: .default) { (action:UIAlertAction) in
                         
-                        for ocId in self.selectOcId {
-                            if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                                NCOperationQueue.shared.delete(metadata: metadata, onlyLocalCache: false)
-                            }
+                        selectedMetadatas.forEach {
+                                                        NCOperationQueue.shared.delete(metadata: $0, onlyLocalCache: false)
                         }
                         self.tapSelect(sender: self)
                     })
                     alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { (action:UIAlertAction) in
-                        for ocId in self.selectOcId {
-                            if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                                NCOperationQueue.shared.delete(metadata: metadata, onlyLocalCache: true)
-                            }
+                        selectedMetadatas.forEach {
+                                                    NCOperationQueue.shared.delete(metadata: $0, onlyLocalCache: true)
                         }
                         self.tapSelect(sender: self)
                     })
