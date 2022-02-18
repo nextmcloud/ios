@@ -648,7 +648,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 }
             }
         }
-        navigationItem.setLeftBarButton(UIBarButtonItem(customView: button), animated: true)
+//        navigationItem.setLeftBarButton(UIBarButtonItem(customView: button), animated: true)
         navigationItem.leftItemsSupplementBackButton = true
     }
     
