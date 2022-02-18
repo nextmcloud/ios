@@ -189,8 +189,8 @@ class NCDataSource: NSObject {
             index = self.getIndexMetadata(ocId: ocId)
         }
 
-        guard let index = index, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return nil }
-                metadatas[index] = metadata
+        guard let indexOf = index, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return nil }
+                metadatas[indexOf] = metadata
 
                 let size = CCUtility.fileProviderStorageSize(metadata.ocId, fileNameView: metadata.fileNameView)
                 if size > 0 {

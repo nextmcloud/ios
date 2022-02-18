@@ -23,7 +23,9 @@
 
 import UIKit
 
-class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProtocol {
+class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProtocol, NCTrashCell {
+    var labelInfo: UILabel?
+    
 
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageSelect: UIImageView!
@@ -35,7 +37,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
     @IBOutlet weak var progressView: UIProgressView!
 
-    private var objectId = ""
+    internal var objectId = ""
     private var user = ""
 
     weak var delegate: NCGridCellDelegate?

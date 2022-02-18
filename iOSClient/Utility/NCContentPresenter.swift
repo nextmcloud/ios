@@ -62,6 +62,14 @@ class NCContentPresenter: NSObject {
 
     // MARK: - Message
 
+    @objc func showError(description: String, errorCode: Int = NCGlobal.shared.errorGeneric) {
+        messageNotification(
+            "_error_", description: description,
+            delay: NCGlobal.shared.dismissAfterSecond,
+            type: .error,
+            errorCode: errorCode)
+    }
+    
     @objc func showGenericError(description: String) {
         messageNotification(
             "_error_", description: description,
