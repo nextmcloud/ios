@@ -175,7 +175,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         cell.titleLabel.textColor = textColor
         cell.titleLabel.text = titles[indexPath.row]
         cell.imageView.image = images[indexPath.row]
-        cell.imageView.contentMode = .scaleAspectFill
+        cell.imageView.contentMode = .scaleToFill
         return cell
     }
 
