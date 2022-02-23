@@ -352,25 +352,18 @@ import XLForm
 //            return
 //        }
         
-        let rowFileName: XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
-        guard var fileNameForm = rowFileName.value else {
-            return
-        }
-
-        
         if fileName as! String == "" {
             return
         } else {
             
-            let result = NCCommunicationCommon.shared.getInternalType(fileName: fileNameForm as! String, mimeType: "", directory: false)
+            let result = NCCommunicationCommon.shared.getInternalType(fileName: fileName as! String, mimeType: "", directory: false)
             if NCUtility.shared.isDirectEditing(account: appDelegate.account, contentType: result.mimeType).count == 0 {
-                fileNameForm = (fileNameForm as! NSString).deletingPathExtension + "." + fileNameExtension
+                fileName = (fileName as! NSString).deletingPathExtension + "." + fileNameExtension
             }
-
             
             if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: String(describing: fileName)) != nil {
                 
-                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: String(describing: fileNameForm), fileNameView: String(describing: fileNameForm), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: String(describing: fileName), fileNameView: String(describing: fileName), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
                 
                 guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
                 conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
@@ -378,7 +371,7 @@ import XLForm
                 conflictViewController.serverUrl = serverUrl
                 conflictViewController.metadatasUploadInConflict = [metadataForUpload]
                 conflictViewController.delegate = self
-
+                
                 self.present(conflictViewController, animated: true, completion: nil)
                 
             } else {
