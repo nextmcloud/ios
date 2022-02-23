@@ -739,7 +739,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                     inputField.hidden = !value
                     if let indexPath = self.form.indexPath(ofFormRow: inputField) {
                         let cell = tableView.cellForRow(at: indexPath) as? NCShareTextInputCell
-                        cell?.cellTextField.text = ""
+                        cell?.cellTextField.text = "\(self.downloadLimit ?? 0)"
                     }
                 }
             }

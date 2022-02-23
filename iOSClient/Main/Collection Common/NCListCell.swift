@@ -110,7 +110,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         longPressedGestureMore.delaysTouchesBegan = true
         buttonMore.addGestureRecognizer(longPressedGestureMore)
         
-        separator.backgroundColor = NCBrandColor.shared.nmcGray70
+        separator.backgroundColor = NCBrandColor.shared.graySoft
         self.labelInfo.textColor = NCBrandColor.shared.gray60
         separatorHeightConstraint.constant = 0.5
     }

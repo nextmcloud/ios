@@ -182,11 +182,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     override func viewWillAppear(_ animated: Bool) {
         self.reloadData()
         self.searchField.text = ""
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -230,10 +225,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         }
         tableView.reloadData()
         tableView.isUserInteractionEnabled = true
-    }
-        
-    @objc func keyboardWillHide(_ notification:Notification) {
-        searchFieldDidEndOnExit(textField: searchField)
     }
 
     
@@ -570,7 +561,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                     let metaData = NCManageDatabase.shared.getMetadataFromOcId(ocId)
                     self?.metadata = metaData
                 }
-                
+                self?.searchField.resignFirstResponder()
                 viewNewUserPermission.metadata = self!.metadata
                 viewNewUserPermission.sharee = sharee
                 viewNewUserPermission.shareeEmail = self?.shareeEmail
@@ -637,6 +628,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             print("this vc is not embedded in navigationController")
             return
         }
+        self.searchField.resignFirstResponder()
         navigationController.pushViewController(advancePermission, animated: true)
     }
     
@@ -650,6 +642,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         viewNewUserComment.metadata = self.metadata
         viewNewUserComment.tableShare = self.tableShareSelected
         viewNewUserComment.isUpdating = true
+        self.searchField.resignFirstResponder()
         self.navigationController?.pushViewController(viewNewUserComment, animated: true)
     }
     
@@ -738,6 +731,13 @@ extension NCShare: UITextFieldDelegate {
         if textField == searchField {
             searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
         }
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let searchString = "\(textField.text ?? "")\(string)"
+        networking?.getSharees(searchString: searchString)
+        self.shareeEmail = searchString
+        return true
     }
 }
 

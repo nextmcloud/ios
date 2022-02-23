@@ -600,13 +600,13 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         
         let activeAccount = NCManageDatabase.shared.getActiveAccount()
         
-        let image = NCUtility.shared.loadUserImage(
-            for: appDelegate.user,
-            displayName: activeAccount?.displayName,
-            userBaseUrl: appDelegate)
+//        let image = NCUtility.shared.loadUserImage(
+//            for: appDelegate.user,
+//            displayName: activeAccount?.displayName,
+//            userBaseUrl: appDelegate)
         
         let button = UIButton(type: .custom)
-        button.setImage(image, for: .normal)
+//        button.setImage(image, for: .normal)
         
         if serverUrl == NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account) {
             
