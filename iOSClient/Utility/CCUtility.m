@@ -1221,17 +1221,14 @@
     return [NSString stringWithFormat:@"%@/%@.preview.%@", [self getDirectoryProviderStorageOcId:ocId], etag, [NCGlobal shared].extensionPreview];
 }
 
-+ (BOOL)fileProviderStorageExists:(tableMetadata *)metadata
++ (BOOL)fileProviderStorageExists:(NSString *)ocId fileNameView:(NSString *)fileNameView
 {
-    NSString *fileNamePath = [self getDirectoryProviderStorageOcId:metadata.ocId fileNameView:metadata.fileNameView];
-       if (![[NSFileManager defaultManager] fileExistsAtPath:fileNamePath]) {
-           return false;
-       }
-
-
+    NSString *fileNamePath = [self getDirectoryProviderStorageOcId:ocId fileNameView:fileNameView];
+    
     unsigned long long fileSize = [[[NSFileManager defaultManager] attributesOfItemAtPath:fileNamePath error:nil] fileSize];
     
-    return fileSize == metadata.size;
+    if (fileSize > 0) return true;
+    else return false;
 }
 
 + (int64_t)fileProviderStorageSize:(NSString *)ocId fileNameView:(NSString *)fileNameView
@@ -1726,7 +1723,7 @@
     int pixelX = 0;
     NSString *lensModel;
 
-    if (![metadata.classFile isEqualToString:@"image"] || ![CCUtility fileProviderStorageExists:metadata]) {
+    if (![metadata.classFile isEqualToString:@"image"] || ![CCUtility fileProviderStorageExists:metadata.ocId fileNameView:metadata.fileNameView]) {
         completition(latitude, longitude, location, date, lensModel);
         return;
     }

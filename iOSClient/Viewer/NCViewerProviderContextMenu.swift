@@ -77,29 +77,29 @@ class NCViewerProviderContextMenu: UIViewController {
                 }
             }
             // VIEW IMAGE
-            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && CCUtility.fileProviderStorageExists(metadata) {
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
 
                 viewImage(metadata: metadata)
             }
 
             // VIEW LIVE PHOTO
-            if let metadataLivePhoto = metadataLivePhoto, CCUtility.fileProviderStorageExists(metadataLivePhoto) {
+            if let metadataLivePhoto = metadataLivePhoto, CCUtility.fileProviderStorageExists(metadataLivePhoto.ocId, fileNameView: metadataLivePhoto.fileNameView) {
                             viewVideo(metadata: metadataLivePhoto)
             }
 
             // VIEW VIDEO
-            if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue && CCUtility.fileProviderStorageExists(metadata) {
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue && CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                 viewVideo(metadata: metadata)
             }
 
             // PLAY SOUND
-            if metadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue && CCUtility.fileProviderStorageExists(metadata) {
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue && CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                 playSound(metadata: metadata)
             }
 
             // AUTO DOWNLOAD VIDEO / AUDIO
             // if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && (metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue || metadata.contentType == "application/pdf") {
-            if !CCUtility.fileProviderStorageExists(metadata) && (metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue) {
+            if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && (metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue) {
 
                 var maxDownload: UInt64 = 0
                 if NCNetworking.shared.networkReachability == NCCommunicationCommon.typeReachability.reachableCellular {
@@ -112,16 +112,16 @@ class NCViewerProviderContextMenu: UIViewController {
                 }
             }
             // AUTO DOWNLOAD IMAGE GIF
-            if !CCUtility.fileProviderStorageExists(metadata) && metadata.contentType == "image/gif" {
+            if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.contentType == "image/gif" {
                 NCOperationQueue.shared.download(metadata: metadata, selector: "")
             }
             // AUTO DOWNLOAD IMAGE SVG
-            if !CCUtility.fileProviderStorageExists(metadata) && metadata.contentType == "image/svg+xml" {
+            if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.contentType == "image/svg+xml" {
                 NCOperationQueue.shared.download(metadata: metadata, selector: "")
             }
             // AUTO DOWNLOAD LIVE PHOTO
             if let metadataLivePhoto = self.metadataLivePhoto {
-                if !CCUtility.fileProviderStorageExists(metadataLivePhoto) {
+                if !CCUtility.fileProviderStorageExists(metadataLivePhoto.ocId, fileNameView: metadataLivePhoto.fileNameView) {
                     NCOperationQueue.shared.download(metadata: metadataLivePhoto, selector: "")
                 }
             }

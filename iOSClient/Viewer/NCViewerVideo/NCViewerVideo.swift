@@ -88,7 +88,7 @@ class NCViewerVideo: AVPlayerViewController {
         }
         
         // AIRPLAY
-        if CCUtility.fileProviderStorageExists(metadata) {
+        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
             player?.allowsExternalPlayback = true
         } else {
             player?.allowsExternalPlayback = false

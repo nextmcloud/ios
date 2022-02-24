@@ -234,7 +234,7 @@ extension NCCollectionViewCommon {
                         if metadataMOV != nil {
                             NCFunctionCenter.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV!)
                         } else {
-                            if CCUtility.fileProviderStorageExists(metadata) {
+                            if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                                 NCFunctionCenter.shared.saveAlbum(metadata: metadata)
                             } else {
                                 NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum)
