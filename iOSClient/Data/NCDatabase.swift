@@ -393,7 +393,6 @@ class tableMetadata: Object, NCUserBaseUrl {
     @objc dynamic var sessionError = ""
     @objc dynamic var sessionSelector = ""
     @objc dynamic var sessionTaskIdentifier: Int = 0
-    @objc dynamic var sharePermissions = ""
     @objc dynamic var sharePermissionsCollaborationServices: Int = 0
     let sharePermissionsCloudMesh = List<String>()
     let shareType = List<Int>()
@@ -402,7 +401,6 @@ class tableMetadata: Object, NCUserBaseUrl {
     @objc dynamic var trashbinFileName = ""
     @objc dynamic var trashbinOriginalLocation = ""
     @objc dynamic var trashbinDeletionTime = NSDate()
-    @objc dynamic var typeFile = ""
     @objc dynamic var uploadDate = NSDate()
     @objc dynamic var url = ""
     @objc dynamic var urlBase = ""
