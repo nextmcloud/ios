@@ -44,6 +44,7 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
         } else if rowDescriptor.tag == "NCShareTextInputCellDownloadLimit" {
             seperator.isHidden = true
             cellTextField.keyboardType = .numberPad
+            setDoneButton(sender: self.cellTextField)
         }
     }
     
@@ -124,6 +125,16 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
 
     @objc func cancelDatePicker() {
         self.cellTextField.endEditing(true)
+    }
+    
+    func setDoneButton(sender: UITextField) {
+        //ToolBar
+        let toolbar = UIToolbar();
+        toolbar.sizeToFit()
+        let doneButton = UIBarButtonItem(title: NSLocalizedString("_done_", comment: ""), style: .plain, target: self, action: #selector(cancelDatePicker));
+        let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+        toolbar.setItems([spaceButton, doneButton], animated: false)
+        sender.inputAccessoryView = toolbar
     }
 }
 
