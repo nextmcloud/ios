@@ -45,20 +45,20 @@ class NCViewer: NSObject {
 
         // IMAGE AUDIO VIDEO
         if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue {
-            
+
             if let navigationController = viewController.navigationController {
-                            
-                let viewerImagePageContainer:NCViewerImage = UIStoryboard(name: "NCViewerImage", bundle: nil).instantiateInitialViewController() as! NCViewerImage
+
+                let viewerMediaPageContainer: NCViewerMediaPage = UIStoryboard(name: "NCViewerMediaPage", bundle: nil).instantiateInitialViewController() as! NCViewerMediaPage
                 var index = 0
                 for medatasImage in metadatas {
                     if medatasImage.ocId == metadata.ocId {
-                        viewerImagePageContainer.currentIndex = index
+                        viewerMediaPageContainer.currentIndex = index
                         break
                     }
                     index += 1
                 }
-                viewerImagePageContainer.metadatas = metadatas
-                navigationController.pushViewController(viewerImagePageContainer, animated: true)
+                viewerMediaPageContainer.metadatas = metadatas
+                navigationController.pushViewController(viewerMediaPageContainer, animated: true)
             }
 
             return

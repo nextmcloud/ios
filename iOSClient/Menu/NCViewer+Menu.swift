@@ -96,7 +96,7 @@ extension NCViewer {
                         icon: NCUtility.shared.loadImage(named: "rotate",color: NCBrandColor.shared.iconColor),
                         action: { menuAction in
                             NotificationCenter.default.postOnMainThread(name: NCBrandGlobal.shared.notificationImagePreviewRotateImage)
-                            if (localFile == nil || !CCUtility.fileProviderStorageExists(metadata)) && metadata.session == "" {
+                            if (localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "" {
                                 
 //                                NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
 //                                NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
@@ -321,7 +321,7 @@ extension NCViewer {
         // DOWNLOAD IMAGE MAX RESOLUTION
         //
         if metadata.session == "" {
-            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && !CCUtility.fileProviderStorageExists(metadata) && metadata.session == "" {
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.session == "" {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_download_image_max_", comment: ""),

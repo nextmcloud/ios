@@ -103,7 +103,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
         if metadata.directory {
             return true
         }
-        if CCUtility.fileProviderStorageExists(metadata) {
+        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
             return true
         } else {
             return false

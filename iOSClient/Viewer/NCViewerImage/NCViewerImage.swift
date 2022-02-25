@@ -179,7 +179,7 @@ class NCViewerImage: UIViewController {
 
     @objc func applicationDidEnterBackground(_ notification: NSNotification) {
         
-        if currentMetadata.typeFile == NCGlobal.shared.metadataTypeFileVideo {
+        if currentMetadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue {
             player?.pause()
         }
     }
@@ -292,7 +292,7 @@ class NCViewerImage: UIViewController {
             let fileName = (currentMetadata.fileNameView as NSString).deletingPathExtension + ".mov"
             if let metadata = NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView LIKE[c] %@", currentMetadata.account, currentMetadata.serverUrl, fileName)) {
                 
-                if CCUtility.fileProviderStorageExists(metadata) {
+                if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                     
                     AudioServicesPlaySystemSound(1519) // peek feedback
                     self.videoPlay(metadata: metadata)
@@ -343,8 +343,8 @@ class NCViewerImage: UIViewController {
             return image
         }
         
-        if metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo && !metadata.hasPreview {
-            NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
+        if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue && !metadata.hasPreview {
+            NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
         }
         
         if CCUtility.fileProviderStoragePreviewIconExists(metadata.ocId, etag: metadata.etag) {
@@ -361,14 +361,14 @@ class NCViewerImage: UIViewController {
         let ext = CCUtility.getExtension(metadata.fileNameView)
         var image: UIImage?
         
-        if CCUtility.fileProviderStorageExists(metadata) && metadata.typeFile == NCGlobal.shared.metadataTypeFileImage {
+        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue {
            
             let previewPath = CCUtility.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)!
             let imagePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
             
             if ext == "GIF" {
                 if !FileManager().fileExists(atPath: previewPath) {
-                    NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
+                    NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
                 }
                 image = UIImage.animatedImage(withAnimatedGIFURL: URL(fileURLWithPath: imagePath))
             } else if ext == "SVG" {
@@ -388,7 +388,7 @@ class NCViewerImage: UIViewController {
                     return nil
                 }
             } else {
-                NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.typeFile)
+                NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
                 image = UIImage.init(contentsOfFile: imagePath)
             }
         }
@@ -698,7 +698,7 @@ extension NCViewerImage: UIGestureRecognizerDelegate {
             return
         }
         
-        if currentMetadata.typeFile == NCGlobal.shared.metadataTypeFileVideo || currentMetadata.typeFile == NCGlobal.shared.metadataTypeFileAudio {
+        if currentMetadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue || currentMetadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue {
             
             if pictureInPictureOcId != currentMetadata.ocId {
                                 
@@ -759,7 +759,7 @@ extension NCViewerImage: NCViewerImageZoomDelegate {
         currentViewerImageZoom = viewerImageZoom
         toolBar.isHidden = true
         
-        if (currentMetadata.typeFile == NCGlobal.shared.metadataTypeFileVideo || currentMetadata.typeFile == NCGlobal.shared.metadataTypeFileAudio) {
+        if (currentMetadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue || currentMetadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 self.videoPlay(metadata: metadata)
             }
@@ -781,13 +781,13 @@ extension NCViewerImage: NCViewerImageZoomDelegate {
         }
         
         // DOWNLOAD FILE
-        if ((metadata.typeFile == NCGlobal.shared.metadataTypeFileImage && CCUtility.getAutomaticDownloadImage()) || (metadata.contentType == "image/heic" &&  metadata.hasPreview == false) || ext == "GIF" || ext == "SVG" || isFolderEncrypted) && metadata.session == "" && !CCUtility.fileProviderStorageExists(metadata) {
+        if ((metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && CCUtility.getAutomaticDownloadImage()) || (metadata.contentType == "image/heic" &&  metadata.hasPreview == false) || ext == "GIF" || ext == "SVG" || isFolderEncrypted) && metadata.session == "" && !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
             NCOperationQueue.shared.download(metadata: metadata, selector: "")
         }
         
         // DOWNLOAD FILE LIVE PHOTO
         if let metadataLivePhoto = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
-            if CCUtility.getAutomaticDownloadImage() && !CCUtility.fileProviderStorageExists(metadata) {
+            if CCUtility.getAutomaticDownloadImage() && !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                 NCOperationQueue.shared.download(metadata: metadataLivePhoto, selector: "")
             }
         }

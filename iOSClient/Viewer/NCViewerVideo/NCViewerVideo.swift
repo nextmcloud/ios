@@ -23,6 +23,7 @@
 
 import UIKit
 import AVKit
+import NCCommunication
 
 protocol NCViewerVideoDelegate {
     func startPictureInPicture(metadata: tableMetadata)
@@ -55,7 +56,7 @@ class NCViewerVideo: AVPlayerViewController {
             
             player = AVPlayer(url: url)
             
-            if  metadata.typeFile == NCGlobal.shared.metadataTypeFileAudio {
+            if  metadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue {
                                 
                 let imageView = UIImageView.init(image: imageBackground)
                 imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -88,7 +89,7 @@ class NCViewerVideo: AVPlayerViewController {
         }
         
         // AIRPLAY
-        if CCUtility.fileProviderStorageExists(metadata) {
+        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
             player?.allowsExternalPlayback = true
         } else {
             player?.allowsExternalPlayback = false

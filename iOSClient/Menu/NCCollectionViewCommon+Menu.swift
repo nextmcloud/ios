@@ -148,7 +148,7 @@ extension NCCollectionViewCommon {
         
         // OPEN with external editor
         //
-        if metadata.typeFile == NCGlobal.shared.metadataTypeFileDocument && editors.contains(NCGlobal.shared.editorText) && ((editors.contains(NCGlobal.shared.editorOnlyoffice) || isRichDocument))  {
+        if metadata.classFile == NCCommunicationCommon.typeClassFile.document.rawValue && editors.contains(NCGlobal.shared.editorText) && ((editors.contains(NCGlobal.shared.editorOnlyoffice) || isRichDocument))  {
             
             var editor = ""
             var title = ""
@@ -234,7 +234,7 @@ extension NCCollectionViewCommon {
                         if metadataMOV != nil {
                             NCFunctionCenter.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV!)
                         } else {
-                            if CCUtility.fileProviderStorageExists(metadata) {
+                            if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                                 NCFunctionCenter.shared.saveAlbum(metadata: metadata)
                             } else {
                                 NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum)

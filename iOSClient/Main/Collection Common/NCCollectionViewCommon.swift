@@ -1282,7 +1282,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                 return
             }
             
-            if CCUtility.fileProviderStorageExists(metadata) {
+            if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                 NCViewer.shared.view(viewController: self, metadata: metadata, metadatas: [metadata], imageIcon: imageIcon)
             } else if NCCommunication.shared.isNetworkReachable() {
                 NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileView) { _ in }
@@ -1525,7 +1525,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 // image local
                 if dataSource.metadataOffLine.contains(metadata.ocId) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
-                } else if CCUtility.fileProviderStorageExists(metadata) {
+                } else if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.local
                 }
             }
@@ -1756,7 +1756,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 // image Local
                 if dataSource.metadataOffLine.contains(metadata.ocId) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
-                } else if CCUtility.fileProviderStorageExists(metadata) {
+                } else if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.local
                 }
             }

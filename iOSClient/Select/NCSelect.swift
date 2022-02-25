@@ -510,7 +510,7 @@ extension NCSelect: UICollectionViewDataSource {
                 // image local
                 if dataSource.metadataOffLine.contains(metadata.ocId) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
-                } else if CCUtility.fileProviderStorageExists(metadata) {
+                } else if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.local
                 }
             }
@@ -602,7 +602,7 @@ extension NCSelect: UICollectionViewDataSource {
                 // image Local
                 if dataSource.metadataOffLine.contains(metadata.ocId) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
-                } else if CCUtility.fileProviderStorageExists(metadata) {
+                } else if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.local
                 }
             }

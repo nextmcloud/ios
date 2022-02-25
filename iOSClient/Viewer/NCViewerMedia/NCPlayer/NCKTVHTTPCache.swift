@@ -33,7 +33,7 @@ class NCKTVHTTPCache: NSObject {
 
     func getVideoURL(metadata: tableMetadata) -> URL? {
 
-        if CCUtility.fileProviderStorageExists(metadata) {
+        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
 
             return URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
 
@@ -94,7 +94,7 @@ class NCKTVHTTPCache: NSObject {
 
     func saveCache(metadata: tableMetadata) {
 
-        if !CCUtility.fileProviderStorageExists(metadata) {
+        if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
 
             guard let stringURL = (metadata.serverUrl + "/" + metadata.fileName).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
 

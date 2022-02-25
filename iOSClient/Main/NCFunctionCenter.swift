@@ -129,7 +129,7 @@ import JGProgressHUD
                 metadata = metadataTMP
             }
             
-            if CCUtility.fileProviderStorageExists(metadata) && CCUtility.fileProviderStorageExists(metadataMOV) {
+            if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
                 saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV)
             }
             
@@ -204,7 +204,7 @@ import JGProgressHUD
     
     func openDownload(metadata: tableMetadata, selector: String) {
         
-        if CCUtility.fileProviderStorageExists(metadata) {
+        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
             
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": selector, "errorCode": 0, "errorDescription": "" ])
                                     
@@ -239,7 +239,7 @@ import JGProgressHUD
                     if metadata.directory {
                         continue
                     }
-                    if !CCUtility.fileProviderStorageExists(metadata) {
+                    if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                         let semaphore = Semaphore()
                         NCNetworking.shared.download(metadata: metadata, selector: "") { errorCode in
                             error = errorCode
@@ -348,15 +348,15 @@ import JGProgressHUD
 
     func saveLivePhoto(metadata: tableMetadata, metadataMOV: tableMetadata) {
 
-        if !CCUtility.fileProviderStorageExists(metadata) {
+        if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
             NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbumLivePhotoIMG)
         }
 
-        if !CCUtility.fileProviderStorageExists(metadataMOV) {
+        if !CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
             NCOperationQueue.shared.download(metadata: metadataMOV, selector: NCGlobal.shared.selectorSaveAlbumLivePhotoMOV)
         }
 
-        if CCUtility.fileProviderStorageExists(metadata) && CCUtility.fileProviderStorageExists(metadataMOV) {
+        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
             saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV)
         }
     }
@@ -711,7 +711,7 @@ import JGProgressHUD
             if metadataMOV != nil {
                 self.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV!)
             } else {
-                if CCUtility.fileProviderStorageExists(metadata) {
+                if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                     self.saveAlbum(metadata: metadata)
                 } else {
                     NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum)
@@ -720,7 +720,7 @@ import JGProgressHUD
         }
         
         let saveBackground = UIAction(title: NSLocalizedString("_use_as_background_", comment: ""), image: UIImage(systemName: "text.below.photo")) { action in
-            if CCUtility.fileProviderStorageExists(metadata) {
+            if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                 self.saveBackground(metadata: metadata)
             } else {
                 NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveBackground)
@@ -848,7 +848,7 @@ fileprivate extension tableMetadata {
     func toPasteBoardItem() -> [String: Any]? {
         // Get Data
         let fileUrl = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileNameView))
-        guard CCUtility.fileProviderStorageExists(self),
+        guard CCUtility.fileProviderStorageExists(self.ocId, fileNameView: self.fileNameView),
               let data = try? Data(contentsOf: fileUrl),
               let unmanagedFileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension as CFString, nil)
         else { return nil }

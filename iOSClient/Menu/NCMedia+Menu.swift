@@ -175,11 +175,11 @@ extension NCMedia {
                         self.isEditMode = false
                         for ocId in self.selectOcId {
                             if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                                if metadata.typeFile == NCGlobal.shared.metadataTypeFileImage || metadata.typeFile == NCGlobal.shared.metadataTypeFileVideo {
+                                if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue {
                                     if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
                                         NCFunctionCenter.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV)
                                     } else {
-                                        if CCUtility.fileProviderStorageExists(metadata) {
+                                        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
                                             NCFunctionCenter.shared.saveAlbum(metadata: metadata)
                                         } else {
                                             NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum)

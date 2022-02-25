@@ -232,7 +232,7 @@
 + (NSString *)getDirectoryProviderStorageOcId:(NSString *)ocId fileNameView:(NSString *)fileNameView;
 + (NSString *)getDirectoryProviderStorageIconOcId:(NSString *)ocId etag:(NSString *)etag;
 + (NSString *)getDirectoryProviderStoragePreviewOcId:(NSString *)ocId etag:(NSString *)etag;
-+ (BOOL)fileProviderStorageExists:(tableMetadata *)metadata;
++ (BOOL)fileProviderStorageExists:(NSString *)ocId fileNameView:(NSString *)fileNameView;
 + (int64_t)fileProviderStorageSize:(NSString *)ocId fileNameView:(NSString *)fileNameView;
 + (BOOL)fileProviderStoragePreviewIconExists:(NSString *)ocId etag:(NSString *)etag;
 
