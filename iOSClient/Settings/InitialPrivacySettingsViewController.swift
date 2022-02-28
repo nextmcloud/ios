@@ -9,6 +9,7 @@
 import Foundation
 import AppTrackingTransparency
 import AdSupport
+import UIKit
 
 class InitialPrivacySettingsViewController: UIViewController {
     
@@ -17,6 +18,7 @@ class InitialPrivacySettingsViewController: UIViewController {
     @IBOutlet weak var acceptButton: UIButton!
     @IBOutlet weak var privacySettingsHelpText: UITextView!
     @IBOutlet weak var privacySettingsTitle: UILabel!
+    @IBOutlet weak var widthPriavacyHelpView: NSLayoutConstraint!
     var privacyHelpText = ""
     
     override func viewDidLoad() {
@@ -64,6 +66,12 @@ class InitialPrivacySettingsViewController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         self.navigationController?.navigationBar.isHidden = false
+    }
+    
+    override func viewDidLayoutSubviews(){
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            widthPriavacyHelpView.constant = UIScreen.main.bounds.width - 100
+        }
     }
     
     @IBAction func onAcceptButtonClicked(_ sender: Any) {
