@@ -674,6 +674,14 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 cell?.switchControl.isOn = downloadLimit != nil
             }
         }
+        
+        //SetDownloadLimitSwitch
+        if let downloadlimitFieldRow : XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellDownloadLimit") {
+            if let downloadlimitIndexPath = self.form.indexPath(ofFormRow: downloadlimitFieldRow), indexPath == downloadlimitIndexPath {
+                let cell = cell as? NCShareTextInputCell
+                cell?.cellTextField.text = "\(downloadLimit ?? 0)"
+            }
+        }
     }
     
     override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
@@ -739,7 +747,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                     inputField.hidden = !value
                     if let indexPath = self.form.indexPath(ofFormRow: inputField) {
                         let cell = tableView.cellForRow(at: indexPath) as? NCShareTextInputCell
-                        cell?.cellTextField.text = "\(self.downloadLimit ?? 0)"
+                        cell?.cellTextField.text = ""
                     }
                 }
             }
