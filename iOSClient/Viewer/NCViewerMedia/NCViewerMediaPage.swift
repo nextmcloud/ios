@@ -102,6 +102,7 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(reloadMediaPage(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadMediaPage), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationDidBecomeActive), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(favoriteFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -132,6 +133,8 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadMediaPage), object: nil)
 
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationDidBecomeActive), object: nil)
+        
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -224,7 +227,19 @@ class NCViewerMediaPage: UIViewController {
             }
         }
     }
+    
+    @objc func favoriteFile(_ notification: NSNotification) {
 
+        if let userInfo = notification.userInfo as NSDictionary? {
+            if let ocId = userInfo["ocId"] as? String, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
+                if let index = metadatas.firstIndex(where: {$0.ocId == metadata.ocId}) {
+                    metadatas[index] = metadata
+                    currentViewController.metadata = metadata
+                }
+            }
+        }
+    }
+    
     @objc func deleteFile(_ notification: NSNotification) {
 
         if let userInfo = notification.userInfo as NSDictionary? {
