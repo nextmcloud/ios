@@ -161,7 +161,6 @@
 		7A82A18126F3529100D52790 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7239876253D86D300257F49 /* NCEmptyView.xib */; };
 		7A82A18526F352AC00D52790 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB20E92660DFA200AF4344 /* NCRenameFile.storyboard */; };
 		7A82A18926F352DA00D52790 /* NCSectionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = F78ACD53219047D40088454D /* NCSectionFooter.xib */; };
-		7A82A1C126F35CB600D52790 /* OpenSSL.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7A82A1A926F35C5000D52790 /* OpenSSL.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7A875ED42694392800AF558D /* PrivacyPolicyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A875ED32694392800AF558D /* PrivacyPolicyViewController.swift */; };
 		7A875EDA26943BC200AF558D /* OpenSourceSoftwareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A875ED926943BC200AF558D /* OpenSourceSoftwareViewController.swift */; };
 		7A875EE026943DB100AF558D /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A875EDF26943DB100AF558D /* HelpViewController.swift */; };
@@ -550,17 +549,6 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7A82A1BD26F35CB000D52790 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 8;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				7A82A1C126F35CB600D52790 /* OpenSSL.xcframework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 1;
-		};
 		F77B0F981D118A16002130FE /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -593,6 +581,7 @@
 		3757A35423D9D76300EC369E /* NCMenuPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuPanelController.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
 		37ECC83A23D0C7400082EFA2 /* NCMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuAction.swift; sourceTree = "<group>"; };
+		562D635927CCFE170005B45A /* NextcloudDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NextcloudDebug.entitlements; sourceTree = "<group>"; };
 		5645C2A927B3F61300553117 /* DropDown.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DropDown.xcframework; path = Carthage/Build/DropDown.xcframework; sourceTree = "<group>"; };
 		5672096E27B5209200413A96 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
 		5672097127B537C400413A96 /* NCLoginNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCLoginNavigationController.swift; sourceTree = "<group>"; };
@@ -1961,6 +1950,7 @@
 		F7F67B9F1A24D27800EE80DA = {
 			isa = PBXGroup;
 			children = (
+				562D635927CCFE170005B45A /* NextcloudDebug.entitlements */,
 				F7F67BAA1A24D27800EE80DA /* iOSClient */,
 				F7F67BAB1A24D27800EE80DA /* Supporting Files */,
 				F771E3D120E2392D00AFB62D /* File Provider Extension */,
@@ -2180,7 +2170,6 @@
 				F71459B51D12E3B700CAFEEC /* Sources */,
 				F7145A141D12E3B700CAFEEC /* Frameworks */,
 				F7145A181D12E3B700CAFEEC /* Resources */,
-				7A82A1BD26F35CB000D52790 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2976,12 +2965,12 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/Notification_Service_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 9FH6TNGWF2;
+				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -3002,14 +2991,14 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
-				MARKETING_VERSION = 6.5.6;
+				MARKETING_VERSION = 7.0.9;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.notificationextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCLOUD Development NotificationExt 006";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
@@ -3034,12 +3023,12 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/Notification_Service_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 9FH6TNGWF2;
+				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -3060,13 +3049,13 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
-				MARKETING_VERSION = 6.5.6;
+				MARKETING_VERSION = 7.0.9;
 				MTL_FAST_MATH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.notificationextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud Notification Service";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCLOUD Development NotificationExt 006";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
@@ -3084,12 +3073,12 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/Share.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 9FH6TNGWF2;
+				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -3110,12 +3099,12 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 7.0.9;
 				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.documentproviderextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCLOUD Development DocProvExt 006";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Share/Share-Bridging-Header.h";
@@ -3134,12 +3123,12 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/Share.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 9FH6TNGWF2;
+				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -3160,12 +3149,12 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 7.0.9;
 				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.documentproviderextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCLOUD Development DocProvExt 006";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Share/Share-Bridging-Header.h";
@@ -3190,12 +3179,12 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 9FH6TNGWF2;
+				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -3216,12 +3205,12 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 7.0.9;
 				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.FileProviderExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCLOUD Development FileProvExt 006";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/File Provider Extension/FileProviderExtension-Bridging-Header.h";
@@ -3246,12 +3235,12 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 9FH6TNGWF2;
+				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -3272,12 +3261,12 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "\"Libraries external\"/**";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 7.0.9;
 				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.FileProviderExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCLOUD Development FileProvExt 006";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/File Provider Extension/FileProviderExtension-Bridging-Header.h";
@@ -3295,12 +3284,12 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
-				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/iOSClient.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				CODE_SIGN_ENTITLEMENTS = NextcloudDebug.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9FH6TNGWF2;
+				DEVELOPMENT_TEAM = S5724FNY84;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
 				"EXCLUDED_ARCHS[sdk=*]" = "";
@@ -3326,7 +3315,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 7.4.0.4.7;
+				MARKETING_VERSION = 7.0.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
 				OTHER_LDFLAGS = (
@@ -3334,10 +3323,10 @@
 					"$(inherited)",
 				);
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCLOUD Development App 006";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -3359,12 +3348,12 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/iOSClient.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9FH6TNGWF2;
+				DEVELOPMENT_TEAM = S5724FNY84;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -3388,17 +3377,17 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 7.4.0.4.7;
+				MARKETING_VERSION = 7.0.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"$(inherited)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCLOUD Development App 006";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -3695,8 +3684,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rechsteiner/Parchment";
 			requirement = {
-				kind = exactVersion;
-				version = 2.4.0;
+				branch = main;
+				kind = branch;
 			};
 		};
 		569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */ = {
