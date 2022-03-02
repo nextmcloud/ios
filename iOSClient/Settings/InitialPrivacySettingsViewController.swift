@@ -50,6 +50,14 @@ class InitialPrivacySettingsViewController: UIViewController {
         privacySettingsHelpText.centerText()
         privacySettingsHelpText.font = UIFont(name: privacySettingsHelpText.font!.fontName, size: 16)
         self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
+        if #available(iOS 13, *) {
+    
+        } else {
+            if let statusBar = UIApplication.shared.value(forKey: "statusBar") as? UIView {
+                statusBar.backgroundColor = .clear
+               }
+        }
+       
     }
     
     override func didReceiveMemoryWarning() {
