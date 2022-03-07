@@ -170,21 +170,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         tableView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         tableView.reloadData()
-       // shareLinkLabel.textColor = NCBrandColor.shared.textView
-       // self.labelShareByMail.textColor = NCBrandColor.shared.shareByEmailTextColor
         self.view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-//        self.containerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-//        self.containerView.frame = self.view.frame
-//        searchField.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("_shareLinksearch_placeholder_", comment: ""),
-//                                                               attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.searchFieldPlaceHolder])
-//        searchField.textColor = NCBrandColor.shared.label
-      //  self.btnCreateLink.layer.borderColor = NCBrandColor.shared.label.cgColor
-      //  self.btnCreateLink.setTitleColor(NCBrandColor.shared.label, for: .normal)
-      //  self.btnCreateLink.backgroundColor = .clear
-//        searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
-      //  labelYourShare.text = NSLocalizedString("_your_shares_", comment: "")
         UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
-//        self.btnCreateLink.titleLabel?.textColor = NCBrandColor.shared.secondarySystemGroupedBackground
     }
         
     @objc func reloadData() {
@@ -513,6 +500,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         dropDown.selectionAction = { [weak self] (index, item) in
             let sharee = sharees[index]
             searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
+            searchField.text = ""
             let directory = self?.metadata?.directory ?? false
             let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
             DispatchQueue.main.async() { [self] in
@@ -1079,67 +1067,13 @@ extension NCShare: UITableViewDataSource {
         return headerView
 
     }
-
-    
-//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-//        if let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: NCShareSectionHeaderView.identifier) as? NCShareSectionHeaderView {
-//            headerView.backgroundColor = .red//NCBrandColor.shared.secondarySystemGroupedBackground
-//            headerView.fileName.textColor = NCBrandColor.shared.label
-//            headerView.labelSharing.textColor = NCBrandColor.shared.label
-//            headerView.labelSharingInfo.textColor = NCBrandColor.shared.label
-//            headerView.info.textColor = NCBrandColor.shared.systemGray2
-//            headerView.ocId = metadata!.ocId
-//            headerView.updateCanReshareUI()
-//
-//            if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
-//                //            headerView.imageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
-//                //            headerView.fullWidthImageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
-//                //            headerView.fullWidthImageView.image = getImage(metadata: metadata!)
-//                headerView.fullWidthImageView.image = getImageMetadata(metadata!)
-//                headerView.fullWidthImageView.contentMode = .scaleAspectFill
-//                headerView.imageView.isHidden = true
-//            } else {
-//                if metadata!.directory {
-//                    headerView.imageView.image = UIImage.init(named: "folder")!
-//                    //                let image = UIImage.init(named: "folder")!
-//                    //                headerView.imageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
-//                } else if metadata!.iconName.count > 0 {
-//                    headerView.imageView.image = UIImage.init(named: metadata!.iconName)
-//                } else {
-//                    headerView.imageView.image = UIImage.init(named: "file")
-//                }
-//            }
-//            headerView.fileName.text = metadata?.fileNameView
-//            headerView.fileName.textColor = NCBrandColor.shared.label
-//            if metadata!.favorite {
-//                headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
-//            } else {
-//                headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
-//            }
-//            headerView.info.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
-//            return headerView
-//        }
-//
-//        return nil
-//
-//    }
     func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
         return 320
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 320
     }
-    
-//    override func willRotate(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
-//        self.tableView.tableHeaderView = self.tableView.tableHeaderView
-//    }
-//    override func willAnimateRotation(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
-////        var headerFrame = self.tableView.tableHeaderView?.frame
-////        headerFrame?.size.height = toInterfaceOrientation.isLandscape ? 50 : 150
-////        self.tableView.tableHeaderView?.frame = headerFrame!
-//
-//            self.tableView.tableHeaderView = self.tableView.tableHeaderView
-//    }
+
 }
 
 // MARK: - NCShareUserCell
