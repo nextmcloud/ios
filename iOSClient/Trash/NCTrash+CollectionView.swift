@@ -138,6 +138,6 @@ extension NCTrash: UICollectionViewDelegateFlowLayout {
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: highHeader)
+        return CGSize(width: collectionView.frame.width, height: highHeader + 50)
     }
 }
