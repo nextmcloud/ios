@@ -791,7 +791,11 @@ extension NCShare: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let searchString = "\(textField.text ?? "")\(string)"
-        networking?.getSharees(searchString: searchString)
+        if searchString.count == 1, string == "" {
+            dropDown.hide()
+        } else {
+            networking?.getSharees(searchString: searchString)
+        }
         self.shareeEmail = searchString
         return true
     }
