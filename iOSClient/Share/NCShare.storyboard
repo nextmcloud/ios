@@ -35,7 +35,7 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="UdT-J4-zvv" kind="relationship" relationship="rootViewController" id="U2F-7c-9yg"/>
+                        <segue destination="bgO-Rz-2M1" kind="relationship" relationship="rootViewController" id="h80-6A-J7f"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jrf-Ek-cnC" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -234,6 +234,7 @@
                             <constraint firstItem="eAi-wv-a4Y" firstAttribute="trailing" secondItem="X2m-IC-J1u" secondAttribute="trailing" id="hVX-vu-qJn"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="2Jf-dL-GNr"/>
                     <connections>
                         <outlet property="tableView" destination="c94-b9-Sim" id="ZlE-Fh-kaR"/>
                     </connections>

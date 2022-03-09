@@ -139,7 +139,14 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 //        }
         
         setupHeader()
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
+        navigationItem.largeTitleDisplayMode = .never
     }
+    
+    @objc func exitTapped() {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     func setupHeader(){
         tableView.register(NCShareSectionHeaderView.nib, forHeaderFooterViewReuseIdentifier: NCShareSectionHeaderView.identifier)
     }
