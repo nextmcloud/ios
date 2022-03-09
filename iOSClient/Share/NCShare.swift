@@ -152,9 +152,17 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     @objc func keyboardWillShow(notification: Notification) {
-        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+        if (UIScreen.main.bounds.width < 350 || UIDevice.current.orientation.isLandscape), UIDevice.current.userInterfaceIdiom == .phone {
+            if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+                if view.frame.origin.y == 0 {
+                    self.view.frame.origin.y -= keyboardSize.height
+                }
+            }
+        }
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
             if view.frame.origin.y == 0 {
-                self.view.frame.origin.y -= keyboardSize.height
+                self.view.frame.origin.y -= 100
             }
         }
     }
@@ -167,7 +175,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     override func viewWillAppear(_ animated: Bool) {
         self.reloadData()
-//        self.searchField.text = ""
+        guard let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField  else { return }
+        searchField.text = ""
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
