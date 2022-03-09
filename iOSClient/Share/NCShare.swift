@@ -127,8 +127,11 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         NotificationCenter.default.addObserver(self, selector: #selector(statusFileDropClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterStatusFileDrop), object: nil)
         TealiumHelper.shared.trackView(title: "magentacloud-app.sharing", data: ["": ""])
         changeTheming()
-        let isCurrentUser = NCShareCommon.shared.isCurrentUserIsFileOwner(fileOwnerId: metadata?.ownerId ?? "")
-        let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+          
+//        let isCurrentUser = NCShareCommon.shared.isCurrentUserIsFileOwner(fileOwnerId: metadata?.ownerId ?? "")
+//        let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
 //        if isCurrentUser || canReshare {
 //            containerView.isHidden = false
 //        } else {
@@ -141,6 +144,19 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         tableView.register(NCShareSectionHeaderView.nib, forHeaderFooterViewReuseIdentifier: NCShareSectionHeaderView.identifier)
     }
     
+    @objc func keyboardWillShow(notification: Notification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            if view.frame.origin.y == 0 {
+                self.view.frame.origin.y -= keyboardSize.height
+            }
+        }
+    }
+
+    @objc func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            self.view.frame.origin.y = 0
+        }
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         self.reloadData()
