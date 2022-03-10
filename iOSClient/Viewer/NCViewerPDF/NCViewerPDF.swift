@@ -108,6 +108,7 @@ class NCViewerPDF: UIViewController, NCViewerPDFSearchDelegate {
         for gesture in pdfView.gestureRecognizers! {
             tapGesture.require(toFail:gesture)
         }
+        navigationItem.largeTitleDisplayMode = .never
     }
     
     override func viewWillAppear(_ animated: Bool) {
