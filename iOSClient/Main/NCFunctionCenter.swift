@@ -225,7 +225,7 @@ import JGProgressHUD
         documentController?.presentOptionsMenu(from: mainTabBar.menuRect, in: mainTabBar, animated: true)
     }
     
-    func openActivityViewController(selectOcId: [String]) {
+    func openActivityViewController(selectedMetadata: [tableMetadata]) {
         
         NCUtility.shared.startActivityIndicator(backgroundView: nil, blurEffect: true)
         
@@ -234,25 +234,22 @@ import JGProgressHUD
             var error: Int = 0
             var items: [Any] = []
 
-            for ocId in selectOcId {
-                if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                    if metadata.directory {
-                        continue
+            for metadata in selectedMetadata {
+                        guard !metadata.directory else { continue }
+                        if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+                            let semaphore = Semaphore()
+                            NCNetworking.shared.download(metadata: metadata, selector: "") { errorCode in
+                                error = errorCode
+                                semaphore.continue()
                     }
-                    if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
-                        let semaphore = Semaphore()
-                        NCNetworking.shared.download(metadata: metadata, selector: "") { errorCode in
-                            error = errorCode
-                            semaphore.continue()
-                        }
-                        semaphore.wait()
-                    }
-                    if error != 0 {
-                        break
-                    }
-                    let fileURL = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
-                    items.append(fileURL)
+                            semaphore.wait()
+                                      
                 }
+                if error != 0 {
+                                break
+                            }
+                            let fileURL = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
+                            items.append(fileURL)
             }
             if error == 0 && items.count > 0 {
                 DispatchQueue.main.async {
@@ -593,7 +590,7 @@ import JGProgressHUD
         }
     }
 
-    func openSelectView(items: [Any], viewController: UIViewController) {
+    func openSelectView(items: [Any]) {
 
         let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as! UINavigationController
         let topViewController = navigationController.topViewController as! NCSelect
@@ -641,7 +638,7 @@ import JGProgressHUD
         navigationController.setViewControllers(listViewController, animated: false)
         navigationController.modalPresentationStyle = .formSheet
 
-        viewController.present(navigationController, animated: true, completion: nil)
+        appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
     }
 
     // MARK: - Context Menu Configuration
@@ -750,7 +747,7 @@ import JGProgressHUD
         //let open = UIMenu(title: NSLocalizedString("_open_", comment: ""), image: UIImage(systemName: "square.and.arrow.up"), children: [openIn, openQuickLook])
         
         let moveCopy = UIAction(title: NSLocalizedString("_move_or_copy_", comment: ""), image: UIImage(systemName: "arrow.up.right.square")) { action in
-            self.openSelectView(items: [metadata], viewController: viewController)
+            self.openSelectView(items: [metadata])
         }
         
         let rename = UIAction(title: NSLocalizedString("_rename_", comment: ""), image: UIImage(systemName: "pencil")) { action in
