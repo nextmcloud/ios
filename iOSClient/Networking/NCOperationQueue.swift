@@ -169,12 +169,12 @@ import NCCommunication
             return
         }
 
-        if let account = NCManageDatabase.shared.getActiveAccount() {
-            cell.fileAvatarImageView?.image = NCUtility.shared.loadUserImage(
-                for: user,
-                   displayName: dispalyName,
-                   userBaseUrl: account)
-        }
+//        if let account = NCManageDatabase.shared.getActiveAccount() {
+//            cell.fileAvatarImageView?.image = NCUtility.shared.loadUserImage(
+//                for: user,
+//                   displayName: dispalyName,
+//                   userBaseUrl: account)
+//        }
 
         for operation in downloadAvatarQueue.operations as! [NCOperationDownloadAvatar] {
             if operation.fileName == fileName {
