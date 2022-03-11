@@ -25,23 +25,24 @@ import UIKit
 import NCCommunication
 import Queuer
 import JGProgressHUD
+import SVGKit
 
 @objc class NCFunctionCenter: NSObject, UIDocumentInteractionControllerDelegate, NCSelectDelegate {
-  
+    
     @objc public static let shared: NCFunctionCenter = {
         let instance = NCFunctionCenter()
         NotificationCenter.default.addObserver(instance, selector: #selector(downloadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
         NotificationCenter.default.addObserver(instance, selector: #selector(uploadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadedFile), object: nil)
-
+        
         return instance
     }()
-
+    
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var viewerQuickLook: NCViewerQuickLook?
     var documentController: UIDocumentInteractionController?
-
+    
     // MARK: - Download
-
+    
     @objc func downloadedFile(_ notification: NSNotification) {
         
         guard let userInfo = notification.userInfo as NSDictionary?,
@@ -164,12 +165,12 @@ import JGProgressHUD
     }
     
     // MARK: - Upload
-
+    
     @objc func uploadedFile(_ notification: NSNotification) {
-
+        
         if let userInfo = notification.userInfo as NSDictionary? {
             if let ocId = userInfo["ocId"] as? String, let errorCode = userInfo["errorCode"] as? Int, let errorDescription = userInfo["errorDescription"] as? String, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-
+                
                 if metadata.account == appDelegate.account {
                     if errorCode != 0 {
                         if errorCode != -999 && errorDescription != "" {
@@ -180,10 +181,10 @@ import JGProgressHUD
             }
         }
     }
-
+    
     
     // MARK: -
-
+    
     func openShare(viewController: UIViewController, metadata: tableMetadata, indexPage: NCGlobal.NCSharePagingIndex) {
         
         let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as! UINavigationController
@@ -199,7 +200,7 @@ import JGProgressHUD
         }
         viewController.present(shareNavigationController, animated: true, completion: nil)
     }
-     
+    
     // MARK: -
     
     func openDownload(metadata: tableMetadata, selector: String) {
@@ -207,7 +208,7 @@ import JGProgressHUD
         if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
             
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": selector, "errorCode": 0, "errorDescription": "" ])
-                                    
+            
         } else {
             
             NCNetworking.shared.download(metadata: metadata, selector: selector) { (_) in }
@@ -233,31 +234,31 @@ import JGProgressHUD
             
             var error: Int = 0
             var items: [Any] = []
-
+            
             for metadata in selectedMetadata {
-                        guard !metadata.directory else { continue }
-                        if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
-                            let semaphore = Semaphore()
-                            NCNetworking.shared.download(metadata: metadata, selector: "") { errorCode in
-                                error = errorCode
-                                semaphore.continue()
+                guard !metadata.directory else { continue }
+                if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+                    let semaphore = Semaphore()
+                    NCNetworking.shared.download(metadata: metadata, selector: "") { errorCode in
+                        error = errorCode
+                        semaphore.continue()
                     }
-                            semaphore.wait()
-                                      
+                    semaphore.wait()
+                    
                 }
                 if error != 0 {
-                                break
-                            }
-                            let fileURL = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
-                            items.append(fileURL)
+                    break
+                }
+                let fileURL = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
+                items.append(fileURL)
             }
             if error == 0 && items.count > 0 {
                 DispatchQueue.main.async {
                     
                     guard let mainTabBar = self.appDelegate.mainTabBar else { return }
-                            
+                    
                     let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: nil)
-
+                    
                     activityViewController.popoverPresentationController?.permittedArrowDirections = .any
                     activityViewController.popoverPresentationController?.sourceView = mainTabBar
                     activityViewController.popoverPresentationController?.sourceRect = mainTabBar.menuRect
@@ -268,98 +269,114 @@ import JGProgressHUD
             NCUtility.shared.stopActivityIndicator()
         }
     }
-        
+    
     // MARK: - Save as scan
     
     func saveAsScan(metadata: tableMetadata) {
-
+        
         let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
         let fileNameDestination = CCUtility.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, keyFileName: NCGlobal.shared.keyFileNameMask, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal, forcedNewFileName: true)!
         let fileNamePathDestination = CCUtility.getDirectoryScan() + "/" + fileNameDestination
         NCUtilityFileSystem.shared.copyFile(atPath: fileNamePath, toPath: fileNamePathDestination)
-
+        
         let storyboard = UIStoryboard(name: "Scan", bundle: nil)
         let navigationController = storyboard.instantiateInitialViewController()!
-
+        
         navigationController.modalPresentationStyle = UIModalPresentationStyle.pageSheet
-
+        
         appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
     }
-
+    
     // MARK: - Print
-
+    
     func printDocument(metadata: tableMetadata) {
-
+        
         let fileNameURL = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!)
-
-        if UIPrintInteractionController.canPrint(fileNameURL) {
-
-            let printInfo = UIPrintInfo(dictionary: nil)
-            printInfo.jobName = fileNameURL.lastPathComponent
-            printInfo.outputType = .photo
-
-            let printController = UIPrintInteractionController.shared
-            printController.printInfo = printInfo
-            printController.showsNumberOfCopies = true
+        let printController = UIPrintInteractionController.shared
+        let printInfo = UIPrintInfo(dictionary: nil)
+        printInfo.jobName = fileNameURL.lastPathComponent
+        printInfo.outputType = metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue ? .photo : .general
+        printController.printInfo = printInfo
+        printController.showsNumberOfCopies = true
+        
+        guard !UIPrintInteractionController.canPrint(fileNameURL) else {
             printController.printingItem = fileNameURL
-            printController.present(animated: true, completionHandler: nil)
+            printController.present(animated: true)
+            return
         }
+        
+        // can't print without data
+        guard let data = try? Data(contentsOf: fileNameURL) else { return }
+        
+        if let svg = SVGKImage(data: data) {
+            printController.printingItem = svg.uiImage
+            printController.present(animated: true)
+            return
+        }
+        guard let text = String(data: data, encoding: .utf8) else { return }
+        let formatter = UISimpleTextPrintFormatter(text: text)
+        formatter.perPageContentInsets.top = 72
+        formatter.perPageContentInsets.bottom = 72
+        formatter.perPageContentInsets.left = 72
+        formatter.perPageContentInsets.right = 72
+        printController.printFormatter = formatter
+        printController.present(animated: true)
     }
-
+    
     // MARK: - Save photo
-
+    
     func saveAlbum(metadata: tableMetadata) {
-
+        
         let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
         let status = PHPhotoLibrary.authorizationStatus()
-
+        
         if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && status == PHAuthorizationStatus.authorized {
-
+            
             if let image = UIImage(contentsOfFile: fileNamePath) {
                 UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveAlbum(_:didFinishSavingWithError:contextInfo:)), nil)
             } else {
                 NCContentPresenter.shared.messageNotification("_save_selected_files_", description: "_file_not_saved_cameraroll_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
             }
-
+            
         } else if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue && status == PHAuthorizationStatus.authorized {
-
+            
             if UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(fileNamePath) {
                 UISaveVideoAtPathToSavedPhotosAlbum(fileNamePath, self, #selector(saveAlbum(_:didFinishSavingWithError:contextInfo:)), nil)
             } else {
                 NCContentPresenter.shared.messageNotification("_save_selected_files_", description: "_file_not_saved_cameraroll_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
             }
-
+            
         } else if status != PHAuthorizationStatus.authorized {
-
+            
             NCContentPresenter.shared.messageNotification("_access_photo_not_enabled_", description: "_access_photo_not_enabled_msg_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
         }
     }
-
+    
     @objc private func saveAlbum(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-
+        
         if error != nil {
             NCContentPresenter.shared.messageNotification("_save_selected_files_", description: "_file_not_saved_cameraroll_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
         }
     }
-
-
+    
+    
     func saveLivePhoto(metadata: tableMetadata, metadataMOV: tableMetadata) {
-
+        
         if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
             NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbumLivePhotoIMG)
         }
-
+        
         if !CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
             NCOperationQueue.shared.download(metadata: metadataMOV, selector: NCGlobal.shared.selectorSaveAlbumLivePhotoMOV)
         }
-
+        
         if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
             saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV)
         }
     }
-
+    
     func saveLivePhotoToDisk(metadata: tableMetadata, metadataMov: tableMetadata) {
-
+        
         let fileNameImage = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!)
         let fileNameMov = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadataMov.ocId, fileNameView: metadataMov.fileNameView)!)
         let hud = JGProgressHUD()
@@ -374,9 +391,9 @@ import JGProgressHUD
         NCLivePhoto.generate(from: fileNameImage, videoURL: fileNameMov, progress: { progress in
             
             hud.progress = Float(progress)
-
+            
         }, completion: { _, resources in
-
+            
             if resources != nil {
                 NCLivePhoto.saveToLibrary(resources!) { result in
                     DispatchQueue.main.async {
@@ -397,14 +414,14 @@ import JGProgressHUD
             }
         })
     }
-
+    
     func saveBackground(metadata: tableMetadata) {
-
+        
         let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
         let destination = CCUtility.getDirectoryGroup().appendingPathComponent(NCGlobal.shared.appBackground).path + "/" + metadata.fileNameView
-
+        
         if NCUtilityFileSystem.shared.copyFile(atPath: fileNamePath, toPath: destination) {
-
+            
             if appDelegate.activeViewController is NCCollectionViewCommon {
                 let viewController: NCCollectionViewCommon = appDelegate.activeViewController as! NCCollectionViewCommon
                 let layoutKey = viewController.layoutKey
@@ -416,69 +433,69 @@ import JGProgressHUD
             }
         }
     }
-
-
+    
+    
     // MARK: - Copy & Paste
-
+    
     func copyPasteboard(pasteboardOcIds: [String], hudView: UIView) {
-            var items = [[String: Any]]()
-            var isCancelled = false
-            let hud = JGProgressHUD()
-            let copyDispatchGroup = DispatchGroup()
-            let seamphore = DispatchSemaphore(value: 5)
-            hud.textLabel.text = NSLocalizedString("_wait_", comment: "")
-            hud.show(in: hudView)
-
-            // getting file data can take some time and block the main queue
-            DispatchQueue.global(qos: .userInitiated).async {
-                var downloadMetadatas: [tableMetadata] = []
-                for ocid in pasteboardOcIds {
-                    guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocid) else { continue }
-                    if let pasteboardItem = metadata.toPasteBoardItem() { items.append(pasteboardItem) }
-                    else { downloadMetadatas.append(metadata) }
-                }
-
-                if !downloadMetadatas.isEmpty {
-                    DispatchQueue.main.async {
-                        hud.textLabel.text = NSLocalizedString("_status_downloading_", comment: "")
-                        hud.detailTextLabel.text = NSLocalizedString("_tap_to_cancel_", comment: "")
-                        hud.tapOnHUDViewBlock = { hud in
-                            isCancelled = true
-                            hud.dismiss()
-                        }
-                    }
-                }
-
-                // do 5 downloads in paralell to optimize efficiancy
-                for metadata in downloadMetadatas {
-                    guard !isCancelled else { return }
-                    copyDispatchGroup.enter()
-                    NCNetworking.shared.download(metadata: metadata, selector: "") { _ in
-                        copyDispatchGroup.leave()
-                        seamphore.signal()
-                    }
-                    seamphore.wait()
-                }
-
-                copyDispatchGroup.notify(queue: .main, execute: {
-                    guard !isCancelled else { return }
-                    hud.indicatorView = JGProgressHUDSuccessIndicatorView()
-                    hud.textLabel.text = NSLocalizedString("_success_", comment: "")
-                    hud.detailTextLabel.text = ""
-                    hud.dismiss(afterDelay: 1)
-                    items.append(contentsOf: downloadMetadatas.compactMap({ $0.toPasteBoardItem() }))
-                    UIPasteboard.general.setItems(items, options: [:])
-                })
+        var items = [[String: Any]]()
+        var isCancelled = false
+        let hud = JGProgressHUD()
+        let copyDispatchGroup = DispatchGroup()
+        let seamphore = DispatchSemaphore(value: 5)
+        hud.textLabel.text = NSLocalizedString("_wait_", comment: "")
+        hud.show(in: hudView)
+        
+        // getting file data can take some time and block the main queue
+        DispatchQueue.global(qos: .userInitiated).async {
+            var downloadMetadatas: [tableMetadata] = []
+            for ocid in pasteboardOcIds {
+                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocid) else { continue }
+                if let pasteboardItem = metadata.toPasteBoardItem() { items.append(pasteboardItem) }
+                else { downloadMetadatas.append(metadata) }
             }
+            
+            if !downloadMetadatas.isEmpty {
+                DispatchQueue.main.async {
+                    hud.textLabel.text = NSLocalizedString("_status_downloading_", comment: "")
+                    hud.detailTextLabel.text = NSLocalizedString("_tap_to_cancel_", comment: "")
+                    hud.tapOnHUDViewBlock = { hud in
+                        isCancelled = true
+                        hud.dismiss()
+                    }
+                }
+            }
+            
+            // do 5 downloads in paralell to optimize efficiancy
+            for metadata in downloadMetadatas {
+                guard !isCancelled else { return }
+                copyDispatchGroup.enter()
+                NCNetworking.shared.download(metadata: metadata, selector: "") { _ in
+                    copyDispatchGroup.leave()
+                    seamphore.signal()
+                }
+                seamphore.wait()
+            }
+            
+            copyDispatchGroup.notify(queue: .main, execute: {
+                guard !isCancelled else { return }
+                hud.indicatorView = JGProgressHUDSuccessIndicatorView()
+                hud.textLabel.text = NSLocalizedString("_success_", comment: "")
+                hud.detailTextLabel.text = ""
+                hud.dismiss(afterDelay: 1)
+                items.append(contentsOf: downloadMetadatas.compactMap({ $0.toPasteBoardItem() }))
+                UIPasteboard.general.setItems(items, options: [:])
+            })
         }
+    }
     
     func upload(pasteboardType: String?, data: Data?, to serverUrl: String) -> Bool {
-
+        
         guard let data = data, let pasteboardType = pasteboardType else { return false }
-
+        
         let results = NCCommunicationCommon.shared.getFileProperties(inUTI: pasteboardType as CFString)
         guard !results.ext.isEmpty else { return false }
-
+        
         do {
             let fileName = results.name + "_" + CCUtility.getIncrementalNumber() + "." + results.ext
             let serverUrlFileName = serverUrl + "/" + fileName
@@ -493,7 +510,7 @@ import JGProgressHUD
             }
             hud.show(in: (appDelegate.window?.rootViewController?.view)!)
             hud.textLabel.text = fileName
-
+            
             NCCommunication.shared.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath) { _ in
             } progressHandler: { progress in
                 hud.progress = Float(progress.fractionCompleted)
@@ -516,33 +533,33 @@ import JGProgressHUD
         }
         return true
     }
-
+    
     func pastePasteboard(serverUrl: String) {
-           for (index, items) in UIPasteboard.general.items.enumerated() {
-               for item in items {
-                   let data = UIPasteboard.general.data(forPasteboardType: item.key, inItemSet: IndexSet([index]))?.first
-                   if upload(pasteboardType: item.key, data: data, to: serverUrl) {
-                       continue
-                   }
-               }
-           }
-       }
+        for (index, items) in UIPasteboard.general.items.enumerated() {
+            for item in items {
+                let data = UIPasteboard.general.data(forPasteboardType: item.key, inItemSet: IndexSet([index]))?.first
+                if upload(pasteboardType: item.key, data: data, to: serverUrl) {
+                    continue
+                }
+            }
+        }
+    }
     
     // MARK: -
-
+    
     func openFileViewInFolder(serverUrl: String, fileName: String) {
-
+        
         let viewController = UIStoryboard(name: "NCFileViewInFolder", bundle: nil).instantiateInitialViewController() as! NCFileViewInFolder
         let navigationController = UINavigationController(rootViewController: viewController)
-
+        
         let topViewController = viewController
         var listViewController = [NCFileViewInFolder]()
         var serverUrl = serverUrl
-
+        
         let homeUrl = NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account)
-
+        
         while true {
-
+            
             var viewController: NCFileViewInFolder?
             if serverUrl != homeUrl {
                 viewController = UIStoryboard(name: "NCFileViewInFolder", bundle: nil).instantiateInitialViewController() as? NCFileViewInFolder
@@ -554,28 +571,28 @@ import JGProgressHUD
                 viewController = topViewController
             }
             guard let vc = viewController else { return }
-
+            
             vc.serverUrl = serverUrl
             vc.fileName = fileName
-
+            
             vc.navigationItem.backButtonTitle = vc.titleCurrentFolder
             listViewController.insert(vc, at: 0)
-
+            
             if serverUrl != homeUrl {
                 serverUrl = NCUtilityFileSystem.shared.deletingLastPathComponent(account: appDelegate.account, serverUrl: serverUrl)
             } else {
                 break
             }
         }
-
+        
         navigationController.setViewControllers(listViewController, animated: false)
         navigationController.modalPresentationStyle = .formSheet
-
+        
         appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
     }
-
+    
     // MARK: - NCSelect + Delegate
-
+    
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
         if serverUrl != nil && items.count > 0 {
             if copy {
@@ -589,21 +606,21 @@ import JGProgressHUD
             }
         }
     }
-
+    
     func openSelectView(items: [Any]) {
-
+        
         let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as! UINavigationController
         let topViewController = navigationController.topViewController as! NCSelect
         var listViewController = [NCSelect]()
-
+        
         var copyItems: [Any] = []
         for item in items {
             copyItems.append(item)
         }
-
+        
         let homeUrl = NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account)
         var serverUrl = (copyItems[0] as! Nextcloud.tableMetadata).serverUrl
-
+        
         // Setup view controllers such that the current view is of the same directory the items to be copied are in
         while true {
             // If not in the topmost directory, create a new view controller and set correct title.
@@ -619,33 +636,33 @@ import JGProgressHUD
                 viewController = topViewController
             }
             guard let vc = viewController else { return }
-
+            
             vc.delegate = self
             vc.typeOfCommandView = .copyMove
             vc.items = copyItems
             vc.serverUrl = serverUrl
-
+            
             vc.navigationItem.backButtonTitle = vc.titleCurrentFolder
             listViewController.insert(vc, at: 0)
-
+            
             if serverUrl != homeUrl {
                 serverUrl = NCUtilityFileSystem.shared.deletingLastPathComponent(account: appDelegate.account, serverUrl: serverUrl)
             } else {
                 break
             }
         }
-
+        
         navigationController.setViewControllers(listViewController, animated: false)
         navigationController.modalPresentationStyle = .formSheet
-
+        
         appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
     }
-
+    
     // MARK: - Context Menu Configuration
-
+    
     @available(iOS 13.0, *)
     func contextMenuConfiguration(ocId: String, viewController: UIViewController, enableDeleteLocal: Bool, enableViewInFolder: Bool, image: UIImage?) -> UIMenu {
-
+        
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else {
             return UIMenu()
         }
@@ -658,7 +675,7 @@ import JGProgressHUD
             titleSave = NSLocalizedString("_livephoto_save_", comment: "")
         }
         let titleFavorite = metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: "")
-
+        
         let serverUrl = metadata.serverUrl + "/" + metadata.fileName
         var isOffline = false
         if metadata.directory {
@@ -671,7 +688,7 @@ import JGProgressHUD
             }
         }
         let titleOffline = isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: "")
-
+        
         let copy = UIAction(title: NSLocalizedString("_copy_file_", comment: ""), image: UIImage(systemName: "doc.on.doc")) { action in
             self.copyPasteboard(pasteboardOcIds: [metadata.ocId], hudView: viewController.view)
         }
@@ -681,7 +698,7 @@ import JGProgressHUD
         }
         
         let offline = UIAction(title: titleOffline, image: UIImage(systemName: "tray.and.arrow.down")) { action in
-
+            
             if isOffline {
                 if metadata.directory {
                     NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, offline: false, account: self.appDelegate.account)
@@ -703,7 +720,7 @@ import JGProgressHUD
                 viewController.reloadDataSource()
             }
         }
-
+        
         let save = UIAction(title: titleSave, image: UIImage(systemName: "square.and.arrow.down")) { action in
             if metadataMOV != nil {
                 self.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV!)
@@ -723,7 +740,7 @@ import JGProgressHUD
                 NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveBackground)
             }
         }
-
+        
         let viewInFolder = UIAction(title: NSLocalizedString("_view_in_folder_", comment: ""), image: UIImage(systemName: "arrow.forward.square")) { action in
             self.openFileViewInFolder(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
         }
@@ -740,9 +757,9 @@ import JGProgressHUD
             self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
         }
         
-//        let saveAsScan = UIAction(title: NSLocalizedString("_save_as_scan_", comment: ""), image: UIImage(systemName: "viewfinder.circle")) { action in
-//            self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
-//        }
+        //        let saveAsScan = UIAction(title: NSLocalizedString("_save_as_scan_", comment: ""), image: UIImage(systemName: "viewfinder.circle")) { action in
+        //            self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
+        //        }
         
         //let open = UIMenu(title: NSLocalizedString("_open_", comment: ""), image: UIImage(systemName: "square.and.arrow.up"), children: [openIn, openQuickLook])
         
@@ -755,9 +772,9 @@ import JGProgressHUD
             if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
                 vcRename.metadata = metadata
                 vcRename.imagePreview = image
-
+                
                 let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
-                                            
+                
                 viewController.present(popup, animated: true)
             }
         }
@@ -778,7 +795,7 @@ import JGProgressHUD
                 }
             }
         }
-
+        
         
         let deleteConfirmLocal = UIAction(title: NSLocalizedString("_remove_local_file_", comment: ""), image: UIImage(systemName: "trash"), attributes: .destructive) { action in
             NCNetworking.shared.deleteMetadata(metadata, onlyLocalCache: false) { errorCode, errorDescription in
@@ -807,27 +824,27 @@ import JGProgressHUD
         
         // FILE
         var children: [UIMenuElement] = [favorite, offline, openIn, rename, moveCopy, copy, delete]
-
+        
         if (metadata.contentType != "image/svg+xml") && (metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue) {
             children.insert(save, at: 2)
         }
-
-//        if (metadata.contentType != "image/svg+xml") && (metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue) {
-//            children.insert(saveAsScan, at: 2)
-//        }
-
-        if (metadata.contentType != "image/svg+xml") && (metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue || metadata.contentType == "application/pdf" || metadata.contentType == "com.adobe.pdf") {
+        
+        //        if (metadata.contentType != "image/svg+xml") && (metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue) {
+        //            children.insert(saveAsScan, at: 2)
+        //        }
+        
+        if (metadata.contentType != "image/svg+xml") && (metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue || metadata.contentType == "application/pdf" || metadata.contentType == "com.adobe.pdf" || metadata.isPrintable) {
             children.insert(print, at: 2)
         }
-
+        
         if enableViewInFolder {
             children.insert(viewInFolder, at: children.count-1)
         }
-
+        
         if (!isFolderEncrypted && metadata.contentType != "image/gif" && metadata.contentType != "image/svg+xml") && (metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" || metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue) {
             children.insert(modify, at: children.count-1)
         }
-
+        
         if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && viewController is NCCollectionViewCommon && !NCBrandOptions.shared.disable_background_image {
             let viewController: NCCollectionViewCommon = viewController as! NCCollectionViewCommon
             let layoutKey = viewController.layoutKey
@@ -835,7 +852,7 @@ import JGProgressHUD
                 children.insert(saveBackground, at: children.count-1)
             }
         }
-
+        
         let submenu = UIMenu(title: "", options: .displayInline, children: children)
         return UIMenu(title: "", children: [detail, submenu])
     }
