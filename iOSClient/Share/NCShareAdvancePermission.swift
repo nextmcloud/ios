@@ -68,7 +68,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     var typeFile: String!
     let tableViewBottomInset: CGFloat = 80.0
     static let displayDateFormat = "dd. MMM. yyyy"
-    var downloadLimit: Int?
+    var downloadLimit: DownloadLimit?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -435,11 +435,21 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             row.cellConfig["cellTextField.font"] = UIFont.systemFont(ofSize: 15.0)
             row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.label
             row.height = 44
-            let downloadLimitSet = downloadLimit != nil
+            let downloadLimitSet = downloadLimit?.limit != nil
             row.hidden = NSNumber.init(booleanLiteral: !downloadLimitSet)
-            if let value = downloadLimit {
+            if let value = downloadLimit?.limit {
                 row.cellConfig["cellTextField.text"] = "\(value)"
             }
+            section.addFormRow(row)
+            
+            row = XLFormRowDescriptor(tag: "kNMCDownloadLimitCell", rowType: "kNMCFilePermissionCell", title: "")
+            row.cellClass = NCFilePermissionCell.self
+            row.height = 44
+            if downloadLimit?.limit != nil {
+                row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_remaining_download_", comment: "") + " \(downloadLimit?.count ?? 0)"
+            }
+            row.cellConfig["titleLabel.textColor"] =  NCBrandColor.shared.systemGray
+            row.disabled = true
             section.addFormRow(row)
         }
         
@@ -478,7 +488,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             DispatchQueue.main.async {
                 NCUtility.shared.stopActivityIndicator()
                 if let downloadLimit = downloadLimit {
-                    self?.downloadLimit = downloadLimit.limit
+                    self?.downloadLimit = downloadLimit
                 }
                 self?.updateDownloadLimitUI()
             }
@@ -492,7 +502,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
     
     func updateDownloadLimitUI() {
-        if let value = downloadLimit {
+        if let value = downloadLimit?.limit {
             if let downloadLimitSwitchField: XLFormRowDescriptor = self.form.formRow(withTag: "kNMCFilePermissionEditCellDownloadLimit") {
                 if let indexPath = self.form.indexPath(ofFormRow: downloadLimitSwitchField) {
                     let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionEditCell
@@ -504,6 +514,14 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                     if let indexPath = self.form.indexPath(ofFormRow: downloadLimitInputField) {
                         let cell = tableView.cellForRow(at: indexPath) as? NCShareTextInputCell
                         cell?.cellTextField.text = "\(value)"
+                    }
+                }
+                
+                if let downloadLimitInputField: XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
+                    downloadLimitInputField.hidden = false
+                    if let indexPath = self.form.indexPath(ofFormRow: downloadLimitInputField) {
+                        let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionCell
+                        cell?.titleLabel.text = NSLocalizedString("_share_remaining_download_", comment: "") + " \(downloadLimit?.count ?? 0)"
                     }
                 }
             }
@@ -671,7 +689,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         if let limitRow : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCFilePermissionEditCellDownloadLimit") {
             if let expiryIndexPath = self.form.indexPath(ofFormRow: limitRow), indexPath == expiryIndexPath {
                 let cell = cell as? NCFilePermissionEditCell
-                cell?.switchControl.isOn = downloadLimit != nil
+                cell?.switchControl.isOn = downloadLimit?.limit != nil
             }
         }
         
@@ -679,7 +697,17 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         if let downloadlimitFieldRow : XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellDownloadLimit") {
             if let downloadlimitIndexPath = self.form.indexPath(ofFormRow: downloadlimitFieldRow), indexPath == downloadlimitIndexPath {
                 let cell = cell as? NCShareTextInputCell
-                cell?.cellTextField.text = "\(downloadLimit ?? 0)"
+                cell?.cellTextField.text = "\(downloadLimit?.limit ?? 0)"
+            }
+        }
+        
+        //SetDownloadLimitSwitch
+        if let downloadlimitFieldRow : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
+            if let downloadlimitIndexPath = self.form.indexPath(ofFormRow: downloadlimitFieldRow), indexPath == downloadlimitIndexPath {
+                let cell = cell as? NCFilePermissionCell
+                cell?.titleLabel.text = NSLocalizedString("_share_remaining_download_", comment: "") + " \(downloadLimit?.count ?? 0)"
+                cell?.seperatorBelowFull.isHidden = true
+                cell?.seperatorBelow.isHidden = true
             }
         }
     }
@@ -748,6 +776,13 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                     if let indexPath = self.form.indexPath(ofFormRow: inputField) {
                         let cell = tableView.cellForRow(at: indexPath) as? NCShareTextInputCell
                         cell?.cellTextField.text = ""
+                    }
+                }
+                if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
+                    inputField.hidden = !value
+                    if let indexPath = self.form.indexPath(ofFormRow: inputField) {
+                        let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionCell
+                        cell?.titleLabel.text = ""
                     }
                 }
             }
