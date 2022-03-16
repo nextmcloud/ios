@@ -26,7 +26,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     @IBOutlet weak var buttonContainerView: UIView!
     
     public var metadata: tableMetadata?
-    public var sharee: NCCommunicationSharee?
+    public var sharee: NCCommunicationShareeProtocol?
     private var networking: NCShareNetworking?
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var permission: Int = 0
@@ -85,6 +85,9 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         buttonContainerView.addShadow(location: .top)
+        
+        // UITestCase Identifire
+        view.accessibilityIdentifier = "view_new_user_add_comment_screen"
     }
     
     func setTitle() {

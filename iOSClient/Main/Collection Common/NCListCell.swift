@@ -113,6 +113,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         separator.backgroundColor = NCBrandColor.shared.graySoft
         self.labelInfo.textColor = NCBrandColor.shared.gray60
         separatorHeightConstraint.constant = 0.5
+        
+        // UITestCase Identifire 
+        buttonShared.accessibilityLabel = "share"
     }
     
     override func prepareForReuse() {

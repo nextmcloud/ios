@@ -47,7 +47,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var networking: NCShareNetworking?
     private var shareeSelected: NCCommunicationSharee?
     public  var tableShareSelected: tableShare?
-    private var quickStatusTableShare: tableShare!
+    var quickStatusTableShare: tableShare!
     private var sendEmailSelected: Int!
     private var shareeEmail: String!
     
@@ -141,6 +141,9 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         setupHeader()
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
         navigationItem.largeTitleDisplayMode = .never
+        
+        // UITestCase Identifire
+//        view.accessibilityIdentifier = "view_sharing_screen”
     }
     
     @objc func exitTapped() {
@@ -1013,7 +1016,7 @@ extension NCShare: UITableViewDataSource {
                     if let image = UIImage(contentsOfFile: fileNameLocalPath) {
 
                     }
-                } 
+                }
                 
                 if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
                     cell.switchCanEdit.setOn(true, animated: false)

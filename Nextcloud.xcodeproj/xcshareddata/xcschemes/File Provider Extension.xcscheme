@@ -56,9 +56,19 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AF8ED1F82757821000B8DBC4"
+               BlueprintIdentifier = "B11D7075271D62C600A303D2"
                BuildableName = "NextcloudTests.xctest"
                BlueprintName = "NextcloudTests"
+               ReferencedContainer = "container:Nextcloud.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "569D38D627917D54005A21DB"
+               BuildableName = "NextcloudUITests.xctest"
+               BlueprintName = "NextcloudUITests"
                ReferencedContainer = "container:Nextcloud.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -93,7 +103,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES"
-      askForAppToLaunch = "Yes"
       launchAutomaticallySubstyle = "2">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
