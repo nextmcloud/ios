@@ -442,6 +442,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             }
             section.addFormRow(row)
             
+            XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
             row = XLFormRowDescriptor(tag: "kNMCDownloadLimitCell", rowType: "kNMCFilePermissionCell", title: "")
             row.cellClass = NCFilePermissionCell.self
             row.height = 44
@@ -450,6 +451,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             }
             row.cellConfig["titleLabel.textColor"] =  NCBrandColor.shared.systemGray
             row.disabled = true
+            row.hidden = NSNumber.init(booleanLiteral: !downloadLimitSet)
             section.addFormRow(row)
         }
         
@@ -702,12 +704,14 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         }
         
         //SetDownloadLimitSwitch
-        if let downloadlimitFieldRow : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
-            if let downloadlimitIndexPath = self.form.indexPath(ofFormRow: downloadlimitFieldRow), indexPath == downloadlimitIndexPath {
-                let cell = cell as? NCFilePermissionCell
-                cell?.titleLabel.text = NSLocalizedString("_share_remaining_download_", comment: "") + " \(downloadLimit?.count ?? 0)"
-                cell?.seperatorBelowFull.isHidden = true
-                cell?.seperatorBelow.isHidden = true
+        if downloadLimit?.count != nil {
+            if let downloadlimitFieldRow : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
+                if let downloadlimitIndexPath = self.form.indexPath(ofFormRow: downloadlimitFieldRow), indexPath == downloadlimitIndexPath {
+                    let cell = cell as? NCFilePermissionCell
+                    cell?.titleLabel.text = NSLocalizedString("_share_remaining_download_", comment: "") + " \(downloadLimit?.count ?? 0)"
+                    cell?.seperatorBelowFull.isHidden = true
+                    cell?.seperatorBelow.isHidden = true
+                }
             }
         }
     }
@@ -778,11 +782,13 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                         cell?.cellTextField.text = ""
                     }
                 }
-                if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
-                    inputField.hidden = !value
-                    if let indexPath = self.form.indexPath(ofFormRow: inputField) {
-                        let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionCell
-                        cell?.titleLabel.text = ""
+                if downloadLimit?.count != nil {
+                    if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
+                        inputField.hidden = !value
+                        if let indexPath = self.form.indexPath(ofFormRow: inputField) {
+                            let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionCell
+                            cell?.titleLabel.text = ""
+                        }
                     }
                 }
             }
