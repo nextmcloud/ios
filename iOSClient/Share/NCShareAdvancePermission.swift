@@ -729,10 +729,12 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         case "kNMCFilePermissionEditCellHideDownload":
             if let value = newValue as? Bool {
                 self.hideDownload = value
+                self.tableShare?.hideDownload = value
             }
             
         case "kNMCFilePermissionEditPasswordCellWithText":
             if let value = newValue as? Bool {
+                tableShare?.password = " "
                 self.passwordProtected = value
                 if let setPasswordInputField : XLFormRowDescriptor  = self.form.formRow(withTag: "SetPasswordInputField") {
                     if let indexPath = self.form.indexPath(ofFormRow: setPasswordInputField) {
@@ -774,7 +776,9 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             }
             
         case "kNMCFilePermissionEditCellDownloadLimit":
-            if let value = newValue as? Bool {                
+            if let value = newValue as? Bool {
+                self.downloadLimit = DownloadLimit()
+                self.downloadLimit?.limit = value ? 0 : nil
                 if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellDownloadLimit") {
                     inputField.hidden = !value
                     if let indexPath = self.form.indexPath(ofFormRow: inputField) {
@@ -782,13 +786,14 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                         cell?.cellTextField.text = ""
                     }
                 }
-                if downloadLimit?.count != nil {
-                    if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
-                        inputField.hidden = !value
-                        if let indexPath = self.form.indexPath(ofFormRow: inputField) {
-                            let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionCell
-                            cell?.titleLabel.text = ""
-                        }
+                
+                if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
+                    inputField.hidden = !value
+                    if let indexPath = self.form.indexPath(ofFormRow: inputField) {
+                        let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionCell
+                        cell?.seperatorBelowFull.isHidden = true
+                        cell?.seperatorBelow.isHidden = true
+                        cell?.titleLabel.text = ""
                     }
                 }
             }
