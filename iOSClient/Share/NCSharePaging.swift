@@ -73,6 +73,7 @@ class NCSharePaging: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(self.changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
+        navigationItem.largeTitleDisplayMode = .never
 
         // Pagination
 //        pagingViewController.view.frame.size.height = 0
@@ -112,7 +113,7 @@ class NCSharePaging: UIViewController {
         
         changeTheming()
         pagingViewController.indicatorColor = .clear
-        (pagingViewController.view as! NCSharePagingView).setupConstraints()
+//        (pagingViewController.view as! NCSharePagingView).setupConstraints()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -304,74 +305,74 @@ class NCSharePagingView: PagingView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func setupConstraints() {
-        
-        let headerView = Bundle.main.loadNibNamed("NCShareHeaderView", owner: self, options: nil)?.first as! NCShareHeaderView
-        headerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        headerView.fileName.textColor = NCBrandColor.shared.label
-        headerView.labelSharing.textColor = NCBrandColor.shared.label
-        headerView.labelSharingInfo.textColor = NCBrandColor.shared.label
-        headerView.info.textColor = NCBrandColor.shared.systemGray2
-        headerView.ocId = metadata!.ocId
-        headerView.updateCanReshareUI()
-        
-        if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
-//            headerView.imageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
-//            headerView.fullWidthImageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
-//            headerView.fullWidthImageView.image = getImage(metadata: metadata!)
-            headerView.fullWidthImageView.image = getImageMetadata(metadata!)
-            headerView.fullWidthImageView.contentMode = .scaleAspectFill
-            headerView.imageView.isHidden = true
-        } else {
-            if metadata!.directory {
-                headerView.imageView.image = UIImage.init(named: "folder")!
-//                let image = UIImage.init(named: "folder")!
-//                headerView.imageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
-            } else if metadata!.iconName.count > 0 {
-                headerView.imageView.image = UIImage.init(named: metadata!.iconName)
-            } else {
-                headerView.imageView.image = UIImage.init(named: "file")
-            }
-        }
-        headerView.fileName.text = metadata?.fileNameView
-        headerView.fileName.textColor = NCBrandColor.shared.label
-        if metadata!.favorite {
-            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
-        } else {
-            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
-        }
-        headerView.info.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
-        addSubview(headerView)
-        
-        pageView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        
-        headerHeightConstraint = headerView.heightAnchor.constraint(
-            equalToConstant: NCSharePagingView.HeaderHeight
-        )
+//    override func setupConstraints() {
+//
+//        let headerView = Bundle.main.loadNibNamed("NCShareHeaderView", owner: self, options: nil)?.first as! NCShareHeaderView
+//        headerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+//        headerView.fileName.textColor = NCBrandColor.shared.label
+//        headerView.labelSharing.textColor = NCBrandColor.shared.label
+//        headerView.labelSharingInfo.textColor = NCBrandColor.shared.label
+//        headerView.info.textColor = NCBrandColor.shared.systemGray2
+//        headerView.ocId = metadata!.ocId
+//        headerView.updateCanReshareUI()
+//
+//        if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
+////            headerView.imageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
+////            headerView.fullWidthImageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
+////            headerView.fullWidthImageView.image = getImage(metadata: metadata!)
+//            headerView.fullWidthImageView.image = getImageMetadata(metadata!)
+//            headerView.fullWidthImageView.contentMode = .scaleAspectFill
+//            headerView.imageView.isHidden = true
+//        } else {
+//            if metadata!.directory {
+//                headerView.imageView.image = UIImage.init(named: "folder")!
+////                let image = UIImage.init(named: "folder")!
+////                headerView.imageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
+//            } else if metadata!.iconName.count > 0 {
+//                headerView.imageView.image = UIImage.init(named: metadata!.iconName)
+//            } else {
+//                headerView.imageView.image = UIImage.init(named: "file")
+//            }
+//        }
+//        headerView.fileName.text = metadata?.fileNameView
+//        headerView.fileName.textColor = NCBrandColor.shared.label
+//        if metadata!.favorite {
+//            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
+//        } else {
+//            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
+//        }
+//        headerView.info.text = CCUtility.transformedSize(metadata!.size) + ", " + CCUtility.dateDiff(metadata!.date as Date)
+//        addSubview(headerView)
+//
+//        pageView.translatesAutoresizingMaskIntoConstraints = false
+//        collectionView.translatesAutoresizingMaskIntoConstraints = false
+//        headerView.translatesAutoresizingMaskIntoConstraints = false
+//
 //        headerHeightConstraint = headerView.heightAnchor.constraint(
-//            equalToConstant: metadata!.directory ? 350 : 370
+//            equalToConstant: NCSharePagingView.HeaderHeight
 //        )
-        
-        headerHeightConstraint?.isActive = true
-        
-        NSLayoutConstraint.activate([
-            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            collectionView.heightAnchor.constraint(equalToConstant: options.menuHeight),
-            collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
-            
-            headerView.topAnchor.constraint(equalTo: topAnchor),
-            headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            
-            pageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            pageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            pageView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            pageView.topAnchor.constraint(equalTo: topAnchor, constant: 10)
-        ])
-    }
+////        headerHeightConstraint = headerView.heightAnchor.constraint(
+////            equalToConstant: metadata!.directory ? 350 : 370
+////        )
+//
+//        headerHeightConstraint?.isActive = true
+//
+//        NSLayoutConstraint.activate([
+//            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
+//            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
+//            collectionView.heightAnchor.constraint(equalToConstant: options.menuHeight),
+//            collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
+//
+//            headerView.topAnchor.constraint(equalTo: topAnchor),
+//            headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+//            headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+//
+//            pageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+//            pageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+//            pageView.bottomAnchor.constraint(equalTo: bottomAnchor),
+//            pageView.topAnchor.constraint(equalTo: topAnchor, constant: 10)
+//        ])
+//    }
     
     private func getImage(metadata: tableMetadata) -> UIImage? {
         

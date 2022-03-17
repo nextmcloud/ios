@@ -188,10 +188,10 @@ import SVGKit
     func openShare(viewController: UIViewController, metadata: tableMetadata, indexPage: NCGlobal.NCSharePagingIndex) {
         
         let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as! UINavigationController
-        let shareViewController = shareNavigationController.topViewController as! NCSharePaging
+        let shareViewController = shareNavigationController.topViewController as! NCShare
         
         shareViewController.metadata = metadata
-        shareViewController.indexPage = indexPage
+//        shareViewController.indexPage = indexPage
         
         if #available(iOS 13.0, *) {
             shareNavigationController.modalPresentationStyle = .automatic
