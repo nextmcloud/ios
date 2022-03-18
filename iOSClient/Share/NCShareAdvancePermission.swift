@@ -729,12 +729,10 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         case "kNMCFilePermissionEditCellHideDownload":
             if let value = newValue as? Bool {
                 self.hideDownload = value
-                self.tableShare?.hideDownload = value
             }
             
         case "kNMCFilePermissionEditPasswordCellWithText":
             if let value = newValue as? Bool {
-                tableShare?.password = " "
                 self.passwordProtected = value
                 if let setPasswordInputField : XLFormRowDescriptor  = self.form.formRow(withTag: "SetPasswordInputField") {
                     if let indexPath = self.form.indexPath(ofFormRow: setPasswordInputField) {
