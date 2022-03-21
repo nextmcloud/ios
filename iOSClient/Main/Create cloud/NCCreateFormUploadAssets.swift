@@ -101,6 +101,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         initializeForm()
         reloadForm()
 
+        // UITestCase Identifire
+        view.accessibilityIdentifier = "view_upload_assets_screen"
     }
     
     override func viewWillDisappear(_ animated: Bool)
