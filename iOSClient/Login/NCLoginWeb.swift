@@ -86,6 +86,10 @@ class NCLoginWeb: UIViewController {
             let statusBar = UIView(frame: (keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
             statusBar.backgroundColor = NCBrandColor.shared.customer
             keyWindow?.addSubview(statusBar)
+        } else {
+            if let statusBar = UIApplication.shared.value(forKey: "statusBar") as? UIView {
+                   statusBar.backgroundColor = NCBrandColor.shared.customer
+               }
         }
         self.navigationController!.navigationBar.backgroundColor = NCBrandColor.shared.customer
 

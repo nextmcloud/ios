@@ -50,6 +50,14 @@ class InitialPrivacySettingsViewController: UIViewController {
         privacySettingsHelpText.centerText()
         privacySettingsHelpText.font = UIFont(name: privacySettingsHelpText.font!.fontName, size: 16)
         self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
+        if #available(iOS 13, *) {
+    
+        } else {
+            if let statusBar = UIApplication.shared.value(forKey: "statusBar") as? UIView {
+                statusBar.backgroundColor = .clear
+               }
+        }
+       
     }
     
     override func didReceiveMemoryWarning() {
@@ -167,7 +175,7 @@ public extension UITextView {
     }
        
     func centerText() {
-            self.textAlignment = .center
+            self.textAlignment = .justified
             let fittingSize = CGSize(width: 300, height: CGFloat.greatestFiniteMagnitude)
             let size = sizeThatFits(fittingSize)
             let topOffset = (bounds.size.height - size.height * zoomScale) / 2

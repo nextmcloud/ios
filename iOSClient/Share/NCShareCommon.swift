@@ -230,7 +230,7 @@ class NCShareCommon: NSObject {
 
         switch shareType {
         case SHARE_TYPE_USER:
-            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
+            return UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_GROUP:
             return UIImage(named: "shareTypeGroup")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_LINK:

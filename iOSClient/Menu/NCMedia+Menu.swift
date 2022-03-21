@@ -26,31 +26,38 @@ import FloatingPanel
 import NCCommunication
 
 extension NCMedia {
-
+    
+    func tapSelect() {
+        self.isEditMode = false
+        self.selectOcId.removeAll()
+        self.reloadDataThenPerform { }
+    }
     func toggleMenu() {
         
         let menuViewController = UIStoryboard.init(name: "NCMenu", bundle: nil).instantiateInitialViewController() as! NCMenu
         var actions: [NCMenuAction] = []
-
+        
+        defer { presentMenu(with: actions) }
+        
         if !isEditMode {
             if metadatas.count > 0 {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_select_", comment: ""),
                         icon: NCUtility.shared.loadImage(named: "selectFull",color: NCBrandColor.shared.iconColor),
-
+                        
                         action: { menuAction in
                             self.isEditMode = true
                         }
                     )
                 )
             }
-
+            
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString(filterClassTypeImage ? "_media_viewimage_show_" : "_media_viewimage_hide_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: filterClassTypeImage ? "nocamera" : "file_photo_menu",color: NCBrandColor.shared.iconColor),
-
+                    
                     selected: filterClassTypeImage,
                     on: true,
                     action: { menuAction in
@@ -60,7 +67,7 @@ extension NCMedia {
                     }
                 )
             )
-
+            
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString(filterClassTypeVideo ? "_media_viewvideo_show_" : "_media_viewvideo_hide_", comment: ""),
@@ -86,7 +93,7 @@ extension NCMedia {
                         viewController.delegate = self
                         viewController.typeOfCommandView = .select
                         viewController.type = "mediaFolder"
-                    
+                        
                         self.present(navigationController, animated: true, completion: nil)
                     }
                 )
@@ -95,7 +102,7 @@ extension NCMedia {
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_modified_date_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "sortFileNameAZ",color: NCBrandColor.shared.iconColor),
-
+                    
                     selected: CCUtility.getMediaSortDate() == "date",
                     on: true,
                     action: { menuAction in
@@ -132,7 +139,7 @@ extension NCMedia {
             )
             
         } else {
-           
+            
             //
             // CANCEL
             //
@@ -140,139 +147,38 @@ extension NCMedia {
                 NCMenuAction(
                     title: NSLocalizedString("_cancel_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "xmark",color: NCBrandColor.shared.iconColor),
-                    action: { menuAction in
-                        self.isEditMode = false
-                        self.selectOcId.removeAll()
-                        self.reloadDataThenPerform { }
-                    }
+                    action: { _ in self.tapSelect() }
                 )
             )
-
+            
+            guard !selectOcId.isEmpty else { return }
+            let selectedMetadatas = selectOcId.compactMap(NCManageDatabase.shared.getMetadataFromOcId)
+            
             //
             // OPEN IN
             //
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_open_in_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "viewInFolder",color: NCBrandColor.shared.iconColor),
-                    action: { menuAction in
-                        self.isEditMode = false
-                        NCFunctionCenter.shared.openActivityViewController(selectOcId: self.selectOcId)
-                        self.selectOcId.removeAll()
-                        self.reloadDataThenPerform { }
-                    }
-                )
-            )
-
+            actions.append(.openInAction(selectedMetadatas: selectedMetadatas, viewController: self, completion: tapSelect))
+            
             //
             // SAVE TO PHOTO GALLERY
             //
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_save_selected_files_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "file_photo_menu",color: NCBrandColor.shared.iconColor),
-                    action: { menuAction in
-                        self.isEditMode = false
-                        for ocId in self.selectOcId {
-                            if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                                if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue {
-                                    if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
-                                        NCFunctionCenter.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV)
-                                    } else {
-                                        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
-                                            NCFunctionCenter.shared.saveAlbum(metadata: metadata)
-                                        } else {
-                                            NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        self.selectOcId.removeAll()
-                        self.reloadDataThenPerform { }
-                    }
-                )
-            )
-
+            actions.append(.saveMediaAction(selectedMediaMetadatas: selectedMetadatas, completion: tapSelect))
             //
             // COPY - MOVE
             //
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_move_or_copy_selected_files_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "move",color: NCBrandColor.shared.iconColor),
-                    action: { menuAction in
-                        self.isEditMode = false
-                        var meradatasSelect = [tableMetadata]()
-                        for ocId in self.selectOcId {
-                            if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                                meradatasSelect.append(metadata)
-                            }
-                        }
-                        if meradatasSelect.count > 0 {
-                            NCFunctionCenter.shared.openSelectView(items: meradatasSelect, viewController: self)
-                        }
-                        self.selectOcId.removeAll()
-                        self.reloadDataThenPerform { }
-                    }
-                )
-            )
-
+            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, completion: tapSelect))
+            
             //
             // COPY
             //
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_copy_to_clipboard_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "copy",color: NCBrandColor.shared.iconColor),
-                    action: { menuAction in
-                        self.isEditMode = false
-                        NCFunctionCenter.shared.copyPasteboard(pasteboardOcIds: self.selectOcId, hudView: self.view)
-                        self.selectOcId.removeAll()
-                        self.reloadDataThenPerform { }
-                    }
-                )
-            )
-
+            actions.append(.copyAction(selectOcId: selectOcId, hudView: self.view, completion: tapSelect))
+            
             //
             // DELETE
             //
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_delete_selected_files_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "trash",color: NCBrandColor.shared.iconColor),
-                    action: { menuAction in
-                        self.isEditMode = false
-                        for ocId in self.selectOcId {
-                            if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                                NCNetworking.shared.deleteMetadata(metadata, onlyLocalCache: false) { (errorCode, errorDescription) in
-                                    if errorCode != 0 {
-                                        NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
-                                    }
-                                }
-                            }
-                        }
-                        self.selectOcId.removeAll()
-                        self.reloadDataThenPerform { }
-                    }
-                )
-            )
+            actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, metadataFolder: nil, viewController: self, completion: tapSelect))
         }
-
-//<<<<<<< HEAD
-//        menuViewController.actions = actions
-//        let menuPanelController = NCMenuPanelController()
-//        menuPanelController.parentPresenter = self
-//        menuPanelController.delegate = menuViewController
-//        menuPanelController.set(contentViewController: menuViewController)
-//        menuPanelController.track(scrollView: menuViewController.tableView)
-//
-//        self.present(menuPanelController, animated: true, completion: nil)
-//    }
-//}
-//
-//=======
-        presentMenu(with: actions)
+        
     }
 }
 
