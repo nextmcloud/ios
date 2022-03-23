@@ -165,11 +165,17 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                 self.view.frame.origin.y -= 100
             }
         }
+        if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
+            searchField.layer.borderColor = NCBrandColor.shared.brand.cgColor
+        }
     }
 
     @objc func keyboardWillHide(notification: Notification) {
         if view.frame.origin.y != 0 {
             self.view.frame.origin.y = 0
+        }
+        if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
+            searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
         }
     }
     
@@ -461,8 +467,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField  else { return }
         dropDown = DropDown()
         let appearance = DropDown.appearance()
-        
-//        appearance.backgroundColor = NCBrandColor.shared.backgroundForm
         appearance.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         appearance.cornerRadius = 10
         appearance.shadowColor = UIColor(white: 0.5, alpha: 1)
@@ -488,7 +492,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         dropDown.cellNib = UINib(nibName: "NCShareUserDropDownCell", bundle: nil)
         dropDown.customCellConfiguration = {[weak self] (index: Index, item: String, cell: DropDownCell) -> Void in
             guard let cell = cell as? NCShareUserDropDownCell else { return }
-            searchField.layer.borderColor = NCBrandColor.shared.brand.cgColor
             let sharee = sharees[index]
             cell.imageItem.image = NCShareCommon.shared.getImageShareType(shareType: sharee.shareType)
             let status = NCUtility.shared.getUserStatus(userIcon: sharee.userIcon, userStatus: sharee.userStatus, userMessage: sharee.userMessage)
@@ -782,22 +785,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 }
 
 extension NCShare: UITextFieldDelegate {
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
-            if textField == searchField {
-                searchField.layer.borderColor = NCBrandColor.shared.brand.cgColor
-            }
-        }
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
-            if textField == searchField {
-                searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
-            }
-        }
-    }
-    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let searchString = "\(textField.text ?? "")\(string)"
         if searchString.count == 1, string == "" {
