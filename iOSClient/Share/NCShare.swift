@@ -70,40 +70,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadDataNCShare), object: nil)
         
-        // Shared with you by ...
-        /*
-        if let metadata = metadata, !metadata.ownerId.isEmpty, metadata.ownerId != self.appDelegate.userId {
-
-            searchFieldTopConstraint.constant = 65
-            sharedWithYouByView.isHidden = false
-            sharedWithYouByLabel.text = NSLocalizedString("_shared_with_you_by_", comment: "") + " " + metadata.ownerDisplayName
-            sharedWithYouByImage.image = NCUtility.shared.loadUserImage(
-                for: metadata.ownerId,
-                   displayName: metadata.ownerDisplayName,
-                   userBaseUrl: appDelegate)
-            
-            let fileName = appDelegate.userBaseUrl + "-" + metadata.ownerId + ".png"
-
-            if NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName) == nil {
-                let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + fileName
-                let etag = NCManageDatabase.shared.getTableAvatar(fileName: fileName)?.etag
-
-                NCCommunication.shared.downloadAvatar(user: metadata.ownerId, fileNameLocalPath: fileNameLocalPath, sizeImage: NCGlobal.shared.avatarSize, avatarSizeRounded: NCGlobal.shared.avatarSizeRounded, etag: etag) { _, imageAvatar, _, etag, errorCode, _ in
-
-                    if errorCode == 0, let etag = etag, let imageAvatar = imageAvatar {
-
-                        NCManageDatabase.shared.addAvatar(fileName: fileName, etag: etag)
-                        self.sharedWithYouByImage.image = imageAvatar
-
-                    } else if errorCode == NCGlobal.shared.errorNotModified, let imageAvatar = NCManageDatabase.shared.setAvatarLoaded(fileName: fileName) {
-
-                        self.sharedWithYouByImage.image = imageAvatar
-                    }
-                }
-            }
-        }
-        */
-        
         reloadData()
         
         tableView.tableFooterView = UIView(frame: .zero)
@@ -1219,5 +1185,20 @@ class NCShareEmailFieldCell: UITableViewCell {
         searchField.textColor = NCBrandColor.shared.label
         searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
         searchField.tag = Tag.searchField
+        setDoneButton(sender: searchField)
+    }
+    
+    @objc func cancelDatePicker() {
+        self.searchField.endEditing(true)
+    }
+    
+    func setDoneButton(sender: UITextField) {
+        //ToolBar
+        let toolbar = UIToolbar();
+        toolbar.sizeToFit()
+        let doneButton = UIBarButtonItem(title: NSLocalizedString("_done_", comment: ""), style: .plain, target: self, action: #selector(cancelDatePicker));
+        let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+        toolbar.setItems([spaceButton, doneButton], animated: false)
+        sender.inputAccessoryView = toolbar
     }
 }
