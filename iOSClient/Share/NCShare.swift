@@ -70,40 +70,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadDataNCShare), object: nil)
         
-        // Shared with you by ...
-        /*
-        if let metadata = metadata, !metadata.ownerId.isEmpty, metadata.ownerId != self.appDelegate.userId {
-
-            searchFieldTopConstraint.constant = 65
-            sharedWithYouByView.isHidden = false
-            sharedWithYouByLabel.text = NSLocalizedString("_shared_with_you_by_", comment: "") + " " + metadata.ownerDisplayName
-            sharedWithYouByImage.image = NCUtility.shared.loadUserImage(
-                for: metadata.ownerId,
-                   displayName: metadata.ownerDisplayName,
-                   userBaseUrl: appDelegate)
-            
-            let fileName = appDelegate.userBaseUrl + "-" + metadata.ownerId + ".png"
-
-            if NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName) == nil {
-                let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + fileName
-                let etag = NCManageDatabase.shared.getTableAvatar(fileName: fileName)?.etag
-
-                NCCommunication.shared.downloadAvatar(user: metadata.ownerId, fileNameLocalPath: fileNameLocalPath, sizeImage: NCGlobal.shared.avatarSize, avatarSizeRounded: NCGlobal.shared.avatarSizeRounded, etag: etag) { _, imageAvatar, _, etag, errorCode, _ in
-
-                    if errorCode == 0, let etag = etag, let imageAvatar = imageAvatar {
-
-                        NCManageDatabase.shared.addAvatar(fileName: fileName, etag: etag)
-                        self.sharedWithYouByImage.image = imageAvatar
-
-                    } else if errorCode == NCGlobal.shared.errorNotModified, let imageAvatar = NCManageDatabase.shared.setAvatarLoaded(fileName: fileName) {
-
-                        self.sharedWithYouByImage.image = imageAvatar
-                    }
-                }
-            }
-        }
-        */
-        
         reloadData()
         
         tableView.tableFooterView = UIView(frame: .zero)
@@ -152,7 +118,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     @objc func keyboardWillShow(notification: Notification) {
-        if (UIScreen.main.bounds.width < 350 || UIDevice.current.orientation.isLandscape), UIDevice.current.userInterfaceIdiom == .phone {
+        if (UIScreen.main.bounds.width < 376 || UIDevice.current.orientation.isLandscape), UIDevice.current.userInterfaceIdiom == .phone {
             if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
                 if view.frame.origin.y == 0 {
                     self.view.frame.origin.y -= keyboardSize.height
@@ -165,11 +131,17 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                 self.view.frame.origin.y -= 100
             }
         }
+        if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
+            searchField.layer.borderColor = NCBrandColor.shared.brand.cgColor
+        }
     }
 
     @objc func keyboardWillHide(notification: Notification) {
         if view.frame.origin.y != 0 {
             self.view.frame.origin.y = 0
+        }
+        if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
+            searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
         }
     }
     
@@ -461,8 +433,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField  else { return }
         dropDown = DropDown()
         let appearance = DropDown.appearance()
-        
-//        appearance.backgroundColor = NCBrandColor.shared.backgroundForm
         appearance.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         appearance.cornerRadius = 10
         appearance.shadowColor = UIColor(white: 0.5, alpha: 1)
@@ -488,7 +458,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         dropDown.cellNib = UINib(nibName: "NCShareUserDropDownCell", bundle: nil)
         dropDown.customCellConfiguration = {[weak self] (index: Index, item: String, cell: DropDownCell) -> Void in
             guard let cell = cell as? NCShareUserDropDownCell else { return }
-            searchField.layer.borderColor = NCBrandColor.shared.brand.cgColor
             let sharee = sharees[index]
             cell.imageItem.image = NCShareCommon.shared.getImageShareType(shareType: sharee.shareType)
             let status = NCUtility.shared.getUserStatus(userIcon: sharee.userIcon, userStatus: sharee.userStatus, userMessage: sharee.userMessage)
@@ -782,22 +751,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 }
 
 extension NCShare: UITextFieldDelegate {
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
-            if textField == searchField {
-                searchField.layer.borderColor = NCBrandColor.shared.brand.cgColor
-            }
-        }
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
-            if textField == searchField {
-                searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
-            }
-        }
-    }
-    
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let searchString = "\(textField.text ?? "")\(string)"
         if searchString.count == 1, string == "" {
@@ -1232,5 +1185,20 @@ class NCShareEmailFieldCell: UITableViewCell {
         searchField.textColor = NCBrandColor.shared.label
         searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
         searchField.tag = Tag.searchField
+        setDoneButton(sender: searchField)
+    }
+    
+    @objc func cancelDatePicker() {
+        self.searchField.endEditing(true)
+    }
+    
+    func setDoneButton(sender: UITextField) {
+        //ToolBar
+        let toolbar = UIToolbar();
+        toolbar.sizeToFit()
+        let doneButton = UIBarButtonItem(title: NSLocalizedString("_done_", comment: ""), style: .plain, target: self, action: #selector(cancelDatePicker));
+        let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+        toolbar.setItems([spaceButton, doneButton], animated: false)
+        sender.inputAccessoryView = toolbar
     }
 }
