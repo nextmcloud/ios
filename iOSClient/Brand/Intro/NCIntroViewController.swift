@@ -43,12 +43,13 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     private var textColorOpponent: UIColor = .black
     private let imagesLandscape = [UIImage(named: "introSlideLand1"), UIImage(named: "introSlideLand2"), UIImage(named: "introSlideLand3")]
     private let imagesPortrait = [UIImage(named: "introSlide1"), UIImage(named: "introSlide2"), UIImage(named: "introSlide3")]
+    private let imagesEightPortrait = [UIImage(named: "introSlideEight1"), UIImage(named: "introSlideEight2"), UIImage(named: "introSlideEight3")]
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : imagesPortrait
+        let isEightPlusDevice = UIScreen.main.bounds.height == 736
+        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : (isEightPlusDevice ? imagesEightPortrait : imagesPortrait)
         
         let isTooLight = NCBrandColor.shared.customer.isTooLight()
         let isTooDark = NCBrandColor.shared.customer.isTooDark()
@@ -139,7 +140,8 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : imagesPortrait
+        let isEightPlusDevice = UIScreen.main.bounds.height == 736
+        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : (isEightPlusDevice ? imagesEightPortrait : imagesPortrait)
         pageControl.currentPage = 0
         introCollectionView.collectionViewLayout.invalidateLayout()
         self.introCollectionView.reloadData()
