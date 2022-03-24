@@ -393,6 +393,15 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                         })
                     }
                 }
+            } else if let ocId = userInfo["ocId"] as? String {
+                if let row = dataSource.deleteMetadata(ocId: ocId) {
+                    let indexPath = IndexPath(row: row, section: 0)
+                    collectionView?.performBatchUpdates({
+                        collectionView?.deleteItems(at: [indexPath])
+                    }, completion: { (_) in
+                        self.collectionView?.reloadData()
+                    })
+                }
             }
         }
     }
