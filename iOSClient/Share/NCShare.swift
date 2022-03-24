@@ -761,6 +761,12 @@ extension NCShare: UITextFieldDelegate {
         self.shareeEmail = searchString
         return true
     }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        if let text = textField.text?.trimmingCharacters(in: .whitespaces), !text.isEmpty {
+            networking?.getSharees(searchString: text)
+        }
+    }
 }
 
 // MARK: - UITableViewDelegate
