@@ -14,7 +14,8 @@
 		2C33C48623E2C475005F963B /* Notification Service Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2C33C47F23E2C475005F963B /* Notification Service Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2CB7D1CA23E2EDCB00376EF9 /* NCPushNotificationEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F72D1005210B6882009C96B7 /* NCPushNotificationEncryption.m */; };
 		370D26AF248A3D7A00121797 /* NCImageCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCImageCellProtocol.swift */; };
-		5621BD7E27DA6A36005A3389 /* NCMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5621BD7D27DA6A36005A3389 /* NCMenuAction.swift */; };
+		56098AAB27EC823000BEB702 /* NCMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56098AAA27EC823000BEB702 /* NCMenuAction.swift */; };
+		5621BD7E27DA6A36005A3389 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		564BFD9927C7A9930047252F /* NCViewerImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70753EA2542A99800972D44 /* NCViewerImage.swift */; };
 		564BFD9A27C7AC5E0047252F /* NCViewerImageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F718C24D254D507B00C5C256 /* NCViewerImageDetailView.swift */; };
 		564BFD9B27C7AC660047252F /* NCViewerVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F752011C25480387000BF3A7 /* NCViewerVideo.swift */; };
@@ -584,6 +585,7 @@
 		3757A35423D9D76300EC369E /* NCMenuPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuPanelController.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
 		37ECC83A23D0C7400082EFA2 /* NCMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuAction.swift; sourceTree = "<group>"; };
+		56098AAA27EC823000BEB702 /* NCMenuAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCMenuAction.swift; sourceTree = "<group>"; };
 		562D635927CCFE170005B45A /* NextcloudDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NextcloudDebug.entitlements; sourceTree = "<group>"; };
 		5645C2A927B3F61300553117 /* DropDown.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DropDown.xcframework; path = Carthage/Build/DropDown.xcframework; sourceTree = "<group>"; };
 		5672096E27B5209200413A96 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -1266,6 +1268,7 @@
 		95BB2078265FEF3F00AF4344 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
+				56098AAA27EC823000BEB702 /* NCMenuAction.swift */,
 				7A70DD8E27B4D5570018F47E /* NCMenu+FloatingPanel.swift */,
 				7A70DD8F27B4D5570018F47E /* UIViewController+Menu.swift */,
 				95BB207A265FEF3F00AF4344 /* AppDelegate+Menu.swift */,
@@ -1277,7 +1280,6 @@
 				95BB2080265FEF3F00AF4344 /* NCSortMenu.swift */,
 				95BB2081265FEF3F00AF4344 /* NCCollectionViewCommon+Menu.swift */,
 				95BB2082265FEF3F00AF4344 /* NCLoginWeb+Menu.swift */,
-				5621BD7D27DA6A36005A3389 /* NCMenuAction.swift */,
 			);
 			path = Menu;
 			sourceTree = "<group>";
@@ -2814,7 +2816,7 @@
 				5672096F27B5209200413A96 /* NCActivityTableViewCell.swift in Sources */,
 				7A29E0EF269873A600B239BA /* InitialPrivacySettingsViewController.swift in Sources */,
 				C0D6062E26C3E4EB00B67843 /* NCShareHeaderCustomCell.swift in Sources */,
-				5621BD7E27DA6A36005A3389 /* NCMenuAction.swift in Sources */,
+				5621BD7E27DA6A36005A3389 /* (null) in Sources */,
 				F7417DB3216CE925007D05F5 /* NCTrashSectionHeaderFooter.swift in Sources */,
 				F7239871253D86B600257F49 /* NCEmptyDataSet.swift in Sources */,
 				F7F878AE1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */,
@@ -2898,6 +2900,7 @@
 				7A875F002694650900AF558D /* PrivacySettingsViewController.swift in Sources */,
 				950A6483264AACF4006ADE0E /* SubFolderCustomCell.swift in Sources */,
 				F70CEF5623E9C7E50007035B /* UIColor+Extensions.swift in Sources */,
+				56098AAB27EC823000BEB702 /* NCMenuAction.swift in Sources */,
 				F75AC2431F1F62450073EC19 /* NCManageAutoUploadFileName.swift in Sources */,
 				7A875EEC2694421B00AF558D /* MagentaCloudVersionView.swift in Sources */,
 				F7C7B489245EBA4100D93E60 /* NCViewerQuickLook.swift in Sources */,
@@ -2979,7 +2982,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -3037,7 +3040,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -3087,7 +3090,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -3137,7 +3140,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -3193,7 +3196,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -3249,7 +3252,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = S5724FNY84;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -3299,7 +3302,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = S5724FNY84;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
@@ -3363,7 +3366,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = S5724FNY84;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
