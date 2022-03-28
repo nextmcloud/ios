@@ -57,7 +57,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     var cellBackgoundColor = NCBrandColor.shared.secondarySystemGroupedBackground
     
     // MARK: - View Life Cycle
-
+    
     convenience init(serverUrl: String, arrayImages: [UIImage]) {
         
         self.init()
@@ -74,7 +74,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     
     // MARK: - View Life Cycle
     
-
+    
     override func viewDidLoad() {
         
         super.viewDidLoad()
@@ -82,25 +82,15 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         self.title = NSLocalizedString("_save_settings_", comment: "")
         
         let saveButton : UIBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_save_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(save))
-
+        
         self.navigationItem.rightBarButtonItem = saveButton
         let cancelButton : UIBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancel))
         self.navigationItem.leftBarButtonItem = cancelButton
         self.navigationItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.brand
         self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
-
+        
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         
-        //        self.tableView.sectionHeaderHeight = 10
-        //        self.tableView.sectionFooterHeight = 10
-        //        self.tableView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        
-        
-        //        let row : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
-        //        let rowCell = row.cell(forForm: self)
-        //        rowCell.becomeFirstResponder()
-        
-
         changeTheming()
         
         initializeForm()
@@ -145,13 +135,6 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         XLFormViewController.cellClassesForRowDescriptorTypes()["NMCScamFileNameCustomInputField"] = FileNameInputTextField.self
         row = XLFormRowDescriptor(tag: "fileName", rowType: "NMCScamFileNameCustomInputField", title: NSLocalizedString("_filename_", comment: ""))
         row.cellClass = FileNameInputTextField.self
-        // row = XLFormRowDescriptor(tag: "fileName", rowType: XLFormRowDescriptorTypeAccount, title: NSLocalizedString("_filename_", comment: ""))
-        //        row.value = self.fileName
-        //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-        //
-        //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-        //
         row.cellConfig["fileNameInputTextField.placeholder"] = self.fileName
         
         row.cellConfig["fileNameInputTextField.textAlignment"] = NSTextAlignment.left.rawValue
@@ -276,87 +259,11 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         
         section.addFormRow(row)
-        // end of enter password input field
-        
-        //        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: ""))
-        //        form.addFormSection(section)
-        //
-        //        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: self.titleServerUrl)
-        //        row.action.formSelector = #selector(changeDestinationFolder(_:))
-        //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-        //
-        //        row.cellConfig["imageView.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.customerDefault, size: 25)
-        //
-        //        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-        //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-        //
-        //        section.addFormRow(row)
-        
-        // Section: Quality
-        
-        //        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_quality_image_title_", comment: ""))
-        //        //form.addFormSection(section)
-        //
-        //        row = XLFormRowDescriptor(tag: "compressionQuality", rowType: XLFormRowDescriptorTypeSlider)
-        //        row.value = 0.5
-        //        row.title = NSLocalizedString("_quality_medium_", comment: "")
-        //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-        //
-        //        row.cellConfig["slider.minimumTrackTintColor"] = NCBrandColor.shared.brandElement
-        //
-        //        row.cellConfig["slider.maximumValue"] = 1
-        //        row.cellConfig["slider.minimumValue"] = 0
-        //        row.cellConfig["steps"] = 2
-        //
-        //        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.center.rawValue
-        //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-        
-        // section.addFormRow(row)
-//=======
-//        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: ""))
-//        form.addFormSection(section)
-//
-//        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: self.titleServerUrl)
-//        row.action.formSelector = #selector(changeDestinationFolder(_:))
-//        row.cellConfig["backgroundColor"] = cellBackgoundColor
-//
-//        row.cellConfig["imageView.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
-//
-//        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-//
-//        section.addFormRow(row)
-//
-//        // Section: Quality
-//
-//        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_quality_image_title_", comment: ""))
-//        form.addFormSection(section)
-//
-//        row = XLFormRowDescriptor(tag: "compressionQuality", rowType: XLFormRowDescriptorTypeSlider)
-//        row.value = 0.5
-//        row.title = NSLocalizedString("_quality_medium_", comment: "")
-//        row.cellConfig["backgroundColor"] = cellBackgoundColor
-//
-//        row.cellConfig["slider.minimumTrackTintColor"] = NCBrandColor.shared.brandElement
-//
-//        row.cellConfig["slider.maximumValue"] = 1
-//        row.cellConfig["slider.minimumValue"] = 0
-//        row.cellConfig["steps"] = 2
-//
-//        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.center.rawValue
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-//
-//        section.addFormRow(row)
-//>>>>>>> feature_branded_client_4
         
         // Section: Password
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_pdf_password_", comment: ""))
-       // form.addFormSection(section)
+        // form.addFormSection(section)
         
         row = XLFormRowDescriptor(tag: "password", rowType: XLFormRowDescriptorTypePassword, title: NSLocalizedString("_password_", comment: ""))
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
@@ -367,23 +274,6 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
-        
-        //section.addFormRow(row)
-//=======
-//        form.addFormSection(section)
-//
-//        row = XLFormRowDescriptor(tag: "password", rowType: XLFormRowDescriptorTypePassword, title: NSLocalizedString("_password_", comment: ""))
-//        row.cellConfig["backgroundColor"] = cellBackgoundColor
-//
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-//
-//        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
-//        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
-//
-//        section.addFormRow(row)
-//>>>>>>> feature_branded_client_4
         
         // Section: Text recognition
         
@@ -399,29 +289,9 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
-        //section.addFormRow(row)
-//=======
-//        form.addFormSection(section)
-//
-//        row = XLFormRowDescriptor(tag: "textRecognition", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_text_recognition_", comment: ""))
-//        row.value = 0
-//        row.cellConfig["backgroundColor"] = cellBackgoundColor
-//
-//        row.cellConfig["imageView.image"] = UIImage(named: "textRecognition")!.image(color: NCBrandColor.shared.brandElement, size: 25)
-//
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-//
-//        section.addFormRow(row)
-//>>>>>>> feature_branded_client_4
-        
         // Section: File
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_file_creation_", comment: ""))
-       // form.addFormSection(section)
-//=======
-//        form.addFormSection(section)
-//>>>>>>> feature_branded_client_4
         
         row = XLFormRowDescriptor(tag: "filetype", rowType: XLFormRowDescriptorTypeSelectorSegmentedControl, title: NSLocalizedString("_file_type_", comment: ""))
         if arrayImages.count == 1 {
@@ -436,45 +306,6 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
-        //section.addFormRow(row)
-        
-        
-        //        row = XLFormRowDescriptor(tag: "fileName", rowType: XLFormRowDescriptorTypeAccount, title: NSLocalizedString("_filename_", comment: ""))
-        //        row.value = self.fileName
-        //        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-        //
-        //        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        //        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-        //
-        //        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
-        //        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-        //        row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
-        
-        //section.addFormRow(row)
-//=======
-//        row.cellConfig["backgroundColor"] = cellBackgoundColor
-//
-//        row.cellConfig["tintColor"] = NCBrandColor.shared.brandElement
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-//
-//        section.addFormRow(row)
-//
-//
-//        row = XLFormRowDescriptor(tag: "fileName", rowType: XLFormRowDescriptorTypeText, title: NSLocalizedString("_filename_", comment: ""))
-//        row.value = self.fileName
-//        row.cellConfig["backgroundColor"] = cellBackgoundColor
-//
-//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-//
-//        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
-//        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
-//
-//        section.addFormRow(row)
-//>>>>>>> feature_branded_client_4
-        
         self.form = form
     }
     
@@ -484,10 +315,6 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         if formRow.tag == "textRecognition" {
             
-            // self.SetTextRecognition(newValue: newValue as! Int)
-//=======
-//            self.SetTextRecognition(newValue: newValue as! Int)
-//>>>>>>> feature_branded_client_4
         }
         
         if formRow.tag == "fileName" {
@@ -647,17 +474,12 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
     }
     
-    //    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    //        return 35
-    //    }
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 4
     }
     func SetTextRecognition(newValue: Int) {
         
-        //let rowCompressionQuality: XLFormRowDescriptor = self.form.formRow(withTag: "compressionQuality")!
-        //let rowFileTape: XLFormRowDescriptor = self.form.formRow(withTag: "filetype")!
         let rowFileName: XLFormRowDescriptor = self.form.formRow(withTag: "fileName")!
         //let rowPassword: XLFormRowDescriptor = self.form.formRow(withTag: "password")!
         //let rowTextRecognition: XLFormRowDescriptor = self.form.formRow(withTag: "textRecognition")!
@@ -682,50 +504,12 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             //rowCompressionQuality.disabled = false
         }
         
-//=======
-//
-//            self.updateFormRow(rowPassword)
-//        }
-//    }
-//
-//    func SetTextRecognition(newValue: Int) {
-//
-//        let rowCompressionQuality: XLFormRowDescriptor = self.form.formRow(withTag: "compressionQuality")!
-//        let rowFileTape: XLFormRowDescriptor = self.form.formRow(withTag: "filetype")!
-//        let rowFileName: XLFormRowDescriptor = self.form.formRow(withTag: "fileName")!
-//        let rowPassword: XLFormRowDescriptor = self.form.formRow(withTag: "password")!
-//        let rowTextRecognition: XLFormRowDescriptor = self.form.formRow(withTag: "textRecognition")!
-//
-//        self.form.delegate = nil
-//
-//        if newValue == 1 {
-//            rowFileTape.selectorOptions = ["PDF","TXT"]
-//            rowFileTape.value = "PDF"
-//            fileType = "PDF"
-//            rowPassword.disabled = true
-//            rowCompressionQuality.disabled = false
-//        } else {
-//            if arrayImages.count == 1 {
-//                rowFileTape.selectorOptions = ["PDF","JPG"]
-//            } else {
-//                rowFileTape.selectorOptions = ["PDF"]
-//            }
-//            rowFileTape.value = "PDF"
-//            fileType = "PDF"
-//            rowPassword.disabled = false
-//            rowCompressionQuality.disabled = false
-//        }
-//
-//>>>>>>> feature_branded_client_4
+        
         rowFileName.value = createFileName(rowFileName.value as? String)
         self.updateFormRow(rowFileName)
         self.tableView.reloadData()
         
         CCUtility.setTextRecognitionStatus(newValue)
-        //rowTextRecognition.value = newValue
-//=======
-//        rowTextRecognition.value = newValue
-//>>>>>>> feature_branded_client_4
         
         self.form.delegate = self
     }
@@ -754,9 +538,6 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     
     // MARK: - Action
     
-//<<<<<<< HEAD
-//    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], buttonType: String, overwrite: Bool) {
-//=======
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
         
         if serverUrl != nil {
@@ -774,18 +555,11 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             let row : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
             //row.title = self.titleServerUrl
             row.cellConfig["photoLabel.text"] = self.titleServerUrl
-//
-//=======
-//            row.title = self.titleServerUrl
-//>>>>>>> feature_branded_client_4
             self.updateFormRow(row)
         }
     }
     
     func startProcessForSaving(){
-//=======
-//    @objc func save() {
-//>>>>>>> feature_branded_client_4
         
         let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
         guard let name = rowFileName.value else {
@@ -809,57 +583,19 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             showAlert()
             return
         }
-                
+        
         NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
         
         saveImages(fileNameSave: fileNameSave,fileType: "jpg",metadataConflict: nil,completion: { (success) -> Void in
-                print("jpg line of code executed")
-                if success { // this will be equal to whatever value is set in this method call
-                      print("true")
-                    saveImages(fileNameSave: fileNameSave,fileType: "png",metadataConflict: nil,completion: { (success) -> Void in
-                            print("png line of code executed")
-                            if success {
-                                if(isPDFWithOCRSwitchOn){
-                                    savePDF(ocrSwitchOn: true,completion: {(success) -> Void in
-                                        if success{
-                                            if(isPDFWithoutOCRSwitchOn){
-                                                savePDF(ocrSwitchOn: false, completion: {(success) -> Void in
-                                                    if success{
-                                                        //Save Text File
-                                                        if(isTextFileSwitchOn){
-                                                            saveTxtFile(completion: {(success) -> Void in
-                                                                if success{
-                                                                    //DELETE Files
-                                                                    showDeleteAlert()
-                                                                    NCUtility.shared.stopActivityIndicator()
-                                                                }
-                                                            })
-                                                        }else{
-                                                            //DELETE files
-                                                            showDeleteAlert()
-                                                            NCUtility.shared.stopActivityIndicator()
-                                                        }
-                                                    }
-                                                })
-                                            }else{
-                                                //Save Text File
-                                                if(isTextFileSwitchOn){
-                                                    saveTxtFile(completion: {(success) -> Void in
-                                                        if success{
-                                                            //DELETE Files
-                                                            showDeleteAlert()
-                                                            NCUtility.shared.stopActivityIndicator()
-                                                        }
-                                                    })
-                                                }else{
-                                                    //DELETE files
-                                                    showDeleteAlert()
-                                                    NCUtility.shared.stopActivityIndicator()
-                                                }
-                                            }
-                                        }
-                                    })
-                                }else {
+            print("jpg line of code executed")
+            if success { // this will be equal to whatever value is set in this method call
+                print("true")
+                saveImages(fileNameSave: fileNameSave,fileType: "png",metadataConflict: nil,completion: { (success) -> Void in
+                    print("png line of code executed")
+                    if success {
+                        if(isPDFWithOCRSwitchOn){
+                            savePDF(ocrSwitchOn: true,completion: {(success) -> Void in
+                                if success{
                                     if(isPDFWithoutOCRSwitchOn){
                                         savePDF(ocrSwitchOn: false, completion: {(success) -> Void in
                                             if success{
@@ -896,10 +632,48 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                                         }
                                     }
                                 }
+                            })
+                        }else {
+                            if(isPDFWithoutOCRSwitchOn){
+                                savePDF(ocrSwitchOn: false, completion: {(success) -> Void in
+                                    if success{
+                                        //Save Text File
+                                        if(isTextFileSwitchOn){
+                                            saveTxtFile(completion: {(success) -> Void in
+                                                if success{
+                                                    //DELETE Files
+                                                    showDeleteAlert()
+                                                    NCUtility.shared.stopActivityIndicator()
+                                                }
+                                            })
+                                        }else{
+                                            //DELETE files
+                                            showDeleteAlert()
+                                            NCUtility.shared.stopActivityIndicator()
+                                        }
+                                    }
+                                })
+                            }else{
+                                //Save Text File
+                                if(isTextFileSwitchOn){
+                                    saveTxtFile(completion: {(success) -> Void in
+                                        if success{
+                                            //DELETE Files
+                                            showDeleteAlert()
+                                            NCUtility.shared.stopActivityIndicator()
+                                        }
+                                    })
+                                }else{
+                                    //DELETE files
+                                    showDeleteAlert()
+                                    NCUtility.shared.stopActivityIndicator()
+                                }
                             }
-                        })
-                }
-            })
+                        }
+                    }
+                })
+            }
+        })
     }
     
     @objc func save() {
@@ -931,7 +705,52 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             alertController.addAction(actionOk)
             self.present(alertController, animated: true)
         }
-     
+        
+    }
+    
+    func saveData(){
+        let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
+        guard let name = rowFileName.value else {
+            return
+        }
+        if name as! String == "" {
+            return
+        }
+        
+        let ext = (name as! NSString).pathExtension.uppercased()
+        var fileNameSave = ""
+        
+        if (ext == "") {
+            fileNameSave = name as! String + "." + fileType.lowercased()
+        } else {
+            fileNameSave = (name as! NSString).deletingPathExtension + "." + fileType.lowercased()
+        }
+        
+        //Create metadata for upload
+        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+        
+        metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
+        metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
+        metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
+        
+        if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: fileNameSave) != nil {
+            
+            guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
+            conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
+            conflictViewController.serverUrl = serverUrl
+            conflictViewController.metadatasUploadInConflict = [metadataForUpload]
+            conflictViewController.delegate = self
+            
+            self.present(conflictViewController, animated: true, completion: nil)
+            
+        } else {
+            
+            NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.dismissAndUpload(metadataForUpload, fileType: "JPG")
+            }
+        }
     }
     
     func showAlert(){
@@ -1105,114 +924,93 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         
         let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
-//=======
-//        //Create metadata for upload
-//        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
-//>>>>>>> feature_branded_client_4
         
         metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
         metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
         metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
         
-       // if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: fileNameSave) != nil {
+        
+        guard let fileNameGenerateExport = CCUtility.getDirectoryProviderStorageOcId(metadataForUpload.ocId, fileNameView: metadataForUpload.fileNameView) else {
+            NCUtility.shared.stopActivityIndicator()
+            NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCreationFile)
+            return
+        }
+        
+        NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
+        
+        let pdfData = NSMutableData()
+        
+        if password.count > 0 {
+            let info: [AnyHashable: Any] = [kCGPDFContextUserPassword as String : password, kCGPDFContextOwnerPassword as String : password]
+            UIGraphicsBeginPDFContextToData(pdfData, CGRect.zero, info)
+        } else {
+            UIGraphicsBeginPDFContextToData(pdfData, CGRect.zero, nil)
+        }
+        var fontColor = UIColor.clear
+#if targetEnvironment(simulator)
+        fontColor = UIColor.red
+#endif
+        
+        for var image in self.arrayImages {
             
+            image = changeCompressionImage(image)
             
-//            guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
-//            conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
-//            conflictViewController.serverUrl = serverUrl
-//            conflictViewController.metadatasUploadInConflict = [metadataForUpload]
-//            conflictViewController.delegate = self
-//
-//            self.present(conflictViewController, animated: true, completion: nil)
+            let bounds = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
             
-        //}else {
-            
-            guard let fileNameGenerateExport = CCUtility.getDirectoryProviderStorageOcId(metadataForUpload.ocId, fileNameView: metadataForUpload.fileNameView) else {
-                NCUtility.shared.stopActivityIndicator()
-                NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCreationFile)
-                return
-            }
-            
-            NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
-            
-            let pdfData = NSMutableData()
-            
-            if password.count > 0 {
-                let info: [AnyHashable: Any] = [kCGPDFContextUserPassword as String : password, kCGPDFContextOwnerPassword as String : password]
-                UIGraphicsBeginPDFContextToData(pdfData, CGRect.zero, info)
-            } else {
-                UIGraphicsBeginPDFContextToData(pdfData, CGRect.zero, nil)
-            }
-            var fontColor = UIColor.clear
-            #if targetEnvironment(simulator)
-            fontColor = UIColor.red
-            #endif
-            
-            for var image in self.arrayImages {
+            if (ocrSwitchOn) {
                 
-                image = changeCompressionImage(image)
+                UIGraphicsBeginPDFPageWithInfo(bounds, nil)
+                image.draw(in: bounds)
                 
-                let bounds = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
+                let requestHandler = VNImageRequestHandler(cgImage: image.cgImage!, options: [:])
                 
-                //if self.form.formRow(withTag: "textRecognition")!.value as! Int == 1 {
-                if (ocrSwitchOn) {
-                    
-                    UIGraphicsBeginPDFPageWithInfo(bounds, nil)
-                    image.draw(in: bounds)
-                    
-                    let requestHandler = VNImageRequestHandler(cgImage: image.cgImage!, options: [:])
-                    
-                    let request = VNRecognizeTextRequest { (request, error) in
-                        guard let observations = request.results as? [VNRecognizedTextObservation] else {
-                            NCUtility.shared.stopActivityIndicator()
-                            return
-                        }
-                        for observation in observations {
-                            guard let textLine = observation.topCandidates(1).first else {
-                                continue
-                            }
-                            
-                            var t: CGAffineTransform = CGAffineTransform.identity
-                            t = t.scaledBy(x: image.size.width, y: -image.size.height)
-                            t = t.translatedBy(x: 0, y: -1)
-                            let rect = observation.boundingBox.applying(t)
-                            let text = textLine.string
-                            
-                            let font = UIFont.systemFont(ofSize: rect.size.height, weight: .regular)
-                            let attributes = self.bestFittingFont(for: text, in: rect, fontDescriptor: font.fontDescriptor, fontColor: fontColor)
-                            
-                            text.draw(with: rect, options: .usesLineFragmentOrigin, attributes: attributes, context: nil)
-                        }
+                let request = VNRecognizeTextRequest { (request, error) in
+                    guard let observations = request.results as? [VNRecognizedTextObservation] else {
+                        NCUtility.shared.stopActivityIndicator()
+                        return
                     }
-                    
-                    request.recognitionLevel = .accurate
-                    request.usesLanguageCorrection = true
-                    try? requestHandler.perform([request])
-                    
-                } else {
-                    
-                    UIGraphicsBeginPDFPageWithInfo(bounds, nil)
-                    image.draw(in: bounds)
+                    for observation in observations {
+                        guard let textLine = observation.topCandidates(1).first else {
+                            continue
+                        }
+                        
+                        var t: CGAffineTransform = CGAffineTransform.identity
+                        t = t.scaledBy(x: image.size.width, y: -image.size.height)
+                        t = t.translatedBy(x: 0, y: -1)
+                        let rect = observation.boundingBox.applying(t)
+                        let text = textLine.string
+                        
+                        let font = UIFont.systemFont(ofSize: rect.size.height, weight: .regular)
+                        let attributes = self.bestFittingFont(for: text, in: rect, fontDescriptor: font.fontDescriptor, fontColor: fontColor)
+                        
+                        text.draw(with: rect, options: .usesLineFragmentOrigin, attributes: attributes, context: nil)
+                    }
                 }
+                
+                request.recognitionLevel = .accurate
+                request.usesLanguageCorrection = true
+                try? requestHandler.perform([request])
+                
+            } else {
+                
+                UIGraphicsBeginPDFPageWithInfo(bounds, nil)
+                image.draw(in: bounds)
             }
-            
-            UIGraphicsEndPDFContext();
-            
-            do {
-                try pdfData.write(toFile: fileNameGenerateExport, options: .atomic)
-            } catch {
-                print("error catched")
-            }
-            
-       // }
+        }
+        
+        UIGraphicsEndPDFContext();
+        
+        do {
+            try pdfData.write(toFile: fileNameGenerateExport, options: .atomic)
+        } catch {
+            print("error catched")
+        }
         
         NCUtility.shared.stopActivityIndicator()
         
         appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
         
         completion(true)
-        // Request delete all image scanned
-        //self.showDeleteAlert()
     }
     
     fileprivate func showDeleteAlert() {
@@ -1270,15 +1068,11 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                     }
                 }
                 
-                //guard let fileName = CCUtility.createFileNameDate("scan\(count)", extension: fileType) else { return }
-                
-                let image = changeCompressionImage(arrayImages[count])
-                
                 let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
                 
                 metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
-                metadataForUpload.sessionSelector = NCBrandGlobal.shared.selectorUploadFile
-                metadataForUpload.status = NCBrandGlobal.shared.metadataStatusWaitUpload
+                metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
+                metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
                 
                 if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: fileNameSave) != nil {
                     
@@ -1292,65 +1086,16 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                     
                 } else {
                     
-                    //NCUtility.shared.startActivityIndicator(view: self.view, blurEffect: true)
-                    //NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
-                    
+                    NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        //                        self.dismissAndUpload(metadataForUpload)
-                        guard let fileNameGenerateExport = CCUtility.getDirectoryProviderStorageOcId(metadataForUpload.ocId, fileNameView: metadataForUpload.fileNameView) else {
-                            NCUtility.shared.stopActivityIndicator()
-                            NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCBrandGlobal.shared.ErrorCreationFile)
-                            return
-                        }
-                        guard let data = image.jpegData(compressionQuality: CGFloat(0.5)) else {
-                            NCUtility.shared.stopActivityIndicator()
-                            NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCBrandGlobal.shared.ErrorCreationFile)
-                            return
-                        }
-                        
-                        do {
-                            try data.write(to: NSURL.fileURL(withPath: fileNameGenerateExport), options: .atomic)
-                        } catch {
-                            NCUtility.shared.stopActivityIndicator()
-                            NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCBrandGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCBrandGlobal.shared.ErrorCreationFile)
-                            return
-                        }
-                        
-                        //NCUtility.shared.stopActivityIndicator()
-                        
-                        NCManageDatabase.shared.addMetadata(metadataForUpload)
-                        
-                        //self.appDelegate.networkingAutoUpload.startProcess()
-                        self.appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
-                        //self.showDeleteAlert()
+                        self.dismissAndUpload(metadataForUpload, fileType: fileType.uppercased())
                     }
                 }
+                
             }
             completion(true)
         }
-       
-//=======
-//
-//        if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: fileNameSave) != nil {
-//
-//            guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
-//            conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
-//            conflictViewController.serverUrl = serverUrl
-//            conflictViewController.metadatasUploadInConflict = [metadataForUpload]
-//            conflictViewController.delegate = self
-//
-//            self.present(conflictViewController, animated: true, completion: nil)
-//
-//        } else {
-//
-//            NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
-//
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-//                self.dismissAndUpload(metadataForUpload)
-//            }
-//        }
-//>>>>>>> feature_branded_client_4
     }
     
     func dismissCreateFormUploadConflict(metadatas: [tableMetadata]?) {
@@ -1360,38 +1105,30 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-               // if let metadata = metadatas![0] as? tableMetadata{
-                    if (metadatas![0].ext == "jpg"){
-                        //TODO for jpg
-                        self.dismissAndUpload(metadatas![0],fileType: "JPG")
-                        NCUtility.shared.stopActivityIndicator()
-
-                    }else if(metadatas![0].ext == "png") {
-                        //TODO for png
-                        self.dismissAndUpload(metadatas![0],fileType: "PNG")
-                        NCUtility.shared.stopActivityIndicator()
-
-
-                    }else if(metadatas![0].ext == "pdf"){
-                        //TODO for pdf
-                        self.isOCRActivatedFileConflicts = metadatas![0].fileName.contains("_OCR")
-                        self.dismissAndUpload(metadatas![0],fileType: "PDF")
-                        NCUtility.shared.stopActivityIndicator()
-
-                    }else if(metadatas![0].ext == "txt"){
-                        //TODO for txt
-                        self.dismissAndUpload(metadatas![0],fileType: "TXT")
-                        NCUtility.shared.stopActivityIndicator()
-
-                    }
-                //}
-//=======
-//
-//            NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
-//
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-//                self.dismissAndUpload(metadatas![0])
-//>>>>>>> feature_branded_client_4
+                // if let metadata = metadatas![0] as? tableMetadata{
+                if (metadatas![0].ext == "jpg"){
+                    //TODO for jpg
+                    self.dismissAndUpload(metadatas![0],fileType: "JPG")
+                    NCUtility.shared.stopActivityIndicator()
+                    
+                }else if(metadatas![0].ext == "png") {
+                    //TODO for png
+                    self.dismissAndUpload(metadatas![0],fileType: "PNG")
+                    NCUtility.shared.stopActivityIndicator()
+                    
+                    
+                }else if(metadatas![0].ext == "pdf"){
+                    //TODO for pdf
+                    self.isOCRActivatedFileConflicts = metadatas![0].fileName.contains("_OCR")
+                    self.dismissAndUpload(metadatas![0],fileType: "PDF")
+                    NCUtility.shared.stopActivityIndicator()
+                    
+                }else if(metadatas![0].ext == "txt"){
+                    //TODO for txt
+                    self.dismissAndUpload(metadatas![0],fileType: "TXT")
+                    NCUtility.shared.stopActivityIndicator()
+                    
+                }
             }
         }
     }
@@ -1406,19 +1143,6 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         // Text Recognition TXT && self.form.formRow(withTag: "textRecognition")!.value as! Int == 1
         if fileType == "TXT"  {
-//=======
-//    func dismissAndUpload(_ metadata: tableMetadata) {
-//
-//        guard let fileNameGenerateExport = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView) else {
-//            NCUtility.shared.stopActivityIndicator()
-//            NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCreationFile, forced: true)
-//            return
-//        }
-//
-//        // Text Recognition TXT
-//        if fileType == "TXT" && self.form.formRow(withTag: "textRecognition")!.value as! Int == 1 {
-//>>>>>>> feature_branded_client_4
-            
             var textFile = ""
             for image in self.arrayImages {
                 
@@ -1433,7 +1157,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                         guard let textLine = observation.topCandidates(1).first else {
                             continue
                         }
-
+                        
                         textFile += textLine.string
                         textFile += "\n"
                     }
@@ -1449,7 +1173,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             } catch {
                 NCUtility.shared.stopActivityIndicator()
                 NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCreationFile)
-
+                
                 return
             }
         }
@@ -1465,10 +1189,10 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 UIGraphicsBeginPDFContextToData(pdfData, CGRect.zero, nil)
             }
             var fontColor = UIColor.clear
-            #if targetEnvironment(simulator)
+#if targetEnvironment(simulator)
             fontColor = UIColor.red
-            #endif
-
+#endif
+            
             
             for var image in self.arrayImages {
                 
@@ -1482,13 +1206,6 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                     UIGraphicsBeginPDFPageWithInfo(bounds, nil)
                     image.draw(in: bounds)
                     
-//=======
-//                if self.form.formRow(withTag: "textRecognition")!.value as! Int == 1 {
-//
-//                    UIGraphicsBeginPDFPageWithInfo(bounds, nil)
-//                    image.draw(in: bounds)
-//
-//>>>>>>> feature_branded_client_4
                     let requestHandler = VNImageRequestHandler(cgImage: image.cgImage!, options: [:])
                     
                     let request = VNRecognizeTextRequest { (request, error) in
@@ -1509,7 +1226,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                             
                             let font = UIFont.systemFont(ofSize: rect.size.height, weight: .regular)
                             let attributes = self.bestFittingFont(for: text, in: rect, fontDescriptor: font.fontDescriptor, fontColor: fontColor)
-
+                            
                             text.draw(with: rect, options: .usesLineFragmentOrigin, attributes: attributes, context: nil)
                         }
                     }
@@ -1586,29 +1303,6 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadata])
         
-//=======
-//            let image = changeCompressionImage(self.arrayImages[0])
-//
-//            guard let data = image.jpegData(compressionQuality: CGFloat(0.5)) else {
-//                NCUtility.shared.stopActivityIndicator()
-//                NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCreationFile, forced: true)
-//                return
-//            }
-//
-//            do {
-//                try data.write(to: NSURL.fileURL(withPath: fileNameGenerateExport), options: .atomic)
-//            } catch {
-//                NCUtility.shared.stopActivityIndicator()
-//                NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCreationFile, forced: true)
-//                return
-//            }
-//        }
-//
-//        NCUtility.shared.stopActivityIndicator()
-//
-//        appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadata])
-//
-//>>>>>>> feature_branded_client_4
         // Request delete all image scanned
         let alertController = UIAlertController(title: "", message: NSLocalizedString("_delete_all_scanned_images_", comment: ""), preferredStyle: .alert)
         
@@ -1638,7 +1332,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     }
     
     @objc func cancel() {
-
+        
         
         self.dismiss(animated: true, completion: nil)
     }
@@ -1646,16 +1340,16 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {
         
         self.deselectFormRow(sender)
-
         let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
         let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
         let viewController = navigationController.topViewController as! NCSelect
-
+        
         viewController.delegate = self
         viewController.typeOfCommandView = .selectCreateFolder
         viewController.includeDirectoryE2EEncryption = true
-
+        
         self.present(navigationController, animated: true, completion: nil)
+        
     }
     
     func changeCompressionImage(_ image: UIImage) -> UIImage {
@@ -1663,7 +1357,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         var compressionQuality: CGFloat = 0.5
         var baseHeight: Float = 595.2    // A4
         var baseWidth: Float = 841.8     // A4
-
+        
         switch quality {
         case .low:
             baseHeight *= 1
@@ -1683,7 +1377,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         var newWidth = Float(image.size.width)
         var imgRatio: Float = newWidth / newHeight
         let baseRatio: Float = baseWidth / baseHeight
-
+        
         if newHeight > baseHeight || newWidth > baseWidth {
             if imgRatio < baseRatio {
                 imgRatio = baseHeight / newHeight
@@ -1750,10 +1444,10 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     
     func isAtleastOneFiletypeSelected() -> Bool{
         if(isPDFWithOCRSwitchOn
-            || isPDFWithoutOCRSwitchOn
-            || isTextFileSwitchOn
-            || isPNGFormatSwitchOn
-            || isJPGFormatSwitchOn){
+           || isPDFWithoutOCRSwitchOn
+           || isTextFileSwitchOn
+           || isPNGFormatSwitchOn
+           || isJPGFormatSwitchOn){
             
             return true
         }else{
@@ -1788,12 +1482,6 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
     }
     
     func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
-//<<<<<<< HEAD
-//
-//        for pageNumber in 0..<scan.pageCount {
-//            let fileName = CCUtility.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, keyFileName: NCGlobal.shared.keyFileNameMask, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal)!
-//=======
-
         for pageNumber in 0..<scan.pageCount {
             let fileName = CCUtility.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, keyFileName: NCGlobal.shared.keyFileNameMask, keyFileNameType: NCGlobal.shared.keyFileNameType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal, forcedNewFileName: true)!
             let fileNamePath = CCUtility.getDirectoryScan() + "/" + fileName
@@ -1810,11 +1498,6 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
                 self.appDelegate.adjust.trackEvent(TriggerEvent(DocumentScan.rawValue))
                 TealiumHelper.shared.trackEvent(title: "magentacloud-app.plus.documentscan", data: ["": ""])
                 self.reDirectToSave()
-//                let storyboard = UIStoryboard(name: "Scan", bundle: nil)
-//                let controller = storyboard.instantiateInitialViewController()!
-//
-//                controller.modalPresentationStyle = UIModalPresentationStyle.pageSheet
-//                self.viewController?.present(controller, animated: true, completion: nil)
             }
         }
     }
@@ -1827,7 +1510,7 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
         var itemsSource: [String] = []
         
         //Data Source for collectionViewDestination
-        var imagesDestination: [UIImage] = []
+        var imagesDestination: [UIImage] = [UIImage(named: "introSlide1")!,UIImage(named: "introSlide2")!,UIImage(named: "introSlide3")!]
         var itemsDestination: [String] = []
         
         do {
@@ -1862,7 +1545,7 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
             
             var images: [UIImage] = []
             var serverUrl = appDelegate.activeServerUrl
-
+            
             for image in imagesDestination {
                 images.append(image)
             }
@@ -1872,19 +1555,14 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
             }
             
             let formViewController = NCCreateFormUploadScanDocument.init(serverUrl: serverUrl, arrayImages: images)
-        
+            
             formViewController.modalPresentationStyle = UIModalPresentationStyle.pageSheet
             
             let navigationController = UINavigationController(rootViewController: formViewController)
-
+            
             //controller.addChild(formViewController)
             //controller.pushViewController(formViewController, animated: true)
             self.viewController?.present(navigationController, animated: true, completion: nil)
-
         }
     }
-
-
 }
-
-
