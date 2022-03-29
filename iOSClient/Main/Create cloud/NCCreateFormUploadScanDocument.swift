@@ -707,52 +707,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         }
         
     }
-    
-    func saveData(){
-        let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
-        guard let name = rowFileName.value else {
-            return
-        }
-        if name as! String == "" {
-            return
-        }
         
-        let ext = (name as! NSString).pathExtension.uppercased()
-        var fileNameSave = ""
-        
-        if (ext == "") {
-            fileNameSave = name as! String + "." + fileType.lowercased()
-        } else {
-            fileNameSave = (name as! NSString).deletingPathExtension + "." + fileType.lowercased()
-        }
-        
-        //Create metadata for upload
-        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
-        
-        metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
-        metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
-        metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-        
-        if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: fileNameSave) != nil {
-            
-            guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
-            conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
-            conflictViewController.serverUrl = serverUrl
-            conflictViewController.metadatasUploadInConflict = [metadataForUpload]
-            conflictViewController.delegate = self
-            
-            self.present(conflictViewController, animated: true, completion: nil)
-            
-        } else {
-            
-            NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.dismissAndUpload(metadataForUpload, fileType: "JPG")
-            }
-        }
-    }
-    
     func showAlert(){
         // Request delete all image scanned
         let alertController = UIAlertController(title: "", message: NSLocalizedString("_no_password_warn_", comment: ""), preferredStyle: .alert)
@@ -1510,7 +1465,7 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
         var itemsSource: [String] = []
         
         //Data Source for collectionViewDestination
-        var imagesDestination: [UIImage] = [UIImage(named: "introSlide1")!,UIImage(named: "introSlide2")!,UIImage(named: "introSlide3")!]
+        var imagesDestination: [UIImage] = []
         var itemsDestination: [String] = []
         
         do {
