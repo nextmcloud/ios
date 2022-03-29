@@ -149,7 +149,7 @@ extension AppDelegate {
         if serverVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isEncrypted && NCCommunication.shared.isNetworkReachable() {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: UIImage(named: "addFolderInfo")!.image(color: NCBrandColor.shared.gray, size: 50), action: { _ in
+                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: UIImage(named: "addFolderInfo")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                         let richWorkspaceCommon = NCRichWorkspaceCommon()
                         if let viewController = self.activeViewController {
                             if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView LIKE[c] %@", appDelegate.account, appDelegate.activeServerUrl, NCGlobal.shared.fileNameRichWorkspace.lowercased())) == nil {
