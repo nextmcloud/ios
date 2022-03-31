@@ -798,7 +798,7 @@ extension NCShare: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
+        let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
         var numOfRows = 0
         var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
         if let shareLink = shares.firstShareLink {
@@ -813,12 +813,13 @@ extension NCShare: UITableViewDataSource {
             for messageView in self.tableView.subviews.filter({$0.tag == 999}){
                 messageView.removeFromSuperview()
             }
-            self.tableView.setEmptyMessage(NSLocalizedString("no_shares_created", comment: ""))
+            if canReshare {
+                self.tableView.setEmptyMessage(NSLocalizedString("no_shares_created", comment: ""))
+            }
         } else {
             self.tableView.restore()
         }
-        
-        return numOfRows + 1
+        return canReshare ? (numOfRows + 1) : numOfRows
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
