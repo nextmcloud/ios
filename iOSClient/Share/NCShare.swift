@@ -137,9 +137,9 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             }
         }
         
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
             if view.frame.origin.y == 0 {
-                self.view.frame.origin.y -= 100
+                self.view.frame.origin.y -= 150
             }
         }
         if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
