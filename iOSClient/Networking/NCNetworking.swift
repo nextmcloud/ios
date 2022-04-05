@@ -466,7 +466,7 @@ import Queuer
             
             CCUtility.extractImageVideoFromAssetLocalIdentifier(forUpload: metadata, notification: true) { extractMetadata, fileNamePath in
                 
-                guard let extractMetadata = extractMetadata else {
+                guard let metadata = extractMetadata else {
                     NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
                     return completion(NCGlobal.shared.errorInternalError, "Internal error")
                 }
@@ -474,7 +474,7 @@ import Queuer
                 let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
                 NCUtilityFileSystem.shared.moveFileInBackground(atPath: fileNamePath!, toPath: fileNameLocalPath)
                 
-                uploadMetadata(extractMetadata)
+                uploadMetadata(metadata)
             }
         }
     }
