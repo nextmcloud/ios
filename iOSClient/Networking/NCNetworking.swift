@@ -445,7 +445,7 @@ import Queuer
         
         let metadata = tableMetadata.init(value: metadata)
         
-        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+        if CCUtility.fileProviderStorageExists(metadata) {
             
             let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
             let results = NCCommunicationCommon.shared.getInternalType(fileName: metadata.fileNameView, mimeType: metadata.contentType, directory: false)
@@ -1345,7 +1345,7 @@ import Queuer
     
     func getVideoUrl(metadata: tableMetadata, completition: @escaping (_ url: URL?) -> Void) {
         
-        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+        if CCUtility.fileProviderStorageExists(metadata) {
             
             completition(URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)))
             
