@@ -15,6 +15,9 @@
 		2CB7D1CA23E2EDCB00376EF9 /* NCPushNotificationEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F72D1005210B6882009C96B7 /* NCPushNotificationEncryption.m */; };
 		370D26AF248A3D7A00121797 /* NCImageCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCImageCellProtocol.swift */; };
 		5621BD7E27DA6A36005A3389 /* NCMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5621BD7D27DA6A36005A3389 /* NCMenuAction.swift */; };
+		564BFD9927C7A9930047252F /* NCViewerImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70753EA2542A99800972D44 /* NCViewerImage.swift */; };
+		564BFD9A27C7AC5E0047252F /* NCViewerImageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F718C24D254D507B00C5C256 /* NCViewerImageDetailView.swift */; };
+		564BFD9B27C7AC660047252F /* NCViewerVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F752011C25480387000BF3A7 /* NCViewerVideo.swift */; };
 		5672096D27B5201000413A96 /* NCShareCommentsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9E727B38370007B1772 /* NCShareCommentsCell.swift */; };
 		5672096F27B5209200413A96 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5672096E27B5209200413A96 /* NCActivityTableViewCell.swift */; };
 		5672097027B5358600413A96 /* UIApplication+Orientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9E227B37FFC007B1772 /* UIApplication+Orientation.swift */; };
@@ -25,8 +28,6 @@
 		5672097727B54A2100413A96 /* UIControl+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9E327B37FFC007B1772 /* UIControl+Extensions.swift */; };
 		567EDE1927B3DC1600181E7E /* NCEndToEndEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F70CAE391F8CF31A008125FD /* NCEndToEndEncryption.m */; };
 		568012CB27BA286300BEEE4D /* NCViewerImageZoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70753F02542A9A200972D44 /* NCViewerImageZoom.swift */; };
-		568012CC27BA28E600BEEE4D /* NCViewerImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70753EA2542A99800972D44 /* NCViewerImage.swift */; };
-		568012CD27BA554C00BEEE4D /* NCViewerVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F752011C25480387000BF3A7 /* NCViewerVideo.swift */; };
 		5696256A27B289C6003F774D /* QRCodeReader in Frameworks */ = {isa = PBXBuildFile; productRef = F7ED547B25EEA65400956C55 /* QRCodeReader */; };
 		5696256B27B289C6003F774D /* SwiftRichString in Frameworks */ = {isa = PBXBuildFile; productRef = F72DA9B325F53E4E00B87DB1 /* SwiftRichString */; };
 		5696256C27B289C6003F774D /* FloatingPanel in Frameworks */ = {isa = PBXBuildFile; productRef = F770768D263A8C3400A1BA94 /* FloatingPanel */; };
@@ -129,6 +130,8 @@
 		56E9B9FB27B39DFC007B1772 /* NYMnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9F627B39DFC007B1772 /* NYMnemonic.m */; };
 		56E9B9FC27B39DFC007B1772 /* english.txt in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B9F827B39DFC007B1772 /* english.txt */; };
 		56E9B9FD27B39DFC007B1772 /* english.txt in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B9F827B39DFC007B1772 /* english.txt */; };
+		56F260FA27D2264200365F78 /* NCShareSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56F260F827D2264100365F78 /* NCShareSectionHeaderView.swift */; };
+		56F260FD27D2276900365F78 /* NCShareSectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56F260FC27D2276900365F78 /* NCShareSectionHeaderView.xib */; };
 		7A29E0EF269873A600B239BA /* InitialPrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */; };
 		7A4619A227BF71F40042D595 /* NCTrash+CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4619A127BF71F40042D595 /* NCTrash+CollectionView.swift */; };
 		7A4619A627BF72440042D595 /* UIBarButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4619A527BF72440042D595 /* UIBarButton+Extension.swift */; };
@@ -330,7 +333,6 @@
 		F7145A231D12E3B700CAFEEC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F7E70DE91A24DE4100E1B66A /* Localizable.strings */; };
 		F717402D24F699A5000C87D5 /* NCFavorite.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F717402B24F699A5000C87D5 /* NCFavorite.storyboard */; };
 		F717402E24F699A5000C87D5 /* NCFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = F717402C24F699A5000C87D5 /* NCFavorite.swift */; };
-		F718C24E254D507B00C5C256 /* NCViewerImageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F718C24D254D507B00C5C256 /* NCViewerImageDetailView.swift */; };
 		F7226EDC1EE4089300EBECB1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7226EDB1EE4089300EBECB1 /* Main.storyboard */; };
 		F722814323C8C34500C41898 /* NCRichWorkspace.xib in Resources */ = {isa = PBXBuildFile; fileRef = F722814223C8C34500C41898 /* NCRichWorkspace.xib */; };
 		F723985C253C95CE00257F49 /* NCViewerRichdocument.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F723985B253C95CE00257F49 /* NCViewerRichdocument.storyboard */; };
@@ -622,6 +624,8 @@
 		56E9B9F627B39DFC007B1772 /* NYMnemonic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NYMnemonic.m; sourceTree = "<group>"; };
 		56E9B9F827B39DFC007B1772 /* english.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = english.txt; sourceTree = "<group>"; };
 		56E9B9F927B39DFC007B1772 /* NYMnemonic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NYMnemonic.h; sourceTree = "<group>"; };
+		56F260F827D2264100365F78 /* NCShareSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareSectionHeaderView.swift; sourceTree = "<group>"; };
+		56F260FC27D2276900365F78 /* NCShareSectionHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareSectionHeaderView.xib; sourceTree = "<group>"; };
 		75D9B76604BC04F7789A83AF /* Pods-Nextcloud.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Nextcloud.release.xcconfig"; path = "Target Support Files/Pods-Nextcloud/Pods-Nextcloud.release.xcconfig"; sourceTree = "<group>"; };
 		7A29E0EE269873A600B239BA /* InitialPrivacySettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialPrivacySettingsViewController.swift; sourceTree = "<group>"; };
 		7A4619A127BF71F40042D595 /* NCTrash+CollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCTrash+CollectionView.swift"; sourceTree = "<group>"; };
@@ -1477,6 +1481,8 @@
 				C0D6061726C2ABF900B67843 /* NCShareAdvancePermissionFooter.swift */,
 				C0D6061D26C2AC1200B67843 /* NCShareAdvancePermissionFooter.xib */,
 				B15AD4B5273D940D00490E0B /* ShareDownloadLimitNetwork.swift */,
+				56F260F827D2264100365F78 /* NCShareSectionHeaderView.swift */,
+				56F260FC27D2276900365F78 /* NCShareSectionHeaderView.xib */,
 			);
 			path = Share;
 			sourceTree = "<group>";
@@ -2450,6 +2456,7 @@
 				7AE63BFE26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect.xib in Resources */,
 				F7F1E54C2492369A00E42386 /* NCMediaCommandView.xib in Resources */,
 				F710E8111EF95C9C00DC2427 /* ImagesIntro.xcassets in Resources */,
+				56F260FD27D2276900365F78 /* NCShareSectionHeaderView.xib in Resources */,
 				95353BA3267232A100E5F8B0 /* PasswordInputField.xib in Resources */,
 				F76032A0252F0F8E0015A421 /* NCTransferCell.xib in Resources */,
 				F74C0437253F1CDC009762AB /* NCShares.storyboard in Resources */,
@@ -2738,6 +2745,7 @@
 				F769454022E9F077000A798A /* NCSharePaging.swift in Sources */,
 				95BB2085265FEF3F00AF4344 /* NCMedia+Menu.swift in Sources */,
 				95BB2084265FEF3F00AF4344 /* AppDelegate+Menu.swift in Sources */,
+				564BFD9A27C7AC5E0047252F /* NCViewerImageDetailView.swift in Sources */,
 				F76D3CF12428B40E005DFA87 /* NCViewerPDFSearch.swift in Sources */,
 				7A4619A627BF72440042D595 /* UIBarButton+Extension.swift in Sources */,
 				F73F537F1E929C8500F8678D /* NCMore.swift in Sources */,
@@ -2745,11 +2753,11 @@
 				F72CD63A25C19EBF00F46F9A /* NCAutoUpload.swift in Sources */,
 				F7DFB7F0219C5B8000680748 /* NCCreateFormUploadAssets.swift in Sources */,
 				F73B422C2476764F00A30FD3 /* NCNotification.swift in Sources */,
-				568012CC27BA28E600BEEE4D /* NCViewerImage.swift in Sources */,
 				7A70DD9127B4D5570018F47E /* UIViewController+Menu.swift in Sources */,
 				956E0D81266A4C7F00DA4F91 /* TextFileWithOcrSwitchView.swift in Sources */,
 				7A875EE026943DB100AF558D /* HelpViewController.swift in Sources */,
 				56A5108627B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */,
+				56F260FA27D2264200365F78 /* NCShareSectionHeaderView.swift in Sources */,
 				F77444F8222816D5000D5EB0 /* NCPickerViewController.swift in Sources */,
 				F72A47EC2487B06B005AD489 /* NCOperationQueue.swift in Sources */,
 				7AE63B2A26DCFB2600CEAAD5 /* NCNetworkingChunkedUpload.swift in Sources */,
@@ -2806,6 +2814,7 @@
 				7A875EE626943DF000AF558D /* ImprintViewController.swift in Sources */,
 				F77B0E5F1D118A16002130FE /* NCSettings.m in Sources */,
 				F7F9D1BB25397CE000D9BFF5 /* NCViewer.swift in Sources */,
+				564BFD9927C7A9930047252F /* NCViewerImage.swift in Sources */,
 				F70460522499061800BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
 				7A875EDA26943BC200AF558D /* OpenSourceSoftwareViewController.swift in Sources */,
 				F78F74362163781100C2ADAD /* NCTrash.swift in Sources */,
@@ -2822,6 +2831,7 @@
 				F7239871253D86B600257F49 /* NCEmptyDataSet.swift in Sources */,
 				F7F878AE1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */,
 				F7DBC37C23325E02001A85BA /* NCAppConfigView.swift in Sources */,
+				564BFD9B27C7AC660047252F /* NCViewerVideo.swift in Sources */,
 				F73D5E47246DE09200DF6467 /* NCElementsJSON.swift in Sources */,
 				F710D1F52405770F00A6033D /* NCViewerPDF.swift in Sources */,
 				F7501C332212E57500FB1415 /* NCMedia.swift in Sources */,
@@ -2836,7 +2846,6 @@
 				F749C10B23C4A5340027D966 /* NCIntroCollectionViewCell.swift in Sources */,
 				7A4619AA27BF72810042D595 /* NCSelectableNavigationView.swift in Sources */,
 				B15AD4B6273D940D00490E0B /* ShareDownloadLimitNetwork.swift in Sources */,
-				F718C24E254D507B00C5C256 /* NCViewerImageDetailView.swift in Sources */,
 				7AD162D32754F8CE001A5DC4 /* TealiumHelper.swift in Sources */,
 				C0D6063E26CBB12F00B67843 /* NCFilePermissionCell.swift in Sources */,
 				F7381EE1218218C9000B1560 /* NCOffline.swift in Sources */,
@@ -2881,7 +2890,6 @@
 				F707C26521A2DC5200F6181E /* NCStoreReview.swift in Sources */,
 				7AE63AEF26D633BA00CEAAD5 /* NCCollectionViewCommon.swift in Sources */,
 				7A875F0626946CDE00AF558D /* RequiredDataCollectionSwitch.swift in Sources */,
-				568012CD27BA554C00BEEE4D /* NCViewerVideo.swift in Sources */,
 				F7BAADCB1ED5A87C00B7EAD4 /* NCManageDatabase.swift in Sources */,
 				F70968A424212C4E00ED60E5 /* NCLivePhoto.swift in Sources */,
 				C0D6064426CCDCFF00B67843 /* NCFilePermissionEditPasswordCell.swift in Sources */,
@@ -3303,7 +3311,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
@@ -3330,7 +3338,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 7.4.0.4.7;
+				MARKETING_VERSION = 7.0.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
 				OTHER_LDFLAGS = (
@@ -3367,7 +3375,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
@@ -3392,7 +3400,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 7.4.0.4.7;
+				MARKETING_VERSION = 7.0.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
 				OTHER_LDFLAGS = (
@@ -3699,8 +3707,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rechsteiner/Parchment";
 			requirement = {
-				kind = exactVersion;
-				version = 2.4.0;
+				branch = main;
+				kind = branch;
 			};
 		};
 		569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */ = {

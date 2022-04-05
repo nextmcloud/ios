@@ -393,6 +393,15 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                         })
                     }
                 }
+            } else if let ocId = userInfo["ocId"] as? String {
+                if let row = dataSource.deleteMetadata(ocId: ocId) {
+                    let indexPath = IndexPath(row: row, section: 0)
+                    collectionView?.performBatchUpdates({
+                        collectionView?.deleteItems(at: [indexPath])
+                    }, completion: { (_) in
+                        self.collectionView?.reloadData()
+                    })
+                }
             }
         }
     }
@@ -1510,7 +1519,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                     cell.imageItem.image =  UIImage(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag))
                 } else {
                     if metadata.hasPreview {
-                        cell.imageItem.backgroundColor = .lightGray
+                        cell.imageItem.backgroundColor = metadata.ext == "pdf" ? nil : .lightGray
                     } else {
                         if metadata.iconName.count > 0 {
                             cell.imageItem.image = UIImage.init(named: metadata.iconName)
