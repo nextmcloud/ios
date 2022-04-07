@@ -505,7 +505,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                     }
                 }
             }
-            let image: UIImage? = sharee.shareType == NCShareCommon.shared.SHARE_TYPE_USER ? NCShareCommon.shared.getImageShareType(shareType: sharee.shareType) : nil
+            let image: UIImage? = NCShareCommon.shared.getImageShareType(shareType: sharee.shareType, isDropDown: true)
             cell.imageShareeType.image = image
         }
         

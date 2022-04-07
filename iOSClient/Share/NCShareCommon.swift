@@ -226,7 +226,7 @@ class NCShareCommon: NSObject {
         viewController.present(activityViewController, animated: true, completion: nil)
     }
 
-    func getImageShareType(shareType: Int) -> UIImage? {
+    func getImageShareType(shareType: Int, isDropDown:Bool = false) -> UIImage? {
 
         switch shareType {
         case SHARE_TYPE_USER:
@@ -237,11 +237,11 @@ class NCShareCommon: NSObject {
             return UIImage(named: "shareTypeLink")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_EMAIL:
 //            return UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.textView)
-            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
+            return UIImage(named: isDropDown ? "email" : "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_CONTACT:
             return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_REMOTE:
-            return UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.label)
+            return UIImage(named: isDropDown ? "shareTypeUser" : "shareTypeEmail")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_CIRCLE:
             return UIImage(named: "shareTypeCircles")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_GUEST:
