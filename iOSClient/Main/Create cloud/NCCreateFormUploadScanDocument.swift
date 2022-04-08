@@ -791,55 +791,11 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 self.present(conflictViewController, animated: true, completion: nil)
                 
             }else {
-                guard let fileNameGenerateExport = CCUtility.getDirectoryProviderStorageOcId(metadataForUpload.ocId, fileNameView: metadataForUpload.fileNameView) else {
-                    NCUtility.shared.stopActivityIndicator()
-                    NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCreationFile)
-                    return
+                NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.dismissAndUpload(metadataForUpload, fileType: "TXT")
                 }
-                
-                // Text Recognition TXT
-                //if fileType == "TXT" && self.form.formRow(withTag: "textRecognition")!.value as! Int == 1 {
-                
-                var textFile = ""
-                // for image in self.arrayImages {
-                
-                let requestHandler = VNImageRequestHandler(cgImage: arrayImages[count].cgImage!, options: [:])
-                
-                let request = VNRecognizeTextRequest { (request, error) in
-                    guard let observations = request.results as? [VNRecognizedTextObservation] else {
-                        NCUtility.shared.stopActivityIndicator()
-                        return
-                    }
-                    for observation in observations {
-                        guard let textLine = observation.topCandidates(1).first else {
-                            continue
-                        }
-                        
-                        textFile += textLine.string
-                        textFile += "\n"
-                    }
-                }
-                
-                request.recognitionLevel = .accurate
-                request.usesLanguageCorrection = true
-                try? requestHandler.perform([request])
-                //}
-                
-                do {
-                    try textFile.write(to: NSURL(fileURLWithPath: fileNameGenerateExport) as URL  , atomically: true, encoding: .utf8)
-                } catch {
-                    NCUtility.shared.stopActivityIndicator()
-                    NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCreationFile)
-                    return
-                }
-                
-                
-                NCUtility.shared.stopActivityIndicator()
-                
-                appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
-                
-                //                        // Request delete all image scanned
-                //self.showDeleteAlert()
             }
         }
         completion(true)
@@ -884,86 +840,11 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
         metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
         
-        
-        guard let fileNameGenerateExport = CCUtility.getDirectoryProviderStorageOcId(metadataForUpload.ocId, fileNameView: metadataForUpload.fileNameView) else {
-            NCUtility.shared.stopActivityIndicator()
-            NCContentPresenter.shared.messageNotification("_error_", description: "_error_creation_file_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorCreationFile)
-            return
-        }
-        
         NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
         
-        let pdfData = NSMutableData()
-        
-        if password.count > 0 {
-            let info: [AnyHashable: Any] = [kCGPDFContextUserPassword as String : password, kCGPDFContextOwnerPassword as String : password]
-            UIGraphicsBeginPDFContextToData(pdfData, CGRect.zero, info)
-        } else {
-            UIGraphicsBeginPDFContextToData(pdfData, CGRect.zero, nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.dismissAndUpload(metadataForUpload, fileType: "PDF")
         }
-        var fontColor = UIColor.clear
-#if targetEnvironment(simulator)
-        fontColor = UIColor.red
-#endif
-        
-        for var image in self.arrayImages {
-            
-            image = changeCompressionImage(image)
-            
-            let bounds = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
-            
-            if (ocrSwitchOn) {
-                
-                UIGraphicsBeginPDFPageWithInfo(bounds, nil)
-                image.draw(in: bounds)
-                
-                let requestHandler = VNImageRequestHandler(cgImage: image.cgImage!, options: [:])
-                
-                let request = VNRecognizeTextRequest { (request, error) in
-                    guard let observations = request.results as? [VNRecognizedTextObservation] else {
-                        NCUtility.shared.stopActivityIndicator()
-                        return
-                    }
-                    for observation in observations {
-                        guard let textLine = observation.topCandidates(1).first else {
-                            continue
-                        }
-                        
-                        var t: CGAffineTransform = CGAffineTransform.identity
-                        t = t.scaledBy(x: image.size.width, y: -image.size.height)
-                        t = t.translatedBy(x: 0, y: -1)
-                        let rect = observation.boundingBox.applying(t)
-                        let text = textLine.string
-                        
-                        let font = UIFont.systemFont(ofSize: rect.size.height, weight: .regular)
-                        let attributes = self.bestFittingFont(for: text, in: rect, fontDescriptor: font.fontDescriptor, fontColor: fontColor)
-                        
-                        text.draw(with: rect, options: .usesLineFragmentOrigin, attributes: attributes, context: nil)
-                    }
-                }
-                
-                request.recognitionLevel = .accurate
-                request.usesLanguageCorrection = true
-                try? requestHandler.perform([request])
-                
-            } else {
-                
-                UIGraphicsBeginPDFPageWithInfo(bounds, nil)
-                image.draw(in: bounds)
-            }
-        }
-        
-        UIGraphicsEndPDFContext();
-        
-        do {
-            try pdfData.write(toFile: fileNameGenerateExport, options: .atomic)
-        } catch {
-            print("error catched")
-        }
-        
-        NCUtility.shared.stopActivityIndicator()
-        
-        appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
         
         completion(true)
     }
