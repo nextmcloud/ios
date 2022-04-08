@@ -3311,7 +3311,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
@@ -3375,7 +3375,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
@@ -3795,8 +3795,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SVGKit/SVGKit.git";
 			requirement = {
-				branch = 3.x;
-				kind = branch;
+				kind = upToNextMinorVersion;
+				minimumVersion = 3.0.0;
 			};
 		};
 		F75EAED626D2552E00F4320E /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
