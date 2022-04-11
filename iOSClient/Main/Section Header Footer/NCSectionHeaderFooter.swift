@@ -105,11 +105,9 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
     func setStatusButton(count: Int) {
 
         if count == 0 {
-            buttonSwitch.isEnabled = false
             buttonOrder.isEnabled = false
             buttonMore.isEnabled = false
         } else {
-            buttonSwitch.isEnabled = true
             buttonOrder.isEnabled = true
             buttonMore.isEnabled = true
         }
