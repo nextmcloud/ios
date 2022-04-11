@@ -377,28 +377,17 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     
     @objc func deleteFile(_ notification: NSNotification) {
         
-        if let userInfo = notification.userInfo as NSDictionary? {
-            if let ocId = userInfo["ocId"] as? String, let fileNameView = userInfo["fileNameView"] as? String, let onlyLocal = userInfo["onlyLocal"] as? Bool {
-                if onlyLocal {
-                    reloadDataSource()
-                } else if fileNameView.lowercased() == NCGlobal.shared.fileNameRichWorkspace.lowercased() {
-                    reloadDataSourceNetwork(forced: true)
-                } else {
-                    if let row = dataSource.deleteMetadata(ocId: ocId) {
-                        let indexPath = IndexPath(row: row, section: 0)
-                        collectionView?.performBatchUpdates({
-                            collectionView?.deleteItems(at: [indexPath])
-                        }, completion: { (_) in
-                            self.collectionView?.reloadData()
-                        })
-                    }
-                }
-            } else if let ocId = userInfo["ocId"] as? String {
+        if let userInfo = notification.userInfo as NSDictionary?, let ocId = userInfo["ocId"] as? String, let fileNameView = userInfo["fileNameView"] as? String, let onlyLocalCache = userInfo["onlyLocalCache"] as? Bool {
+            if onlyLocalCache {
+                reloadDataSource()
+            } else if fileNameView.lowercased() == NCGlobal.shared.fileNameRichWorkspace.lowercased() {
+                reloadDataSourceNetwork(forced: true)
+            } else {
                 if let row = dataSource.deleteMetadata(ocId: ocId) {
                     let indexPath = IndexPath(row: row, section: 0)
                     collectionView?.performBatchUpdates({
                         collectionView?.deleteItems(at: [indexPath])
-                    }, completion: { (_) in
+                    }, completion: { _ in
                         self.collectionView?.reloadData()
                     })
                 }

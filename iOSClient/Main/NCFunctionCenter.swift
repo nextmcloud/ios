@@ -798,7 +798,7 @@ import SVGKit
         
         
         let deleteConfirmLocal = UIAction(title: NSLocalizedString("_remove_local_file_", comment: ""), image: UIImage(systemName: "trash"), attributes: .destructive) { action in
-            NCNetworking.shared.deleteMetadata(metadata, onlyLocalCache: false) { errorCode, errorDescription in
+            NCNetworking.shared.deleteMetadata(metadata, onlyLocalCache: true) { errorCode, errorDescription in
             }
         }
         
