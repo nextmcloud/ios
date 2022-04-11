@@ -124,15 +124,15 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     @objc func keyboardWillShow(notification: Notification) {
         if UIDevice.current.userInterfaceIdiom == .phone {
-            if UIScreen.main.bounds.width == 375, UIScreen.main.bounds.height == 812 {
-                if view.frame.origin.y == 0 {
-                    self.view.frame.origin.y -= 100
-                }
-            } else if (UIScreen.main.bounds.width < 376 || UIDevice.current.orientation.isLandscape) {
+           if (UIScreen.main.bounds.width < 376 || UIDevice.current.orientation.isLandscape) {
                 if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
                     if view.frame.origin.y == 0 {
                         self.view.frame.origin.y -= keyboardSize.height
                     }
+                }
+            } else if UIScreen.main.bounds.height < 850 {
+                if view.frame.origin.y == 0 {
+                    self.view.frame.origin.y -= 100
                 }
             }
         }
