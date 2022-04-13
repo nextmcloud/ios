@@ -231,7 +231,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let metadata = self.metadata else { return }
         
         let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
-        tapCopy(with: shares.firstShareLink, sender: sender)
+        tapCopy(with: shares.firstShareLink, sender: sender, index: 0)
     }
     
     @IBAction func touchUpInsideButtonCopyInernalLink(_ sender: Any) {
@@ -291,16 +291,16 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         return gestureRecognizer.view == touch.view
     }
     
-    func tapCopy(with tableShare: tableShare?, sender: Any) {
-        
-        if let link = tableShare?.url {
+    func tapCopy(with tableShare: tableShare?, sender: Any, index: Int) {
+        let share = (tableShare?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShare
+        if let link = share?.url {
             NCShareCommon.shared.copyLink(link: link, viewController: self, sender: sender)
         }
     }
     
-    func switchCanEdit(with tableShare: tableShare?, switch: Bool, sender: UISwitch) {
-        
-        guard let tableShare = tableShare else { return }
+    func switchCanEdit(with tableShare: tableShare?, switch: Bool, sender: UISwitch, index: Int) {
+        let share = (tableShare?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShare
+        guard let tableShare = share else { return }
         guard let metadata = self.metadata else { return }
         
         let canShare = CCUtility.isPermission(toCanShare: tableShare.permissions)
@@ -349,36 +349,20 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     //    }
     
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int) {
-        
-        guard let tableShare = tableShare else { return }
+        let share = (tableShare?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShare
+        guard let tableShare = share else { return }
         guard let metadata = self.metadata else { return }
         
         self.tableShareSelected = tableShare
         self.sendEmailSelected = index
         let isFolder = metadata.directory
         if tableShare.shareType == 3 {
-            //            let views = NCShareCommon.shared.openViewMenuShareLink(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-            //            shareLinkMenuView = views.shareLinkMenuView
-            //            shareMenuViewWindow = views.viewWindow
-            //            let shareMenu = NCShareMenu()
-            //            shareMenu.toggleMenu(viewController: self)
-            //            let views = NCShareCommon.shared.openViewMenuShareLink(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-            //            shareLinkMenuView = views.shareLinkMenuView
-            //            shareMenuViewWindow = views.viewWindow
             let shareMenu = NCShareMenu()
             let isFolder = metadata.directory
             shareMenu.toggleMenu(viewController: self, sendMail: false, folder: isFolder)
             
             let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
             tap.delegate = self
-            //            shareUserMenuView = views.shareUserMenuView
-            //            shareMenuViewWindow = views.viewWindow
-            //            let shareMenu = NCShareMenu()
-            //            shareMenu.toggleMenu(viewController: self)
-            //            shareMenu.toggleMenu(viewController: self, sendMail: true)
-            //
-            //            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-            //            tap.delegate = self
         } else {
             let shareMenu = NCShareMenu()
             shareMenu.toggleMenu(viewController: self, sendMail: true, folder: isFolder)
@@ -640,6 +624,11 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
     }
     
+    func getShareFromIndex(index: Int) -> tableShare? {
+        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        return shares.share?[index]
+    }
+    
     @objc func shareMenuAdvancePermissionClicked() {
         //        let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
         //        let directory = self.metadata?.directory
@@ -702,8 +691,9 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     // MARK: -StatusChangeNotification
-    func quickStatus(with tableShare: tableShare?, sender: UIButton) {
-        guard let tableShare = tableShare else { return }
+    func quickStatus(with tableShare: tableShare?, sender: UIButton, index: Int) {
+        let share = (tableShare?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShare
+        guard let tableShare = share else { return }
         let directory = self.metadata?.directory ?? false
         let editingAllowed = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: tableShare.shareType)
         if editingAllowed {
@@ -716,8 +706,9 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     
-    func quickStatusLink(with tableShare: tableShare?, sender: UIButton) {
-        guard let tableShare = tableShare else { return }
+    func quickStatusLink(with tableShare: tableShare?, sender: UIButton, index: Int) {
+        let share = (tableShare?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShare
+        guard let tableShare = share else { return }
         let directory = metadata?.directory ?? false
         
         if directory {
@@ -1115,7 +1106,7 @@ class NCShareUserCell: UITableViewCell {
     }
     
     @IBAction func switchCanEditChanged(sender: UISwitch) {
-        delegate?.switchCanEdit(with: tableShare, switch: sender.isOn, sender: sender)
+        delegate?.switchCanEdit(with: tableShare, switch: sender.isOn, sender: sender, index: indexSelected!)
     }
     
     @IBAction func touchUpInsideMenu(_ sender: Any) {
@@ -1123,14 +1114,14 @@ class NCShareUserCell: UITableViewCell {
     }
     
     @IBAction func quickStatusClicked(_ sender: UIButton) {
-        delegate?.quickStatus(with: tableShare, sender: sender)
+        delegate?.quickStatus(with: tableShare, sender: sender, index: indexSelected!)
     }
 }
 
 protocol NCShareUserCellDelegate: AnyObject {
-    func switchCanEdit(with tableShare: tableShare?, switch: Bool, sender: UISwitch)
+    func switchCanEdit(with tableShare: tableShare?, switch: Bool, sender: UISwitch, index: Int)
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int)
-    func quickStatus(with tableShare: tableShare?, sender: UIButton)
+    func quickStatus(with tableShare: tableShare?, sender: UIButton, index: Int)
 }
 
 // MARK: - NCShareUserDropDownCell
