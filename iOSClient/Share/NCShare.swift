@@ -124,7 +124,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     @objc func keyboardWillShow(notification: Notification) {
         if UIDevice.current.userInterfaceIdiom == .phone {
-           if (UIScreen.main.bounds.width < 376 || UIDevice.current.orientation.isLandscape) {
+           if (UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape) {
                 if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
                     if view.frame.origin.y == 0 {
                         self.view.frame.origin.y -= keyboardSize.height
@@ -213,6 +213,16 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let searchString = textField.text else { return }
         
         networking?.getSharees(searchString: searchString)
+        self.shareeEmail = searchString
+    }
+    
+    @IBAction func searchFieldDidChange(textField: UITextField) {
+        guard let searchString = textField.text else {return}
+        if searchString.count == 0 {
+            dropDown.hide()
+        } else {
+            networking?.getSharees(searchString: searchString)
+        }
         self.shareeEmail = searchString
     }
     
@@ -762,16 +772,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
 }
 
 extension NCShare: UITextFieldDelegate {
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        let searchString = "\(textField.text ?? "")\(string)"
-        if searchString.count == 1, string == "" {
-            dropDown.hide()
-        } else {
-            networking?.getSharees(searchString: searchString)
-        }
-        self.shareeEmail = searchString
-        return true
-    }
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
         if let text = textField.text?.trimmingCharacters(in: .whitespaces), !text.isEmpty {
@@ -831,6 +831,7 @@ extension NCShare: UITableViewDataSource {
         if indexPath.row == 0 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "NCShareEmailFieldCell", for: indexPath) as! NCShareEmailFieldCell
             cell.searchField.addTarget(self, action: #selector(searchFieldDidEndOnExit(textField:)), for: .editingDidEndOnExit)
+            cell.searchField.addTarget(self, action: #selector(searchFieldDidChange(textField:)), for: .editingChanged)
             cell.searchField.delegate = self
             cell.btnCreateLink.addTarget(self, action: #selector(createLinkClicked(_:)), for: .touchUpInside)
             return cell
