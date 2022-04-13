@@ -49,7 +49,7 @@ class NCShareLinkCell: UITableViewCell {
     }
 
     @IBAction func touchUpInsideCopy(_ sender: Any) {
-        delegate?.tapCopy(with: tableShare, sender: sender)
+        delegate?.tapCopy(with: tableShare, sender: sender, index: indexSelected!)
     }
     
     @IBAction func touchUpInsideMenu(_ sender: Any) {
@@ -57,14 +57,14 @@ class NCShareLinkCell: UITableViewCell {
     }
     
     @IBAction func quickStatusClicked(_ sender: UIButton) {
-        delegate?.quickStatusLink(with: tableShare, sender: sender)
+        delegate?.quickStatusLink(with: tableShare, sender: sender, index: indexSelected!)
     }
 }
 
 
 
 protocol NCShareLinkCellDelegate: class {
-    func tapCopy(with tableShare: tableShare?, sender: Any)
+    func tapCopy(with tableShare: tableShare?, sender: Any, index: Int)
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int)
-    func quickStatusLink(with tableShare: tableShare?, sender: UIButton)
+    func quickStatusLink(with tableShare: tableShare?, sender: UIButton, index: Int)
 }
