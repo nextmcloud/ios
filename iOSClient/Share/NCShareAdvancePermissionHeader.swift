@@ -10,6 +10,8 @@ import UIKit
 
 class NCShareAdvancePermissionHeader: UIView {
     
+    @IBOutlet weak var trailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var leadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var fileName: UILabel!
     @IBOutlet weak var info: UILabel!
@@ -20,7 +22,12 @@ class NCShareAdvancePermissionHeader: UIView {
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var delegate: NCShareAdvancePermissionHeaderDelegate?
     var ocId = ""
-        
+    
+    override func layoutSubviews() {
+        trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
+        leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
+    }
+    
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         delegate?.favoriteClicked()
 //        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
