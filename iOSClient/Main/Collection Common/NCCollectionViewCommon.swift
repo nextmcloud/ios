@@ -699,7 +699,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 view.emptyTitle.text = NSLocalizedString(emptyTitle, comment: "")
                 view.emptyDescription.text = NSLocalizedString(emptyDescription, comment: "")
             } else {
-                view.emptyImage.image = UIImage.init(named: "folder")
+                view.emptyImage.image = UIImage.init(named: "folder_nmcloud")
                 view.emptyTitle.text = NSLocalizedString("_files_no_files_", comment: "")
                 view.emptyDescription.text = NSLocalizedString("_no_file_pull_down_", comment: "")
             }
