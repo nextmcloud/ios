@@ -14,6 +14,8 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
     @IBOutlet weak var seperatorBottom: UIView!
     @IBOutlet weak var cellTextField: UITextField!
     @IBOutlet weak var calendarImageView: UIImageView!
+    @IBOutlet weak var trailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var leadingConstraint: NSLayoutConstraint!
     
     let datePicker = UIDatePicker()
     var expirationDateText: String!
@@ -33,6 +35,11 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
     
     override func configure() {
         super.configure()
+    }
+    
+    override func layoutSubviews() {
+        trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
+        leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
     }
     
     override func update() {
