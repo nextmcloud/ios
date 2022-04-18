@@ -28,8 +28,10 @@ class NCShareHeaderCustomCell: XLFormBaseCell {
         super.configure()
     }
     override func layoutSubviews() {
-        trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 56 : 16
-        leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 56 : 16
+        if (UIDevice.current.userInterfaceIdiom != .pad){
+            trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 56 : 16
+            leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 56 : 16
+        }
     }
     override func update() {
         self.backgroundColor = .clear

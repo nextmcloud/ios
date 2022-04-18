@@ -24,8 +24,10 @@ class NCShareAdvancePermissionHeader: UIView {
     var ocId = ""
     
     override func layoutSubviews() {
-        trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
-        leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
+        if (UIDevice.current.userInterfaceIdiom != .pad){
+            trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
+            leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
+        }
     }
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
