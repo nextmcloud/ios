@@ -257,7 +257,7 @@ extension NCViewer {
         // DOWNLOAD IMAGE MAX RESOLUTION
         //
         if metadata.session == "" {
-            if metadata.typeFile == NCBrandGlobal.shared.metadataTypeFileImage && !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.session == "" {
+            if metadata.typeFile == NCBrandGlobal.shared.metadataTypeFileImage && !CCUtility.fileProviderStorageExists(metadata) && metadata.session == "" {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_download_image_max_", comment: ""),

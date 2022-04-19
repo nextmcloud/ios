@@ -68,6 +68,10 @@ class NCFileViewInFolder: NCCollectionViewCommon {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_close_", comment: ""), style: .plain, target: self, action: #selector(tapClose(sender:)))
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        appDelegate.activeFileViewInFolder = nil
+    }
+    
     // MARK: - TAP EVENT
 
     @objc func tapClose(sender: Any) {
