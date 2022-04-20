@@ -86,11 +86,4 @@ class NCShareUITest: XCTestCase {
         let advancePermissionScreenShow = advancePermissionScreen.waitForExistence(timeout: 5)
         XCTAssert(advancePermissionScreenShow)
     }
-    
-//    func testEmailFieldDescriptionColor() throws {
-//        app.collectionViews.cells.otherElements.containing(.button, identifier:"share").children(matching: .button).element(boundBy: 0).tap()
-//        let elementsQuery = app.scrollViews.otherElements
-//        let emailDescription = elementsQuery.staticTexts.element(boundBy: 0).label
-//        XCTAssertEqual(emailDescription, "Personal share by mail", "Email Description should match")
-//    }
 }

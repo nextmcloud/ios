@@ -79,7 +79,9 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         changeTheming()
         initializeForm()
 //=======
-
+        
+        // UITestCase Identifire
+        view.accessibilityIdentifier = "view_upload_voice_note"
     }
     
     override func viewWillAppear(_ animated: Bool) {
