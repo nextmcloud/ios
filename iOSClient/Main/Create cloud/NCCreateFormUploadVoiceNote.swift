@@ -271,7 +271,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     
     @objc func save() {
         let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
-        if (rowFileName.value as? String)?.trimmingCharacters(in: .whitespaces).isEmpty ?? true {
+        let fileNameValue = (rowFileName.value as? String)?.trimmingCharacters(in: .whitespaces)
+        if (fileNameValue?.isEmpty ?? true), fileNameValue != nil {
             let alert = UIAlertController(title: "", message: NSLocalizedString("_prompt_insert_file_name", comment: ""), preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
             self.present(alert, animated: true)
