@@ -116,8 +116,8 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     override func viewDidLayoutSubviews() {
-        if UIScreen.main.bounds.width < 350 {
-            contstraintBottomLoginButton.constant = 20
+        if UIScreen.main.bounds.width < 350 || UIScreen.main.bounds.height > 800 {
+            contstraintBottomLoginButton.constant = 15
         }
     }
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -177,7 +177,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         cell.titleLabel.textColor = textColor
         cell.titleLabel.text = titles[indexPath.row]
         cell.imageView.image = images[indexPath.row]
-        cell.imageView.contentMode = .scaleToFill
+        cell.imageView.contentMode = .scaleAspectFill
         return cell
     }
 
