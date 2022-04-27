@@ -38,10 +38,8 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
     }
     
     override func layoutSubviews() {
-        if (UIDevice.current.userInterfaceIdiom != .pad){
-            trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
-            leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
-        }
+        trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
+        leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
     }
     
     override func update() {
