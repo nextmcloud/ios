@@ -10,8 +10,6 @@ import UIKit
 
 class NCShareHeaderCustomCell: XLFormBaseCell {
 
-    @IBOutlet weak var trailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var leadingConstraint: NSLayoutConstraint!
     @IBOutlet weak var titleLabel: UILabel!
     
     override func awakeFromNib() {
@@ -27,10 +25,7 @@ class NCShareHeaderCustomCell: XLFormBaseCell {
     override func configure() {
         super.configure()
     }
-    override func layoutSubviews() {
-        trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 56 : 16
-        leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 56 : 16
-    }
+    
     override func update() {
         self.backgroundColor = .clear
         self.titleLabel.textColor = NCBrandColor.shared.systemGray

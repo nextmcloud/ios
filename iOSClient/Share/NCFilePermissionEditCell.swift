@@ -17,9 +17,6 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
     @IBOutlet weak var switchControl: UISwitch!
     @IBOutlet weak var cellTextField: UITextField!
     @IBOutlet weak var buttonLinkLabel: UIButton!
-    @IBOutlet weak var trailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var leadingConstraint: NSLayoutConstraint!
-    
     let datePicker = UIDatePicker()
     var expirationDateText: String!
     var expirationDate: NSDate!
@@ -47,10 +44,6 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
         super.configure()
     }
     
-    override func layoutSubviews() {
-        trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
-        leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
-    }
     override func update() {
         super.update()
                 
