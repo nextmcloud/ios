@@ -12,8 +12,6 @@ class PasswordInputField: XLFormBaseCell,UITextFieldDelegate {
     
     @IBOutlet weak var fileNameInputTextField: UITextField!
     @IBOutlet weak var separatorBottom: UIView!
-    @IBOutlet weak var trailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var leadingConstraint: NSLayoutConstraint!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -33,13 +31,6 @@ class PasswordInputField: XLFormBaseCell,UITextFieldDelegate {
         super.configure()
        // fileNameInputTextField.isEnabled = false
         
-    }
-    
-    override func layoutSubviews() {
-        if (UIDevice.current.userInterfaceIdiom != .pad){
-            trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
-            leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
-        }
     }
     
     override func update() {

@@ -16,8 +16,6 @@ class NCFilePermissionCell: XLFormButtonCell {
     @IBOutlet weak var seperatorBelow: UIView!
     @IBOutlet weak var seperatorBelowFull: UIView!
     @IBOutlet weak var titleLabelBottom: UILabel!
-    @IBOutlet weak var trailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var leadingConstraint: NSLayoutConstraint!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -37,12 +35,6 @@ class NCFilePermissionCell: XLFormButtonCell {
         super.configure()
     }
     
-    override func layoutSubviews() {
-        if (UIDevice.current.userInterfaceIdiom != .pad){
-            trailingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
-            leadingConstraint.constant = UIDevice.current.orientation.isLandscape ? 40 : 0
-        }
-    }
     
     override func update() {
         super.update()

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -14,69 +14,56 @@
             <rect key="frame" x="0.0" y="0.0" width="644" height="94"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YrC-I9-EYD">
-                    <rect key="frame" x="0.0" y="0.0" width="644" height="94"/>
-                    <subviews>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zIu-1K-ZBo">
-                            <rect key="frame" x="0.0" y="0.0" width="644" height="1"/>
-                            <color key="backgroundColor" systemColor="systemGray4Color"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="1" id="o58-9X-9jS"/>
-                            </constraints>
-                        </view>
-                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="calender" translatesAutoresizingMaskIntoConstraints="NO" id="YK3-ah-Nx0">
-                            <rect key="frame" x="604" y="35" width="24" height="24"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="24" id="UyU-Ba-YJX"/>
-                                <constraint firstAttribute="width" secondItem="YK3-ah-Nx0" secondAttribute="height" multiplier="1:1" id="k28-lm-qOw"/>
-                            </constraints>
-                        </imageView>
-                        <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Date" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Yyq-Ik-ENe">
-                            <rect key="frame" x="16" y="30" width="612" height="34"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="34" id="FCL-BW-7sd"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                            <textInputTraits key="textInputTraits"/>
-                        </textField>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jKy-1g-ndM">
-                            <rect key="frame" x="0.0" y="93" width="644" height="1"/>
-                            <color key="backgroundColor" systemColor="systemGray4Color"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="1" id="8Dx-V8-40I"/>
-                            </constraints>
-                        </view>
-                    </subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zIu-1K-ZBo">
+                    <rect key="frame" x="0.0" y="0.0" width="644" height="1"/>
+                    <color key="backgroundColor" systemColor="systemGray4Color"/>
                     <constraints>
-                        <constraint firstItem="zIu-1K-ZBo" firstAttribute="top" secondItem="YrC-I9-EYD" secondAttribute="top" id="1VY-pr-tga"/>
-                        <constraint firstAttribute="trailing" secondItem="zIu-1K-ZBo" secondAttribute="trailing" id="46S-ZA-79b"/>
-                        <constraint firstItem="YK3-ah-Nx0" firstAttribute="centerY" secondItem="Yyq-Ik-ENe" secondAttribute="centerY" id="9jg-bG-C8Z"/>
-                        <constraint firstItem="YK3-ah-Nx0" firstAttribute="trailing" secondItem="Yyq-Ik-ENe" secondAttribute="trailing" id="K5f-bC-llx"/>
-                        <constraint firstItem="Yyq-Ik-ENe" firstAttribute="centerY" secondItem="YrC-I9-EYD" secondAttribute="centerY" id="Qok-dD-YuZ"/>
-                        <constraint firstItem="zIu-1K-ZBo" firstAttribute="leading" secondItem="YrC-I9-EYD" secondAttribute="leading" id="ThR-B8-Kis"/>
-                        <constraint firstItem="Yyq-Ik-ENe" firstAttribute="leading" secondItem="YrC-I9-EYD" secondAttribute="leading" constant="16" id="Xbu-z5-uly"/>
-                        <constraint firstAttribute="bottom" secondItem="jKy-1g-ndM" secondAttribute="bottom" id="dGp-Ur-Tc0"/>
-                        <constraint firstItem="jKy-1g-ndM" firstAttribute="leading" secondItem="YrC-I9-EYD" secondAttribute="leading" id="hDW-c0-KoN"/>
-                        <constraint firstAttribute="trailing" secondItem="jKy-1g-ndM" secondAttribute="trailing" id="tTz-Vy-Ing"/>
-                        <constraint firstItem="Yyq-Ik-ENe" firstAttribute="centerX" secondItem="YrC-I9-EYD" secondAttribute="centerX" id="vfG-Op-Ldc"/>
+                        <constraint firstAttribute="height" constant="1" id="o58-9X-9jS"/>
+                    </constraints>
+                </view>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="calender" translatesAutoresizingMaskIntoConstraints="NO" id="YK3-ah-Nx0">
+                    <rect key="frame" x="604" y="35" width="24" height="24"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="24" id="UyU-Ba-YJX"/>
+                        <constraint firstAttribute="width" secondItem="YK3-ah-Nx0" secondAttribute="height" multiplier="1:1" id="k28-lm-qOw"/>
+                    </constraints>
+                </imageView>
+                <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Date" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Yyq-Ik-ENe">
+                    <rect key="frame" x="16" y="30" width="612" height="34"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="34" id="FCL-BW-7sd"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <textInputTraits key="textInputTraits"/>
+                </textField>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jKy-1g-ndM">
+                    <rect key="frame" x="0.0" y="93" width="644" height="1"/>
+                    <color key="backgroundColor" systemColor="systemGray4Color"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="8Dx-V8-40I"/>
                     </constraints>
                 </view>
             </subviews>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
-                <constraint firstItem="YrC-I9-EYD" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="2bg-Lh-fRM"/>
-                <constraint firstAttribute="trailing" secondItem="YrC-I9-EYD" secondAttribute="trailing" id="86m-hH-w5c"/>
-                <constraint firstItem="YrC-I9-EYD" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="Act-cJ-hnd"/>
-                <constraint firstAttribute="bottom" secondItem="YrC-I9-EYD" secondAttribute="bottom" id="loN-2c-mDq"/>
+                <constraint firstItem="YK3-ah-Nx0" firstAttribute="centerY" secondItem="Yyq-Ik-ENe" secondAttribute="centerY" id="0nk-St-xX0"/>
+                <constraint firstItem="Yyq-Ik-ENe" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="FVf-UM-xE3"/>
+                <constraint firstAttribute="bottom" secondItem="jKy-1g-ndM" secondAttribute="bottom" id="OtZ-MG-7W9"/>
+                <constraint firstAttribute="trailing" secondItem="jKy-1g-ndM" secondAttribute="trailing" id="QcK-0L-wAB"/>
+                <constraint firstItem="zIu-1K-ZBo" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="W6v-jQ-XSe"/>
+                <constraint firstAttribute="trailing" secondItem="zIu-1K-ZBo" secondAttribute="trailing" id="ccP-r3-9Xi"/>
+                <constraint firstItem="jKy-1g-ndM" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="dJI-hd-KxJ"/>
+                <constraint firstItem="zIu-1K-ZBo" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="fgt-OE-O0a"/>
+                <constraint firstItem="Yyq-Ik-ENe" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="oce-QC-xjG"/>
+                <constraint firstItem="Yyq-Ik-ENe" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="16" id="w8W-xh-UNc"/>
+                <constraint firstItem="YK3-ah-Nx0" firstAttribute="trailing" secondItem="Yyq-Ik-ENe" secondAttribute="trailing" id="zoy-1T-PyE"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="calendarImageView" destination="YK3-ah-Nx0" id="Byl-aE-WkL"/>
                 <outlet property="cellTextField" destination="Yyq-Ik-ENe" id="Apj-ft-G1e"/>
-                <outlet property="leadingConstraint" destination="2bg-Lh-fRM" id="EgN-ob-boD"/>
                 <outlet property="seperator" destination="zIu-1K-ZBo" id="6zu-Uv-n0t"/>
                 <outlet property="seperatorBottom" destination="jKy-1g-ndM" id="9We-YO-cTe"/>
-                <outlet property="trailingConstraint" destination="86m-hH-w5c" id="rOP-pZ-fKj"/>
             </connections>
             <point key="canvasLocation" x="194.20289855072465" y="-206.91964285714286"/>
         </view>
