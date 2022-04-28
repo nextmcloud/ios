@@ -162,7 +162,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder_nmcloud")!.image(color: NCBrandColor.shared.brandElement, size: 25)
         
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -212,7 +212,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
                 self.fileName = CCUtility.removeForbiddenCharactersServer(fileNameNew as? String)
             }
             
-            formRow.value = self.fileName
+//            formRow.value = self.fileName
             //self.updateFormRow(formRow)
 //=======
 //            self.updateFormRow(formRow)
@@ -223,7 +223,14 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     }
     
     //MARK: TableViewDelegate
-
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if let advancePermissionHeaderRow: XLFormRowDescriptor = self.form.formRow(withTag: "fileName") {
+            if let advancePermissionHeaderRowIndexPath = form.indexPath(ofFormRow: advancePermissionHeaderRow), indexPath == advancePermissionHeaderRowIndexPath {
+                let cell = cell as? TextTableViewCell
+                cell?.fileNameTextField.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
+            }
+        }
+    }
 
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
@@ -263,54 +270,47 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     }
     
     @objc func save() {
-        
         let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
-//        guard let name = self.fileName else {
-//            return
-//        }
-        let ext = (self.fileName as! NSString).pathExtension.uppercased()
-        var fileNameSave = ""
-                   
-        if (ext == "") {
-            fileNameSave = self.fileName as! String + ".m4a"
+        let fileNameValue = (rowFileName.value as? String)?.trimmingCharacters(in: .whitespaces)
+        if (fileNameValue?.isEmpty ?? true), fileNameValue != nil {
+            let alert = UIAlertController(title: "", message: NSLocalizedString("_prompt_insert_file_name", comment: ""), preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
+            self.present(alert, animated: true)
         } else {
-            fileNameSave = (self.fileName as! NSString).deletingPathExtension + ".m4a"
-        }
-        
-        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
-//=======
-//        guard let name = rowFileName.value else {
-//            return
-//        }
-//        let ext = (name as! NSString).pathExtension.uppercased()
-//        var fileNameSave = ""
-//
-//        if (ext == "") {
-//            fileNameSave = name as! String + ".m4a"
-//        } else {
-//            fileNameSave = (name as! NSString).deletingPathExtension + ".m4a"
-//        }
-//
-//        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase ,url: "", contentType: "", livePhoto: false)
-//>>>>>>> feature_branded_client_4
-        
-        metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
-        metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
-        metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-        
-        if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: fileNameSave) != nil {
-                        
-            guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
-            conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
-            conflictViewController.serverUrl = serverUrl
-            conflictViewController.metadatasUploadInConflict = [metadataForUpload]
-            conflictViewController.delegate = self
-
-            self.present(conflictViewController, animated: true, completion: nil)
+           
+            //        guard let name = self.fileName else {
+            //            return
+            //        }
+            let ext = (self.fileName as! NSString).pathExtension.uppercased()
+            var fileNameSave = ""
             
-        } else {
-                            
-            dismissAndUpload(metadataForUpload)
+            if (ext == "") {
+                fileNameSave = self.fileName as! String + ".m4a"
+            } else {
+                fileNameSave = (self.fileName as! NSString).deletingPathExtension + ".m4a"
+            }
+            
+            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+            
+            metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
+            metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
+            metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
+            metadataForUpload.size = NCUtilityFileSystem.shared.getFileSize(filePath: fileNamePath)
+            
+            if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: fileNameSave) != nil {
+                
+                guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
+                conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
+                conflictViewController.serverUrl = serverUrl
+                conflictViewController.metadatasUploadInConflict = [metadataForUpload]
+                conflictViewController.delegate = self
+                
+                self.present(conflictViewController, animated: true, completion: nil)
+                
+            } else {
+                
+                dismissAndUpload(metadataForUpload)
+            }
         }
     }
     
@@ -408,6 +408,11 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         updateTimerUI()
         buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
 
+    }
+    
+    @IBAction func textFieldDidChange(textField: UITextField) {
+        let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
+        rowFileName.value = textField.text
     }
 }
 

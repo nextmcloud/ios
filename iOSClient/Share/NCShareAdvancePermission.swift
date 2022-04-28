@@ -141,6 +141,15 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        if (UIDevice.current.userInterfaceIdiom == .phone), UIDevice().hasNotch {
+            let isLandscape = UIDevice.current.orientation.isLandscape
+            let tableViewWidth = isLandscape ? view.bounds.width - 80 : view.bounds.width
+            tableView.frame = CGRect(x: isLandscape ? 40 : 0, y: tableView.frame.minY, width: tableViewWidth, height: tableView.bounds.height)
+            tableView.layoutIfNeeded()
+        }
+    }
+    
     func setTitle() {
         if newUser {
             title = sharee?.shareWith ?? NSLocalizedString("_sharing_", comment: "")
@@ -1084,7 +1093,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         let ext = CCUtility.getExtension(metadata.fileNameView)
         var image: UIImage?
         
-        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue {
+        if CCUtility.fileProviderStorageExists(metadata) && metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue {
            
             let previewPath = CCUtility.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)!
             let imagePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!

@@ -377,28 +377,17 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     
     @objc func deleteFile(_ notification: NSNotification) {
         
-        if let userInfo = notification.userInfo as NSDictionary? {
-            if let ocId = userInfo["ocId"] as? String, let fileNameView = userInfo["fileNameView"] as? String, let onlyLocal = userInfo["onlyLocal"] as? Bool {
-                if onlyLocal {
-                    reloadDataSource()
-                } else if fileNameView.lowercased() == NCGlobal.shared.fileNameRichWorkspace.lowercased() {
-                    reloadDataSourceNetwork(forced: true)
-                } else {
-                    if let row = dataSource.deleteMetadata(ocId: ocId) {
-                        let indexPath = IndexPath(row: row, section: 0)
-                        collectionView?.performBatchUpdates({
-                            collectionView?.deleteItems(at: [indexPath])
-                        }, completion: { (_) in
-                            self.collectionView?.reloadData()
-                        })
-                    }
-                }
-            } else if let ocId = userInfo["ocId"] as? String {
+        if let userInfo = notification.userInfo as NSDictionary?, let ocId = userInfo["ocId"] as? String, let fileNameView = userInfo["fileNameView"] as? String, let onlyLocalCache = userInfo["onlyLocalCache"] as? Bool {
+            if onlyLocalCache {
+                reloadDataSource()
+            } else if fileNameView.lowercased() == NCGlobal.shared.fileNameRichWorkspace.lowercased() {
+                reloadDataSourceNetwork(forced: true)
+            } else {
                 if let row = dataSource.deleteMetadata(ocId: ocId) {
                     let indexPath = IndexPath(row: row, section: 0)
                     collectionView?.performBatchUpdates({
                         collectionView?.deleteItems(at: [indexPath])
-                    }, completion: { (_) in
+                    }, completion: { _ in
                         self.collectionView?.reloadData()
                     })
                 }
@@ -710,7 +699,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 view.emptyTitle.text = NSLocalizedString(emptyTitle, comment: "")
                 view.emptyDescription.text = NSLocalizedString(emptyDescription, comment: "")
             } else {
-                view.emptyImage.image = UIImage.init(named: "folder")
+                view.emptyImage.image = UIImage.init(named: "folder_nmcloud")
                 view.emptyTitle.text = NSLocalizedString("_files_no_files_", comment: "")
                 view.emptyDescription.text = NSLocalizedString("_no_file_pull_down_", comment: "")
             }
@@ -1291,7 +1280,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                 return
             }
             
-            if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+            if CCUtility.fileProviderStorageExists(metadata) {
                 NCViewer.shared.view(viewController: self, metadata: metadata, metadatas: [metadata], imageIcon: imageIcon)
             } else if NCCommunication.shared.isNetworkReachable() {
                 NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileView) { _ in }
@@ -1534,7 +1523,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 // image local
                 if dataSource.metadataOffLine.contains(metadata.ocId) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
-                } else if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+                } else if CCUtility.fileProviderStorageExists(metadata) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.local
                 }
             }
@@ -1765,7 +1754,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 // image Local
                 if dataSource.metadataOffLine.contains(metadata.ocId) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
-                } else if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+                } else if CCUtility.fileProviderStorageExists(metadata) {
                     cell.imageLocal.image = NCBrandColor.cacheImages.local
                 }
             }

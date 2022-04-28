@@ -79,11 +79,8 @@ import SVGKit
                 editingMode = true
             }
             
-            let viewerQuickLook = NCViewerQuickLook(with: URL(fileURLWithPath: fileNamePath), editingMode: editingMode, metadata: metadata)
-            let navigationController = UINavigationController(rootViewController: viewerQuickLook)
-            navigationController.modalPresentationStyle = .overFullScreen
-            
-            self.appDelegate.window?.rootViewController?.present(navigationController, animated: true)
+            let viewerQuickLook = NCViewerQuickLook(with: URL(fileURLWithPath: fileNamePath), isEditingEnabled: editingMode, metadata: metadata)
+            self.appDelegate.window?.rootViewController?.present(viewerQuickLook, animated: true)
             
         case NCGlobal.shared.selectorLoadFileView:
             guard UIApplication.shared.applicationState == UIApplication.State.active else { break }
@@ -130,7 +127,7 @@ import SVGKit
                 metadata = metadataTMP
             }
             
-            if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
+            if CCUtility.fileProviderStorageExists(metadata) && CCUtility.fileProviderStorageExists(metadataMOV) {
                 saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV)
             }
             
@@ -205,7 +202,7 @@ import SVGKit
     
     func openDownload(metadata: tableMetadata, selector: String) {
         
-        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+        if CCUtility.fileProviderStorageExists(metadata) {
             
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": selector, "errorCode": 0, "errorDescription": "" ])
             
@@ -237,7 +234,7 @@ import SVGKit
             
             for metadata in selectedMetadata {
                 guard !metadata.directory else { continue }
-                if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+                if !CCUtility.fileProviderStorageExists(metadata) {
                     let semaphore = Semaphore()
                     NCNetworking.shared.download(metadata: metadata, selector: "") { errorCode in
                         error = errorCode
@@ -362,15 +359,15 @@ import SVGKit
     
     func saveLivePhoto(metadata: tableMetadata, metadataMOV: tableMetadata) {
         
-        if !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+        if !CCUtility.fileProviderStorageExists(metadata) {
             NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbumLivePhotoIMG)
         }
         
-        if !CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
+        if !CCUtility.fileProviderStorageExists(metadataMOV) {
             NCOperationQueue.shared.download(metadata: metadataMOV, selector: NCGlobal.shared.selectorSaveAlbumLivePhotoMOV)
         }
         
-        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && CCUtility.fileProviderStorageExists(metadataMOV.ocId, fileNameView: metadataMOV.fileNameView) {
+        if CCUtility.fileProviderStorageExists(metadata) && CCUtility.fileProviderStorageExists(metadataMOV) {
             saveLivePhotoToDisk(metadata: metadata, metadataMov: metadataMOV)
         }
     }
@@ -725,7 +722,7 @@ import SVGKit
             if metadataMOV != nil {
                 self.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV!)
             } else {
-                if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+                if CCUtility.fileProviderStorageExists(metadata) {
                     self.saveAlbum(metadata: metadata)
                 } else {
                     NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum)
@@ -734,7 +731,7 @@ import SVGKit
         }
         
         let saveBackground = UIAction(title: NSLocalizedString("_use_as_background_", comment: ""), image: UIImage(systemName: "text.below.photo")) { action in
-            if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+            if CCUtility.fileProviderStorageExists(metadata) {
                 self.saveBackground(metadata: metadata)
             } else {
                 NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveBackground)
@@ -798,7 +795,7 @@ import SVGKit
         
         
         let deleteConfirmLocal = UIAction(title: NSLocalizedString("_remove_local_file_", comment: ""), image: UIImage(systemName: "trash"), attributes: .destructive) { action in
-            NCNetworking.shared.deleteMetadata(metadata, onlyLocalCache: false) { errorCode, errorDescription in
+            NCNetworking.shared.deleteMetadata(metadata, onlyLocalCache: true) { errorCode, errorDescription in
             }
         }
         
@@ -862,7 +859,7 @@ fileprivate extension tableMetadata {
     func toPasteBoardItem() -> [String: Any]? {
         // Get Data
         let fileUrl = URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileNameView))
-        guard CCUtility.fileProviderStorageExists(self.ocId, fileNameView: self.fileNameView),
+        guard CCUtility.fileProviderStorageExists(self),
               let data = try? Data(contentsOf: fileUrl),
               let unmanagedFileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension as CFString, nil)
         else { return nil }

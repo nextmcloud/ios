@@ -105,9 +105,8 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(favoriteFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
     }
 
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-
+    deinit {
+        print("#deinit NCViewerMediaPage")
         // Clear
         if let ncplayer = currentViewController.ncplayer, ncplayer.isPlay() {
             ncplayer.playerPause()
@@ -115,7 +114,7 @@ class NCViewerMediaPage: UIViewController {
         }
         currentViewController.playerToolBar.stopTimerAutoHide()
         clearCommandCenter()
-
+        
         metadatas.removeAll()
         ncplayerLivePhoto = nil
 
@@ -352,19 +351,19 @@ class NCViewerMediaPage: UIViewController {
         if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue {
 
             MPRemoteCommandCenter.shared().skipForwardCommand.isEnabled = true
-            skipForwardCommand = MPRemoteCommandCenter.shared().skipForwardCommand.addTarget { event in
+            skipForwardCommand = MPRemoteCommandCenter.shared().skipForwardCommand.addTarget { [weak self] event in
 
                 let seconds = Float64((event as! MPSkipIntervalCommandEvent).interval)
-                self.currentViewController.playerToolBar.skip(seconds: seconds)
-                return.success
+                self?.currentViewController.playerToolBar.skip(seconds: seconds)
+                return .success
             }
 
             MPRemoteCommandCenter.shared().skipBackwardCommand.isEnabled = true
-            skipBackwardCommand = MPRemoteCommandCenter.shared().skipBackwardCommand.addTarget { event in
+            skipBackwardCommand = MPRemoteCommandCenter.shared().skipBackwardCommand.addTarget { [weak self] event in
 
                 let seconds = Float64((event as! MPSkipIntervalCommandEvent).interval)
-                self.currentViewController.playerToolBar.skip(seconds: -seconds)
-                return.success
+                self?.currentViewController.playerToolBar.skip(seconds: -seconds)
+                return .success
             }
         }
 
@@ -485,15 +484,15 @@ extension NCViewerMediaPage: UIPageViewControllerDelegate, UIPageViewControllerD
 
         if currentIndex == 0 { return nil }
 
-        let viewerMedia = getViewerMedia(index: currentIndex-1, metadata: metadatas[currentIndex-1])
+        let viewerMedia = getViewerMedia(index: currentIndex - 1, metadata: metadatas[currentIndex - 1])
         return viewerMedia
     }
 
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
 
-        if currentIndex == metadatas.count-1 { return nil }
+        if currentIndex == metadatas.count - 1 { return nil }
 
-        let viewerMedia = getViewerMedia(index: currentIndex+1, metadata: metadatas[currentIndex+1])
+        let viewerMedia = getViewerMedia(index: currentIndex + 1, metadata: metadatas[currentIndex + 1])
         return viewerMedia
     }
 
@@ -594,7 +593,7 @@ extension NCViewerMediaPage: UIGestureRecognizerDelegate {
             currentViewController.statusLabel.isHidden = true
 
             let fileName = (currentViewController.metadata.fileNameView as NSString).deletingPathExtension + ".mov"
-            if let metadata = NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView LIKE[c] %@", currentViewController.metadata.account, currentViewController.metadata.serverUrl, fileName)), CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+            if let metadata = NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView LIKE[c] %@", currentViewController.metadata.account, currentViewController.metadata.serverUrl, fileName)), CCUtility.fileProviderStorageExists(metadata) {
 
                 AudioServicesPlaySystemSound(1519) // peek feedback
 
