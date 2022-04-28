@@ -456,9 +456,14 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         }
         
         dropDown.anchorView = searchField
-        dropDown.bottomOffset = CGPoint(x: 0, y: searchField.bounds.height)
         dropDown.width = searchField.bounds.width
-        dropDown.direction = .bottom
+        if (UIDevice.current.userInterfaceIdiom == .phone || UIDevice.current.orientation.isLandscape), UIScreen.main.bounds.width < 1111  {
+            dropDown.topOffset = CGPoint(x: 0, y: -searchField.bounds.height)
+            dropDown.direction = .any
+        } else {
+            dropDown.bottomOffset = CGPoint(x: 0, y: searchField.bounds.height)
+            dropDown.direction = .bottom
+        }
         
         dropDown.cellNib = UINib(nibName: "NCShareUserDropDownCell", bundle: nil)
         dropDown.customCellConfiguration = {[weak self] (index: Index, item: String, cell: DropDownCell) -> Void in
