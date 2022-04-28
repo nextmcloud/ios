@@ -119,6 +119,7 @@
 		56A510AF27B2E66700D9F3E6 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A510AC27B2E66700D9F3E6 /* NCCellProtocol.swift */; };
 		56A510B027B2E66700D9F3E6 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A510AC27B2E66700D9F3E6 /* NCCellProtocol.swift */; };
 		56CEE77A27BFA9CD008EE490 /* NCFunctionCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CEE77927BFA9CD008EE490 /* NCFunctionCenter.swift */; };
+		56E4B393281A789700B4A9C1 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E4B392281A789700B4A9C1 /* UIDevice+Extension.swift */; };
 		56E9B9D827B37E2D007B1772 /* NCShareCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9CB27B37E2C007B1772 /* NCShareCell.swift */; };
 		56E9B9DE27B37E2D007B1772 /* NCShareExtension+Files.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9D427B37E2C007B1772 /* NCShareExtension+Files.swift */; };
 		56E9B9DF27B37E2D007B1772 /* NCShareExtension+NCDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9D527B37E2C007B1772 /* NCShareExtension+NCDelegate.swift */; };
@@ -601,6 +602,7 @@
 		56A5109F27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCManageDatabase+Activity.swift"; sourceTree = "<group>"; };
 		56A510AC27B2E66700D9F3E6 /* NCCellProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCellProtocol.swift; sourceTree = "<group>"; };
 		56CEE77927BFA9CD008EE490 /* NCFunctionCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCFunctionCenter.swift; sourceTree = "<group>"; };
+		56E4B392281A789700B4A9C1 /* UIDevice+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
 		56E9B9CB27B37E2C007B1772 /* NCShareCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCShareCell.swift; sourceTree = "<group>"; };
 		56E9B9D427B37E2C007B1772 /* NCShareExtension+Files.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCShareExtension+Files.swift"; sourceTree = "<group>"; };
 		56E9B9D527B37E2C007B1772 /* NCShareExtension+NCDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCShareExtension+NCDelegate.swift"; sourceTree = "<group>"; };
@@ -1668,6 +1670,7 @@
 		F7A0D14E259229FA008F8A13 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				56E4B392281A789700B4A9C1 /* UIDevice+Extension.swift */,
 				7A4619A527BF72440042D595 /* UIBarButton+Extension.swift */,
 				56E9B9E227B37FFC007B1772 /* UIApplication+Orientation.swift */,
 				56E9B9E327B37FFC007B1772 /* UIControl+Extensions.swift */,
@@ -2837,6 +2840,7 @@
 				7A4619AA27BF72810042D595 /* NCSelectableNavigationView.swift in Sources */,
 				B15AD4B6273D940D00490E0B /* ShareDownloadLimitNetwork.swift in Sources */,
 				7AD162D32754F8CE001A5DC4 /* TealiumHelper.swift in Sources */,
+				56E4B393281A789700B4A9C1 /* UIDevice+Extension.swift in Sources */,
 				C0D6063E26CBB12F00B67843 /* NCFilePermissionCell.swift in Sources */,
 				F7381EE1218218C9000B1560 /* NCOffline.swift in Sources */,
 				F78071091EDAB65800EAFFF6 /* NSNotificationCenter+MainThread.m in Sources */,
@@ -3786,8 +3790,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SVGKit/SVGKit.git";
 			requirement = {
-				branch = 3.x;
-				kind = branch;
+				kind = upToNextMinorVersion;
+				minimumVersion = 3.0.0;
 			};
 		};
 		F75EAED626D2552E00F4320E /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
