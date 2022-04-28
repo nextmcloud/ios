@@ -24,6 +24,7 @@
 //
 
 import UIKit
+import NCCommunication
 
 class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
@@ -201,7 +202,12 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func login(_ sender: Any) {
-        appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+        if NCCommunication.shared.isNetworkReachable() {
+            appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+        } else {
+            showNoInternetAlert()
+        }
+        
     }
 
     @IBAction func signup(_ sender: Any) {
@@ -211,6 +217,12 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     @IBAction func host(_ sender: Any) {
         guard let url = URL(string: NCBrandOptions.shared.linkLoginHost) else { return }
         UIApplication.shared.open(url)
+    }
+    
+    func showNoInternetAlert(){
+        let alertController = UIAlertController(title: NSLocalizedString("_no_internet_alert_title_", comment: ""), message: NSLocalizedString("_no_internet_alert_message_", comment: ""), preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { action in }))
+        self.present(alertController, animated: true)
     }
 }
 
