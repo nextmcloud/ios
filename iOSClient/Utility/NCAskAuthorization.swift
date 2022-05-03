@@ -28,9 +28,11 @@ class NCAskAuthorization: NSObject {
         let instance = NCAskAuthorization()
         return instance
     }()
-
+    
+    private(set) var isRequesting = false
+    
     func askAuthorizationAudioRecord(viewController: UIViewController?, completion: @escaping (_ hasPermission: Bool) -> Void) {
-
+        
         switch AVAudioSession.sharedInstance().recordPermission {
         case AVAudioSession.RecordPermission.granted:
             completion(true)
@@ -64,8 +66,8 @@ class NCAskAuthorization: NSObject {
             break
         }
     }
-    func askAuthorizationPhotoLibrary(viewController: UIViewController?, completion: @escaping (_ hasPermission: Bool) -> Void) {
-
+    @objc func askAuthorizationPhotoLibrary(viewController: UIViewController?, completion: @escaping (_ hasPermission: Bool) -> Void) {
+        
         switch PHPhotoLibrary.authorizationStatus() {
         case PHAuthorizationStatus.authorized:
             completion(true)
@@ -90,9 +92,14 @@ class NCAskAuthorization: NSObject {
                 // Fallback on earlier versions
             }
         case PHAuthorizationStatus.notDetermined:
-           let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            isRequesting = true
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
             appDelegate.isPrivacyProtectionWindowNeedToShow = false
             PHPhotoLibrary.requestAuthorization { (allowed) in
+                self.isRequesting = false
+                DispatchQueue.main.async {
+                    (UIApplication.shared.delegate as? AppDelegate)?.hidePrivacyProtectionWindow()
+                }
                 DispatchQueue.main.async {
                     appDelegate.isPrivacyProtectionWindowNeedToShow = true
                     if allowed == PHAuthorizationStatus.authorized {
@@ -108,27 +115,27 @@ class NCAskAuthorization: NSObject {
             break
         }
     }
-
+    
     @objc func askAuthorizationLocationManager(completion: @escaping (_ hasFullPermissions: Bool) -> Void) {
-
+        
         switch CLLocationManager.authorizationStatus() {
         case CLAuthorizationStatus.authorizedAlways:
             completion(true)
             break
-        /*
-        case CLAuthorizationStatus.authorizedWhenInUse, CLAuthorizationStatus.denied, CLAuthorizationStatus.restricted:
-            DispatchQueue.main.async {
-                NCAutoUpload.shared.startSignificantChangeUpdates()
-            }
-            completion(false)
-            break
-        case CLAuthorizationStatus.notDetermined:
-            DispatchQueue.main.async {
-                NCAutoUpload.shared.startSignificantChangeUpdates()
-            }
-            completion(false)
-            break
-        */
+            /*
+             case CLAuthorizationStatus.authorizedWhenInUse, CLAuthorizationStatus.denied, CLAuthorizationStatus.restricted:
+             DispatchQueue.main.async {
+             NCAutoUpload.shared.startSignificantChangeUpdates()
+             }
+             completion(false)
+             break
+             case CLAuthorizationStatus.notDetermined:
+             DispatchQueue.main.async {
+             NCAutoUpload.shared.startSignificantChangeUpdates()
+             }
+             completion(false)
+             break
+             */
         default:
             DispatchQueue.main.async {
                 NCAutoUpload.shared.startSignificantChangeUpdates()
