@@ -745,7 +745,13 @@ import SVGKit
         }
         
         let modify = UIAction(title: NSLocalizedString("_modify_", comment: ""), image: UIImage(systemName: "pencil.tip.crop.circle")) { action in
-            self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
+            if viewController is NCFileViewInFolder {
+                viewController.dismiss(animated: true) {
+                    NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
+                }
+            } else {
+                NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
+            }
         }
         
         //        let saveAsScan = UIAction(title: NSLocalizedString("_save_as_scan_", comment: ""), image: UIImage(systemName: "viewfinder.circle")) { action in
