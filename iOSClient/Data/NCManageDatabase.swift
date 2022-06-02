@@ -165,7 +165,9 @@ class NCManageDatabase: NSObject {
                             } catch { }
                         }
                     }
-
+                    if oldSchemaVersion < 220 {
+                        migration.deleteData(forType: tableMetadata.className())
+                    }
                 }, shouldCompactOnLaunch: { totalBytes, usedBytes in
 
                     // totalBytes refers to the size of the file on disk in bytes (data + free space)
