@@ -40,6 +40,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     var shareeEmail: String?
     public var tableShare: tableShare?
     var isUpdating = true
+    let contentInsets: CGFloat = 16
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -67,8 +68,8 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         labelSharing.text = NSLocalizedString("_sharing_", comment: "")
         labelNote.text = NSLocalizedString("_share_note_recipient_", comment: "")
         
-        commentContainerView.layer.borderWidth = 1
-        commentContainerView.layer.cornerRadius = 4.0
+        commentTextView.layer.borderWidth = 1
+        commentTextView.layer.cornerRadius = 4.0
         
         btnCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         btnCancel.layer.cornerRadius = 10
@@ -85,6 +86,9 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         buttonContainerView.addShadow(location: .top)
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        commentTextView.textContainerInset = UIEdgeInsets(top: contentInsets, left: contentInsets, bottom: contentInsets, right: contentInsets)
     }
     
     func setTitle() {
@@ -104,7 +108,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         buttonContainerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
         btnSendShare.setTitleColor(.white, for: .normal)
-        commentContainerView.layer.borderColor = NCBrandColor.shared.label.cgColor
+        commentTextView.layer.borderColor = NCBrandColor.shared.label.cgColor
     }
     
     @IBAction func cancelClicked(_ sender: Any) {
@@ -235,4 +239,19 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     
     func getSharees(sharees: [NCCommunicationSharee]?) {}
     
+    @objc func adjustForKeyboard(notification: Notification) {
+        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue,
+              let globalTextViewFrame = commentTextView.superview?.convert(commentTextView.frame, to: nil) else { return }
+
+        let keyboardScreenEndFrame = keyboardValue.cgRectValue
+        let portionCovoredByLeyboard = globalTextViewFrame.maxY - keyboardScreenEndFrame.minY
+
+        if notification.name == UIResponder.keyboardWillHideNotification || portionCovoredByLeyboard < 0 {
+            commentTextView.contentInset = .zero
+        } else {
+            commentTextView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: portionCovoredByLeyboard, right: 0)
+        }
+
+        commentTextView.scrollIndicatorInsets = commentTextView.contentInset
+    }
 }
