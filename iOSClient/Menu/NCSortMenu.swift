@@ -93,11 +93,11 @@ class NCSortMenu: NSObject {
         )
         
         if layoutForView.ascending {
-            title = NSLocalizedString("_order_by_size_smallest_", comment: "")
-            icon = UIImage(named: "sortSmallest")!.image(color: NCBrandColor.shared.gray, size: 50)
-        } else {
             title = NSLocalizedString("_order_by_size_largest_", comment: "")
             icon = UIImage(named: "sortLargest")!.image(color: NCBrandColor.shared.gray, size: 50)
+        } else {
+            title = NSLocalizedString("_order_by_size_smallest_", comment: "")
+            icon = UIImage(named: "sortSmallest")!.image(color: NCBrandColor.shared.gray, size: 50)
         }
         
         actions.append(

@@ -88,14 +88,6 @@ extension NCViewer {
                     icon: NCUtility.shared.loadImage(named: "rotate",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         NotificationCenter.default.postOnMainThread(name: NCBrandGlobal.shared.notificationImagePreviewRotateImage)
-                        if (localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "" {
-                            
-                            //                                NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
-                            //                                NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
-                            
-                        } else {
-                            NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: !localFile!.offline)
-                        }
                     }
                 )
             )
@@ -281,7 +273,7 @@ extension NCViewer {
         // DOWNLOAD IMAGE MAX RESOLUTION
         //
         if metadata.session == "" {
-            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) && metadata.session == "" {
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && !CCUtility.fileProviderStorageExists(metadata) && metadata.session == "" {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_download_image_max_", comment: ""),
@@ -309,30 +301,30 @@ extension NCViewer {
                 )
             )
             
-            var title = ""
-            var icon = UIImage()
-            
-            if CCUtility.getPDFDisplayDirection() == .horizontal {
-                title = NSLocalizedString("_pdf_vertical_", comment: "")
-                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
-            } else {
-                title = NSLocalizedString("_pdf_horizontal_", comment: "")
-                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
-            }
-            
-            actions.append(
-                NCMenuAction(
-                    title: title,
-                    icon: icon,
-                    action: { _ in
-                        if CCUtility.getPDFDisplayDirection() == .horizontal {
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.vertical])
-                        } else {
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.horizontal])
-                        }
-                    }
-                )
-            )
+//            var title = ""
+//            var icon = UIImage()
+//            
+//            if CCUtility.getPDFDisplayDirection() == .horizontal {
+//                title = NSLocalizedString("_pdf_vertical_", comment: "")
+//                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
+//            } else {
+//                title = NSLocalizedString("_pdf_horizontal_", comment: "")
+//                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
+//            }
+//            
+//            actions.append(
+//                NCMenuAction(
+//                    title: title,
+//                    icon: icon,
+//                    action: { _ in
+//                        if CCUtility.getPDFDisplayDirection() == .horizontal {
+//                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.vertical])
+//                        } else {
+//                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.horizontal])
+//                        }
+//                    }
+//                )
+//            )
             
             actions.append(
                 NCMenuAction(

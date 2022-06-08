@@ -14,10 +14,25 @@
 		2C33C48623E2C475005F963B /* Notification Service Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2C33C47F23E2C475005F963B /* Notification Service Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2CB7D1CA23E2EDCB00376EF9 /* NCPushNotificationEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F72D1005210B6882009C96B7 /* NCPushNotificationEncryption.m */; };
 		370D26AF248A3D7A00121797 /* NCImageCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCImageCellProtocol.swift */; };
+		56007DDD282B98CA00EA4115 /* EasyTipView in Frameworks */ = {isa = PBXBuildFile; productRef = 56007DDC282B98CA00EA4115 /* EasyTipView */; };
+		5620EF8B28191F96009CDD9E /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5620EF8A28191F96009CDD9E /* UIDevice+Extension.swift */; };
+		5620EF8C281943AA009CDD9E /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; };
+		5620EF8D281943AA009CDD9E /* Alamofire.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5620EF8E281943AF009CDD9E /* DropDown.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; };
+		5620EF8F281943AF009CDD9E /* DropDown.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5620EF90281943BD009CDD9E /* KTVCocoaHTTPServer.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; };
+		5620EF91281943BE009CDD9E /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5620EF92281943C2009CDD9E /* KTVHTTPCache.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; };
+		5620EF93281943C2009CDD9E /* KTVHTTPCache.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5620EF94281943C5009CDD9E /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
+		5620EF95281943C6009CDD9E /* NCCommunication.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5620EF96281943D8009CDD9E /* Pods_Nextcloud.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3E8A85DCD6F57798011CA1C /* Pods_Nextcloud.framework */; };
+		5620EF98281943E3009CDD9E /* TOPasscodeViewController.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56E9B9F227B39218007B1772 /* TOPasscodeViewController.xcframework */; };
+		5620EF99281943E3009CDD9E /* TOPasscodeViewController.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56E9B9F227B39218007B1772 /* TOPasscodeViewController.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5621BD7E27DA6A36005A3389 /* NCMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5621BD7D27DA6A36005A3389 /* NCMenuAction.swift */; };
 		564BFD9927C7A9930047252F /* NCViewerImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70753EA2542A99800972D44 /* NCViewerImage.swift */; };
 		564BFD9A27C7AC5E0047252F /* NCViewerImageDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F718C24D254D507B00C5C256 /* NCViewerImageDetailView.swift */; };
 		564BFD9B27C7AC660047252F /* NCViewerVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F752011C25480387000BF3A7 /* NCViewerVideo.swift */; };
-		5621BD7E27DA6A36005A3389 /* NCMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5621BD7D27DA6A36005A3389 /* NCMenuAction.swift */; };
 		5672096D27B5201000413A96 /* NCShareCommentsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9E727B38370007B1772 /* NCShareCommentsCell.swift */; };
 		5672096F27B5209200413A96 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5672096E27B5209200413A96 /* NCActivityTableViewCell.swift */; };
 		5672097027B5358600413A96 /* UIApplication+Orientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9E227B37FFC007B1772 /* UIApplication+Orientation.swift */; };
@@ -81,15 +96,12 @@
 		56A229E727B3BE1F00C35F8B /* NCCreateFormUploadConflictCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F704B5E82430C0B800632F5F /* NCCreateFormUploadConflictCell.swift */; };
 		56A229EA27B3C7F900C35F8B /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
 		56A229EB27B3C81100C35F8B /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
-		56A5107727B2C4B800D9F3E6 /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
 		56A5107827B2C5DA00D9F3E6 /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
 		56A5107927B2C5DB00D9F3E6 /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
 		56A5107A27B2C5DC00D9F3E6 /* NCCommunication.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; };
-		56A5107C27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; };
 		56A5107D27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; };
 		56A5107E27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; };
 		56A5107F27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; };
-		56A5108127B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; };
 		56A5108227B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; };
 		56A5108327B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; };
 		56A5108427B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; };
@@ -124,7 +136,6 @@
 		56E9B9E027B37E2D007B1772 /* NCShareExtension+DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9D627B37E2D007B1772 /* NCShareExtension+DataSource.swift */; };
 		56E9B9EB27B38370007B1772 /* NCShareUserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9E827B38370007B1772 /* NCShareUserCell.swift */; };
 		56E9B9EC27B386E5007B1772 /* NCCreateFormUploadConflict.swift in Sources */ = {isa = PBXBuildFile; fileRef = F704B5E42430AA8000632F5F /* NCCreateFormUploadConflict.swift */; };
-		56E9B9F327B39218007B1772 /* TOPasscodeViewController.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56E9B9F227B39218007B1772 /* TOPasscodeViewController.xcframework */; };
 		56E9B9F427B39218007B1772 /* TOPasscodeViewController.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56E9B9F227B39218007B1772 /* TOPasscodeViewController.xcframework */; };
 		56E9B9FA27B39DFC007B1772 /* NYMnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9F627B39DFC007B1772 /* NYMnemonic.m */; };
 		56E9B9FB27B39DFC007B1772 /* NYMnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B9F627B39DFC007B1772 /* NYMnemonic.m */; };
@@ -144,8 +155,6 @@
 		7A70DD1C27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
 		7A70DD1D27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
 		7A70DD1E27B42A3D0018F47E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DD1A27B42A3D0018F47E /* GoogleService-Info.plist */; };
-		7A70DD2B27B42B7F0018F47E /* DropDown.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; };
-		7A70DD2C27B42B7F0018F47E /* DropDown.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7A70DD3027B42C190018F47E /* DropDown.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5645C2A927B3F61300553117 /* DropDown.xcframework */; };
 		7A70DD5427B4301A0018F47E /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = 7A70DD5327B4301A0018F47E /* Adjust */; };
 		7A70DD9027B4D5570018F47E /* NCMenu+FloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A70DD8E27B4D5570018F47E /* NCMenu+FloatingPanel.swift */; };
@@ -157,12 +166,6 @@
 		7A70DDA127B4D9B70018F47E /* NCPlayerToolBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A70DD9A27B4D9B70018F47E /* NCPlayerToolBar.swift */; };
 		7A70DDA227B4D9B80018F47E /* NCViewerMediaPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A70DD9B27B4D9B70018F47E /* NCViewerMediaPage.swift */; };
 		7A70DDA327B4D9B80018F47E /* NCViewerMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A70DD9C27B4D9B70018F47E /* NCViewerMedia.swift */; };
-		7A70DDE727B567920018F47E /* KTVHTTPCache.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7A70DDF227B567AA0018F47E /* NCCommunication.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107627B2C4B800D9F3E6 /* NCCommunication.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7A70DDF527B567B30018F47E /* Alamofire.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7A70DDFA27B567C50018F47E /* TOPasscodeViewController.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56E9B9F227B39218007B1772 /* TOPasscodeViewController.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7A70DE1A27B56B040018F47E /* KTVCocoaHTTPServer.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; };
-		7A70DE1D27B56B0E0018F47E /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7A70DE2327B5736E0018F47E /* NCSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DE2227B5736E0018F47E /* NCSettings.storyboard */; };
 		7A70DE3727B6242E0018F47E /* NCCreateFormUploadDocuments.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DE3627B6242E0018F47E /* NCCreateFormUploadDocuments.storyboard */; };
 		7A82A18126F3529100D52790 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7239876253D86D300257F49 /* NCEmptyView.xib */; };
@@ -307,7 +310,6 @@
 		C0D7889026809F9800B876BB /* NCShareNewUserAddComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D7888F26809F9800B876BB /* NCShareNewUserAddComment.swift */; };
 		C0D788A6268AEE8400B876BB /* NCShareMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D788A5268AEE8400B876BB /* NCShareMenu.swift */; };
 		C0D788CC268C656C00B876BB /* NCShareQuickStatusMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D788CB268C656C00B876BB /* NCShareQuickStatusMenu.swift */; };
-		C970193FFBCF83131028E4BC /* Pods_Nextcloud.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3E8A85DCD6F57798011CA1C /* Pods_Nextcloud.framework */; };
 		F700222C1EC479840080073F /* Custom.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F700222B1EC479840080073F /* Custom.xcassets */; };
 		F700222D1EC479840080073F /* Custom.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F700222B1EC479840080073F /* Custom.xcassets */; };
 		F700510122DF63AC003A3356 /* NCShare.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F700510022DF63AC003A3356 /* NCShare.storyboard */; };
@@ -566,12 +568,12 @@
 			dstSubfolderSpec = 10;
 			files = (
 				7A5F80DE27B62993008B90E8 /* OpenSSL.xcframework in Embed Frameworks */,
-				7A70DE1D27B56B0E0018F47E /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */,
-				7A70DDFA27B567C50018F47E /* TOPasscodeViewController.xcframework in Embed Frameworks */,
-				7A70DDF527B567B30018F47E /* Alamofire.xcframework in Embed Frameworks */,
-				7A70DDF227B567AA0018F47E /* NCCommunication.xcframework in Embed Frameworks */,
-				7A70DDE727B567920018F47E /* KTVHTTPCache.xcframework in Embed Frameworks */,
-				7A70DD2C27B42B7F0018F47E /* DropDown.xcframework in Embed Frameworks */,
+				5620EF93281943C2009CDD9E /* KTVHTTPCache.xcframework in Embed Frameworks */,
+				5620EF99281943E3009CDD9E /* TOPasscodeViewController.xcframework in Embed Frameworks */,
+				5620EF8F281943AF009CDD9E /* DropDown.xcframework in Embed Frameworks */,
+				5620EF95281943C6009CDD9E /* NCCommunication.xcframework in Embed Frameworks */,
+				5620EF91281943BE009CDD9E /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */,
+				5620EF8D281943AA009CDD9E /* Alamofire.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -619,6 +621,7 @@
 		3757A35423D9D76300EC369E /* NCMenuPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuPanelController.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
 		37ECC83A23D0C7400082EFA2 /* NCMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuAction.swift; sourceTree = "<group>"; };
+		5620EF8A28191F96009CDD9E /* UIDevice+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
 		5621BD7D27DA6A36005A3389 /* NCMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenuAction.swift; sourceTree = "<group>"; };
 		5645C2A927B3F61300553117 /* DropDown.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DropDown.xcframework; path = Carthage/Build/DropDown.xcframework; sourceTree = "<group>"; };
 		5672096E27B5209200413A96 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -1138,29 +1141,28 @@
 			files = (
 				5696257B27B289C6003F774D /* JGProgressHUD in Frameworks */,
 				5696257227B289C6003F774D /* Queuer in Frameworks */,
-				56A5108127B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework in Frameworks */,
 				5696258F27B28DB8003F774D /* QRCodeReader in Frameworks */,
 				5696257927B289C6003F774D /* ChromaColorPicker in Frameworks */,
 				5696256D27B289C6003F774D /* MarkdownKit in Frameworks */,
+				5620EF8C281943AA009CDD9E /* Alamofire.xcframework in Frameworks */,
 				5696256B27B289C6003F774D /* SwiftRichString in Frameworks */,
 				569625F627B29BA7003F774D /* JGProgressHUD in Frameworks */,
-				7A70DD2B27B42B7F0018F47E /* DropDown.xcframework in Frameworks */,
+				5620EF92281943C2009CDD9E /* KTVHTTPCache.xcframework in Frameworks */,
 				569625D327B291E6003F774D /* SwiftEntryKit in Frameworks */,
 				569625F027B29B07003F774D /* ChromaColorPicker in Frameworks */,
+				5620EF94281943C5009CDD9E /* NCCommunication.xcframework in Frameworks */,
 				5696256A27B289C6003F774D /* QRCodeReader in Frameworks */,
 				5696257627B289C6003F774D /* TLPhotoPicker in Frameworks */,
 				5696259527B28E9E003F774D /* FloatingPanel in Frameworks */,
 				5696257A27B289C6003F774D /* Parchment in Frameworks */,
-				56A5107C27B2CCF700D9F3E6 /* Alamofire.xcframework in Frameworks */,
 				5696256C27B289C6003F774D /* FloatingPanel in Frameworks */,
-				56E9B9F327B39218007B1772 /* TOPasscodeViewController.xcframework in Frameworks */,
 				7A70DD5427B4301A0018F47E /* Adjust in Frameworks */,
 				5696256F27B289C6003F774D /* SwiftEntryKit in Frameworks */,
 				569625DF27B29670003F774D /* UICKeyChainStore in Frameworks */,
 				5696257027B289C6003F774D /* MarqueeLabel in Frameworks */,
 				5696259227B28E46003F774D /* SwiftRichString in Frameworks */,
 				5696257727B289C6003F774D /* Realm in Frameworks */,
-				56A5107727B2C4B800D9F3E6 /* NCCommunication.xcframework in Frameworks */,
+				5620EF98281943E3009CDD9E /* TOPasscodeViewController.xcframework in Frameworks */,
 				569625D927B29589003F774D /* MarqueeLabel in Frameworks */,
 				569625DC27B295ED003F774D /* Queuer in Frameworks */,
 				5696257327B289C6003F774D /* UICKeyChainStore in Frameworks */,
@@ -1168,13 +1170,15 @@
 				5696256E27B289C6003F774D /* FirebaseCrashlytics in Frameworks */,
 				5696257827B289C6003F774D /* RealmSwift in Frameworks */,
 				569625D627B292EF003F774D /* XLForm in Frameworks */,
-				7A70DE1A27B56B040018F47E /* KTVCocoaHTTPServer.xcframework in Frameworks */,
 				569625E827B2991A003F774D /* TLPhotoPicker in Frameworks */,
+				5620EF90281943BD009CDD9E /* KTVCocoaHTTPServer.xcframework in Frameworks */,
 				569625E527B29844003F774D /* FSCalendar in Frameworks */,
 				F75E57BD25BF0EC1002B72C2 /* SVGKit in Frameworks */,
 				5696259827B28ED4003F774D /* MarkdownKit in Frameworks */,
-				C970193FFBCF83131028E4BC /* Pods_Nextcloud.framework in Frameworks */,
 				5696257527B289C6003F774D /* FSCalendar in Frameworks */,
+				56007DDD282B98CA00EA4115 /* EasyTipView in Frameworks */,
+				5620EF96281943D8009CDD9E /* Pods_Nextcloud.framework in Frameworks */,
+				5620EF8E281943AF009CDD9E /* DropDown.xcframework in Frameworks */,
 				5696257127B289C6003F774D /* XLForm in Frameworks */,
 				569625EB27B299A0003F774D /* Realm in Frameworks */,
 				569625ED27B299A0003F774D /* RealmSwift in Frameworks */,
@@ -1767,6 +1771,7 @@
 				F7B7504A2397D38E004E13EC /* UIImage+Extensions.swift */,
 				F7A0D1452592256F008F8A13 /* UIImageView+Extensions.swift */,
 				B176BAD526FD9FF8009A0F33 /* UIView+Extensions.swift */,
+				5620EF8A28191F96009CDD9E /* UIDevice+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2409,6 +2414,7 @@
 				569625F227B29B57003F774D /* Parchment */,
 				569625F527B29BA7003F774D /* JGProgressHUD */,
 				7A70DD5327B4301A0018F47E /* Adjust */,
+				56007DDC282B98CA00EA4115 /* EasyTipView */,
 			);
 			productName = "Crypto Cloud";
 			productReference = F7CE8AFA1DC1F8D8009CAE48 /* Nextcloud.app */;
@@ -2493,6 +2499,7 @@
 				569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */,
 				56A229E527B3B57400C35F8B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				7A70DCFF27B429B70018F47E /* XCRemoteSwiftPackageReference "ios_sdk" */,
+				56007DDB282B98C900EA4115 /* XCRemoteSwiftPackageReference "EasyTipView" */,
 			);
 			productRefGroup = F7F67B9F1A24D27800EE80DA;
 			projectDirPath = "";
@@ -2920,6 +2927,7 @@
 				7A70DD9127B4D5570018F47E /* UIViewController+Menu.swift in Sources */,
 				956E0D81266A4C7F00DA4F91 /* TextFileWithOcrSwitchView.swift in Sources */,
 				7A875EE026943DB100AF558D /* HelpViewController.swift in Sources */,
+				5620EF8B28191F96009CDD9E /* UIDevice+Extension.swift in Sources */,
 				56A5108627B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */,
 				56F260FA27D2264200365F78 /* NCShareSectionHeaderView.swift in Sources */,
 				F77444F8222816D5000D5EB0 /* NCPickerViewController.swift in Sources */,
@@ -3162,8 +3170,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/Notification_Service_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -3195,7 +3203,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension QA";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
@@ -3252,7 +3260,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud Notification Service";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
@@ -3408,8 +3416,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/Share.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -3439,7 +3447,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Share/Share-Bridging-Header.h";
@@ -3514,8 +3522,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -3545,7 +3553,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/File Provider Extension/FileProviderExtension-Bridging-Header.h";
@@ -3620,10 +3628,10 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/iOSClient.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
@@ -3661,7 +3669,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -3687,7 +3695,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
@@ -3929,6 +3937,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		56007DDB282B98C900EA4115 /* XCRemoteSwiftPackageReference "EasyTipView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marinofaggiana/EasyTipView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		5696258D27B28DB8003F774D /* XCRemoteSwiftPackageReference "QRCodeReader" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/yannickl/QRCodeReader.swift";
@@ -4125,8 +4141,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SVGKit/SVGKit.git";
 			requirement = {
-				branch = 3.x;
-				kind = branch;
+				kind = upToNextMinorVersion;
+				minimumVersion = 3.0.0;
 			};
 		};
 		F75EAED626D2552E00F4320E /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
@@ -4204,6 +4220,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		56007DDC282B98CA00EA4115 /* EasyTipView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56007DDB282B98C900EA4115 /* XCRemoteSwiftPackageReference "EasyTipView" */;
+			productName = EasyTipView;
+		};
 		5696258E27B28DB8003F774D /* QRCodeReader */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 5696258D27B28DB8003F774D /* XCRemoteSwiftPackageReference "QRCodeReader" */;

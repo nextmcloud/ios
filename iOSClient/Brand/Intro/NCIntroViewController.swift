@@ -24,6 +24,7 @@
 //
 
 import UIKit
+import NCCommunication
 
 class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
@@ -43,12 +44,13 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     private var textColorOpponent: UIColor = .black
     private let imagesLandscape = [UIImage(named: "introSlideLand1"), UIImage(named: "introSlideLand2"), UIImage(named: "introSlideLand3")]
     private let imagesPortrait = [UIImage(named: "introSlide1"), UIImage(named: "introSlide2"), UIImage(named: "introSlide3")]
+    private let imagesEightPortrait = [UIImage(named: "introSlideEight1"), UIImage(named: "introSlideEight2"), UIImage(named: "introSlideEight3")]
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : imagesPortrait
+        let isEightPlusDevice = UIScreen.main.bounds.height == 736
+        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : (isEightPlusDevice ? imagesEightPortrait : imagesPortrait)
         
         let isTooLight = NCBrandColor.shared.customer.isTooLight()
         let isTooDark = NCBrandColor.shared.customer.isTooDark()
@@ -115,8 +117,8 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     override func viewDidLayoutSubviews() {
-        if UIScreen.main.bounds.width < 350 {
-            contstraintBottomLoginButton.constant = 20
+        if UIScreen.main.bounds.width < 350 || UIScreen.main.bounds.height > 800 {
+            contstraintBottomLoginButton.constant = 15
         }
     }
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -139,7 +141,8 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : imagesPortrait
+        let isEightPlusDevice = UIScreen.main.bounds.height == 736
+        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : (isEightPlusDevice ? imagesEightPortrait : imagesPortrait)
         pageControl.currentPage = 0
         introCollectionView.collectionViewLayout.invalidateLayout()
         self.introCollectionView.reloadData()
@@ -175,7 +178,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         cell.titleLabel.textColor = textColor
         cell.titleLabel.text = titles[indexPath.row]
         cell.imageView.image = images[indexPath.row]
-        cell.imageView.contentMode = .scaleToFill
+        cell.imageView.contentMode = .scaleAspectFill
         return cell
     }
 
@@ -199,7 +202,12 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func login(_ sender: Any) {
-        appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+        if NCCommunication.shared.isNetworkReachable() {
+            appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+        } else {
+            showNoInternetAlert()
+        }
+        
     }
 
     @IBAction func signup(_ sender: Any) {
@@ -209,6 +217,12 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     @IBAction func host(_ sender: Any) {
         guard let url = URL(string: NCBrandOptions.shared.linkLoginHost) else { return }
         UIApplication.shared.open(url)
+    }
+    
+    func showNoInternetAlert(){
+        let alertController = UIAlertController(title: NSLocalizedString("_no_internet_alert_title_", comment: ""), message: NSLocalizedString("_no_internet_alert_message_", comment: ""), preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { action in }))
+        self.present(alertController, animated: true)
     }
 }
 
