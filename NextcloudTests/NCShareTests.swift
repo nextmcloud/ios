@@ -33,7 +33,7 @@ class NCShareTests: XCTestCase {
         share.shareType = 4
         share.permissions = 19
         
-        sut.quickStatus(with: share, sender: UIButton())
+        sut.quickStatus(with: share, sender: UIButton(), index:0)
         XCTAssertEqual(sut.quickStatusTableShare.permissions, 19, "permission should be equal")
     }
     
@@ -46,7 +46,7 @@ class NCShareTests: XCTestCase {
         let share = tableShare()
         share.shareType = 3
         
-        sut.quickStatusLink(with: share, sender: UIButton())
+        sut.quickStatusLink(with: share, sender: UIButton(), index:0)
         XCTAssertEqual(sut.quickStatusTableShare.shareType, 3, "permission should be equal")
     }
 }
@@ -106,24 +106,3 @@ class NCShareCommonTests: XCTestCase {
     }
 }
 
-class NCCreateFormUploadScanDocumentTests: XCTestCase {
-    var sut: NCCreateFormUploadScanDocument!
-    let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    
-    override func setUp() {
-        super.setUp()
-        sut = NCCreateFormUploadScanDocument.init(serverUrl: appDelegate.activeServerUrl, arrayImages: [])
-    }
-    
-    override func tearDown() {
-        super.tearDown()
-        sut = nil
-    }
-    
-    func testChangeCompressionImage() {
-        let image = sut.changeCompressionImage(UIImage(named: "directory")!)
-        let newDataCount = image.pngData()?.count ?? 0
-        let originalDataCount = UIImage(named: "directory")!.pngData()?.count ?? 0
-        XCTAssertLessThan(newDataCount, originalDataCount, "new image should be less in size")
-    }
-}
