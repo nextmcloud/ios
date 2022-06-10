@@ -111,7 +111,7 @@ class NCGlobal: NSObject {
     // Database Realm
     //
     let databaseDefault                             = "nextcloud.realm"
-    let databaseSchemaVersion: UInt64               = 215
+    let databaseSchemaVersion: UInt64               = 220
 
     // Intro selector
     //
@@ -371,7 +371,6 @@ class NCGlobal: NSObject {
     let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId
 
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
-    let notificationCenterMenuPDFDisplayDirection               = "menuPDFDisplayDirection"         // userInfo: direction
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
     let notificationCenterMenuDetailClose                       = "menuDetailClose"
 
@@ -393,4 +392,8 @@ class NCGlobal: NSObject {
     let notificationCenterStatusReadOnly                        = "statusReadOnly"
     let notificationCenterStatusEditing                         = "statusEditing"
     let notificationCenterStatusFileDrop                        = "statusFileDrop"
+    
+    // Tip
+    //
+    let tipNCViewerPDFThumbnail                                 = "tipncviewerpdfthumbnail"
 }

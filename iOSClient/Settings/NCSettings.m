@@ -124,7 +124,7 @@
 //    row.action.viewControllerClass = [NCManageEndToEndEncryption class];
 //
 //    [section addFormRow:row];
-    
+//    
     // Section : Screen --------------------------------------------------------------
     
 //    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_screen_", nil)];

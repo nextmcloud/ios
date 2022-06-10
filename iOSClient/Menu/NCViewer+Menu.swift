@@ -301,30 +301,30 @@ extension NCViewer {
                 )
             )
             
-            var title = ""
-            var icon = UIImage()
-            
-            if CCUtility.getPDFDisplayDirection() == .horizontal {
-                title = NSLocalizedString("_pdf_vertical_", comment: "")
-                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
-            } else {
-                title = NSLocalizedString("_pdf_horizontal_", comment: "")
-                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
-            }
-            
-            actions.append(
-                NCMenuAction(
-                    title: title,
-                    icon: icon,
-                    action: { _ in
-                        if CCUtility.getPDFDisplayDirection() == .horizontal {
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.vertical])
-                        } else {
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.horizontal])
-                        }
-                    }
-                )
-            )
+//            var title = ""
+//            var icon = UIImage()
+//            
+//            if CCUtility.getPDFDisplayDirection() == .horizontal {
+//                title = NSLocalizedString("_pdf_vertical_", comment: "")
+//                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
+//            } else {
+//                title = NSLocalizedString("_pdf_horizontal_", comment: "")
+//                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
+//            }
+//            
+//            actions.append(
+//                NCMenuAction(
+//                    title: title,
+//                    icon: icon,
+//                    action: { _ in
+//                        if CCUtility.getPDFDisplayDirection() == .horizontal {
+//                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.vertical])
+//                        } else {
+//                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.horizontal])
+//                        }
+//                    }
+//                )
+//            )
             
             actions.append(
                 NCMenuAction(

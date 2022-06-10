@@ -325,27 +325,21 @@ import SVGKit
     func saveAlbum(metadata: tableMetadata) {
         
         let fileNamePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
-        let status = PHPhotoLibrary.authorizationStatus()
         
-        if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && status == PHAuthorizationStatus.authorized {
+        NCContentPresenter.shared.messageNotification("_save_selected_files_", description: "_file_not_saved_cameraroll_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
+        NCAskAuthorization.shared.askAuthorizationPhotoLibrary(viewController: appDelegate.mainTabBar?.window?.rootViewController) { hasPermission in
+            guard hasPermission else {
+                return NCContentPresenter.shared.messageNotification("_access_photo_not_enabled_", description: "_access_photo_not_enabled_msg_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
+                
+            }
             
-            if let image = UIImage(contentsOfFile: fileNamePath) {
-                UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveAlbum(_:didFinishSavingWithError:contextInfo:)), nil)
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue, let image = UIImage(contentsOfFile: fileNamePath) {
+                UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.saveAlbum(_:didFinishSavingWithError:contextInfo:)), nil)
+            } else if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue, UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(fileNamePath) {
+                UISaveVideoAtPathToSavedPhotosAlbum(fileNamePath, self, #selector(self.saveAlbum(_:didFinishSavingWithError:contextInfo:)), nil)
             } else {
                 NCContentPresenter.shared.messageNotification("_save_selected_files_", description: "_file_not_saved_cameraroll_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
             }
-            
-        } else if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue && status == PHAuthorizationStatus.authorized {
-            
-            if UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(fileNamePath) {
-                UISaveVideoAtPathToSavedPhotosAlbum(fileNamePath, self, #selector(saveAlbum(_:didFinishSavingWithError:contextInfo:)), nil)
-            } else {
-                NCContentPresenter.shared.messageNotification("_save_selected_files_", description: "_file_not_saved_cameraroll_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
-            }
-            
-        } else if status != PHAuthorizationStatus.authorized {
-            
-            NCContentPresenter.shared.messageNotification("_access_photo_not_enabled_", description: "_access_photo_not_enabled_msg_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorFileNotSaved)
         }
     }
     
@@ -751,7 +745,13 @@ import SVGKit
         }
         
         let modify = UIAction(title: NSLocalizedString("_modify_", comment: ""), image: UIImage(systemName: "pencil.tip.crop.circle")) { action in
-            self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
+            if viewController is NCFileViewInFolder {
+                viewController.dismiss(animated: true) {
+                    NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
+                }
+            } else {
+                NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook)
+            }
         }
         
         //        let saveAsScan = UIAction(title: NSLocalizedString("_save_as_scan_", comment: ""), image: UIImage(systemName: "viewfinder.circle")) { action in
