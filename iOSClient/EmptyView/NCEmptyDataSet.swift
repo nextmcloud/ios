@@ -111,9 +111,32 @@ public class NCEmptyView: UIView {
     @IBOutlet weak var emptyTitle: UILabel!
     @IBOutlet weak var emptyDescription: UILabel!
 
+    @IBOutlet weak var constraintImageTop: NSLayoutConstraint!
+    @IBOutlet weak var constraintTitleTop: NSLayoutConstraint!
+    @IBOutlet weak var contraintTitleBottom: NSLayoutConstraint!
+    
     public override func awakeFromNib() {
         super.awakeFromNib()
-
+        self.rotated()
         emptyTitle.textColor = NCBrandColor.shared.label
+        NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: UIDevice.orientationDidChangeNotification, object: nil)
+    }
+
+    deinit {
+       NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
+    }
+    
+    @objc func rotated() {
+        if (UIDevice.current.userInterfaceIdiom == .phone) {
+            if UIDevice.current.orientation.isLandscape {
+                constraintImageTop.constant = 5
+                constraintTitleTop.constant = -10
+                contraintTitleBottom.constant = 5
+            } else {
+                constraintImageTop.constant = 30
+                constraintTitleTop.constant = 30
+                contraintTitleBottom.constant = 20
+            }
+        }
     }
 }

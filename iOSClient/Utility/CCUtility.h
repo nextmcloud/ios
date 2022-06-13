@@ -191,9 +191,6 @@
 + (NSInteger)getCleanUpDay;
 + (void)setCleanUpDay:(NSInteger)days;
 
-+ (PDFDisplayDirection)getPDFDisplayDirection;
-+ (void)setPDFDisplayDirection:(PDFDisplayDirection)direction;
-
 + (BOOL)getPrivacyScreenEnabled;
 + (void)setPrivacyScreenEnabled:(BOOL)set;
 
@@ -233,6 +230,7 @@
 + (NSString *)getDirectoryProviderStorageIconOcId:(NSString *)ocId etag:(NSString *)etag;
 + (NSString *)getDirectoryProviderStoragePreviewOcId:(NSString *)ocId etag:(NSString *)etag;
 + (BOOL)fileProviderStorageExists:(tableMetadata *)metadata;
++ (BOOL)fileProviderStorageExists:(NSString *)ocId fileNameView:(NSString *)fileNameView;
 + (int64_t)fileProviderStorageSize:(NSString *)ocId fileNameView:(NSString *)fileNameView;
 + (BOOL)fileProviderStoragePreviewIconExists:(NSString *)ocId etag:(NSString *)etag;
 

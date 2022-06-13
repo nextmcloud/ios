@@ -763,23 +763,6 @@
     [UICKeyChainStore setString:daysString forKey:@"cleanUpDay" service:NCGlobal.shared.serviceShareKeyChain];
 }
 
-+ (PDFDisplayDirection)getPDFDisplayDirection
-{
-    NSString *direction = [UICKeyChainStore stringForKey:@"PDFDisplayDirection" service:NCGlobal.shared.serviceShareKeyChain];
-    
-    if (direction == nil) {
-        return kPDFDisplayDirectionVertical;
-    } else {
-        return [direction integerValue];
-    }
-}
-
-+ (void)setPDFDisplayDirection:(PDFDisplayDirection)direction
-{
-    NSString *directionString = [@(direction) stringValue];
-    [UICKeyChainStore setString:directionString forKey:@"PDFDisplayDirection" service:NCGlobal.shared.serviceShareKeyChain];
-}
-
 + (BOOL)getPrivacyScreenEnabled
 {
     NSString *valueString = [UICKeyChainStore stringForKey:@"privacyScreen" service:NCGlobal.shared.serviceShareKeyChain];
@@ -1230,6 +1213,16 @@
 
     unsigned long long fileSize = [[[NSFileManager defaultManager] attributesOfItemAtPath:fileNamePath error:nil] fileSize];
     return fileSize == metadata.size;
+}
+
++ (BOOL)fileProviderStorageExists:(NSString *)ocId fileNameView:(NSString *)fileNameView
+{
+    NSString *fileNamePath = [self getDirectoryProviderStorageOcId:ocId fileNameView:fileNameView];
+    
+    unsigned long long fileSize = [[[NSFileManager defaultManager] attributesOfItemAtPath:fileNamePath error:nil] fileSize];
+    
+    if (fileSize > 0) return true;
+    else return false;
 }
 
 + (int64_t)fileProviderStorageSize:(NSString *)ocId fileNameView:(NSString *)fileNameView

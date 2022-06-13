@@ -91,7 +91,7 @@ class NCLoginWeb: UIViewController {
                    statusBar.backgroundColor = NCBrandColor.shared.customer
                }
         }
-        self.navigationController!.navigationBar.backgroundColor = NCBrandColor.shared.customer
+        self.navigationController?.navigationBar.backgroundColor = NCBrandColor.shared.customer
 
         activityIndicator = UIActivityIndicatorView(style: .gray)
         activityIndicator.center = self.view.center
