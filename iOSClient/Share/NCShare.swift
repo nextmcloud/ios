@@ -349,6 +349,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     //    }
     
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int) {
+        getShareFromIndex(index: index)
         let share = (tableShare?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShare
         guard let tableShare = share else { return }
         guard let metadata = self.metadata else { return }
@@ -630,7 +631,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     func getShareFromIndex(index: Int) -> tableShare? {
-        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        if let shareLink = shares.firstShareLink {
+            shares.share?.insert(shareLink, at: 0)
+        }
         return shares.share?[index]
     }
     
