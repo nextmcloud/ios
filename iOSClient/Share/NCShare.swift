@@ -630,7 +630,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     func getShareFromIndex(index: Int) -> tableShare? {
-        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        if let shareLink = shares.firstShareLink {
+            shares.share?.insert(shareLink, at: 0)
+        }
         return shares.share?[index]
     }
     
