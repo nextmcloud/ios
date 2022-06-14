@@ -349,7 +349,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     //    }
     
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int) {
-        getShareFromIndex(index: index)
         let share = (tableShare?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShare
         guard let tableShare = share else { return }
         guard let metadata = self.metadata else { return }
