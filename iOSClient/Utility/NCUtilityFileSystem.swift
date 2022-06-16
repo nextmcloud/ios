@@ -21,7 +21,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import PhotosUI
 
 class NCUtilityFileSystem: NSObject {
@@ -29,25 +29,11 @@ class NCUtilityFileSystem: NSObject {
         let instance = NCUtilityFileSystem()
         return instance
     }()
-    
+
     let fileManager = FileManager.default
-    
-    @objc func getFileSize(asset: PHAsset) -> Int64 {
-        
-        let resources = PHAssetResource.assetResources(for: asset)
-        
-        if let resource = resources.first {
-            if resource.responds(to: #selector(NSDictionary.fileSize)) {
-                let unsignedInt64 = resource.value(forKey: "fileSize") as! CLong
-                return Int64(bitPattern: UInt64(unsignedInt64))
-            }
-        }
-        
-        return 0
-    }
-    
+
     @objc func getFileSize(filePath: String) -> Int64 {
-        
+
         do {
             let attributes = try fileManager.attributesOfItem(atPath: filePath)
             return attributes[FileAttributeKey.size] as? Int64 ?? 0
@@ -56,9 +42,9 @@ class NCUtilityFileSystem: NSObject {
         }
         return 0
     }
-    
+
     @objc func getFileModificationDate(filePath: String) -> NSDate? {
-        
+
         do {
             let attributes = try fileManager.attributesOfItem(atPath: filePath)
             return attributes[FileAttributeKey.modificationDate] as? NSDate
@@ -67,9 +53,9 @@ class NCUtilityFileSystem: NSObject {
         }
         return nil
     }
-    
+
     @objc func getFileCreationDate(filePath: String) -> NSDate? {
-        
+
         do {
             let attributes = try fileManager.attributesOfItem(atPath: filePath)
             return attributes[FileAttributeKey.creationDate] as? NSDate
@@ -78,97 +64,132 @@ class NCUtilityFileSystem: NSObject {
         }
         return nil
     }
-    
+
     @objc func writeFile(fileURL: URL, text: String) -> Bool {
-        
+
         do {
             try FileManager.default.removeItem(at: fileURL)
-        }
-        catch {
+        } catch {
             print(error)
         }
-        
+
         do {
             try text.write(to: fileURL, atomically: true, encoding: .utf8)
             return true
-        }
-        catch {
+        } catch {
             print(error)
             return false
         }
     }
-    
+
     @objc func deleteFile(filePath: String) {
-        
+
         do {
             try FileManager.default.removeItem(atPath: filePath)
-        }
-        catch {
+        } catch {
             print(error)
         }
     }
-    
-    @objc func moveFile(atPath: String, toPath: String) {
+
+    @discardableResult
+    @objc func moveFile(atPath: String, toPath: String) -> Bool {
+
+        if atPath == toPath { return true }
+
+        do {
+            try FileManager.default.removeItem(atPath: toPath)
+        } catch {
+            print(error)
+        }
+
+        do {
+            try FileManager.default.copyItem(atPath: atPath, toPath: toPath)
+            try FileManager.default.removeItem(atPath: atPath)
+            return true
+        } catch {
+            print(error)
+            return false
+        }
+    }
+
+    @discardableResult
+    @objc func copyFile(atPath: String, toPath: String) -> Bool {
+
+        if atPath == toPath { return true }
+
+        do {
+            try FileManager.default.removeItem(atPath: toPath)
+        } catch {
+            print(error)
+        }
+
+        do {
+            try FileManager.default.copyItem(atPath: atPath, toPath: toPath)
+            return true
+        } catch {
+            print(error)
+            return false
+        }
+    }
+
+    @objc func moveFileInBackground(atPath: String, toPath: String) {
 
         if atPath == toPath { return }
-    
-        try? FileManager.default.removeItem(atPath: toPath)
-        try? FileManager.default.copyItem(atPath: atPath, toPath: toPath)
-        try? FileManager.default.removeItem(atPath: atPath)
-    }
-    
-    @objc func moveFileInBackground(atPath: String, toPath: String) {
-        
-        if atPath == toPath { return }
-        
+
         DispatchQueue.global().async {
-            
+
             try? FileManager.default.removeItem(atPath: toPath)
             try? FileManager.default.copyItem(atPath: atPath, toPath: toPath)
             try? FileManager.default.removeItem(atPath: atPath)
         }
     }
-    
+
     @objc func linkItem(atPath: String, toPath: String) {
-    
+
         try? FileManager.default.removeItem(atPath: toPath)
         try? FileManager.default.linkItem(atPath: atPath, toPath: toPath)
     }
-    
+
     // MARK: - 
-    
+
     @objc func getWebDAV(account: String) -> String {
-        return NCManageDatabase.shared.getCapabilitiesServerString(account: account, elements: NCElementsJSON.shared.capabilitiesWebDavRoot) ?? "remote.php/webdav"
-    }
-    
-    @objc func getDAV() -> String {
+        // return NCManageDatabase.shared.getCapabilitiesServerString(account: account, elements: NCElementsJSON.shared.capabilitiesWebDavRoot) ?? "remote.php/webdav"
         return "remote.php/dav"
     }
-    
-    @objc func getHomeServer(urlBase: String, account: String) -> String {
-        return urlBase + "/" + self.getWebDAV(account: account)
+
+    @objc func getHomeServer(account: String) -> String {
+        var home = self.getWebDAV(account: account)
+        if let tableAccount = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", account)) {
+            home = tableAccount.urlBase + "/" + self.getWebDAV(account: account) + "/files/" + tableAccount.userId
+        }
+        return home
     }
-    
-    @objc func deletingLastPathComponent(serverUrl: String, urlBase: String, account: String) -> String {
-        if getHomeServer(urlBase: urlBase, account: account) == serverUrl { return serverUrl }
+
+    @objc func getPath(metadata: tableMetadata) -> String {
+
+        return metadata.path.replacingOccurrences(of: "/remote.php/dav/files/"+metadata.user, with: "") + metadata.fileName
+    }
+
+    @objc func deletingLastPathComponent(account: String, serverUrl: String) -> String {
+        if getHomeServer(account: account) == serverUrl { return serverUrl }
         let fileName = (serverUrl as NSString).lastPathComponent
         let serverUrl = serverUrl.replacingOccurrences(of: "/"+fileName, with: "", options: String.CompareOptions.backwards, range: nil)
         return serverUrl
     }
-    
+
     @objc func createFileName(_ fileName: String, serverUrl: String, account: String) -> String {
-        
+
         var resultFileName = fileName
         var exitLoop = false
-            
+
             while exitLoop == false {
-                
+
                 if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "fileNameView == %@ AND serverUrl == %@ AND account == %@", resultFileName, serverUrl, account)) != nil {
-                    
+
                     var name = NSString(string: resultFileName).deletingPathExtension
                     let ext = NSString(string: resultFileName).pathExtension
                     let characters = Array(name)
-                    
+
                     if characters.count < 2 {
                         if ext == "" {
                             resultFileName = name + " " + "1"
@@ -179,7 +200,7 @@ class NCUtilityFileSystem: NSObject {
                         let space = characters[characters.count-2]
                         let numChar = characters[characters.count-1]
                         var num = Int(String(numChar))
-                        if (space == " " && num != nil) {
+                        if space == " " && num != nil {
                             name = String(name.dropLast())
                             num = num! + 1
                             if ext == "" {
@@ -195,13 +216,83 @@ class NCUtilityFileSystem: NSObject {
                             }
                         }
                     }
-                    
+
                 } else {
                     exitLoop = true
                 }
         }
-        
+
         return resultFileName
     }
-}
 
+    @objc func getDirectorySize(directory: String) -> Int64 {
+
+        let url = URL(fileURLWithPath: directory)
+        let manager = FileManager.default
+        var totalSize: Int64 = 0
+
+        if let enumerator = manager.enumerator(at: url, includingPropertiesForKeys: [.isRegularFileKey], options: []) {
+            for case let fileURL as URL in enumerator {
+                if let attributes = try? manager.attributesOfItem(atPath: fileURL.path) {
+                    if let size = attributes[.size] as? Int64 {
+                        totalSize += size
+                    }
+                }
+            }
+        }
+
+        return totalSize
+    }
+
+    func cleanUp(directory: String, days: TimeInterval) {
+
+        if days == 0 { return}
+
+        let minimumDate = Date().addingTimeInterval(-days*24*60*60)
+        let url = URL(fileURLWithPath: directory)
+        var offlineDir: [String] = []
+        var offlineFiles: [String] = []
+
+        if let directories = NCManageDatabase.shared.getTablesDirectory(predicate: NSPredicate(format: "offline == true"), sorted: "serverUrl", ascending: true) {
+            for directory: tableDirectory in directories {
+                offlineDir.append(CCUtility.getDirectoryProviderStorageOcId(directory.ocId))
+            }
+        }
+
+        let files = NCManageDatabase.shared.getTableLocalFiles(predicate: NSPredicate(format: "offline == true"), sorted: "fileName", ascending: true)
+        for file: tableLocalFile in files {
+            offlineFiles.append(CCUtility.getDirectoryProviderStorageOcId(file.ocId, fileNameView: file.fileName))
+        }
+
+        func meetsRequirement(date: Date) -> Bool {
+            return date < minimumDate
+        }
+
+        let manager = FileManager.default
+        if let enumerator = manager.enumerator(at: url, includingPropertiesForKeys: [.isRegularFileKey], options: []) {
+            for case let fileURL as URL in enumerator {
+                if let attributes = try? manager.attributesOfItem(atPath: fileURL.path) {
+                    if let date = CCUtility.getATime(fileURL.path) {
+                        if attributes[.size] as? Double == 0 { continue }
+                        if attributes[.type] as? FileAttributeType == FileAttributeType.typeDirectory { continue }
+                        if fileURL.pathExtension == NCGlobal.shared.extensionPreview { continue }
+                        // check offline
+                        if offlineFiles.contains(fileURL.path) { continue }
+                        let filter = offlineDir.filter({ fileURL.path.hasPrefix($0)})
+                        if filter.count > 0 { continue }
+                        // check date
+                        if meetsRequirement(date: date) {
+                            let folderURL = fileURL.deletingLastPathComponent()
+                            let ocId = folderURL.lastPathComponent
+                            do {
+                                try manager.removeItem(atPath: fileURL.path)
+                            } catch { }
+                            manager.createFile(atPath: fileURL.path, contents: nil, attributes: nil)
+                            NCManageDatabase.shared.deleteLocalFile(predicate: NSPredicate(format: "ocId == %@", ocId))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

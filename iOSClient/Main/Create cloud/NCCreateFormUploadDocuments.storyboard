@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hTm-e0-ORl">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hTm-e0-ORl">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -76,7 +76,7 @@
                                     <outlet property="delegate" destination="uQo-FX-ejX" id="9zi-Ui-T0z"/>
                                 </connections>
                             </collectionView>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" ambiguous="YES" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="eeP-9N-ZRP">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="eeP-9N-ZRP">
                                 <rect key="frame" x="0.0" y="304" width="375" height="200"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
@@ -87,7 +87,7 @@
                                     <outlet property="delegate" destination="uQo-FX-ejX" id="gsE-cc-f9G"/>
                                 </connections>
                             </tableView>
-                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" ambiguous="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="MR6-tv-tqK">
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="MR6-tv-tqK">
                                 <rect key="frame" x="172.5" y="154" width="30" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="30" id="0S5-5q-xmr"/>
@@ -95,7 +95,6 @@
                                 </constraints>
                             </activityIndicatorView>
                         </subviews>
-                        <viewLayoutGuide key="safeArea" id="ILQ-5j-b92"/>
                         <constraints>
                             <constraint firstItem="MR6-tv-tqK" firstAttribute="centerX" secondItem="ILQ-5j-b92" secondAttribute="centerX" id="71o-CE-nGW"/>
                             <constraint firstItem="eeP-9N-ZRP" firstAttribute="top" secondItem="kdt-bX-icm" secondAttribute="bottom" constant="10" id="Fhq-zQ-1Cx"/>
@@ -106,11 +105,7 @@
                             <constraint firstItem="eeP-9N-ZRP" firstAttribute="leading" secondItem="ILQ-5j-b92" secondAttribute="leading" id="pNx-zH-54E"/>
                             <constraint firstItem="ILQ-5j-b92" firstAttribute="trailing" secondItem="eeP-9N-ZRP" secondAttribute="trailing" id="yxz-bK-MTp"/>
                         </constraints>
-                        <variation key="default">
-                            <mask key="subviews">
-                                <exclude reference="kdt-bX-icm"/>
-                            </mask>
-                        </variation>
+                        <viewLayoutGuide key="safeArea" id="ILQ-5j-b92"/>
                     </view>
                     <navigationItem key="navigationItem" id="YB9-Lg-X9d"/>
                     <connections>

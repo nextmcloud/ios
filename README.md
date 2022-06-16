@@ -1,10 +1,14 @@
-# [Nextcloud](https://nextcloud.com)  iOS app [![Releases](https://img.shields.io/github/release/nextcloud/ios.svg)](https://github.com/nextcloud/ios/releases/latest)
-
-[<img src="Animation.gif"
-alt="Download from App Store"
-height="400">](https://itunes.apple.com/us/app/nextcloud/id1125420102?mt=8)
-
+# [Nextcloud](https://nextcloud.com) iOS app 
+[![Releases](https://img.shields.io/github/release/nextcloud/ios.svg)](https://github.com/nextcloud/ios/releases/latest) [![Build](https://github.com/nextcloud/ios/actions/workflows/xcode.yml/badge.svg)](https://github.com/nextcloud/ios/actions/workflows/xcode.yml) [![SwiftLint](https://github.com/nextcloud/ios/actions/workflows/lint.yml/badge.svg)](https://github.com/nextcloud/ios/actions/workflows/lint.yml)
 [![irc](https://img.shields.io/badge/IRC-%23nextcloud--mobile%20on%20freenode-blue.svg)](https://webchat.freenode.net/?channels=nextcloud-mobile)
+
+<img src="Animation.gif" 
+alt="Demo of the Nextcloud iOS files app"
+height="400">
+
+[<img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+alt="Demo of the Nextcloud iOS files app"
+height="40">](https://itunes.apple.com/us/app/nextcloud/id1125420102)
 
 Check out https://nextcloud.com and follow us on [twitter.com/nextclouders](https://twitter.com/nextclouders) or [twitter.com/NextcloudiOS](https://twitter.com/NextcloudiOS)
 
@@ -33,29 +37,23 @@ More information how to contribute: [https://nextcloud.com/contribute/](https://
 ## Start contributing
 
 You can start by forking this repository and creating pull requests on the develop
-branch. Maybe start working on [starter issues](https://github.com/nextcloud/ios/issues?q=is%3Aopen+is%3Aissue+label%3A%22starter+issue%22). 
+branch. Maybe start working on [starter issues](https://github.com/nextcloud/ios/labels/good%20first%20issue). 
 
 Easy starting points are also reviewing [pull requests](https://github.com/nextcloud/ios/pulls)
 
-### Xcode Project Setup
+### Xcode 13.1 Project Setup
 
 #### Dependencies
 
-After forking a repository you have to build the dependencies. Dependencies are managed with Carthage. 
+After forking a repository you have to build the dependencies. Dependencies are managed with Carthage version 0.37.0 or later. 
 Run
 
 ```
-carthage build --platform ios
+carthage update --use-xcframeworks --platform iOS --cache-builds
 ```
 to fetch and compile the dependencies.
 
-#### Carthage XCode 12 issues
-
-Due to issues with carthage and XCode 12, use the following command when building dependencies for XCode 12
-
-```
-./wcarthage update --no-use-binaries --platform iOS --cache-builds
-```
+In order to build the project in Xcode you will also need a file `GoogleService-Info.plist` at the root of the repository which contains the Firebase configuration. For development work you can use a mock version found [here](https://github.com/firebase/quickstart-ios/blob/master/mock-GoogleService-Info.plist).
 
 ### Creating Pull requests
 
