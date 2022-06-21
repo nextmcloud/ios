@@ -178,6 +178,13 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         loadDatasource(withLoadFolder: true)
 
         shares = NCManageDatabase.shared.getTableShares(account: activeAccount.account, serverUrl: serverUrl)
+        if let item = items.first as? tableMetadata, item.serverUrl == serverUrl {
+            selectCommandViewSelect?.moveButton?.isEnabled = false
+            selectCommandViewSelect?.copyButton?.isEnabled = false
+        } else {
+            selectCommandViewSelect?.moveButton?.isEnabled = true
+            selectCommandViewSelect?.copyButton?.isEnabled = true
+        }
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
