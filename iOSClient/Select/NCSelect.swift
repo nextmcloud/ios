@@ -178,6 +178,15 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         loadDatasource(withLoadFolder: true)
 
         shares = NCManageDatabase.shared.getTableShares(account: activeAccount.account, serverUrl: serverUrl)
+        if let item = items.first as? tableMetadata, item.serverUrl == serverUrl {
+            selectCommandViewSelect?.moveButton?.isEnabled = false
+            selectCommandViewSelect?.copyButton?.isEnabled = false
+            selectCommandViewSelect?.copyButton?.alpha = 0.5
+        } else {
+            selectCommandViewSelect?.moveButton?.isEnabled = true
+            selectCommandViewSelect?.copyButton?.isEnabled = true
+            selectCommandViewSelect?.copyButton?.alpha = 1.0
+        }
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -726,7 +735,8 @@ class NCSelectCommandView: UIView {
     @IBOutlet weak var overwriteSwitch: UISwitch?
     @IBOutlet weak var overwriteLabel: UILabel?
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
-
+    @IBOutlet weak var buttonsWidthConstraint: NSLayoutConstraint!
+    
     var selectView: NCSelect?
     private let gradient: CAGradientLayer = CAGradientLayer()
     override func awakeFromNib() {
@@ -765,6 +775,7 @@ class NCSelectCommandView: UIView {
         moveButton?.layer.masksToBounds = true
         moveButton?.setTitle(NSLocalizedString("_move_", comment: ""), for: .normal)
         moveButton?.setTitleColor(.white, for: .normal)
+        buttonsWidthConstraint.constant = UIScreen.main.bounds.width > 321 ? 150 : 132
     }
     
     @IBAction func createFolderButtonPressed(_ sender: UIButton) {
