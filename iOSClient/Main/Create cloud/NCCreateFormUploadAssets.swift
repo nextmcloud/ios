@@ -392,7 +392,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         }else{
             let asset = assets[0]
             let  placeHolderString =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
-            row.cellConfig["fileNameTextField.text"] = placeHolderString
+            let placeholderWithoutExtension = URL(fileURLWithPath: placeHolderString ?? "").deletingPathExtension().lastPathComponent
+            row.cellConfig["fileNameTextField.text"] = placeholderWithoutExtension
             row.value = ""
         }
         row.hidden = "$\("maintainOriginalFileName") == 1"
@@ -610,7 +611,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         }else{
             let asset = assets[0]
             let  placeHolderString =   CCUtility.createFileName(asset.value(forKey: "filename") as! String?, fileDate: asset.creationDate, fileType: asset.mediaType, keyFileName: nil, keyFileNameType: NCBrandGlobal.shared.keyFileNameType, keyFileNameOriginal: NCBrandGlobal.shared.keyFileNameOriginal, forcedNewFileName: false)
-            maskFileName.cellConfig["fileNameTextField.text"] = placeHolderString
+            let placeholderWithoutExtension = URL(fileURLWithPath: placeHolderString ?? "").deletingPathExtension().lastPathComponent
+            maskFileName.cellConfig["fileNameTextField.text"] = placeholderWithoutExtension
         }
         
         self.tableView.reloadData()
@@ -652,30 +654,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         }
     }
     
-    /*
-<<<<<<< HEAD
-    @objc func save() {
-=======
-    func save() {
->>>>>>> feature_branded_client_4
-        
-        self.dismiss(animated: true, completion: {
-            
-            let useFolderPhotoRow : XLFormRowDescriptor  = self.form.formRow(withTag: "useFolderAutoUpload")!
-            let useSubFolderRow : XLFormRowDescriptor  = self.form.formRow(withTag: "useSubFolder")!
-            var useSubFolder : Bool = false
-            
-            if (useFolderPhotoRow.value! as AnyObject).boolValue == true {
-                
-                self.serverUrl = NCManageDatabase.shared.getAccountAutoUploadPath(urlBase: self.appDelegate.urlBase, account: self.appDelegate.account)
-                useSubFolder = (useSubFolderRow.value! as AnyObject).boolValue
-            }
-            
-            self.appDelegate.activeMain.uploadFileAsset(self.assets, serverUrl: self.serverUrl, useSubFolder: useSubFolder, session: self.session)
-        })
-    }
-    */
-    
+
     @objc func save() {
          
         DispatchQueue.global().async { [self] in
