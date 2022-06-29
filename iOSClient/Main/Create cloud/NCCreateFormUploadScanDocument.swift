@@ -1037,7 +1037,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 let bounds = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
                 
                 //self.form.formRow(withTag: "textRecognition")!.value as! Int == 1
-                if isOCRActivatedFileConflicts {
+                if isPDFWithOCRSwitchOn {
                     
                     UIGraphicsBeginPDFPageWithInfo(bounds, nil)
                     image.draw(in: bounds)
