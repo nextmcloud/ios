@@ -37,9 +37,7 @@ class tableAccount: Object, NCUserBaseUrl {
     @objc dynamic var address = ""
     @objc dynamic var alias = ""
     @objc dynamic var autoUpload: Bool = false
-    @objc dynamic var autoUploadBackground: Bool = false
     @objc dynamic var autoUploadCreateSubfolder: Bool = false
-    @objc dynamic var autoUploadDeleteAssetLocalIdentifier: Bool = false
     @objc dynamic var autoUploadDirectory = ""
     @objc dynamic var autoUploadFileName = ""
     @objc dynamic var autoUploadFull: Bool = false
@@ -53,7 +51,6 @@ class tableAccount: Object, NCUserBaseUrl {
     @objc dynamic var businessSize: String = ""
     @objc dynamic var businessType = ""
     @objc dynamic var city = ""
-    @objc dynamic var company = ""
     @objc dynamic var country = ""
     @objc dynamic var displayName = ""
     @objc dynamic var email = ""
@@ -63,6 +60,7 @@ class tableAccount: Object, NCUserBaseUrl {
     @objc dynamic var lastLogin: Int64 = 0
     @objc dynamic var locale = ""
     @objc dynamic var mediaPath = ""
+    @objc dynamic var organisation = ""
     @objc dynamic var password = ""
     @objc dynamic var phone = ""
     @objc dynamic var quota: Int64 = 0
@@ -84,8 +82,9 @@ class tableAccount: Object, NCUserBaseUrl {
     @objc dynamic var userStatusMessageIsPredefined: Bool = false
     @objc dynamic var userStatusStatus: String?
     @objc dynamic var userStatusStatusIsUserDefined: Bool = false
-    @objc dynamic var webpage = ""
+    @objc dynamic var website = ""
     @objc dynamic var zip = ""
+
     // COLOR Files
     @objc dynamic var darkColorBackground = ""
     @objc dynamic var lightColorBackground = ""
@@ -131,7 +130,7 @@ class tableActivity: Object, DateCompareable {
     @objc dynamic var note = ""
     @objc dynamic var selector = ""
     @objc dynamic var verbose: Bool = false
-    
+
     override static func primaryKey() -> String {
         return "idPrimaryKey"
     }
@@ -164,7 +163,7 @@ class tableActivityPreview: Object {
 }
 
 class tableActivitySubjectRich: Object {
-    
+
     @objc dynamic var account = ""
     @objc dynamic var idActivity: Int = 0
     @objc dynamic var idPrimaryKey = ""
@@ -383,6 +382,13 @@ class tableMetadata: Object, NCUserBaseUrl {
     @objc dynamic var ocId = ""
     @objc dynamic var ownerId = ""
     @objc dynamic var ownerDisplayName = ""
+    @objc public var lock = false
+    @objc public var lockOwner = ""
+    @objc public var lockOwnerEditor = ""
+    @objc public var lockOwnerType = 0
+    @objc public var lockOwnerDisplayName = ""
+    @objc public var lockTime: Date?
+    @objc public var lockTimeOut: Date?
     @objc dynamic var path = ""
     @objc dynamic var permissions = ""
     @objc dynamic var quotaUsedBytes: Int64 = 0
@@ -415,10 +421,15 @@ class tableMetadata: Object, NCUserBaseUrl {
 
 extension tableMetadata {
     var fileExtension: String { (fileNameView as NSString).pathExtension }
-    
+
     var isPrintable: Bool {
-            classFile == NCCommunicationCommon.typeClassFile.image.rawValue || ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/")
-        }
+        classFile == NCCommunicationCommon.typeClassFile.image.rawValue || ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/")
+    }
+
+    /// Returns false if the user is lokced out of the file. I.e. The file is locked but by somone else
+    func canUnlock(as user: String) -> Bool {
+        return !lock || (lockOwner == user && lockOwnerType == 0)
+    }
 }
 
 class tablePhotoLibrary: Object {
@@ -489,11 +500,11 @@ class tableShare: Object {
 }
 
 class tableTag: Object {
-    
+
     @objc dynamic var account = ""
     @objc dynamic var ocId = ""
-    @objc dynamic var tagIOS: Data? = nil
-    
+    @objc dynamic var tagIOS: Data?
+
     override static func primaryKey() -> String {
         return "ocId"
     }
@@ -517,7 +528,6 @@ class tableTrash: Object {
     @objc dynamic var hasPreview: Bool = false
     @objc dynamic var iconName = ""
     @objc dynamic var size: Int64 = 0
-    @objc dynamic var typeFile = ""
     @objc dynamic var trashbinFileName = ""
     @objc dynamic var trashbinOriginalLocation = ""
     @objc dynamic var trashbinDeletionTime = NSDate()

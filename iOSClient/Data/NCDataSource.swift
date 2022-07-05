@@ -114,16 +114,13 @@ class NCDataSource: NSObject {
             }
 
             // is Local / offline
-            if !metadata.directory {
-                let size = CCUtility.fileProviderStorageSize(metadata.ocId, fileNameView: metadata.fileNameView)
-                if size > 0 {
-                    let tableLocalFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
-                    if tableLocalFile == nil && size == metadata.size {
-                        NCManageDatabase.shared.addLocalFile(metadata: metadata)
-                    }
-                    if tableLocalFile?.offline ?? false {
-                        metadataOffLine.append(metadata.ocId)
-                    }
+            if !metadata.directory, CCUtility.fileProviderStorageExists(metadata) {
+                let tableLocalFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
+                if tableLocalFile == nil {
+                    NCManageDatabase.shared.addLocalFile(metadata: metadata)
+                }
+                if tableLocalFile?.offline ?? false {
+                    metadataOffLine.append(metadata.ocId)
                 }
             }
 
@@ -184,7 +181,7 @@ class NCDataSource: NSObject {
         var index: Int?
 
         if let ocIdTemp = ocIdTemp {
-                   index = self.getIndexMetadata(ocId: ocIdTemp)
+            index = self.getIndexMetadata(ocId: ocIdTemp)
         } else {
             index = self.getIndexMetadata(ocId: ocId)
         }

@@ -41,10 +41,10 @@ class NCViewerProviderContextMenu: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     init(metadata: tableMetadata, image: UIImage?) {
         super.init(nibName: nil, bundle: nil)
-        
+
         self.metadata = metadata
         self.metadataLivePhoto = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
         self.image = image
@@ -61,6 +61,7 @@ class NCViewerProviderContextMenu: UIViewController {
             imageView.frame = resize(CGSize(width: sizeIcon, height: sizeIcon))
 
         } else {
+
             // ICON
             if let image = UIImage(named: metadata.iconName)?.resizeImage(size: CGSize(width: sizeIcon*2, height: sizeIcon*2), isAspectRation: true) {
 
@@ -76,15 +77,15 @@ class NCViewerProviderContextMenu: UIViewController {
                     imageView.frame = resize(image.size)
                 }
             }
+
             // VIEW IMAGE
             if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && CCUtility.fileProviderStorageExists(metadata) {
-
                 viewImage(metadata: metadata)
             }
 
             // VIEW LIVE PHOTO
             if let metadataLivePhoto = metadataLivePhoto, CCUtility.fileProviderStorageExists(metadataLivePhoto) {
-                            viewVideo(metadata: metadataLivePhoto)
+                viewVideo(metadata: metadataLivePhoto)
             }
 
             // VIEW VIDEO
@@ -132,7 +133,6 @@ class NCViewerProviderContextMenu: UIViewController {
         view = imageView
         imageView.contentMode = .scaleAspectFill
     }
-
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

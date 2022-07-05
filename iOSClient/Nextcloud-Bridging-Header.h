@@ -1,6 +1,5 @@
 //
 //  Use this file to import your target's public headers that you would like to expose to Swift.
-//  Author TSI-mc
 //
 
 #import "CCManageAccount.h"
@@ -9,4 +8,3 @@
 #import "UIImage+animatedGIF.h"
 #import "CCUtility.h"
 #import "NCPushNotification.h"
-#import "AdjustHelper.h"

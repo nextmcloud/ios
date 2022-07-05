@@ -4,7 +4,9 @@
 //
 //  Created by Marino Faggiana on 02/10/2018.
 //  Copyright © 2018 Marino Faggiana. All rights reserved.
+//  Copyright © 2022 Henrik Storch. All rights reserved.
 //
+//  Author Henrik Storch <henrik.storch@nextcloud.com>
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -21,34 +23,34 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import Realm
 import UIKit
 import NCCommunication
 import Realm
 
 class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDelegate, NCTrashSectionHeaderMenuDelegate, NCEmptyDataSetDelegate, NCGridCellDelegate {
+
     var selectableDataSource: [RealmSwiftObject] { datasource }
-    
+
     @IBOutlet weak var collectionView: UICollectionView!
     
     var trashPath = ""
     var titleCurrentFolder = NSLocalizedString("_trash_view_", comment: "")
     var blinkFileId: String?
     var emptyDataSet: NCEmptyDataSet?
-    
     internal let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    
+
     internal var isEditMode = false
     internal var selectOcId: [String] = []
-    
+
     var datasource: [tableTrash] = []
     var layoutForView: NCGlobal.layoutForViewType?
     var listLayout: NCListLayout!
     var gridLayout: NCGridLayout!
     let highHeader: CGFloat = 50
     private let refreshControl = UIRefreshControl()
-    
     // MARK: - View Life Cycle
-    
+
     override func viewDidLoad() {
         view.backgroundColor = NCBrandColor.shared.systemBackground
         self.navigationController?.navigationBar.prefersLargeTitles = true
@@ -56,36 +58,33 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
         // Cell
         collectionView.register(UINib(nibName: "NCTrashListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
         collectionView.register(UINib(nibName: "NCGridCell", bundle: nil), forCellWithReuseIdentifier: "gridCell")
-        
         // Header - Footer
         collectionView.register(UINib(nibName: "NCTrashSectionHeaderMenu", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionHeaderMenu")
         collectionView.register(UINib(nibName: "NCTrashSectionFooter", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "sectionFooter")
-        
+
         collectionView.alwaysBounceVertical = true
         collectionView.backgroundColor = NCBrandColor.shared.systemBackground
-        
+
         listLayout = NCListLayout()
         gridLayout = NCGridLayout()
-        
+
         // Add Refresh Control
         collectionView.addSubview(refreshControl)
         refreshControl.tintColor = .gray
         refreshControl.addTarget(self, action: #selector(loadListingTrash), for: .valueChanged)
-        
+
         // Empty
         emptyDataSet = NCEmptyDataSet(view: collectionView, offset: highHeader, delegate: self)
-        
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reloadDataSource), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadDataSource), object: nil)
-        
         changeTheming()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
-        
         appDelegate.activeViewController = self
+
         self.navigationItem.title = titleCurrentFolder
-        
+
         layoutForView = NCUtility.shared.getLayoutForView(key: NCGlobal.shared.layoutViewTrash, serverUrl: "", sort: "date", ascending: false, titleButtonHeader: "_sorted_by_date_more_recent_")
         gridLayout.itemForLine = CGFloat(layoutForView?.itemForLine ?? 3)
         if layoutForView?.layout == NCGlobal.shared.layoutList {
@@ -93,7 +92,6 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
         } else {
             collectionView.collectionViewLayout = gridLayout
         }
-        
         if trashPath.isEmpty {
             guard let userId = (appDelegate.userId as NSString).addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlFragmentAllowed) else { return }
             trashPath = appDelegate.urlBase + "/" + NCUtilityFileSystem.shared.getWebDAV(account: appDelegate.account) + "/trashbin/" + userId + "/trash/"
@@ -101,34 +99,34 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
         setNavigationItem()
         reloadDataSource()
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         loadListingTrash()
     }
-    
+
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        
+
         coordinator.animate(alongsideTransition: nil) { _ in
             self.collectionView?.collectionViewLayout.invalidateLayout()
         }
     }
-    
+
     @objc func changeTheming() {
         collectionView.reloadData()
     }
-    
+
     // MARK: - Empty
-    
+
     func emptyDataSetView(_ view: NCEmptyView) {
         view.emptyImage.image = UIImage.init(named: "trash")?.image(color: NCBrandColor.shared.nmcGray1, size: UIScreen.main.bounds.width)
         view.emptyTitle.text = NSLocalizedString("_trash_no_trash_", comment: "")
         view.emptyDescription.text = NSLocalizedString("_trash_no_trash_description_", comment: "")
     }
-    
+
     // MARK: TAP EVENT
-    
+
     func tapSwitchHeaderMenu(sender: Any) {
         if collectionView.collectionViewLayout == gridLayout {
             // list layout
@@ -152,16 +150,16 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
             NCUtility.shared.setLayoutForView(key: NCGlobal.shared.layoutViewTrash, serverUrl: "", layout: layoutForView?.layout)
         }
     }
-    
+
     func tapOrderHeaderMenu(sender: Any) {
         let sortMenu = NCSortMenu()
         sortMenu.toggleMenu(viewController: self, key: NCGlobal.shared.layoutViewTrash, sortButton: sender as? UIButton, serverUrl: "", hideDirectoryOnTop: true)
     }
-    
+
     func tapMoreHeaderMenu(sender: Any) {
         toggleMenuMoreHeader()
     }
-    
+
     func tapRestoreListItem(with ocId: String, image: UIImage?, sender: Any) {
         if !isEditMode {
             restoreItem(with: ocId)
@@ -171,20 +169,20 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
             collectionView(self.collectionView, didSelectItemAt: indexPath!)
         }// else: undefined sender
     }
-    
+
     func tapMoreListItem(with objectId: String, image: UIImage?, sender: Any) {
-        
+
         if !isEditMode {
             toggleMenuMore(with: objectId, image: image, isGridCell: false)
         } else if let button = sender as? UIView {
             let buttonPosition = button.convert(CGPoint.zero, to: collectionView)
             let indexPath = collectionView.indexPathForItem(at: buttonPosition)
             collectionView(self.collectionView, didSelectItemAt: indexPath!)
-        }
+        } // else: undefined sender
     }
-    
+
     func tapMoreGridItem(with objectId: String, namedButtonMore: String, image: UIImage?, sender: Any) {
-        
+
         if !isEditMode {
             toggleMenuMore(with: objectId, image: image, isGridCell: true)
         } else if let button = sender as? UIView {
@@ -193,43 +191,39 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
             collectionView(self.collectionView, didSelectItemAt: indexPath!)
         } // else: undefined sender
     }
-    
-    
-    func longPressGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) {
-    }
-    
-    func longPressMoreGridItem(with objectId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) {
-    }
-    
+    func longPressGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+
+    func longPressMoreGridItem(with objectId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+
     @objc func reloadDataSource() {
 
-            layoutForView = NCUtility.shared.getLayoutForView(key: NCGlobal.shared.layoutViewTrash, serverUrl: "")
+        layoutForView = NCUtility.shared.getLayoutForView(key: NCGlobal.shared.layoutViewTrash, serverUrl: "")
 
-            datasource.removeAll()
+        datasource.removeAll()
 
-            guard let tashItems = NCManageDatabase.shared.getTrash(filePath: trashPath, sort: layoutForView?.sort, ascending: layoutForView?.ascending, account: appDelegate.account) else {
-                return
-            }
+        guard let tashItems = NCManageDatabase.shared.getTrash(filePath: trashPath, sort: layoutForView?.sort, ascending: layoutForView?.ascending, account: appDelegate.account) else {
+            return
+        }
 
-            datasource = tashItems
-            collectionView.reloadData()
-            guard let blinkFileId = blinkFileId else { return }
-            for itemIx in 0..<self.datasource.count where self.datasource[itemIx].fileId.contains(blinkFileId) {
-                let indexPath = IndexPath(item: itemIx, section: 0)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    UIView.animate(withDuration: 0.3) {
-                        self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
-                    } completion: { _ in
-                        guard let cell = self.collectionView.cellForItem(at: indexPath) else { return }
-                        cell.backgroundColor = .darkGray
-                        UIView.animate(withDuration: 2) {
-                            cell.backgroundColor = .clear
-                            self.blinkFileId = nil
-                        }
+        datasource = tashItems
+        collectionView.reloadData()
+        guard let blinkFileId = blinkFileId else { return }
+        for itemIx in 0..<self.datasource.count where self.datasource[itemIx].fileId.contains(blinkFileId) {
+            let indexPath = IndexPath(item: itemIx, section: 0)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                UIView.animate(withDuration: 0.3) {
+                    self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+                } completion: { _ in
+                    guard let cell = self.collectionView.cellForItem(at: indexPath) else { return }
+                    cell.backgroundColor = .darkGray
+                    UIView.animate(withDuration: 2) {
+                        cell.backgroundColor = .clear
+                        self.blinkFileId = nil
                     }
                 }
             }
         }
+    }
 }
 
 // MARK: - NC API & Algorithm

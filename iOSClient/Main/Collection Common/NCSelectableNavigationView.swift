@@ -42,11 +42,13 @@ protocol NCSelectableNavigationView: AnyObject {
     var selectOcId: [String] { get set }
     var titleCurrentFolder: String { get }
     var navigationItem: UINavigationItem { get }
-    
+    var selectActions: [NCMenuAction] { get }
+
+    func reloadDataSource()
+    func setNavigationItem()
+
     func tapSelectMenu()
     func tapSelect()
-    func setNavigationItem()
-    var selectActions: [NCMenuAction] { get }
 }
 
 extension NCSelectableNavigationView {
@@ -63,14 +65,14 @@ extension NCSelectableNavigationView {
             navigationItem.title = titleCurrentFolder
         }
     }
-    
+
     func tapSelect() {
         isEditMode = !isEditMode
         selectOcId.removeAll()
         self.setNavigationItem()
         self.collectionView.reloadData()
     }
-    
+
     func collectionViewSelectAll() {
         selectOcId = selectableDataSource.compactMap({ $0.primaryKeyValue })
         navigationItem.title = NSLocalizedString("_selected_", comment: "") + " : \(selectOcId.count)" + " / \(selectableDataSource.count)"
@@ -82,33 +84,59 @@ extension NCSelectableNavigationView where Self: UIViewController {
     func tapSelectMenu() {
         presentMenu(with: selectActions)
     }
-    
+
     var selectActions: [NCMenuAction] {
         var actions = [NCMenuAction]()
-        
         if selectOcId.count != selectableDataSource.count {
             actions.append(.selectAllAction(action: collectionViewSelectAll))
         }
-        
+
         guard !selectOcId.isEmpty else { return actions }
         var selectedMetadatas: [tableMetadata] = []
         var selectedMediaMetadatas: [tableMetadata] = []
-        
+        var isAnyOffline = false
+        var isAnyFolder = false
+        var isAnyLocked = false
+        var canUnlock = true
+
         for ocId in selectOcId {
             guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
             selectedMetadatas.append(metadata)
             if [NCCommunicationCommon.typeClassFile.image.rawValue, NCCommunicationCommon.typeClassFile.video.rawValue].contains(metadata.classFile) {
                 selectedMediaMetadatas.append(metadata)
             }
+
+            if metadata.directory { isAnyFolder = true }
+            if metadata.lock {
+                isAnyLocked = true
+                if metadata.lockOwner != appDelegate.userId {
+                    canUnlock = false
+                }
+            }
+
+            guard !isAnyOffline else { continue }
+            if metadata.directory,
+               let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, metadata.serverUrl + "/" + metadata.fileName)) {
+                isAnyOffline = directory.offline
+            } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
+                isAnyOffline = localFile.offline
+            } // else: file is not offline, continue
         }
-        
+
         actions.append(.openInAction(selectedMetadatas: selectedMetadatas, viewController: self, completion: tapSelect))
-        
-        
+
+        if !isAnyFolder, canUnlock, NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesFilesLockVersion) >= 1 {
+            actions.append(.lockUnlockFiles(shouldLock: !isAnyLocked, metadatas: selectedMetadatas, completion: tapSelect))
+        }
+
         if !selectedMediaMetadatas.isEmpty {
             actions.append(.saveMediaAction(selectedMediaMetadatas: selectedMediaMetadatas, completion: tapSelect))
         }
-        
+        actions.append(.setAvailableOfflineAction(selectedMetadatas: selectedMetadatas, isAnyOffline: isAnyOffline, viewController: self, completion: {
+            self.reloadDataSource()
+            self.tapSelect()
+        }))
+
         actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, completion: tapSelect))
         actions.append(.copyAction(selectOcId: selectOcId, hudView: self.view, completion: tapSelect))
         actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, viewController: self, completion: tapSelect))

@@ -21,17 +21,17 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 import UIKit
 import FloatingPanel
 import NCCommunication
 
 extension NCViewer {
-    
+
     func toggleMenu(viewController: UIViewController, metadata: tableMetadata, webView: Bool, imageIcon: UIImage?) {
-        let menuViewController = UIStoryboard.init(name: "NCMenu", bundle: nil).instantiateInitialViewController() as! NCMenu
+
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
+
         var actions = [NCMenuAction]()
-        
         var titleFavorite = NSLocalizedString("_add_favorites_", comment: "")
         if metadata.favorite { titleFavorite = NSLocalizedString("_remove_favorites_", comment: "") }
         let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
@@ -44,24 +44,28 @@ extension NCViewer {
         }
         
         let isFolderEncrypted = CCUtility.isFolderEncrypted(metadata.serverUrl, e2eEncrypted: metadata.e2eEncrypted, account: metadata.account, urlBase: metadata.urlBase)
-        
+        let isOffline = localFile?.offline == true
+
         //
         // FAVORITE
-        //
-        actions.append(
-            NCMenuAction(
-                title: titleFavorite,
-                icon: NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite),
-                action: { _ in
-                    NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
-                        if errorCode != 0 {
-                            NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+        // Workaround: PROPPATCH doesn't work
+        // https://github.com/nextcloud/files_lock/issues/68
+        if !metadata.lock {
+            actions.append(
+                NCMenuAction(
+                    title: titleFavorite,
+                    icon: NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite),
+                    action: { _ in
+                        NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
+                            if errorCode != 0 {
+                                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                            }
                         }
                     }
-                }
+                )
             )
-        )
-        
+        }
+
         //
         // DETAIL
         //
@@ -78,7 +82,6 @@ extension NCViewer {
         //        }
         
         //
-        // ROTATE
         // OFFLINE
         //
         if (metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml"), !metadata.livePhoto {
@@ -180,31 +183,53 @@ extension NCViewer {
         //        }
         
         //
+        // SAVE IMAGE / VIDEO
+        //
+        if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue {
+            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata]))
+        }
+
+        //
+        // SAVE AS SCAN
+        //
+        if #available(iOS 13.0, *) {
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml" {
+                actions.append(
+                    NCMenuAction(
+                        title: NSLocalizedString("_save_as_scan_", comment: ""),
+                        icon: NCUtility.shared.loadImage(named: "viewfinder.circle"),
+                        action: { _ in
+                            NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
+                        }
+                    )
+                )
+            }
+        }
+
+        //
         // RENAME
         //
-        if !webView {
+        if !webView, !metadata.lock {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "rename",color: NCBrandColor.shared.iconColor),
-                    action: { menuAction in
-                        
+                    action: { _ in
+
                         if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
-                            
+
                             vcRename.metadata = metadata
                             vcRename.disableChangeExt = true
                             vcRename.imagePreview = imageIcon
                             
                             let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
-                            
-                            
                             viewController.present(popup, animated: true)
                         }
                     }
                 )
             )
         }
-        
+
         //
         // COPY - MOVE
         //
@@ -251,7 +276,6 @@ extension NCViewer {
         //                }
         //            )
         //        )
-        
         //
         // VIEW IN FOLDER
         //
@@ -261,14 +285,14 @@ extension NCViewer {
                     NCMenuAction(
                         title: NSLocalizedString("_view_in_folder_", comment: ""),
                         icon: NCUtility.shared.loadImage(named: "viewInFolder",color: NCBrandColor.shared.iconColor),
-                        action: { menuAction in
+                        action: { _ in
                             NCFunctionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
                         }
                     )
                 )
-            }
+            )
         }
-        
+
         //
         // DOWNLOAD IMAGE MAX RESOLUTION
         //
@@ -278,28 +302,28 @@ extension NCViewer {
                     NCMenuAction(
                         title: NSLocalizedString("_download_image_max_", comment: ""),
                         icon: NCUtility.shared.loadImage(named: "cloudDownload",color: NCBrandColor.shared.iconColor),
-                        action: { menuAction in
-                            NCNetworking.shared.download(metadata: metadata, selector: "") { (_) in }
+                        action: { _ in
+                            NCNetworking.shared.download(metadata: metadata, selector: "") { _ in }
                         }
                     )
                 )
             }
         }
-        
+
         //
         // PDF
         //
-        
         if metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_search_", comment: ""),
                     icon: UIImage(named: "search")!.image(color: NCBrandColor.shared.iconColor, size: 50),
-                    action: { menuAction in
+                    action: { _ in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuSearchTextPDF)
                     }
                 )
             )
+
             
 //            var title = ""
 //            var icon = UIImage()
@@ -336,7 +360,7 @@ extension NCViewer {
                 )
             )
         }
-        
+
         //
         // MODIFY
         //
@@ -353,7 +377,7 @@ extension NCViewer {
                 )
             }
         }
-        
+
         //
         // DELETE
         //

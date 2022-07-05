@@ -237,17 +237,6 @@
     [UICKeyChainStore setString:sValue forKey:key service:NCGlobal.shared.serviceShareKeyChain];
 }
 
-+ (void)setOriginalFileNamePrefsChanged:(BOOL)value key:(NSString *)key
-{
-    NSString *sValue = (value) ? @"true" : @"false";
-    [UICKeyChainStore setString:sValue forKey:key service:NCGlobal.shared.serviceShareKeyChain];
-}
-
-+ (BOOL)getOriginalFileNamePrefsChanged:(NSString *)key
-{
-    return [[UICKeyChainStore stringForKey:key service:NCGlobal.shared.serviceShareKeyChain] boolValue];
-}
-
 + (NSString *)getFileNameMask:(NSString *)key
 {
     NSString *mask = [UICKeyChainStore stringForKey:key service:NCGlobal.shared.serviceShareKeyChain];
@@ -395,7 +384,6 @@
 
 + (void)clearAllKeysEndToEnd:(NSString *)account
 {
-
     [self setEndToEndCertificate:account certificate:nil];
     [self setEndToEndPrivateKey:account privateKey:nil];
     [self setEndToEndPublicKey:account publicKey:nil];
@@ -782,6 +770,18 @@
     [UICKeyChainStore setString:sSet forKey:@"privacyScreen" service:NCGlobal.shared.serviceShareKeyChain];
 }
 
+
++ (BOOL)getRemovePhotoCameraRoll
+{
+    return [[UICKeyChainStore stringForKey:@"removePhotoCameraRoll" service:NCGlobal.shared.serviceShareKeyChain] boolValue];
+}
+
++ (void)setRemovePhotoCameraRoll:(BOOL)set
+{
+    NSString *sSet = (set) ? @"true" : @"false";
+    [UICKeyChainStore setString:sSet forKey:@"removePhotoCameraRoll" service:NCGlobal.shared.serviceShareKeyChain];
+}
+
 #pragma --------------------------------------------------------------------------------------------
 #pragma mark ===== Various =====
 #pragma --------------------------------------------------------------------------------------------
@@ -1099,23 +1099,6 @@
     return path;
 }
 
-+ (NSString *)getStringUser:(NSString *)user urlBase:(NSString *)urlBase
-{
-    NSString *baseUrl = [urlBase lowercaseString];
-    NSString *dirUserBaseUrl = @"";
-
-    if ([user length] && [baseUrl length]) {
-        
-        if ([baseUrl hasPrefix:@"https://"]) baseUrl = [baseUrl substringFromIndex:8];
-        if ([baseUrl hasPrefix:@"http://"]) baseUrl = [baseUrl substringFromIndex:7];
-        
-        dirUserBaseUrl = [NSString stringWithFormat:@"%@-%@", user, baseUrl];
-        dirUserBaseUrl = [[self removeForbiddenCharactersFileSystem:dirUserBaseUrl] lowercaseString];
-    }
-    
-    return dirUserBaseUrl;
-}
-
 // Return the path of directory Documents -> NSDocumentDirectory
 + (NSString *)getDirectoryDocuments
 {
@@ -1212,15 +1195,6 @@
     }
 
     unsigned long long fileSize = [[[NSFileManager defaultManager] attributesOfItemAtPath:fileNamePath error:nil] fileSize];
-    return fileSize == metadata.size;
-}
-
-+ (BOOL)fileProviderStorageExists:(NSString *)ocId fileNameView:(NSString *)fileNameView
-{
-    NSString *fileNamePath = [self getDirectoryProviderStorageOcId:ocId fileNameView:fileNameView];
-    
-    unsigned long long fileSize = [[[NSFileManager defaultManager] attributesOfItemAtPath:fileNamePath error:nil] fileSize];
-    
     if (fileSize > 0) return true;
     else return false;
 }
@@ -1409,7 +1383,7 @@
     return path;
 }
 
-+ (void)extractImageVideoFromAssetLocalIdentifierForUpload:(tableMetadata *)metadataForUpload notification:(BOOL)notification completion:(void(^)(tableMetadata *metadata, NSString* fileNamePath))completion
++ (void)extractImageVideoFromAssetLocalIdentifierForUpload:(tableMetadata *)metadataForUpload completion:(void(^)(tableMetadata *metadata, NSString* fileNamePath))completion
 {
     if (metadataForUpload == nil) {
         return completion(nil, nil);
@@ -1419,10 +1393,6 @@
     
     PHFetchResult *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[metadata.assetLocalIdentifier] options:nil];
     if (!result.count) {
-        if (notification) {
-            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterUploadedFile object:nil userInfo:@{@"ocId": metadata.ocId, @"errorCode": @(NCGlobal.shared.errorInternalError), @"errorDescription": @"_err_file_not_found_"}];
-        }
-        
         return completion(nil, nil);
     }
     
@@ -1444,21 +1414,24 @@
                 NSLog(@"cacheAsset: %f", progress);
                 
                 if (error) {
-                    if (notification) {
-                        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterUploadedFile object:nil userInfo:@{@"ocId": metadata.ocId, @"errorCode": @(error.code), @"errorDescription": [NSString stringWithFormat:@"Image request iCloud failed [%@]", error.description]}];
-                    }
-                    
+                    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterUploadedFile object:nil userInfo:@{@"ocId": metadata.ocId, @"errorCode": @(error.code), @"errorDescription": [NSString stringWithFormat:@"Image request iCloud failed [%@]", error.description]}];
                     return completion(nil, nil);
                 }
             };
             
+            NSString *extensionAsset = [[[asset valueForKey:@"filename"] pathExtension] uppercaseString];
+            
+            //raw image will always ignore any edits made to the photo if compatibility is false
+            if ([extensionAsset isEqualToString:@"DNG"]) {
+                options.version = PHImageRequestOptionsVersionOriginal;
+            }
+            
             [[PHImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
                 
                 NSError *error = nil;
-                NSString *extensionAsset = [[[asset valueForKey:@"filename"] pathExtension] uppercaseString];
                 NSString *fileName = metadata.fileNameView;
 
-                if ([extensionAsset isEqualToString:@"HEIC"] && [CCUtility getFormatCompatibility]) {
+                if (([extensionAsset isEqualToString:@"HEIC"] || [extensionAsset isEqualToString:@"DNG"]) && [CCUtility getFormatCompatibility]) {
                     
                     CIImage *ciImage = [CIImage imageWithData:imageData];
                     CIContext *context = [CIContext context];
@@ -1503,10 +1476,7 @@
                 NSLog(@"cacheAsset: %f", progress);
                 
                 if (error) {
-                    if (notification) {
-                        [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterUploadedFile object:nil userInfo:@{@"ocId": metadata.ocId, @"errorCode": @(error.code), @"errorDescription": [NSString stringWithFormat:@"Video request iCloud failed [%@]", error.description]}];
-                    }
-                    
+                    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterUploadedFile object:nil userInfo:@{@"ocId": metadata.ocId, @"errorCode": @(error.code), @"errorDescription": [NSString stringWithFormat:@"Video request iCloud failed [%@]", error.description]}];
                     completion(nil, nil);
                 }
             };
@@ -1527,19 +1497,12 @@
                     dispatch_async(dispatch_get_main_queue(), ^{
                         
                         if (error) {
-                            
-                            if (notification) {
-                                [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterUploadedFile object:nil userInfo:@{@"ocId": metadata.ocId, @"errorCode": @(error.code), @"errorDescription": [NSString stringWithFormat:@"Video request iCloud failed [%@]", error.description]}];
-                            }
-                            
+                            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterUploadedFile object:nil userInfo:@{@"ocId": metadata.ocId, @"errorCode": @(error.code), @"errorDescription": [NSString stringWithFormat:@"Video request iCloud failed [%@]", error.description]}];
                             completion(nil, nil);
-                            
                         } else {
-                            
                             metadata.creationDate = creationDate;
                             metadata.date = modificationDate;
                             metadata.size = [[NCUtilityFileSystem shared] getFileSizeWithFilePath:fileNamePath];
-                            
                             completion(metadata, fileNamePath);
                         }
                     });
@@ -1715,7 +1678,7 @@
     long fileSize = 0;
     int pixelY = 0;
     int pixelX = 0;
-    NSString *lensModel;
+    NSString *lensModel = @"";
 
     if (![metadata.classFile isEqualToString:@"image"] || ![CCUtility fileProviderStorageExists:metadata]) {
         completition(latitude, longitude, location, date, lensModel);
@@ -1732,7 +1695,7 @@
     CFDictionaryRef fileProperties = CGImageSourceCopyProperties(originalSource, nil);
     if (!fileProperties) {
         CFRelease(originalSource);
-        completition(latitude, longitude, location,date, lensModel);
+        completition(latitude, longitude, location, date, lensModel);
         return;
     }
     
@@ -1744,7 +1707,7 @@
     if (!imageProperties) {
         CFRelease(originalSource);
         CFRelease(fileProperties);
-        completition(latitude, longitude, location,date, lensModel);
+        completition(latitude, longitude, location, date, lensModel);
         return;
     }
 
@@ -1771,7 +1734,6 @@
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         [dateFormatter setDateFormat:@"yyyy:MM:dd HH:mm:ss"];
         date = [dateFormatter dateFromString:dateTime];
-        if (!date) date = metadata.date;
     }
     
     if (gps) {
@@ -1788,6 +1750,7 @@
             stringLatitude = [NSString stringWithFormat:@"+%.4f", latitude];
         } else {
             stringLatitude = [NSString stringWithFormat:@"-%.4f", latitude];
+            latitude *= -1;
         }
         
         // conversion 4 decimal +E -W
@@ -1797,10 +1760,10 @@
             stringLongitude = [NSString stringWithFormat:@"+%.4f", longitude];
         } else {
             stringLongitude = [NSString stringWithFormat:@"-%.4f", longitude];
+            longitude *= -1;
         }
         
         if (latitude == 0 || longitude == 0) {
-            
             stringLatitude = @"0";
             stringLongitude = @"0";
         }

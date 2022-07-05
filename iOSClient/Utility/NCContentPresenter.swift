@@ -69,7 +69,7 @@ class NCContentPresenter: NSObject {
             type: .error,
             errorCode: errorCode)
     }
-    
+
     @objc func showGenericError(description: String) {
         messageNotification(
             "_error_", description: description,

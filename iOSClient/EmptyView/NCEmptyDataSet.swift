@@ -110,7 +110,6 @@ public class NCEmptyView: UIView {
     @IBOutlet weak var emptyImage: UIImageView!
     @IBOutlet weak var emptyTitle: UILabel!
     @IBOutlet weak var emptyDescription: UILabel!
-
     @IBOutlet weak var constraintImageTop: NSLayoutConstraint!
     @IBOutlet weak var constraintTitleTop: NSLayoutConstraint!
     @IBOutlet weak var contraintTitleBottom: NSLayoutConstraint!

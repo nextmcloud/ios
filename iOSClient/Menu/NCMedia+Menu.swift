@@ -32,21 +32,19 @@ extension NCMedia {
         self.selectOcId.removeAll()
         self.reloadDataThenPerform { }
     }
+
     func toggleMenu() {
-        
-        let menuViewController = UIStoryboard.init(name: "NCMenu", bundle: nil).instantiateInitialViewController() as! NCMenu
+
         var actions: [NCMenuAction] = []
-        
         defer { presentMenu(with: actions) }
-        
+
         if !isEditMode {
             if metadatas.count > 0 {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_select_", comment: ""),
                         icon: NCUtility.shared.loadImage(named: "selectFull",color: NCBrandColor.shared.iconColor),
-                        
-                        action: { menuAction in
+                        action: { _ in
                             self.isEditMode = true
                         }
                     )
@@ -57,10 +55,9 @@ extension NCMedia {
                 NCMenuAction(
                     title: NSLocalizedString(filterClassTypeImage ? "_media_viewimage_show_" : "_media_viewimage_hide_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: filterClassTypeImage ? "nocamera" : "file_photo_menu",color: NCBrandColor.shared.iconColor),
-                    
                     selected: filterClassTypeImage,
                     on: true,
-                    action: { menuAction in
+                    action: { _ in
                         self.filterClassTypeImage = !self.filterClassTypeImage
                         self.filterClassTypeVideo = false
                         self.reloadDataSourceWithCompletion { _ in }
@@ -74,14 +71,14 @@ extension NCMedia {
                     icon: NCUtility.shared.loadImage(named: filterClassTypeVideo ? "videono" : "videoyes",color: NCBrandColor.shared.iconColor),
                     selected: filterClassTypeVideo,
                     on: true,
-                    action: { menuAction in
+                    action: { _ in
                         self.filterClassTypeVideo = !self.filterClassTypeVideo
                         self.filterClassTypeImage = false
                         self.reloadDataSourceWithCompletion { _ in }
                     }
                 )
             )
-            
+
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_select_media_folder_", comment: ""),
@@ -89,57 +86,54 @@ extension NCMedia {
                     action: { menuAction in
                         let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as! UINavigationController
                         let viewController = navigationController.topViewController as! NCSelect
-                        
                         viewController.delegate = self
                         viewController.typeOfCommandView = .select
                         viewController.type = "mediaFolder"
-                        
                         self.present(navigationController, animated: true, completion: nil)
                     }
                 )
             )
+
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_modified_date_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "sortFileNameAZ",color: NCBrandColor.shared.iconColor),
-                    
                     selected: CCUtility.getMediaSortDate() == "date",
                     on: true,
-                    action: { menuAction in
+                    action: { _ in
                         CCUtility.setMediaSortDate("date")
                         self.reloadDataSourceWithCompletion { _ in }
                     }
                 )
             )
-            
+
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_created_date_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "sortFileNameAZ",color: NCBrandColor.shared.iconColor),
                     selected: CCUtility.getMediaSortDate() == "creationDate",
                     on: true,
-                    action: { menuAction in
+                    action: { _ in
                         CCUtility.setMediaSortDate("creationDate")
                         self.reloadDataSourceWithCompletion { _ in }
                     }
                 )
             )
-            
+
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_upload_date_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "sortFileNameAZ",color: NCBrandColor.shared.iconColor),
                     selected: CCUtility.getMediaSortDate() == "uploadDate",
                     on: true,
-                    action: { menuAction in
+                    action: { _ in
                         CCUtility.setMediaSortDate("uploadDate")
                         self.reloadDataSourceWithCompletion { _ in }
                     }
                 )
             )
-            
+
         } else {
-            
             //
             // CANCEL
             //
@@ -172,13 +166,12 @@ extension NCMedia {
             // COPY
             //
             actions.append(.copyAction(selectOcId: selectOcId, hudView: self.view, completion: tapSelect))
-            
             //
             // DELETE
-            //
-            actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, metadataFolder: nil, viewController: self, completion: tapSelect))
+            // can't delete from cache because is needed for NCMedia view, and if locked can't delete from server either.
+            if !selectedMetadatas.contains(where: { $0.lock && $0.lockOwner != appDelegate.userId }) {
+                actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, metadataFolder: nil, viewController: self, completion: tapSelect))
+            }
         }
-        
     }
 }
-

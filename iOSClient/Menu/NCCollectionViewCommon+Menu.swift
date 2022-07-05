@@ -5,9 +5,11 @@
 //  Created by Philippe Weidmann on 24.01.20.
 //  Copyright © 2020 Philippe Weidmann. All rights reserved.
 //  Copyright © 2020 Marino Faggiana All rights reserved.
+//  Copyright © 2022 Henrik Storch. All rights reserved.
 //
 //  Author Philippe Weidmann
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//  Author Henrik Storch <henrik.storch@nextcloud.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,29 +40,26 @@ extension NCCollectionViewCommon {
     }
     
     func toggleMenu(metadata: tableMetadata, imageIcon: UIImage?) {
-        
         var actions = [NCMenuAction]()
-        
+
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
         let serverUrl = metadata.serverUrl + "/" + metadata.fileName
         let isFolderEncrypted = CCUtility.isFolderEncrypted(metadata.serverUrl, e2eEncrypted: metadata.e2eEncrypted, account: metadata.account, urlBase: metadata.urlBase)
         let serverUrlHome = NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account)
-        var isOffline = false
-        
-        if metadata.directory {
-            if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl)) {
-                isOffline = directory.offline
-            }
-        } else {
-            if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
-                isOffline = localFile.offline
-            }
-        }
-        
+
+        let isOffline: Bool
+
+        if metadata.directory, let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl)) {
+            isOffline = directory.offline
+        } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
+            isOffline = localFile.offline
+        } else { isOffline = false }
+
         let editors = NCUtility.shared.isDirectEditing(account: metadata.account, contentType: metadata.contentType)
         let isRichDocument = NCUtility.shared.isRichDocument(metadata)
-        
+
         var iconHeader: UIImage!
+
         if imageIcon != nil {
             iconHeader = imageIcon!
         } else {
@@ -70,6 +69,7 @@ extension NCCollectionViewCommon {
                 iconHeader = NCBrandColor.cacheImages.file
             }
         }
+
         actions.append(
             NCMenuAction(
                 title: metadata.fileNameView,
@@ -77,24 +77,61 @@ extension NCCollectionViewCommon {
                 action: nil
             )
         )
-        
+
+        if metadata.lock {
+            var lockOwnerName = metadata.lockOwnerDisplayName.isEmpty ? metadata.lockOwner : metadata.lockOwnerDisplayName
+            var lockIcon = NCUtility.shared.loadUserImage(for: metadata.lockOwner, displayName: lockOwnerName, userBaseUrl: metadata)
+            if metadata.lockOwnerType != 0 {
+                lockOwnerName += " app"
+                if !metadata.lockOwnerEditor.isEmpty, let appIcon = UIImage(named: metadata.lockOwnerEditor) {
+                    lockIcon = appIcon
+                }
+            }
+
+            var lockTimeString: String?
+            if let lockTime = metadata.lockTimeOut {
+                if lockTime >= Date().addingTimeInterval(60),
+                   let timeInterval = (lockTime.timeIntervalSince1970 - Date().timeIntervalSince1970).format() {
+                    lockTimeString = String(format: NSLocalizedString("_time_remaining_", comment: ""), timeInterval)
+                } else if lockTime > Date() {
+                    lockTimeString = NSLocalizedString("_less_a_minute_", comment: "")
+                } // else: don't show negative time
+            }
+            if let lockTime = metadata.lockTime, lockTimeString == nil {
+                lockTimeString = DateFormatter.localizedString(from: lockTime, dateStyle: .short, timeStyle: .short)
+            }
+
+            actions.append(
+                NCMenuAction(
+                    title: String(format: NSLocalizedString("_locked_by_", comment: ""), lockOwnerName),
+                    details: lockTimeString,
+                    icon: lockIcon,
+                    action: nil)
+            )
+        }
+
+        actions.append(.seperator)
+
         //
         // FAVORITE
-        //
-        actions.append(
-            NCMenuAction(
-                title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite),
-                
-                action: { _ in
-                    NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
-                        if errorCode != 0 {
-                            NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+        // FIXME: PROPPATCH doesn't work
+        // https://github.com/nextcloud/files_lock/issues/68
+        if !metadata.lock {
+            actions.append(
+                NCMenuAction(
+                    title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
+                    icon: NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite),
+                    
+                    action: { _ in
+                        NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
+                            if errorCode != 0 {
+                                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                            }
                         }
                     }
-                }
+                )
             )
-        )
+
         
         
         //
@@ -114,6 +151,20 @@ extension NCCollectionViewCommon {
         
         
         //
+        // LOCK / UNLOCK
+        //
+        let hasLockCapability = NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesFilesLockVersion) >= 1
+        if !metadata.directory, metadata.canUnlock(as: appDelegate.userId), hasLockCapability {
+            let lockAction = NCMenuAction.lockUnlockFiles(shouldLock: !metadata.lock, metadatas: [metadata])
+            if metadata.lock {
+                // make unlock first action, after info rows & seperator
+                actions.insert(lockAction, at: 3)
+            } else {
+                actions.append(lockAction)
+            }
+        }
+
+        //
         // OFFLINE
         //
         if !isFolderEncrypted {
@@ -126,9 +177,9 @@ extension NCCollectionViewCommon {
                         self.setMetadatasAvalableOffline([metadata], isOffline: isOffline)
                     }
                 )
-            )
+            }
         }
-        
+
         //
         
         // OPEN with external editor
@@ -169,7 +220,7 @@ extension NCCollectionViewCommon {
         if !metadata.directory && !NCBrandOptions.shared.disable_openin_file {
             actions.append(.openInAction(selectedMetadatas: [metadata], viewController: self))
         }
-        
+
         //
         // PRINT
         //
@@ -184,14 +235,13 @@ extension NCCollectionViewCommon {
         //                )
         //            )
         //        }
-        
         //
         // SAVE
         //
         if (metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml") || metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue {
             actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata]))
         }
-        
+
         //
         // SAVE AS SCAN
         //
@@ -212,7 +262,7 @@ extension NCCollectionViewCommon {
         //
         // RENAME
         //
-        if !(isFolderEncrypted && metadata.serverUrl == serverUrlHome) {
+        if !(isFolderEncrypted && metadata.serverUrl == serverUrlHome), !metadata.lock {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
@@ -231,14 +281,14 @@ extension NCCollectionViewCommon {
                 )
             )
         }
-        
+
         //
         // COPY - MOVE
         //
         if !isFolderEncrypted && serverUrl != "" {
             actions.append(.moveOrCopyAction(selectedMetadatas: [metadata]))
         }
-        
+
         //
         // COPY
         //
@@ -246,9 +296,11 @@ extension NCCollectionViewCommon {
             actions.append(.copyAction(selectOcId: [metadata.ocId], hudView: self.view))
         }
         
+        /*
         //
-        // VIEW IN FOLDER
+        // USE AS BACKGROUND
         //
+<<<<<<< HEAD
         if layoutKey == NCGlobal.shared.layoutViewRecent && appDelegate.activeFileViewInFolder == nil {
             actions.append(
                 NCMenuAction(
@@ -257,9 +309,26 @@ extension NCCollectionViewCommon {
                     action: { menuAction in
                         NCFunctionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
                     }
+=======
+        if #available(iOS 13.0, *) {
+            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && self.layoutKey == NCGlobal.shared.layoutViewFiles && !NCBrandOptions.shared.disable_background_image {
+                actions.append(
+                    NCMenuAction(
+                        title: NSLocalizedString("_use_as_background_", comment: ""),
+                        icon: NCUtility.shared.loadImage(named: "text.below.photo"),
+                        action: { menuAction in
+                            if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+                                NCFunctionCenter.shared.saveBackground(metadata: metadata)
+                            } else {
+                                NCOperationQueue.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveBackground)
+                            }
+                        }
+                    )
+>>>>>>> 0a189cae5a398ec2cbe2ec82c96a0f4484578fa0
                 )
-            )
+            }
         }
+<<<<<<< HEAD
         
         
         /*
@@ -288,6 +357,9 @@ extension NCCollectionViewCommon {
          }
          }
          */
+=======
+        */
+
         //
         // MODIFY
         //
@@ -310,13 +382,12 @@ extension NCCollectionViewCommon {
                 )
             }
         }
-        
+
         //
         // DELETE
         //
         actions.append(.deleteAction(selectedMetadatas: [metadata], metadataFolder: metadataFolder, viewController: self))
-        
-        
+
         //
         // SET FOLDER E2EE
         //
@@ -340,7 +411,7 @@ extension NCCollectionViewCommon {
                 )
             )
         }
-        
+
         //
         // UNSET FOLDER E2EE
         //
@@ -349,14 +420,14 @@ extension NCCollectionViewCommon {
                 NCMenuAction(
                     title: NSLocalizedString("_e2e_remove_folder_encrypted_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "lock",color: NCBrandColor.shared.iconColor),
-                    action: { menuAction in
+                    action: { _ in
                         NCCommunication.shared.markE2EEFolder(fileId: metadata.fileId, delete: true) { (account, errorCode, errorDescription) in
                             if errorCode == 0 {
                                 NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", self.appDelegate.account, serverUrl))
                                 NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, serverUrlTo: nil, etag: nil, ocId: nil, fileId: nil, encrypted: false, richWorkspace: nil, account: metadata.account)
                                 NCManageDatabase.shared.setMetadataEncrypted(ocId: metadata.ocId, encrypted: false)
-                                
-                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeStatusFolderE2EE, userInfo: ["serverUrl":metadata.serverUrl])
+
+                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeStatusFolderE2EE, userInfo: ["serverUrl": metadata.serverUrl])
                             } else {
                                 NCContentPresenter.shared.messageNotification(NSLocalizedString("_e2e_error_delete_mark_folder_", comment: ""), description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: .error, errorCode: errorCode)
                             }
@@ -365,28 +436,17 @@ extension NCCollectionViewCommon {
                 )
             )
         }
-        //<<<<<<< HEAD
-        //
-        //        menuViewController.actions = actions
-        //
-        //        let menuPanelController = NCMenuPanelController()
-        //
-        //        menuPanelController.parentPresenter = self
-        //        menuPanelController.delegate = menuViewController
-        //        menuPanelController.set(contentViewController: menuViewController)
-        //        menuPanelController.track(scrollView: menuViewController.tableView)
-        //
-        //        present(menuPanelController, animated: true, completion: nil)
-        //    }
-        //
-        //    func toggleMenuSelect() {
-        //
-        //        let menuViewController = UIStoryboard.init(name: "NCMenu", bundle: nil).instantiateInitialViewController() as! NCMenu
-        //        var actions = [NCMenuAction]()
-        //
-        //=======
-        
         presentMenu(with: actions)
     }
 }
 
+
+extension TimeInterval {
+    func format() -> String? {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.day, .hour, .minute]
+        formatter.unitsStyle = .full
+        formatter.maximumUnitCount = 1
+        return formatter.string(from: self)
+    }
+}

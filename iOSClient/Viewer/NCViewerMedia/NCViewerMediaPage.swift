@@ -44,6 +44,7 @@ class NCViewerMediaPage: UIViewController {
     }
 
     var metadatas: [tableMetadata] = []
+    var modifiedOcId: [String] = []
     var currentIndex = 0
     var nextIndex: Int?
     var ncplayerLivePhoto: NCPlayer?
@@ -96,6 +97,8 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(downloadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(triggerProgressTask(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterProgressTask), object: nil)
 
+        NotificationCenter.default.addObserver(self, selector: #selector(uploadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadedFile), object: nil)
+
         NotificationCenter.default.addObserver(self, selector: #selector(hidePlayerToolBar(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterHidePlayerToolBar), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showPlayerToolBar(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShowPlayerToolBar), object: nil)
         
@@ -106,15 +109,20 @@ class NCViewerMediaPage: UIViewController {
     }
 
     deinit {
-        print("#deinit NCViewerMediaPage")
-        // Clear
+        
+        print("deinit NCViewerMediaPage")
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         if let ncplayer = currentViewController.ncplayer, ncplayer.isPlay() {
             ncplayer.playerPause()
             ncplayer.saveCurrentTime()
         }
-        currentViewController.playerToolBar.stopTimerAutoHide()
+
+        currentViewController.playerToolBar?.stopTimerAutoHide()
         clearCommandCenter()
-        
+
         metadatas.removeAll()
         ncplayerLivePhoto = nil
 
@@ -125,6 +133,8 @@ class NCViewerMediaPage: UIViewController {
 
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterProgressTask), object: nil)
+
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadedFile), object: nil)
 
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterHidePlayerToolBar), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShowPlayerToolBar), object: nil)
@@ -143,6 +153,10 @@ class NCViewerMediaPage: UIViewController {
         } else {
             return .lightContent
         }
+    }
+
+    override var prefersHomeIndicatorAutoHidden: Bool {
+        return currentScreenMode == .full
     }
 
     // MARK: -
@@ -178,7 +192,7 @@ class NCViewerMediaPage: UIViewController {
             progressView.isHidden = false
 
             if !currentViewController.detailView.isShow() {
-                currentViewController.playerToolBar.show(enableTimerAutoHide: enableTimerAutoHide)
+                currentViewController.playerToolBar?.show(enableTimerAutoHide: enableTimerAutoHide)
             }
 
             NCUtility.shared.colorNavigationController(navigationController, backgroundColor: NCBrandColor.shared.systemBackground, titleColor: NCBrandColor.shared.label, tintColor: nil, withoutShadow: false)
@@ -189,8 +203,7 @@ class NCViewerMediaPage: UIViewController {
 
             navigationController?.setNavigationBarHidden(true, animated: true)
             progressView.isHidden = true
-
-            currentViewController.playerToolBar.hide()
+            currentViewController.playerToolBar?.hide()
 
             view.backgroundColor = .black
             textColor = .white
@@ -203,6 +216,7 @@ class NCViewerMediaPage: UIViewController {
         }
 
         setNeedsStatusBarAppearanceUpdate()
+        setNeedsUpdateOfHomeIndicatorAutoHidden()
         currentViewController.reloadDetail()
     }
 
@@ -226,7 +240,7 @@ class NCViewerMediaPage: UIViewController {
             }
         }
     }
-    
+
     @objc func favoriteFile(_ notification: NSNotification) {
 
         if let userInfo = notification.userInfo as NSDictionary? {
@@ -238,7 +252,23 @@ class NCViewerMediaPage: UIViewController {
             }
         }
     }
-    
+
+    @objc func uploadedFile(_ notification: NSNotification) {
+
+        if let userInfo = notification.userInfo as NSDictionary? {
+            if let ocId = userInfo["ocId"] as? String, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), let errorCode = userInfo["errorCode"] as? Int {
+                if errorCode == 0, let index = metadatas.firstIndex(where: {$0.ocId == metadata.ocId}) {
+                    metadatas[index] = metadata
+                    if currentViewController.metadata.ocId == ocId {
+                        currentViewController.reloadImage()
+                    } else {
+                        modifiedOcId.append(ocId)
+                    }
+                }
+            }
+        }
+    }
+
     @objc func deleteFile(_ notification: NSNotification) {
 
         if let userInfo = notification.userInfo as NSDictionary? {
@@ -351,19 +381,19 @@ class NCViewerMediaPage: UIViewController {
         if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue {
 
             MPRemoteCommandCenter.shared().skipForwardCommand.isEnabled = true
-            skipForwardCommand = MPRemoteCommandCenter.shared().skipForwardCommand.addTarget { [weak self] event in
+            skipForwardCommand = MPRemoteCommandCenter.shared().skipForwardCommand.addTarget { event in
 
                 let seconds = Float64((event as! MPSkipIntervalCommandEvent).interval)
-                self?.currentViewController.playerToolBar.skip(seconds: seconds)
-                return .success
+                self.currentViewController.playerToolBar?.skip(seconds: seconds)
+                return.success
             }
 
             MPRemoteCommandCenter.shared().skipBackwardCommand.isEnabled = true
-            skipBackwardCommand = MPRemoteCommandCenter.shared().skipBackwardCommand.addTarget { [weak self] event in
+            skipBackwardCommand = MPRemoteCommandCenter.shared().skipBackwardCommand.addTarget { event in
 
                 let seconds = Float64((event as! MPSkipIntervalCommandEvent).interval)
-                self?.currentViewController.playerToolBar.skip(seconds: -seconds)
-                return .success
+                self.currentViewController.playerToolBar?.skip(seconds: -seconds)
+                return.success
             }
         }
 
@@ -454,16 +484,16 @@ extension NCViewerMediaPage: UIPageViewControllerDelegate, UIPageViewControllerD
             direction = .reverse
         }
 
-        currentViewController.ncplayer?.deactivateObserver()
+//        currentViewController.ncplayer?.deactivateObserver()
         
         let viewerMedia = getViewerMedia(index: currentIndex, metadata: metadatas[currentIndex])
         pageViewController.setViewControllers([viewerMedia], direction: direction, animated: true, completion: nil)
     }
     
     func reloadCurrentPage() {
-        
-        currentViewController.ncplayer?.deactivateObserver()
-        
+
+//        currentViewController.ncplayer?.deactivateObserver()
+
         let viewerMedia = getViewerMedia(index: currentIndex, metadata: metadatas[currentIndex])
         viewerMedia.autoPlay = false
         pageViewController.setViewControllers([viewerMedia], direction: .forward, animated: false, completion: nil)
@@ -473,7 +503,7 @@ extension NCViewerMediaPage: UIPageViewControllerDelegate, UIPageViewControllerD
 
         currentIndex = index
 
-        currentViewController.ncplayer?.deactivateObserver()
+//        currentViewController.ncplayer?.deactivateObserver()
 
         let viewerMedia = getViewerMedia(index: currentIndex, metadata: metadatas[currentIndex])
         viewerMedia.autoPlay = autoPlay
@@ -597,8 +627,11 @@ extension NCViewerMediaPage: UIGestureRecognizerDelegate {
 
                 AudioServicesPlaySystemSound(1519) // peek feedback
 
-                if let url = NCKTVHTTPCache.shared.getVideoURL(metadata: metadata) {
-                    self.ncplayerLivePhoto = NCPlayer.init(url: url, autoPlay: true, imageVideoContainer: self.currentViewController.imageVideoContainer, playerToolBar: nil, metadata: metadata, detailView: nil, viewController: self)
+                let urlVideo = NCKTVHTTPCache.shared.getVideoURL(metadata: metadata)
+                
+                if let url = urlVideo.url {
+                    self.ncplayerLivePhoto = NCPlayer.init(url: url, autoPlay: true, isProxy: urlVideo.isProxy, imageVideoContainer: self.currentViewController.imageVideoContainer, playerToolBar: nil, metadata: metadata, detailView: nil, viewController: self)
+                    self.ncplayerLivePhoto?.openAVPlayer()
                 }
             }
 

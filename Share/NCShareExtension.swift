@@ -130,8 +130,9 @@ class NCShareExtension: UIViewController {
         if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
             indicatorView.ringWidth = 1.5
         }
-        
+
         NotificationCenter.default.addObserver(self, selector: #selector(triggerProgressTask(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterProgressTask), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didCreateFolder(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterCreateFolder), object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -188,7 +189,7 @@ class NCShareExtension: UIViewController {
         guard let progress = notification.userInfo?["progress"] as? Float else { return }
         hud.progress = progress
     }
-    
+
     func setNavigationBar(navigationTitle: String) {
 
         navigationItem.title = navigationTitle
@@ -284,25 +285,11 @@ class NCShareExtension: UIViewController {
     }
 
     @objc func actionCreateFolder() {
-
-        let alertController = UIAlertController(title: NSLocalizedString("_create_folder_", comment: ""), message: "", preferredStyle: .alert)
-
-        alertController.addTextField { textField in
-            textField.autocapitalizationType = UITextAutocapitalizationType.words
+        let alertController = UIAlertController.createFolder(serverUrl: serverUrl, urlBase: activeAccount) { errorCode, errorDescription in
+            guard errorCode != 0 else { return }
+            self.showAlert(title: "_error_createsubfolders_upload_", description: errorDescription)
         }
-
-        let actionSave = UIAlertAction(title: NSLocalizedString("_save_", comment: ""), style: .default) { _ in
-            if let fileName = alertController.textFields?.first?.text {
-                self.createFolder(with: fileName)
-            }
-        }
-
-        let actionCancel = UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel)
-
-        alertController.addAction(actionSave)
-        alertController.addAction(actionCancel)
-
-        self.present(alertController, animated: true, completion: nil)
+        self.present(alertController, animated: true)
     }
 }
 
@@ -364,18 +351,17 @@ extension NCShareExtension {
         hud.textLabel.text = NSLocalizedString("_upload_file_", comment: "") + " \(counterUploaded + 1) " + NSLocalizedString("_of_", comment: "") + " \(filesName.count)"
         hud.progress = 0
         hud.show(in: self.view)
-        
         NCNetworking.shared.upload(metadata: metadata) { } completion: { errorCode, _ in
-            if errorCode == 0 {
-                self.counterUploaded += 1
-                self.upload()
-            } else {
+            if errorCode != 0 {
                 let path = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId)!
                 NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
                 NCManageDatabase.shared.deleteChunks(account: metadata.account, ocId: metadata.ocId)
                 NCUtilityFileSystem.shared.deleteFile(filePath: path)
                 self.uploadErrors.append(metadata)
             }
+
+            self.counterUploaded += 1
+            self.upload()
         }
     }
 

@@ -68,6 +68,7 @@ class NCGlobal: NSObject {
         var totalBytes: Int64
         var totalBytesExpected: Int64
     }
+
     // Struct for LayoutForView
     //
     struct layoutForViewType {
@@ -111,7 +112,7 @@ class NCGlobal: NSObject {
     // Database Realm
     //
     let databaseDefault                             = "nextcloud.realm"
-    let databaseSchemaVersion: UInt64               = 220
+    let databaseSchemaVersion: UInt64               = 222
 
     // Intro selector
     //
@@ -178,6 +179,7 @@ class NCGlobal: NSObject {
     //
     let buttonMoreMore                              = "more"
     let buttonMoreStop                              = "stop"
+    let buttonMoreLock                              = "moreLock"
 
     // Text -  OnlyOffice - Collabora - QuickLook
     //
@@ -195,7 +197,7 @@ class NCGlobal: NSObject {
     let templateDocument                            = "document"
     let templateSpreadsheet                         = "spreadsheet"
     let templatePresentation                        = "presentation"
-    
+
     // Rich Workspace
     //
     let fileNameRichWorkspace                       = "Readme.md"
@@ -313,8 +315,6 @@ class NCGlobal: NSObject {
     // 4) done or error
     //
     let metadataStatusNormal: Int                   = 0
-
-
     let metadataStatusWaitDownload: Int             = -1
     let metadataStatusInDownload: Int               = -2
     let metadataStatusDownloading: Int              = -3
@@ -376,7 +376,6 @@ class NCGlobal: NSObject {
 
     let notificationCenterChangedLocation                       = "changedLocation"
     let notificationStatusAuthorizationChangedLocation          = "statusAuthorizationChangedLocation"
-
     let notificationCenterShareChangePermissions                = "shareChangePermissions"          // userInfo: idShare, permissions, hideDownload
 
     let notificationCenterDownloadedThumbnail                   = "DownloadedThumbnail"             // userInfo: ocId
@@ -388,11 +387,9 @@ class NCGlobal: NSObject {
     let notificationCenterReloadMediaPage                       = "reloadMediaPage"
     let notificationCenterPlayMedia                             = "playMedia"
     let notificationCenterPauseMedia                            = "pauseMedia"
-    
     let notificationCenterStatusReadOnly                        = "statusReadOnly"
     let notificationCenterStatusEditing                         = "statusEditing"
     let notificationCenterStatusFileDrop                        = "statusFileDrop"
-    
     // Tip
     //
     let tipNCViewerPDFThumbnail                                 = "tipncviewerpdfthumbnail"

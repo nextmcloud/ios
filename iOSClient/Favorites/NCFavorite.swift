@@ -30,7 +30,7 @@ class NCFavorite: NCCollectionViewCommon {
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        
+
         titleCurrentFolder = NSLocalizedString("_favorites_", comment: "")
         layoutKey = NCGlobal.shared.layoutViewFavorite
         enableSearchBar = true
@@ -38,16 +38,16 @@ class NCFavorite: NCCollectionViewCommon {
         emptyTitle = "_favorite_no_files_"
         emptyDescription = "_tutorial_favorite_view_"
     }
-    
+
     // MARK: - DataSource + NC Endpoint
-    
+
     override func reloadDataSource() {
         super.reloadDataSource()
-        
+
         DispatchQueue.global().async {
-            
+
             if !self.isSearching {
-           
+
                 if self.serverUrl == "" {
                     self.metadatasSource = NCManageDatabase.shared.getMetadatas(predicate: NSPredicate(format: "account == %@ AND favorite == true", self.appDelegate.account))
                 } else {
@@ -116,4 +116,3 @@ class NCFavorite: NCCollectionViewCommon {
         }
     }
 }
-

@@ -30,20 +30,20 @@ class NCShares: NCCollectionViewCommon {
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        
+
         titleCurrentFolder = NSLocalizedString("_list_shares_", comment: "")
-        layoutKey = NCGlobal.shared.layoutViewShares 
+        layoutKey = NCGlobal.shared.layoutViewShares
         enableSearchBar = false
         emptyImage = UIImage.init(named: "share")?.image(color: NCBrandColor.shared.nmcGray1, size: UIScreen.main.bounds.width)
         emptyTitle = "_list_shares_no_files_"
         emptyDescription = "_tutorial_list_shares_view_"
     }
-    
+
     // MARK: - DataSource + NC Endpoint
-    
+
     override func reloadDataSource() {
         super.reloadDataSource()
-        
+
         DispatchQueue.global().async {
             self.metadatasSource.removeAll()
             let sharess = NCManageDatabase.shared.getTableShares(account: self.appDelegate.account)
@@ -54,7 +54,6 @@ class NCShares: NCCollectionViewCommon {
                     }
                 }
             }
-            
             self.dataSource = NCDataSource(metadatasSource: self.metadatasSource, sort: self.layoutForView?.sort, ascending: self.layoutForView?.ascending, directoryOnTop: self.layoutForView?.directoryOnTop, favoriteOnTop: true, filterLivePhoto: true)
 
             DispatchQueue.main.async {
@@ -76,7 +75,7 @@ class NCShares: NCCollectionViewCommon {
         collectionView?.reloadData()
 
         // Shares network
-        NCCommunication.shared.readShares { account, shares, errorCode, errorDescription in
+        NCCommunication.shared.readShares(parameters: NCCShareParameter(), queue: NCCommunicationCommon.shared.backgroundQueue) { account, shares, errorCode, errorDescription in
 
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()

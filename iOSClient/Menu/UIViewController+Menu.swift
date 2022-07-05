@@ -36,7 +36,6 @@ extension UIViewController {
                 let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
             else {
                 NCContentPresenter.shared.showError(description: "_cannot_send_mail_error_")
-
                 return
             }
             sendEmail(to: components.path)

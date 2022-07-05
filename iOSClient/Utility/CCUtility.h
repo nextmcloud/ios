@@ -28,7 +28,6 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <MessageUI/MessageUI.h>
 #import <UICKeyChainStore.h>
-#import <UICKeyChainStore.h>
 #import <Photos/Photos.h>
 #import <PDFKit/PDFKit.h>
 
@@ -83,9 +82,6 @@
 + (BOOL)getOriginalFileName:(NSString *)key;
 + (void)setOriginalFileName:(BOOL)value key:(NSString *)key;
 
-+ (void)setOriginalFileNamePrefsChanged:(BOOL)value key:(NSString *)key;
-+ (BOOL)getOriginalFileNamePrefsChanged:(NSString *)key;
-
 + (NSString *)getFileNameMask:(NSString *)key;
 + (void)setFileNameMask:(NSString *)mask key:(NSString *)key;
 
@@ -101,8 +97,6 @@
 + (BOOL)getFormatCompatibility;
 + (void)setFormatCompatibility:(BOOL)set;
 
-+ (NSString *)getEndToEndPublicKey:(NSString *)account;
-+ (void)setEndToEndPublicKey:(NSString *)account publicKey:(NSString *)publicKey;
 // E2EE -------------------------------------------
 
 + (NSString *)getEndToEndCertificate:(NSString *)account;
@@ -194,6 +188,9 @@
 + (BOOL)getPrivacyScreenEnabled;
 + (void)setPrivacyScreenEnabled:(BOOL)set;
 
++ (BOOL)getRemovePhotoCameraRoll;
++ (void)setRemovePhotoCameraRoll:(BOOL)set;
+
 // ===== Varius =====
 
 + (BOOL)addSkipBackupAttributeToItemAtURL:(NSURL *)URL;
@@ -256,7 +253,7 @@
 
 + (NSString *)getMimeType:(NSString *)fileNameView;
 
-+ (void)extractImageVideoFromAssetLocalIdentifierForUpload:(tableMetadata *)metadataForUpload notification:(BOOL)notification completion:(void(^)(tableMetadata *newMetadata, NSString* fileNamePath))completion;
++ (void)extractImageVideoFromAssetLocalIdentifierForUpload:(tableMetadata *)metadataForUpload completion:(void(^)(tableMetadata *newMetadata, NSString* fileNamePath))completion;
 + (void)extractLivePhotoAsset:(PHAsset*)asset filePath:(NSString *)filePath withCompletion:(void (^)(NSURL* url))completion;
 
 // ===== E2E Encrypted =====

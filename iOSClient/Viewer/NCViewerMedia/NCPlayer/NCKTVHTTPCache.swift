@@ -30,18 +30,28 @@ class NCKTVHTTPCache: NSObject {
         instance.setupHTTPCache()
         return instance
     }()
+<<<<<<<< HEAD:iOSClient/Viewer/NCViewerMedia/NCPlayer/NCKTVHTTPCache.swift
 
-    func getVideoURL(metadata: tableMetadata) -> URL? {
+    func getVideoURL(metadata: tableMetadata) -> (url: URL?, isProxy: Bool) {
 
         if CCUtility.fileProviderStorageExists(metadata) {
 
-            return URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
+            return (URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)), false)
 
+========
+    
+    func getVideoURL(metadata: tableMetadata) -> URL? {
+        
+        if CCUtility.fileProviderStorageExists(metadata) {
+            
+            return URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
+            
+>>>>>>>> 0a189cae5a398ec2cbe2ec82c96a0f4484578fa0:iOSClient/Viewer/NCViewerVideo/NCKTVHTTPCache.swift
         } else {
 
-            guard let stringURL = (metadata.serverUrl + "/" + metadata.fileName).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return nil }
+            guard let stringURL = (metadata.serverUrl + "/" + metadata.fileName).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return (nil, false) }
 
-            return NCKTVHTTPCache.shared.getProxyURL(stringURL: stringURL)
+            return (NCKTVHTTPCache.shared.getProxyURL(stringURL: stringURL), true)
         }
     }
 
@@ -70,7 +80,7 @@ class NCKTVHTTPCache: NSObject {
         }
     }
 
-    func stopProxy() {
+    private func stopProxy() {
 
         if KTVHTTPCache.proxyIsRunning() {
             KTVHTTPCache.proxyStop()
@@ -92,10 +102,21 @@ class NCKTVHTTPCache: NSObject {
         KTVHTTPCache.cacheDelete(with: videoURL)
     }
 
+    @objc func deleteAllCache() {
+
+        KTVHTTPCache.cacheDeleteAllCaches()
+    }
+
     func saveCache(metadata: tableMetadata) {
+<<<<<<<< HEAD:iOSClient/Viewer/NCViewerMedia/NCPlayer/NCKTVHTTPCache.swift
 
         if !CCUtility.fileProviderStorageExists(metadata) {
 
+========
+        
+        if !CCUtility.fileProviderStorageExists(metadata) {
+            
+>>>>>>>> 0a189cae5a398ec2cbe2ec82c96a0f4484578fa0:iOSClient/Viewer/NCViewerVideo/NCKTVHTTPCache.swift
             guard let stringURL = (metadata.serverUrl + "/" + metadata.fileName).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
 
             let videoURL = URL(string: stringURL)
@@ -107,6 +128,13 @@ class NCKTVHTTPCache: NSObject {
 
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["ocId": metadata.ocId, "serverUrl": metadata.serverUrl])
         }
+    }
+
+    func getDownloadStatusCode(metadata: tableMetadata) -> Int {
+
+        guard let stringURL = (metadata.serverUrl + "/" + metadata.fileName).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return 0 }
+        let url = URL(string: stringURL)
+        return KTVHTTPCache.downloadStatusCode(url)
     }
 
     private func setupHTTPCache() {

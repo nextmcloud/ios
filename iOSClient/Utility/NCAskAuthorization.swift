@@ -28,11 +28,11 @@ class NCAskAuthorization: NSObject {
         let instance = NCAskAuthorization()
         return instance
     }()
-    
+
     private(set) var isRequesting = false
-    
+
     func askAuthorizationAudioRecord(viewController: UIViewController?, completion: @escaping (_ hasPermission: Bool) -> Void) {
-        
+
         switch AVAudioSession.sharedInstance().recordPermission {
         case AVAudioSession.RecordPermission.granted:
             completion(true)
@@ -66,8 +66,9 @@ class NCAskAuthorization: NSObject {
             break
         }
     }
+
     @objc func askAuthorizationPhotoLibrary(viewController: UIViewController?, completion: @escaping (_ hasPermission: Bool) -> Void) {
-        
+
         switch PHPhotoLibrary.authorizationStatus() {
         case PHAuthorizationStatus.authorized:
             completion(true)

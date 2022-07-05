@@ -5,6 +5,21 @@
 //  Created by Henrik Storch on 30.11.21.
 //  Copyright © 2021 Marino Faggiana. All rights reserved.
 //
+//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 import Foundation
 import RealmSwift
@@ -14,6 +29,38 @@ extension NCManageDatabase {
 
     @objc func copyObject(account: tableAccount) -> tableAccount {
         return tableAccount.init(value: account)
+    }
+
+    @objc func addAccount(_ account: String, urlBase: String, user: String, password: String) {
+
+        let realm = try! Realm()
+
+        do {
+            try realm.safeWrite {
+                let addObject = tableAccount()
+
+                addObject.account = account
+
+                // Brand
+                if NCBrandOptions.shared.use_default_auto_upload {
+
+                    addObject.autoUpload = true
+                    addObject.autoUploadImage = true
+                    addObject.autoUploadVideo = true
+                    addObject.autoUploadWWAnVideo = true
+                }
+
+                CCUtility.setPassword(account, password: password)
+
+                addObject.urlBase = urlBase
+                addObject.user = user
+                addObject.userId = user
+
+                realm.add(addObject, update: .all)
+            }
+        } catch let error {
+            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+        }
     }
 
     @objc func updateAccount(_ account: tableAccount) {
@@ -270,6 +317,7 @@ extension NCManageDatabase {
                 result.language = userProfile.language
                 result.lastLogin = userProfile.lastLogin
                 result.locale = userProfile.locale
+                result.organisation = userProfile.organisation
                 result.phone = userProfile.phone
                 result.quota = userProfile.quota
                 result.quotaFree = userProfile.quotaFree
@@ -280,7 +328,7 @@ extension NCManageDatabase {
                 result.subadmin = userProfile.subadmin.joined(separator: ",")
                 result.twitter = userProfile.twitter
                 result.userId = userProfile.userId
-                result.webpage = userProfile.webpage
+                result.website = userProfile.website
 
                 returnAccount = result
             }
@@ -291,7 +339,7 @@ extension NCManageDatabase {
         return tableAccount.init(value: returnAccount)
     }
 
-    @objc func setAccountUserProfileHC(businessSize: String, businessType: String, city: String, company: String, country: String, role: String, zip: String) -> tableAccount? {
+    @objc func setAccountUserProfileHC(businessSize: String, businessType: String, city: String, organisation: String, country: String, role: String, zip: String) -> tableAccount? {
 
         let realm = try! Realm()
 
@@ -311,7 +359,7 @@ extension NCManageDatabase {
                 result.businessSize = businessSize
                 result.businessType = businessType
                 result.city = city
-                result.company = company
+                result.organisation =  organisation
                 result.country = country
                 result.role = role
                 result.zip = zip

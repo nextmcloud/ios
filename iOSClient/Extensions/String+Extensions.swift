@@ -26,6 +26,11 @@ import UIKit
 import CommonCrypto
 
 extension String {
+
+    var alphanumeric: String {
+        return self.components(separatedBy: CharacterSet.alphanumerics.inverted).joined().lowercased()
+    }
+
     public var uppercaseInitials: String? {
         let initials = self.components(separatedBy: .whitespaces)
             .reduce("", {
@@ -44,12 +49,12 @@ extension String {
         let hour = Int(seconds / 3600)
         return String(format: "%02d:%02d:%02d", hour, min, sec)
     }
-    
+
     func md5() -> String {
         //https://stackoverflow.com/a/32166735/9506784
 
         let length = Int(CC_MD5_DIGEST_LENGTH)
-        let messageData = self.data(using: .utf8)!
+        let messageData = self.data(using: .utf8) ?? Data()
         var digestData = Data(count: length)
 
         _ = digestData.withUnsafeMutableBytes { digestBytes -> UInt8 in
@@ -64,12 +69,4 @@ extension String {
 
         return digestData.map { String(format: "%02hhx", $0) }.joined()
     }
-}
-
-extension Date {
-   static var tomorrow:  Date { return Date().dayAfter }
-   static var today: Date {return Date()}
-   var dayAfter: Date {
-      return Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-   }
 }

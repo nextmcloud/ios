@@ -54,7 +54,7 @@ extension UIImage {
     }
     
     @objc func resizeImage(size: CGSize, isAspectRation: Bool) -> UIImage? {
-        
+
         let originRatio = self.size.width / self.size.height
         let newRatio = size.width / size.height
         var newSize = size
@@ -85,17 +85,18 @@ extension UIImage {
             // This is default orientation, don't need to do anything
             return self.copy() as? UIImage
         }
+
         guard let cgImage = self.cgImage else {
             // CGImage is not available
             return nil
         }
-        
+
         guard let colorSpace = cgImage.colorSpace, let ctx = CGContext(data: nil, width: Int(size.width), height: Int(size.height), bitsPerComponent: cgImage.bitsPerComponent, bytesPerRow: 0, space: colorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
             return nil // Not able to create CGContext
         }
-        
+
         var transform: CGAffineTransform = CGAffineTransform.identity
-        
+
         switch imageOrientation {
         case .down, .downMirrored:
             transform = transform.translatedBy(x: size.width, y: size.height)
@@ -125,9 +126,9 @@ extension UIImage {
         @unknown default:
             break
         }
-        
+
         ctx.concatenate(transform)
-        
+
         switch imageOrientation {
         case .left, .leftMirrored, .right, .rightMirrored:
             ctx.draw(cgImage, in: CGRect(x: 0, y: 0, width: size.height, height: size.width))
@@ -135,12 +136,17 @@ extension UIImage {
             ctx.draw(cgImage, in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
             break
         }
+
         guard let newCGImage = ctx.makeImage() else { return nil }
         return UIImage(cgImage: newCGImage, scale: 1, orientation: .up)
     }
 
     @objc func image(color: UIColor, size: CGFloat) -> UIImage {
+        let size = CGSize(width: size, height: size)
 
+        UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
+        color.setFill()
+        
         return autoreleasepool { () -> UIImage in
             let size = CGSize(width: size, height: size)
             UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
@@ -151,15 +157,10 @@ extension UIImage {
             context?.scaleBy(x: 1.0, y: -1.0)
             context?.setBlendMode(CGBlendMode.normal)
 
-            let rect = CGRect(origin: .zero, size: size)
-            guard let cgImage = self.cgImage else { return self }
-            context?.clip(to: rect, mask: cgImage)
-            context?.fill(rect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext() ?? self
+        UIGraphicsEndImageContext()
 
-            let newImage = UIGraphicsGetImageFromCurrentImageContext() ?? self
-            UIGraphicsEndImageContext()
-            return newImage
-        }
+        return newImage        
     }
 
     func imageColor(_ color: UIColor) -> UIImage {
@@ -238,7 +239,6 @@ extension UIImage {
         
         return UIImage(cgImage: self.cgImage!, scale: 1.0, orientation: newOrientation)
     }
-    
 
     func isEqualToImage(image: UIImage?) -> Bool {
         if image == nil { return false }
@@ -291,5 +291,31 @@ extension UIImage {
 
         // Return the downsampled image as UIImage
         return UIImage(cgImage: downsampledImage)
+    }
+
+    
+    // Source:
+    // https://stackoverflow.com/questions/27092354/rotating-uiimage-in-swift/47402811#47402811
+    
+    func rotate(radians: Float) -> UIImage? {
+        var newSize = CGRect(origin: CGPoint.zero, size: self.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
+        // Trim off the extremely small float value to prevent core graphics from rounding it up
+        newSize.width = floor(newSize.width)
+        newSize.height = floor(newSize.height)
+
+        UIGraphicsBeginImageContextWithOptions(newSize, true, self.scale)
+        let context = UIGraphicsGetCurrentContext()!
+
+        // Move origin to middle
+        context.translateBy(x: newSize.width / 2, y: newSize.height / 2)
+        // Rotate around middle
+        context.rotate(by: CGFloat(radians))
+        // Draw the image at its center
+        self.draw(in: CGRect(x: -self.size.width / 2, y: -self.size.height / 2, width: self.size.width, height: self.size.height))
+
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage
     }
 }
