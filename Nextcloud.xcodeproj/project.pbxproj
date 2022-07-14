@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1131BD2CFD566A28606B4380 /* Pods_Nextcloud.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B64780EEA33C832A268BB870 /* Pods_Nextcloud.framework */; };
 		2C1D5D7523E2DE3300334ABB /* NCDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB41ED5A87C00B7EAD4 /* NCDatabase.swift */; };
 		2C1D5D7623E2DE3300334ABB /* NCManageDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB51ED5A87C00B7EAD4 /* NCManageDatabase.swift */; };
 		2C1D5D7923E2DE9100334ABB /* NCBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B3CCD1EAE01BD00921AC9 /* NCBrand.swift */; };
@@ -27,18 +26,19 @@
 		5610960F2876B53100292C4C /* NCCollectionViewCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565B11E32875CF97006998FA /* NCCollectionViewCommon.swift */; };
 		561096122876B6BD00292C4C /* NCTrashListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78ACD4821903F850088454D /* NCTrashListCell.swift */; };
 		561096142876C22000292C4C /* UIAlertController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5610960028769C7F00292C4C /* UIAlertController+Extension.swift */; };
-		561096152876C4CA00292C4C /* OpenSSL.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F70B86802642CF5400ED5349 /* OpenSSL.xcframework */; };
-		561096162876C4CA00292C4C /* OpenSSL.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F70B86802642CF5400ED5349 /* OpenSSL.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		56151A762874747700A83F13 /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = F7EBCDD0277B820D00A4EF67 /* UICKeyChainStore */; };
 		56151A772874747700A83F13 /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = F7EBCDD6277B834400A4EF67 /* Queuer */; };
+		561B3B522880448B00ED7D40 /* KTVCocoaHTTPServer.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; };
+		561B3B532880448B00ED7D40 /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		561B3B542880448F00ED7D40 /* KTVHTTPCache.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; };
+		561B3B552880449000ED7D40 /* KTVHTTPCache.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		561B3B562880449800ED7D40 /* OpenSSL.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F70B86802642CF5400ED5349 /* OpenSSL.xcframework */; };
+		561B3B572880449800ED7D40 /* OpenSSL.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F70B86802642CF5400ED5349 /* OpenSSL.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		561B3B582880449B00ED7D40 /* Pods_Nextcloud.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B64780EEA33C832A268BB870 /* Pods_Nextcloud.framework */; };
+		561B3B5A288044A400ED7D40 /* TOPasscodeViewController.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56E9B9F227B39218007B1772 /* TOPasscodeViewController.xcframework */; };
+		561B3B5B288044A500ED7D40 /* TOPasscodeViewController.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56E9B9F227B39218007B1772 /* TOPasscodeViewController.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		561CAB97287F0A84001CC9AB /* MagentaCloudVersionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 561CAB96287F0A84001CC9AB /* MagentaCloudVersionView.xib */; };
 		5620EF8B28191F96009CDD9E /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5620EF8A28191F96009CDD9E /* UIDevice+Extension.swift */; };
-		5620EF90281943BD009CDD9E /* KTVCocoaHTTPServer.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; };
-		5620EF91281943BE009CDD9E /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5620EF92281943C2009CDD9E /* KTVHTTPCache.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; };
-		5620EF93281943C2009CDD9E /* KTVHTTPCache.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5620EF98281943E3009CDD9E /* TOPasscodeViewController.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 56E9B9F227B39218007B1772 /* TOPasscodeViewController.xcframework */; };
-		5620EF99281943E3009CDD9E /* TOPasscodeViewController.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 56E9B9F227B39218007B1772 /* TOPasscodeViewController.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		564A96F2287C0ADF00D6F3A1 /* PrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564A96EC287C0ADE00D6F3A1 /* PrivacySettingsViewController.swift */; };
 		564A96F3287C0ADF00D6F3A1 /* SaveSettingsCustomButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564A96ED287C0ADE00D6F3A1 /* SaveSettingsCustomButtonCell.swift */; };
 		564A96F4287C0ADF00D6F3A1 /* SaveSettingsCustomButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 564A96EE287C0ADF00D6F3A1 /* SaveSettingsCustomButtonCell.xib */; };
@@ -557,10 +557,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5620EF93281943C2009CDD9E /* KTVHTTPCache.xcframework in Embed Frameworks */,
-				5620EF99281943E3009CDD9E /* TOPasscodeViewController.xcframework in Embed Frameworks */,
-				561096162876C4CA00292C4C /* OpenSSL.xcframework in Embed Frameworks */,
-				5620EF91281943BE009CDD9E /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */,
+				561B3B552880449000ED7D40 /* KTVHTTPCache.xcframework in Embed Frameworks */,
+				561B3B572880449800ED7D40 /* OpenSSL.xcframework in Embed Frameworks */,
+				561B3B532880448B00ED7D40 /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */,
+				561B3B5B288044A500ED7D40 /* TOPasscodeViewController.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1135,11 +1135,11 @@
 				5696257B27B289C6003F774D /* JGProgressHUD in Frameworks */,
 				5696257227B289C6003F774D /* Queuer in Frameworks */,
 				5696258F27B28DB8003F774D /* QRCodeReader in Frameworks */,
-				561096152876C4CA00292C4C /* OpenSSL.xcframework in Frameworks */,
+				561B3B542880448F00ED7D40 /* KTVHTTPCache.xcframework in Frameworks */,
+				561B3B5A288044A400ED7D40 /* TOPasscodeViewController.xcframework in Frameworks */,
 				5696257927B289C6003F774D /* ChromaColorPicker in Frameworks */,
 				5696256B27B289C6003F774D /* SwiftRichString in Frameworks */,
 				569625F627B29BA7003F774D /* JGProgressHUD in Frameworks */,
-				5620EF92281943C2009CDD9E /* KTVHTTPCache.xcframework in Frameworks */,
 				569625D327B291E6003F774D /* SwiftEntryKit in Frameworks */,
 				569625F027B29B07003F774D /* ChromaColorPicker in Frameworks */,
 				56E9FB792878040D0006B408 /* Criteo in Frameworks */,
@@ -1154,28 +1154,28 @@
 				5696257027B289C6003F774D /* MarqueeLabel in Frameworks */,
 				56E9FB772878040D0006B408 /* Adjust in Frameworks */,
 				5696259227B28E46003F774D /* SwiftRichString in Frameworks */,
+				561B3B522880448B00ED7D40 /* KTVCocoaHTTPServer.xcframework in Frameworks */,
 				5696257727B289C6003F774D /* Realm in Frameworks */,
-				5620EF98281943E3009CDD9E /* TOPasscodeViewController.xcframework in Frameworks */,
 				56E9FB142877E4560006B408 /* DropDown in Frameworks */,
 				566FE2352875748900FD5E71 /* NCCommunication in Frameworks */,
 				569625D927B29589003F774D /* MarqueeLabel in Frameworks */,
 				569625DC27B295ED003F774D /* Queuer in Frameworks */,
 				5696257327B289C6003F774D /* UICKeyChainStore in Frameworks */,
+				561B3B562880449800ED7D40 /* OpenSSL.xcframework in Frameworks */,
 				569625F327B29B57003F774D /* Parchment in Frameworks */,
 				5696256E27B289C6003F774D /* FirebaseCrashlytics in Frameworks */,
 				5696257827B289C6003F774D /* RealmSwift in Frameworks */,
 				569625D627B292EF003F774D /* XLForm in Frameworks */,
 				569625E827B2991A003F774D /* TLPhotoPicker in Frameworks */,
-				5620EF90281943BD009CDD9E /* KTVCocoaHTTPServer.xcframework in Frameworks */,
 				569625E527B29844003F774D /* FSCalendar in Frameworks */,
 				F75E57BD25BF0EC1002B72C2 /* SVGKit in Frameworks */,
 				56E9FB7B2878040D0006B408 /* Sociomantic in Frameworks */,
 				5696257527B289C6003F774D /* FSCalendar in Frameworks */,
+				561B3B582880449B00ED7D40 /* Pods_Nextcloud.framework in Frameworks */,
 				56007DDD282B98CA00EA4115 /* EasyTipView in Frameworks */,
 				5696257127B289C6003F774D /* XLForm in Frameworks */,
 				569625EB27B299A0003F774D /* Realm in Frameworks */,
 				569625ED27B299A0003F774D /* RealmSwift in Frameworks */,
-				1131BD2CFD566A28606B4380 /* Pods_Nextcloud.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
