@@ -286,40 +286,6 @@ class NCManageDatabase: NSObject {
         }
     }
     
-    
-    @objc func addAccount(_ account: String, urlBase: String, user: String, password: String) {
-        let realm = try! Realm()
-
-        do {
-            try realm.safeWrite {
-    
-                let addObject = tableAccount()
-            
-                addObject.account = account
-                
-                // Brand
-                if NCBrandOptions.shared.use_default_auto_upload {
-                        
-                    addObject.autoUpload = true
-                    addObject.autoUploadImage = true
-                    addObject.autoUploadVideo = true
-                    addObject.autoUploadWWAnVideo = true
-                }
-                
-                CCUtility.setPassword(account, password: password)
-                
-                addObject.urlBase = urlBase
-                addObject.user = user
-                addObject.userId = user
-
-                realm.add(addObject, update: .all)
-            }
-        } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
-        }
-    }
-
-    
     @objc func getThreadConfined(_ object: Object) -> Any {
 
         // id tradeReference = [[NCManageDatabase shared] getThreadConfined:metadata];
@@ -457,8 +423,6 @@ class NCManageDatabase: NSObject {
         } catch let error {
             NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
         }
-
-        return tableAvatar.init(value: result)
     }
 
 
@@ -493,7 +457,19 @@ class NCManageDatabase: NSObject {
         return json[elements].string
     }
 
+    @objc func getCapabilitiesServerInt(account: String, elements: [String]) -> Int {
 
+        let realm = try! Realm()
+
+        guard let result = realm.objects(tableCapabilities.self).filter("account == %@", account).first,
+              let jsondata = result.jsondata else {
+            return 0
+        }
+
+        let json = JSON(jsondata)
+        return json[elements].intValue
+    }
+    
     @objc func getCapabilitiesServerBool(account: String, elements: [String], exists: Bool) -> Bool {
 
         let realm = try! Realm()
@@ -1743,6 +1719,21 @@ class NCManageDatabase: NSObject {
         } catch let error {
             NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
         }
+    }
+    
+    func getSubtitles(account: String, serverUrl: String, fileName: String) -> (all:[tableMetadata], existing:[tableMetadata]) {
+
+        let realm = try! Realm()
+        let nameOnly = (fileName as NSString).deletingPathExtension + "."
+        var metadatas: [tableMetadata] = []
+
+        let results = realm.objects(tableMetadata.self).filter("account == %@ AND serverUrl == %@ AND fileName BEGINSWITH[c] %@ AND fileName ENDSWITH[c] '.srt'", account, serverUrl, nameOnly)
+        for result in results {
+            if CCUtility.fileProviderStorageExists(result) {
+                metadatas.append(result)
+            }
+        }
+        return(Array(results.map { tableMetadata.init(value: $0) }), Array(metadatas.map { tableMetadata.init(value: $0) }))
     }
 }
 

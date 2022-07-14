@@ -30,7 +30,6 @@ class NCKTVHTTPCache: NSObject {
         instance.setupHTTPCache()
         return instance
     }()
-<<<<<<<< HEAD:iOSClient/Viewer/NCViewerMedia/NCPlayer/NCKTVHTTPCache.swift
 
     func getVideoURL(metadata: tableMetadata) -> (url: URL?, isProxy: Bool) {
 
@@ -38,15 +37,6 @@ class NCKTVHTTPCache: NSObject {
 
             return (URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)), false)
 
-========
-    
-    func getVideoURL(metadata: tableMetadata) -> URL? {
-        
-        if CCUtility.fileProviderStorageExists(metadata) {
-            
-            return URL(fileURLWithPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
-            
->>>>>>>> 0a189cae5a398ec2cbe2ec82c96a0f4484578fa0:iOSClient/Viewer/NCViewerVideo/NCKTVHTTPCache.swift
         } else {
 
             guard let stringURL = (metadata.serverUrl + "/" + metadata.fileName).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return (nil, false) }
@@ -108,15 +98,9 @@ class NCKTVHTTPCache: NSObject {
     }
 
     func saveCache(metadata: tableMetadata) {
-<<<<<<<< HEAD:iOSClient/Viewer/NCViewerMedia/NCPlayer/NCKTVHTTPCache.swift
 
         if !CCUtility.fileProviderStorageExists(metadata) {
 
-========
-        
-        if !CCUtility.fileProviderStorageExists(metadata) {
-            
->>>>>>>> 0a189cae5a398ec2cbe2ec82c96a0f4484578fa0:iOSClient/Viewer/NCViewerVideo/NCKTVHTTPCache.swift
             guard let stringURL = (metadata.serverUrl + "/" + metadata.fileName).addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else { return }
 
             let videoURL = URL(string: stringURL)

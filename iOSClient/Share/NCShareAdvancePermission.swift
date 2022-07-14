@@ -29,7 +29,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     }
     
     public var metadata: tableMetadata?
-    public var sharee: NCCommunicationSharee?
+    public var sharee: NCTableShareable!
     public var tableShare: tableShare?
     private var networking: NCShareNetworking?
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -1014,8 +1014,16 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                 }
             
             let label = linkLabel.trimmingCharacters(in: .whitespacesAndNewlines)
-            let expirationDate = isExpiryEnabled ? getServerStyleDate(date: self.expirationDate as Date) : ""
-            networking?.updateShare(idShare: self.tableShare!.idShare, password: password, permission: self.permissionInt, note: nil, label: label, expirationDate: expirationDate, hideDownload: self.hideDownload)
+            guard let shareData = sharee else { return }
+            if let pass = self.password {
+                shareData.password = pass
+            }
+            shareData.idShare = self.tableShare!.idShare
+            shareData.permissions = self.permissionInt
+            shareData.label = label
+            shareData.hideDownload = self.hideDownload
+            shareData.expirationDate = self.expirationDate
+            networking?.updateShare(option: shareData)
         }
     }
     

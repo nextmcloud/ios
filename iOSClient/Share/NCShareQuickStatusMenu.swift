@@ -23,7 +23,7 @@ class NCShareQuickStatusMenu: NSObject {
                 selected: tableShare.permissions == (NCGlobal.shared.permissionReadShare + NCGlobal.shared.permissionShareShare) || tableShare.permissions == NCGlobal.shared.permissionReadShare,
                 on: false,
                 action: { _ in
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusReadOnly)
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusReadOnly, object: tableShare)
                 }
             )
         )
@@ -35,7 +35,7 @@ class NCShareQuickStatusMenu: NSObject {
                 selected: hasUploadPermission(tableShare: tableShare),
                 on: false,
                 action: { _ in
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing)
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusEditing, object: tableShare)
                 }
             )
         )
@@ -49,7 +49,7 @@ class NCShareQuickStatusMenu: NSObject {
                     selected: false,
                     on: false,
                     action: { menuAction in
-                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusFileDrop)
+                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusFileDrop, object: tableShare)
                     }
                 )
             )

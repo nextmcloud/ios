@@ -237,6 +237,17 @@
     [UICKeyChainStore setString:sValue forKey:key service:NCGlobal.shared.serviceShareKeyChain];
 }
 
++ (void)setOriginalFileNamePrefsChanged:(BOOL)value key:(NSString *)key
+{
+    NSString *sValue = (value) ? @"true" : @"false";
+    [UICKeyChainStore setString:sValue forKey:key service:NCGlobal.shared.serviceShareKeyChain];
+}
+
++ (BOOL)getOriginalFileNamePrefsChanged:(NSString *)key
+{
+    return [[UICKeyChainStore stringForKey:key service:NCGlobal.shared.serviceShareKeyChain] boolValue];
+}
+
 + (NSString *)getFileNameMask:(NSString *)key
 {
     NSString *mask = [UICKeyChainStore stringForKey:key service:NCGlobal.shared.serviceShareKeyChain];
@@ -1097,6 +1108,23 @@
 {
     NSURL *path = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:[NCBrandOptions shared].capabilitiesGroups];
     return path;
+}
+
++ (NSString *)getStringUser:(NSString *)user urlBase:(NSString *)urlBase
+{
+    NSString *baseUrl = [urlBase lowercaseString];
+    NSString *dirUserBaseUrl = @"";
+
+    if ([user length] && [baseUrl length]) {
+        
+        if ([baseUrl hasPrefix:@"https://"]) baseUrl = [baseUrl substringFromIndex:8];
+        if ([baseUrl hasPrefix:@"http://"]) baseUrl = [baseUrl substringFromIndex:7];
+        
+        dirUserBaseUrl = [NSString stringWithFormat:@"%@-%@", user, baseUrl];
+        dirUserBaseUrl = [[self removeForbiddenCharactersFileSystem:dirUserBaseUrl] lowercaseString];
+    }
+    
+    return dirUserBaseUrl;
 }
 
 // Return the path of directory Documents -> NSDocumentDirectory

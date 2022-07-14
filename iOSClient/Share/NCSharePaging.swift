@@ -27,6 +27,10 @@ import Parchment
 import NCCommunication
 import SVGKit
 
+protocol NCSharePagingContent {
+    var textField: UITextField? { get }
+}
+
 class NCSharePaging: UIViewController {
     
     private let pagingViewController = NCShareHeaderViewController()
@@ -207,7 +211,6 @@ extension NCSharePaging: PagingViewControllerDataSource {
                 let viewController = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "sharing") as! NCShare
                 viewController.sharingEnabled = sharingEnabled
                 viewController.metadata = metadata
-                viewController.height = height
                 return viewController
             default:
                 return UIViewController()

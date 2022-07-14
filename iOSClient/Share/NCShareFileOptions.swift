@@ -269,8 +269,14 @@ class NCShareFileOptions: UIViewController , UIGestureRecognizerDelegate, NCShar
                 self.present(alertController, animated: true, completion: nil)
             }
         }
-        
-        self.networking?.updateShare(idShare: tableShare!.idShare, password: self.password, permission: self.permissionsInt!, note: nil, label: nil, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
+        let share = NCTableShareOptions(sharee: sharee!, metadata: metadata!, password: self.password)
+        share.idShare = tableShare!.idShare
+        share.password = self.password
+        share.permissions = self.permissionsInt!
+        share.expirationDate = self.expirationDate as NSDate
+        share.hideDownload = self.hideDownload
+//        self.networking?.updateShare(idShare: tableShare!.idShare, password: self.password, permission: self.permissionsInt!, note: nil, label: nil, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
+        self.networking?.updateShare(option: share)
     }
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {

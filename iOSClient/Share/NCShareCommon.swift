@@ -56,123 +56,123 @@ class NCShareCommon: NSObject {
         return image
     }
 
-    func openViewMenuShareLink(shareViewController: NCShare, tableShare: tableShare?, metadata: tableMetadata) -> (shareLinkMenuView: NCShareLinkMenuView, viewWindow: UIView) {
+//    func openViewMenuShareLink(shareViewController: NCShare, tableShare: tableShare?, metadata: tableMetadata) -> (shareLinkMenuView: NCShareLinkMenuView, viewWindow: UIView) {
+//
+//        var shareLinkMenuView: NCShareLinkMenuView
+//        let window = UIApplication.shared.keyWindow!
+//        let viewWindow = UIView(frame: window.bounds)
+//
+//        window.addSubview(viewWindow)
+//        viewWindow.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//
+//        if metadata.directory {
+//            shareLinkMenuView = Bundle.main.loadNibNamed("NCShareLinkFolderMenuView", owner: self, options: nil)?.first as! NCShareLinkMenuView
+//        } else {
+//            shareLinkMenuView = Bundle.main.loadNibNamed("NCShareLinkMenuView", owner: self, options: nil)?.first as! NCShareLinkMenuView
+//        }
+//        
+//        shareLinkMenuView.width = 250
+//        if metadata.directory {
+//            shareLinkMenuView.height = 590
+//        } else {
+//            shareLinkMenuView.height = 490
+//        }
+//        
+//        shareLinkMenuView.backgroundColor = NCBrandColor.shared.systemBackground
+//        shareLinkMenuView.metadata = metadata
+//        shareLinkMenuView.viewWindow = viewWindow
+//        shareLinkMenuView.shareViewController = shareViewController
+//        shareLinkMenuView.reloadData(idShare: tableShare?.idShare ?? 0)
+//        shareLinkMenuView.translatesAutoresizingMaskIntoConstraints = false
+//        viewWindow.addSubview(shareLinkMenuView)
+//        NSLayoutConstraint.activate([
+//            shareLinkMenuView.widthAnchor.constraint(equalToConstant: shareLinkMenuView.width),
+//            shareLinkMenuView.heightAnchor.constraint(equalToConstant: shareLinkMenuView.height),
+//            shareLinkMenuView.centerXAnchor.constraint(equalTo: viewWindow.centerXAnchor),
+//            shareLinkMenuView.centerYAnchor.constraint(equalTo: viewWindow.centerYAnchor)
+//        ])
+//
+//        return(shareLinkMenuView: shareLinkMenuView, viewWindow: viewWindow)
+//    }
 
-        var shareLinkMenuView: NCShareLinkMenuView
-        let window = UIApplication.shared.keyWindow!
-        let viewWindow = UIView(frame: window.bounds)
-
-        window.addSubview(viewWindow)
-        viewWindow.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
-        if metadata.directory {
-            shareLinkMenuView = Bundle.main.loadNibNamed("NCShareLinkFolderMenuView", owner: self, options: nil)?.first as! NCShareLinkMenuView
-        } else {
-            shareLinkMenuView = Bundle.main.loadNibNamed("NCShareLinkMenuView", owner: self, options: nil)?.first as! NCShareLinkMenuView
-        }
-        
-        shareLinkMenuView.width = 250
-        if metadata.directory {
-            shareLinkMenuView.height = 590
-        } else {
-            shareLinkMenuView.height = 490
-        }
-        
-        shareLinkMenuView.backgroundColor = NCBrandColor.shared.systemBackground
-        shareLinkMenuView.metadata = metadata
-        shareLinkMenuView.viewWindow = viewWindow
-        shareLinkMenuView.shareViewController = shareViewController
-        shareLinkMenuView.reloadData(idShare: tableShare?.idShare ?? 0)
-        shareLinkMenuView.translatesAutoresizingMaskIntoConstraints = false
-        viewWindow.addSubview(shareLinkMenuView)
-        NSLayoutConstraint.activate([
-            shareLinkMenuView.widthAnchor.constraint(equalToConstant: shareLinkMenuView.width),
-            shareLinkMenuView.heightAnchor.constraint(equalToConstant: shareLinkMenuView.height),
-            shareLinkMenuView.centerXAnchor.constraint(equalTo: viewWindow.centerXAnchor),
-            shareLinkMenuView.centerYAnchor.constraint(equalTo: viewWindow.centerYAnchor)
-        ])
-
-        return(shareLinkMenuView: shareLinkMenuView, viewWindow: viewWindow)
-    }
-
-    func openViewMenuUser(shareViewController: NCShare, tableShare: tableShare?, metadata: tableMetadata) -> (shareUserMenuView: NCShareUserMenuView, viewWindow: UIView) {
-
-        var shareUserMenuView: NCShareUserMenuView
-        let window = UIApplication.shared.keyWindow!
-        let viewWindow = UIView(frame: window.bounds)
-
-        window.addSubview(viewWindow)
-        viewWindow.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
-        if metadata.directory {
-            shareUserMenuView = Bundle.main.loadNibNamed("NCShareUserFolderMenuView", owner: self, options: nil)?.first as! NCShareUserMenuView
-        } else {
-            shareUserMenuView = Bundle.main.loadNibNamed("NCShareUserMenuView", owner: self, options: nil)?.first as! NCShareUserMenuView
-        }
-
-        
-        shareUserMenuView.width = 250
-        if metadata.directory {
-            shareUserMenuView.height = 410
-        } else {
-            shareUserMenuView.height = 370
-        }
-        
-        shareUserMenuView.backgroundColor = NCBrandColor.shared.systemBackground
-        shareUserMenuView.metadata = metadata
-        shareUserMenuView.viewWindow = viewWindow
-        shareUserMenuView.shareViewController = shareViewController
-        shareUserMenuView.reloadData(idShare: tableShare?.idShare ?? 0)
-        shareUserMenuView.translatesAutoresizingMaskIntoConstraints = false
-        viewWindow.addSubview(shareUserMenuView)
-
-        NSLayoutConstraint.activate([
-            shareUserMenuView.widthAnchor.constraint(equalToConstant: shareUserMenuView.width),
-            shareUserMenuView.heightAnchor.constraint(equalToConstant: shareUserMenuView.height),
-            shareUserMenuView.centerXAnchor.constraint(equalTo: viewWindow.centerXAnchor),
-            shareUserMenuView.centerYAnchor.constraint(equalTo: viewWindow.centerYAnchor),
-        ])
-        
-        return(shareUserMenuView: shareUserMenuView, viewWindow: viewWindow)
-    }
-    
-    func openQuickShare(shareViewController: NCShare, tableShare: tableShare?, metadata: tableMetadata) -> (sharePermissionMenuView: NCPermissionMenuView, viewWindow: UIView) {
-        var sharePermissionMenuView: NCPermissionMenuView
-        let window = UIApplication.shared.keyWindow!
-        let viewWindow = UIView(frame: window.bounds)
-        window.addSubview(viewWindow)
-        viewWindow.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
-        if metadata.directory {
-            sharePermissionMenuView = Bundle.main.loadNibNamed("NCPermissionFolderMenuView", owner: self, options: nil)?.first as! NCPermissionMenuView
-        } else {
-            sharePermissionMenuView = Bundle.main.loadNibNamed("NCPermissionMenuView", owner: self, options: nil)?.first as! NCPermissionMenuView
-        }
-        
-        sharePermissionMenuView.width = 250
-        if metadata.directory {
-            sharePermissionMenuView.height = 153
-        } else {
-            sharePermissionMenuView.height = 112
-        }
-        
-        sharePermissionMenuView.backgroundColor = NCBrandColor.shared.backgroundForm
-        sharePermissionMenuView.metadata = metadata
-        sharePermissionMenuView.viewWindow = viewWindow
-        sharePermissionMenuView.shareViewController = shareViewController
-        sharePermissionMenuView.reloadData(idShare: tableShare?.idShare ?? 0)
-        sharePermissionMenuView.translatesAutoresizingMaskIntoConstraints = false
-        viewWindow.addSubview(sharePermissionMenuView)
-
-        NSLayoutConstraint.activate([
-            sharePermissionMenuView.widthAnchor.constraint(equalToConstant: sharePermissionMenuView.width),
-            sharePermissionMenuView.heightAnchor.constraint(equalToConstant: sharePermissionMenuView.height),
-            sharePermissionMenuView.centerXAnchor.constraint(equalTo: viewWindow.centerXAnchor),
-            sharePermissionMenuView.centerYAnchor.constraint(equalTo: viewWindow.centerYAnchor),
-        ])
-        
-        return(sharePermissionMenuView: sharePermissionMenuView, viewWindow: viewWindow)
-    }
+//    func openViewMenuUser(shareViewController: NCShare, tableShare: tableShare?, metadata: tableMetadata) -> (shareUserMenuView: NCShareUserMenuView, viewWindow: UIView) {
+//
+//        var shareUserMenuView: NCShareUserMenuView
+//        let window = UIApplication.shared.keyWindow!
+//        let viewWindow = UIView(frame: window.bounds)
+//
+//        window.addSubview(viewWindow)
+//        viewWindow.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//
+//        if metadata.directory {
+//            shareUserMenuView = Bundle.main.loadNibNamed("NCShareUserFolderMenuView", owner: self, options: nil)?.first as! NCShareUserMenuView
+//        } else {
+//            shareUserMenuView = Bundle.main.loadNibNamed("NCShareUserMenuView", owner: self, options: nil)?.first as! NCShareUserMenuView
+//        }
+//
+//
+//        shareUserMenuView.width = 250
+//        if metadata.directory {
+//            shareUserMenuView.height = 410
+//        } else {
+//            shareUserMenuView.height = 370
+//        }
+//
+//        shareUserMenuView.backgroundColor = NCBrandColor.shared.systemBackground
+//        shareUserMenuView.metadata = metadata
+//        shareUserMenuView.viewWindow = viewWindow
+//        shareUserMenuView.shareViewController = shareViewController
+//        shareUserMenuView.reloadData(idShare: tableShare?.idShare ?? 0)
+//        shareUserMenuView.translatesAutoresizingMaskIntoConstraints = false
+//        viewWindow.addSubview(shareUserMenuView)
+//
+//        NSLayoutConstraint.activate([
+//            shareUserMenuView.widthAnchor.constraint(equalToConstant: shareUserMenuView.width),
+//            shareUserMenuView.heightAnchor.constraint(equalToConstant: shareUserMenuView.height),
+//            shareUserMenuView.centerXAnchor.constraint(equalTo: viewWindow.centerXAnchor),
+//            shareUserMenuView.centerYAnchor.constraint(equalTo: viewWindow.centerYAnchor),
+//        ])
+//
+//        return(shareUserMenuView: shareUserMenuView, viewWindow: viewWindow)
+//    }
+//
+//    func openQuickShare(shareViewController: NCShare, tableShare: tableShare?, metadata: tableMetadata) -> (sharePermissionMenuView: NCPermissionMenuView, viewWindow: UIView) {
+//        var sharePermissionMenuView: NCPermissionMenuView
+//        let window = UIApplication.shared.keyWindow!
+//        let viewWindow = UIView(frame: window.bounds)
+//        window.addSubview(viewWindow)
+//        viewWindow.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//
+//        if metadata.directory {
+//            sharePermissionMenuView = Bundle.main.loadNibNamed("NCPermissionFolderMenuView", owner: self, options: nil)?.first as! NCPermissionMenuView
+//        } else {
+//            sharePermissionMenuView = Bundle.main.loadNibNamed("NCPermissionMenuView", owner: self, options: nil)?.first as! NCPermissionMenuView
+//        }
+//
+//        sharePermissionMenuView.width = 250
+//        if metadata.directory {
+//            sharePermissionMenuView.height = 153
+//        } else {
+//            sharePermissionMenuView.height = 112
+//        }
+//
+//        sharePermissionMenuView.backgroundColor = NCBrandColor.shared.backgroundForm
+//        sharePermissionMenuView.metadata = metadata
+//        sharePermissionMenuView.viewWindow = viewWindow
+//        sharePermissionMenuView.shareViewController = shareViewController
+//        sharePermissionMenuView.reloadData(idShare: tableShare?.idShare ?? 0)
+//        sharePermissionMenuView.translatesAutoresizingMaskIntoConstraints = false
+//        viewWindow.addSubview(sharePermissionMenuView)
+//
+//        NSLayoutConstraint.activate([
+//            sharePermissionMenuView.widthAnchor.constraint(equalToConstant: sharePermissionMenuView.width),
+//            sharePermissionMenuView.heightAnchor.constraint(equalToConstant: sharePermissionMenuView.height),
+//            sharePermissionMenuView.centerXAnchor.constraint(equalTo: viewWindow.centerXAnchor),
+//            sharePermissionMenuView.centerYAnchor.constraint(equalTo: viewWindow.centerYAnchor),
+//        ])
+//
+//        return(sharePermissionMenuView: sharePermissionMenuView, viewWindow: viewWindow)
+//    }
     
     func openCalendar(view: UIView, width: CGFloat, height: CGFloat) -> (calendarView: FSCalendar, viewWindow: UIView) {
         

@@ -35,16 +35,7 @@ extension NCViewer {
         var titleFavorite = NSLocalizedString("_add_favorites_", comment: "")
         if metadata.favorite { titleFavorite = NSLocalizedString("_remove_favorites_", comment: "") }
         let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
-        
-        var titleOffline = ""
-        if (localFile == nil || localFile!.offline == false) {
-            titleOffline = NSLocalizedString("_set_available_offline_", comment: "")
-        } else {
-            titleOffline = NSLocalizedString("_remove_available_offline_", comment: "")
-        }
-        
         let isFolderEncrypted = CCUtility.isFolderEncrypted(metadata.serverUrl, e2eEncrypted: metadata.e2eEncrypted, account: metadata.account, urlBase: metadata.urlBase)
-        let isOffline = localFile?.offline == true
 
         //
         // FAVORITE
@@ -67,21 +58,7 @@ extension NCViewer {
         }
 
         //
-        // DETAIL
-        //
-        //        if !appDelegate.disableSharesView {
-        //            actions.append(
-        //                NCMenuAction(
-        //                    title: NSLocalizedString("_details_", comment: ""),
-        //                    icon: NCUtility.shared.loadImage(named: "share"),
-        //                    action: { menuAction in
-        //                        NCFunctionCenter.shared.openShare(ViewController: viewController, metadata: metadata, indexPage: 0)
-        //                    }
-        //                )
-        //            )
-        //        }
-        
-        //
+        // ROTATE
         // OFFLINE
         //
         if (metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml"), !metadata.livePhoto {
@@ -95,28 +72,6 @@ extension NCViewer {
                 )
             )
         }
-        
-        
-        //        //
-        //        // OFFLINE
-        //        //
-        //        if metadata.session == "" && !webView {
-        //            actions.append(
-        //                NCMenuAction(
-        //                    title: titleOffline,
-        //                    icon: NCUtility.shared.loadImage(named: "offlineMenu"),
-        //                    action: { menuAction in
-        //                        if ((localFile == nil || !CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView)) && metadata.session == "") {
-        //
-        //                            NCNetworking.shared.download(metadata: metadata, activityIndicator: true, selector: NCGlobal.shared.selectorLoadOffline) { (_) in }
-        //                        } else {
-        //                            NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: !localFile!.offline)
-        //                        }
-        //                    }
-        //                )
-        //            )
-        //        }
-        
         
         //
         // OPEN IN
@@ -164,47 +119,6 @@ extension NCViewer {
         if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue {
             actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata]))
         }
-        
-        //
-        // SAVE AS SCAN
-        //
-        //        if #available(iOS 13.0, *) {
-        //            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml" {
-        //                actions.append(
-        //                    NCMenuAction(
-        //                        title: NSLocalizedString("_save_as_scan_", comment: ""),
-        //                        icon: NCUtility.shared.loadImage(named: "viewfinder.circle"),
-        //                        action: { _ in
-        //                            NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
-        //                        }
-        //                    )
-        //                )
-        //            }
-        //        }
-        
-        //
-        // SAVE IMAGE / VIDEO
-        //
-        if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue {
-            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata]))
-        }
-
-        //
-        // SAVE AS SCAN
-        //
-        if #available(iOS 13.0, *) {
-            if metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml" {
-                actions.append(
-                    NCMenuAction(
-                        title: NSLocalizedString("_save_as_scan_", comment: ""),
-                        icon: NCUtility.shared.loadImage(named: "viewfinder.circle"),
-                        action: { _ in
-                            NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
-                        }
-                    )
-                )
-            }
-        }
 
         //
         // RENAME
@@ -231,52 +145,6 @@ extension NCViewer {
         }
 
         //
-        // COPY - MOVE
-        //
-        //        if !webView {
-        //            actions.append(
-        //                NCMenuAction(
-        //                    title: NSLocalizedString("_move_or_copy_", comment: ""),
-        //                    icon: NCUtility.shared.loadImage(named: "move"),
-        //                    action: { menuAction in
-        //
-        //                        let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
-        //                        let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
-        //                        let viewController = navigationController.topViewController as! NCSelect
-        //
-        //                        viewController.delegate = NCViewer.shared
-        //                        viewController.hideButtonCreateFolder = false
-        //                        viewController.items = [metadata]
-        //                        viewController.selectFile = false
-        //                        viewController.includeDirectoryE2EEncryption = false
-        //                        viewController.includeImages = false
-        //                        viewController.type = ""
-        //                        viewController.titleButtonDone = NSLocalizedString("_move_", comment: "")
-        //                        viewController.titleButtonDone1 = NSLocalizedString("_copy_", comment: "")
-        //                        viewController.isButtonDone1Hide = false
-        //                        viewController.isOverwriteHide = false
-        //
-        //                        navigationController.modalPresentationStyle = UIModalPresentationStyle.fullScreen
-        //                        self.appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
-        //                    }
-        //                )
-        //            )
-        //        }
-        
-        
-        //
-        // COPY
-        //
-        //        actions.append(
-        //            NCMenuAction(
-        //                title: NSLocalizedString("_copy_file_", comment: ""),
-        //                icon: NCUtility.shared.loadImage(named: "copy"),
-        //                action: { menuAction in
-        //                    NCFunctionCenter.shared.copyPasteboard(pasteboardOcIds: [metadata.ocId], hudView: viewController.view)
-        //                }
-        //            )
-        //        )
-        //
         // VIEW IN FOLDER
         //
         if !webView {
@@ -290,7 +158,7 @@ extension NCViewer {
                         }
                     )
                 )
-            )
+            }
         }
 
         //
@@ -323,32 +191,6 @@ extension NCViewer {
                     }
                 )
             )
-
-            
-//            var title = ""
-//            var icon = UIImage()
-//            
-//            if CCUtility.getPDFDisplayDirection() == .horizontal {
-//                title = NSLocalizedString("_pdf_vertical_", comment: "")
-//                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
-//            } else {
-//                title = NSLocalizedString("_pdf_horizontal_", comment: "")
-//                icon = UIImage(named: "pdf-orientation")!.image(color: NCBrandColor.shared.iconColor, size: 50)
-//            }
-//            
-//            actions.append(
-//                NCMenuAction(
-//                    title: title,
-//                    icon: icon,
-//                    action: { _ in
-//                        if CCUtility.getPDFDisplayDirection() == .horizontal {
-//                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.vertical])
-//                        } else {
-//                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuPDFDisplayDirection, userInfo: ["direction": PDFDisplayDirection.horizontal])
-//                        }
-//                    }
-//                )
-//            )
             
             actions.append(
                 NCMenuAction(

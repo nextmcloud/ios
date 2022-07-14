@@ -72,12 +72,6 @@ import NCCommunication
                 type: NCContentPresenter.messageType.info,
                 errorCode: NCGlobal.shared.errorCharactersForbidden)
         }
-        
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_save_as_copy_", comment: ""), style: .default) { _ in
-            self.saveModifiedFile(override: false)
-        })
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_discard_changes_", comment: ""), style: .destructive) { _ in })
-        parentVC?.present(alertController, animated: true)
     }
 
     override func viewDidAppear(_ animated: Bool) {

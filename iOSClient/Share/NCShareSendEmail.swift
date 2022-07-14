@@ -104,7 +104,14 @@ class NCShareSendEmail: UIViewController, UITextViewDelegate, NCShareNetworkingD
             }
         }
         self.note = message
-        self.networking?.updateShare(idShare: tableShare!.idShare, password: nil, permission: self.tableShare!.permissions, note: message, label: nil, expirationDate: nil, hideDownload: tableShare!.hideDownload)
+        let share = NCTableShareOptions(sharee: sharee!, metadata: metadata!, password: nil)
+        share.idShare = tableShare!.idShare
+        share.permissions = self.tableShare!.permissions
+        share.note = message
+        share.hideDownload = tableShare!.hideDownload
+        self.networking?.updateShare(option: share)
+//        self.networking?.updateShare(idShare: tableShare!.idShare, password: nil, permission: self.tableShare!.permissions, note: message, label: nil, expirationDate: nil, hideDownload: tableShare!.hideDownload)
+        
         self.creatingShare = true
     }
     

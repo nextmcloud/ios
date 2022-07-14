@@ -131,23 +131,7 @@ extension NCCollectionViewCommon {
                     }
                 )
             )
-
-        
-        
-        //
-        // DETAIL
-        //
-        //        if !isFolderEncrypted && !appDelegate.disableSharesView {
-        //            actions.append(
-        //                NCMenuAction(
-        //                    title: NSLocalizedString("_details_", comment: ""),
-        //                    icon: NCUtility.shared.loadImage(named: "share"),
-        //                    action: { menuAction in
-        //                        NCFunctionCenter.shared.openShare(ViewController: self, metadata: metadata, indexPage: 0)
-        //                    }
-        //                )
-        //            )
-        //        }
+        }
         
         
         //
@@ -168,16 +152,7 @@ extension NCCollectionViewCommon {
         // OFFLINE
         //
         if !isFolderEncrypted {
-            actions.append(
-                NCMenuAction(
-                    title: isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: ""),
-                    //icon: NCUtility.shared.loadImage(named: "offlineMenu"),
-                    icon:  NCUtility.shared.loadImage(named: "offlineMenu", color: NCBrandColor.shared.iconColor),
-                    action: { menuAction in
-                        self.setMetadatasAvalableOffline([metadata], isOffline: isOffline)
-                    }
-                )
-            }
+            actions.append(.setAvailableOfflineAction(selectedMetadatas: [metadata], isAnyOffline: isOffline, viewController: self, completion: self.reloadDataSource))
         }
 
         //

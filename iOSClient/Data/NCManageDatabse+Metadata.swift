@@ -692,6 +692,22 @@ extension NCManageDatabase {
 
         return assetLocalIdentifiers
     }
+    
+    @objc func getAssetLocalIdentifiersUploaded(account: String) -> [String] {
+
+        let realm = try! Realm()
+        realm.refresh()
+
+        var assetLocalIdentifiers: [String] = []
+
+        let results = realm.objects(tableMetadata.self).filter("account == %@ AND assetLocalIdentifier != '' AND deleteAssetLocalIdentifier == true", account)
+        for result in results {
+            assetLocalIdentifiers.append(result.assetLocalIdentifier)
+        }
+
+        return assetLocalIdentifiers
+    }
+    
 
     @objc func clearAssetLocalIdentifiers(_ assetLocalIdentifiers: [String], account: String) {
 

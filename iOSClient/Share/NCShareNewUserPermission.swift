@@ -353,8 +353,13 @@ class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, N
                     break
                 }
             }
-            
-            networking?.updateShare(idShare: self.tableShare!.idShare, password: self.password, permission: self.permissionInt, note: nil, label: nil, expirationDate: self.expirationDateText, hideDownload: self.hideDownload)
+            let shareData = NCTableShareOptions(sharee: sharee!, metadata: metadata!, password: self.password)
+            shareData.idShare = self.tableShare!.idShare
+            shareData.permissions = self.permissionInt
+            shareData.password = self.password
+            shareData.hideDownload = self.hideDownload
+            shareData.expirationDate = expirationDate
+            networking?.updateShare(option: shareData)
         }
     }
     

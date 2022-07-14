@@ -142,11 +142,7 @@ extension UIImage {
     }
 
     @objc func image(color: UIColor, size: CGFloat) -> UIImage {
-        let size = CGSize(width: size, height: size)
 
-        UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
-        color.setFill()
-        
         return autoreleasepool { () -> UIImage in
             let size = CGSize(width: size, height: size)
             UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
@@ -157,10 +153,15 @@ extension UIImage {
             context?.scaleBy(x: 1.0, y: -1.0)
             context?.setBlendMode(CGBlendMode.normal)
 
-        let newImage = UIGraphicsGetImageFromCurrentImageContext() ?? self
-        UIGraphicsEndImageContext()
+            let rect = CGRect(origin: .zero, size: size)
+            guard let cgImage = self.cgImage else { return self }
+            context?.clip(to: rect, mask: cgImage)
+            context?.fill(rect)
 
-        return newImage        
+            let newImage = UIGraphicsGetImageFromCurrentImageContext() ?? self
+            UIGraphicsEndImageContext()
+            return newImage
+        }
     }
 
     func imageColor(_ color: UIColor) -> UIImage {
@@ -298,6 +299,7 @@ extension UIImage {
     // https://stackoverflow.com/questions/27092354/rotating-uiimage-in-swift/47402811#47402811
     
     func rotate(radians: Float) -> UIImage? {
+        guard jpegData(compressionQuality: 1) != nil else { return UIImage() }
         var newSize = CGRect(origin: CGPoint.zero, size: self.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
         // Trim off the extremely small float value to prevent core graphics from rounding it up
         newSize.width = floor(newSize.width)

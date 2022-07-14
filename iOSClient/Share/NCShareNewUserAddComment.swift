@@ -26,7 +26,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     @IBOutlet weak var buttonContainerView: UIView!
     
     public var metadata: tableMetadata?
-    public var sharee: NCCommunicationSharee?
+    public var sharee: NCTableShareable!
     private var networking: NCShareNetworking?
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var permission: Int = 0
@@ -118,10 +118,17 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     @IBAction func sendShareClicked(_ sender: Any) {
         let message = commentTextView.text.trimmingCharacters(in: .whitespaces)
         self.note = message
+        guard let shareData = sharee else { return }
+        shareData.note = message
         if isUpdating {
-            self.networking?.updateShare(idShare: tableShare!.idShare, password: nil, permission: self.tableShare!.permissions, note: message, label: nil, expirationDate: nil, hideDownload: tableShare!.hideDownload)
+            shareData.idShare = self.tableShare!.idShare
+            shareData.hideDownload = tableShare!.hideDownload
+            self.networking?.updateShare(option: shareData)
         } else {
-            self.networking?.createShare(shareWith: sharee!.shareWith, shareType: sharee!.shareType, metadata: self.metadata!, note: message)
+            shareData.permissions = permission
+            shareData.shareWith = sharee!.shareWith
+            shareData.shareType = sharee!.shareType
+            self.networking?.createShare(option: shareData)
         }
         self.creatingShare = true
     }
@@ -224,7 +231,12 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         if self.creatingShare {
             self.appDelegate.shares = NCManageDatabase.shared.getTableShares(account: self.metadata!.account)
             if let id = createdShareId {
-                networking?.updateShare(idShare: id, password: password, permission: permission, note: nil, label: label, expirationDate: expirationDate, hideDownload: hideDownload)
+                guard let shareData = sharee else { return }
+                shareData.idShare = id
+                shareData.permissions = permission
+                shareData.hideDownload = hideDownload
+                shareData.label = label ?? ""
+                networking?.updateShare(option: shareData)
             } else {
                 popToShare()
             }

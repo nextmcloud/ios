@@ -44,14 +44,6 @@ class NCMenu: UITableViewController {
 
     // MARK: - View Life Cycle
 
-    static func makeNCMenu(with actions: [NCMenuAction]) -> NCMenu? {
-        let menuViewController = UIStoryboard(name: "NCMenu", bundle: nil).instantiateInitialViewController() as? NCMenu
-        menuViewController?.actions = actions
-        return menuViewController
-    }
-
-    // MARK: - View Life Cycle
-
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.estimatedRowHeight = 60
@@ -119,31 +111,7 @@ class NCMenu: UITableViewController {
 extension NCMenu: FloatingPanelControllerDelegate {
 
     func floatingPanel(_ fpc: FloatingPanelController, layoutFor size: CGSize) -> FloatingPanelLayout {
-        return NCMenuFloatingPanelLayout(numberOfActions: self.actions.count)
-    }
-
-    func floatingPanel(_ fpc: FloatingPanelController, layoutFor newCollection: UITraitCollection) -> FloatingPanelLayout {
-        return NCMenuFloatingPanelLayout(numberOfActions: self.actions.count)
-    }
-
-    func floatingPanel(_ fpc: FloatingPanelController, animatorForDismissingWith velocity: CGVector) -> UIViewPropertyAnimator {
-        return UIViewPropertyAnimator(duration: 0.1, curve: .easeInOut)
-    }
-
-    func floatingPanel(_ fpc: FloatingPanelController, animatorForPresentingTo state: FloatingPanelState) -> UIViewPropertyAnimator {
-        return UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut)
-    }
-
-    func floatingPanelWillEndDragging(_ fpc: FloatingPanelController, withVelocity velocity: CGPoint, targetState: UnsafeMutablePointer<FloatingPanelState>) {
-        guard velocity.y > 750 else { return }
-        fpc.dismiss(animated: true, completion: nil)
-    }
-}
-
-public class NCMenuFloatingPanelBehavior: FloatingPanelBehavior {
-
-    public func addAnimator(_ fpc: FloatingPanelController, to: FloatingPanelPosition) -> UIViewPropertyAnimator {
-        return UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut)
+        return NCMenuFloatingPanelLayout(actionsHeight: self.actions.listHeight)
     }
 
     func floatingPanel(_ fpc: FloatingPanelController, layoutFor newCollection: UITraitCollection) -> FloatingPanelLayout {
@@ -163,3 +131,27 @@ public class NCMenuFloatingPanelBehavior: FloatingPanelBehavior {
         fpc.dismiss(animated: true, completion: nil)
     }
 }
+
+//public class NCMenuFloatingPanelBehavior: FloatingPanelBehavior {
+//
+//    public func addAnimator(_ fpc: FloatingPanelController, to: FloatingPanelPosition) -> UIViewPropertyAnimator {
+//        return UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut)
+//    }
+//
+//    func floatingPanel(_ fpc: FloatingPanelController, layoutFor newCollection: UITraitCollection) -> FloatingPanelLayout {
+//        return NCMenuFloatingPanelLayout(actionsHeight: self.actions.listHeight)
+//    }
+//
+//    func floatingPanel(_ fpc: FloatingPanelController, animatorForDismissingWith velocity: CGVector) -> UIViewPropertyAnimator {
+//        return UIViewPropertyAnimator(duration: 0.1, curve: .easeInOut)
+//    }
+//
+//    func floatingPanel(_ fpc: FloatingPanelController, animatorForPresentingTo state: FloatingPanelState) -> UIViewPropertyAnimator {
+//        return UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut)
+//    }
+//
+//    func floatingPanelWillEndDragging(_ fpc: FloatingPanelController, withVelocity velocity: CGPoint, targetState: UnsafeMutablePointer<FloatingPanelState>) {
+//        guard velocity.y > 750 else { return }
+//        fpc.dismiss(animated: true, completion: nil)
+//    }
+//}

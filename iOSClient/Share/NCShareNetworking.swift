@@ -65,9 +65,7 @@ class NCShareNetworking: NSObject {
     func createShareLink(password: String?) {
         NCUtility.shared.startActivityIndicator(backgroundView: view, blurEffect: false)
         let filenamePath = CCUtility.returnFileNamePath(fromFileName: metadata.fileName, serverUrl: metadata.serverUrl, urlBase: urlBase, account: metadata.account)!
-        let options = NCCCreateShareOptions(path: filenamePath, publicUpload: false, hideDownload: false, password: password, note: nil, permissions: 1)
-        NCCommunication.shared.createShare(options: options) { (account, share, errorCode, errorDescription) in
-
+        NCCommunication.shared.createShareLink(path: filenamePath, hideDownload: false, publicUpload: false, password: password, permissions: 1) { account, share, errorCode, errorDescription in
             NCUtility.shared.stopActivityIndicator()
             if errorCode == 0 && share != nil {
                 NCManageDatabase.shared.addShare(urlBase: self.urlBase, account: self.metadata.account, shares: [share!])

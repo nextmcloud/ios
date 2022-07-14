@@ -27,6 +27,8 @@ import NCCommunication
 import TOPasscodeViewController
 import LocalAuthentication
 import Firebase
+import Adjust
+import AppAuth
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, TOPasscodeViewControllerDelegate, NCAccountRequestDelegate, NCViewCertificateDetailsDelegate, NCUserBaseUrl {
@@ -48,8 +50,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     @objc var activeMedia: NCMedia?
     var activeServerUrl: String = ""
     @objc var activeViewController: UIViewController?
-<<<<<<< HEAD
-    var activeViewerVideo: NCViewerVideo?
     
     var mainTabBar: NCMainTabBar?
     var activeMetadata: tableMetadata?
@@ -721,11 +721,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func accountRequestChangeAccount(account: String) {
         changeAccount(account)
     }
-
-    func accountRequestChangeAccount(account: String) {
-        
-        changeAccount(account)
-    }
     
     func requestAccount() {
         
@@ -759,42 +754,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     // MARK: - Passcode
-
-    func presentPasscode(completion: @escaping () -> ()) {
-
-        let laContext = LAContext()
-        var error: NSError?
-        
-        if account == "" { return }
-        
-        guard let passcode = CCUtility.getPasscode() else {
-            requestAccount()
-            return
-        }
-        if passcode.count == 0 || CCUtility.getNotPasscodeAtStart() {
-            requestAccount()
-            return
-        }
-        
-        if passcodeViewController == nil {
-            
-            passcodeViewController = TOPasscodeViewController.init(passcodeType: .sixDigits, allowCancel: false)
-            //            passcodeViewController = TOPasscodeViewController.init(style: .opaqueLight, passcodeType: .sixDigits)
-            passcodeViewController?.delegate = self
-            passcodeViewController?.keypadButtonShowLettering = false
-            if CCUtility.getEnableTouchFaceID() && laContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-                if error == nil {
-                    if laContext.biometryType == .faceID  {
-                        passcodeViewController?.biometryType = .faceID
-                        passcodeViewController?.allowBiometricValidation = true
-                    } else if laContext.biometryType == .touchID  {
-                        passcodeViewController?.biometryType = .touchID
-                        passcodeViewController?.allowBiometricValidation = true
-                    }
-                }
-            }
-        }
-    }
     
     func didPerformBiometricValidationRequest(in passcodeViewController: TOPasscodeViewController) {
         LAContext().evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: NCBrandOptions.shared.brand) { (success, error) in

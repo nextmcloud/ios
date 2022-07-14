@@ -200,7 +200,7 @@ extension NCMenuAction {
     static func setAvailableOfflineAction(selectedMetadatas: [tableMetadata], isAnyOffline: Bool, viewController: UIViewController, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: isAnyOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: ""),
-            icon: NCUtility.shared.loadImage(named: "tray.and.arrow.down"),
+            icon: UIImage(named: "offlineMenu")!.image(color: NCBrandColor.shared.iconColor, size: 50),
             action: { _ in
                 if !isAnyOffline, selectedMetadatas.count > 3 {
                     let alert = UIAlertController(

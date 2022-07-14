@@ -29,28 +29,19 @@ import NCCommunication
 import SVGKit
 class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDelegate, NCShareUserCellDelegate, NCShareNetworkingDelegate {
     
-    //    @IBOutlet weak var viewContainerConstraint: NSLayoutConstraint!
     @IBOutlet weak var tableView: UITableView!
-    //    @IBOutlet weak var containerView: UIView!
-    
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    
+
     public var metadata: tableMetadata?
     public var sharingEnabled = true
-    public var height: CGFloat = 0
-    
-    private var shareLinkMenuView: NCShareLinkMenuView?
-    private var shareUserMenuView: NCShareUserMenuView?
-    private var sharePermissionMenuView: NCPermissionMenuView?
-    private var shareMenuViewWindow: UIView?
     private var dropDown = DropDown()
     private var networking: NCShareNetworking?
+    
     private var shareeSelected: NCCommunicationSharee?
     public  var tableShareSelected: tableShare?
     private var quickStatusTableShare: tableShare!
-    private var sendEmailSelected: Int!
     private var shareeEmail: String!
-    
+
     // MARK: - View Life Cycle
     
     override func viewDidLoad() {
@@ -96,14 +87,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(willComeForeground), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationWillEnterForeground), object: nil)
-        
-        //        let isCurrentUser = NCShareCommon.shared.isCurrentUserIsFileOwner(fileOwnerId: metadata?.ownerId ?? "")
-        //        let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
-        //        if isCurrentUser || canReshare {
-        //            containerView.isHidden = false
-        //        } else {
-        //            containerView.isHidden = true
-        //        }
         
         setupHeader()
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
@@ -205,6 +188,15 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         tableView.isUserInteractionEnabled = true
     }
     
+    func checkEnforcedPassword(shareType: Int, completion: @escaping (String?) -> Void) {
+        guard let metadata = self.metadata,
+              NCManageDatabase.shared.getCapabilitiesServerBool(account: metadata.account, elements: NCElementsJSON.shared.capabilitiesFileSharingPubPasswdEnforced, exists: false),
+              shareType == NCShareCommon.shared.SHARE_TYPE_LINK || shareType == NCShareCommon.shared.SHARE_TYPE_EMAIL
+        else { return completion(nil) }
+
+        self.present(UIAlertController.password(titleKey: "_enforce_password_protection_", completion: completion), animated: true)
+    }
+
     
     // MARK: - IBAction
     
@@ -278,15 +270,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
     }
     
-    @objc func tapLinkMenuViewWindow(gesture: UITapGestureRecognizer) {
-        shareLinkMenuView?.unLoad()
-        shareLinkMenuView = nil
-        shareUserMenuView?.unLoad()
-        shareUserMenuView = nil
-        sharePermissionMenuView?.unLoad()
-        sharePermissionMenuView = nil
-    }
-    
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         return gestureRecognizer.view == touch.view
     }
@@ -311,42 +294,12 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         } else {
             permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: canShare, andIsFolder: metadata.directory)
         }
-        
-        networking?.updateShare(idShare: tableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: tableShare.hideDownload)
+        let shareData = NCTableShareOptions(sharee: shareeSelected!, metadata: metadata, password: nil)
+        shareData.idShare = tableShare.idShare
+        shareData.permissions = permission
+        shareData.hideDownload = tableShare.hideDownload
+        networking?.updateShare(option: shareData)
     }
-    
-    //    func tapMenu(with tableShare: tableShare?, sender: Any) {
-    //    func tapMenu(with tableShare: tableShare?, sender: Any, index: Int) {
-    //
-    //        guard let tableShare = tableShare else { return }
-    //
-    //        self.tableShareSelected = tableShare
-    //        self.sendEmailSelected = index
-    //        if tableShare.shareType == 3 {
-    ////            let views = NCShareCommon.shared.openViewMenuShareLink(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-    ////            shareLinkMenuView = views.shareLinkMenuView
-    ////            shareMenuViewWindow = views.viewWindow
-    //            let shareMenu = NCShareMenu()
-    //            shareMenu.toggleMenu(viewController: self, sendMail: false)
-    //
-    //            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-    //            tap.delegate = self
-    //            shareMenuViewWindow?.addGestureRecognizer(tap)
-    //        } else {
-    ////            let views = NCShareCommon.shared.openViewMenuUser(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-    ////            shareUserMenuView = views.shareUserMenuView
-    ////            shareMenuViewWindow = views.viewWindow
-    //            let shareMenu = NCShareMenu()
-    //            shareMenu.toggleMenu(viewController: self, sendMail: true)
-    //            let views = NCShareCommon.shared.openViewMenuUser(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-    //            shareUserMenuView = views.shareUserMenuView
-    //            shareMenuViewWindow = views.viewWindow
-    //
-    //            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-    //            tap.delegate = self
-    //            shareMenuViewWindow?.addGestureRecognizer(tap)
-    //        }
-    //    }
     
     func tapMenu(with tableShare: tableShare?, sender: Any, index: Int) {
         let share = (tableShare?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShare
@@ -354,64 +307,16 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let metadata = self.metadata else { return }
         
         self.tableShareSelected = tableShare
-        self.sendEmailSelected = index
         let isFolder = metadata.directory
         if tableShare.shareType == 3 {
             let shareMenu = NCShareMenu()
             let isFolder = metadata.directory
             shareMenu.toggleMenu(viewController: self, sendMail: false, folder: isFolder)
-            
-            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-            tap.delegate = self
         } else {
             let shareMenu = NCShareMenu()
             shareMenu.toggleMenu(viewController: self, sendMail: true, folder: isFolder)
-            
-            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-            tap.delegate = self
         }
     }
-    
-    
-    //    func quickStatus(with tableShare: tableShare?, sender: UIButton) {
-    //        guard let tableShare = tableShare else { return }
-    //
-    //        if tableShare.shareType != 3 {
-    ////            let views = NCShareCommon.shared.openQuickShare(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-    ////            sharePermissionMenuView = views.sharePermissionMenuView
-    ////            shareMenuViewWindow = views.viewWindow
-    ////
-    ////            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-    ////            tap.delegate = self
-    ////            shareMenuViewWindow?.addGestureRecognizer(tap)
-    //
-    //            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-    //            tap.delegate = self
-    //            shareMenuViewWindow?.addGestureRecognizer(tap)
-    //            self.quickStatusTableShare = tableShare
-    //            let quickStatusMenu = NCShareQuickStatusMenu()
-    //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, directoryType: "", status: tableShare.permissions)
-    //        }
-    //    }
-    
-    //    func quickStatus(with tableShare: tableShare?, sender: UIButton) {
-    //        guard let tableShare = tableShare else { return }
-    //
-    //        if tableShare.shareType != 3 {
-    ////            let views = NCShareCommon.shared.openQuickShare(shareViewController: self, tableShare: tableShare, metadata: metadata!)
-    ////            sharePermissionMenuView = views.sharePermissionMenuView
-    ////            shareMenuViewWindow = views.viewWindow
-    ////
-    ////            let tap = UITapGestureRecognizer(target: self, action: #selector(tapLinkMenuViewWindow))
-    ////            tap.delegate = self
-    ////            shareMenuViewWindow?.addGestureRecognizer(tap)
-    //
-    //            self.quickStatusTableShare = tableShare
-    //            let quickStatusMenu = NCShareQuickStatusMenu()
-    //            quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, status: tableShare.permissions)
-    //
-    //        }
-    //    }
     
     /// MARK: - NCShareNetworkingDelegate
     
@@ -509,43 +414,27 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         }
         
         dropDown.selectionAction = { [weak self] (index, item) in
-            let sharee = sharees[index]
             searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
             searchField.text = ""
-            let directory = self?.metadata?.directory ?? false
-            let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-            DispatchQueue.main.async() { [self] in
-                //                var viewNewUserPermission: NCShareNewUserPermission
-                var viewNewUserPermission: NCShareAdvancePermission
-                //                if directory! {
-                ////                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-                //                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFolderPermission") as! NCShareNewUserPermission
-                //                } else {
-                ////                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-                //                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
-                //                }
-                //                if directory! {
-                
-                viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareAdvancePermission") as! NCShareAdvancePermission
-                //                } else {
-                ////                    let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-                //                    viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserFilePermission") as! NCShareNewUserPermission
-                //                }
-                
-                if let ocId = self?.metadata?.ocId {
-                    let metaData = NCManageDatabase.shared.getMetadataFromOcId(ocId)
-                    self?.metadata = metaData
-                }
-                searchField.resignFirstResponder()
-                viewNewUserPermission.metadata = self!.metadata
-                viewNewUserPermission.sharee = sharee
-                viewNewUserPermission.shareeEmail = self?.shareeEmail
-                viewNewUserPermission.newUser = true
-                self?.navigationController!.pushViewController(viewNewUserPermission, animated: true)
+            let sharee = sharees[index]
+            if let ocId = self?.metadata?.ocId {
+                let metaData = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+                self?.metadata = metaData
             }
-            //            self!.networking?.createShare(shareWith: sharee.shareWith, shareType: sharee.shareType, metadata: self!.metadata!)
+            guard
+                let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
+                let navigationController = self?.navigationController,
+                let metadata = self?.metadata else { return }
+            self?.checkEnforcedPassword(shareType: sharee.shareType) { password in
+                let shareOptions = NCTableShareOptions(sharee: sharee, metadata: metadata, password: password)
+                advancePermission.metadata = metadata
+                advancePermission.sharee = shareOptions
+                advancePermission.shareeEmail = self?.shareeEmail
+                advancePermission.newUser = true
+                searchField.resignFirstResponder()
+                navigationController.pushViewController(advancePermission, animated: true)
+            }
         }
-        
         dropDown.show()
     }
     
@@ -638,23 +527,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     @objc func shareMenuAdvancePermissionClicked() {
-        //        let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-        //        let directory = self.metadata?.directory
-        //        let shareFileOptions = storyboard.instantiateViewController(withIdentifier: "NCShareFileOptions") as! NCShareFileOptions
-        //        shareFileOptions.metadata = self.metadata
-        //        shareFileOptions.tableShare = self.tableShareSelected
-        //        shareFileOptions.sharee = self.shareeSelected
-        //        guard let navigationController = navigationController else {
-        //            print("this vc is not embedded in navigationController")
-        //            return
-        //        }
-        //        navigationController.pushViewController(shareFileOptions, animated: true)
-        //NCShareAdvancePermission
-        
-        let directory = self.metadata?.directory
         let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-        //        var viewNewUserPermission: NCShareNewUserPermission
-        //        viewNewUserPermission = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserPermission") as! NCShareNewUserPermission
         var advancePermission: NCShareAdvancePermission
         advancePermission = storyboard.instantiateViewController(withIdentifier: "NCShareAdvancePermission") as! NCShareAdvancePermission
         if let ocId = metadata?.ocId {
@@ -662,8 +535,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             self.metadata = metaData
         }
         advancePermission.metadata = self.metadata
-        advancePermission.sharee = self.shareeSelected
-        //        advancePermission.shareeEmail = self.shareeEmail
+        advancePermission.sharee = tableShare(value: tableShareSelected)
         advancePermission.newUser = false
         advancePermission.tableShare = self.tableShareSelected
         guard let navigationController = navigationController else {
@@ -686,6 +558,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         viewNewUserComment.metadata = self.metadata
         viewNewUserComment.tableShare = self.tableShareSelected
         viewNewUserComment.isUpdating = true
+        viewNewUserComment.sharee = tableShare(value: tableShareSelected)
         if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
             searchField.resignFirstResponder()
         }
@@ -726,33 +599,40 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         }
     }
     
-    @objc func statusReadOnlyClicked() {
+    @objc func statusReadOnlyClicked(_ notification: NSNotification) {
         guard self.quickStatusTableShare != nil else { return }
         var canReshare = false
         if let value = self.tableShareSelected?.permissions {
             canReshare = CCUtility.isPermission(toCanShare: value)
         }
+        guard let tableShareObject = notification.object as? tableShare else { return }
+        let updatedShare = tableShare(value: tableShareObject)
         let permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: canReshare, andIsFolder: metadata!.directory)
-        
-        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
+        updatedShare.permissions = permission
+        networking?.updateShare(option: updatedShare)
     }
     
-    @objc func statusEditingClicked() {
+    @objc func statusEditingClicked(_ notification: NSNotification) {
         guard self.quickStatusTableShare != nil else { return }
         var canReshare = false
         if let value = self.tableShareSelected?.permissions {
             canReshare = CCUtility.isPermission(toCanShare: value)
         }
+        guard let tableShareObject = notification.object as? tableShare else { return }
+        let updatedShare = tableShare(value: tableShareObject)
         let permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: canReshare, andIsFolder: metadata!.directory)
-        
-        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
+        updatedShare.permissions = permission
+        networking?.updateShare(option: updatedShare)
     }
     
-    @objc func statusFileDropClicked() {
+    @objc func statusFileDropClicked(_ notification: NSNotification) {
         guard self.quickStatusTableShare != nil else { return }
-        let permission = NCGlobal.shared.permissionCreateShare
+        guard let tableShareObject = notification.object as? tableShare else { return }
+        let updatedShare = tableShare(value: tableShareObject)
         
-        networking?.updateShare(idShare: self.quickStatusTableShare.idShare, password: nil, permission: permission, note: nil, label: nil, expirationDate: nil, hideDownload: self.quickStatusTableShare.hideDownload)
+        let permission = NCGlobal.shared.permissionCreateShare
+        updatedShare.permissions = permission
+        networking?.updateShare(option: updatedShare)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
