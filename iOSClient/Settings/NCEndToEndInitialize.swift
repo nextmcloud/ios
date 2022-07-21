@@ -210,8 +210,8 @@ class NCEndToEndInitialize: NSObject {
                     
                 case NCGlobal.shared.errorResourceNotFound:
                     // message
-                    let e2ePassphrase = NYMnemonic.generateString(128, language: "english")
-                    let message = "\n" + NSLocalizedString("_e2e_settings_view_passphrase_", comment: "") + "\n\n" + e2ePassphrase!
+                    guard let e2ePassphrase = NYMnemonic.generateString(128, language: "english") else { return }
+                    let message = "\n" + NSLocalizedString("_e2e_settings_view_passphrase_", comment: "") + "\n\n" + e2ePassphrase
                     let alertController = UIAlertController(title: NSLocalizedString("_e2e_settings_title_", comment: ""), message: NSLocalizedString(message, comment: ""), preferredStyle: .alert)
 
                     let OKAction = UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default) { _ in
