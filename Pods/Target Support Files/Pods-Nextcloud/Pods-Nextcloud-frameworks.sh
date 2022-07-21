@@ -178,22 +178,24 @@ code_sign_if_enabled() {
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ChromaColorPicker/ChromaColorPicker.framework"
-  install_framework "${PODS_ROOT}/MORichNotification/Frameworks/MORichNotification.framework"
-  install_framework "${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MoEngage.framework"
-  install_framework "${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MoEngageCore.framework"
-  install_framework "${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MOAnalytics.framework"
-  install_framework "${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MOMessaging.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/MarkdownKit/MarkdownKit.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/tealium-swift/TealiumSwift.framework"
+  install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MORichNotification/MORichNotification.framework"
+  install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MoEngage.framework"
+  install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MoEngageCore.framework"
+  install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MOAnalytics.framework"
+  install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MOMessaging.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ChromaColorPicker/ChromaColorPicker.framework"
-  install_framework "${PODS_ROOT}/MORichNotification/Frameworks/MORichNotification.framework"
-  install_framework "${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MoEngage.framework"
-  install_framework "${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MoEngageCore.framework"
-  install_framework "${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MOAnalytics.framework"
-  install_framework "${PODS_ROOT}/MoEngage-iOS-SDK/Frameworks/MOMessaging.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/MarkdownKit/MarkdownKit.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/tealium-swift/TealiumSwift.framework"
+  install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MORichNotification/MORichNotification.framework"
+  install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MoEngage.framework"
+  install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MoEngageCore.framework"
+  install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MOAnalytics.framework"
+  install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MOMessaging.framework"
 fi
 if [ "${COCOAPODS_PARALLEL_CODE_SIGN}" == "true" ]; then
   wait

@@ -1,5 +1,3 @@
-github "AssistoLab/DropDown" "v2.3.13"
-github "https://github.com/tsdimobile/ios-communication-library" "v0.99.4"
 github "https://github.com/marinofaggiana/KTVHTTPCache" "2.0.5"
 github "https://github.com/marinofaggiana/TOPasscodeViewController" "master"
 github "krzyzanowskim/OpenSSL"

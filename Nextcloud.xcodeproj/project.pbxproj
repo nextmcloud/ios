@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2359E0987D4467DCBEE63559 /* Pods_Share.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 737F4CC01AEC98AD8B253954 /* Pods_Share.framework */; };
 		2C1D5D7523E2DE3300334ABB /* NCDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB41ED5A87C00B7EAD4 /* NCDatabase.swift */; };
 		2C1D5D7623E2DE3300334ABB /* NCManageDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB51ED5A87C00B7EAD4 /* NCManageDatabase.swift */; };
 		2C1D5D7923E2DE9100334ABB /* NCBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B3CCD1EAE01BD00921AC9 /* NCBrand.swift */; };
@@ -153,7 +154,6 @@
 		56BE8A94287842C10024C78B /* DropDown in Frameworks */ = {isa = PBXBuildFile; productRef = 56BE8A93287842C10024C78B /* DropDown */; };
 		56BE8A96287842D30024C78B /* DropDown in Frameworks */ = {isa = PBXBuildFile; productRef = 56BE8A95287842D30024C78B /* DropDown */; };
 		56BE8A98287842DD0024C78B /* DropDown in Frameworks */ = {isa = PBXBuildFile; productRef = 56BE8A97287842DD0024C78B /* DropDown */; };
-		56BE8A9B287849550024C78B /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56BE8A99287849540024C78B /* NCCreateDocumentCustomTextField.xib */; };
 		56BE8A9C287849550024C78B /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BE8A9A287849550024C78B /* NCCreateDocumentCustomTextField.swift */; };
 		56BE8A9E28784BA30024C78B /* NCLoginWeb+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BE8A9D28784BA30024C78B /* NCLoginWeb+Menu.swift */; };
 		56BE8AA428784CCF0024C78B /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7F4F11127ECDC52008676F9 /* UIFont+Extension.swift */; };
@@ -162,10 +162,6 @@
 		56D88E192876CB0400B72455 /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = 56D88E182876CB0400B72455 /* NCCommunication */; };
 		56D88E1B2876CB1A00B72455 /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = 56D88E1A2876CB1A00B72455 /* NCCommunication */; };
 		56D88E1D2876CB2700B72455 /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = 56D88E1C2876CB2700B72455 /* NCCommunication */; };
-		56D88E1F2876CF6600B72455 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56D88E1E2876CF6600B72455 /* GoogleService-Info.plist */; };
-		56D88E202876CF6600B72455 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56D88E1E2876CF6600B72455 /* GoogleService-Info.plist */; };
-		56D88E212876CF6600B72455 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56D88E1E2876CF6600B72455 /* GoogleService-Info.plist */; };
-		56D88E222876CF6600B72455 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56D88E1E2876CF6600B72455 /* GoogleService-Info.plist */; };
 		56E92DA1287E9A5400399818 /* NCPlayerToolBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E92D9F287E9A5300399818 /* NCPlayerToolBar.swift */; };
 		56E92DA2287E9A5400399818 /* NCPlayerToolBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E92DA0287E9A5300399818 /* NCPlayerToolBar.xib */; };
 		56E9B32B287C1E5000F1D413 /* NCActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C9555421F0C5470024296E /* NCActivity.swift */; };
@@ -177,7 +173,6 @@
 		56E9B341287C203200F1D413 /* NCViewerMediaPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B337287C203100F1D413 /* NCViewerMediaPage.swift */; };
 		56E9B342287C203200F1D413 /* NCViewerMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B338287C203100F1D413 /* NCViewerMedia.swift */; };
 		56E9B344287C209A00F1D413 /* NCViewerMediaPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B343287C209A00F1D413 /* NCViewerMediaPage.storyboard */; };
-		56E9B346287C244F00F1D413 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B345287C244F00F1D413 /* Images.xcassets */; };
 		56E9B349287C269200F1D413 /* NCListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B348287C269200F1D413 /* NCListCell.xib */; };
 		56E9B34C287C281100F1D413 /* NCGridCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E9B34A287C281000F1D413 /* NCGridCell.xib */; };
 		56E9B34D287C281100F1D413 /* NCGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9B34B287C281100F1D413 /* NCGridCell.swift */; };
@@ -222,20 +217,6 @@
 		56E9FB7D2878040D0006B408 /* Trademob in Frameworks */ = {isa = PBXBuildFile; productRef = 56E9FB7C2878040D0006B408 /* Trademob */; };
 		56E9FB7F2878040D0006B408 /* WebBridge in Frameworks */ = {isa = PBXBuildFile; productRef = 56E9FB7E2878040D0006B408 /* WebBridge */; };
 		56E9FB8028780CEA0006B408 /* NCListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565B11E12875CF97006998FA /* NCListCell.swift */; };
-		56E9FBA5287813810006B408 /* AutoUploadFolderCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E9FB97287813810006B408 /* AutoUploadFolderCustomCell.xib */; };
-		56E9FBA6287813810006B408 /* TypeInFileNameCustomSwitchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E9FB98287813810006B408 /* TypeInFileNameCustomSwitchCell.xib */; };
-		56E9FBA7287813810006B408 /* SubFolderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FB99287813810006B408 /* SubFolderCustomCell.swift */; };
-		56E9FBA8287813810006B408 /* OriginalFileNameCustomSwitchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E9FB9A287813810006B408 /* OriginalFileNameCustomSwitchCell.xib */; };
-		56E9FBA9287813810006B408 /* ToggleButtonViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E9FB9B287813810006B408 /* ToggleButtonViewCell.xib */; };
-		56E9FBAA287813810006B408 /* SubFolderCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E9FB9C287813810006B408 /* SubFolderCustomCell.xib */; };
-		56E9FBAB287813810006B408 /* ToggleButtonViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FB9D287813810006B408 /* ToggleButtonViewCell.swift */; };
-		56E9FBAC287813810006B408 /* OriginalFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FB9E287813810006B408 /* OriginalFileNameCustomSwitchCell.swift */; };
-		56E9FBAD287813810006B408 /* TypeInFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FB9F287813810006B408 /* TypeInFileNameCustomSwitchCell.swift */; };
-		56E9FBAE287813810006B408 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E9FBA0287813810006B408 /* FolderPathCustomCell.xib */; };
-		56E9FBAF287813810006B408 /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FBA1287813810006B408 /* TextTableViewCell.swift */; };
-		56E9FBB0287813810006B408 /* AutoUploadFolderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FBA2287813810006B408 /* AutoUploadFolderCustomCell.swift */; };
-		56E9FBB1287813810006B408 /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E9FBA3287813810006B408 /* TextTableViewCell.xib */; };
-		56E9FBB2287813810006B408 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FBA4287813810006B408 /* FolderPathCustomCell.swift */; };
 		56E9FBB42878196D0006B408 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FBB32878196D0006B408 /* NCShare+Helper.swift */; };
 		56E9FBB5287827A00006B408 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		56E9FBB7287827E40006B408 /* NCMenu+FloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FBB6287827E40006B408 /* NCMenu+FloatingPanel.swift */; };
@@ -252,7 +233,7 @@
 		56E9FBCE28783B740006B408 /* ScanCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FBCC28783B740006B408 /* ScanCell.swift */; };
 		56F260FA27D2264200365F78 /* NCShareSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56F260F827D2264100365F78 /* NCShareSectionHeaderView.swift */; };
 		56F260FD27D2276900365F78 /* NCShareSectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56F260FC27D2276900365F78 /* NCShareSectionHeaderView.xib */; };
-		5D4C68D9150C5E02F36A94B4 /* Pods_Notification_Service_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0DF19FDFCB13AB2A6D32652 /* Pods_Notification_Service_Extension.framework */; };
+		5886B3709EA5025FB0FD8FD6 /* Pods_File_Provider_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 64C70207B70F7487D3B445A0 /* Pods_File_Provider_Extension.framework */; };
 		7A4619A227BF71F40042D595 /* NCTrash+CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4619A127BF71F40042D595 /* NCTrash+CollectionView.swift */; };
 		7A4619A627BF72440042D595 /* UIBarButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4619A527BF72440042D595 /* UIBarButton+Extension.swift */; };
 		7A70DE2327B5736E0018F47E /* NCSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7A70DE2227B5736E0018F47E /* NCSettings.storyboard */; };
@@ -281,7 +262,26 @@
 		7AE63BFD26DE5FCE00CEAAD5 /* NCSelectCommandViewCopyMove.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BFA26DE5FCD00CEAAD5 /* NCSelectCommandViewCopyMove.xib */; };
 		7AE63BFE26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AE63BFB26DE5FCD00CEAAD5 /* NCSelectCommandViewSelect.xib */; };
 		7AE63C8326E8AF9500CEAAD5 /* NCSectionHeaderMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F78ACD57219048040088454D /* NCSectionHeaderMenu.xib */; };
-		81C9C81FCF310C311197A312 /* Pods_Share.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 704ECA9B4060FBB4E5619FB8 /* Pods_Share.framework */; };
+		8402B121288920F800CBAC94 /* AutoUploadFolderCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B117288920F700CBAC94 /* AutoUploadFolderCustomCell.xib */; };
+		8402B122288920F800CBAC94 /* TypeInFileNameCustomSwitchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B118288920F700CBAC94 /* TypeInFileNameCustomSwitchCell.xib */; };
+		8402B123288920F800CBAC94 /* OriginalFileNameCustomSwitchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B119288920F700CBAC94 /* OriginalFileNameCustomSwitchCell.xib */; };
+		8402B124288920F800CBAC94 /* ToggleButtonViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B11A288920F700CBAC94 /* ToggleButtonViewCell.xib */; };
+		8402B125288920F800CBAC94 /* SubFolderCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B11B288920F700CBAC94 /* SubFolderCustomCell.xib */; };
+		8402B126288920F800CBAC94 /* ToggleButtonViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B11C288920F700CBAC94 /* ToggleButtonViewCell.swift */; };
+		8402B127288920F800CBAC94 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B11D288920F700CBAC94 /* FolderPathCustomCell.xib */; };
+		8402B128288920F800CBAC94 /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B11E288920F700CBAC94 /* TextTableViewCell.swift */; };
+		8402B129288920F800CBAC94 /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B11F288920F700CBAC94 /* TextTableViewCell.xib */; };
+		8402B12A288920F800CBAC94 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B120288920F700CBAC94 /* FolderPathCustomCell.swift */; };
+		8402B12C2889210A00CBAC94 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8402B12B2889210A00CBAC94 /* Images.xcassets */; };
+		8402B1312889245200CBAC94 /* TypeInFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B12D2889245100CBAC94 /* TypeInFileNameCustomSwitchCell.swift */; };
+		8402B1322889245200CBAC94 /* AutoUploadFolderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B12E2889245200CBAC94 /* AutoUploadFolderCustomCell.swift */; };
+		8402B1332889245200CBAC94 /* SubFolderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B12F2889245200CBAC94 /* SubFolderCustomCell.swift */; };
+		8402B1342889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B1302889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift */; };
+		8402B1372889298600CBAC94 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B1352889298600CBAC94 /* NCCreateDocumentCustomTextField.xib */; };
+		8456608D28891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
+		8456608E28891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
+		8456608F28891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
+		8456609028891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
 		95BB2056265FE2AE00AF4344 /* NCGlobal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB2054265FE2AE00AF4344 /* NCGlobal.swift */; };
 		95BB2068265FE90F00AF4344 /* NCGlobal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB2054265FE2AE00AF4344 /* NCGlobal.swift */; };
 		95BB20CD26600F6100AF4344 /* NCLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20CC26600F6100AF4344 /* NCLogin.swift */; };
@@ -292,6 +292,7 @@
 		B176BA9926F8B83A009A0F33 /* NCShareTextInputCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B176BA9826F8B83A009A0F33 /* NCShareTextInputCell.swift */; };
 		B176BAB626F8F7A0009A0F33 /* NCShareTextInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B176BAB526F8F7A0009A0F33 /* NCShareTextInputCell.xib */; };
 		B176BAD626FD9FF8009A0F33 /* UIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B176BAD526FD9FF8009A0F33 /* UIView+Extensions.swift */; };
+		B1C45E5024AF948DE1AF05FE /* Pods_Notification_Service_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E0B45CD4E8F820EE8B09D55 /* Pods_Notification_Service_Extension.framework */; };
 		C00B205726908551003E18AD /* NCShareSendEmail.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00B205626908550003E18AD /* NCShareSendEmail.swift */; };
 		C00B205D26908B9B003E18AD /* NCShareFolderOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00B205C26908B9B003E18AD /* NCShareFolderOptions.swift */; };
 		C00B206D2691B8A0003E18AD /* NCShareFileOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00B206C2691B8A0003E18AD /* NCShareFileOptions.swift */; };
@@ -314,7 +315,6 @@
 		C0D7889026809F9800B876BB /* NCShareNewUserAddComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D7888F26809F9800B876BB /* NCShareNewUserAddComment.swift */; };
 		C0D788A6268AEE8400B876BB /* NCShareMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D788A5268AEE8400B876BB /* NCShareMenu.swift */; };
 		C0D788CC268C656C00B876BB /* NCShareQuickStatusMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D788CB268C656C00B876BB /* NCShareQuickStatusMenu.swift */; };
-		DD4538F3ECA6B69D099A612D /* Pods_File_Provider_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BABA7DA4EBF86A7FBE66CCBC /* Pods_File_Provider_Extension.framework */; };
 		F700222C1EC479840080073F /* Custom.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F700222B1EC479840080073F /* Custom.xcassets */; };
 		F700222D1EC479840080073F /* Custom.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F700222B1EC479840080073F /* Custom.xcassets */; };
 		F700510122DF63AC003A3356 /* NCShare.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F700510022DF63AC003A3356 /* NCShare.storyboard */; };
@@ -586,6 +586,7 @@
 		08EA97451E6554FC004C83FA /* FirebaseCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseCore.framework; sourceTree = "<group>"; };
 		08EA97461E6554FC004C83FA /* FirebaseInstanceID.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseInstanceID.framework; sourceTree = "<group>"; };
 		08EA97471E6554FC004C83FA /* GoogleToolboxForMac.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleToolboxForMac.framework; sourceTree = "<group>"; };
+		2554A2B66EF736EFAB6BF600 /* Pods-Share.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share.release.xcconfig"; path = "Target Support Files/Pods-Share/Pods-Share.release.xcconfig"; sourceTree = "<group>"; };
 		2C33C47F23E2C475005F963B /* Notification Service Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Notification Service Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C33C48123E2C475005F963B /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		2C33C48A23E2CC26005F963B /* Notification_Service_Extension-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Notification_Service_Extension-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -594,9 +595,7 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
-		3D1F0CBE7113D3E489A5445C /* Pods-Share.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share.debug.xcconfig"; path = "Target Support Files/Pods-Share/Pods-Share.debug.xcconfig"; sourceTree = "<group>"; };
-		3E8D3C3E7CD53402E2361370 /* Pods-Share.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share.release.xcconfig"; path = "Target Support Files/Pods-Share/Pods-Share.release.xcconfig"; sourceTree = "<group>"; };
-		54ED43EF8E89035E093FC234 /* Pods-File Provider Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-File Provider Extension.release.xcconfig"; path = "Target Support Files/Pods-File Provider Extension/Pods-File Provider Extension.release.xcconfig"; sourceTree = "<group>"; };
+		46E07D44DFFC2097E39B7FF5 /* Pods-Share.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share.debug.xcconfig"; path = "Target Support Files/Pods-Share/Pods-Share.debug.xcconfig"; sourceTree = "<group>"; };
 		5610960028769C7F00292C4C /* UIAlertController+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extension.swift"; sourceTree = "<group>"; };
 		5610960A2876B50500292C4C /* NCRenameFile.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCRenameFile.storyboard; sourceTree = "<group>"; };
 		5610960B2876B50500292C4C /* NCRenameFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCRenameFile.swift; sourceTree = "<group>"; };
@@ -640,13 +639,11 @@
 		56A5109D27B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCManageDatabse+Metadata.swift"; sourceTree = "<group>"; };
 		56A5109E27B2D5D700D9F3E6 /* NCManageDatabase+Account.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCManageDatabase+Account.swift"; sourceTree = "<group>"; };
 		56A5109F27B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCManageDatabase+Activity.swift"; sourceTree = "<group>"; };
-		56BE8A99287849540024C78B /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = NCCreateDocumentCustomTextField.xib; path = "../../../../../NEW NMC BRANDED CLIENT/ios/iOSClient/Main/Create cloud/NCCreateDocumentCustomTextField.xib"; sourceTree = "<group>"; };
 		56BE8A9A287849550024C78B /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
 		56BE8A9D28784BA30024C78B /* NCLoginWeb+Menu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCLoginWeb+Menu.swift"; sourceTree = "<group>"; };
 		56CAF29128785FC700DB870E /* TealiumHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
 		56CAF29228785FC700DB870E /* AdjustHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
 		56CAF29328785FC700DB870E /* AdjustHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
-		56D88E1E2876CF6600B72455 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		56E92D9F287E9A5300399818 /* NCPlayerToolBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCPlayerToolBar.swift; sourceTree = "<group>"; };
 		56E92DA0287E9A5300399818 /* NCPlayerToolBar.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCPlayerToolBar.xib; sourceTree = "<group>"; };
 		56E9B32D287C203100F1D413 /* NCViewerMediaDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCViewerMediaDetailView.swift; sourceTree = "<group>"; };
@@ -657,7 +654,6 @@
 		56E9B337287C203100F1D413 /* NCViewerMediaPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCViewerMediaPage.swift; sourceTree = "<group>"; };
 		56E9B338287C203100F1D413 /* NCViewerMedia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCViewerMedia.swift; sourceTree = "<group>"; };
 		56E9B343287C209A00F1D413 /* NCViewerMediaPage.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCViewerMediaPage.storyboard; sourceTree = "<group>"; };
-		56E9B345287C244F00F1D413 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "../../../NEW NMC BRANDED CLIENT/ios/iOSClient/Images.xcassets"; sourceTree = "<group>"; };
 		56E9B348287C269200F1D413 /* NCListCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCListCell.xib; sourceTree = "<group>"; };
 		56E9B34A287C281000F1D413 /* NCGridCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCGridCell.xib; sourceTree = "<group>"; };
 		56E9B34B287C281100F1D413 /* NCGridCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCGridCell.swift; sourceTree = "<group>"; };
@@ -695,20 +691,6 @@
 		56E9FB5D2877EF3C0006B408 /* JPGImageSaveSwitchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JPGImageSaveSwitchView.swift; sourceTree = "<group>"; };
 		56E9FB5E2877EF3C0006B408 /* TextFileWithOcrSwitchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFileWithOcrSwitchView.swift; sourceTree = "<group>"; };
 		56E9FB5F2877EF3C0006B408 /* TextFileWithOcrSwitchView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TextFileWithOcrSwitchView.xib; sourceTree = "<group>"; };
-		56E9FB97287813810006B408 /* AutoUploadFolderCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AutoUploadFolderCustomCell.xib; sourceTree = "<group>"; };
-		56E9FB98287813810006B408 /* TypeInFileNameCustomSwitchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TypeInFileNameCustomSwitchCell.xib; sourceTree = "<group>"; };
-		56E9FB99287813810006B408 /* SubFolderCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubFolderCustomCell.swift; sourceTree = "<group>"; };
-		56E9FB9A287813810006B408 /* OriginalFileNameCustomSwitchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OriginalFileNameCustomSwitchCell.xib; sourceTree = "<group>"; };
-		56E9FB9B287813810006B408 /* ToggleButtonViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ToggleButtonViewCell.xib; sourceTree = "<group>"; };
-		56E9FB9C287813810006B408 /* SubFolderCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SubFolderCustomCell.xib; sourceTree = "<group>"; };
-		56E9FB9D287813810006B408 /* ToggleButtonViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleButtonViewCell.swift; sourceTree = "<group>"; };
-		56E9FB9E287813810006B408 /* OriginalFileNameCustomSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OriginalFileNameCustomSwitchCell.swift; sourceTree = "<group>"; };
-		56E9FB9F287813810006B408 /* TypeInFileNameCustomSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeInFileNameCustomSwitchCell.swift; sourceTree = "<group>"; };
-		56E9FBA0287813810006B408 /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
-		56E9FBA1287813810006B408 /* TextTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
-		56E9FBA2287813810006B408 /* AutoUploadFolderCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoUploadFolderCustomCell.swift; sourceTree = "<group>"; };
-		56E9FBA3287813810006B408 /* TextTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
-		56E9FBA4287813810006B408 /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
 		56E9FBB32878196D0006B408 /* NCShare+Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
 		56E9FBB6287827E40006B408 /* NCMenu+FloatingPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCMenu+FloatingPanel.swift"; sourceTree = "<group>"; };
 		56E9FBB8287828820006B408 /* NCActivityCommentView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCActivityCommentView.xib; sourceTree = "<group>"; };
@@ -722,8 +704,9 @@
 		56E9FBCC28783B740006B408 /* ScanCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanCell.swift; sourceTree = "<group>"; };
 		56F260F827D2264100365F78 /* NCShareSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareSectionHeaderView.swift; sourceTree = "<group>"; };
 		56F260FC27D2276900365F78 /* NCShareSectionHeaderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareSectionHeaderView.xib; sourceTree = "<group>"; };
-		612E82A6A333C8D0A63548C3 /* Pods-Notification Service Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notification Service Extension.debug.xcconfig"; path = "Target Support Files/Pods-Notification Service Extension/Pods-Notification Service Extension.debug.xcconfig"; sourceTree = "<group>"; };
-		704ECA9B4060FBB4E5619FB8 /* Pods_Share.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Share.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		64C70207B70F7487D3B445A0 /* Pods_File_Provider_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_File_Provider_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		737F4CC01AEC98AD8B253954 /* Pods_Share.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Share.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		79F5FC134839515403AE1CB7 /* Pods-Notification Service Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notification Service Extension.debug.xcconfig"; path = "Target Support Files/Pods-Notification Service Extension/Pods-Notification Service Extension.debug.xcconfig"; sourceTree = "<group>"; };
 		7A4619A127BF71F40042D595 /* NCTrash+CollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCTrash+CollectionView.swift"; sourceTree = "<group>"; };
 		7A4619A527BF72440042D595 /* UIBarButton+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIBarButton+Extension.swift"; sourceTree = "<group>"; };
 		7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = KTVCocoaHTTPServer.xcframework; path = Carthage/Build/KTVCocoaHTTPServer.xcframework; sourceTree = "<group>"; };
@@ -741,7 +724,27 @@
 		7AE63BF926DE5FCD00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "NCSelectCommandViewSelect+CreateFolder.xib"; sourceTree = "<group>"; };
 		7AE63BFA26DE5FCD00CEAAD5 /* NCSelectCommandViewCopyMove.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCSelectCommandViewCopyMove.xib; sourceTree = "<group>"; };
 		7AE63BFB26DE5FCD00CEAAD5 /* NCSelectCommandViewSelect.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCSelectCommandViewSelect.xib; sourceTree = "<group>"; };
-		81055B40143CCE57356BC79F /* Pods-File Provider Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-File Provider Extension.debug.xcconfig"; path = "Target Support Files/Pods-File Provider Extension/Pods-File Provider Extension.debug.xcconfig"; sourceTree = "<group>"; };
+		7BBFEB342B5402734CE0E347 /* Pods-File Provider Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-File Provider Extension.debug.xcconfig"; path = "Target Support Files/Pods-File Provider Extension/Pods-File Provider Extension.debug.xcconfig"; sourceTree = "<group>"; };
+		8402B117288920F700CBAC94 /* AutoUploadFolderCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AutoUploadFolderCustomCell.xib; sourceTree = "<group>"; };
+		8402B118288920F700CBAC94 /* TypeInFileNameCustomSwitchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TypeInFileNameCustomSwitchCell.xib; sourceTree = "<group>"; };
+		8402B119288920F700CBAC94 /* OriginalFileNameCustomSwitchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OriginalFileNameCustomSwitchCell.xib; sourceTree = "<group>"; };
+		8402B11A288920F700CBAC94 /* ToggleButtonViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ToggleButtonViewCell.xib; sourceTree = "<group>"; };
+		8402B11B288920F700CBAC94 /* SubFolderCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SubFolderCustomCell.xib; sourceTree = "<group>"; };
+		8402B11C288920F700CBAC94 /* ToggleButtonViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ToggleButtonViewCell.swift; sourceTree = "<group>"; };
+		8402B11D288920F700CBAC94 /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
+		8402B11E288920F700CBAC94 /* TextTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
+		8402B11F288920F700CBAC94 /* TextTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
+		8402B120288920F700CBAC94 /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
+		8402B12B2889210A00CBAC94 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		8402B12D2889245100CBAC94 /* TypeInFileNameCustomSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeInFileNameCustomSwitchCell.swift; sourceTree = "<group>"; };
+		8402B12E2889245200CBAC94 /* AutoUploadFolderCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoUploadFolderCustomCell.swift; sourceTree = "<group>"; };
+		8402B12F2889245200CBAC94 /* SubFolderCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubFolderCustomCell.swift; sourceTree = "<group>"; };
+		8402B1302889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OriginalFileNameCustomSwitchCell.swift; sourceTree = "<group>"; };
+		8402B1352889298600CBAC94 /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
+		8402B1362889298600CBAC94 /* NCCreateMenuAdd.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCreateMenuAdd.swift; sourceTree = "<group>"; };
+		8456608C28891B880053E00A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		8C00AE38527457006AFA3958 /* Pods-Notification Service Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notification Service Extension.release.xcconfig"; path = "Target Support Files/Pods-Notification Service Extension/Pods-Notification Service Extension.release.xcconfig"; sourceTree = "<group>"; };
+		8E0B45CD4E8F820EE8B09D55 /* Pods_Notification_Service_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Notification_Service_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		95BB2054265FE2AE00AF4344 /* NCGlobal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCGlobal.swift; sourceTree = "<group>"; };
 		95BB206D265FEE2F00AF4344 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		95BB20CC26600F6100AF4344 /* NCLogin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCLogin.swift; sourceTree = "<group>"; };
@@ -755,7 +758,6 @@
 		B176BAB526F8F7A0009A0F33 /* NCShareTextInputCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareTextInputCell.xib; sourceTree = "<group>"; };
 		B176BAD526FD9FF8009A0F33 /* UIView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extensions.swift"; sourceTree = "<group>"; };
 		B64780EEA33C832A268BB870 /* Pods_Nextcloud.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Nextcloud.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BABA7DA4EBF86A7FBE66CCBC /* Pods_File_Provider_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_File_Provider_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C00B205626908550003E18AD /* NCShareSendEmail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareSendEmail.swift; sourceTree = "<group>"; };
 		C00B205C26908B9B003E18AD /* NCShareFolderOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareFolderOptions.swift; sourceTree = "<group>"; };
 		C00B206C2691B8A0003E18AD /* NCShareFileOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareFileOptions.swift; sourceTree = "<group>"; };
@@ -780,8 +782,6 @@
 		C0D7888F26809F9800B876BB /* NCShareNewUserAddComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareNewUserAddComment.swift; sourceTree = "<group>"; };
 		C0D788A5268AEE8400B876BB /* NCShareMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareMenu.swift; sourceTree = "<group>"; };
 		C0D788CB268C656C00B876BB /* NCShareQuickStatusMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareQuickStatusMenu.swift; sourceTree = "<group>"; };
-		E0DF19FDFCB13AB2A6D32652 /* Pods_Notification_Service_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Notification_Service_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F076C31292A67C9C9D5E2AB7 /* Pods-Notification Service Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notification Service Extension.release.xcconfig"; path = "Target Support Files/Pods-Notification Service Extension/Pods-Notification Service Extension.release.xcconfig"; sourceTree = "<group>"; };
 		F700222B1EC479840080073F /* Custom.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Custom.xcassets; sourceTree = "<group>"; };
 		F700510022DF63AC003A3356 /* NCShare.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCShare.storyboard; sourceTree = "<group>"; };
 		F700510222DF6897003A3356 /* Parchment.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Parchment.framework; path = Carthage/Build/iOS/Parchment.framework; sourceTree = "<group>"; };
@@ -1075,6 +1075,7 @@
 		F7F878AD1FB9E3B900599E4F /* NCEndToEndMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCEndToEndMetadata.swift; sourceTree = "<group>"; };
 		F7F9D1BA25397CE000D9BFF5 /* NCViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCViewer.swift; sourceTree = "<group>"; };
 		F7FC7D551DC1F93800BB2C6A /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		FA2760F23C2E797982C157E7 /* Pods-File Provider Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-File Provider Extension.release.xcconfig"; path = "Target Support Files/Pods-File Provider Extension/Pods-File Provider Extension.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1089,7 +1090,7 @@
 				F75E57C325BF0ED2002B72C2 /* SVGKit in Frameworks */,
 				56BE8A98287842DD0024C78B /* DropDown in Frameworks */,
 				56D88E1D2876CB2700B72455 /* NCCommunication in Frameworks */,
-				5D4C68D9150C5E02F36A94B4 /* Pods_Notification_Service_Extension.framework in Frameworks */,
+				B1C45E5024AF948DE1AF05FE /* Pods_Notification_Service_Extension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1106,8 +1107,8 @@
 				5696258227B289C6003F774D /* JGProgressHUD in Frameworks */,
 				5696257E27B289C6003F774D /* Realm in Frameworks */,
 				56D88E192876CB0400B72455 /* NCCommunication in Frameworks */,
-				81C9C81FCF310C311197A312 /* Pods_Share.framework in Frameworks */,
 				56BE8A94287842C10024C78B /* DropDown in Frameworks */,
+				2359E0987D4467DCBEE63559 /* Pods_Share.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1123,7 +1124,7 @@
 				F710FC84277B7D3500AA9FBF /* RealmSwift in Frameworks */,
 				56D88E1B2876CB1A00B72455 /* NCCommunication in Frameworks */,
 				56BE8A96287842D30024C78B /* DropDown in Frameworks */,
-				DD4538F3ECA6B69D099A612D /* Pods_File_Provider_Extension.framework in Frameworks */,
+				5886B3709EA5025FB0FD8FD6 /* Pods_File_Provider_Extension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1327,28 +1328,6 @@
 			path = NMCViews;
 			sourceTree = "<group>";
 		};
-		56E9FB96287813810006B408 /* NMC CustomViews */ = {
-			isa = PBXGroup;
-			children = (
-				56E9FB97287813810006B408 /* AutoUploadFolderCustomCell.xib */,
-				56E9FB98287813810006B408 /* TypeInFileNameCustomSwitchCell.xib */,
-				56E9FB99287813810006B408 /* SubFolderCustomCell.swift */,
-				56E9FB9A287813810006B408 /* OriginalFileNameCustomSwitchCell.xib */,
-				56E9FB9B287813810006B408 /* ToggleButtonViewCell.xib */,
-				56E9FB9C287813810006B408 /* SubFolderCustomCell.xib */,
-				56E9FB9D287813810006B408 /* ToggleButtonViewCell.swift */,
-				56E9FB9E287813810006B408 /* OriginalFileNameCustomSwitchCell.swift */,
-				56E9FB9F287813810006B408 /* TypeInFileNameCustomSwitchCell.swift */,
-				56E9FBA0287813810006B408 /* FolderPathCustomCell.xib */,
-				56E9FBA1287813810006B408 /* TextTableViewCell.swift */,
-				56E9FBA2287813810006B408 /* AutoUploadFolderCustomCell.swift */,
-				56E9FBA3287813810006B408 /* TextTableViewCell.xib */,
-				56E9FBA4287813810006B408 /* FolderPathCustomCell.swift */,
-			);
-			name = "NMC CustomViews";
-			path = "../../../NEW NMC BRANDED CLIENT/ios/iOSClient/NMC CustomViews";
-			sourceTree = "<group>";
-		};
 		7AE63BB526DDFC7C00CEAAD5 /* BackgroundImageColor */ = {
 			isa = PBXGroup;
 			children = (
@@ -1356,6 +1335,27 @@
 				7AE63BB726DDFC7C00CEAAD5 /* NCBackgroundImageColor.storyboard */,
 			);
 			path = BackgroundImageColor;
+			sourceTree = "<group>";
+		};
+		8402B116288920F700CBAC94 /* NMC CustomViews */ = {
+			isa = PBXGroup;
+			children = (
+				8402B12E2889245200CBAC94 /* AutoUploadFolderCustomCell.swift */,
+				8402B1302889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift */,
+				8402B12F2889245200CBAC94 /* SubFolderCustomCell.swift */,
+				8402B12D2889245100CBAC94 /* TypeInFileNameCustomSwitchCell.swift */,
+				8402B117288920F700CBAC94 /* AutoUploadFolderCustomCell.xib */,
+				8402B118288920F700CBAC94 /* TypeInFileNameCustomSwitchCell.xib */,
+				8402B119288920F700CBAC94 /* OriginalFileNameCustomSwitchCell.xib */,
+				8402B11A288920F700CBAC94 /* ToggleButtonViewCell.xib */,
+				8402B11B288920F700CBAC94 /* SubFolderCustomCell.xib */,
+				8402B11C288920F700CBAC94 /* ToggleButtonViewCell.swift */,
+				8402B11D288920F700CBAC94 /* FolderPathCustomCell.xib */,
+				8402B11E288920F700CBAC94 /* TextTableViewCell.swift */,
+				8402B11F288920F700CBAC94 /* TextTableViewCell.xib */,
+				8402B120288920F700CBAC94 /* FolderPathCustomCell.swift */,
+			);
+			path = "NMC CustomViews";
 			sourceTree = "<group>";
 		};
 		958C87EF2636D7C7006C8923 /* NextcloudTests */ = {
@@ -1370,12 +1370,12 @@
 			children = (
 				A78BD6E8AC22358517785D56 /* Pods-Nextcloud.debug.xcconfig */,
 				AF3E5E0B7186F36A6B26BCB4 /* Pods-Nextcloud.release.xcconfig */,
-				81055B40143CCE57356BC79F /* Pods-File Provider Extension.debug.xcconfig */,
-				54ED43EF8E89035E093FC234 /* Pods-File Provider Extension.release.xcconfig */,
-				612E82A6A333C8D0A63548C3 /* Pods-Notification Service Extension.debug.xcconfig */,
-				F076C31292A67C9C9D5E2AB7 /* Pods-Notification Service Extension.release.xcconfig */,
-				3D1F0CBE7113D3E489A5445C /* Pods-Share.debug.xcconfig */,
-				3E8D3C3E7CD53402E2361370 /* Pods-Share.release.xcconfig */,
+				7BBFEB342B5402734CE0E347 /* Pods-File Provider Extension.debug.xcconfig */,
+				FA2760F23C2E797982C157E7 /* Pods-File Provider Extension.release.xcconfig */,
+				46E07D44DFFC2097E39B7FF5 /* Pods-Share.debug.xcconfig */,
+				2554A2B66EF736EFAB6BF600 /* Pods-Share.release.xcconfig */,
+				79F5FC134839515403AE1CB7 /* Pods-Notification Service Extension.debug.xcconfig */,
+				8C00AE38527457006AFA3958 /* Pods-Notification Service Extension.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -1904,7 +1904,7 @@
 		F7C1CDD91E6DFC6F005D92BE /* Brand */ = {
 			isa = PBXGroup;
 			children = (
-				56D88E1E2876CF6600B72455 /* GoogleService-Info.plist */,
+				8456608C28891B880053E00A /* GoogleService-Info.plist */,
 				F7C742D31E7BD36600D9C973 /* Supporting Files */,
 				F710E80C1EF95C9C00DC2427 /* Intro */,
 				F700222B1EC479840080073F /* Custom.xcassets */,
@@ -1974,8 +1974,9 @@
 		F7DFB7E9219C5A0500680748 /* Create cloud */ = {
 			isa = PBXGroup;
 			children = (
+				8402B1352889298600CBAC94 /* NCCreateDocumentCustomTextField.xib */,
+				8402B1362889298600CBAC94 /* NCCreateMenuAdd.swift */,
 				56BE8A9A287849550024C78B /* NCCreateDocumentCustomTextField.swift */,
-				56BE8A99287849540024C78B /* NCCreateDocumentCustomTextField.xib */,
 				7A70DE3627B6242E0018F47E /* NCCreateFormUploadDocuments.storyboard */,
 				F7DFB7EF219C5B8000680748 /* NCCreateFormUploadAssets.swift */,
 				F704B5E22430AA6F00632F5F /* NCCreateFormUploadConflict.storyboard */,
@@ -2062,9 +2063,9 @@
 		F7F67BAA1A24D27800EE80DA /* iOSClient */ = {
 			isa = PBXGroup;
 			children = (
-				56E9B345287C244F00F1D413 /* Images.xcassets */,
+				8402B12B2889210A00CBAC94 /* Images.xcassets */,
+				8402B116288920F700CBAC94 /* NMC CustomViews */,
 				56CAF29028785FC700DB870E /* Helper */,
-				56E9FB96287813810006B408 /* NMC CustomViews */,
 				561096092876B50500292C4C /* Rename file */,
 				565B11C5287581F3006998FA /* AudioRecorder */,
 				7AE63BB526DDFC7C00CEAAD5 /* BackgroundImageColor */,
@@ -2221,9 +2222,9 @@
 				08DC3BD41E64727E00F036D3 /* AdSupport.framework */,
 				F7FC7D551DC1F93800BB2C6A /* libz.tbd */,
 				B64780EEA33C832A268BB870 /* Pods_Nextcloud.framework */,
-				BABA7DA4EBF86A7FBE66CCBC /* Pods_File_Provider_Extension.framework */,
-				E0DF19FDFCB13AB2A6D32652 /* Pods_Notification_Service_Extension.framework */,
-				704ECA9B4060FBB4E5619FB8 /* Pods_Share.framework */,
+				64C70207B70F7487D3B445A0 /* Pods_File_Provider_Extension.framework */,
+				737F4CC01AEC98AD8B253954 /* Pods_Share.framework */,
+				8E0B45CD4E8F820EE8B09D55 /* Pods_Notification_Service_Extension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2257,7 +2258,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2C33C48923E2C475005F963B /* Build configuration list for PBXNativeTarget "Notification Service Extension" */;
 			buildPhases = (
-				5D6F67C76AD3208FCE7DC8C1 /* [CP] Check Pods Manifest.lock */,
+				305B35FB5DD3820320F93915 /* [CP] Check Pods Manifest.lock */,
 				2C33C47B23E2C475005F963B /* Sources */,
 				2C33C47C23E2C475005F963B /* Frameworks */,
 				2C33C47D23E2C475005F963B /* Resources */,
@@ -2299,7 +2300,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F7145A251D12E3B700CAFEEC /* Build configuration list for PBXNativeTarget "Share" */;
 			buildPhases = (
-				58FB543B611794E27230C28D /* [CP] Check Pods Manifest.lock */,
+				D39F34254C6D10BA10E2C808 /* [CP] Check Pods Manifest.lock */,
 				F71459B51D12E3B700CAFEEC /* Sources */,
 				F7145A141D12E3B700CAFEEC /* Frameworks */,
 				F7145A181D12E3B700CAFEEC /* Resources */,
@@ -2328,7 +2329,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F771E3EF20E2392E00AFB62D /* Build configuration list for PBXNativeTarget "File Provider Extension" */;
 			buildPhases = (
-				D8FBC341CEF573EACD97B823 /* [CP] Check Pods Manifest.lock */,
+				D76F01A86B938923653D4AC0 /* [CP] Check Pods Manifest.lock */,
 				F771E3CC20E2392D00AFB62D /* Sources */,
 				F771E3CD20E2392D00AFB62D /* Frameworks */,
 				F771E3CE20E2392D00AFB62D /* Resources */,
@@ -2519,7 +2520,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				56D88E222876CF6600B72455 /* GoogleService-Info.plist in Resources */,
+				8456609028891B880053E00A /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2527,7 +2528,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				56D88E202876CF6600B72455 /* GoogleService-Info.plist in Resources */,
+				8456608E28891B880053E00A /* GoogleService-Info.plist in Resources */,
 				7A82A18926F352DA00D52790 /* NCSectionFooter.xib in Resources */,
 				56E9B34E287C281D00F1D413 /* NCGridCell.xib in Resources */,
 				7A82A18126F3529100D52790 /* NCEmptyView.xib in Resources */,
@@ -2547,7 +2548,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				56D88E212876CF6600B72455 /* GoogleService-Info.plist in Resources */,
+				8456608F28891B880053E00A /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2555,6 +2556,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8402B12C2889210A00CBAC94 /* Images.xcassets in Resources */,
 				56E9B9FC27B39DFC007B1772 /* english.txt in Resources */,
 				F7362A1F220C853A005101B5 /* LaunchScreen.storyboard in Resources */,
 				F77444F622281649000D5EB0 /* NCGridMediaCell.xib in Resources */,
@@ -2566,6 +2568,7 @@
 				F700222C1EC479840080073F /* Custom.xcassets in Resources */,
 				56E9FBC82878321E0006B408 /* NCShareUserMenuView.xib in Resources */,
 				56E9FBCD28783B740006B408 /* Scan.storyboard in Resources */,
+				8402B123288920F800CBAC94 /* OriginalFileNameCustomSwitchCell.xib in Resources */,
 				56E9B351287C313000F1D413 /* NCMenu.storyboard in Resources */,
 				F702F2F125EE5CDB008F8E80 /* NCLogin.storyboard in Resources */,
 				F723985C253C95CE00257F49 /* NCViewerRichdocument.storyboard in Resources */,
@@ -2589,31 +2592,31 @@
 				56F260FD27D2276900365F78 /* NCShareSectionHeaderView.xib in Resources */,
 				56E9FBBA287828820006B408 /* NCActivityCommentView.xib in Resources */,
 				F76032A0252F0F8E0015A421 /* NCTransferCell.xib in Resources */,
-				56E9FBB1287813810006B408 /* TextTableViewCell.xib in Resources */,
 				F74C0437253F1CDC009762AB /* NCShares.storyboard in Resources */,
 				C0D6063426C3E4F500B67843 /* NCShareHeaderCustomCell.xib in Resources */,
-				56E9FBA8287813810006B408 /* OriginalFileNameCustomSwitchCell.xib in Resources */,
 				F7381EE5218218C9000B1560 /* NCOffline.storyboard in Resources */,
 				C0D6061E26C2AC1200B67843 /* NCShareAdvancePermissionFooter.xib in Resources */,
 				F76D3CF32428B94E005DFA87 /* NCViewerPDFSearchCell.xib in Resources */,
 				F7CA212E25F1333300826ABB /* NCAccountRequest.storyboard in Resources */,
 				F749C10E23C4A5340027D966 /* NCIntroCollectionViewCell.xib in Resources */,
+				8456608D28891B880053E00A /* GoogleService-Info.plist in Resources */,
 				5610960C2876B50500292C4C /* NCRenameFile.storyboard in Resources */,
 				F717402D24F699A5000C87D5 /* NCFavorite.storyboard in Resources */,
 				F723B3DD22FC6D1D00301EFE /* NCShareCommentsCell.xib in Resources */,
-				56E9B346287C244F00F1D413 /* Images.xcassets in Resources */,
 				F78ACD4B21903F850088454D /* NCTrashListCell.xib in Resources */,
 				5690BB43287C1B66007115BF /* NCSearchUserDropDownCell.xib in Resources */,
+				8402B129288920F800CBAC94 /* TextTableViewCell.xib in Resources */,
+				8402B127288920F800CBAC94 /* FolderPathCustomCell.xib in Resources */,
 				56E9FB682877EF3D0006B408 /* PdfWithOcrSwitchView.xib in Resources */,
 				F7725A61251F33BB00D125E0 /* NCFiles.storyboard in Resources */,
 				56E92DA2287E9A5400399818 /* NCPlayerToolBar.xib in Resources */,
 				56E9B344287C209A00F1D413 /* NCViewerMediaPage.storyboard in Resources */,
-				56E9FBA6287813810006B408 /* TypeInFileNameCustomSwitchCell.xib in Resources */,
+				8402B122288920F800CBAC94 /* TypeInFileNameCustomSwitchCell.xib in Resources */,
 				561CAB97287F0A84001CC9AB /* MagentaCloudVersionView.xib in Resources */,
 				F700510122DF63AC003A3356 /* NCShare.storyboard in Resources */,
-				56E9FBAE287813810006B408 /* FolderPathCustomCell.xib in Resources */,
 				F787704F22E7019900F287A9 /* NCShareLinkCell.xib in Resources */,
 				564A9700287C0E0900D6F3A1 /* AnalysisDataCollectionSwitch.xib in Resources */,
+				8402B125288920F800CBAC94 /* SubFolderCustomCell.xib in Resources */,
 				56E9FB6A2877EF3D0006B408 /* PasswordInputField.xib in Resources */,
 				F70A58C024D0545100DED00D /* NCCapabilitiesViewController.storyboard in Resources */,
 				F749C10D23C4A5340027D966 /* NCIntro.storyboard in Resources */,
@@ -2622,13 +2625,11 @@
 				F704B5E72430C06700632F5F /* NCCreateFormUploadConflictCell.xib in Resources */,
 				F7C9555321F0C4CA0024296E /* NCActivity.storyboard in Resources */,
 				F7BC287E26663F6C004D46C5 /* (null) in Resources */,
+				8402B124288920F800CBAC94 /* ToggleButtonViewCell.xib in Resources */,
 				F78ACD54219047D40088454D /* NCSectionFooter.xib in Resources */,
 				7AD16323275A33C3001A5DC4 /* InfoPlist.strings in Resources */,
 				B176BAB626F8F7A0009A0F33 /* NCShareTextInputCell.xib in Resources */,
-				56BE8A9B287849550024C78B /* NCCreateDocumentCustomTextField.xib in Resources */,
-				56E9FBAA287813810006B408 /* SubFolderCustomCell.xib in Resources */,
 				56E9B349287C269200F1D413 /* NCListCell.xib in Resources */,
-				56E9FBA9287813810006B408 /* ToggleButtonViewCell.xib in Resources */,
 				F704B5E32430AA6F00632F5F /* NCCreateFormUploadConflict.storyboard in Resources */,
 				F77B0F611D118A16002130FE /* Acknowledgements.rtf in Resources */,
 				F732D23327CF8AED000B0F1B /* (null) in Resources */,
@@ -2637,14 +2638,12 @@
 				7A70DE3727B6242E0018F47E /* NCCreateFormUploadDocuments.storyboard in Resources */,
 				F7D1612023CF19E30039EBBF /* NCViewerRichWorkspace.storyboard in Resources */,
 				56E9B353287C3A4D00F1D413 /* NCShareUserDropDownCell.xib in Resources */,
-				56E9FBA5287813810006B408 /* AutoUploadFolderCustomCell.xib in Resources */,
 				F77B0F631D118A16002130FE /* Localizable.strings in Resources */,
 				F7632FC1218353AA00721B71 /* NCTrashSectionFooter.xib in Resources */,
 				7AE63BFC26DE5FCE00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib in Resources */,
 				5690BB45287C1B66007115BF /* NCShareLinkFolderMenuView.xib in Resources */,
 				56E9FB6E2877EF3D0006B408 /* FileNameInputTextField.xib in Resources */,
 				F7CB689A2541676B0050EC94 /* NCMore.storyboard in Resources */,
-				56D88E1F2876CF6600B72455 /* GoogleService-Info.plist in Resources */,
 				F70B866D2642A21300ED5349 /* NCBackgroundImageColor.storyboard in Resources */,
 				C07020ED267B45AE00E094AD /* NCPermissionFolderMenuView.xib in Resources */,
 				56E9FB622877EF3D0006B408 /* PNGImageSaveSwitchView.xib in Resources */,
@@ -2654,6 +2653,7 @@
 				F78ACD58219048040088454D /* NCSectionHeaderMenu.xib in Resources */,
 				56E9FB6B2877EF3D0006B408 /* ScanDocumentPathView.xib in Resources */,
 				C0D605F226C294E500B67843 /* NCFilePermissionCell.xib in Resources */,
+				8402B121288920F800CBAC94 /* AutoUploadFolderCustomCell.xib in Resources */,
 				F7501C322212E57500FB1415 /* NCMedia.storyboard in Resources */,
 				564A96FA287C0DA600D6F3A1 /* RequiredDataCollectionSwitch.xib in Resources */,
 				C07020EC267B45AE00E094AD /* NCPermissionMenuView.xib in Resources */,
@@ -2661,6 +2661,7 @@
 				F77910A525DD517B00CEDB9E /* Settings.bundle in Resources */,
 				56E9FB712877EF3D0006B408 /* TextFileWithOcrSwitchView.xib in Resources */,
 				56E9B34C287C281100F1D413 /* NCGridCell.xib in Resources */,
+				8402B1372889298600CBAC94 /* NCCreateDocumentCustomTextField.xib in Resources */,
 				95BB21172660F55900AF4344 /* NCLogin.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2702,29 +2703,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Nextcloud/Pods-Nextcloud-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		58FB543B611794E27230C28D /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Share-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5D6F67C76AD3208FCE7DC8C1 /* [CP] Check Pods Manifest.lock */ = {
+		305B35FB5DD3820320F93915 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2768,7 +2747,29 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D8FBC341CEF573EACD97B823 /* [CP] Check Pods Manifest.lock */ = {
+		D39F34254C6D10BA10E2C808 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Share-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D76F01A86B938923653D4AC0 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2952,12 +2953,12 @@
 				C0D788A6268AEE8400B876BB /* NCShareMenu.swift in Sources */,
 				56937C3A2877617500F14292 /* NCScanCell.swift in Sources */,
 				C0D7889026809F9800B876BB /* NCShareNewUserAddComment.swift in Sources */,
-				56E9FBB2287813810006B408 /* FolderPathCustomCell.swift in Sources */,
 				F70A58BE24D0349500DED00D /* NCCapabilitiesViewController.swift in Sources */,
 				F733598125C1C188002ABA72 /* NCAskAuthorization.swift in Sources */,
 				370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */,
 				F77B0DF51D118A16002130FE /* CCUtility.m in Sources */,
 				C00CF3F426C13B8D00DB959F /* NCShareAdvancePermission.swift in Sources */,
+				8402B126288920F800CBAC94 /* ToggleButtonViewCell.swift in Sources */,
 				F790110E21415BF600D7B136 /* NCViewerRichdocument.swift in Sources */,
 				561096052876AD7E00292C4C /* NCMenuAction.swift in Sources */,
 				F769454022E9F077000A798A /* NCSharePaging.swift in Sources */,
@@ -2987,17 +2988,16 @@
 				56A510A427B2D5D700D9F3E6 /* NCManageDatabase+Account.swift in Sources */,
 				56CAF29528785FC700DB870E /* AdjustHelper.m in Sources */,
 				564A9704287C10E100D6F3A1 /* HelpViewController.swift in Sources */,
+				8402B128288920F800CBAC94 /* TextTableViewCell.swift in Sources */,
 				565B11C7287581F3006998FA /* NCAudioRecorderViewController.swift in Sources */,
 				F738E8421F90FFD100F95C8E /* NCManageEndToEndEncryption.m in Sources */,
 				F7A80BCB252624C100C7CD01 /* NCFileViewInFolder.swift in Sources */,
 				F78A18B823CDE2B300F681F3 /* NCViewerRichWorkspace.swift in Sources */,
 				F77910AB25DD53C700CEDB9E /* NCSettingsBundleHelper.swift in Sources */,
-				56E9FBAC287813810006B408 /* OriginalFileNameCustomSwitchCell.swift in Sources */,
 				F78A18B623CDD07D00F681F3 /* NCViewerRichWorkspaceWebView.swift in Sources */,
 				F716B75F26F09DF600D37EFC /* (null) in Sources */,
 				F75A9EE623796C6F0044CFCE /* NCNetworking.swift in Sources */,
 				5610960D2876B50500292C4C /* NCRenameFile.swift in Sources */,
-				56E9FBAF287813810006B408 /* TextTableViewCell.swift in Sources */,
 				56E9FB612877EF3D0006B408 /* PdfWithOcrSwitchView.swift in Sources */,
 				5672097327B5468700413A96 /* UIControl+Extensions.swift in Sources */,
 				C00B206D2691B8A0003E18AD /* NCShareFileOptions.swift in Sources */,
@@ -3012,7 +3012,6 @@
 				F704B5E92430C0B800632F5F /* NCCreateFormUploadConflictCell.swift in Sources */,
 				F72D404923D2082500A97FD0 /* NCViewerNextcloudText.swift in Sources */,
 				56E9FB602877EF3D0006B408 /* FileNameInputTextField.swift in Sources */,
-				56E9FBA7287813810006B408 /* SubFolderCustomCell.swift in Sources */,
 				56BE8AA428784CCF0024C78B /* UIFont+Extension.swift in Sources */,
 				F700510522DF6A89003A3356 /* NCShare.swift in Sources */,
 				F72D1007210B6882009C96B7 /* NCPushNotificationEncryption.m in Sources */,
@@ -3071,7 +3070,6 @@
 				F78071091EDAB65800EAFFF6 /* NSNotificationCenter+MainThread.m in Sources */,
 				F79B646026CA661600838ACA /* UIControl+Extensions.swift in Sources */,
 				56E9B33C287C203200F1D413 /* NCKTVHTTPCache.swift in Sources */,
-				56E9FBAB287813810006B408 /* ToggleButtonViewCell.swift in Sources */,
 				564A96F6287C0ADF00D6F3A1 /* InitialPrivacySettingsViewController.swift in Sources */,
 				56E9B33B287C203200F1D413 /* NCPlayer.swift in Sources */,
 				56E9FB182877EB130006B408 /* UIViewController+Menu.swift in Sources */,
@@ -3087,6 +3085,7 @@
 				F755BD9B20594AC7008C5FBB /* NCService.swift in Sources */,
 				56E9B342287C203200F1D413 /* NCViewerMedia.swift in Sources */,
 				56A510A827B2D5D700D9F3E6 /* NCManageDatabase+Activity.swift in Sources */,
+				8402B12A288920F800CBAC94 /* FolderPathCustomCell.swift in Sources */,
 				F7B7504B2397D38F004E13EC /* UIImage+Extensions.swift in Sources */,
 				56E9FB692877EF3D0006B408 /* PasswordInputField.swift in Sources */,
 				7AE63BBE26DDFC8500CEAAD5 /* NCBackgroundImageColor.swift in Sources */,
@@ -3095,10 +3094,10 @@
 				564A96FB287C0DA600D6F3A1 /* RequiredDataCollectionSwitch.swift in Sources */,
 				F7020FCE2233D7F700B7297D /* NCCreateFormUploadVoiceNote.swift in Sources */,
 				F7134186259747BA00768D21 /* NCPushNotification.m in Sources */,
+				8402B1342889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift in Sources */,
 				564A9705287C10E100D6F3A1 /* ImprintViewController.swift in Sources */,
 				F726EEEC1FED1C820030B9C8 /* NCEndToEndInitialize.swift in Sources */,
 				F79A65C62191D95E00FF6DCC /* NCSelect.swift in Sources */,
-				56E9FBAD287813810006B408 /* TypeInFileNameCustomSwitchCell.swift in Sources */,
 				5672096D27B5201000413A96 /* NCShareCommentsCell.swift in Sources */,
 				C0ABA3C526A142F70049DE9A /* NCShareQuickStatusMenu.swift in Sources */,
 				56A5109927B2D09E00D9F3E6 /* NSData+Base64.m in Sources */,
@@ -3110,6 +3109,7 @@
 				F7AE00F5230D5F9E007ACF8A /* NCLoginWeb.swift in Sources */,
 				F707C26521A2DC5200F6181E /* NCStoreReview.swift in Sources */,
 				F7BAADCB1ED5A87C00B7EAD4 /* NCManageDatabase.swift in Sources */,
+				8402B1322889245200CBAC94 /* AutoUploadFolderCustomCell.swift in Sources */,
 				F70968A424212C4E00ED60E5 /* NCLivePhoto.swift in Sources */,
 				C0D6064426CCDCFF00B67843 /* NCFilePermissionEditPasswordCell.swift in Sources */,
 				56E9FB642877EF3D0006B408 /* PNGImageSaveSwitchView.swift in Sources */,
@@ -3129,7 +3129,6 @@
 				F765608F23BF813600765969 /* NCContentPresenter.swift in Sources */,
 				56A510A027B2D5D700D9F3E6 /* NCManageDatabse+Metadata.swift in Sources */,
 				F70CEF5623E9C7E50007035B /* UIColor+Extensions.swift in Sources */,
-				56E9FBB0287813810006B408 /* AutoUploadFolderCustomCell.swift in Sources */,
 				56E9B339287C203200F1D413 /* NCViewerMediaDetailView.swift in Sources */,
 				56E9FBB42878196D0006B408 /* NCShare+Helper.swift in Sources */,
 				56BE8A9E28784BA30024C78B /* NCLoginWeb+Menu.swift in Sources */,
@@ -3138,6 +3137,7 @@
 				564A9701287C0E0900D6F3A1 /* AnalysisDataCollectionSwitch.swift in Sources */,
 				F77B0ED11D118A16002130FE /* Acknowledgements.m in Sources */,
 				F7D96FCC246ED7E200536D73 /* NCNetworkingCheckRemoteUser.swift in Sources */,
+				8402B1332889245200CBAC94 /* SubFolderCustomCell.swift in Sources */,
 				F717402E24F699A5000C87D5 /* NCFavorite.swift in Sources */,
 				F74DE14325135B6800917068 /* NCTransfers.swift in Sources */,
 				564A96F3287C0ADF00D6F3A1 /* SaveSettingsCustomButtonCell.swift in Sources */,
@@ -3147,6 +3147,7 @@
 				56E9B341287C203200F1D413 /* NCViewerMediaPage.swift in Sources */,
 				56E9FBB5287827A00006B408 /* NCMenu.swift in Sources */,
 				95BB20F22660E25200AF4344 /* NCPopupViewController.swift in Sources */,
+				8402B1312889245200CBAC94 /* TypeInFileNameCustomSwitchCell.swift in Sources */,
 				56A229E627B3BACE00C35F8B /* NCShareLinkCell.swift in Sources */,
 				95BB20D326600FB900AF4344 /* NCNetworkingProcessUpload.swift in Sources */,
 			);
@@ -3202,7 +3203,7 @@
 /* Begin XCBuildConfiguration section */
 		2C33C48723E2C475005F963B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 612E82A6A333C8D0A63548C3 /* Pods-Notification Service Extension.debug.xcconfig */;
+			baseConfigurationReference = 79F5FC134839515403AE1CB7 /* Pods-Notification Service Extension.debug.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -3248,7 +3249,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension QA";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
@@ -3261,7 +3262,7 @@
 		};
 		2C33C48823E2C475005F963B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F076C31292A67C9C9D5E2AB7 /* Pods-Notification Service Extension.release.xcconfig */;
+			baseConfigurationReference = 8C00AE38527457006AFA3958 /* Pods-Notification Service Extension.release.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -3306,7 +3307,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
@@ -3339,7 +3340,7 @@
 		};
 		F7145A261D12E3B700CAFEEC /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3D1F0CBE7113D3E489A5445C /* Pods-Share.debug.xcconfig */;
+			baseConfigurationReference = 46E07D44DFFC2097E39B7FF5 /* Pods-Share.debug.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
@@ -3377,7 +3378,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
+				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Share/Share-Bridging-Header.h";
@@ -3390,7 +3391,7 @@
 		};
 		F7145A271D12E3B700CAFEEC /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3E8D3C3E7CD53402E2361370 /* Pods-Share.release.xcconfig */;
+			baseConfigurationReference = 2554A2B66EF736EFAB6BF600 /* Pods-Share.release.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
@@ -3428,7 +3429,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
+				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Share/Share-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -3439,7 +3440,7 @@
 		};
 		F771E3F020E2392E00AFB62D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 81055B40143CCE57356BC79F /* Pods-File Provider Extension.debug.xcconfig */;
+			baseConfigurationReference = 7BBFEB342B5402734CE0E347 /* Pods-File Provider Extension.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -3484,7 +3485,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/File Provider Extension/FileProviderExtension-Bridging-Header.h";
@@ -3496,7 +3497,7 @@
 		};
 		F771E3F120E2392E00AFB62D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 54ED43EF8E89035E093FC234 /* Pods-File Provider Extension.release.xcconfig */;
+			baseConfigurationReference = FA2760F23C2E797982C157E7 /* Pods-File Provider Extension.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -3541,7 +3542,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/File Provider Extension/FileProviderExtension-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -3595,7 +3596,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -3652,7 +3653,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
