@@ -272,7 +272,6 @@
 		8402B128288920F800CBAC94 /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B11E288920F700CBAC94 /* TextTableViewCell.swift */; };
 		8402B129288920F800CBAC94 /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B11F288920F700CBAC94 /* TextTableViewCell.xib */; };
 		8402B12A288920F800CBAC94 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B120288920F700CBAC94 /* FolderPathCustomCell.swift */; };
-		8402B12C2889210A00CBAC94 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8402B12B2889210A00CBAC94 /* Images.xcassets */; };
 		8402B1312889245200CBAC94 /* TypeInFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B12D2889245100CBAC94 /* TypeInFileNameCustomSwitchCell.swift */; };
 		8402B1322889245200CBAC94 /* AutoUploadFolderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B12E2889245200CBAC94 /* AutoUploadFolderCustomCell.swift */; };
 		8402B1332889245200CBAC94 /* SubFolderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B12F2889245200CBAC94 /* SubFolderCustomCell.swift */; };
@@ -282,6 +281,7 @@
 		8456608E28891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
 		8456608F28891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
 		8456609028891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
+		8489357528892F14004D4278 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8489357428892F14004D4278 /* Images.xcassets */; };
 		95BB2056265FE2AE00AF4344 /* NCGlobal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB2054265FE2AE00AF4344 /* NCGlobal.swift */; };
 		95BB2068265FE90F00AF4344 /* NCGlobal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB2054265FE2AE00AF4344 /* NCGlobal.swift */; };
 		95BB20CD26600F6100AF4344 /* NCLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20CC26600F6100AF4344 /* NCLogin.swift */; };
@@ -735,7 +735,6 @@
 		8402B11E288920F700CBAC94 /* TextTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
 		8402B11F288920F700CBAC94 /* TextTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
 		8402B120288920F700CBAC94 /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
-		8402B12B2889210A00CBAC94 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		8402B12D2889245100CBAC94 /* TypeInFileNameCustomSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeInFileNameCustomSwitchCell.swift; sourceTree = "<group>"; };
 		8402B12E2889245200CBAC94 /* AutoUploadFolderCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoUploadFolderCustomCell.swift; sourceTree = "<group>"; };
 		8402B12F2889245200CBAC94 /* SubFolderCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubFolderCustomCell.swift; sourceTree = "<group>"; };
@@ -743,6 +742,7 @@
 		8402B1352889298600CBAC94 /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
 		8402B1362889298600CBAC94 /* NCCreateMenuAdd.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCreateMenuAdd.swift; sourceTree = "<group>"; };
 		8456608C28891B880053E00A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		8489357428892F14004D4278 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		8C00AE38527457006AFA3958 /* Pods-Notification Service Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notification Service Extension.release.xcconfig"; path = "Target Support Files/Pods-Notification Service Extension/Pods-Notification Service Extension.release.xcconfig"; sourceTree = "<group>"; };
 		8E0B45CD4E8F820EE8B09D55 /* Pods_Notification_Service_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Notification_Service_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		95BB2054265FE2AE00AF4344 /* NCGlobal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCGlobal.swift; sourceTree = "<group>"; };
@@ -2063,7 +2063,7 @@
 		F7F67BAA1A24D27800EE80DA /* iOSClient */ = {
 			isa = PBXGroup;
 			children = (
-				8402B12B2889210A00CBAC94 /* Images.xcassets */,
+				8489357428892F14004D4278 /* Images.xcassets */,
 				8402B116288920F700CBAC94 /* NMC CustomViews */,
 				56CAF29028785FC700DB870E /* Helper */,
 				561096092876B50500292C4C /* Rename file */,
@@ -2556,7 +2556,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8402B12C2889210A00CBAC94 /* Images.xcassets in Resources */,
+				8489357528892F14004D4278 /* Images.xcassets in Resources */,
 				56E9B9FC27B39DFC007B1772 /* english.txt in Resources */,
 				F7362A1F220C853A005101B5 /* LaunchScreen.storyboard in Resources */,
 				F77444F622281649000D5EB0 /* NCGridMediaCell.xib in Resources */,
