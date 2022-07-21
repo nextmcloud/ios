@@ -23,7 +23,6 @@ class SubFolderCustomCell: XLFormBaseCell{
     
     override func configure() {
         super.configure()
-        self.subFolderSwitch.isEnabled = false
     }
     
     override func update() {
