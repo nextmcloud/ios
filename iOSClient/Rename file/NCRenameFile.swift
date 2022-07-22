@@ -203,17 +203,17 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 
                 if extNew != extCurrent {
 
-                    let message = String(format: NSLocalizedString("_rename_ext_message_", comment: ""), extNew, extCurrent)
+                    let message = String(format: NSLocalizedString("_rename_ext_message_", comment: ""), extCurrent, extNew)
                     let alertController = UIAlertController(title: NSLocalizedString("_rename_ext_title_", comment: ""), message: message, preferredStyle: .alert)
 
-                    var title = NSLocalizedString("_use_", comment: "") + " ." + extNew
+                    var title = String(format: NSLocalizedString("_use_", comment: ""), extNew)
                     alertController.addAction(UIAlertAction(title: title, style: .default, handler: { _ in
 
                         fileNameNew = fileNameWithoutExtNew + "." + extNew
                         self.renameMetadata(metadata, fileNameNew: fileNameNew)
                     }))
-
-                    title = NSLocalizedString("_keep_", comment: "") + " ." + extCurrent
+                    
+                    title = String(format: NSLocalizedString("_keep_", comment: ""), extCurrent)
                     alertController.addAction(UIAlertAction(title: title, style: .default, handler: { _ in
                         self.ext.text = metadata.fileExtension
                     }))
