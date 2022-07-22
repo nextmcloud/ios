@@ -406,11 +406,13 @@ import XLForm
         if self.editorId == NCGlobal.shared.editorText || self.editorId == NCGlobal.shared.editorOnlyoffice {
 
             var customUserAgent: String?
+            
             if self.editorId == NCGlobal.shared.editorOnlyoffice {
                 customUserAgent = NCUtility.shared.getCustomUserAgentOnlyOffice()
             } else if editorId == NCGlobal.shared.editorText {
                 customUserAgent = NCUtility.shared.getCustomUserAgentNCText()
             } // else: use default
+            
             NCCommunication.shared.NCTextCreateFile(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, customUserAgent: customUserAgent) { account, url, errorCode, errorMessage in
                 guard errorCode == 0, account == self.appDelegate.account, let url = url else {
                     self.navigationItem.rightBarButtonItem?.isEnabled = true
