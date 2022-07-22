@@ -70,7 +70,7 @@ class NCPhotosPickerViewController: NSObject {
         configure.selectedColor = NCBrandColor.shared.brandElement
         configure.singleSelectedMode = singleSelectedMode
         configure.allowedAlbumCloudShared = true
-
+        
         let viewController = customPhotoPickerViewController(withTLPHAssets: { assets in
             for asset: TLPHAsset in assets {
                 if asset.phAsset != nil {
@@ -109,8 +109,8 @@ class customPhotoPickerViewController: TLPhotosPickerViewController {
     override func makeUI() {
         super.makeUI()
 
-        self.customNavItem.leftBarButtonItem?.tintColor = .systemBlue
-        self.customNavItem.rightBarButtonItem?.tintColor = .systemBlue
+        self.customNavItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brandElement
+        self.customNavItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.brandElement
     }
 }
 
