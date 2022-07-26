@@ -27,9 +27,6 @@ class PNGImageSaveSwitchView: XLFormBaseCell{
     
     override func update() {
         super.update()
-        let backgroundView = UIView()
-        backgroundView.backgroundColor = UIColor.white
-        self.selectedBackgroundView = backgroundView
     }
     
     @objc func switchChanged(mySwitch: UISwitch) {

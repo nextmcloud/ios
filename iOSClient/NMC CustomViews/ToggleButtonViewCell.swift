@@ -27,9 +27,6 @@ class ToggleButtonViewCell: XLFormBaseCell{
     
     override func update() {
         super.update()
-        let backgroundView = UIView()
-        backgroundView.backgroundColor = UIColor.white
-        self.selectedBackgroundView = backgroundView
         if rowDescriptor.tag == "autoUpload" {
             bottomLine.isHidden = true
             topLine.isHidden = true
