@@ -27,11 +27,7 @@ class SubFolderCustomCell: XLFormBaseCell{
     }
     
     override func update() {
-        super.update()
-        let backgroundView = UIView()
-        backgroundView.backgroundColor = UIColor.white
-        self.selectedBackgroundView = backgroundView
-        
+        super.update()        
         if let rowValue = rowDescriptor.value as? String {
             if (rowValue == "disable_switch"){
                 self.subFolderSwitch.isEnabled = false

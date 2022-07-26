@@ -27,9 +27,6 @@ class SetPDFPasswordSwitchView: XLFormBaseCell{
     
     override func update() {
         super.update()
-        let backgroundView = UIView()
-        backgroundView.backgroundColor = UIColor.white
-        self.selectedBackgroundView = backgroundView
         
         if let rowValue = rowDescriptor.value as? String {
             if (rowValue == "disable_switch"){
