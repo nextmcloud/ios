@@ -133,7 +133,7 @@ public class NCEmptyView: UIView {
                 contraintTitleBottom.constant = 5
             } else {
                 constraintImageTop.constant = 30
-                constraintTitleTop.constant = 30
+                constraintTitleTop.constant = UIScreen.main.bounds.width == 320 ? 20 : 30
                 contraintTitleBottom.constant = 20
             }
         }
