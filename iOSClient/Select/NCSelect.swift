@@ -764,7 +764,7 @@ class NCSelectCommandView: UIView {
         moveButton?.layer.masksToBounds = true
         moveButton?.setTitle(NSLocalizedString("_move_", comment: ""), for: .normal)
         moveButton?.setTitleColor(.white, for: .normal)
-        buttonsWidthConstraint.constant = UIScreen.main.bounds.width > 321 ? 150 : 132
+        buttonsWidthConstraint?.constant = UIScreen.main.bounds.width > 321 ? 150 : 132
     }
     
     @IBAction func createFolderButtonPressed(_ sender: UIButton) {
