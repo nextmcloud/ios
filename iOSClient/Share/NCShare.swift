@@ -174,7 +174,14 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         tableView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         tableView.reloadData()
         self.view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
+        if #available(iOS 13.0, *) {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            navigationController?.navigationBar.standardAppearance = appearance
+            navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
+        } else {
+            UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
+        }
     }
     
     @objc func reloadData() {
