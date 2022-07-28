@@ -65,12 +65,12 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         tableView.tableFooterView = UIView(frame: .zero)
         tableView.separatorStyle = .none
-        
+        tableView.isUserInteractionEnabled = false
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
         if sharingEnabled {
             networking?.readShare(showLoadingIndicator: true)
         }
-        
+        tableView.isUserInteractionEnabled = true
         // changeTheming
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         
