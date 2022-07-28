@@ -110,11 +110,13 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
            if (UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape) {
                 if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
                     if view.frame.origin.y == 0 {
+                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
                         self.view.frame.origin.y -= keyboardSize.height
                     }
                 }
             } else if UIScreen.main.bounds.height < 850 {
                 if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
                     self.view.frame.origin.y -= 100
                 }
             }
@@ -122,6 +124,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
             if view.frame.origin.y == 0 {
+                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
                 self.view.frame.origin.y -= 230
             }
         }
