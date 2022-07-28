@@ -86,7 +86,8 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         buttonContainerView.addShadow(location: .top)
-        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         commentTextView.textContainerInset = UIEdgeInsets(top: contentInsets, left: contentInsets, bottom: contentInsets, right: contentInsets)
     }
@@ -266,4 +267,17 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
 
         commentTextView.scrollIndicatorInsets = commentTextView.contentInset
     }
+    @objc func keyboardWillShow(notification: Notification) {
+        if UIScreen.main.bounds.width <= 375 {
+            if view.frame.origin.y == 0 {
+                self.view.frame.origin.y -= 200
+            }
+        }
+    }
+    @objc func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            self.view.frame.origin.y = 0
+        }
+    }
+    
 }
