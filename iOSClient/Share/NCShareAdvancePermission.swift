@@ -287,7 +287,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditingMsg", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
             row.cellConfig["titleLabel.text"] = NSLocalizedString("share_editing_message", comment: "")
             row.cellConfig["titleLabel.textColor"] = NCBrandColor.shared.gray60
-            row.height = 60
+            row.height = 80
             section.addFormRow(row)
         }
         
