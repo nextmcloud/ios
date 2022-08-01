@@ -254,7 +254,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             NCUtility.shared.stopActivityIndicator()
 
             if errorCode == 0 {
-
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSourceNetworkForced)
                 self.dismiss(animated: true)
 
             } else {
