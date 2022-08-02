@@ -97,6 +97,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(willEnterInForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
         
         if newUser == false {
             
@@ -194,6 +195,13 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     @objc func keyboardWillHide(_ notification:Notification) {
         if ((notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue) != nil {
             tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: tableViewBottomInset, right: 0)
+        }
+    }
+    
+    @objc func willEnterInForeground(_ notification:Notification) {
+        if (tableShare?.isInvalidated ?? false) {
+            guard let newTableShare = NCManageDatabase.shared.getTableShare(account: metadata?.account ?? "", idShare: sharee.idShare) else { return }
+            tableShare = newTableShare
         }
     }
 
