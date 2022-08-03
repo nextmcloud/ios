@@ -105,7 +105,6 @@
 		5696257D27B289C6003F774D /* SwiftEntryKit in Frameworks */ = {isa = PBXBuildFile; productRef = F73ADD2026554F8E0069EA0D /* SwiftEntryKit */; };
 		5696257E27B289C6003F774D /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC7D277B7D2600AA9FBF /* Realm */; };
 		5696257F27B289C6003F774D /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC7F277B7D2700AA9FBF /* RealmSwift */; };
-		5696258027B289C6003F774D /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = F7EBCDCE277B81FF00A4EF67 /* UICKeyChainStore */; };
 		5696258127B289C6003F774D /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = F7EBCDD4277B82DE00A4EF67 /* Queuer */; };
 		5696258227B289C6003F774D /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = F72CD01127A7E92400E59476 /* JGProgressHUD */; };
 		5696258827B289C6003F774D /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC85277B7D3F00AA9FBF /* Realm */; };
@@ -277,11 +276,14 @@
 		8402B1332889245200CBAC94 /* SubFolderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B12F2889245200CBAC94 /* SubFolderCustomCell.swift */; };
 		8402B1342889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B1302889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift */; };
 		8402B1372889298600CBAC94 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B1352889298600CBAC94 /* NCCreateDocumentCustomTextField.xib */; };
+		840FA6F4289980A60012F0AE /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = 840FA6F3289980A60012F0AE /* UICKeyChainStore */; };
 		8456608D28891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
 		8456608E28891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
 		8456608F28891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
 		8456609028891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
 		8489357528892F14004D4278 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8489357428892F14004D4278 /* Images.xcassets */; };
+		84924AA9289A2FC300154220 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5610960A2876B50500292C4C /* NCRenameFile.storyboard */; };
+		849B4561289920D2009254A7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8489357428892F14004D4278 /* Images.xcassets */; };
 		95BB2056265FE2AE00AF4344 /* NCGlobal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB2054265FE2AE00AF4344 /* NCGlobal.swift */; };
 		95BB2068265FE90F00AF4344 /* NCGlobal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB2054265FE2AE00AF4344 /* NCGlobal.swift */; };
 		95BB20CD26600F6100AF4344 /* NCLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20CC26600F6100AF4344 /* NCLogin.swift */; };
@@ -1100,10 +1102,10 @@
 			files = (
 				5696257F27B289C6003F774D /* RealmSwift in Frameworks */,
 				5696257D27B289C6003F774D /* SwiftEntryKit in Frameworks */,
-				5696258027B289C6003F774D /* UICKeyChainStore in Frameworks */,
 				F75E57BF25BF0EC8002B72C2 /* SVGKit in Frameworks */,
 				565B11CF2875A37D006998FA /* OpenSSL.xcframework in Frameworks */,
 				5696258127B289C6003F774D /* Queuer in Frameworks */,
+				840FA6F4289980A60012F0AE /* UICKeyChainStore in Frameworks */,
 				5696258227B289C6003F774D /* JGProgressHUD in Frameworks */,
 				5696257E27B289C6003F774D /* Realm in Frameworks */,
 				56D88E192876CB0400B72455 /* NCCommunication in Frameworks */,
@@ -2315,11 +2317,11 @@
 				F73ADD2026554F8E0069EA0D /* SwiftEntryKit */,
 				F710FC7D277B7D2600AA9FBF /* Realm */,
 				F710FC7F277B7D2700AA9FBF /* RealmSwift */,
-				F7EBCDCE277B81FF00A4EF67 /* UICKeyChainStore */,
 				F7EBCDD4277B82DE00A4EF67 /* Queuer */,
 				F72CD01127A7E92400E59476 /* JGProgressHUD */,
 				56D88E182876CB0400B72455 /* NCCommunication */,
 				56BE8A93287842C10024C78B /* DropDown */,
+				840FA6F3289980A60012F0AE /* UICKeyChainStore */,
 			);
 			productName = "Share Ext";
 			productReference = F7CE8AFB1DC1F8D8009CAE48 /* Share.appex */;
@@ -2537,10 +2539,12 @@
 				F78BFEE11D31126B00E513CF /* MainInterface.storyboard in Resources */,
 				F7145A231D12E3B700CAFEEC /* Localizable.strings in Resources */,
 				F746EC51273906C40052598D /* (null) in Resources */,
+				849B4561289920D2009254A7 /* Images.xcassets in Resources */,
 				F714804F262ED4F900693E51 /* (null) in Resources */,
 				F714805E262ED52900693E51 /* NCSectionFooter.xib in Resources */,
 				F700222D1EC479840080073F /* Custom.xcassets in Resources */,
 				56E9B350287C282700F1D413 /* NCListCell.xib in Resources */,
+				84924AA9289A2FC300154220 /* NCRenameFile.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4273,6 +4277,11 @@
 			package = 56E9FB752878040D0006B408 /* XCRemoteSwiftPackageReference "ios_sdk" */;
 			productName = WebBridge;
 		};
+		840FA6F3289980A60012F0AE /* UICKeyChainStore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 569625DD27B29670003F774D /* XCRemoteSwiftPackageReference "UICKeyChainStore" */;
+			productName = UICKeyChainStore;
+		};
 		F70B86742642CE3B00ED5349 /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F70B86732642CE3B00ED5349 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -4412,11 +4421,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F7BB7E4527A18C56009B9F29 /* XCRemoteSwiftPackageReference "Parchment" */;
 			productName = Parchment;
-		};
-		F7EBCDCE277B81FF00A4EF67 /* UICKeyChainStore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F76DA964277B76F10082465B /* XCRemoteSwiftPackageReference "UICKeyChainStore" */;
-			productName = UICKeyChainStore;
 		};
 		F7EBCDD0277B820D00A4EF67 /* UICKeyChainStore */ = {
 			isa = XCSwiftPackageProductDependency;
