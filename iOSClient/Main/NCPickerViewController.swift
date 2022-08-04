@@ -111,6 +111,7 @@ class customPhotoPickerViewController: TLPhotosPickerViewController {
 
         self.customNavItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brandElement
         self.customNavItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.brandElement
+        self.albumPopView.tintColor = NCBrandColor.shared.brandElement
     }
 }
 
