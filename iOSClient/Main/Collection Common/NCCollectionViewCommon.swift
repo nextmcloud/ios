@@ -420,7 +420,11 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     }
 
     @objc func renameFile(_ notification: NSNotification) {
-        reloadDataSource()
+        if isSearching {
+            reloadDataSourceNetwork()
+        } else {
+            reloadDataSource()
+        }
     }
 
     @objc func createFolder(_ notification: NSNotification) {
