@@ -841,8 +841,8 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
         
         NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.isPDFWithOCRSwitchOn = ocrSwitchOn
             self.dismissAndUpload(metadataForUpload, fileType: "PDF")
         }
         
