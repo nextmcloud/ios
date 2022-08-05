@@ -430,6 +430,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         dropDown.selectionAction = { [weak self] (index, item) in
             searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
+            guard let searchString = item.components(separatedBy: " ").first else { return }
+            if !NCUtility.shared.isValidEmail(searchString) { return }
             searchField.text = ""
             let sharee = sharees[index]
             if let ocId = self?.metadata?.ocId {
