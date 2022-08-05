@@ -888,6 +888,15 @@ class NCUtility: NSObject {
         return UIDevice.current.systemVersion.compare(version,
          options: NSString.CompareOptions.numeric) == ComparisonResult.orderedAscending
     }
+    
+    
+    // https://stackoverflow.com/questions/25471114/how-to-validate-an-e-mail-address-in-swift
+    func isValidEmail(_ email: String) -> Bool {
+
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailPred.evaluate(with: email)
+    }
 }
 
 // MARK: -
