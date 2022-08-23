@@ -62,7 +62,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var disableSharesView: Bool = false
     var documentPickerViewController: NCDocumentPickerViewController?
     var networkingProcessUpload: NCNetworkingProcessUpload?
-    var passcodeViewController: TOPasscodeViewController?
     var shares: [tableShare] = []
     var timerErrorNetworking: Timer?
     @objc let adjust = AdjustHelper()
@@ -756,59 +755,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // MARK: - Passcode
     
     func didPerformBiometricValidationRequest(in passcodeViewController: TOPasscodeViewController) {
-        LAContext().evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: NCBrandOptions.shared.brand) { (success, error) in
-            if success {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    passcodeViewController.dismiss(animated: true) {
-                        self.passcodeViewController = nil
-                        self.requestAccount()
-                    }
-                }
-            }
-        }
-
-        privacyProtectionWindow = UIWindow(frame: UIScreen.main.bounds)
-
-        let storyboard = UIStoryboard(name: "LaunchScreen", bundle: nil)
-        let initialViewController = storyboard.instantiateInitialViewController()
-
-        self.privacyProtectionWindow?.rootViewController = initialViewController
-
-        privacyProtectionWindow?.windowLevel = .alert + 1
-        privacyProtectionWindow?.makeKeyAndVisible()
-    }
-    
-    func enableTouchFaceID(_ automaticallyPromptForBiometricValidation: Bool) {
-        if CCUtility.getEnableTouchFaceID() && automaticallyPromptForBiometricValidation && passcodeViewController?.view.window != nil {
-            LAContext().evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: NCBrandOptions.shared.brand) { (success, error) in
-                if success {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.passcodeViewController?.dismiss(animated: true) {
-                            self.passcodeViewController = nil
-                            self.requestAccount()
-                        }
-                    }
-                }
-            }
-        }
+        enableTouchFaceID()
     }
     
     // MARK: - Passcode
     
     func presentPasscode(completion: @escaping ()->()) {
         
+       
         let laContext = LAContext()
         var error: NSError?
-        
-        defer {
-            self.requestAccount()
-        }
+
+        defer { self.requestAccount() }
+
         let presentedViewController = window?.rootViewController?.presentedViewController
         guard !account.isEmpty, CCUtility.isPasscodeAtStartEnabled(), !(presentedViewController is NCLoginNavigationController) else { return }
-        
+
         // Make sure we have a privacy window (in case it's not enabled)
         showPrivacyProtectionWindow()
-        
+
         let passcodeViewController = TOPasscodeViewController(passcodeType: .sixDigits, allowCancel: false)
         passcodeViewController.delegate = self
         passcodeViewController.keypadButtonShowLettering = false
@@ -823,7 +788,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 passcodeViewController.automaticallyPromptForBiometricValidation = false
             }
         }
-        
+
         // show passcode on top of privacy window
         privacyProtectionWindow?.rootViewController?.present(passcodeViewController, animated: true, completion: {
             completion()
@@ -835,17 +800,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func enableTouchFaceID() {
-        
         guard !account.isEmpty,
               CCUtility.getEnableTouchFaceID(),
               CCUtility.isPasscodeAtStartEnabled(),
-              let passcodeViewController = window?.rootViewController?.presentedViewController as? TOPasscodeViewController
+              let passcodeViewController = privacyProtectionWindow?.rootViewController?.presentedViewController as? TOPasscodeViewController
         else { return }
-        
+
         LAContext().evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: NCBrandOptions.shared.brand) { (success, error) in
             if success {
                 DispatchQueue.main.async {
                     passcodeViewController.dismiss(animated: true) {
+                        self.hidePrivacyProtectionWindow()
                         self.requestAccount()
                     }
                 }
