@@ -532,8 +532,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     @objc func shareMenuViewInClicked() {
         // image to share
         let image = UIImage(named: "pencil")
-        
-        let imageToShare = [ image! ]
+        let link = tableShareSelected?.url
+        let imageToShare = [ link, image! ] as [Any]
         let activityViewController = UIActivityViewController(activityItems: imageToShare, applicationActivities: nil)
         activityViewController.popoverPresentationController?.sourceView = self.view
         
