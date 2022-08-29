@@ -175,6 +175,7 @@ class NCViewerMedia: UIViewController {
     }
 
     override func viewDidDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationImagePreviewRotateImage), object: nil)
         super.viewDidDisappear(animated)
     }
 
