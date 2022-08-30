@@ -326,10 +326,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         if tableShare.shareType == 3 {
             let shareMenu = NCShareMenu()
             let isFolder = metadata.directory
-            shareMenu.toggleMenu(viewController: self, sendMail: false, folder: isFolder)
+            shareMenu.toggleMenu(viewController: self, sendMail: false, folder: isFolder, index: index)
         } else {
             let shareMenu = NCShareMenu()
-            shareMenu.toggleMenu(viewController: self, sendMail: true, folder: isFolder)
+            shareMenu.toggleMenu(viewController: self, sendMail: true, folder: isFolder, index: index)
         }
     }
     
@@ -550,49 +550,57 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         return shares.share?[index]
     }
     
-    @objc func shareMenuAdvancePermissionClicked() {
-        let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-        var advancePermission: NCShareAdvancePermission
-        advancePermission = storyboard.instantiateViewController(withIdentifier: "NCShareAdvancePermission") as! NCShareAdvancePermission
-        if let ocId = metadata?.ocId {
-            let metaData = NCManageDatabase.shared.getMetadataFromOcId(ocId)
-            self.metadata = metaData
+    @objc func shareMenuAdvancePermissionClicked(notification: NSNotification) {
+        guard let index = notification.object as? Int else { return }
+        if let tableShared = (tableShareSelected?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShareSelected {
+            let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+            var advancePermission: NCShareAdvancePermission
+            advancePermission = storyboard.instantiateViewController(withIdentifier: "NCShareAdvancePermission") as! NCShareAdvancePermission
+            if let ocId = metadata?.ocId {
+                let metaData = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+                self.metadata = metaData
+            }
+            advancePermission.metadata = self.metadata
+            advancePermission.sharee = tableShare(value: tableShared)
+            advancePermission.newUser = false
+            advancePermission.tableShare = tableShared
+            guard let navigationController = navigationController else {
+                print("this vc is not embedded in navigationController")
+                return
+            }
+            if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
+                searchField.resignFirstResponder()
+            }
+            navigationController.pushViewController(advancePermission, animated: true)
         }
-        advancePermission.metadata = self.metadata
-        advancePermission.sharee = tableShare(value: tableShareSelected)
-        advancePermission.newUser = false
-        advancePermission.tableShare = self.tableShareSelected
-        guard let navigationController = navigationController else {
-            print("this vc is not embedded in navigationController")
-            return
-        }
-        if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
-            searchField.resignFirstResponder()
-        }
-        navigationController.pushViewController(advancePermission, animated: true)
     }
     
-    @objc func shareMenuSendEmailClicked() {
-        let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-        let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
-        if let ocId = metadata?.ocId {
-            let metaData = NCManageDatabase.shared.getMetadataFromOcId(ocId)
-            self.metadata = metaData
+    @objc func shareMenuSendEmailClicked(notification: NSNotification) {
+        guard let index = notification.object as? Int else { return }
+        if let tableShared = (tableShareSelected?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShareSelected {
+            let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+            let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
+            if let ocId = metadata?.ocId {
+                let metaData = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+                self.metadata = metaData
+            }
+            viewNewUserComment.metadata = self.metadata
+            viewNewUserComment.tableShare = tableShared
+            viewNewUserComment.isUpdating = true
+            viewNewUserComment.sharee = tableShare(value: tableShared)
+            if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
+                searchField.resignFirstResponder()
+            }
+            self.navigationController?.pushViewController(viewNewUserComment, animated: true)
         }
-        viewNewUserComment.metadata = self.metadata
-        viewNewUserComment.tableShare = self.tableShareSelected
-        viewNewUserComment.isUpdating = true
-        viewNewUserComment.sharee = tableShare(value: tableShareSelected)
-        if let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField {
-            searchField.resignFirstResponder()
-        }
-        self.navigationController?.pushViewController(viewNewUserComment, animated: true)
     }
     
-    @objc func shareMenuUnshareClicked() {
-        guard let tableShare = self.tableShareSelected else { return }
-        tableView.isUserInteractionEnabled = false
-        networking?.unShare(idShare: tableShare.idShare)
+    @objc func shareMenuUnshareClicked(notification: NSNotification) {
+        guard let index = notification.object as? Int else { return }
+        if let tableShare = (tableShareSelected?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShareSelected {
+            tableView.isUserInteractionEnabled = false
+            networking?.unShare(idShare: tableShare.idShare)
+        }
     }
     
     // MARK: -StatusChangeNotification
