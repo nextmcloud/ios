@@ -134,7 +134,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         // ITEM : Notification
         item = NCCommunicationExternalSite()
-        item.name = "_notification_"
+        item.name = "_notifications_"
         item.icon = "notification"
         item.url = "segueNotification"
         functionMenu.append(item)
