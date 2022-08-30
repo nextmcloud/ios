@@ -32,7 +32,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     var permission: Int = 0
     var password: String?
     var label: String?
-    var expirationDate: String?
+    var expirationDate: NSDate?
     var hideDownload = false
     
     var creatingShare = false
@@ -129,6 +129,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
             shareData.permissions = permission
             shareData.shareWith = sharee!.shareWith
             shareData.shareType = sharee!.shareType
+            shareData.hideDownload = hideDownload
             self.networking?.createShare(option: shareData)
         }
         self.creatingShare = true
@@ -237,6 +238,8 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
                 shareData.permissions = permission
                 shareData.hideDownload = hideDownload
                 shareData.label = label ?? ""
+                shareData.password = password ?? ""
+                shareData.expirationDate = expirationDate
                 networking?.updateShare(option: shareData)
             } else {
                 popToShare()
