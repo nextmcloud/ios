@@ -983,8 +983,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             }
         }
         let label = linkLabel.trimmingCharacters(in: .whitespacesAndNewlines)
-        let expirationDate = isExpiryEnabled ? getServerStyleDate(date: self.expirationDate as Date) : ""
-        
+
         if newUser {
             let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
             let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as! NCShareNewUserAddComment
@@ -995,7 +994,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             viewNewUserComment.permission = self.permissionInt
             viewNewUserComment.password = self.password
             viewNewUserComment.label = label
-            viewNewUserComment.expirationDate = nil
+            viewNewUserComment.expirationDate = self.expirationDate
             viewNewUserComment.hideDownload = self.hideDownload
             
             viewNewUserComment.sharee = sharee
