@@ -37,12 +37,11 @@ extension UIAlertController {
             guard let fileNameFolder = alertController.textFields?.first?.text else { return }
             NCUtility.shared.startActivityIndicator(backgroundView: nil, blurEffect: true)
             NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: serverUrl, account: urlBase.account, urlBase: urlBase.urlBase, overwrite: false) { errorCode, errorDescription in
+                NCUtility.shared.stopActivityIndicator()
                 if let completion = completion {
                     completion(errorCode, errorDescription)
                 } else if errorCode != 0 {
                     NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
-                }  else {
-                    NCUtility.shared.stopActivityIndicator()
                 }
             }
         })
