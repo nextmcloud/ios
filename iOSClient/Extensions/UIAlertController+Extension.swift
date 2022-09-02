@@ -35,12 +35,15 @@ extension UIAlertController {
 
         let okAction = UIAlertAction(title: NSLocalizedString("_save_", comment: ""), style: .default, handler: { _ in
             guard let fileNameFolder = alertController.textFields?.first?.text else { return }
+            NCUtility.shared.startActivityIndicator(backgroundView: nil, blurEffect: true)
             NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: serverUrl, account: urlBase.account, urlBase: urlBase.urlBase, overwrite: false) { errorCode, errorDescription in
                 if let completion = completion {
                     completion(errorCode, errorDescription)
                 } else if errorCode != 0 {
                     NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
-                } // else: successful, no action
+                }  else {
+                    NCUtility.shared.stopActivityIndicator()
+                }
             }
         })
 
