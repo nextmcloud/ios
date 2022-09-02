@@ -19,6 +19,7 @@ class PasswordInputField: XLFormBaseCell,UITextFieldDelegate {
         fileNameInputTextField.isSecureTextEntry = true
         fileNameInputTextField.delegate = self
         separatorBottom.backgroundColor = NCBrandColor.shared.systemGray4
+        self.selectionStyle = .none
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
