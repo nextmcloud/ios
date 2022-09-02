@@ -130,10 +130,6 @@
 		56A229E727B3BE1F00C35F8B /* NCCreateFormUploadConflictCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F704B5E82430C0B800632F5F /* NCCreateFormUploadConflictCell.swift */; };
 		56A229EA27B3C7F900C35F8B /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
 		56A229EB27B3C81100C35F8B /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
-		56A4831E28BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */; };
-		56A4831F28BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */; };
-		56A4832028BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */; };
-		56A4832128BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */; };
 		56A5108627B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */; };
 		56A5108727B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */; };
 		56A5108827B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */; };
@@ -165,6 +161,10 @@
 		56D88E192876CB0400B72455 /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = 56D88E182876CB0400B72455 /* NCCommunication */; };
 		56D88E1B2876CB1A00B72455 /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = 56D88E1A2876CB1A00B72455 /* NCCommunication */; };
 		56D88E1D2876CB2700B72455 /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = 56D88E1C2876CB2700B72455 /* NCCommunication */; };
+		56DF5C5C28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56DF5C5B28C1DF9B003668C5 /* GoogleService-Info.plist */; };
+		56DF5C5D28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56DF5C5B28C1DF9B003668C5 /* GoogleService-Info.plist */; };
+		56DF5C5E28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56DF5C5B28C1DF9B003668C5 /* GoogleService-Info.plist */; };
+		56DF5C5F28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56DF5C5B28C1DF9B003668C5 /* GoogleService-Info.plist */; };
 		56E92DA1287E9A5400399818 /* NCPlayerToolBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E92D9F287E9A5300399818 /* NCPlayerToolBar.swift */; };
 		56E92DA2287E9A5400399818 /* NCPlayerToolBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E92DA0287E9A5300399818 /* NCPlayerToolBar.xib */; };
 		56E9B32B287C1E5000F1D413 /* NCActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C9555421F0C5470024296E /* NCActivity.swift */; };
@@ -633,7 +633,6 @@
 		5690BB41287C1B66007115BF /* NCShareUserFolderMenuView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCShareUserFolderMenuView.xib; sourceTree = "<group>"; };
 		56937C382877617500F14292 /* NCScanCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCScanCell.swift; sourceTree = "<group>"; };
 		56937C392877617500F14292 /* NCScan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCScan.swift; sourceTree = "<group>"; };
-		56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Alamofire.xcframework; path = Carthage/Build/Alamofire.xcframework; sourceTree = "<group>"; };
 		56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = KTVHTTPCache.xcframework; path = Carthage/Build/KTVHTTPCache.xcframework; sourceTree = "<group>"; };
 		56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCUserBaseUrl.swift; sourceTree = "<group>"; };
@@ -647,6 +646,7 @@
 		56CAF29128785FC700DB870E /* TealiumHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
 		56CAF29228785FC700DB870E /* AdjustHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
 		56CAF29328785FC700DB870E /* AdjustHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
+		56DF5C5B28C1DF9B003668C5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		56E92D9F287E9A5300399818 /* NCPlayerToolBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCPlayerToolBar.swift; sourceTree = "<group>"; };
 		56E92DA0287E9A5300399818 /* NCPlayerToolBar.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCPlayerToolBar.xib; sourceTree = "<group>"; };
 		56E9B32D287C203100F1D413 /* NCViewerMediaDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCViewerMediaDetailView.swift; sourceTree = "<group>"; };
@@ -1906,7 +1906,7 @@
 		F7C1CDD91E6DFC6F005D92BE /* Brand */ = {
 			isa = PBXGroup;
 			children = (
-				56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */,
+				56DF5C5B28C1DF9B003668C5 /* GoogleService-Info.plist */,
 				F7C742D31E7BD36600D9C973 /* Supporting Files */,
 				F710E80C1EF95C9C00DC2427 /* Intro */,
 				F700222B1EC479840080073F /* Custom.xcassets */,
@@ -2522,7 +2522,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				56A4832128BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */,
+				56DF5C5F28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2532,7 +2532,7 @@
 			files = (
 				7A82A18926F352DA00D52790 /* NCSectionFooter.xib in Resources */,
 				56E9B34E287C281D00F1D413 /* NCGridCell.xib in Resources */,
-				56A4831F28BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */,
+				56DF5C5D28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */,
 				7A82A18126F3529100D52790 /* NCEmptyView.xib in Resources */,
 				56E9B9FD27B39DFC007B1772 /* english.txt in Resources */,
 				7AE63C8326E8AF9500CEAAD5 /* NCSectionHeaderMenu.xib in Resources */,
@@ -2552,7 +2552,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				56A4832028BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */,
+				56DF5C5E28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2603,7 +2603,7 @@
 				F76D3CF32428B94E005DFA87 /* NCViewerPDFSearchCell.xib in Resources */,
 				F7CA212E25F1333300826ABB /* NCAccountRequest.storyboard in Resources */,
 				F749C10E23C4A5340027D966 /* NCIntroCollectionViewCell.xib in Resources */,
-				56A4831E28BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */,
+				56DF5C5C28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */,
 				5610960C2876B50500292C4C /* NCRenameFile.storyboard in Resources */,
 				F717402D24F699A5000C87D5 /* NCFavorite.storyboard in Resources */,
 				F723B3DD22FC6D1D00301EFE /* NCShareCommentsCell.xib in Resources */,
