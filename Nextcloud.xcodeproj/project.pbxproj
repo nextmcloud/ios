@@ -130,6 +130,10 @@
 		56A229E727B3BE1F00C35F8B /* NCCreateFormUploadConflictCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F704B5E82430C0B800632F5F /* NCCreateFormUploadConflictCell.swift */; };
 		56A229EA27B3C7F900C35F8B /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
 		56A229EB27B3C81100C35F8B /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE63BAA26DDFBCC00CEAAD5 /* NCViewCertificateDetails.swift */; };
+		56A4831E28BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */; };
+		56A4831F28BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */; };
+		56A4832028BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */; };
+		56A4832128BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */; };
 		56A5108627B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */; };
 		56A5108727B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */; };
 		56A5108827B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */; };
@@ -277,10 +281,6 @@
 		8402B1342889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B1302889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift */; };
 		8402B1372889298600CBAC94 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B1352889298600CBAC94 /* NCCreateDocumentCustomTextField.xib */; };
 		840FA6F4289980A60012F0AE /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = 840FA6F3289980A60012F0AE /* UICKeyChainStore */; };
-		8456608D28891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
-		8456608E28891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
-		8456608F28891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
-		8456609028891B880053E00A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8456608C28891B880053E00A /* GoogleService-Info.plist */; };
 		8489357528892F14004D4278 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8489357428892F14004D4278 /* Images.xcassets */; };
 		84924AA9289A2FC300154220 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5610960A2876B50500292C4C /* NCRenameFile.storyboard */; };
 		849B4561289920D2009254A7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8489357428892F14004D4278 /* Images.xcassets */; };
@@ -633,6 +633,7 @@
 		5690BB41287C1B66007115BF /* NCShareUserFolderMenuView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCShareUserFolderMenuView.xib; sourceTree = "<group>"; };
 		56937C382877617500F14292 /* NCScanCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCScanCell.swift; sourceTree = "<group>"; };
 		56937C392877617500F14292 /* NCScan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCScan.swift; sourceTree = "<group>"; };
+		56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		56A5107B27B2CCF700D9F3E6 /* Alamofire.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Alamofire.xcframework; path = Carthage/Build/Alamofire.xcframework; sourceTree = "<group>"; };
 		56A5108027B2CE0D00D9F3E6 /* KTVHTTPCache.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = KTVHTTPCache.xcframework; path = Carthage/Build/KTVHTTPCache.xcframework; sourceTree = "<group>"; };
 		56A5108527B2D03E00D9F3E6 /* NCUserBaseUrl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCUserBaseUrl.swift; sourceTree = "<group>"; };
@@ -743,7 +744,6 @@
 		8402B1302889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OriginalFileNameCustomSwitchCell.swift; sourceTree = "<group>"; };
 		8402B1352889298600CBAC94 /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
 		8402B1362889298600CBAC94 /* NCCreateMenuAdd.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCreateMenuAdd.swift; sourceTree = "<group>"; };
-		8456608C28891B880053E00A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		8489357428892F14004D4278 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		8C00AE38527457006AFA3958 /* Pods-Notification Service Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notification Service Extension.release.xcconfig"; path = "Target Support Files/Pods-Notification Service Extension/Pods-Notification Service Extension.release.xcconfig"; sourceTree = "<group>"; };
 		8E0B45CD4E8F820EE8B09D55 /* Pods_Notification_Service_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Notification_Service_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1906,7 +1906,7 @@
 		F7C1CDD91E6DFC6F005D92BE /* Brand */ = {
 			isa = PBXGroup;
 			children = (
-				8456608C28891B880053E00A /* GoogleService-Info.plist */,
+				56A4831D28BF7B2F00B5DD58 /* GoogleService-Info.plist */,
 				F7C742D31E7BD36600D9C973 /* Supporting Files */,
 				F710E80C1EF95C9C00DC2427 /* Intro */,
 				F700222B1EC479840080073F /* Custom.xcassets */,
@@ -2522,7 +2522,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8456609028891B880053E00A /* GoogleService-Info.plist in Resources */,
+				56A4832128BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2530,9 +2530,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8456608E28891B880053E00A /* GoogleService-Info.plist in Resources */,
 				7A82A18926F352DA00D52790 /* NCSectionFooter.xib in Resources */,
 				56E9B34E287C281D00F1D413 /* NCGridCell.xib in Resources */,
+				56A4831F28BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */,
 				7A82A18126F3529100D52790 /* NCEmptyView.xib in Resources */,
 				56E9B9FD27B39DFC007B1772 /* english.txt in Resources */,
 				7AE63C8326E8AF9500CEAAD5 /* NCSectionHeaderMenu.xib in Resources */,
@@ -2552,7 +2552,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8456608F28891B880053E00A /* GoogleService-Info.plist in Resources */,
+				56A4832028BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2603,7 +2603,7 @@
 				F76D3CF32428B94E005DFA87 /* NCViewerPDFSearchCell.xib in Resources */,
 				F7CA212E25F1333300826ABB /* NCAccountRequest.storyboard in Resources */,
 				F749C10E23C4A5340027D966 /* NCIntroCollectionViewCell.xib in Resources */,
-				8456608D28891B880053E00A /* GoogleService-Info.plist in Resources */,
+				56A4831E28BF7B2F00B5DD58 /* GoogleService-Info.plist in Resources */,
 				5610960C2876B50500292C4C /* NCRenameFile.storyboard in Resources */,
 				F717402D24F699A5000C87D5 /* NCFavorite.storyboard in Resources */,
 				F723B3DD22FC6D1D00301EFE /* NCShareCommentsCell.xib in Resources */,
@@ -3220,8 +3220,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/Notification_Service_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -3253,7 +3253,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension QA";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA NotificationServiceExtension devel";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
@@ -3351,8 +3351,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/Share.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -3382,7 +3382,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA Share";
+				PROVISIONING_PROFILE_SPECIFIER = "MagenaCloud QA Share developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Share/Share-Bridging-Header.h";
@@ -3458,8 +3458,8 @@
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/iOSClient/Brand/File_Provider_Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -3489,7 +3489,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA FileProviderExtension developer";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/File Provider Extension/FileProviderExtension-Bridging-Header.h";
@@ -3560,8 +3560,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = iOSClient/Brand/iOSClient.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: T-Systems International GmbH";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 31;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
@@ -3600,7 +3600,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA";
+				PROVISIONING_PROFILE_SPECIFIER = "MagentaCloud QA developer";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/iOSClient/Nextcloud-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
