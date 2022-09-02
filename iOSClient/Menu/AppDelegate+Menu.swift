@@ -137,6 +137,16 @@ extension AppDelegate {
                             }
                         }
                     })
+                    okAction.isEnabled = false
+                     // only allow saving if folder name exists
+                    NotificationCenter.default.addObserver(
+                        forName: UITextField.textDidChangeNotification,
+                        object: alertController.textFields?.first,
+                        queue: .main) { _ in
+                            guard let text = alertController.textFields?.first?.text,
+                                  let folderName = CCUtility.removeForbiddenCharactersServer(text)?.trimmingCharacters(in: .whitespaces) else { return }
+                            okAction.isEnabled = !folderName.isEmpty && folderName != "." && folderName != ".."
+                        }
 
                     alertController.addAction(cancelAction)
                     alertController.addAction(okAction)
