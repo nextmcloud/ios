@@ -87,7 +87,7 @@ extension AppDelegate {
                 NCMenuAction(
                     title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility.shared.loadImage(named: "scan").image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                         if let viewController = appDelegate.window?.rootViewController {
-                            NCCreateScanDocument.shared.openScannerDocument(viewController: viewController)
+                            NCCreateScanDocument.shared.reDirectToSave()
                         }
                     }
                 )
