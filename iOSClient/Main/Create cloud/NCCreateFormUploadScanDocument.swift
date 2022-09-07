@@ -559,6 +559,29 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         }
     }
     
+    func checkPasswordEnabled() -> Bool {
+          if let passwordField: XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionEditPasswordCellWithText") {
+              if let indexPath = self.form.indexPath(ofFormRow: passwordField) {
+                  let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionEditCell
+                  return cell?.switchControl.isOn ?? false
+              }
+          }
+          return false
+      }
+
+      func checkGetPasswordFromField() -> String? {
+          if let setPasswordInputField : XLFormRowDescriptor = self.form.formRow(withTag: "SetPasswordInputField") {
+              var password = ""
+              if let indexPath = self.form.indexPath(ofFormRow: setPasswordInputField) {
+                  let cell = tableView.cellForRow(at: indexPath) as? PasswordInputField
+                  password = cell?.fileNameInputTextField.text ?? ""
+              }
+              return password
+          }
+          return nil
+      }
+
+    
     func startProcessForSaving(){
         
         let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
@@ -677,6 +700,17 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     }
     
     @objc func save() {
+        
+        let isPasswordEnabledd = self.checkPasswordEnabled()
+                   if isPasswordEnabledd {
+                       let password = (checkGetPasswordFromField() ?? "").trimmingCharacters(in: .whitespaces)
+                           if  password == ""{
+                           let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_password", comment: ""), preferredStyle: .alert)
+                           alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
+                           self.present(alert, animated: true)
+                           return
+                       }
+                   }
         
         if(!isAtleastOneFiletypeSelected()){
             let alertController = UIAlertController(title: "", message: NSLocalizedString("_no_file_type_selection_error_", comment: ""), preferredStyle: .alert)
