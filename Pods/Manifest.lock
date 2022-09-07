@@ -1,24 +1,19 @@
 PODS:
-  - AppAuth (1.5.0):
-    - AppAuth/Core (= 1.5.0)
-    - AppAuth/ExternalUserAgent (= 1.5.0)
-  - AppAuth/Core (1.5.0)
-  - AppAuth/ExternalUserAgent (1.5.0):
-    - AppAuth/Core
-  - ChromaColorPicker (2.0.2)
-  - MarkdownKit (1.7.1)
-  - MoEngage-iOS-SDK (7.2.3):
-    - MORichNotification (< 5.4.0, >= 5.3.0)
-  - MORichNotification (5.3.0)
-  - tealium-swift (2.7.0):
-    - tealium-swift/TealiumFull (= 2.7.0)
-  - tealium-swift/Core (2.7.0)
-  - tealium-swift/TealiumFull (2.7.0)
+  - AppAuth (1.4.0):
+    - AppAuth/Core (= 1.4.0)
+    - AppAuth/ExternalUserAgent (= 1.4.0)
+  - AppAuth/Core (1.4.0)
+  - AppAuth/ExternalUserAgent (1.4.0)
+  - MoEngage-iOS-SDK (7.0.4):
+    - MORichNotification (< 5.1.0, >= 5.0.0)
+  - MORichNotification (5.0.0)
+  - tealium-swift (2.4.1):
+    - tealium-swift/TealiumFull (= 2.4.1)
+  - tealium-swift/Core (2.4.1)
+  - tealium-swift/TealiumFull (2.4.1)
 
 DEPENDENCIES:
   - AppAuth
-  - ChromaColorPicker
-  - MarkdownKit
   - MoEngage-iOS-SDK (~> 7.0)
   - tealium-swift
   - tealium-swift/Core
@@ -26,20 +21,16 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - AppAuth
-    - ChromaColorPicker
-    - MarkdownKit
     - MoEngage-iOS-SDK
     - MORichNotification
     - tealium-swift
 
 SPEC CHECKSUMS:
-  AppAuth: 80317d99ac7ff2801a2f18ff86b48cd315ed465d
-  ChromaColorPicker: 307585f2dc23d4d72f24cad320c1e08825cb5c09
-  MarkdownKit: 0b15195c63cf3e39387949c4bdeccde0055e252a
-  MoEngage-iOS-SDK: 8c61e4be7cad51c9377da3bf29cb21cdc0fa3104
-  MORichNotification: 3f4c3f3e6aa4f961811b15e9b6d25c27d923812c
-  tealium-swift: da6605540fc647f795932de24a17e031f73ae943
+  AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
+  MoEngage-iOS-SDK: 71451fb44893536b0c70ff7dace1989e6fa734ff
+  MORichNotification: abf1f1aaed3a9366dc8e966c55652bff7716b3b8
+  tealium-swift: 67fa94e8fb0937a7c949f0160e7ffb76f17fe1cd
 
-PODFILE CHECKSUM: c8f9f014022b502e78fe91f54f0b7381c8f78b40
+PODFILE CHECKSUM: 4ad0f0fe41e3cf275b50bf6bd8ad597c4cc21205
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.10.1

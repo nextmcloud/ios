@@ -1,3 +1,21 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:1c8d0e506926a585146a2a437897802f8bb0cfa16f19bd6b78e5c4347cc88445
-size 1938
+/*
+  InfoPlist.strings
+  Nextcloud
+
+  Created by TSI-mc on 01/12/21.
+  Author TSI-mc
+  Copyright © 2021 Marino Faggiana. All rights reserved.
+*/
+
+"NSPhotoLibraryUsageDescription"        = "Der Zugriff auf die Fotobibliothek ist erforderlich, um Ihre Fotos und Videos in Ihre Cloud hochzuladen.";
+"NSPhotoLibraryAddUsageDescription"     = "Der Zugriff auf die Fotobibliothek ist erforderlich, um Ihre Fotos und Videos in Ihre Cloud hochzuladen.";
+"NSCameraUsageDescription"              = "Der Zugriff auf die Kamera ist erforderlich, um Dokumente zu scannen und Fotos und Videos zu machen.";
+
+"NSMicrophoneUsageDescription"          = "Mikrofonzugriff ist zur Erstellung von Sprachnotizen erforderlich.";
+"NSFaceIDUsageDescription"              = "Für die Authentifizierung mit Gesichtserkennung ist der Zugriff auf Face ID erforderlich.";
+"NSLocationAlwaysAndWhenInUseUsageDescription"  = "GPS wird verwendet, um neue Fotos zu erkennen, die fortgesetzte Verwendung von GPS im Hintergrund kann die Akkulaufzeit dramatisch verkürzen.";
+"NSLocationAlwaysUsageDescription"      = "GPS wird verwendet, um neue Fotos zu erkennen, die fortgesetzte Verwendung von GPS im Hintergrund kann die Akkulaufzeit dramatisch verkürzen.";
+"NSLocationWhenInUseUsageDescription"   = "GPS wird verwendet, um neue Fotos im Hintergrund zu erkennen. GPS wird nur verwendet, wenn die App im Hintergrund ist.";
+"NSUserTrackingUsageDescription"        = "Die Telekom verwendet die Apple-Advertising-ID, um die Funktionsweise der App anhand der Nutzerbedürfnisse zu optimieren und weiterzuentwickeln, etwaige Fehler zu beheben sowie um Ihnen bedarfsgerechte Werbung in der App und auf Drittseiten auszuspielen. Ihre Einwilligung können Sie jederzeit im Betriebssystem widerrufen.";
+"NSUserNotificationsUsageDescription"   = "Benachrichtigungen können Warnungen, Töne und Symbolabzeichen enthalten. Diese können in den Einstellungen konfiguriert werden.";
+

@@ -1,3 +1,21 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:93d3d1b84dbb510e64d8d60323b0ae2725a420f98001ec6bc877fb2223c7bcb8
-size 1728
+/*
+  InfoPlist.strings
+  Nextcloud
+
+  Created by TSI-mc on 01/12/21.
+  Author TSI-mc
+  Copyright © 2021 Marino Faggiana. All rights reserved.
+*/
+
+"NSPhotoLibraryUsageDescription"        = "Photo library access is required to upload your photos and videos to your cloud.";
+"NSPhotoLibraryAddUsageDescription"     = "Photo library access is required to upload your photos and videos to your cloud.";
+"NSCameraUsageDescription"              = "Camera access is required to scan documents and make photo and video.";
+
+"NSMicrophoneUsageDescription"          = "Microphone access is required to create voice notes.";
+"NSFaceIDUsageDescription"              = "Face ID is required to authenticate using face recognition.";
+"NSLocationAlwaysAndWhenInUseUsageDescription"  = "GPS is used to detect new photos from camera roll, continued use of GPS running in the background can dramatically decrease battery life.";
+"NSLocationAlwaysUsageDescription"      = "GPS is used to detect new photos from camera roll, continued use of GPS running in the background can dramatically decrease battery life.";
+"NSLocationWhenInUseUsageDescription"   = "GPS is used to detect new photos from camera roll on background, the use of GPS only when the App is in use is useless.";
+"NSUserTrackingUsageDescription"        = "Telekom uses the Apple Advertising ID to optimize and further develop the functionality of the app based on user needs, to correct any errors and to show you needs-based advertising in the app and on third-party sites. You can revoke your consent at any time in the operating system.";
+"NSUserNotificationsUsageDescription"   = "Notifications may include alerts, sounds, and icon badges. These can be configured in Settings.";
+
