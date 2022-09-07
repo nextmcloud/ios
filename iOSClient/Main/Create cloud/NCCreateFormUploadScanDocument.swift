@@ -559,27 +559,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         }
     }
     
-    func checkPasswordEnabled() -> Bool {
-          if let passwordField: XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionEditPasswordCellWithText") {
-              if let indexPath = self.form.indexPath(ofFormRow: passwordField) {
-                  let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionEditCell
-                  return cell?.switchControl.isOn ?? false
-              }
-          }
-          return false
-      }
-
-      func checkGetPasswordFromField() -> String? {
-          if let setPasswordInputField : XLFormRowDescriptor = self.form.formRow(withTag: "SetPasswordInputField") {
-              var password = ""
-              if let indexPath = self.form.indexPath(ofFormRow: setPasswordInputField) {
-                  let cell = tableView.cellForRow(at: indexPath) as? PasswordInputField
-                  password = cell?.fileNameInputTextField.text ?? ""
-              }
-              return password
-          }
-          return nil
-      }
+    
 
     
     func startProcessForSaving(){
@@ -600,12 +580,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         } else {
             fileNameSave = (name as! NSString).deletingPathExtension + "." + fileType.lowercased()
         }
-        
-        
-        if(isSetpasswordEnable && password.count <= 0){
-            showAlert()
-            return
-        }
+    
         
         NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
         
@@ -699,20 +674,16 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         })
     }
     
+    
     @objc func save() {
         
-        let isPasswordEnabledd = self.checkPasswordEnabled()
-                   if isPasswordEnabledd {
-                       let password = (checkGetPasswordFromField() ?? "").trimmingCharacters(in: .whitespaces)
-                           if  password == ""{
-                           let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_password", comment: ""), preferredStyle: .alert)
-                           alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
-                           self.present(alert, animated: true)
-                           return
-                       }
-                   }
-        
+        if(isSetpasswordEnable && password.count <= 0){
+            showAlert()
+            return
+        }
+          
         if(!isAtleastOneFiletypeSelected()){
+            
             let alertController = UIAlertController(title: "", message: NSLocalizedString("_no_file_type_selection_error_", comment: ""), preferredStyle: .alert)
             let alertWindow = UIWindow(frame: UIScreen.main.bounds)
             alertWindow.windowLevel = UIWindow.Level.alert
@@ -724,7 +695,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             
             alertController.addAction(actionOk)
             self.present(alertController, animated: true)
-        }else{
+        }else {
             // Request delete all image scanned
             let alertController = UIAlertController(title: "", message: NSLocalizedString("_saved_info_alert_", comment: ""), preferredStyle: .alert)
             let alertWindow = UIWindow(frame: UIScreen.main.bounds)
@@ -1382,7 +1353,7 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
         var itemsSource: [String] = []
         
         //Data Source for collectionViewDestination
-        var imagesDestination: [UIImage] = []
+        var imagesDestination: [UIImage] = [UIImage(named: "themingBackground")!]
         var itemsDestination: [String] = []
         
         do {
@@ -1434,7 +1405,7 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
             
             //controller.addChild(formViewController)
             //controller.pushViewController(formViewController, animated: true)
-            self.viewController?.present(navigationController, animated: true, completion: nil)
+            appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
         }
     }
 }
