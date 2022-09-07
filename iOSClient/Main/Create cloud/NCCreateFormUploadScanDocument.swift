@@ -1353,7 +1353,7 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
         var itemsSource: [String] = []
         
         //Data Source for collectionViewDestination
-        var imagesDestination: [UIImage] = [UIImage(named: "themingBackground")!]
+        var imagesDestination: [UIImage] = []
         var itemsDestination: [String] = []
         
         do {
@@ -1405,7 +1405,7 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
             
             //controller.addChild(formViewController)
             //controller.pushViewController(formViewController, animated: true)
-            appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+            self.viewController?.present(navigationController, animated: true, completion: nil)
         }
     }
 }
