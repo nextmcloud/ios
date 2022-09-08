@@ -559,6 +559,9 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         }
     }
     
+    
+
+    
     func startProcessForSaving(){
         
         let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
@@ -577,12 +580,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         } else {
             fileNameSave = (name as! NSString).deletingPathExtension + "." + fileType.lowercased()
         }
-        
-        
-        if(isSetpasswordEnable && password.count <= 0){
-            showAlert()
-            return
-        }
+    
         
         NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
         
@@ -676,9 +674,16 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         })
     }
     
+    
     @objc func save() {
         
+        if(isSetpasswordEnable && password.count <= 0){
+            showAlert()
+            return
+        }
+          
         if(!isAtleastOneFiletypeSelected()){
+            
             let alertController = UIAlertController(title: "", message: NSLocalizedString("_no_file_type_selection_error_", comment: ""), preferredStyle: .alert)
             let alertWindow = UIWindow(frame: UIScreen.main.bounds)
             alertWindow.windowLevel = UIWindow.Level.alert
@@ -690,7 +695,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             
             alertController.addAction(actionOk)
             self.present(alertController, animated: true)
-        }else{
+        }else {
             // Request delete all image scanned
             let alertController = UIAlertController(title: "", message: NSLocalizedString("_saved_info_alert_", comment: ""), preferredStyle: .alert)
             let alertWindow = UIWindow(frame: UIScreen.main.bounds)
