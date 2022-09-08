@@ -431,14 +431,6 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         dropDown.selectionAction = { [weak self] (index, item) in
             searchField.resignFirstResponder()
             searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
-            guard let searchString = item.components(separatedBy: " ").first else { return }
-            if !NCUtility.shared.isValidEmail(searchString) {
-                let alert = UIAlertController(title: "", message: NSLocalizedString("_invalid_email_alert_", comment: ""), preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
-                self?.present(alert, animated: true)
-                self?.dropDown.hide()
-                return
-            }
             searchField.text = ""
             let sharee = sharees[index]
             if let ocId = self?.metadata?.ocId {
