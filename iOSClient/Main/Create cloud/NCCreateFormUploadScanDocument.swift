@@ -152,6 +152,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         XLFormViewController.cellClassesForRowDescriptorTypes()["NMCScanFolderPathCustomCell"] = ScanDocumentPathView.self
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "NMCScanFolderPathCustomCell", title: self.titleServerUrl)
         row.action.formSelector = #selector(changeDestinationFolder(_:))
+        row.cellConfig["backgroundColor"] = cellBackgoundColor
         row.cellConfig["folderImage.image"] =  UIImage(named: "folder")?.imageColor(NCBrandColor.shared.customer)
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -553,7 +554,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             
             // Update
             let row : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
-            //row.title = self.titleServerUrl
+            row.title = self.titleServerUrl
             row.cellConfig["photoLabel.text"] = self.titleServerUrl
             self.updateFormRow(row)
         }
@@ -1393,9 +1394,9 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
                 images.append(image)
             }
             
-            if let directory = CCUtility.getDirectoryScanDocuments() {
-                serverUrl = directory
-            }
+//            if let directory = CCUtility.getDirectoryScanDocuments() {
+//                serverUrl = directory
+//            }
             
             let formViewController = NCCreateFormUploadScanDocument.init(serverUrl: serverUrl, arrayImages: images)
             
