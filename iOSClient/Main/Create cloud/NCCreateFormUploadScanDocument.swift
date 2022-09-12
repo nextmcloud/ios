@@ -1394,10 +1394,6 @@ class NCCreateScanDocument : NSObject, VNDocumentCameraViewControllerDelegate {
                 images.append(image)
             }
             
-//            if let directory = CCUtility.getDirectoryScanDocuments() {
-//                serverUrl = directory
-//            }
-            
             let formViewController = NCCreateFormUploadScanDocument.init(serverUrl: serverUrl, arrayImages: images)
             
             formViewController.modalPresentationStyle = UIModalPresentationStyle.pageSheet
