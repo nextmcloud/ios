@@ -343,6 +343,8 @@ class NCGlobal: NSObject {
     
     let notificationCenterShareViewIn                           = "ShareViewIn"
     let notificationCenterShareAdvancePermission                = "ShareAdvancePermission"
+    let notificationCenterEditCommentAction                     = "EditCommentAction"
+    let notificationCenterDeleteCommentAction                   = "DeleteCommentAction"
     let notificationCenterShareSendEmail                        = "ShareSendEmail"
     let notificationCenterShareUnshare                          = "ShareUnshare"
     

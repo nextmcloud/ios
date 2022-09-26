@@ -656,6 +656,7 @@
 "_share_reshare_allowed_"       = "Resharing is allowed.";
 "_share_reshare_not_allowed_"   = "Resharing is not allowed.";
 "_shareLinksearch_placeholder_" = "Contact name or email address";
+"_message_placeholder_"         = "Write a message ...";
 "_new_comment_"                 = "New comment…";
 "_edit_comment_"                = "Edit comment";
 "_delete_comment_"              = "Delete comment";
@@ -681,10 +682,12 @@
 "_share_can_change_"            = "Can change";
 "_share_can_delete_"            = "Can delete";
 "_share_unshare_"               = "Unshare";
+"_delete_comment"               = "Delete Comment";
 "_share_internal_link_"         = "Internal link";
 "_share_internal_link_des_"     = "Only works for users with access to this folder";
 "_permissions_"                 = "Permissions";
 "_advance_permissions_"         = "Advanced permissions";
+"_edit_comment_"                = "Edit Comment";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
 "_your_shares_"                 = "Your Shares";
 "no_shares_created"             = "No shares created yet.";

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="NCCommentSectionCell" rowHeight="167" id="KGk-i7-Jjw" customClass="NCCommentSectionCell" customModule="Nextcloud" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="405" height="167"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="405" height="167"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="HansJoachim@gmail.com" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cbk-e0-8Nr">
+                        <rect key="frame" x="16" y="5" width="373" height="21"/>
+                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3 seconds ago" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MNJ-su-x9C">
+                        <rect key="frame" x="16" y="32" width="373" height="21"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rGq-dS-sRV">
+                        <rect key="frame" x="16" y="59" width="373" height="61"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WWV-Dc-pRN">
+                        <rect key="frame" x="345" y="5" width="50" height="25"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="50" id="Hn5-Y5-tWL"/>
+                            <constraint firstAttribute="height" constant="25" id="Mek-BH-nKe"/>
+                        </constraints>
+                        <state key="normal" title="Button" image="shareMenu">
+                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        </state>
+                        <connections>
+                            <action selector="editButtonClicked:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="ri0-lZ-1d5"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="cbk-e0-8Nr" secondAttribute="trailing" constant="16" id="0AM-Pq-OkZ"/>
+                    <constraint firstItem="cbk-e0-8Nr" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="HbN-yp-wjH"/>
+                    <constraint firstItem="rGq-dS-sRV" firstAttribute="leading" secondItem="cbk-e0-8Nr" secondAttribute="leading" id="Rre-MZ-1Ku"/>
+                    <constraint firstItem="WWV-Dc-pRN" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="Tc8-l9-pjy"/>
+                    <constraint firstItem="MNJ-su-x9C" firstAttribute="top" secondItem="cbk-e0-8Nr" secondAttribute="bottom" constant="6" id="eQ9-Kw-vr5"/>
+                    <constraint firstAttribute="trailing" secondItem="MNJ-su-x9C" secondAttribute="trailing" constant="16" id="eYC-m8-Ubo"/>
+                    <constraint firstAttribute="trailing" secondItem="WWV-Dc-pRN" secondAttribute="trailing" constant="10" id="em0-nD-u6Z"/>
+                    <constraint firstItem="MNJ-su-x9C" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="gZb-f5-5Qd"/>
+                    <constraint firstItem="cbk-e0-8Nr" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="osl-Xx-lDb"/>
+                    <constraint firstItem="rGq-dS-sRV" firstAttribute="top" secondItem="MNJ-su-x9C" secondAttribute="bottom" constant="6" id="qEB-fJ-06Z"/>
+                    <constraint firstItem="rGq-dS-sRV" firstAttribute="trailing" secondItem="cbk-e0-8Nr" secondAttribute="trailing" id="she-hW-LKG"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <connections>
+                <outlet property="discriptionLabel" destination="rGq-dS-sRV" id="PZt-mB-wPq"/>
+                <outlet property="editCommentButton" destination="WWV-Dc-pRN" id="R4E-Ra-Dfh"/>
+                <outlet property="nameLabel" destination="cbk-e0-8Nr" id="a7m-3e-qTH"/>
+                <outlet property="timeLabel" destination="MNJ-su-x9C" id="vxw-B2-iuq"/>
+            </connections>
+            <point key="canvasLocation" x="199.27536231884059" y="116.85267857142857"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="shareMenu" width="500" height="500"/>
+    </resources>
+</document>

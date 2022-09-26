@@ -41,6 +41,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     public  var tableShareSelected: tableShare?
     private var quickStatusTableShare: tableShare!
     private var shareeEmail: String!
+    var isShareSelected: Bool = true
+    let textView = UITextView(frame: CGRect.zero)
 
     // MARK: - View Life Cycle
     
@@ -48,12 +50,16 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         super.viewDidLoad()
         
         view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        
-        //        viewContainerConstraint.constant = height
+
         tableView.dataSource = self
         tableView.delegate = self
         tableView.allowsSelection = false
         tableView.backgroundColor = NCBrandColor.shared.systemBackground
+        
+        tableView.register(UINib.init(nibName: "CommentShareButtonSelectionTableViewCell", bundle: nil), forCellReuseIdentifier: "CommentShareButtonSelectionTableViewCell")
+        tableView.register(UINib.init(nibName: "NCCommentSectionTextFieldCell", bundle: nil), forCellReuseIdentifier: "NCCommentSectionTextFieldCell")
+        tableView.register(UINib.init(nibName: "NCCommentDaySectionCell", bundle: nil), forCellReuseIdentifier: "NCCommentDaySectionCell")
+        tableView.register(UINib.init(nibName: "NCCommentSectionCell", bundle: nil), forCellReuseIdentifier: "NCCommentSectionCell")
         
         tableView.register(UINib.init(nibName: "NCShareLinkCell", bundle: nil), forCellReuseIdentifier: "cellLink")
         tableView.register(UINib.init(nibName: "NCShareUserCell", bundle: nil), forCellReuseIdentifier: "cellUser")
@@ -76,6 +82,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         
         NotificationCenter.default.addObserver(self, selector: #selector(shareMenuViewInClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareViewIn), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(shareMenuAdvancePermissionClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareAdvancePermission), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(editCommentMenuActionClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterEditCommentAction), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(deleteCommentMenuActionClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDeleteCommentAction), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(shareMenuSendEmailClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareSendEmail), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(shareMenuUnshareClicked), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareUnshare), object: nil)
         
@@ -150,6 +158,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterEditCommentAction)
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteCommentAction)
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
     }
     
@@ -567,6 +577,54 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         }
     }
     
+    @objc func editCommentMenuActionClicked(notification: NSNotification) {
+        let alertController = UIAlertController(title: "Edit Comment \n\n\n\n\n", message: nil, preferredStyle: .alert)
+
+           let cancelAction = UIAlertAction.init(title: "Cancel", style: .default) { (action) in
+               alertController.view.removeObserver(self, forKeyPath: "bounds")
+           }
+           alertController.addAction(cancelAction)
+
+           let saveAction = UIAlertAction(title: "Done", style: .default) { (action) in
+               alertController.view.removeObserver(self, forKeyPath: "bounds")
+           }
+           alertController.addAction(saveAction)
+
+           alertController.view.addObserver(self, forKeyPath: "bounds", options: NSKeyValueObservingOptions.new, context: nil)
+           textView.backgroundColor = UIColor.white
+           textView.textContainerInset = UIEdgeInsets.init(top: 8, left: 5, bottom: 8, right: 5)
+           textView.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt."
+           alertController.view.addSubview(self.textView)
+
+           self.present(alertController, animated: true, completion: nil)
+       }
+
+       override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+           if keyPath == "bounds"{
+               if let rect = (change?[NSKeyValueChangeKey.newKey] as? NSValue)?.cgRectValue {
+                   let margin: CGFloat = 8
+                   let xPos = rect.origin.x + margin
+                   let yPos = rect.origin.y + 55
+                   let width = rect.width - 2 * margin
+                   let height: CGFloat = 90
+
+                   textView.frame = CGRect.init(x: xPos, y: yPos, width: width, height: height)
+               }
+           }
+       
+        print(" Edit Action Executed")
+        
+    }
+    
+    @objc func deleteCommentMenuActionClicked(notification: NSNotification) {
+        let alert = UIAlertController(title: "Alert", message: "The Comment is deleted", preferredStyle: .alert)
+        let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(ok)
+        present(alert, animated: true, completion: nil)
+        print("Delete Action Executed")
+        
+    }
+    
     @objc func shareMenuSendEmailClicked(notification: NSNotification) {
         guard let index = notification.object as? Int else { return }
         if let tableShared = (tableShareSelected?.isInvalidated ?? false) ? getShareFromIndex(index: index) : tableShareSelected {
@@ -683,30 +741,70 @@ extension NCShare: UITextFieldDelegate {
     }
 }
 
+extension NCShare: NCCommentMenuCellDelegate {
+  
+    func tapMenu() {
+        let commentMenu = NCCommentMenu()
+        commentMenu.toggleMenu(viewController: self)
+    }
+    
+
+}
+
 // MARK: - UITableViewDelegate
 
 extension NCShare: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return indexPath.row == 0 ? UITableView.automaticDimension : 60
+      
+        if indexPath.row == 0 {
+            return  UITableView.automaticDimension
+            
+        } else if isShareSelected {
+            var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+                    if let shareLink = shares.firstShareLink {
+                        shares.share?.insert(shareLink, at: 0)
+                    }
+            if indexPath.row >= 2 {
+                let tableShare = shares.share![indexPath.row - 2]
+                if tableShare.shareType == 3 {
+                    return 70
+                }
+            }
+                return 300
+        
+        } else {
+            // indexPath.row == 3 ? return 100 : return 70
+            if indexPath.row == 3 {
+                return 100 // name label
+            }
+            else {
+                return 70 // today
+            }
+        }
+        
     }
 }
+
+
 
 // MARK: - UITableViewDataSource
 
 extension NCShare: UITableViewDataSource {
-    
+  
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    
+   
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+      
         let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
         var numOfRows = 0
         var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
         if let shareLink = shares.firstShareLink {
             shares.share?.insert(shareLink, at: 0)
         }
+    
         
         self.tableView.setEmptyMessage(NSLocalizedString("", comment: ""))
         if shares.share != nil {
@@ -722,21 +820,52 @@ extension NCShare: UITableViewDataSource {
         } else {
             self.tableView.restore()
         }
-        return canReshare ? (numOfRows + 1) : numOfRows
+        
+        numOfRows += 2
+        if !isShareSelected {
+            for messageView in self.tableView.subviews.filter({$0.tag == 999}){
+                messageView.removeFromSuperview()
+              
+            }
+           return 4
+        }
+        return numOfRows
     }
+    
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("")
     }
     
+   
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if indexPath.row == 0 {
+            return commentShareButtonCell(tableView, cellForRowAt: indexPath)
+        }
+        if !isShareSelected {
+            if indexPath.row == 1 {
+                return commentSectionTextFieldCell(tableView, cellForRowAt: indexPath)
+            }
+            if indexPath.row == 2 {
+                return CommentDaySectionCell(tableView, cellForRowAt: indexPath)
+
+            }
+         
+            return commentSectionCell(tableView, cellForRowAt: indexPath)
+           
+        }
+    
+            
+        if indexPath.row == 1 {
             let cell = tableView.dequeueReusableCell(withIdentifier: "NCShareEmailFieldCell", for: indexPath) as! NCShareEmailFieldCell
+            cell.labelSharingInfo.textColor = NCBrandColor.shared.label
             cell.searchField.addTarget(self, action: #selector(searchFieldDidEndOnExit(textField:)), for: .editingDidEndOnExit)
             cell.searchField.addTarget(self, action: #selector(searchFieldDidChange(textField:)), for: .editingChanged)
             cell.searchField.delegate = self
             cell.btnCreateLink.addTarget(self, action: #selector(createLinkClicked(_:)), for: .touchUpInside)
+            cell.ocId = metadata!.ocId
+            cell.updateCanReshareUI()
             return cell
         }
         
@@ -744,7 +873,7 @@ extension NCShare: UITableViewDataSource {
         if let shareLink = shares.firstShareLink {
             shares.share?.insert(shareLink, at: 0)
         }
-        let tableShare = shares.share![indexPath.row - 1]
+        let tableShare = shares.share![indexPath.row - 2]
         let directory = self.metadata?.directory ?? false
         
         // LINK
@@ -761,8 +890,8 @@ extension NCShare: UITableViewDataSource {
                 }
                 
                 cell.labelTitle.textColor = NCBrandColor.shared.label
-                cell.indexSelected = indexPath.row - 1
-                cell.btnQuickStatus.tag = indexPath.row - 1
+                cell.indexSelected = indexPath.row - 2
+                cell.btnQuickStatus.tag = indexPath.row - 2
                 
                 if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
                     cell.labelQuickStatus.text = NSLocalizedString("_share_file_drop_", comment: "")
@@ -803,8 +932,8 @@ extension NCShare: UITableViewDataSource {
                 cell.labelCanEdit.isHidden = true//false
                 cell.buttonMenu.isHidden = false
                 cell.imageItem.image = NCShareCommon.shared.getImageShareType(shareType: tableShare.shareType)
-                cell.indexSelected = indexPath.row - 1
-                cell.btnQuickStatus.tag = indexPath.row - 1
+                cell.indexSelected = indexPath.row - 2
+                cell.btnQuickStatus.tag = indexPath.row - 2
                 
                 let status = NCUtility.shared.getUserStatus(userIcon: tableShare.userIcon, userStatus: tableShare.userStatus, userMessage: tableShare.userMessage)
                 cell.imageStatus.image = status.onlineStatus
@@ -875,8 +1004,8 @@ extension NCShare: UITableViewDataSource {
                 cell.labelCanEdit.isHidden = true//false
                 cell.buttonMenu.isHidden = false
                 cell.imageItem.image = NCShareCommon.shared.getImageShareType(shareType: tableShare.shareType)
-                cell.indexSelected = indexPath.row - 1
-                cell.btnQuickStatus.tag = indexPath.row - 1
+                cell.indexSelected = indexPath.row - 2
+                cell.btnQuickStatus.tag = indexPath.row - 2
                 
                 let status = NCUtility.shared.getUserStatus(userIcon: tableShare.userIcon, userStatus: tableShare.userStatus, userMessage: tableShare.userMessage)
                 cell.imageStatus.image = status.onlineStatus
@@ -936,6 +1065,75 @@ extension NCShare: UITableViewDataSource {
         
         return UITableViewCell()
     }
+    
+    func CommentDaySectionCell(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "NCCommentDaySectionCell", for: indexPath) as? NCCommentDaySectionCell
+         {
+            cell.updateDaySection(isCommentSelected: true)
+         
+            return cell
+        }
+        
+        
+        return UITableViewCell()
+    }
+    
+    func commentSectionCell(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "NCCommentSectionCell", for: indexPath) as? NCCommentSectionCell
+         {
+            cell.delegate = self
+            cell.commentSection(isCommentSelected: true)
+         
+            return cell
+        }
+        
+        return UITableViewCell()
+    }
+    
+    func commentSectionTextFieldCell(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+       if let cell = tableView.dequeueReusableCell(withIdentifier: "NCCommentSectionTextFieldCell", for: indexPath) as? NCCommentSectionTextFieldCell
+        {
+           cell.updateCommentSectionUI(isCommentSelected: true)
+        
+           return cell
+       }
+        
+        return UITableViewCell()
+    }
+    
+    
+    
+    func commentShareButtonCell(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+      
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "CommentShareButtonSelectionTableViewCell", for: indexPath) as? CommentShareButtonSelectionTableViewCell
+            
+        {
+            cell.updateUI(isShareSelected: self.isShareSelected)
+            cell.shareButton.addTarget(self, action: #selector(shareAction), for: .touchUpInside)
+            cell.commentButton.addTarget(self, action: #selector(commentAction), for: .touchUpInside)
+            return cell
+        }
+       
+        return UITableViewCell()
+    }
+    
+    
+    
+    
+    
+    @objc func shareAction() {
+        isShareSelected = true
+        tableView.reloadData()
+    }
+    
+    @objc func commentAction() {
+        
+        isShareSelected = false
+        
+        tableView.reloadData()
+            
+    }
+    
     //    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
     //        return "Share Header"
     //    }
@@ -943,11 +1141,9 @@ extension NCShare: UITableViewDataSource {
         let headerView = Bundle.main.loadNibNamed("NCShareHeaderView", owner: self, options: nil)?.first as! NCShareHeaderView
         headerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         headerView.fileName.textColor = NCBrandColor.shared.label
-        headerView.labelSharing.textColor = NCBrandColor.shared.label
-        headerView.labelSharingInfo.textColor = NCBrandColor.shared.label
         headerView.info.textColor = NCBrandColor.shared.systemGray2
         headerView.ocId = metadata!.ocId
-        headerView.updateCanReshareUI()
+       
         
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag)) {
             //            headerView.imageView.image = UIImage.init(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata!.ocId, etag: metadata!.etag))
@@ -979,10 +1175,10 @@ extension NCShare: UITableViewDataSource {
         
     }
     func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-        return 320
+        return 230
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 320
+        return 230
     }
     
 }
@@ -1049,7 +1245,7 @@ class NCShareUserDropDownCell: DropDownCell {
 
 extension UITableView {
     func setEmptyMessage(_ message: String) {
-        let messageLabel = UILabel(frame: CGRect(x: 10, y: 515, width: self.bounds.size.width, height: 20))
+        let messageLabel = UILabel(frame: CGRect(x: 16, y: 527, width: self.bounds.size.width, height: 20))
         messageLabel.text = message
         messageLabel.textColor = NCBrandColor.shared.textInfo
         messageLabel.numberOfLines = 0
@@ -1068,6 +1264,7 @@ extension UITableView {
 
 enum Tag {
     static let searchField = 999
+    static let commmentSearchField = 999
 }
 
 class NCShareEmailFieldCell: UITableViewCell {
@@ -1075,6 +1272,12 @@ class NCShareEmailFieldCell: UITableViewCell {
     @IBOutlet weak var btnCreateLink: UIButton!
     @IBOutlet weak var labelYourShare: UILabel!
     @IBOutlet weak var labelShareByMail: UILabel!
+    @IBOutlet weak var labelSharingInfo: UILabel!
+    @IBOutlet weak var canShareInfoView: UIView!
+    @IBOutlet weak var sharedByLabel: UILabel!
+    @IBOutlet weak var resharingAllowedLabel: UILabel!
+    @IBOutlet weak var sharedByImageView: UIImageView!
+    var ocId = ""
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -1082,6 +1285,9 @@ class NCShareEmailFieldCell: UITableViewCell {
     }
     
     func setupCell(){
+        
+        labelSharingInfo.text = NSLocalizedString("_sharing_message_", comment: "")
+        
         self.btnCreateLink.setTitle(NSLocalizedString("_create_link_", comment: ""), for: .normal)
         self.btnCreateLink.layer.cornerRadius = 7
         self.btnCreateLink.layer.masksToBounds = true
@@ -1108,6 +1314,31 @@ class NCShareEmailFieldCell: UITableViewCell {
         searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
         searchField.tag = Tag.searchField
         setDoneButton(sender: searchField)
+    }
+    
+    func updateCanReshareUI() {
+        let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+        var isCurrentUser = true
+        if let ownerId = metadata?.ownerId, !ownerId.isEmpty {
+            isCurrentUser = NCShareCommon.shared.isCurrentUserIsFileOwner(fileOwnerId: ownerId)
+        }
+        let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
+        canShareInfoView.isHidden = isCurrentUser
+        labelSharingInfo.isHidden = !isCurrentUser
+        
+        if !isCurrentUser {
+            sharedByImageView.image = UIImage(named: "cloudUpload")?.image(color: .systemBlue, size: 26)
+            let ownerName = metadata?.ownerDisplayName ?? ""
+            sharedByLabel.text = NSLocalizedString("_shared_with_you_by_", comment: "") + " " + ownerName
+            let resharingAllowedMessage =  NSLocalizedString("_share_reshare_allowed_", comment: "")
+            let resharingNotAllowedMessage = NSLocalizedString("_share_reshare_not_allowed_", comment: "")
+            resharingAllowedLabel.text = canReshare ? resharingAllowedMessage  : resharingNotAllowedMessage
+            searchField.isHidden = !canReshare
+            labelShareByMail.isHidden =  !canReshare
+            btnCreateLink.isHidden = !canReshare
+            labelYourShare.isHidden = !canReshare
+            
+        }
     }
     
     @objc func cancelDatePicker() {

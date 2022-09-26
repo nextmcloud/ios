@@ -644,6 +644,8 @@
 "_share_can_change_"            = "kann ändern";
 "_share_can_delete_"            = "kann löschen";
 "_share_unshare_"               = "Freigabe aufheben";
+"_edit_comment_"                = "Edit Comment";
+"_delete_comment"               = "Delete Comment";
 "_share_internal_link_"         = "Interner Link";
 "_share_internal_link_des_"     = "Funktioniert nur für Benutzer, die Zugriff auf diesen Ordner haben";
 "_permissions_"                 = "Berechtigungen";
