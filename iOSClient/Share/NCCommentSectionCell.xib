@@ -5,6 +5,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -29,12 +30,13 @@
                         <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt." textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rGq-dS-sRV">
-                        <rect key="frame" x="16" y="59" width="373" height="61"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
+                    <textView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" editable="NO" text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt." textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t12-ui-tuz">
+                        <rect key="frame" x="16" y="59" width="373" height="96"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="textColor" systemColor="labelColor"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                    </textView>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WWV-Dc-pRN">
                         <rect key="frame" x="345" y="5" width="50" height="25"/>
                         <constraints>
@@ -52,20 +54,20 @@
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="cbk-e0-8Nr" secondAttribute="trailing" constant="16" id="0AM-Pq-OkZ"/>
                     <constraint firstItem="cbk-e0-8Nr" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="HbN-yp-wjH"/>
-                    <constraint firstItem="rGq-dS-sRV" firstAttribute="leading" secondItem="cbk-e0-8Nr" secondAttribute="leading" id="Rre-MZ-1Ku"/>
                     <constraint firstItem="WWV-Dc-pRN" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="Tc8-l9-pjy"/>
+                    <constraint firstItem="t12-ui-tuz" firstAttribute="top" secondItem="MNJ-su-x9C" secondAttribute="bottom" constant="6" id="Z4g-rl-Whf"/>
                     <constraint firstItem="MNJ-su-x9C" firstAttribute="top" secondItem="cbk-e0-8Nr" secondAttribute="bottom" constant="6" id="eQ9-Kw-vr5"/>
                     <constraint firstAttribute="trailing" secondItem="MNJ-su-x9C" secondAttribute="trailing" constant="16" id="eYC-m8-Ubo"/>
                     <constraint firstAttribute="trailing" secondItem="WWV-Dc-pRN" secondAttribute="trailing" constant="10" id="em0-nD-u6Z"/>
                     <constraint firstItem="MNJ-su-x9C" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="gZb-f5-5Qd"/>
+                    <constraint firstItem="t12-ui-tuz" firstAttribute="leading" secondItem="cbk-e0-8Nr" secondAttribute="leading" id="mVh-XA-5WZ"/>
                     <constraint firstItem="cbk-e0-8Nr" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="osl-Xx-lDb"/>
-                    <constraint firstItem="rGq-dS-sRV" firstAttribute="top" secondItem="MNJ-su-x9C" secondAttribute="bottom" constant="6" id="qEB-fJ-06Z"/>
-                    <constraint firstItem="rGq-dS-sRV" firstAttribute="trailing" secondItem="cbk-e0-8Nr" secondAttribute="trailing" id="she-hW-LKG"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="t12-ui-tuz" secondAttribute="bottom" constant="1" id="tvH-nj-nQ6"/>
+                    <constraint firstItem="t12-ui-tuz" firstAttribute="trailing" secondItem="cbk-e0-8Nr" secondAttribute="trailing" id="ylM-QM-lbP"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
-                <outlet property="discriptionLabel" destination="rGq-dS-sRV" id="PZt-mB-wPq"/>
                 <outlet property="editCommentButton" destination="WWV-Dc-pRN" id="R4E-Ra-Dfh"/>
                 <outlet property="nameLabel" destination="cbk-e0-8Nr" id="a7m-3e-qTH"/>
                 <outlet property="timeLabel" destination="MNJ-su-x9C" id="vxw-B2-iuq"/>
@@ -75,5 +77,11 @@
     </objects>
     <resources>
         <image name="shareMenu" width="500" height="500"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>

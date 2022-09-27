@@ -765,18 +765,23 @@ extension NCShare: UITableViewDelegate {
                     if let shareLink = shares.firstShareLink {
                         shares.share?.insert(shareLink, at: 0)
                     }
-            if indexPath.row >= 2 {
+            if indexPath.row >= 2 {  // link to folder spacing
                 let tableShare = shares.share![indexPath.row - 2]
                 if tableShare.shareType == 3 {
                     return 70
                 }
             }
+            if shares.share?.count == 0 {  // links
                 return 300
+            } else {
+                return 250
+            }
+               
         
         } else {
             // indexPath.row == 3 ? return 100 : return 70
             if indexPath.row == 3 {
-                return 100 // name label
+                return 150 // name label
             }
             else {
                 return 70 // today
