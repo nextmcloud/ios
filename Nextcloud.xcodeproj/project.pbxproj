@@ -161,6 +161,15 @@
 		56D88E192876CB0400B72455 /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = 56D88E182876CB0400B72455 /* NCCommunication */; };
 		56D88E1B2876CB1A00B72455 /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = 56D88E1A2876CB1A00B72455 /* NCCommunication */; };
 		56D88E1D2876CB2700B72455 /* NCCommunication in Frameworks */ = {isa = PBXBuildFile; productRef = 56D88E1C2876CB2700B72455 /* NCCommunication */; };
+		56D8C47828E41CB1004C8C78 /* NCCommentSectionTextFieldCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56D8C46F28E41CB0004C8C78 /* NCCommentSectionTextFieldCell.xib */; };
+		56D8C47928E41CB1004C8C78 /* NCCommentMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D8C47028E41CB0004C8C78 /* NCCommentMenu.swift */; };
+		56D8C47A28E41CB1004C8C78 /* CommentShareButtonSelectionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56D8C47128E41CB0004C8C78 /* CommentShareButtonSelectionTableViewCell.xib */; };
+		56D8C47B28E41CB1004C8C78 /* NCCommentDaySectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D8C47228E41CB0004C8C78 /* NCCommentDaySectionCell.swift */; };
+		56D8C47C28E41CB1004C8C78 /* NCCommentSectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56D8C47328E41CB1004C8C78 /* NCCommentSectionCell.xib */; };
+		56D8C47D28E41CB1004C8C78 /* NCCommentDaySectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56D8C47428E41CB1004C8C78 /* NCCommentDaySectionCell.xib */; };
+		56D8C47E28E41CB1004C8C78 /* NCCommentSectionTextFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D8C47528E41CB1004C8C78 /* NCCommentSectionTextFieldCell.swift */; };
+		56D8C47F28E41CB1004C8C78 /* CommentShareButtonSelectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D8C47628E41CB1004C8C78 /* CommentShareButtonSelectionTableViewCell.swift */; };
+		56D8C48028E41CB1004C8C78 /* NCCommentSectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D8C47728E41CB1004C8C78 /* NCCommentSectionCell.swift */; };
 		56DF5C5C28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56DF5C5B28C1DF9B003668C5 /* GoogleService-Info.plist */; };
 		56DF5C5D28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56DF5C5B28C1DF9B003668C5 /* GoogleService-Info.plist */; };
 		56DF5C5E28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56DF5C5B28C1DF9B003668C5 /* GoogleService-Info.plist */; };
@@ -646,6 +655,15 @@
 		56CAF29128785FC700DB870E /* TealiumHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
 		56CAF29228785FC700DB870E /* AdjustHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
 		56CAF29328785FC700DB870E /* AdjustHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
+		56D8C46F28E41CB0004C8C78 /* NCCommentSectionTextFieldCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCCommentSectionTextFieldCell.xib; sourceTree = "<group>"; };
+		56D8C47028E41CB0004C8C78 /* NCCommentMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCommentMenu.swift; sourceTree = "<group>"; };
+		56D8C47128E41CB0004C8C78 /* CommentShareButtonSelectionTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CommentShareButtonSelectionTableViewCell.xib; sourceTree = "<group>"; };
+		56D8C47228E41CB0004C8C78 /* NCCommentDaySectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCommentDaySectionCell.swift; sourceTree = "<group>"; };
+		56D8C47328E41CB1004C8C78 /* NCCommentSectionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCCommentSectionCell.xib; sourceTree = "<group>"; };
+		56D8C47428E41CB1004C8C78 /* NCCommentDaySectionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCCommentDaySectionCell.xib; sourceTree = "<group>"; };
+		56D8C47528E41CB1004C8C78 /* NCCommentSectionTextFieldCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCommentSectionTextFieldCell.swift; sourceTree = "<group>"; };
+		56D8C47628E41CB1004C8C78 /* CommentShareButtonSelectionTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommentShareButtonSelectionTableViewCell.swift; sourceTree = "<group>"; };
+		56D8C47728E41CB1004C8C78 /* NCCommentSectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCommentSectionCell.swift; sourceTree = "<group>"; };
 		56DF5C5B28C1DF9B003668C5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		56E92D9F287E9A5300399818 /* NCPlayerToolBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCPlayerToolBar.swift; sourceTree = "<group>"; };
 		56E92DA0287E9A5300399818 /* NCPlayerToolBar.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCPlayerToolBar.xib; sourceTree = "<group>"; };
@@ -1491,6 +1509,15 @@
 		F728CE741BF6322C00E69702 /* Share */ = {
 			isa = PBXGroup;
 			children = (
+				56D8C47628E41CB1004C8C78 /* CommentShareButtonSelectionTableViewCell.swift */,
+				56D8C47128E41CB0004C8C78 /* CommentShareButtonSelectionTableViewCell.xib */,
+				56D8C47228E41CB0004C8C78 /* NCCommentDaySectionCell.swift */,
+				56D8C47428E41CB1004C8C78 /* NCCommentDaySectionCell.xib */,
+				56D8C47028E41CB0004C8C78 /* NCCommentMenu.swift */,
+				56D8C47728E41CB1004C8C78 /* NCCommentSectionCell.swift */,
+				56D8C47328E41CB1004C8C78 /* NCCommentSectionCell.xib */,
+				56D8C47528E41CB1004C8C78 /* NCCommentSectionTextFieldCell.swift */,
+				56D8C46F28E41CB0004C8C78 /* NCCommentSectionTextFieldCell.xib */,
 				56E9B352287C3A4D00F1D413 /* NCShareUserDropDownCell.xib */,
 				5690BB3E287C1B65007115BF /* NCSearchUserDropDownCell.xib */,
 				5690BB3F287C1B65007115BF /* NCShare+NCCellDelegate.swift */,
@@ -2595,6 +2622,7 @@
 				564A96F4287C0ADF00D6F3A1 /* SaveSettingsCustomButtonCell.xib in Resources */,
 				56F260FD27D2276900365F78 /* NCShareSectionHeaderView.xib in Resources */,
 				56E9FBBA287828820006B408 /* NCActivityCommentView.xib in Resources */,
+				56D8C47A28E41CB1004C8C78 /* CommentShareButtonSelectionTableViewCell.xib in Resources */,
 				F76032A0252F0F8E0015A421 /* NCTransferCell.xib in Resources */,
 				F74C0437253F1CDC009762AB /* NCShares.storyboard in Resources */,
 				C0D6063426C3E4F500B67843 /* NCShareHeaderCustomCell.xib in Resources */,
@@ -2604,6 +2632,7 @@
 				F7CA212E25F1333300826ABB /* NCAccountRequest.storyboard in Resources */,
 				F749C10E23C4A5340027D966 /* NCIntroCollectionViewCell.xib in Resources */,
 				56DF5C5C28C1DF9B003668C5 /* GoogleService-Info.plist in Resources */,
+				56D8C47828E41CB1004C8C78 /* NCCommentSectionTextFieldCell.xib in Resources */,
 				5610960C2876B50500292C4C /* NCRenameFile.storyboard in Resources */,
 				F717402D24F699A5000C87D5 /* NCFavorite.storyboard in Resources */,
 				F723B3DD22FC6D1D00301EFE /* NCShareCommentsCell.xib in Resources */,
@@ -2641,6 +2670,7 @@
 				F73B422B2476764F00A30FD3 /* NCNotification.storyboard in Resources */,
 				7A70DE3727B6242E0018F47E /* NCCreateFormUploadDocuments.storyboard in Resources */,
 				F7D1612023CF19E30039EBBF /* NCViewerRichWorkspace.storyboard in Resources */,
+				56D8C47D28E41CB1004C8C78 /* NCCommentDaySectionCell.xib in Resources */,
 				56E9B353287C3A4D00F1D413 /* NCShareUserDropDownCell.xib in Resources */,
 				F77B0F631D118A16002130FE /* Localizable.strings in Resources */,
 				F7632FC1218353AA00721B71 /* NCTrashSectionFooter.xib in Resources */,
@@ -2662,6 +2692,7 @@
 				564A96FA287C0DA600D6F3A1 /* RequiredDataCollectionSwitch.xib in Resources */,
 				C07020EC267B45AE00E094AD /* NCPermissionMenuView.xib in Resources */,
 				F74DE14425135B6800917068 /* NCTransfers.storyboard in Resources */,
+				56D8C47C28E41CB1004C8C78 /* NCCommentSectionCell.xib in Resources */,
 				F77910A525DD517B00CEDB9E /* Settings.bundle in Resources */,
 				56E9FB712877EF3D0006B408 /* TextFileWithOcrSwitchView.xib in Resources */,
 				56E9B34C287C281100F1D413 /* NCGridCell.xib in Resources */,
@@ -2981,6 +3012,7 @@
 				56A5108627B2D03E00D9F3E6 /* NCUserBaseUrl.swift in Sources */,
 				56E9B33F287C203200F1D413 /* NCSubtitlePlayer.swift in Sources */,
 				56F260FA27D2264200365F78 /* NCShareSectionHeaderView.swift in Sources */,
+				56D8C48028E41CB1004C8C78 /* NCCommentSectionCell.swift in Sources */,
 				F77444F8222816D5000D5EB0 /* NCPickerViewController.swift in Sources */,
 				F72A47EC2487B06B005AD489 /* NCOperationQueue.swift in Sources */,
 				5610960128769C7F00292C4C /* UIAlertController+Extension.swift in Sources */,
@@ -2995,6 +3027,7 @@
 				8402B128288920F800CBAC94 /* TextTableViewCell.swift in Sources */,
 				565B11C7287581F3006998FA /* NCAudioRecorderViewController.swift in Sources */,
 				F738E8421F90FFD100F95C8E /* NCManageEndToEndEncryption.m in Sources */,
+				56D8C47B28E41CB1004C8C78 /* NCCommentDaySectionCell.swift in Sources */,
 				F7A80BCB252624C100C7CD01 /* NCFileViewInFolder.swift in Sources */,
 				F78A18B823CDE2B300F681F3 /* NCViewerRichWorkspace.swift in Sources */,
 				F77910AB25DD53C700CEDB9E /* NCSettingsBundleHelper.swift in Sources */,
@@ -3038,6 +3071,7 @@
 				F7682FE023C36B0500983A04 /* NCMainTabBar.swift in Sources */,
 				F7A0D1352591FBC5008F8A13 /* String+Extensions.swift in Sources */,
 				56E9B32B287C1E5000F1D413 /* NCActivity.swift in Sources */,
+				56D8C47928E41CB1004C8C78 /* NCCommentMenu.swift in Sources */,
 				F77B0E5F1D118A16002130FE /* NCSettings.m in Sources */,
 				F7F9D1BB25397CE000D9BFF5 /* NCViewer.swift in Sources */,
 				F70460522499061800BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
@@ -3124,6 +3158,7 @@
 				F745B253222D88AE00346520 /* NCLoginQRCode.swift in Sources */,
 				F769454822E9F20D000A798A /* NCShareNetworking.swift in Sources */,
 				5610960228769EEF00292C4C /* NCSelectableNavigationView.swift in Sources */,
+				56D8C47F28E41CB1004C8C78 /* CommentShareButtonSelectionTableViewCell.swift in Sources */,
 				F7725A60251F33BB00D125E0 /* NCFiles.swift in Sources */,
 				F704B5E52430AA8000632F5F /* NCCreateFormUploadConflict.swift in Sources */,
 				C0D6060C26C2A12300B67843 /* NCShareAdvancePermissionHeader.swift in Sources */,
@@ -3139,6 +3174,7 @@
 				F75AC2431F1F62450073EC19 /* NCManageAutoUploadFileName.swift in Sources */,
 				F7C7B489245EBA4100D93E60 /* NCViewerQuickLook.swift in Sources */,
 				564A9701287C0E0900D6F3A1 /* AnalysisDataCollectionSwitch.swift in Sources */,
+				56D8C47E28E41CB1004C8C78 /* NCCommentSectionTextFieldCell.swift in Sources */,
 				F77B0ED11D118A16002130FE /* Acknowledgements.m in Sources */,
 				F7D96FCC246ED7E200536D73 /* NCNetworkingCheckRemoteUser.swift in Sources */,
 				8402B1332889245200CBAC94 /* SubFolderCustomCell.swift in Sources */,
@@ -3563,9 +3599,9 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3622,9 +3658,9 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

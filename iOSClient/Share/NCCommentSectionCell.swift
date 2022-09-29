@@ -12,7 +12,7 @@ class NCCommentSectionCell: UITableViewCell {
 
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var timeLabel: UILabel!
-    @IBOutlet weak var discriptionLabel: UILabel!
+    @IBOutlet weak var descriptionTextView: UITextView!
     @IBOutlet weak var editCommentButton: UIButton!
     weak var delegate: NCCommentMenuCellDelegate?
   
@@ -20,6 +20,7 @@ class NCCommentSectionCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        descriptionTextView.textContainer.lineFragmentPadding = 0
         
     }
 

@@ -756,37 +756,39 @@ extension NCShare: NCCommentMenuCellDelegate {
 extension NCShare: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-      
-        if indexPath.row == 0 {
-            return  UITableView.automaticDimension
-            
-        } else if isShareSelected {
-            var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
-                    if let shareLink = shares.firstShareLink {
-                        shares.share?.insert(shareLink, at: 0)
-                    }
-            if indexPath.row >= 2 {  // link to folder spacing
-                let tableShare = shares.share![indexPath.row - 2]
-                if tableShare.shareType == 3 {
-                    return 70
-                }
-            }
-            if shares.share?.count == 0 {  // links
-                return 300
-            } else {
-                return 250
-            }
-               
-        
-        } else {
-            // indexPath.row == 3 ? return 100 : return 70
-            if indexPath.row == 3 {
-                return 150 // name label
-            }
-            else {
-                return 70 // today
-            }
-        }
+        return UITableView.automaticDimension
+//        return indexPath.row == 0 ? UITableView.automaticDimension : 60
+
+//        if indexPath.row == 0 {
+//            return  UITableView.automaticDimension
+//
+//        } else if isShareSelected {
+//            var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+//                    if let shareLink = shares.firstShareLink {
+//                        shares.share?.insert(shareLink, at: 0)
+//                    }
+//            if indexPath.row >= 2 {  // link to folder spacing
+//                let tableShare = shares.share![indexPath.row - 2]
+//                if tableShare.shareType == 3 {
+//                    return 70
+//                }
+//            }
+//            if shares.share?.count == 0 {  // links
+//                return 300
+//            } else {
+//                return 250
+//            }
+//
+//
+//        } else {
+//            // indexPath.row == 3 ? return 100 : return 70
+//            if indexPath.row == 3 {
+//                return 150 // name label
+//            }
+//            else {
+//                return 70 // today
+//            }
+//        }
         
     }
 }
@@ -832,7 +834,7 @@ extension NCShare: UITableViewDataSource {
                 messageView.removeFromSuperview()
               
             }
-           return 4
+           return 5
         }
         return numOfRows
     }
@@ -1088,7 +1090,7 @@ extension NCShare: UITableViewDataSource {
          {
             cell.delegate = self
             cell.commentSection(isCommentSelected: true)
-         
+            cell.descriptionTextView.text = indexPath.row == 3 ? "have the current iOS MagentaCloud app 7.0.9.8 on iOS 15.6.1 (iPhone12) and cannot log in.  have the current iOS MagentaCloud app 7.0.9.8 on iOS 15.6.1 (iPhone12) and cannot log in.  have the current iOS MagentaCloud app 7.0.9.8 on iOS 15.6.1 (iPhone12) and cannot log in.  have the current iOS MagentaCloud app 7.0.9.8 on iOS 15.6.1 (iPhone12) and cannot log in." : "Error message: Unable to sign in, an error has occurred, please try again later"
             return cell
         }
         

@@ -20,7 +20,7 @@ class NCShareMenu: NSObject {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_open_in_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "viewInFolder").imageColor(NCBrandColor.shared.brandElement),
+                    icon: NCUtility.shared.loadImage(named: "viewInFolder",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareViewIn, object: index)
                     }
@@ -31,7 +31,7 @@ class NCShareMenu: NSObject {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_advance_permissions_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "rename").imageColor(NCBrandColor.shared.brandElement),
+                icon: NCUtility.shared.loadImage(named: "rename",color: NCBrandColor.shared.iconColor),
                 action: { menuAction in
                     NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareAdvancePermission, object: index)
                     //                    self.reloadDataSource()
@@ -43,7 +43,7 @@ class NCShareMenu: NSObject {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_send_new_email_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "email").imageColor(NCBrandColor.shared.brandElement),
+                    icon: NCUtility.shared.loadImage(named: "email",color: NCBrandColor.shared.iconColor),
                     action: { menuAction in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareSendEmail, object: index)
                         //                    self.reloadDataSource()
@@ -55,7 +55,7 @@ class NCShareMenu: NSObject {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_share_unshare_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "delete").imageColor(NCBrandColor.shared.brandElement),
+                icon: NCUtility.shared.loadImage(named: "delete",color: NCBrandColor.shared.iconColor),
                 action: { menuAction in
                     NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterShareUnshare, object: index)
                     //                    self.reloadDataSource()

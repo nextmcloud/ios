@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -18,56 +18,78 @@
                 <rect key="frame" x="0.0" y="0.0" width="405" height="167"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="HansJoachim@gmail.com" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cbk-e0-8Nr">
-                        <rect key="frame" x="16" y="5" width="373" height="21"/>
-                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
-                        <nil key="textColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3 seconds ago" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MNJ-su-x9C">
-                        <rect key="frame" x="16" y="32" width="373" height="21"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <textView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" editable="NO" text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt." textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t12-ui-tuz">
-                        <rect key="frame" x="16" y="59" width="373" height="96"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <color key="textColor" systemColor="labelColor"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                    </textView>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WWV-Dc-pRN">
-                        <rect key="frame" x="345" y="5" width="50" height="25"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3jh-Ia-6hr">
+                        <rect key="frame" x="16" y="0.0" width="378" height="151"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="HansJoachim@gmail.com" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cbk-e0-8Nr">
+                                <rect key="frame" x="0.0" y="0.0" width="346" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="18" id="L4q-tZ-ehq"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3 seconds ago" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MNJ-su-x9C">
+                                <rect key="frame" x="0.0" y="25" width="378" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="18" id="h6n-fD-vEX"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt." textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t12-ui-tuz">
+                                <rect key="frame" x="0.0" y="51" width="378" height="100"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="30" id="dBa-AR-4zC"/>
+                                </constraints>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WWV-Dc-pRN">
+                                <rect key="frame" x="354" y="-3" width="24" height="24"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="24" id="7aJ-1u-VlT"/>
+                                    <constraint firstAttribute="height" constant="24" id="p67-jf-6MR"/>
+                                </constraints>
+                                <state key="normal" image="shareMenu">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="editButtonClicked:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="ri0-lZ-1d5"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="50" id="Hn5-Y5-tWL"/>
-                            <constraint firstAttribute="height" constant="25" id="Mek-BH-nKe"/>
+                            <constraint firstItem="cbk-e0-8Nr" firstAttribute="leading" secondItem="3jh-Ia-6hr" secondAttribute="leading" id="IUu-yU-5vX"/>
+                            <constraint firstAttribute="trailing" secondItem="MNJ-su-x9C" secondAttribute="trailing" id="Ike-O1-JX8"/>
+                            <constraint firstItem="WWV-Dc-pRN" firstAttribute="leading" secondItem="cbk-e0-8Nr" secondAttribute="trailing" constant="8" id="P4r-k8-u4t"/>
+                            <constraint firstItem="t12-ui-tuz" firstAttribute="leading" secondItem="MNJ-su-x9C" secondAttribute="leading" id="Qb9-Ae-3Nv"/>
+                            <constraint firstItem="t12-ui-tuz" firstAttribute="trailing" secondItem="MNJ-su-x9C" secondAttribute="trailing" id="RRW-yV-gjD"/>
+                            <constraint firstAttribute="bottom" secondItem="t12-ui-tuz" secondAttribute="bottom" id="UWs-QG-KYL"/>
+                            <constraint firstItem="t12-ui-tuz" firstAttribute="top" secondItem="MNJ-su-x9C" secondAttribute="bottom" constant="8" id="X96-9c-xw4"/>
+                            <constraint firstItem="cbk-e0-8Nr" firstAttribute="centerY" secondItem="WWV-Dc-pRN" secondAttribute="centerY" id="a99-5q-Wrc"/>
+                            <constraint firstItem="cbk-e0-8Nr" firstAttribute="top" secondItem="3jh-Ia-6hr" secondAttribute="top" id="bX7-zv-jLc"/>
+                            <constraint firstAttribute="trailing" secondItem="WWV-Dc-pRN" secondAttribute="trailing" id="bqw-jL-fKu"/>
+                            <constraint firstItem="MNJ-su-x9C" firstAttribute="top" secondItem="WWV-Dc-pRN" secondAttribute="bottom" constant="4" id="tDr-vX-pU7"/>
+                            <constraint firstItem="MNJ-su-x9C" firstAttribute="leading" secondItem="cbk-e0-8Nr" secondAttribute="leading" id="vdx-qj-hUM"/>
                         </constraints>
-                        <state key="normal" title="Button" image="shareMenu">
-                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        </state>
-                        <connections>
-                            <action selector="editButtonClicked:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="ri0-lZ-1d5"/>
-                        </connections>
-                    </button>
+                    </view>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="cbk-e0-8Nr" secondAttribute="trailing" constant="16" id="0AM-Pq-OkZ"/>
-                    <constraint firstItem="cbk-e0-8Nr" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="HbN-yp-wjH"/>
-                    <constraint firstItem="WWV-Dc-pRN" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="5" id="Tc8-l9-pjy"/>
-                    <constraint firstItem="t12-ui-tuz" firstAttribute="top" secondItem="MNJ-su-x9C" secondAttribute="bottom" constant="6" id="Z4g-rl-Whf"/>
-                    <constraint firstItem="MNJ-su-x9C" firstAttribute="top" secondItem="cbk-e0-8Nr" secondAttribute="bottom" constant="6" id="eQ9-Kw-vr5"/>
-                    <constraint firstAttribute="trailing" secondItem="MNJ-su-x9C" secondAttribute="trailing" constant="16" id="eYC-m8-Ubo"/>
-                    <constraint firstAttribute="trailing" secondItem="WWV-Dc-pRN" secondAttribute="trailing" constant="10" id="em0-nD-u6Z"/>
-                    <constraint firstItem="MNJ-su-x9C" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="gZb-f5-5Qd"/>
-                    <constraint firstItem="t12-ui-tuz" firstAttribute="leading" secondItem="cbk-e0-8Nr" secondAttribute="leading" id="mVh-XA-5WZ"/>
-                    <constraint firstItem="cbk-e0-8Nr" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="osl-Xx-lDb"/>
-                    <constraint firstAttribute="bottomMargin" secondItem="t12-ui-tuz" secondAttribute="bottom" constant="1" id="tvH-nj-nQ6"/>
-                    <constraint firstItem="t12-ui-tuz" firstAttribute="trailing" secondItem="cbk-e0-8Nr" secondAttribute="trailing" id="ylM-QM-lbP"/>
+                    <constraint firstItem="3jh-Ia-6hr" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="59M-RR-NG3"/>
+                    <constraint firstItem="3jh-Ia-6hr" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="WY4-tD-oGs"/>
+                    <constraint firstAttribute="bottom" secondItem="3jh-Ia-6hr" secondAttribute="bottom" constant="16" id="bDt-bD-ScG"/>
+                    <constraint firstAttribute="trailing" secondItem="3jh-Ia-6hr" secondAttribute="trailing" constant="11" id="scb-do-t6m"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
+                <outlet property="descriptionTextView" destination="t12-ui-tuz" id="xPf-Fb-LXu"/>
                 <outlet property="editCommentButton" destination="WWV-Dc-pRN" id="R4E-Ra-Dfh"/>
                 <outlet property="nameLabel" destination="cbk-e0-8Nr" id="a7m-3e-qTH"/>
                 <outlet property="timeLabel" destination="MNJ-su-x9C" id="vxw-B2-iuq"/>
@@ -78,10 +100,7 @@
     <resources>
         <image name="shareMenu" width="500" height="500"/>
         <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

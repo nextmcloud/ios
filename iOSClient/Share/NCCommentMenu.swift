@@ -19,7 +19,7 @@ class NCCommentMenu: NSObject {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_edit_comment_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "rename").imageColor(NCBrandColor.shared.label),
+                icon: NCUtility.shared.loadImage(named: "rename",color: NCBrandColor.shared.iconColor),
                 action: { menuAction in
                     print("Edit Comment")
                     NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterEditCommentAction)
@@ -31,7 +31,7 @@ class NCCommentMenu: NSObject {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_delete_comment_", comment: ""),
-                icon: NCUtility.shared.loadImage(named: "delete").imageColor(NCBrandColor.shared.label),
+                icon: NCUtility.shared.loadImage(named: "delete",color: NCBrandColor.shared.iconColor),
                 action: { menuAction in
                     NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteCommentAction)
                     print("Delete Comment")
