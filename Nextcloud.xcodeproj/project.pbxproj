@@ -3563,7 +3563,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jens Eckert (H6C98P2566)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 34;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
@@ -3622,7 +3622,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: T-Systems International GmbH";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 34;
 				DEVELOPMENT_TEAM = 9FH6TNGWF2;
 				ENABLE_BITCODE = YES;
 				EXCLUDED_ARCHS = "";
