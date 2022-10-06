@@ -50,7 +50,7 @@ import UIKit
     @objc public var mailMe:                            String = "ios@nextcloud.com"
     @objc public var textCopyrightNextcloudiOS:         String = "Nextcloud Coherence for iOS %@ © 2021"
     @objc public var textCopyrightNextcloudServer:      String = "Nextcloud Server %@"
-    @objc public var loginBaseUrl:                      String = "https://magentacloud.de/"
+    @objc public var loginBaseUrl:                      String = "https://pre1.next.magentacloud.de/"
     @objc public var pushNotificationServerProxy:       String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost:                     String = "https://nextcloud.com/install"
     @objc public var linkloginPreferredProviders:       String = "https://nextcloud.com/signup-ios";
@@ -68,7 +68,7 @@ import UIKit
     // Capabilities Group
 
 //    @objc public var capabilitiesGroups:                String = "group.in.t-systems.com"
-    @objc public var capabilitiesGroups:                String = "group.de.telekom.Mediencenter"
+    @objc public var capabilitiesGroups:                String = "group.com.t-systems.pu-ds.magentacloud.qa"
     
     // User Agent
     @objc public var userAgent:                         String = "Magenta-iOS"                                    // Don't touch me !!
