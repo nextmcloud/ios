@@ -15,7 +15,7 @@ class NCCommentSectionCell: UITableViewCell {
     @IBOutlet weak var descriptionTextView: UITextView!
     @IBOutlet weak var editCommentButton: UIButton!
     weak var delegate: NCCommentMenuCellDelegate?
-  
+    var tableComment: tableComments?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -37,8 +37,10 @@ class NCCommentSectionCell: UITableViewCell {
     }
     
     @IBAction func  editButtonClicked(_ sender: Any) {
-        
-        delegate?.tapMenu()
+        guard let comment = tableComment else {
+            return
+        }
+        delegate?.tapMenu(comment: comment)
     
     }
     
@@ -46,5 +48,5 @@ class NCCommentSectionCell: UITableViewCell {
 }
 
 protocol NCCommentMenuCellDelegate: class {
-    func tapMenu()
+    func tapMenu(comment: tableComments)
 }

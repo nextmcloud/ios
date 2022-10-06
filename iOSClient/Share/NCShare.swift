@@ -580,50 +580,18 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     @objc func editCommentMenuActionClicked(notification: NSNotification) {
-        let alertController = UIAlertController(title: "Edit Comment \n\n\n\n\n", message: nil, preferredStyle: .alert)
-
-           let cancelAction = UIAlertAction.init(title: "Cancel", style: .default) { (action) in
-               alertController.view.removeObserver(self, forKeyPath: "bounds")
-           }
-           alertController.addAction(cancelAction)
-
-           let saveAction = UIAlertAction(title: "Done", style: .default) { (action) in
-               alertController.view.removeObserver(self, forKeyPath: "bounds")
-           }
-           alertController.addAction(saveAction)
-
-           alertController.view.addObserver(self, forKeyPath: "bounds", options: NSKeyValueObservingOptions.new, context: nil)
-           textView.backgroundColor = UIColor.white
-           textView.textContainerInset = UIEdgeInsets.init(top: 8, left: 5, bottom: 8, right: 5)
-           textView.text = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt."
-           alertController.view.addSubview(self.textView)
-
-           self.present(alertController, animated: true, completion: nil)
-       }
-
-       override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-           if keyPath == "bounds"{
-               if let rect = (change?[NSKeyValueChangeKey.newKey] as? NSValue)?.cgRectValue {
-                   let margin: CGFloat = 8
-                   let xPos = rect.origin.x + margin
-                   let yPos = rect.origin.y + 55
-                   let width = rect.width - 2 * margin
-                   let height: CGFloat = 90
-
-                   textView.frame = CGRect.init(x: xPos, y: yPos, width: width, height: height)
-               }
-           }
+        guard let comment = notification.object as? tableComments else {
+            return
+        }
+        self.editCommentText(comment: comment)
        
-        print(" Edit Action Executed")
-        
     }
     
     @objc func deleteCommentMenuActionClicked(notification: NSNotification) {
-        let alert = UIAlertController(title: "Alert", message: "The Comment is deleted", preferredStyle: .alert)
-        let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
-        alert.addAction(ok)
-        present(alert, animated: true, completion: nil)
-        print("Delete Action Executed")
+        guard let comment = notification.object as? tableComments else {
+            return
+        }
+        self.deleteComment(messageId: comment.messageId)
         
     }
     
@@ -744,10 +712,11 @@ extension NCShare: UITextFieldDelegate {
 }
 
 extension NCShare: NCCommentMenuCellDelegate {
+    
   
-    func tapMenu() {
+    func tapMenu(comment : tableComments) {
         let commentMenu = NCCommentMenu()
-        commentMenu.toggleMenu(viewController: self)
+        commentMenu.toggleMenu(viewController: self, comment: comment)
     }
     
 
@@ -1062,6 +1031,7 @@ extension NCShare: UITableViewDataSource {
             .filter({ Calendar.current.isDate($0.dateKey, inSameDayAs: date) })
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "NCCommentSectionCell", for: indexPath) as? NCCommentSectionCell,  let commentData = sectionItems[indexPath.row] as? tableComments {
+            cell.tableComment = commentData
             cell.delegate = self
             cell.commentSection(isCommentSelected: true)
             cell.descriptionTextView.text = commentData.message
@@ -1214,6 +1184,67 @@ extension NCShare {
             }
         }
     }
+    
+    func deleteComment(messageId: String) {
+        
+        guard let metadata = self.metadata else { return }
+
+        NCCommunication.shared.deleteComments(fileId: metadata.fileId, messageId: messageId) { _, errorCode, errorDescription in
+            if errorCode == 0 {
+                self.loadComments()
+            } else {
+                NCContentPresenter.shared.messageNotification("_share_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+            }
+        }
+
+    }
+    
+    func editCommentText(comment: tableComments) {
+        
+        guard let metadata = self.metadata else { return }
+        
+        let alertController = UIAlertController(title: "Edit Comment \n\n\n\n\n", message: nil, preferredStyle: .alert)
+        
+        let cancelAction = UIAlertAction.init(title: "Cancel", style: .default)
+        alertController.addAction(cancelAction)
+        
+        alertController.addAction(UIAlertAction(title: "Done", style: .default, handler: { _ in
+            guard let message = self.textView.text, message != "" else { return }
+            
+            NCCommunication.shared.updateComments(fileId: metadata.fileId, messageId: comment.messageId, message: message) { _, errorCode, errorDescription in
+                if errorCode == 0 {
+                    self.loadComments()
+                } else {
+                    NCContentPresenter.shared.messageNotification("_share_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                }
+            }
+           
+        }))
+        
+        alertController.view.addObserver(self, forKeyPath: "bounds", options: NSKeyValueObservingOptions.new, context: nil)
+        textView.backgroundColor = UIColor.white
+        textView.text = comment.message
+        textView.textContainerInset = UIEdgeInsets.init(top: 8, left: 5, bottom: 8, right: 5)
+        alertController.view.addSubview(self.textView)
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
+
+        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+            if keyPath == "bounds"{
+                if let rect = (change?[NSKeyValueChangeKey.newKey] as? NSValue)?.cgRectValue {
+                    let margin: CGFloat = 8
+                    let xPos = rect.origin.x + margin
+                    let yPos = rect.origin.y + 54
+                    let width = rect.width - 2 * margin
+                    let height: CGFloat = 90
+
+                    textView.frame = CGRect.init(x: xPos, y: yPos, width: width, height: height)
+                }
+            }
+
+    }
+        
 }
 
 

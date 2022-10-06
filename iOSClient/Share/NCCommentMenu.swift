@@ -10,7 +10,7 @@ import UIKit
 
 class NCCommentMenu: NSObject {
     
-    func toggleMenu(viewController: UIViewController) {
+    func toggleMenu(viewController: UIViewController, comment: tableComments) {
         
         let menuViewController = UIStoryboard.init(name: "NCMenu", bundle: nil).instantiateInitialViewController() as! NCMenu
         var actions = [NCMenuAction]()
@@ -22,7 +22,7 @@ class NCCommentMenu: NSObject {
                 icon: NCUtility.shared.loadImage(named: "rename",color: NCBrandColor.shared.iconColor),
                 action: { menuAction in
                     print("Edit Comment")
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterEditCommentAction)
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterEditCommentAction, object: comment)
                 }
             )
         )
@@ -33,7 +33,7 @@ class NCCommentMenu: NSObject {
                 title: NSLocalizedString("_delete_comment_", comment: ""),
                 icon: NCUtility.shared.loadImage(named: "delete",color: NCBrandColor.shared.iconColor),
                 action: { menuAction in
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteCommentAction)
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteCommentAction, object: comment)
                     print("Delete Comment")
                    
                 }
