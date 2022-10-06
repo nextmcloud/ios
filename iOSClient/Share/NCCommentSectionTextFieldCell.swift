@@ -8,10 +8,10 @@
 
 import UIKit
 
-class NCCommentSectionTextFieldCell: UITableViewCell {
+class NCCommentSectionTextFieldCell: UITableViewCell, UITextFieldDelegate {
 
     @IBOutlet weak var commmentSearchField: UITextField!
-    
+    var completionHandler: ((String?) -> Void)?
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
@@ -23,8 +23,9 @@ class NCCommentSectionTextFieldCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func updateCommentSectionUI(isCommentSelected: Bool) {
-       
+    func updateCommentSectionUI(isCommentSelected: Bool, completionHandler: @escaping (String?) -> Void) {
+        self.completionHandler = completionHandler
+        commmentSearchField.delegate = self
         commmentSearchField.layer.cornerRadius = 5
         commmentSearchField.layer.masksToBounds = true
         commmentSearchField.layer.borderWidth = 1
@@ -34,7 +35,11 @@ class NCCommentSectionTextFieldCell: UITableViewCell {
         commmentSearchField.textColor = NCBrandColor.shared.label
         commmentSearchField.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("_message_placeholder_", comment: ""),
                                                                attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.searchFieldPlaceHolder])
-        
     }
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        completionHandler?(textField.text)
+        return true
+    }
 }
