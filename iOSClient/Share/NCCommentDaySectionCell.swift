@@ -16,6 +16,8 @@ class NCCommentDaySectionCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        daySectionView.backgroundColor = NCBrandColor.shared.lightMagenta
+        daySectionView.layer.cornerRadius = 10
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -23,13 +25,4 @@ class NCCommentDaySectionCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-    
-    func updateDaySection(isCommentSelected: Bool) {
-        
-        daySectionView.backgroundColor = NCBrandColor.shared.lightMagenta
-        daySectionView.layer.cornerRadius = 10
-        
-        
-    }
-    
 }

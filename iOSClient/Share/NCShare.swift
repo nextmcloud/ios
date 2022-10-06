@@ -43,7 +43,9 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var shareeEmail: String!
     var isShareSelected: Bool = true
     let textView = UITextView(frame: CGRect.zero)
-
+    
+    var allItems: [DateCompareable] = []
+    var sectionDates: [Date] = []
     // MARK: - View Life Cycle
     
     override func viewDidLoad() {
@@ -99,6 +101,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         setupHeader()
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
         navigationItem.largeTitleDisplayMode = .never
+        loadComments()
     }
     
     @objc func exitTapped() {
@@ -766,7 +769,7 @@ extension NCShare: UITableViewDelegate {
 extension NCShare: UITableViewDataSource {
   
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return isShareSelected ? 1 : 1 + sectionDates.count
     }
    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -800,7 +803,15 @@ extension NCShare: UITableViewDataSource {
                 messageView.removeFromSuperview()
               
             }
-           return 5
+            if !sectionDates.isEmpty {
+                if section != 0 {
+                    let date = sectionDates[section - 1]
+                    return allItems.filter({ Calendar.current.isDate($0.dateKey, inSameDayAs: date) }).count
+                } else {
+                    return 2
+                }
+            }
+            return 2
         }
         return numOfRows
     }
@@ -813,18 +824,13 @@ extension NCShare: UITableViewDataSource {
    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        if indexPath.row == 0 {
+        if indexPath.row == 0, indexPath.section == 0 {
             return commentShareButtonCell(tableView, cellForRowAt: indexPath)
         }
         if !isShareSelected {
-            if indexPath.row == 1 {
+            if indexPath.row == 1, indexPath.section == 0 {
                 return commentSectionTextFieldCell(tableView, cellForRowAt: indexPath)
             }
-            if indexPath.row == 2 {
-                return CommentDaySectionCell(tableView, cellForRowAt: indexPath)
-
-            }
-         
             return commentSectionCell(tableView, cellForRowAt: indexPath)
            
         }
@@ -1040,10 +1046,9 @@ extension NCShare: UITableViewDataSource {
     }
     
     func CommentDaySectionCell(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: "NCCommentDaySectionCell", for: indexPath) as? NCCommentDaySectionCell
-         {
-            cell.updateDaySection(isCommentSelected: true)
-         
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "NCCommentDaySectionCell", for: indexPath) as? NCCommentDaySectionCell {
+            let section = indexPath.section - 1
+            cell.dayLabel.text = CCUtility.getTitleSectionDate(sectionDates[section])
             return cell
         }
         
@@ -1052,11 +1057,16 @@ extension NCShare: UITableViewDataSource {
     }
     
     func commentSectionCell(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if let cell = tableView.dequeueReusableCell(withIdentifier: "NCCommentSectionCell", for: indexPath) as? NCCommentSectionCell
-         {
+        let date = sectionDates[indexPath.section - 1]
+        let sectionItems = allItems
+            .filter({ Calendar.current.isDate($0.dateKey, inSameDayAs: date) })
+        
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "NCCommentSectionCell", for: indexPath) as? NCCommentSectionCell,  let commentData = sectionItems[indexPath.row] as? tableComments {
             cell.delegate = self
             cell.commentSection(isCommentSelected: true)
-            cell.descriptionTextView.text = indexPath.row == 3 ? "have the current iOS MagentaCloud app 7.0.9.8 on iOS 15.6.1 (iPhone12) and cannot log in.  have the current iOS MagentaCloud app 7.0.9.8 on iOS 15.6.1 (iPhone12) and cannot log in.  have the current iOS MagentaCloud app 7.0.9.8 on iOS 15.6.1 (iPhone12) and cannot log in.  have the current iOS MagentaCloud app 7.0.9.8 on iOS 15.6.1 (iPhone12) and cannot log in." : "Error message: Unable to sign in, an error has occurred, please try again later"
+            cell.descriptionTextView.text = commentData.message
+            cell.nameLabel.text = commentData.actorDisplayName
+            cell.timeLabel.text = CCUtility.dateDiff(commentData.creationDateTime as Date)
             return cell
         }
         
@@ -1066,11 +1076,11 @@ extension NCShare: UITableViewDataSource {
     func commentSectionTextFieldCell(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
        if let cell = tableView.dequeueReusableCell(withIdentifier: "NCCommentSectionTextFieldCell", for: indexPath) as? NCCommentSectionTextFieldCell
         {
-           cell.updateCommentSectionUI(isCommentSelected: true)
-        
+           cell.updateCommentSectionUI(isCommentSelected: true) { newComment in
+               self.addComment(message: newComment, newCommentField: cell.commmentSearchField)
+           }
            return cell
        }
-        
         return UITableViewCell()
     }
     
@@ -1111,6 +1121,9 @@ extension NCShare: UITableViewDataSource {
     //        return "Share Header"
     //    }
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if !isShareSelected && section != 0 {
+            return CommentDaySectionCell(tableView, cellForRowAt: IndexPath(row: 0, section: section)).contentView
+        }
         let headerView = Bundle.main.loadNibNamed("NCShareHeaderView", owner: self, options: nil)?.first as! NCShareHeaderView
         headerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         headerView.fileName.textColor = NCBrandColor.shared.label
@@ -1148,13 +1161,61 @@ extension NCShare: UITableViewDataSource {
         
     }
     func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-        return 230
+        return section == 0 ? 230 : 50
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 230
+        return section == 0 ? 230 : UITableView.automaticDimension
     }
     
 }
+
+// MARK: - Comments API
+extension NCShare {
+    
+    func loadDataSource() {
+        var newItems = [DateCompareable]()
+        if let metadata = metadata, let account = NCManageDatabase.shared.getActiveAccount() {
+            let comments = NCManageDatabase.shared.getComments(account: account.account, objectId: metadata.fileId)
+            newItems += comments
+        }
+        self.allItems = newItems.sorted(by: { $0.dateKey > $1.dateKey })
+        self.sectionDates = self.allItems.reduce(into: Set<Date>()) { partialResult, next in
+            let newDay = Calendar.current.startOfDay(for: next.dateKey)
+            partialResult.insert(newDay)
+        }.sorted(by: >)
+        self.tableView.reloadData()
+    }
+
+    func loadComments(disptachGroup: DispatchGroup? = nil) {
+        guard let metadata = metadata else { return }
+        disptachGroup?.enter()
+        NCCommunication.shared.getComments(fileId: metadata.fileId) { account, comments,  errorCode, errorDescription in
+            if errorCode == 0, let comments = comments {
+                NCManageDatabase.shared.addComments(comments, account: metadata.account, objectId: metadata.fileId)
+            } else if errorCode != NCGlobal.shared.errorResourceNotFound {
+                NCContentPresenter.shared.messageNotification("_share_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+            }
+            if let disptachGroup = disptachGroup {
+                disptachGroup.leave()
+            } else {
+                self.loadDataSource()
+            }
+        }
+    }
+    
+    func addComment(message: String?, newCommentField: UITextField){
+        guard let newComment = message, !newComment.isEmpty, let metadata = self.metadata else { return }
+        NCCommunication.shared.putComments(fileId: metadata.fileId, message: newComment) { _, errorCode, errorDescription in
+            if errorCode == 0 {
+                newCommentField.text?.removeAll()
+                self.loadComments()
+            } else {
+                NCContentPresenter.shared.messageNotification("_share_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+            }
+        }
+    }
+}
+
 
 // MARK: - NCShareUserCell
 
