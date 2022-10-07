@@ -654,6 +654,7 @@
 "_sharing_message_"             = "Sie können Links erstellen oder Freigaben per Mail versenden. Wenn Sie MagentaCLOUD Nutzer einladen, bieten sich Ihnen mehr Möglichkeiten der Zusammenarbeit.";
 "_your_shares_"                 = "Ihre Freigaben";
 "no_shares_created"             = "Noch keine Freigaben erstellt.";
+"no_comments_added_"            = "Noch keine Kommentare";
 "share_editing_message"         = "Es gibt keine Bearbeitungsfunktionen für Dateien, außer Sie teilen sie mit MagentaCLOUD Nutzern.";
 "_file_drop_message_"           = "Bei der Sammelbox ist nur das Hochladen erlaubt. Nur Sie sehen Dateien und Ordner die hochgeladen worden sind.";
 "_share_download_limit_"        = "Download Limit";

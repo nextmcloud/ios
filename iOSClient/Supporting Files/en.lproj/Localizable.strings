@@ -691,6 +691,7 @@
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
 "_your_shares_"                 = "Your Shares";
 "no_shares_created"             = "No shares created yet.";
+"no_comments_added_"            = "No Comments Added yet";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
 "share_editing_message"         = "There are no editing functions for files unless you share them with MagentaCLOUD users.";
 "personal_share_by_mail"        = "Personal share by mail";

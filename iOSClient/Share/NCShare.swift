@@ -770,17 +770,28 @@ extension NCShare: UITableViewDataSource {
         if !isShareSelected {
             for messageView in self.tableView.subviews.filter({$0.tag == 999}){
                 messageView.removeFromSuperview()
-              
+                
             }
             if !sectionDates.isEmpty {
+                for messageView in self.tableView.subviews.filter({$0.tag == 998}){
+                    messageView.removeFromSuperview()
+                }
                 if section != 0 {
                     let date = sectionDates[section - 1]
                     return allItems.filter({ Calendar.current.isDate($0.dateKey, inSameDayAs: date) }).count
                 } else {
                     return 2
                 }
+                
+            } else {
+                
+                self.tableView.setEmptyCommentMessage(NSLocalizedString("no_comments_added_", comment: ""))
+                
+                return 2
             }
-            return 2
+        }
+        for messageView in self.tableView.subviews.filter({$0.tag == 998}){
+            messageView.removeFromSuperview()
         }
         return numOfRows
     }
@@ -1047,7 +1058,9 @@ extension NCShare: UITableViewDataSource {
         {
            cell.updateCommentSectionUI(isCommentSelected: true) { newComment in
                self.addComment(message: newComment, newCommentField: cell.commmentSearchField)
+               
            }
+           
            return cell
        }
         return UITableViewCell()
@@ -1316,6 +1329,18 @@ extension UITableView {
         messageLabel.textAlignment = .center
         messageLabel.font = UIFont.systemFont(ofSize: 17)
         messageLabel.tag = 999
+        messageLabel.sizeToFit()
+        self.addSubview(messageLabel)
+    }
+    
+    func setEmptyCommentMessage(_ message: String) {
+        let messageLabel = UILabel(frame: CGRect(x: 16, y: 327, width: self.bounds.size.width, height: 20))
+        messageLabel.text = message
+        messageLabel.textColor = NCBrandColor.shared.textInfo
+        messageLabel.numberOfLines = 0
+        messageLabel.textAlignment = .center
+        messageLabel.font = UIFont.systemFont(ofSize: 17)
+        messageLabel.tag = 998
         messageLabel.sizeToFit()
         self.addSubview(messageLabel)
     }
