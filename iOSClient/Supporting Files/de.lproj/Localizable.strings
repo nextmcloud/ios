@@ -625,6 +625,7 @@
 "_shareLinksearch_placeholder_" = "Kontaktname oder E-Mail-Adresse";
 "_new_comment_"                 = "Neuer Kommentar…";
 "_edit_comment_"                = "Kommentar bearbeiten";
+"edit_comment"                  = "Kommentar bearbeiten \n\n\n\n";
 "_delete_comment_"              = "Kommentar löschen";
 "_share_allow_editing_"         = "Bearbeitung erlauben";
 "_share_read_only_"             = "Nur lesen";
@@ -644,8 +645,8 @@
 "_share_can_change_"            = "kann ändern";
 "_share_can_delete_"            = "kann löschen";
 "_share_unshare_"               = "Freigabe aufheben";
-"_edit_comment_"                = "Edit Comment";
-"_delete_comment"               = "Delete Comment";
+"_delete_comment"               = "Kommentar löschen";
+"_message_placeholder_"         = "Schreibe eine Nachricht ...";
 "_share_internal_link_"         = "Interner Link";
 "_share_internal_link_des_"     = "Funktioniert nur für Benutzer, die Zugriff auf diesen Ordner haben";
 "_permissions_"                 = "Berechtigungen";

@@ -659,6 +659,7 @@
 "_message_placeholder_"         = "Write a message ...";
 "_new_comment_"                 = "New comment…";
 "_edit_comment_"                = "Edit comment";
+"edit_comment"                  = "Edit Comment \n\n\n\n";
 "_delete_comment_"              = "Delete comment";
 "_share_allow_editing_"         = "Allow editing";
 "_share_read_only_"             = "Read only";
@@ -687,7 +688,6 @@
 "_share_internal_link_des_"     = "Only works for users with access to this folder";
 "_permissions_"                 = "Permissions";
 "_advance_permissions_"         = "Advanced permissions";
-"_edit_comment_"                = "Edit Comment";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
 "_your_shares_"                 = "Your Shares";
 "no_shares_created"             = "No shares created yet.";

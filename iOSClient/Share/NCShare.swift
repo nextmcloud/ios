@@ -1033,7 +1033,6 @@ extension NCShare: UITableViewDataSource {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "NCCommentSectionCell", for: indexPath) as? NCCommentSectionCell,  let commentData = sectionItems[indexPath.row] as? tableComments {
             cell.tableComment = commentData
             cell.delegate = self
-            cell.commentSection(isCommentSelected: true)
             cell.descriptionTextView.text = commentData.message
             cell.nameLabel.text = commentData.actorDisplayName
             cell.timeLabel.text = CCUtility.dateDiff(commentData.creationDateTime as Date)
@@ -1203,12 +1202,12 @@ extension NCShare {
         
         guard let metadata = self.metadata else { return }
         
-        let alertController = UIAlertController(title: "Edit Comment \n\n\n\n\n", message: nil, preferredStyle: .alert)
+        let alertController = UIAlertController(title: NSLocalizedString("edit_comment", comment: ""), message: nil, preferredStyle: .alert)
         
-        let cancelAction = UIAlertAction.init(title: "Cancel", style: .default)
+        let cancelAction = UIAlertAction.init(title: NSLocalizedString("Cancel", comment: ""), style: .default)
         alertController.addAction(cancelAction)
         
-        alertController.addAction(UIAlertAction(title: "Done", style: .default, handler: { _ in
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_done_", comment: ""), style: .default, handler: { _ in
             guard let message = self.textView.text, message != "" else { return }
             
             NCCommunication.shared.updateComments(fileId: metadata.fileId, messageId: comment.messageId, message: message) { _, errorCode, errorDescription in

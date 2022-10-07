@@ -21,7 +21,7 @@ class NCCommentSectionCell: UITableViewCell {
         super.awakeFromNib()
         // Initialization code
         descriptionTextView.textContainer.lineFragmentPadding = 0
-        
+        editCommentButton.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -30,11 +30,6 @@ class NCCommentSectionCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func commentSection(isCommentSelected: Bool) {
-        
-        editCommentButton.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
-    
-    }
     
     @IBAction func  editButtonClicked(_ sender: Any) {
         guard let comment = tableComment else {
