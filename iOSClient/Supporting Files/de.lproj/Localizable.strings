@@ -817,6 +817,7 @@
 "_e2e_error_directory_not_empty_"   = "Dieses Verzeichnis ist nicht leer";
 "_e2e_error_not_move_"              = "Es ist nicht möglich Dateien in ein verschlüsseltes Verzeichnis zu verschieben";
 "_copy_passphrase_"                 = "Passphrase kopieren";
+"_ok_copy_passphrase_"              = "OK und Passphrase kopieren";
 "_enter_passphrase_"                = "Passphrase eingeben (12 Wörter)";
 
 // Scan Document
