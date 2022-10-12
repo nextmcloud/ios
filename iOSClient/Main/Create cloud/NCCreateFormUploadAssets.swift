@@ -47,6 +47,12 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
     
 
     var cellBackgoundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+    
+    var switchAutoUpload: Bool = false
+    var switchUseSubFolders: Bool = false
+    var switchMaintainOriginalFileName: Bool = false
+    var switchspecifyTypeInFileName: Bool = false
+
         
     // MARK: - View Life Cycle
 
@@ -195,12 +201,15 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_use_folder_auto_upload_", comment: "")
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label
-        row.cellConfigAtConfigure["autoUploadSwitchControl.on"] = 0 //onTintColor
+        //        row.cellConfigAtConfigure["autoUploadSwitchControl.on"] = 0 //onTintColor
         row.cellConfig["autoUploadSwitchControl.onTintColor"] = NCBrandColor.shared.brand
         row.value = 0
         if (NSLocalizedString("_use_folder_auto_upload_", comment: "").count > 44 ){
             row.height = 65;
         }
+        
+        row.cellConfigAtConfigure["autoUploadSwitchControl.on"] = switchAutoUpload
+        row.value = switchAutoUpload
         //end of custom autoupload cell
         
 //=======
@@ -251,15 +260,16 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row = XLFormRowDescriptor(tag: "useSubFolder", rowType: "NMCCustomSwitchCellsubFolderUpload", title: self.titleServerUrl)
         row.cellConfig["subFolderLabel.text"] = NSLocalizedString("_autoupload_create_subfolder_", comment: "")
         let tableAccount = NCManageDatabase.shared.getActiveAccount()
-        if tableAccount?.autoUploadCreateSubfolder == true {
-            row.cellConfigAtConfigure["subFolderSwitch.on"] = 1
+        if tableAccount?.autoUploadCreateSubfolder == true || switchAutoUpload == true {
             row.value = 1
             row.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.label
+            row.value = "enable_switch"
         } else {
-            row.cellConfigAtConfigure["subFolderSwitch.on"] = 0
             row.value = 0
             row.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.graySoft
+            row.value = "disable_switch"
         }
+        row.cellConfigAtConfigure["subFolderSwitch.on"] = switchUseSubFolders
         //row.hidden = "$\("useFolderAutoUpload") == 0"
         row.cellConfig["backgroundColor"] = cellBackgoundColor
         row.cellConfig["subFolderLabel.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -327,6 +337,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         }else {
             row.cellConfigAtConfigure["originalFileNameSwitch.on"] = 0
         }
+        row.cellConfigAtConfigure["originalFileNameSwitch.on"] = switchMaintainOriginalFileName
 //        row.cellConfig["originalFileNameSwitch.on"] = CCUtility.getOriginalFileName(NCBrandGlobal.shared.keyFileNameOriginal)
         row.cellConfig["originalFileNameTitle.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["originalFileNameTitle.textColor"] = NCBrandColor.shared.label
@@ -355,12 +366,13 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
         row.cellConfig["cellLabel.text"] = NSLocalizedString("_add_filenametype_", comment: "")
         row.cellConfigAtConfigure["switchControl.on"] = CCUtility.getFileNameType(NCBrandGlobal.shared.keyFileNameType)
         row.hidden = "$\("maintainOriginalFileName") == 1"
+        row.hidden = switchMaintainOriginalFileName
        // row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
 
         row.cellConfig["cellLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["cellLabel.textColor"] = NCBrandColor.shared.label
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand
-
+        row.cellConfigAtConfigure["switchControl.on"] = switchspecifyTypeInFileName
         //#######end of custom row Add File Name Type
         
         section.addFormRow(row)
@@ -494,6 +506,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 subfolderSwitchOption.cellConfig["subFolderLabel.textColor"] = NCBrandColor.shared.label//isEnabled
                 subfolderSwitchOption.value = "enable_switch"
                 buttonDestinationFolder.disabled = true
+                switchAutoUpload = true
                 self.reloadForm()
 
             } else{
@@ -508,6 +521,8 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 subfolderSwitchOption.disabled = true
                 subfolderSwitchOption.value = "disable_switch"
                 buttonDestinationFolder.disabled = false
+                switchAutoUpload = false
+                switchUseSubFolders = false
                 self.reloadForm()
 
 //=======
@@ -525,14 +540,22 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
             
             if (formRow.value! as AnyObject).boolValue  == true {
                 print("switch on subfolder")
-                
+                switchUseSubFolders = true
             } else{
                 print("switch off subfolder")
-
+                switchUseSubFolders = false
             }
         }
         else if formRow.tag == "maintainOriginalFileName" {
             CCUtility.setOriginalFileName((formRow.value! as AnyObject).boolValue, key: NCBrandGlobal.shared.keyFileNameOriginal)
+            let rowTypeInFile : XLFormRowDescriptor  = self.form.formRow(withTag: "addFileNameType")!
+            if (formRow.value! as AnyObject).boolValue  == true {
+                switchMaintainOriginalFileName = true
+                rowTypeInFile.hidden = switchMaintainOriginalFileName
+            } else {
+                switchMaintainOriginalFileName = false
+                rowTypeInFile.hidden = switchMaintainOriginalFileName
+            }
             self.reloadForm()
         }
         else if formRow.tag == "addFileNameType" {
@@ -550,6 +573,11 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
 //        else if formRow.tag == "addFileNameType" {
 //            CCUtility.setFileNameType((formRow.value! as AnyObject).boolValue, key: NCGlobal.shared.keyFileNameType)
 //>>>>>>> feature_branded_client_4
+            if (formRow.value! as AnyObject).boolValue  == true {
+                switchspecifyTypeInFileName = true
+            } else {
+                switchspecifyTypeInFileName = false
+            }
             self.reloadForm()
         }
         else if formRow.tag == "maskFileName" {
