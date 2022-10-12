@@ -856,6 +856,7 @@
 "_e2e_error_directory_not_empty_"   = "The directory is not empty";
 "_e2e_error_not_move_"              = "It is not possible move files to encrypted directory";
 "_copy_passphrase_"                 = "Copy passphrase";
+"_ok_copy_passphrase_"              = "OK and copy passphrase";
 "_enter_passphrase_"                = "Enter passphrase (12 words)";
 "_error_files_upload_"              = "Error uploading files";
 
