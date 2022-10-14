@@ -94,12 +94,13 @@
         // Section PASSPHRASE -------------------------------------------------
         
         section = [XLFormSectionDescriptor formSection];
+        section.footerTitle = NSLocalizedString(@"_read_passphrase_description_", nil);
         [form addFormSection:section];
         
         // Read Passphrase
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"readPassphrase" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_e2e_settings_read_passphrase_", nil)];
         row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
-        [row.cellConfig setObject:[[UIImage imageNamed:@"e2eReadPassphrase"] imageWithColor:NCBrandColor.shared.gray size:25] forKey:@"imageView.image"];
+        [row.cellConfig setObject:[[UIImage imageNamed:@"show_password"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
         [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
         [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
@@ -109,12 +110,15 @@
         // Section DELETE -------------------------------------------------
         
         section = [XLFormSectionDescriptor formSection];
+        NSString *removeStrDesc1 = NSLocalizedString(@"_remove_passphrase_desc_1_", nil);
+        NSString *removeStrDesc2 = NSLocalizedString(@"_remove_passphrase_desc_2_", nil);
+        section.footerTitle = [NSString stringWithFormat:@"%@\n\n%@",removeStrDesc1,removeStrDesc2];
         [form addFormSection:section];
         
         // remove locally Encryption
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"removeLocallyEncryption" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_e2e_settings_remove_", nil)];
         row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
-        [row.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.gray size:25] forKey:@"imageView.image"];
+        [row.cellConfig setObject:[[UIImage imageNamed:@"delete"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
         [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
         [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
@@ -126,6 +130,11 @@
         // Section START E2E -------------------------------------------------
 
         section = [XLFormSectionDescriptor formSection];
+        NSString *startE2EDesc1 = NSLocalizedString(@"_start_e2e_encryption_1_", nil);
+        NSString *startE2EDesc2 = NSLocalizedString(@"_start_e2e_encryption_2_", nil);
+        NSString *startE2EDesc3 = NSLocalizedString(@"_start_e2e_encryption_3_", nil);
+        section.footerTitle = [NSString stringWithFormat:@"%@\n\n%@\n\n%@",startE2EDesc1,startE2EDesc2,startE2EDesc3];
+        [form addFormSection:section];
         [form addFormSection:section];
     
         // Start e2e

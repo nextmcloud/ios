@@ -819,7 +819,12 @@
 "_copy_passphrase_"                 = "Passphrase kopieren";
 "_ok_copy_passphrase_"              = "OK und Passphrase kopieren";
 "_enter_passphrase_"                = "Passphrase eingeben (12 Wörter)";
-
+"_start_e2e_encryption_1_"          = "Um die Ende-zu-Ende Verschlüsselung einzurichten, müssen sie zunächst die PIN-Sperre einrichten, um den Zugriff von unberechtigten Personen auf ihren Schlüssel zu verhindern.";
+"_start_e2e_encryption_2_"          = "Nach dem Start der Verschlüsselung wird ihnen eine aus 12 Wörtern zufällig erzeugte Wortfolge (Passphrase) angezeigt. Diese bleibt in dieser App erhalten und kann erneut angezeigt werden. Dennoch empfehlen wir ihnen, die Passphrase zu notieren.";
+"_start_e2e_encryption_3_"          = "Die Passphrase ist ihr persönliches Kennwort mit dem sie auf verschlüsselte Daten in ihrer MagentaCLOUD zugreifen können oder den Zugriff auf diese Dateien auf anderen Geräten wie ihrem PC zu ermöglichen.";
+"_read_passphrase_description_"     = "Hier können Sie sich die Passphrase erneut anzeigen lassen und diese auch kopieren. Sie benötigen die Passphrase, wenn Sie die Daten auf einem anderen Gerät mit Zugriff auf MagentaCLOUD, zum Beispiel ihrem PC oder ein weiteres Smartphone oder Tablet, entschlüsseln möchten.";
+"_remove_passphrase_desc_1_"        = "Sie können die Passphrase auf diesem Gerät entfernen. Dadurch bleiben die verschlüsselten Inhalte unberührt, jedoch kann dieses Gerät die Daten nicht mehr entschlüsseln.";
+"_remove_passphrase_desc_2_"        = "Sie können die Passphrase jederzeit wieder hier eingeben, um Zugriff von diesem Gerät aus auf ihre verschlüsselten Inhalte zu gewährleisten.";
 // Scan Document
 
 "_scans_document_"                  = "Dokument scannen";
