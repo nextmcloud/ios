@@ -73,7 +73,7 @@ extension AppDelegate {
                     let viewController = (navigationController as! UINavigationController).topViewController as! NCCreateFormUploadDocuments
                     viewController.editorId = NCGlobal.shared.editorText
                     viewController.creatorId = directEditingCreator.identifier
-                    viewController.typeTemplate = NCGlobal.shared.templateDocument
+                    viewController.typeTemplate = NCGlobal.shared.editorText
                     viewController.serverUrl = appDelegate.activeServerUrl
                     viewController.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
 

@@ -77,7 +77,7 @@ import XLForm
         self.title = titleForm
 
         
-        fileName = CCUtility.createFileNameDate("Text", extension: "md")!
+        fileName = CCUtility.createFileNameDate("Text", extension: getFileExtension())!
 
         changeTheming()
         
@@ -605,6 +605,20 @@ import XLForm
             } else {
                 print("[LOG] It has been changed user during networking process, error.")
             }
+        }
+    }
+    func getFileExtension() -> String {
+        switch typeTemplate {
+        case NCGlobal.shared.editorText:
+            return "md"
+        case NCGlobal.shared.templateDocument:
+            return "docx"
+        case NCGlobal.shared.templateSpreadsheet:
+            return "xlsx"
+        case NCGlobal.shared.templatePresentation:
+            return "pptx"
+        default:
+            return ""
         }
     }
 }
