@@ -176,6 +176,18 @@
 "_keep_both_for_all_action_title_" = "Beide Versionen für alle behalten";
 "_more_action_title_" = "Mehr Details";
 
+"_upload_chunk_"            = "Die Datei, die Sie hochladen, ist groß. Halten Sie die App bis zum Abschluss im Vordergrund.";
+"_upload_e2ee_"             = "Die Datei, die Sie hochladen, ist verschlüsselt. Halten Sie die App bis zum Abschluss im Vordergrund.";
+"_chunk_size_mb_"           = "Chunk-Größe in MB";
+"_chunk_footer_title_"      = "Datei in Stücken hochladen (0 ist deaktiviert)\nWichtig: Das gestückelte Hochladen funktioniert nur, wenn die App \"aktiv\" ist.";
+"_source_code_"             = "Zum Programmcode";
+"_account_select_"          = "Das Konto auswählen";
+"_host_insert_"             = "Hostname eingeben, z.B.:";
+"_certificate_not_found_"   = "Datei %@ im Dokumentenverzeichnis nicht gefunden";
+"_copy_failed_"             = "Kopieren fehlgeschlagen";
+"_certificate_installed_"   = "Zertifikat installiert";
+"_want_delete_account_"     = "Wollen Sie das Konto %@ löschen?";
+
 /* User status */
 "_online_"                  = "Online";
 
