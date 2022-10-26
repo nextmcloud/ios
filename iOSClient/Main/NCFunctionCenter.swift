@@ -773,8 +773,8 @@ import SVGKit
         if metadata.directory {
             
             let submenu = UIMenu(title: "", options: .displayInline, children: [favorite, offline, rename, moveCopy, delete])
-
-            return UIMenu(title: "", children: [detail, submenu])
+            var childrenArray = isFolderEncrypted ? [submenu] : [detail, submenu]
+            return UIMenu(title: "", children: childrenArray)
         }
 
         // FILE
