@@ -616,7 +616,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let tableShare = share else { return }
         let directory = metadata?.directory ?? false
         
-        if directory {
+        if directory || checkIsCollaboraFile() {
             self.quickStatusTableShare = tableShare
             let quickStatusMenu = NCShareQuickStatusMenu()
             quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, tableShare: tableShare)
@@ -672,6 +672,20 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             }
         }
     }
+    
+    func checkIsCollaboraFile() -> Bool {
+        guard let metadata = metadata else {
+            return false
+        }
+        
+        // EDITORS
+        let editors = NCUtility.shared.isDirectEditing(account: metadata.account, contentType: metadata.contentType)
+        let availableRichDocument = NCUtility.shared.isRichDocument(metadata)
+        
+        // RichDocument: Collabora
+        return (availableRichDocument && editors.count == 0)
+    }
+    
 }
 
 extension NCShare: UITextFieldDelegate {
@@ -775,7 +789,7 @@ extension NCShare: UITableViewDataSource {
                     }
                 }
                 
-                if directory {
+                if directory || checkIsCollaboraFile() {
                     cell.btnQuickStatus.isEnabled = true
                     cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
                     cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
