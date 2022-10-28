@@ -167,10 +167,7 @@ public extension UITextView {
             attributedOriginalText.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: 10), range: fullRange)
         }
         
-        self.linkTextAttributes = [
-            kCTForegroundColorAttributeName: NCBrandColor.shared.label
-        ] as [NSAttributedString.Key: Any]
-        
+        self.linkTextAttributes = [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.brand]
         self.attributedText = attributedOriginalText
     }
        
