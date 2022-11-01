@@ -322,7 +322,13 @@ import XLForm
     }
 
     @objc func save() {
-    
+        let fileNameUpload = self.fileName.trimmingCharacters(in: .whitespaces)
+        if  fileNameUpload == "" || fileNameUpload.isEmpty {
+            let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_file_name_", comment: ""), preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+            return
+        }
         guard let selectTemplate = self.selectTemplate else {
             return
         }
