@@ -517,6 +517,7 @@
 "_files_"                       = "Dateien";
 "_file_"                        = "Datei";
 "_folder_blocked_"              = "Ordner gesperrt";
+"_downloading_"                 = "Wird heruntergeladen";
 "_downloading_progress_"        = "Das Herunterladen von Dateien wird eingeleitet …";
 "_no_file_pull_down_"           = "Laden Sie eine Datei hoch oder ziehen Sie herunter, um zu aktualisieren";
 "_browse_images_"               = "Bilder durchsuchen";

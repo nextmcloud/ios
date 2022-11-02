@@ -542,6 +542,7 @@
 "_file_"                        = "file";
 "_folder_blocked_"              = "Folder blocked";
 "_downloading_progress_"        = "Initiating download of files…";
+"_downloading_"                 = "Downloading";
 "_no_file_pull_down_"           = "Upload a file or pull down to refresh";
 "_browse_images_"               = "Browse images";
 "_synchronized_folder_"         = "Keep the folder synchronized";
