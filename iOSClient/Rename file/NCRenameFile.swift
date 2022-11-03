@@ -21,7 +21,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
+import Foundation
 import UIKit
 import NCCommunication
 
@@ -37,6 +37,7 @@ public extension NCRenameFileDelegate {
 class NCRenameFile: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var separatorHeightContraint: NSLayoutConstraint!
     @IBOutlet weak var previewFile: UIImageView!
     @IBOutlet weak var fileNameWithoutExt: UITextField!
     @IBOutlet weak var point: UILabel!
@@ -48,14 +49,14 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     weak var delegate: NCRenameFileDelegate?
 
     let width: CGFloat = 300
-    let height: CGFloat = 310
+    let height: CGFloat = 350
     var metadata: tableMetadata?
     var fileName: String?
     var imagePreview: UIImage?
     var disableChangeExt: Bool = false
-
-    // MARK: - View Life Cycle
-
+    
+    // MARK: - Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -66,7 +67,8 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             } else {
                 titleLabel.text = NSLocalizedString("_rename_file_", comment: "")
             }
-
+            separatorHeightContraint.constant = 0.3
+            
             fileNameWithoutExt.text = (metadata.fileNameView as NSString).deletingPathExtension
             fileNameWithoutExt.delegate = self
             fileNameWithoutExt.layer.borderColor = NCBrandColor.shared.iconColor.cgColor
@@ -78,7 +80,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
                 ext.isEnabled = false
                 ext.textColor = .lightGray
             }
-
+            
             previewFile.image = imagePreview
             previewFile.layer.cornerRadius = 10
             previewFile.layer.masksToBounds = true
@@ -98,10 +100,12 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
                 if imagePreview == nil {
                     previewFile.image = NCBrandColor.cacheImages.file
                 }
-
+//                if let icon = UIImage(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)) {
+//                    previewFile.image = icon
+//                }
+                
                 fileNameWithoutExtTrailingContraint.constant = 90
             }
-
         } else if let fileName = self.fileName {
 
             titleLabel.text = NSLocalizedString("_rename_file_", comment: "")
@@ -122,7 +126,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             previewFile.layer.cornerRadius = 10
             previewFile.layer.masksToBounds = true
         }
-
+        
         cancelButton.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
         cancelButton.setTitleColor(NCBrandColor.shared.iconColor, for: .normal)
         cancelButton.layer.cornerRadius = 5
@@ -130,24 +134,33 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 //        cancelButton.layer.backgroundColor =  NCBrandColor.shared.graySoft.withAlphaComponent(0.2).cgColor
         cancelButton.layer.borderWidth = 0.3
         cancelButton.layer.borderColor = NCBrandColor.shared.iconColor.cgColor
-
+        
         renameButton.setTitle(NSLocalizedString("_rename_", comment: ""), for: .normal)
+        renameButton.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
+        renameButton.layer.cornerRadius = 5
+        renameButton.layer.masksToBounds = true
+        renameButton.layer.backgroundColor = NCBrandColor.shared.brand.cgColor
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+        
+        changeTheming()
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-    }
 
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
+        
         if metadata == nil && fileName == nil {
             dismiss(animated: true)
         }
 
         fileNameWithoutExt.selectAll(nil)
     }
-
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         renameMedia(textField)
