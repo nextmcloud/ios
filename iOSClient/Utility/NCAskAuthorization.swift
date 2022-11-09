@@ -21,27 +21,31 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 
 class NCAskAuthorization: NSObject {
     @objc static let shared: NCAskAuthorization = {
         let instance = NCAskAuthorization()
         return instance
     }()
-    
-    func askAuthorizationAudioRecord(viewController: UIViewController?, completion: @escaping (_ hasPermission: Bool)->()) {
-        
+
+    private(set) var isRequesting = false
+
+    func askAuthorizationAudioRecord(viewController: UIViewController?, completion: @escaping (_ hasPermission: Bool) -> Void) {
+
         switch AVAudioSession.sharedInstance().recordPermission {
         case AVAudioSession.RecordPermission.granted:
             completion(true)
             break
         case AVAudioSession.RecordPermission.denied:
             let alert = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: NSLocalizedString("_err_permission_microphone_", comment: ""), preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_open_settings_", comment: ""), style: .default, handler: { action in
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_open_settings_", comment: ""), style: .default, handler: { _ in
+                #if !EXTENSION
                 UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                #endif
                 completion(false)
             }))
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: { action in
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: { _ in
                 completion(false)
             }))
             DispatchQueue.main.async {
@@ -49,7 +53,7 @@ class NCAskAuthorization: NSObject {
             }
             break
         case AVAudioSession.RecordPermission.undetermined:
-            AVAudioSession.sharedInstance().requestRecordPermission { (allowed) in
+            AVAudioSession.sharedInstance().requestRecordPermission { allowed in
                 DispatchQueue.main.async {
                     if allowed {
                         completion(true)
@@ -64,20 +68,22 @@ class NCAskAuthorization: NSObject {
             break
         }
     }
-    
-    func askAuthorizationPhotoLibrary(viewController: UIViewController?, completion: @escaping (_ hasPermission: Bool)->()) {
-     
+
+    @objc func askAuthorizationPhotoLibrary(viewController: UIViewController?, completion: @escaping (_ hasPermission: Bool) -> Void) {
+
         switch PHPhotoLibrary.authorizationStatus() {
         case PHAuthorizationStatus.authorized:
             completion(true)
             break
         case PHAuthorizationStatus.denied, PHAuthorizationStatus.limited, PHAuthorizationStatus.restricted:
             let alert = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: NSLocalizedString("_err_permission_photolibrary_", comment: ""), preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_open_settings_", comment: ""), style: .default, handler: { action in
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_open_settings_", comment: ""), style: .default, handler: { _ in
+                #if !EXTENSION
                 UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                #endif
                 completion(false)
             }))
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: { action in
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: { _ in
                 completion(false)
             }))
             DispatchQueue.main.async {
@@ -85,7 +91,12 @@ class NCAskAuthorization: NSObject {
             }
             break
         case PHAuthorizationStatus.notDetermined:
-            PHPhotoLibrary.requestAuthorization { (allowed) in
+            isRequesting = true
+            PHPhotoLibrary.requestAuthorization { allowed in
+                self.isRequesting = false
+                #if !EXTENSION
+                DispatchQueue.main.async { (UIApplication.shared.delegate as? AppDelegate)?.hidePrivacyProtectionWindow() }
+                #endif
                 DispatchQueue.main.async {
                     if allowed == PHAuthorizationStatus.authorized {
                         completion(true)
@@ -100,33 +111,22 @@ class NCAskAuthorization: NSObject {
             break
         }
     }
-    
-    @objc func askAuthorizationLocationManager(completion: @escaping (_ hasFullPermissions: Bool)->()) {
-        
-        switch CLLocationManager.authorizationStatus() {
-        case CLAuthorizationStatus.authorizedAlways:
-            completion(true)
-            break
-        /*
-        case CLAuthorizationStatus.authorizedWhenInUse, CLAuthorizationStatus.denied, CLAuthorizationStatus.restricted:
-            DispatchQueue.main.async {
-                NCAutoUpload.shared.startSignificantChangeUpdates()
-            }
-            completion(false)
-            break
-        case CLAuthorizationStatus.notDetermined:
-            DispatchQueue.main.async {
-                NCAutoUpload.shared.startSignificantChangeUpdates()
-            }
-            completion(false)
-            break
-        */
+
+    #if !EXTENSION
+    func checkBackgroundRefreshStatus() {
+        switch UIApplication.shared.backgroundRefreshStatus {
+        case .available:
+            print("Background fetch is enabled")
+        case .denied:
+            print("Background fetch is explicitly disabled")
+            // Redirect user to Settings page only once; Respect user's choice is important
+            UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+        case .restricted:
+            // Should not redirect user to Settings since he / she cannot toggle the settings
+            print("Background fetch is restricted, e.g. under parental control")
         default:
-            DispatchQueue.main.async {
-                NCAutoUpload.shared.startSignificantChangeUpdates()
-            }
-            completion(false)
-            break
+            print("Unknown property")
         }
     }
+    #endif
 }

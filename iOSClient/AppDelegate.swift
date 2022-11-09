@@ -6,7 +6,6 @@
 //  Copyright (c) 2014 Marino Faggiana. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//  Author TSI-mc
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -24,15 +23,14 @@
 
 import UIKit
 import BackgroundTasks
-import NCCommunication
+import NextcloudKit
 import TOPasscodeViewController
 import LocalAuthentication
 import Firebase
-import Adjust
-import AppAuth
+import WidgetKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, TOPasscodeViewControllerDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, TOPasscodeViewControllerDelegate, NCAccountRequestDelegate, NCViewCertificateDetailsDelegate, NCUserBaseUrl {
 
     var backgroundSessionCompletionHandler: (() -> Void)?
     var window: UIWindow?
@@ -42,139 +40,123 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     @objc var user: String = ""
     @objc var userId: String = ""
     @objc var password: String = ""
-    
-    var activeAppConfigView: NCAppConfigView?
-    var activeFiles: NCFiles?
-    var activeFileViewInFolder: NCFileViewInFolder?
+
+    var deletePasswordSession: Bool = false
     var activeLogin: NCLogin?
     var activeLoginWeb: NCLoginWeb?
-    @objc var activeMedia: NCMedia?
     var activeServerUrl: String = ""
     @objc var activeViewController: UIViewController?
-    var activeViewerVideo: NCViewerVideo?
-    
-    var listFilesVC: [String:NCFiles] = [:]
-    var listFavoriteVC: [String:NCFavorite] = [:]
-    var listOfflineVC: [String:NCOffline] = [:]
-    var listProgress: [String:NCGlobal.progressType] = [:]
-    
+    var mainTabBar: NCMainTabBar?
+    var activeMetadata: tableMetadata?
+    var isSearchingMode: Bool = false
+
+    let listFilesVC = ThreadSafeDictionary<String,NCFiles>()
+    let listFavoriteVC = ThreadSafeDictionary<String,NCFavorite>()
+    let listOfflineVC = ThreadSafeDictionary<String,NCOffline>()
+
     var disableSharesView: Bool = false
     var documentPickerViewController: NCDocumentPickerViewController?
-    var networkingProcessUpload: NCNetworkingProcessUpload?
-    var passcodeViewController: TOPasscodeViewController?
-    var pasteboardOcIds: [String] = []
     var shares: [tableShare] = []
     var timerErrorNetworking: Timer?
-    @objc let adjust = AdjustHelper()
-    let triggerEvent:TriggerEvent = Login
 
-    var currentAuthorizationFlow: OIDExternalUserAgentSession?
-    
+    private var privacyProtectionWindow: UIWindow?
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
+
         let userAgent = CCUtility.getUserAgent() as String
-        let isSimulatorOrTestFlight = NCUtility.shared.isSimulatorOrTestFlight()
         let versionNextcloudiOS = String(format: NCBrandOptions.shared.textCopyrightNextcloudiOS, NCUtility.shared.getVersionApp())
 
-        UserDefaults.standard.register(defaults: ["UserAgent" : userAgent])
+        // Register initialize
+        NotificationCenter.default.addObserver(self, selector: #selector(initialize), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
+
+        UserDefaults.standard.register(defaults: ["UserAgent": userAgent])
         if !CCUtility.getDisableCrashservice() && !NCBrandOptions.shared.disable_crash_service {
             FirebaseApp.configure()
         }
-        
+
         CCUtility.createDirectoryStandard()
         CCUtility.emptyTemporaryDirectory()
-        
-        NCCommunicationCommon.shared.setup(delegate: NCNetworking.shared)
-        NCCommunicationCommon.shared.setup(userAgent: userAgent)
-        
+
+        NKCommon.shared.setup(delegate: NCNetworking.shared)
+        NKCommon.shared.setup(userAgent: userAgent)
+
         startTimerErrorNetworking()
 
         // LOG
-        let levelLog = CCUtility.getLogLevel()
-        NCCommunicationCommon.shared.levelLog = levelLog
+        var levelLog = 0
         if let pathDirectoryGroup = CCUtility.getDirectoryGroup()?.path {
-            NCCommunicationCommon.shared.pathLog = pathDirectoryGroup
+            NKCommon.shared.pathLog = pathDirectoryGroup
         }
-        NCCommunicationCommon.shared.copyLogToDocumentDirectory = true
-        if isSimulatorOrTestFlight {
-            NCCommunicationCommon.shared.writeLog("Start session with level \(levelLog) " + versionNextcloudiOS + " (Simulator / TestFlight)")
+
+        if NCBrandOptions.shared.disable_log {
+
+            NCUtilityFileSystem.shared.deleteFile(filePath: NKCommon.shared.filenamePathLog)
+            NCUtilityFileSystem.shared.deleteFile(filePath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first! + "/" + NKCommon.shared.filenameLog)
+
         } else {
-            NCCommunicationCommon.shared.writeLog("Start session with level \(levelLog) " + versionNextcloudiOS)
+
+            levelLog = CCUtility.getLogLevel()
+            NKCommon.shared.levelLog = levelLog
+            NKCommon.shared.copyLogToDocumentDirectory = true
+            NKCommon.shared.writeLog("[INFO] Start session with level \(levelLog) " + versionNextcloudiOS + " in state \(UIApplication.shared.applicationState.rawValue) where (0 active, 1 inactive, 2 background).")
         }
-        
-        // Activate user account
-        if let resultActiveAccount = NCManageDatabase.shared.getAccountActive() {
-            
-            // FIX 3.0.5 lost urlbase
-            if resultActiveAccount.urlBase.count == 0 {
-                let user = resultActiveAccount.user + " "
-                let urlBase = resultActiveAccount.account.replacingOccurrences(of: user, with: "")
-                resultActiveAccount.urlBase = urlBase
-                NCManageDatabase.shared.updateAccount(resultActiveAccount)
+
+        // LOG Account
+        if let account = NCManageDatabase.shared.getActiveAccount() {
+            NKCommon.shared.writeLog("Account active \(account.account)")
+            if CCUtility.getPassword(account.account).isEmpty {
+                NKCommon.shared.writeLog("[ERROR] PASSWORD NOT FOUND for \(account.account)")
             }
-            
-            settingAccount(resultActiveAccount.account, urlBase: resultActiveAccount.urlBase, user: resultActiveAccount.user, userId: resultActiveAccount.userId, password: CCUtility.getPassword(resultActiveAccount.account))
-            
+        }
+
+        // Activate user account
+        if let activeAccount = NCManageDatabase.shared.getActiveAccount() {
+
+            // FIX 3.0.5 lost urlbase
+            if activeAccount.urlBase.count == 0 {
+                let user = activeAccount.user + " "
+                let urlBase = activeAccount.account.replacingOccurrences(of: user, with: "")
+                activeAccount.urlBase = urlBase
+                NCManageDatabase.shared.updateAccount(activeAccount)
+            }
+
+            settingAccount(activeAccount.account, urlBase: activeAccount.urlBase, user: activeAccount.user, userId: activeAccount.userId, password: CCUtility.getPassword(activeAccount.account))
+
+            NCBrandColor.shared.settingThemingColor(account: activeAccount.account)
+
         } else {
-            
+
             CCUtility.deleteAllChainStore()
             if let bundleID = Bundle.main.bundleIdentifier {
-                self.adjust.trackEvent(TriggerEvent(Logout.rawValue))
                 UserDefaults.standard.removePersistentDomain(forName: bundleID)
             }
-        }
-        
-        // init home
-        NotificationCenter.default.addObserver(self, selector: #selector(initializeMain), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitializeMain), object: nil)
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitializeMain)
-        
-        // Process upload
-        networkingProcessUpload = NCNetworkingProcessUpload.init()
-        
-//        // Push Notification & display notification
-//        application.registerForRemoteNotifications()
-//        UNUserNotificationCenter.current().delegate = self
-//        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (_, _) in }
 
-        // AV
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print(error)
+            NCBrandColor.shared.createImagesThemingColor()
         }
-        application.beginReceivingRemoteControlEvents()
-                
+
+        // Create user color
+        NCBrandColor.shared.createUserColors()
+
+        // Push Notification & display notification
+        application.registerForRemoteNotifications()
+        UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { _, _ in }
+
         // Store review
         if !NCUtility.shared.isSimulatorOrTestFlight() {
             let review = NCStoreReview()
             review.incrementAppRuns()
             review.showStoreReview()
         }
-        
-        // Detect Dark mode
-        if #available(iOS 13.0, *) {
-            if CCUtility.getDarkModeDetect() {
-                if UITraitCollection.current.userInterfaceStyle == .dark {
-                    CCUtility.setDarkMode(true)
-                } else {
-                    CCUtility.setDarkMode(false)
-                }
-            }
-        }
-        
+
         // Background task: register
-        if #available(iOS 13.0, *) {
-            BGTaskScheduler.shared.register(forTaskWithIdentifier: NCGlobal.shared.refreshTask, using: nil) { task in
-                self.handleRefreshTask(task)
-            }
-            BGTaskScheduler.shared.register(forTaskWithIdentifier: NCGlobal.shared.processingTask, using: nil) { task in
-                self.handleProcessingTask(task)
-            }
-        } else {
-            application.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: NCGlobal.shared.refreshTask, using: nil) { task in
+            self.handleRefreshTask(task)
         }
-        
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: NCGlobal.shared.processingTask, using: nil) { task in
+            self.handleProcessingTask(task)
+        }
+
         // Intro
         if NCBrandOptions.shared.disable_intro {
             CCUtility.setIntro(true)
@@ -184,279 +166,272 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         } else {
             if !CCUtility.getIntro() {
                 if let viewController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() {
-                    let navigationController = UINavigationController(rootViewController: viewController)
+                    let navigationController = NCLoginNavigationController.init(rootViewController: viewController)
                     window?.rootViewController = navigationController
                     window?.makeKeyAndVisible()
                 }
             }
         }
-        
+
         // Passcode
         DispatchQueue.main.async {
-            self.passcodeWithAutomaticallyPromptForBiometricValidation(true)
+            self.presentPasscode {
+                self.enableTouchFaceID()
+            }
         }
-        
-        adjust.configAdjust()
-        
+
         return true
     }
-    
+
     // MARK: - Life Cycle
 
-    // L' applicazione entrerà in primo piano (attivo sempre)
+    // L' applicazione entrerà in attivo (sempre)
     func applicationDidBecomeActive(_ application: UIApplication) {
-        
-        NCSettingsBundleHelper.setVersionAndBuildNumber()
-        
-        if account == "" { return }
 
-        NCNetworking.shared.verifyUploadZombie()
-        
+        NKCommon.shared.writeLog("[INFO] Application did become active")
+
+        self.deletePasswordSession = false
+
+        if !NCAskAuthorization.shared.isRequesting {
+            hidePrivacyProtectionWindow()
+        }
+
+        NCSettingsBundleHelper.setVersionAndBuildNumber()
+
+        if !account.isEmpty {
+            NCNetworkingProcessUpload.shared.verifyUploadZombie()
+        }
+
+        // Start Auto Upload
+        NCAutoUpload.shared.initAutoUpload(viewController: nil) { items in
+            NKCommon.shared.writeLog("[INFO] Initialize Auto upload with \(items) uploads")
+        }
+
+        // START UPLOAD PROCESS
+        NCNetworkingProcessUpload.shared.startTimer()
+
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterApplicationDidBecomeActive)
     }
-    
-    // L' applicazione entrerà in primo piano (attivo solo dopo il background)
-    func applicationWillEnterForeground(_ application: UIApplication) {
-        
-        if account == "" { return }
 
-        NCCommunicationCommon.shared.writeLog("Application will enter in foreground")
-        
-        // Request Passcode
-        passcodeWithAutomaticallyPromptForBiometricValidation(true)
-        
-        // Initialize Auto upload
-        NCAutoUpload.shared.initAutoUpload(viewController: nil) { (_) in }
-                
+    // L' applicazione entrerà in primo piano (dopo il background)
+    func applicationWillEnterForeground(_ application: UIApplication) {
+        guard !account.isEmpty, let activeAccount = NCManageDatabase.shared.getActiveAccount() else { return }
+
+        NKCommon.shared.writeLog("[INFO] Application will enter in foreground")
+
+        // Account changed ??
+        if activeAccount.account != account {
+            settingAccount(activeAccount.account, urlBase: activeAccount.urlBase, user: activeAccount.user, userId: activeAccount.userId, password: CCUtility.getPassword(activeAccount.account))
+        }
+
         // Required unsubscribing / subscribing
         NCPushNotification.shared().pushNotification()
-        
+
         // Request Service Server Nextcloud
         NCService.shared.startRequestServicesServer()
         
+        // Request TouchID, FaceID
+        enableTouchFaceID()
+        
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterApplicationWillEnterForeground)
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSourceNetworkForced)
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSourceNetwork)
     }
 
     // L' applicazione si dimetterà dallo stato di attivo
     func applicationWillResignActive(_ application: UIApplication) {
-        
-        if account == "" { return }
-        
-        // Dismiss FileViewInFolder
-        if activeFileViewInFolder != nil {
-            activeFileViewInFolder?.dismiss(animated: false, completion: {
-                self.activeFileViewInFolder = nil
-            })
+        guard !account.isEmpty else { return }
+
+        NKCommon.shared.writeLog("[INFO] Application will resign active")
+
+        if CCUtility.getPrivacyScreenEnabled() {
+            // Privacy
+            showPrivacyProtectionWindow()
         }
+
+        // STOP UPLOAD PROCESS
+        NCNetworkingProcessUpload.shared.stopTimer()
+
+        // Reload Widget
+        WidgetCenter.shared.reloadAllTimelines()
+
+        // Clear operation queue
+        NCOperationQueue.shared.cancelAllQueue()
+        // Clear download
+        NCNetworking.shared.cancelAllDownloadTransfer()
+
+        // Clear older files
+        let days = CCUtility.getCleanUpDay()
+        if let directory = CCUtility.getDirectoryProviderStorage() {
+            NCUtilityFileSystem.shared.cleanUp(directory: directory, days: TimeInterval(days))
+        }
+
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterApplicationWillResignActive)
     }
-    
+
     // L' applicazione è entrata nello sfondo
     func applicationDidEnterBackground(_ application: UIApplication) {
-        
-        if account == "" { return }
-        
-        NCCommunicationCommon.shared.writeLog("Application did enter in background")
-        
-        passcodeWithAutomaticallyPromptForBiometricValidation(false)
-        
-        if #available(iOS 13.0, *) {
-            scheduleAppRefresh()
-            scheduleBackgroundProcessing()
-        }
-        
+        guard !account.isEmpty else { return }
+
+        NKCommon.shared.writeLog("[INFO] Application did enter in background")
+
+        scheduleAppRefresh()
+        scheduleAppProcessing()
+
+        // Passcode
+        presentPasscode { }
+
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterApplicationDidEnterBackground)
     }
-    
+
     // L'applicazione terminerà
     func applicationWillTerminate(_ application: UIApplication) {
-        
-        NCCommunicationCommon.shared.writeLog("bye bye")
+
+        NCNetworking.shared.cancelAllDownloadTransfer()
+
+        let content = UNMutableNotificationContent()
+        content.title = NCBrandOptions.shared.brand
+        content.body = NSLocalizedString("_keep_running_", comment: "")
+        let req = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+        let notificationCenter = UNUserNotificationCenter.current()
+        notificationCenter.add(req)
+
+        NKCommon.shared.writeLog("bye bye")
     }
-    
-    
-//    willre
-    
+
     // MARK: -
 
-    @objc func initializeMain() {
-        
-        if account == "" { return }
+    @objc private func initialize() {
+        guard !account.isEmpty else { return }
 
-        NCCommunicationCommon.shared.writeLog("initialize Main")
-        
-        // Clear error certificate
-        CCUtility.setCertificateError(account, error: false)
-        
+        NKCommon.shared.writeLog("[INFO] initialize Main")
+
         // Registeration push notification
         NCPushNotification.shared().pushNotification()
-        
-        // Setting Theming
-        NCBrandColor.shared.settingThemingColor(account: account)
-        
-        // Start Auto Upload
-        NCAutoUpload.shared.initAutoUpload(viewController: nil) { (_) in }
-        
+
         // Start services
         NCService.shared.startRequestServicesServer()
-        
+
         // close detail
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuDetailClose)
 
+        // Reload Widget
+        WidgetCenter.shared.reloadAllTimelines()
+
         // Registeration domain File Provider
-        //FileProviderDomain *fileProviderDomain = [FileProviderDomain new];
-        //[fileProviderDomain removeAllDomains];
-        //[fileProviderDomain registerDomains];
+        // FileProviderDomain *fileProviderDomain = [FileProviderDomain new];
+        // [fileProviderDomain removeAllDomains];
+        // [fileProviderDomain registerDomains];
     }
-  
+
     // MARK: - Background Task
-    
-    @available(iOS 13.0, *)
+
+    /*
+    @discussion Schedule a refresh task request to ask that the system launch your app briefly so that you can download data and keep your app's contents up-to-date. The system will fulfill this request intelligently based on system conditions and app usage.
+     < MAX 30 seconds >
+     */
     func scheduleAppRefresh() {
-        
-        let request = BGAppRefreshTaskRequest.init(identifier: NCGlobal.shared.refreshTask)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 5 * 60) // Refresh after 5 minutes.
+
+        let request = BGAppRefreshTaskRequest(identifier: NCGlobal.shared.refreshTask)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 60) // Refresh after 60 seconds.
         do {
             try BGTaskScheduler.shared.submit(request)
-            NCCommunicationCommon.shared.writeLog("Refresh task success submit request \(request)")
+            NKCommon.shared.writeLog("[SUCCESS] Refresh task success submit request 60 seconds \(request)")
         } catch {
-            NCCommunicationCommon.shared.writeLog("Refresh task failed to submit request: \(error)")
+            NKCommon.shared.writeLog("[ERROR] Refresh task failed to submit request: \(error)")
         }
     }
-    
-    @available(iOS 13.0, *)
-    func scheduleBackgroundProcessing() {
-        
-        let request = BGProcessingTaskRequest.init(identifier: NCGlobal.shared.processingTask)
+
+    /*
+     @discussion Schedule a processing task request to ask that the system launch your app when conditions are favorable for battery life to handle deferrable, longer-running processing, such as syncing, database maintenance, or similar tasks. The system will attempt to fulfill this request to the best of its ability within the next two days as long as the user has used your app within the past week.
+     < MAX over 1 minute >
+     */
+    func scheduleAppProcessing() {
+
+        let request = BGProcessingTaskRequest(identifier: NCGlobal.shared.processingTask)
         request.earliestBeginDate = Date(timeIntervalSinceNow: 5 * 60) // Refresh after 5 minutes.
-        request.requiresNetworkConnectivity = true
+        request.requiresNetworkConnectivity = false
         request.requiresExternalPower = false
         do {
             try BGTaskScheduler.shared.submit(request)
-            NCCommunicationCommon.shared.writeLog("Background Processing task success submit request \(request)")
+            NKCommon.shared.writeLog("[SUCCESS] Background Processing task success submit request 5 minutes \(request)")
         } catch {
-            NCCommunicationCommon.shared.writeLog("Background Processing task failed to submit request: \(error)")
+            NKCommon.shared.writeLog("[ERROR] Background Processing task failed to submit request: \(error)")
         }
     }
-    
-    @available(iOS 13.0, *)
+
     func handleRefreshTask(_ task: BGTask) {
+        scheduleAppRefresh()
         
-        if account == "" {
+        guard !account.isEmpty else {
             task.setTaskCompleted(success: true)
             return
         }
-        
-        NCCommunicationCommon.shared.writeLog("Start handler refresh task [Auto upload]")
-        
-        NCAutoUpload.shared.initAutoUpload(viewController: nil) { (items) in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateBadgeNumber)
-                NCCommunicationCommon.shared.writeLog("Completition handler refresh task with %lu uploads [Auto upload]")
+
+        NKCommon.shared.setup(delegate: NCNetworking.shared)
+
+        NCAutoUpload.shared.initAutoUpload(viewController: nil) { items in
+            NKCommon.shared.writeLog("[INFO] Refresh task auto upload with \(items) uploads")
+            NCNetworkingProcessUpload.shared.process { items in
+                NKCommon.shared.writeLog("[INFO] Refresh task upload process with \(items) uploads")
                 task.setTaskCompleted(success: true)
             }
         }
     }
-    
-    @available(iOS 13.0, *)
-    func handleProcessingTask(_ task: BGTask) {
-        
-        if account == "" {
-            task.setTaskCompleted(success: true)
-            return
-        }
-        
-        NCCommunicationCommon.shared.writeLog("Start handler processing task [Synchronize Favorite & Offline]")
-        
-        NCNetworking.shared.listingFavoritescompletion(selector: NCGlobal.shared.selectorReadFile) { (account, metadatas, errorCode, errorDescription) in
-            NCCommunicationCommon.shared.writeLog("Completition listing favorite with error: \(errorCode)")
-        }
-        
-        NCService.shared.synchronizeOffline(account: account)
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 25) {
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateBadgeNumber)
-            NCCommunicationCommon.shared.writeLog("Completition handler processing task [Synchronize Favorite & Offline]")
-            task.setTaskCompleted(success: true)
-        }
-    }
-    
-    // MARK: - Fetch
 
-    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    func handleProcessingTask(_ task: BGTask) {
+        scheduleAppProcessing()
         
-        if account == "" {
-            completionHandler(UIBackgroundFetchResult.noData)
+        guard !account.isEmpty else {
+            task.setTaskCompleted(success: true)
             return
         }
-        
-        NCCommunicationCommon.shared.writeLog("Start perform Fetch [Auto upload]")
-        
-        NCAutoUpload.shared.initAutoUpload(viewController: nil) { (items) in
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateBadgeNumber)
-            NCCommunicationCommon.shared.writeLog("Completition perform Fetch with \(items) uploads [Auto upload]")
-            if items == 0 {
-                completionHandler(UIBackgroundFetchResult.noData)
-            } else {
-                completionHandler(UIBackgroundFetchResult.newData)
-            }
-        }
+
+        NKCommon.shared.writeLog("[INFO] Processing task")
+        task.setTaskCompleted(success: true)
     }
-    
+
     // MARK: - Background Networking Session
 
     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
-        
-        NCCommunicationCommon.shared.writeLog("Start handle Events For Background URLSession: \(identifier)")
+
+        NKCommon.shared.writeLog("[INFO] Start handle Events For Background URLSession: \(identifier)")
+        // Reload Widget
+        WidgetCenter.shared.reloadAllTimelines()
         backgroundSessionCompletionHandler = completionHandler
     }
-    
+
     // MARK: - Push Notifications
-    
+
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler(UNNotificationPresentationOptions.alert)
+        completionHandler([.list, .banner, .sound])
     }
-    
+
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         completionHandler()
     }
-    
+
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        NCPushNotification.shared().registerForRemoteNotifications(withDeviceToken: deviceToken)
+        NCNetworking.shared.checkPushNotificationServerProxyCertificateUntrusted(viewController: self.window?.rootViewController) { error in
+            if error == .success {
+                NCPushNotification.shared().registerForRemoteNotifications(withDeviceToken: deviceToken)
+            }
+        }
     }
-    
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        NCPushNotification.shared().applicationdidReceiveRemoteNotification(userInfo) { (result) in
+
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        NCPushNotification.shared().applicationdidReceiveRemoteNotification(userInfo) { result in
             completionHandler(result)
         }
     }
-    
-    func requestPushNotificationPermission(){
-        // Push Notification & display notification
-        UIApplication.shared.registerForRemoteNotifications()
-        UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (_, _) in }
-        NCPushNotification.shared().pushNotification()
-    }
-        
+
     // MARK: - Login & checkErrorNetworking
 
     @objc func openLogin(viewController: UIViewController?, selector: Int, openLoginWeb: Bool) {
-       
-        // use appConfig [MDM]
-        if NCBrandOptions.shared.use_configuration {
-            
-            if activeAppConfigView?.view.window == nil {
-                activeAppConfigView = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCAppConfigView") as? NCAppConfigView
-                showLoginViewController(activeAppConfigView, contextViewController: viewController)
-            }
-            return
-        }
-        
-        // only for personalized LoginWeb [customer]
-        if NCBrandOptions.shared.use_login_web_personalized {
-            
+
+        // [WEBPersonalized] [AppConfig]
+        if NCBrandOptions.shared.use_login_web_personalized || NCBrandOptions.shared.use_AppConfig {
+
             if activeLoginWeb?.view.window == nil {
                 activeLoginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb
                 activeLoginWeb?.urlBase = NCBrandOptions.shared.loginBaseUrl
@@ -464,10 +439,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
             return
         }
-        
+
         // Nextcloud standard login
         if selector == NCGlobal.shared.introSignup {
-            
+
             if activeLoginWeb?.view.window == nil {
                 activeLoginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb
                 if selector == NCGlobal.shared.introSignup {
@@ -477,25 +452,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 }
                 showLoginViewController(activeLoginWeb, contextViewController: viewController)
             }
-            
+
         } else if NCBrandOptions.shared.disable_intro && NCBrandOptions.shared.disable_request_login_url {
-            
+
             if activeLoginWeb?.view.window == nil {
                 activeLoginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb
                 activeLoginWeb?.urlBase = NCBrandOptions.shared.loginBaseUrl
                 showLoginViewController(activeLoginWeb, contextViewController: viewController)
             }
-            
+
         } else if openLoginWeb {
-            
+
             if activeLoginWeb?.view.window == nil {
                 activeLoginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb
                 activeLoginWeb?.urlBase = urlBase
                 showLoginViewController(activeLoginWeb, contextViewController: viewController)
             }
-            
+
         } else {
-            
+
             if activeLogin?.view.window == nil {
                 activeLogin = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin
                 showLoginViewController(activeLogin, contextViewController: viewController)
@@ -503,11 +478,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
     }
 
-    func showLoginViewController(_ viewController:UIViewController?, contextViewController: UIViewController?) {
-        
+    func showLoginViewController(_ viewController: UIViewController?, contextViewController: UIViewController?) {
+
         if contextViewController == nil {
             if let viewController = viewController {
-                let navigationController = UINavigationController.init(rootViewController: viewController)
+                let navigationController = NCLoginNavigationController.init(rootViewController: viewController)
                 navigationController.navigationBar.barStyle = .black
                 navigationController.navigationBar.tintColor = NCBrandColor.shared.customerText
                 navigationController.navigationBar.barTintColor = NCBrandColor.shared.customer
@@ -521,7 +496,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
         } else {
             if let viewController = viewController, let contextViewController = contextViewController {
-                let navigationController = UINavigationController.init(rootViewController: viewController)
+                let navigationController = NCLoginNavigationController.init(rootViewController: viewController)
                 navigationController.modalPresentationStyle = .fullScreen
                 navigationController.navigationBar.barStyle = .black
                 navigationController.navigationBar.tintColor = NCBrandColor.shared.customerText
@@ -535,64 +510,88 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     @objc func startTimerErrorNetworking() {
         timerErrorNetworking = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(checkErrorNetworking), userInfo: nil, repeats: true)
     }
-    
+
     @objc private func checkErrorNetworking() {
         
-        if account == "" { return }
-        
-        // check unauthorized server (401)
-        if CCUtility.getPassword(account)!.count == 0 {
+        // check unauthorized server (401/403)
+        if account != "" && CCUtility.getPassword(account)!.count == 0 {
             openLogin(viewController: window?.rootViewController, selector: NCGlobal.shared.introLogin, openLoginWeb: true)
-        }
-        
-        // check certificate untrusted (-1202)
-        if CCUtility.getCertificateError(account) {
-            
-            let alertController = UIAlertController(title: NSLocalizedString("_ssl_certificate_untrusted_", comment: ""), message: NSLocalizedString("_connect_server_anyway_", comment: ""), preferredStyle: .alert)
-                        
-            alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .default, handler: { action in
-                NCNetworking.shared.writeCertificate(directoryCertificate: CCUtility.getDirectoryCerificates())
-                self.startTimerErrorNetworking()
-            }))
-            
-            alertController.addAction(UIAlertAction(title: NSLocalizedString("_no_", comment: ""), style: .default, handler: { action in
-                self.startTimerErrorNetworking()
-            }))
-            
-            window?.rootViewController?.present(alertController, animated: true, completion: {
-                self.timerErrorNetworking?.invalidate()
-            })
         }
     }
     
+    func trustCertificateError(host: String) {
+
+        guard let currentHost = URL(string: self.urlBase)?.host,
+              let pushNotificationServerProxyHost = URL(string: NCBrandOptions.shared.pushNotificationServerProxy)?.host,
+              host != pushNotificationServerProxyHost,
+              host == currentHost
+        else { return }
+
+        let certificateHostSavedPath = CCUtility.getDirectoryCerificates()! + "/" + host + ".der"
+        var title = NSLocalizedString("_ssl_certificate_changed_", comment: "")
+
+        if !FileManager.default.fileExists(atPath: certificateHostSavedPath) {
+            title = NSLocalizedString("_connect_server_anyway_", comment: "")
+        }
+
+        let alertController = UIAlertController(title: title, message: NSLocalizedString("_server_is_trusted_", comment: ""), preferredStyle: .alert)
+
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .default, handler: { action in
+            NCNetworking.shared.writeCertificate(host: host)
+        }))
+
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_no_", comment: ""), style: .default, handler: { action in }))
+
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_certificate_details_", comment: ""), style: .default, handler: { action in
+            if let navigationController = UIStoryboard(name: "NCViewCertificateDetails", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+                let viewController = navigationController.topViewController as! NCViewCertificateDetails
+                viewController.delegate = self
+                viewController.host = host
+                self.window?.rootViewController?.present(navigationController, animated: true)
+            }
+        }))
+
+        window?.rootViewController?.present(alertController, animated: true)
+    }
+
+    func viewCertificateDetailsDismiss(host: String) {
+        trustCertificateError(host: host)
+    }
+
     // MARK: - Account
-    
+
     @objc func settingAccount(_ account: String, urlBase: String, user: String, userId: String, password: String) {
-        
+
+        let accountTestBackup = self.account + "/" + self.userId
+        let accountTest = account +  "/" + userId
+
         self.account = account
         self.urlBase = urlBase
         self.user = user
         self.userId = userId
         self.password = password
-        
+
         _ = NCFunctionCenter.shared
-        
-        NCCommunicationCommon.shared.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase)
-        NCCommunicationCommon.shared.setup(webDav: NCUtilityFileSystem.shared.getWebDAV(account: account))
-        NCCommunicationCommon.shared.setup(dav: NCUtilityFileSystem.shared.getDAV())
+
+        NKCommon.shared.setup(account: account, user: user, userId: userId, password: password, urlBase: urlBase)
         let serverVersionMajor = NCManageDatabase.shared.getCapabilitiesServerInt(account: account, elements: NCElementsJSON.shared.capabilitiesVersionMajor)
         if serverVersionMajor > 0 {
-            NCCommunicationCommon.shared.setup(nextcloudVersion: serverVersionMajor)
+            NKCommon.shared.setup(nextcloudVersion: serverVersionMajor)
+        }
+        NCKTVHTTPCache.shared.restartProxy(user: user, password: password)
+
+        DispatchQueue.main.async {
+            if UIApplication.shared.applicationState != .background && accountTestBackup != accountTest {
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitialize, second: 0.2)
+            }
         }
     }
-    
+
     @objc func deleteAccount(_ account: String, wipe: Bool) {
-        
+
         if let account = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", account)) {
             NCPushNotification.shared().unsubscribingNextcloudServerPushNotification(account.account, urlBase: account.urlBase, user: account.user, withSubscribing: false)
         }
-        
-        settingAccount("", urlBase: "", user: "", userId: "", password: "")
         
         let results = NCManageDatabase.shared.getTableLocalFiles(predicate: NSPredicate(format: "account == %@", account), sorted: "ocId", ascending: false)
         for result in results {
@@ -602,227 +601,327 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         CCUtility.clearAllKeysEnd(toEnd: account)
         CCUtility.clearAllKeysPushNotification(account)
-        CCUtility.setCertificateError(account, error: false)
         CCUtility.setPassword(account, password: nil)
-        
+
         if wipe {
+            settingAccount("", urlBase: "", user: "", userId: "", password: "")
             let accounts = NCManageDatabase.shared.getAccounts()
             if accounts?.count ?? 0 > 0 {
                 if let newAccount = accounts?.first {
-                    if let account = NCManageDatabase.shared.setAccountActive(newAccount) {
-                        settingAccount(account.account, urlBase: account.urlBase, user: account.user, userId: account.userId, password: CCUtility.getPassword(account.account))
-                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitializeMain)
-                    }
+                    self.changeAccount(newAccount)
                 }
             } else {
                 openLogin(viewController: window?.rootViewController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
             }
         }
     }
-    
+
+    @objc func changeAccount(_ account: String) {
+
+        NCManageDatabase.shared.setAccountActive(account)
+        if let tableAccount = NCManageDatabase.shared.getActiveAccount() {
+
+            NCOperationQueue.shared.cancelAllQueue()
+            NCNetworking.shared.cancelAllTask()
+
+            settingAccount(tableAccount.account, urlBase: tableAccount.urlBase, user: tableAccount.user, userId: tableAccount.userId, password: CCUtility.getPassword(tableAccount.account))
+        }
+    }
+
     // MARK: - Account Request
+
+    func accountRequestChangeAccount(account: String) {
+        changeAccount(account)
+    }
     
-    func requestAccount(startTimer: Bool) {
-              
+    func requestAccount() {
+
+        if isPasscodePresented() { return }
+        if !CCUtility.getAccountRequest() { return }
+
         let accounts = NCManageDatabase.shared.getAllAccount()
-        
-        if CCUtility.getAccountRequest() && accounts.count > 1 {
+
+        if accounts.count > 1 {
             
             if let vcAccountRequest = UIStoryboard(name: "NCAccountRequest", bundle: nil).instantiateInitialViewController() as? NCAccountRequest {
-               
+
+                vcAccountRequest.activeAccount = NCManageDatabase.shared.getActiveAccount()
                 vcAccountRequest.accounts = accounts
                 vcAccountRequest.enableTimerProgress = true
                 vcAccountRequest.enableAddAccount = false
                 vcAccountRequest.dismissDidEnterBackground = false
-                
+                vcAccountRequest.delegate = self
+
                 let screenHeighMax = UIScreen.main.bounds.height - (UIScreen.main.bounds.height/5)
                 let numberCell = accounts.count
-                let height = min(CGFloat(numberCell * Int(vcAccountRequest.heightCell) + 65), screenHeighMax)
-                
-                let popup = NCPopupViewController(contentController: vcAccountRequest, popupWidth: 300, popupHeight: height)
+                let height = min(CGFloat(numberCell * Int(vcAccountRequest.heightCell) + 45), screenHeighMax)
+
+                let popup = NCPopupViewController(contentController: vcAccountRequest, popupWidth: 300, popupHeight: height+20)
                 popup.backgroundAlpha = 0.8
+
+                window?.rootViewController?.present(popup, animated: true)
                 
-                UIApplication.shared.keyWindow?.rootViewController?.present(popup, animated: true)
-                
-                if startTimer {
-                    vcAccountRequest.startTimer()
-                }
+                vcAccountRequest.startTimer()
             }
         }
     }
-    
+
     // MARK: - Passcode
-    
-    func passcodeWithAutomaticallyPromptForBiometricValidation(_ automaticallyPromptForBiometricValidation: Bool) {
-        
+
+    func presentPasscode(completion: @escaping () -> ()) {
+
         let laContext = LAContext()
         var error: NSError?
-        
-        if account == "" { return }
-        
-        guard let passcode = CCUtility.getPasscode() else {
-            requestAccount(startTimer: false)
-            return
-        }
-        if passcode.count == 0 || CCUtility.getNotPasscodeAtStart() {
-            requestAccount(startTimer: false)
-            return
-        }
-        
-        if passcodeViewController == nil {
-            passcodeViewController = TOPasscodeViewController.init(style: .translucentLight, passcodeType: .sixDigits)
-            if #available(iOS 13.0, *) {
-                if UITraitCollection.current.userInterfaceStyle == .dark {
-                    passcodeViewController?.style = .translucentDark
+
+        defer { self.requestAccount() }
+
+        let presentedViewController = window?.rootViewController?.presentedViewController
+        guard !account.isEmpty, CCUtility.isPasscodeAtStartEnabled(), !(presentedViewController is NCLoginNavigationController) else { return }
+
+        // Make sure we have a privacy window (in case it's not enabled)
+        showPrivacyProtectionWindow()
+
+        let passcodeViewController = TOPasscodeViewController(passcodeType: .sixDigits, allowCancel: false)
+        passcodeViewController.delegate = self
+        passcodeViewController.keypadButtonShowLettering = false
+        if CCUtility.getEnableTouchFaceID() && laContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            if error == nil {
+                if laContext.biometryType == .faceID  {
+                    passcodeViewController.biometryType = .faceID
+                } else if laContext.biometryType == .touchID  {
+                    passcodeViewController.biometryType = .touchID
                 }
-            }
-            passcodeViewController?.delegate = self
-            passcodeViewController?.keypadButtonShowLettering = false
-            if CCUtility.getEnableTouchFaceID() && laContext.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
-                if error == nil {
-                    if laContext.biometryType == .faceID  {
-                        passcodeViewController?.biometryType = .faceID
-                        passcodeViewController?.allowBiometricValidation = true
-                    } else if laContext.biometryType == .touchID  {
-                        passcodeViewController?.biometryType = .touchID
-                        passcodeViewController?.allowBiometricValidation = true
-                    }
-                }
-            }
-            if let passcodeViewController = self.passcodeViewController {
-                window?.rootViewController?.present(passcodeViewController, animated: true, completion: {
-                    self.enableTouchFaceID(automaticallyPromptForBiometricValidation)
-                })
-            }
-        } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.enableTouchFaceID(automaticallyPromptForBiometricValidation)
+                passcodeViewController.allowBiometricValidation = true
+                passcodeViewController.automaticallyPromptForBiometricValidation = false
             }
         }
+
+        // show passcode on top of privacy window
+        privacyProtectionWindow?.rootViewController?.present(passcodeViewController, animated: true, completion: {
+            completion()
+        })
     }
-        
-    func didInputCorrectPasscode(in passcodeViewController: TOPasscodeViewController) {
-        passcodeViewController.dismiss(animated: true) {
-            self.passcodeViewController = nil
-            self.requestAccount(startTimer: true)
-        }
+
+    func isPasscodePresented() -> Bool {
+        return privacyProtectionWindow?.rootViewController?.presentedViewController is TOPasscodeViewController
     }
-    
-    func passcodeViewController(_ passcodeViewController: TOPasscodeViewController, isCorrectCode code: String) -> Bool {
-        return code == CCUtility.getPasscode()
-    }
-    
-    func didPerformBiometricValidationRequest(in passcodeViewController: TOPasscodeViewController) {
-        LAContext().evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: NCBrandOptions.shared.brand) { (success, error) in
-            if success {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    passcodeViewController.dismiss(animated: true) {
-                        self.passcodeViewController = nil
-                        self.requestAccount(startTimer: true)
-                    }
-                }
-            }
-        }
-    }
-    
-    func enableTouchFaceID(_ automaticallyPromptForBiometricValidation: Bool) {
-        if CCUtility.getEnableTouchFaceID() && automaticallyPromptForBiometricValidation && passcodeViewController?.view.window != nil {
+
+    func enableTouchFaceID() {
+        guard !account.isEmpty,
+              CCUtility.getEnableTouchFaceID(),
+              CCUtility.isPasscodeAtStartEnabled(),
+              let passcodeViewController = privacyProtectionWindow?.rootViewController?.presentedViewController as? TOPasscodeViewController
+        else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             LAContext().evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: NCBrandOptions.shared.brand) { (success, error) in
                 if success {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.passcodeViewController?.dismiss(animated: true) {
-                            self.passcodeViewController = nil
-                            self.requestAccount(startTimer: true)
+                    DispatchQueue.main.async {
+                        passcodeViewController.dismiss(animated: true) {
+                            self.hidePrivacyProtectionWindow()
+                            self.requestAccount()
                         }
                     }
                 }
             }
+        }
+    }
+
+    func didInputCorrectPasscode(in passcodeViewController: TOPasscodeViewController) {
+        DispatchQueue.main.async {
+            passcodeViewController.dismiss(animated: true) {
+                self.hidePrivacyProtectionWindow()
+                self.requestAccount()
+            }
+        }
+    }
+
+    func passcodeViewController(_ passcodeViewController: TOPasscodeViewController, isCorrectCode code: String) -> Bool {
+        return code == CCUtility.getPasscode()
+    }
+
+    func didPerformBiometricValidationRequest(in passcodeViewController: TOPasscodeViewController) {
+        enableTouchFaceID()
+    }
+
+    // MARK: - Privacy Protection
+
+    private func showPrivacyProtectionWindow() {
+        guard privacyProtectionWindow == nil else {
+            privacyProtectionWindow?.isHidden = false
+            return
+        }
+
+        privacyProtectionWindow = UIWindow(frame: UIScreen.main.bounds)
+
+        let storyboard = UIStoryboard(name: "LaunchScreen", bundle: nil)
+        let initialViewController = storyboard.instantiateInitialViewController()
+
+        self.privacyProtectionWindow?.rootViewController = initialViewController
+
+        privacyProtectionWindow?.windowLevel = .alert + 1
+        privacyProtectionWindow?.makeKeyAndVisible()
+    }
+
+    func hidePrivacyProtectionWindow() {
+        guard !(privacyProtectionWindow?.rootViewController?.presentedViewController is TOPasscodeViewController) else { return }
+        UIWindow.animate(withDuration: 0.25) {
+            self.privacyProtectionWindow?.alpha = 0
+        } completion: { _ in
+            self.privacyProtectionWindow?.isHidden = true
+            self.privacyProtectionWindow = nil
         }
     }
     
     // MARK: - Open URL
 
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        
-        // Sends the URL to the current authorization flow (if any) which will
-         // process it if it relates to an authorization response.
-         if let authorizationFlow = self.currentAuthorizationFlow,
-                                    authorizationFlow.resumeExternalUserAgentFlow(with: url) {
-            
-           return true
-         }
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        guard !account.isEmpty else { return false }
 
-        
-        if account == "" { return false }
-        
         let scheme = url.scheme
         let action = url.host
         var fileName: String = ""
         var serverUrl: String = ""
-        var matchedAccount: tableAccount?
 
-        if scheme == "nextcloud" && action == "open-file" {
-            
-            if let urlComponents = URLComponents.init(url: url, resolvingAgainstBaseURL: false) {
-                
+        /*
+         Example:
+         nextcloud://open-action?action=create-voice-memo&&user=marinofaggiana&url=https://cloud.nextcloud.com
+         */
+
+        if scheme == "nextcloud" && action == "open-action" {
+
+            if let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+
+                let queryItems = urlComponents.queryItems
+                guard let actionScheme = CCUtility.value(forKey: "action", fromQueryItems: queryItems), let rootViewController = window?.rootViewController else { return false }
+                guard let userScheme = CCUtility.value(forKey: "user", fromQueryItems: queryItems) else { return false }
+                guard let urlScheme = CCUtility.value(forKey: "url", fromQueryItems: queryItems) else { return false }
+                if getMatchedAccount(userId: userScheme, url: urlScheme) == nil {
+                    let message = String(format: NSLocalizedString("_account_not_exists_", comment: ""), userScheme, urlScheme)
+
+                    let alertController = UIAlertController(title: NSLocalizedString("_info_", comment: ""), message: message, preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
+
+                    window?.rootViewController?.present(alertController, animated: true, completion: { })
+
+                    return false
+                }
+
+
+                switch actionScheme {
+                case NCGlobal.shared.actionUploadAsset:
+
+                    NCAskAuthorization.shared.askAuthorizationPhotoLibrary(viewController: rootViewController) { hasPermission in
+                        if hasPermission {
+                            NCPhotosPickerViewController.init(viewController: rootViewController, maxSelectedAssets: 0, singleSelectedMode: false)
+                        }
+                    }
+                    
+                case NCGlobal.shared.actionScanDocument:
+                    
+                    NCCreateScanDocument.shared.openScannerDocument(viewController: rootViewController)
+                    
+                case NCGlobal.shared.actionTextDocument:
+                    
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController(), let directEditingCreators = NCManageDatabase.shared.getDirectEditingCreators(account: account), let directEditingCreator = directEditingCreators.first(where: { $0.editor == NCGlobal.shared.editorText}) else { return false }
+                    
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+
+                    let viewController = (navigationController as! UINavigationController).topViewController as! NCCreateFormUploadDocuments
+                    viewController.editorId = NCGlobal.shared.editorText
+                    viewController.creatorId = directEditingCreator.identifier
+                    viewController.typeTemplate = NCGlobal.shared.templateDocument
+                    viewController.serverUrl = activeServerUrl
+                    viewController.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
+
+                    rootViewController.present(navigationController, animated: true, completion: nil)
+                    
+                case NCGlobal.shared.actionVoiceMemo:
+                    
+                    NCAskAuthorization.shared.askAuthorizationAudioRecord(viewController: rootViewController) { hasPermission in
+                        if hasPermission {
+                            let fileName = CCUtility.createFileNameDate(NSLocalizedString("_voice_memo_filename_", comment: ""), extension: "m4a")!
+                            let viewController = UIStoryboard(name: "NCAudioRecorderViewController", bundle: nil).instantiateInitialViewController() as! NCAudioRecorderViewController
+
+                            viewController.delegate = self
+                            viewController.createRecorder(fileName: fileName)
+                            viewController.modalTransitionStyle = .crossDissolve
+                            viewController.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+
+                            rootViewController.present(viewController, animated: true, completion: nil)
+                        }
+                    }
+
+                default:
+                    print("No action")
+                }
+            }
+        }
+
+        /*
+         Example:
+         nextcloud://open-file?path=Talk/IMG_0000123.jpg&user=marinofaggiana&link=https://cloud.nextcloud.com/f/123
+         */
+
+        else if scheme == "nextcloud" && action == "open-file" {
+
+            if !isSearchingMode, let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+
                 let queryItems = urlComponents.queryItems
                 guard let userScheme = CCUtility.value(forKey: "user", fromQueryItems: queryItems) else { return false }
                 guard let pathScheme = CCUtility.value(forKey: "path", fromQueryItems: queryItems) else { return false }
                 guard let linkScheme = CCUtility.value(forKey: "link", fromQueryItems: queryItems) else { return false }
-                
-                if let account = NCManageDatabase.shared.getAccountActive() {
-                    
+                guard let matchedAccount = getMatchedAccount(userId: userScheme, url: linkScheme) else {
+                    guard let domain = URL(string: linkScheme)?.host else { return true }
+                    fileName = (pathScheme as NSString).lastPathComponent
+                    let message = String(format: NSLocalizedString("_account_not_available_", comment: ""), userScheme, domain, fileName)
+
+                    let alertController = UIAlertController(title: NSLocalizedString("_info_", comment: ""), message: message, preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
+
+                    window?.rootViewController?.present(alertController, animated: true, completion: { })
+
+                    return false
+                }
+
+                let davFiles = NCGlobal.shared.davfiles + self.userId
+                if pathScheme.contains("/") {
+                    fileName = (pathScheme as NSString).lastPathComponent
+                    serverUrl = matchedAccount.urlBase + "/" + davFiles + "/" + (pathScheme as NSString).deletingLastPathComponent
+                } else {
+                    fileName = pathScheme
+                    serverUrl = matchedAccount.urlBase + "/" + davFiles
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    NCFunctionCenter.shared.openFileViewInFolder(serverUrl: serverUrl, fileNameBlink: nil, fileNameOpen: fileName)
+                }
+            }
+        } else {
+            app.open(url)
+        }
+
+        return true
+    }
+
+    func getMatchedAccount(userId: String, url: String) -> tableAccount? {
+
+        if let activeAccount = NCManageDatabase.shared.getActiveAccount() {
+            let urlBase = URL(string: activeAccount.urlBase)
+            if url.contains(urlBase?.host ?? "") && userId == activeAccount.userId {
+               return activeAccount
+            } else {
+                let accounts = NCManageDatabase.shared.getAllAccount()
+                for account in accounts {
                     let urlBase = URL(string: account.urlBase)
-                    let user = account.user
-                    if linkScheme.contains(urlBase?.host ?? "") && userScheme == user {
-                        matchedAccount = account
-                    } else {
-                        let accounts = NCManageDatabase.shared.getAllAccount()
-                        for account in accounts {
-                            guard let accountURL = URL(string: account.urlBase) else { return false }
-                            if linkScheme.contains(accountURL.host ?? "") && userScheme == account.user {
-                                NCManageDatabase.shared.setAccountActive(account.account)
-                                settingAccount(account.account, urlBase: account.urlBase, user: account.user, userId: account.userId, password: CCUtility.getPassword(account.account))
-                                matchedAccount = account
-                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitializeMain)
-                                break
-                            }
-                        }
-                    }
-                    
-                    if matchedAccount != nil {
-                        
-                        let webDAV = NCUtilityFileSystem.shared.getWebDAV(account: account.account)
-                        if pathScheme.contains("/") {
-                            fileName = (pathScheme as NSString).lastPathComponent
-                            serverUrl = matchedAccount!.urlBase + "/" + webDAV + "/" + (pathScheme as NSString).deletingLastPathComponent
-                        } else {
-                            fileName = pathScheme
-                            serverUrl = matchedAccount!.urlBase + "/" + webDAV
-                        }
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            NCFunctionCenter.shared.openFileViewInFolder(serverUrl: serverUrl, fileName: fileName)
-                        }
-                        
-                    } else {
-                        
-                        guard let domain = URL(string: linkScheme)?.host else { return true }
-                        fileName = (pathScheme as NSString).lastPathComponent
-                        let message = String(format: NSLocalizedString("_account_not_available_", comment: ""), userScheme, domain, fileName)
-                        
-                        let alertController = UIAlertController(title: NSLocalizedString("_info_", comment: ""), message: message, preferredStyle: .alert)
-                        alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
-                                           
-                        window?.rootViewController?.present(alertController, animated: true, completion: { })
-                        
-                        return false
+                    if url.contains(urlBase?.host ?? "") && userId == account.userId {
+                        changeAccount(account.account)
+                        return account
                     }
                 }
             }
         }
-        
-        return true
+        return nil
     }
 }
 
@@ -831,16 +930,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 extension AppDelegate: NCAudioRecorderViewControllerDelegate {
 
     func didFinishRecording(_ viewController: NCAudioRecorderViewController, fileName: String) {
-        
-        guard let navigationController = UIStoryboard(name: "NCCreateFormUploadVoiceNote", bundle: nil).instantiateInitialViewController() else { return }
-        navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
-        let viewController = (navigationController as! UINavigationController).topViewController as! NCCreateFormUploadVoiceNote
-        viewController.setup(serverUrl: appDelegate.activeServerUrl, fileNamePath: NSTemporaryDirectory() + fileName, fileName: fileName)
-        appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+
+        guard
+            let navigationController = UIStoryboard(name: "NCCreateFormUploadVoiceNote", bundle: nil).instantiateInitialViewController() as? UINavigationController,
+                let viewController = navigationController.topViewController as? NCCreateFormUploadVoiceNote
+        else { return }
+        navigationController.modalPresentationStyle = .formSheet
+        viewController.setup(serverUrl: activeServerUrl, fileNamePath: NSTemporaryDirectory() + fileName, fileName: fileName)
+        window?.rootViewController?.present(navigationController, animated: true)
     }
-    
+
     func didFinishWithoutRecording(_ viewController: NCAudioRecorderViewController, fileName: String) {
+    }
+}
+
+extension AppDelegate: NCCreateFormUploadConflictDelegate {
+    func dismissCreateFormUploadConflict(metadatas: [tableMetadata]?) {
+        guard let metadatas = metadatas, !metadatas.isEmpty else { return }
+        NCNetworkingProcessUpload.shared.createProcessUploads(metadatas: metadatas) { _ in }
     }
 }

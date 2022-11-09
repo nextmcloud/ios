@@ -19,9 +19,9 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
+import UIKit
 import OpenSSL
-import NCCommunication
+import NextcloudKit
 import CFNetwork
 import Alamofire
 
@@ -30,45 +30,45 @@ import Alamofire
         let instance = NCNetworkingE2EE()
         return instance
     }()
-    
-    //MARK: - WebDav Create Folder
-    
-    func createFolder(fileName: String, serverUrl: String, account: String, urlBase: String, completion: @escaping (_ errorCode: Int, _ errorDescription: String)->()) {
-        
+
+    // MARK: - WebDav Create Folder
+
+    func createFolder(fileName: String, serverUrl: String, account: String, urlBase: String, userId: String, completion: @escaping (_ error: NKError) -> Void) {
+
         var fileNameFolder = CCUtility.removeForbiddenCharactersServer(fileName)!
         var fileNameFolderUrl = ""
         var fileNameIdentifier = ""
         var key: NSString?
         var initializationVector: NSString?
-        
+
         fileNameFolder = NCUtilityFileSystem.shared.createFileName(fileNameFolder, serverUrl: serverUrl, account: account)
         if fileNameFolder.count == 0 {
-            completion(0, "")
-            return
+            return completion(NKError())
         }
         fileNameIdentifier = CCUtility.generateRandomIdentifier()
         fileNameFolderUrl = serverUrl + "/" + fileNameIdentifier
-       
-        self.lock(account: account, serverUrl: serverUrl) { (directory, e2eToken, errorCode, errorDescription) in
-            if errorCode == 0 && e2eToken != nil && directory != nil {
-                               
-                NCCommunication.shared.createFolder(fileNameFolderUrl, addCustomHeaders: ["e2e-token" : e2eToken!]) { (account, ocId, date, errorCode, errorDescription) in
-                    if errorCode == 0 {
+
+        self.lock(account: account, serverUrl: serverUrl) { directory, e2eToken, error in
+            if error == .success && e2eToken != nil && directory != nil {
+
+                let options = NKRequestOptions(customHeader: ["e2e-token": e2eToken!])
+                
+                NextcloudKit.shared.createFolder(fileNameFolderUrl, options: options) { account, ocId, _, error in
+                    if error == .success {
                         guard let fileId = NCUtility.shared.ocIdToFileId(ocId: ocId) else {
                             // unlock
                             if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: account, serverUrl: serverUrl) {
-                                NCCommunication.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { (_, _, _, _) in }
+                                NextcloudKit.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { _, _, _, _ in }
                             }
-                            completion(NCGlobal.shared.ErrorInternalError, "Error convert ocId")
-                            return
+                            return completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Error convert ocId"))
                         }
-                        NCCommunication.shared.markE2EEFolder(fileId: fileId, delete: false) { (account, errorCode, errorDescription) in
-                            if errorCode == 0 {
-                                                                         
+                        NextcloudKit.shared.markE2EEFolder(fileId: fileId, delete: false) { account, error in
+                            if error == .success {
+
                                 let object = tableE2eEncryption()
-                                
+
                                 NCEndToEndEncryption.sharedManager()?.encryptkey(&key, initializationVector: &initializationVector)
-                                
+
                                 object.account = account
                                 object.authenticationTag = nil
                                 object.fileName = fileNameFolder
@@ -76,7 +76,7 @@ import Alamofire
                                 object.fileNamePath = ""
                                 object.key = key! as String
                                 object.initializationVector = initializationVector! as String
-                                
+
                                 if let result = NCManageDatabase.shared.getE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl)) {
                                     object.metadataKey = result.metadataKey
                                     object.metadataKeyIndex = result.metadataKeyIndex
@@ -87,149 +87,148 @@ import Alamofire
                                 object.mimeType = "httpd/unix-directory"
                                 object.serverUrl = serverUrl
                                 object.version = 1
-                               
-                                let _ = NCManageDatabase.shared.addE2eEncryption(object)
-                                
-                                self.sendE2EMetadata(account: account, serverUrl: serverUrl, fileNameRename: nil, fileNameNewRename: nil, deleteE2eEncryption: nil, urlBase: urlBase) { (e2eToken, errorCode, errorDescription) in
+
+                                NCManageDatabase.shared.addE2eEncryption(object)
+
+                                self.sendE2EMetadata(account: account, serverUrl: serverUrl, fileNameRename: nil, fileNameNewRename: nil, deleteE2eEncryption: nil, urlBase: urlBase, userId: userId) { e2eToken, error in
                                     // unlock
                                     if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: account, serverUrl: serverUrl) {
-                                        NCCommunication.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { (_, _, _, _) in }
+                                        NextcloudKit.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { _, _, _, _ in }
                                     }
-                                    if errorCode == 0 {
-                                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCreateFolder, userInfo: nil)
+                                    if error == .success, let ocId = ocId {
+                                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCreateFolder, userInfo: ["ocId": ocId, "serverUrl": serverUrl, "account": account, "e2ee": true])
                                     }
-                                    completion(errorCode, errorDescription ?? "")
+                                    completion(error)
                                 }
-                                
+
                             } else {
                                 // unlock
                                 if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: account, serverUrl: serverUrl) {
-                                    NCCommunication.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { (_, _, _, _) in }
+                                    NextcloudKit.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { _, _, _, _ in }
                                 }
-                                completion(errorCode, errorDescription)
+                                completion(error)
                             }
                         }
-                        
+
                     } else {
                         // unlock
                         if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: account, serverUrl: serverUrl) {
-                            NCCommunication.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { (_, _, _, _) in }
+                            NextcloudKit.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { _, _, _, _ in }
                         }
-                        completion(errorCode, errorDescription)
+                        completion(error)
                     }
                 }
             } else {
-                completion(errorCode, errorDescription ?? "")
+                completion(error)
             }
         }
     }
-    
-    //MARK: - WebDav Delete
-    
-    func deleteMetadata(_ metadata: tableMetadata, urlBase: String, completion: @escaping (_ errorCode: Int, _ errorDescription: String)->()) {
-                        
-        self.lock(account:metadata.account, serverUrl: metadata.serverUrl) { (directory, e2eToken, errorCode, errorDescription) in
-            if errorCode == 0 && e2eToken != nil && directory != nil {
+
+    // MARK: - WebDav Delete
+
+    func deleteMetadata(_ metadata: tableMetadata, completion: @escaping (_ error: NKError) -> Void) {
+
+        self.lock(account: metadata.account, serverUrl: metadata.serverUrl) { directory, e2eToken, error in
+            if error == .success && e2eToken != nil && directory != nil {
+                
                 let deleteE2eEncryption = NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameIdentifier == %@", metadata.account, metadata.serverUrl, metadata.fileName)
-                NCNetworking.shared.deleteMetadataPlain(metadata, addCustomHeaders: ["e2e-token" :e2eToken!]) { (errorCode, errorDescription) in
-                    
-                    let home = NCUtilityFileSystem.shared.getHomeServer(urlBase: metadata.urlBase, account: metadata.account)
+                NCNetworking.shared.deleteMetadataPlain(metadata, customHeader: ["e2e-token": e2eToken!]) { error in
+
+                    let home = NCUtilityFileSystem.shared.getHomeServer(urlBase: metadata.urlBase, userId: metadata.userId)
                     if metadata.serverUrl != home {
-                        self.sendE2EMetadata(account: metadata.account, serverUrl: metadata.serverUrl, fileNameRename: nil, fileNameNewRename: nil, deleteE2eEncryption: deleteE2eEncryption, urlBase: urlBase) { (e2eToken, errorCode, errorDescription) in
+                        self.sendE2EMetadata(account: metadata.account, serverUrl: metadata.serverUrl, fileNameRename: nil, fileNameNewRename: nil, deleteE2eEncryption: deleteE2eEncryption, urlBase: metadata.urlBase, userId: metadata.userId) { e2eToken, error in
                             // unlock
                             if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: metadata.account, serverUrl: metadata.serverUrl) {
-                                NCCommunication.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { (_, _, _, _) in }
+                                NextcloudKit.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { _, _, _, _ in }
                             }
-                            completion(errorCode, errorDescription ?? "")
+                            completion(error)
                         }
                     } else {
                         // unlock
                         if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: metadata.account, serverUrl: metadata.serverUrl) {
-                            NCCommunication.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { (_, _, _, _) in }
+                            NextcloudKit.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { _, _, _, _ in }
                         }
-                        completion(errorCode, errorDescription)
+                        completion(error)
                     }
                 }
             } else {
-                completion(errorCode, errorDescription ?? "")
+                completion(error)
             }
         }
     }
-    
-    //MARK: - WebDav Rename
-    
-    func renameMetadata(_ metadata: tableMetadata, fileNameNew: String, urlBase: String, completion: @escaping (_ errorCode: Int, _ errorDescription: String?)->()) {
-        
+
+    // MARK: - WebDav Rename
+
+    func renameMetadata(_ metadata: tableMetadata, fileNameNew: String, completion: @escaping (_ error: NKError) -> Void) {
+
         // verify if exists the new fileName
         if NCManageDatabase.shared.getE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", metadata.account, metadata.serverUrl, fileNameNew)) != nil {
-            
-            completion(NCGlobal.shared.ErrorInternalError, "_file_already_exists_")
+
+            return completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_file_already_exists_"))
 
         } else {
-            
-            self.sendE2EMetadata(account: metadata.account, serverUrl: metadata.serverUrl, fileNameRename: metadata.fileName, fileNameNewRename: fileNameNew, deleteE2eEncryption: nil, urlBase: urlBase) { (e2eToken, errorCode, errorDescription) in
-                
-                if errorCode == 0 {
+
+            self.sendE2EMetadata(account: metadata.account, serverUrl: metadata.serverUrl, fileNameRename: metadata.fileName, fileNameNewRename: fileNameNew, deleteE2eEncryption: nil, urlBase: metadata.urlBase, userId: metadata.userId) { e2eToken, error in
+
+                if error == .success {
                     NCManageDatabase.shared.setMetadataFileNameView(serverUrl: metadata.serverUrl, fileName: metadata.fileName, newFileNameView: fileNameNew, account: metadata.account)
-                    
+
                     // Move file system
                     let atPath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId) + "/" + metadata.fileNameView
                     let toPath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId) + "/" + fileNameNew
                     do {
                         try FileManager.default.moveItem(atPath: atPath, toPath: toPath)
                     } catch { }
-                    
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["ocId": metadata.ocId])
+
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["ocId": metadata.ocId, "account": metadata.account])
                 }
-                
+
                 // unlock
                 if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: metadata.account, serverUrl: metadata.serverUrl) {
-                    NCCommunication.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { (_, _, _, _) in }
+                    NextcloudKit.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, method: "DELETE") { _, _, _, _ in }
                 }
-                
-                completion(errorCode, errorDescription)
+
+                completion(error)
             }
         }
     }
-    
-    //MARK: - Upload
-    
-    func upload(metadata: tableMetadata, account: tableAccount, completion: @escaping (_ errorCode: Int, _ errorDescription: String)->()) {
-        
+
+    // MARK: - Upload
+
+    func upload(metadata: tableMetadata, start: @escaping () -> Void, completion: @escaping (_ error: NKError) -> Void) {
+
         let objectE2eEncryption = tableE2eEncryption()
         var key: NSString?, initializationVector: NSString?, authenticationTag: NSString?
         let ocIdTemp = metadata.ocId
         let serverUrl = metadata.serverUrl
-        
+
         // Verify max size
         if metadata.size > NCGlobal.shared.e2eeMaxFileSize {
             NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
-
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":NCGlobal.shared.ErrorInternalError, "errorDescription":"E2E Error file too big"])
-            completion(NCGlobal.shared.ErrorInternalError, "E2E Error file too big")
-            return
+            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId": metadata.ocId, "serverUrl": metadata.serverUrl, "account": metadata.account, "fileName": metadata.fileName, "ocIdTemp": ocIdTemp, "error": NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "E2E Error file too big")])
+            start()
+            return completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "E2E Error file too big"))
         }
-        
+
         // Update metadata
         var metadata = tableMetadata.init(value: metadata)
         metadata.fileName = CCUtility.generateRandomIdentifier()!
         metadata.e2eEncrypted = true
-        metadata.session = NCCommunicationCommon.shared.sessionIdentifierUpload
+        metadata.session = NKCommon.shared.sessionIdentifierUpload
         metadata.sessionError = ""
         NCManageDatabase.shared.addMetadata(metadata)
-        
+
         let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileName)!
         let fileNameLocalPathRequest = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
         let serverUrlFileName = serverUrl + "/" + metadata.fileName
-        
+
         if NCEndToEndEncryption.sharedManager()?.encryptFileName(metadata.fileNameView, fileNameIdentifier: metadata.fileName, directory: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId), key: &key, initializationVector: &initializationVector, authenticationTag: &authenticationTag) == false {
-            
             NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":NCGlobal.shared.ErrorInternalError, "errorDescription":"_e2e_error_create_encrypted_"])
-            completion(NCGlobal.shared.ErrorInternalError, "_e2e_error_create_encrypted_")
-            return
+            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId": metadata.ocId, "serverUrl": metadata.serverUrl, "account": metadata.account, "fileName": metadata.fileName, "ocIdTemp": ocIdTemp, "error": NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_e2e_error_create_encrypted_")])
+            start()
+            return completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_e2e_error_create_encrypted_"))
         }
-        
+
         if let result = NCManageDatabase.shared.getE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", metadata.account, serverUrl)) {
             objectE2eEncryption.metadataKey = result.metadataKey
             objectE2eEncryption.metadataKeyIndex = result.metadataKeyIndex
@@ -238,7 +237,7 @@ import Alamofire
             objectE2eEncryption.metadataKey = key!.base64EncodedString()
             objectE2eEncryption.metadataKeyIndex = 0
         }
-        
+
         objectE2eEncryption.account = metadata.account
         objectE2eEncryption.authenticationTag = authenticationTag as String?
         objectE2eEncryption.fileName = metadata.fileNameView
@@ -249,178 +248,168 @@ import Alamofire
         objectE2eEncryption.mimeType = metadata.contentType
         objectE2eEncryption.serverUrl = serverUrl
         objectE2eEncryption.version = 1
-        
+
         NCManageDatabase.shared.addE2eEncryption(objectE2eEncryption)
-        
+
         if let getMetadata = NCManageDatabase.shared.getMetadataFromOcId(ocIdTemp) {
             metadata = getMetadata
         } else {
-            return
+            start()
+            return completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_e2e_error_create_encrypted_"))
         }
-        
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["ocId":metadata.ocId, "serverUrl":metadata.serverUrl])
-        
-        NCNetworkingE2EE.shared.sendE2EMetadata(account: metadata.account, serverUrl: serverUrl, fileNameRename: nil, fileNameNewRename: nil, deleteE2eEncryption: nil, urlBase: account.urlBase, upload: true) { (e2eToken, errorCode, errorDescription) in
-            
-            if errorCode == 0 && e2eToken != nil {
-                                                
-                NCCommunication.shared.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, dateCreationFile: metadata.date as Date, dateModificationFile: metadata.date as Date, addCustomHeaders: ["e2e-token":e2eToken!], requestHandler: { (request) in
-                    
+
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": metadata.serverUrl])
+        NCContentPresenter.shared.noteTop(text: NSLocalizedString("_upload_e2ee_", comment: ""), image: nil, type: NCContentPresenter.messageType.info, delay: NCGlobal.shared.dismissAfterSecond, priority: .max)
+        NCNetworkingE2EE.shared.sendE2EMetadata(account: metadata.account, serverUrl: serverUrl, fileNameRename: nil, fileNameNewRename: nil, deleteE2eEncryption: nil, urlBase: metadata.urlBase, userId: metadata.userId, upload: true) { e2eToken, error in
+
+            start()
+
+            if error == .success && e2eToken != nil {
+
+                NextcloudKit.shared.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, dateCreationFile: metadata.date as Date, dateModificationFile: metadata.date as Date, addCustomHeaders: ["e2e-token": e2eToken!], requestHandler: { request in
+
                     NCNetworking.shared.uploadRequest[fileNameLocalPathRequest] = request
                     NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: nil, sessionSelector: nil, sessionTaskIdentifier: nil, status: NCGlobal.shared.metadataStatusUploading)
-                    
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadStartFile, userInfo: ["ocId":metadata.ocId])
-                
-                }, taskHandler: { (_) in
-                    
-                }, progressHandler: { (progress) in
-                    
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterProgressTask, userInfo: ["account":metadata.account, "ocId":metadata.ocId, "serverUrl":serverUrl, "status":NSNumber(value: NCGlobal.shared.metadataStatusInUpload), "progress":NSNumber(value: progress.fractionCompleted), "totalBytes":NSNumber(value: progress.totalUnitCount), "totalBytesExpected":NSNumber(value: progress.completedUnitCount)])
-                    
-                }) { (account, ocId, etag, date, size, allHeaderFields, error, errorCode, errorDescription) in
-                
-                    NCNetworking.shared.uploadRequest[fileNameLocalPath] = nil
-                    guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadStartFile, userInfo: ["ocId": metadata.ocId, "serverUrl": metadata.serverUrl, "account": metadata.account, "fileName": metadata.fileName, "sessionSelector": metadata.sessionSelector])
 
-                    if error?.isExplicitlyCancelledError ?? false {
-                    
-                        CCUtility.removeFile(atPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId))
-                        NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
-                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":errorCode, "errorDescription":""])
+                }, taskHandler: { _ in
 
-                    } else if errorCode == 0 && ocId != nil {
-                        
-                        guard let metadataTemp = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-                        let metadata = tableMetadata.init(value: metadataTemp)
-                        
-                        NCUtilityFileSystem.shared.moveFileInBackground(atPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId), toPath: CCUtility.getDirectoryProviderStorageOcId(ocId))
-                        
-                        metadata.date = date ?? NSDate()
-                        metadata.etag = etag ?? ""
-                        metadata.ocId = ocId!
-                        
-                        metadata.session = ""
-                        metadata.sessionError = ""
-                        metadata.sessionTaskIdentifier = 0
-                        metadata.status = NCGlobal.shared.metadataStatusNormal
-                        
-                        NCManageDatabase.shared.addMetadata(metadata)
-                        NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
-                        NCManageDatabase.shared.addLocalFile(metadata: metadata)
-                        
-                        NCUtility.shared.createImageFrom(fileName: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, typeFile: metadata.typeFile)
-                                                
-                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp ,"errorCode":errorCode, "errorDescription":""])
-                                                                                    
-                    } else {
-                        
-                        if errorCode == 401 || errorCode == 403 {
-                        
-                            NCNetworkingCheckRemoteUser.shared.checkRemoteUser(account: metadata.account)
-                            NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
-                        
-                        } else if errorCode == Int(CFNetworkErrors.cfurlErrorServerCertificateUntrusted.rawValue) {
-                        
-                            CCUtility.setCertificateError(metadata.account, error: true)
-                            NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
-                                                
-                        } else {
-                        
-                            NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
+                }, progressHandler: { progress in
+
+                    NotificationCenter.default.postOnMainThread(
+                        name: NCGlobal.shared.notificationCenterProgressTask,
+                        userInfo: [
+                            "account": metadata.account,
+                            "ocId": metadata.ocId,
+                            "fileName": metadata.fileName,
+                            "serverUrl": serverUrl,
+                            "status": NSNumber(value: NCGlobal.shared.metadataStatusInUpload),
+                            "progress": NSNumber(value: progress.fractionCompleted),
+                            "totalBytes": NSNumber(value: progress.totalUnitCount),
+                            "totalBytesExpected": NSNumber(value: progress.completedUnitCount)])
+
+                }) { account, ocId, etag, date, _, _, afError, error in
+
+                    NCNetworkingE2EE.shared.unlock(account: metadata.account, serverUrl: serverUrl) { _, _, errorLock in
+
+                        NCNetworking.shared.uploadRequest.removeValue(forKey: fileNameLocalPath)
+                        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) {
+                            if afError?.isExplicitlyCancelledError ?? false {
+
+                                CCUtility.removeFile(atPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId))
+                                NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
+                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId": metadata.ocId, "serverUrl": metadata.serverUrl, "account": metadata.account, "fileName": metadata.fileName, "ocIdTemp": ocIdTemp, "error": error])
+
+                            } else if error == .success && ocId != nil {
+
+                                NCUtilityFileSystem.shared.moveFileInBackground(atPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId), toPath: CCUtility.getDirectoryProviderStorageOcId(ocId))
+
+                                metadata.date = date ?? NSDate()
+                                metadata.etag = etag ?? ""
+                                metadata.ocId = ocId!
+
+                                metadata.session = ""
+                                metadata.sessionError = ""
+                                metadata.sessionTaskIdentifier = 0
+                                metadata.status = NCGlobal.shared.metadataStatusNormal
+
+                                NCManageDatabase.shared.addMetadata(metadata)
+                                NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", ocIdTemp))
+                                NCManageDatabase.shared.addLocalFile(metadata: metadata)
+
+                                NCUtility.shared.createImageFrom(fileNameView: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
+                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId": metadata.ocId, "serverUrl": metadata.serverUrl, "account": metadata.account, "fileName": metadata.fileName, "ocIdTemp": ocIdTemp, "error": error])
+
+                            } else {
+
+                                NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: error.errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
+
+                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId": metadata.ocId, "serverUrl": metadata.serverUrl, "account": metadata.account, "fileName": metadata.fileName, "ocIdTemp": ocIdTemp, "error": error])
+                            }
                         }
-                        
-                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":errorCode, "errorDescription":""])
+                        completion(error)
                     }
-                    
-                    NCNetworkingE2EE.shared.unlock(account: metadata.account, serverUrl: serverUrl) { (_, _, _, _) in }
-        
-                    completion(errorCode, errorDescription)                    
                 }
-                
-            } else {
-                
-                if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocIdTemp) {
-                    NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
 
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId":metadata.ocId, "ocIdTemp":ocIdTemp, "errorCode":errorCode, "errorDescription":errorDescription ?? ""])
+            } else {
+
+                if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocIdTemp) {
+                    NCManageDatabase.shared.setMetadataSession(ocId: metadata.ocId, session: nil, sessionError: error.errorDescription, sessionTaskIdentifier: 0, status: NCGlobal.shared.metadataStatusUploadError)
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUploadedFile, userInfo: ["ocId": metadata.ocId, "serverUrl": metadata.serverUrl, "account": metadata.account, "fileName": metadata.fileName, "ocIdTemp": ocIdTemp, "error": error])
                 }
-                
-                completion(errorCode, errorDescription ?? "")
+                completion(error)
             }
         }
     }
-    
-    //MARK: - E2EE
-    
-    @objc func lock(account:String, serverUrl: String, completion: @escaping (_ direcrtory: tableDirectory?, _ e2eToken: String?, _ errorCode: Int, _ errorDescription: String?)->()) {
-        
+
+    // MARK: - E2EE
+
+    @objc func lock(account: String, serverUrl: String, completion: @escaping (_ direcrtory: tableDirectory?, _ e2eToken: String?, _ error: NKError) -> Void) {
+
         var e2eToken: String?
-        
+
         guard let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl)) else {
-            completion(nil, nil, 0, "")
-            return
+            return completion(nil, nil, NKError())
         }
-        
+
         if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: account, serverUrl: serverUrl) {
             e2eToken = tableLock.e2eToken
         }
-        
-        NCCommunication.shared.lockE2EEFolder(fileId: directory.fileId, e2eToken: e2eToken, method: "POST") { (account, e2eToken, errorCode, errorDescription) in
-            if errorCode == 0 && e2eToken != nil {
+
+        NextcloudKit.shared.lockE2EEFolder(fileId: directory.fileId, e2eToken: e2eToken, method: "POST") { account, e2eToken, data, error in
+            if error == .success && e2eToken != nil {
                 NCManageDatabase.shared.setE2ETokenLock(account: account, serverUrl: serverUrl, fileId: directory.fileId, e2eToken: e2eToken!)
             }
-            completion(directory, e2eToken, errorCode, errorDescription)
+            completion(directory, e2eToken, error)
         }
     }
-    
-    @objc func unlock(account:String, serverUrl: String, completion: @escaping (_ direcrtory: tableDirectory?, _ e2eToken: String?, _ errorCode: Int, _ errorDescription: String?)->()) {
-        
+
+    @objc func unlock(account: String, serverUrl: String, completion: @escaping (_ direcrtory: tableDirectory?, _ e2eToken: String?, _ error: NKError) -> Void) {
+
         var e2eToken: String?
-        
+
         guard let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl)) else {
-            completion(nil, nil, 0, "")
-            return
+            return completion(nil, nil, NKError())
         }
-        
+
         if let tableLock = NCManageDatabase.shared.getE2ETokenLock(account: account, serverUrl: serverUrl) {
             e2eToken = tableLock.e2eToken
         }
-        
-        NCCommunication.shared.lockE2EEFolder(fileId: directory.fileId, e2eToken: e2eToken, method: "DELETE") { (account, e2eToken, errorCode, errorDescription) in
-            if errorCode == 0 {
+
+        NextcloudKit.shared.lockE2EEFolder(fileId: directory.fileId, e2eToken: e2eToken, method: "DELETE") { account, e2eToken, data, error in
+            if error == .success {
                 NCManageDatabase.shared.deteleE2ETokenLock(account: account, serverUrl: serverUrl)
             }
-            completion(directory, e2eToken, errorCode, errorDescription)
+            completion(directory, e2eToken, error)
         }
     }
-    
-    @objc func sendE2EMetadata(account: String, serverUrl: String, fileNameRename: String?, fileNameNewRename: String?, deleteE2eEncryption : NSPredicate?, urlBase: String, upload: Bool = false, completion: @escaping (_ e2eToken: String?, _ errorCode: Int, _ errorDescription: String?)->()) {
-            
-        self.lock(account: account, serverUrl: serverUrl) { (directory, e2eToken, errorCode, errorDescription) in
-            if errorCode == 0 && e2eToken != nil && directory != nil {
-                          
-                NCCommunication.shared.getE2EEMetadata(fileId: directory!.fileId, e2eToken: e2eToken) { (account, e2eMetadata, errorCode, errorDescription) in
+
+    @objc func sendE2EMetadata(account: String, serverUrl: String, fileNameRename: String?, fileNameNewRename: String?, deleteE2eEncryption: NSPredicate?, urlBase: String, userId: String, upload: Bool = false, completion: @escaping (_ e2eToken: String?, _ error: NKError) -> Void) {
+
+        self.lock(account: account, serverUrl: serverUrl) { directory, e2eToken, error in
+            if error == .success && e2eToken != nil && directory != nil {
+
+                NextcloudKit.shared.getE2EEMetadata(fileId: directory!.fileId, e2eToken: e2eToken) { account, e2eMetadata, data, error in
                     var method = "POST"
                     var e2eMetadataNew: String?
-                    
-                    if errorCode == 0 && e2eMetadata != nil {
-                        if !NCEndToEndMetadata.shared.decoderMetadata(e2eMetadata!, privateKey: CCUtility.getEndToEndPrivateKey(account), serverUrl: serverUrl, account: account, urlBase: urlBase) {
-                            completion(e2eToken, NCGlobal.shared.ErrorInternalError, NSLocalizedString("_e2e_error_encode_metadata_", comment: ""))
-                            return
+
+                    if error == .success && e2eMetadata != nil {
+                        if !NCEndToEndMetadata.shared.decoderMetadata(e2eMetadata!, privateKey: CCUtility.getEndToEndPrivateKey(account), serverUrl: serverUrl, account: account, urlBase: urlBase, userId: userId) {
+                            return completion(e2eToken, NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: NSLocalizedString("_e2e_error_encode_metadata_", comment: "")))
                         }
                         method = "PUT"
                     }
-    
+
                     // Rename
-                    if (fileNameRename != nil && fileNameNewRename != nil) {
-                        NCManageDatabase.shared.renameFileE2eEncryption(serverUrl: serverUrl, fileNameIdentifier: fileNameRename!, newFileName: fileNameNewRename!, newFileNamePath: CCUtility.returnFileNamePath(fromFileName: fileNameNewRename!, serverUrl: serverUrl, urlBase: urlBase, account: account))
+                    if fileNameRename != nil && fileNameNewRename != nil {
+                        NCManageDatabase.shared.renameFileE2eEncryption(serverUrl: serverUrl, fileNameIdentifier: fileNameRename!, newFileName: fileNameNewRename!, newFileNamePath: CCUtility.returnFileNamePath(fromFileName: fileNameNewRename!, serverUrl: serverUrl, urlBase: urlBase, userId: userId, account: account))
                     }
-                    
+
                     // Delete
                     if deleteE2eEncryption != nil {
                         NCManageDatabase.shared.deleteE2eEncryption(predicate: deleteE2eEncryption!)
                     }
-                
+
                     // Rebuild metadata for send it
                     let tableE2eEncryption = NCManageDatabase.shared.getE2eEncryptions(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl))
                     if tableE2eEncryption != nil {
@@ -428,23 +417,21 @@ import Alamofire
                     } else {
                         method = "DELETE"
                     }
-                    
-                    NCCommunication.shared.putE2EEMetadata(fileId: directory!.fileId, e2eToken: e2eToken!, e2eMetadata: e2eMetadataNew, method: method) { (account, e2eMetadata, errorCode, errorDescription) in
+
+                    NextcloudKit.shared.putE2EEMetadata(fileId: directory!.fileId, e2eToken: e2eToken!, e2eMetadata: e2eMetadataNew, method: method) { account, _, _, error in
 
                         if upload {
-                            completion(e2eToken, errorCode, errorDescription)
+                            completion(e2eToken, error)
                         } else {
-                            self.unlock(account: account, serverUrl: serverUrl) { (_, e2eToken, _, _) in
-                                completion(e2eToken, errorCode, errorDescription)
+                            self.unlock(account: account, serverUrl: serverUrl) { _, e2eToken, _ in
+                                completion(e2eToken, error)
                             }
                         }
                     }
                 }
             } else {
-                completion(e2eToken, errorCode, errorDescription)
+                completion(e2eToken, error)
             }
         }
     }
 }
-
-

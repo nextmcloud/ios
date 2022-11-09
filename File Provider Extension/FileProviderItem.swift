@@ -21,8 +21,9 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import UIKit
 import FileProvider
-import NCCommunication
+import NextcloudKit
 
 class FileProviderItem: NSObject, NSFileProviderItem {
 
@@ -32,44 +33,46 @@ class FileProviderItem: NSObject, NSFileProviderItem {
     var itemIdentifier: NSFileProviderItemIdentifier {
         return fileProviderUtility.shared.getItemIdentifier(metadata: metadata)
     }
-    
+
     var filename: String {
         return metadata.fileNameView
     }
-    
+
     var documentSize: NSNumber? {
         return NSNumber(value: metadata.size)
     }
-    
+
     var typeIdentifier: String {
-        let results = NCCommunicationCommon.shared.getInternalType(fileName: metadata.fileNameView, mimeType: "", directory: metadata.directory)
-        return results.uniformTypeIdentifier
+        let results = NKCommon.shared.getInternalType(fileName: metadata.fileNameView, mimeType: "", directory: metadata.directory)
+        return results.typeIdentifier
     }
-    
+
     var contentModificationDate: Date? {
         return metadata.date as Date
     }
-    
+
     var creationDate: Date? {
         return metadata.creationDate as Date
     }
-    
+
     var lastUsedDate: Date? {
         return metadata.date as Date
     }
 
     var capabilities: NSFileProviderItemCapabilities {
-        if (metadata.directory) {
+        guard !metadata.directory else {
             return [ .allowsAddingSubItems, .allowsContentEnumerating, .allowsReading, .allowsDeleting, .allowsRenaming ]
-        } else {
-            return [ .allowsWriting, .allowsReading, .allowsDeleting, .allowsRenaming, .allowsReparenting ]
         }
+        guard !metadata.lock else {
+            return [ .allowsReading ]
+        }
+        return [ .allowsWriting, .allowsReading, .allowsDeleting, .allowsRenaming, .allowsReparenting ]
     }
-    
+
     var isTrashed: Bool {
         return false
     }
-    
+
     var childItemCount: NSNumber? {
         return nil
     }
@@ -77,7 +80,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
     var versionIdentifier: Data? {
         return metadata.etag.data(using: .utf8)
     }
-    
+
     var tagData: Data? {
         if let tableTag = NCManageDatabase.shared.getTag(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
             return tableTag.tagIOS
@@ -85,7 +88,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
             return nil
         }
     }
-    
+
     var favoriteRank: NSNumber? {
         if let rank = fileProviderData.shared.listFavoriteIdentifierRank[metadata.ocId] {
             return rank
@@ -97,15 +100,18 @@ class FileProviderItem: NSObject, NSFileProviderItem {
     var isMostRecentVersionDownloaded: Bool {
         return true
     }
-    
+
     var isDownloaded: Bool {
-        if CCUtility.fileProviderStorageExists(metadata.ocId, fileNameView: metadata.fileNameView) {
+        if metadata.directory {
+            return true
+        }
+        if CCUtility.fileProviderStorageExists(metadata) {
             return true
         } else {
             return false
         }
     }
-    
+
     var isDownloading: Bool {
         if metadata.status == NCGlobal.shared.metadataStatusDownloading {
             return true
@@ -113,7 +119,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
             return false
         }
     }
-    
+
     var downloadingError: Error? {
         if metadata.status == NCGlobal.shared.metadataStatusDownloadError {
             return fileProviderData.FileProviderError.downloadError
@@ -129,7 +135,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
             return false
         }
     }
-    
+
     var isUploading: Bool {
         if metadata.status == NCGlobal.shared.metadataStatusUploading {
             return true
@@ -137,7 +143,7 @@ class FileProviderItem: NSObject, NSFileProviderItem {
             return false
         }
     }
-    
+
     var uploadingError: Error? {
         if metadata.status == NCGlobal.shared.metadataStatusUploadError {
             return fileProviderData.FileProviderError.uploadError

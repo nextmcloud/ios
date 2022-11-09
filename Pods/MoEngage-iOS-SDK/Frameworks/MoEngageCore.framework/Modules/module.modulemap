@@ -1,6 +1,0 @@
-framework module MoEngageCore {
-  umbrella header "MoEngageCore.h"
-
-  export *
-  module * { export * }
-}

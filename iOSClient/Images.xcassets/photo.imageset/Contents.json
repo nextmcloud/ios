@@ -1,17 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "file_photo_menu.pdf",
-      "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "default copy@500w.pdf",
+      "filename" : "photo.pdf",
       "idiom" : "universal"
     }
   ],
