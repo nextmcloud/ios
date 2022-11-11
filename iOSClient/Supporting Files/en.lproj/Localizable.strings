@@ -433,6 +433,7 @@
 "_web_login_"                   = "Revert to web login method";
 "_login_url_error_"             = "URL error, please verify your server URL";
 "_webflow_not_available_"       = "Web login not available, use the old login method";
+"_prevent_http_redirection_"    = "The redirection in HTTP is not permitted";
 
 // Favorite
 "_favorites_"                   = "Favorites";

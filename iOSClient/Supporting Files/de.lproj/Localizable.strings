@@ -408,6 +408,7 @@
 "_traditional_login_"           = "Zur alten Anmeldungsmethode zurückkehren";
 "_web_login_"                   = "Zur Web-Anmeldungsmethode zurückkehren";
 "_login_url_error_"             = "URL-Fehler, bitte die Server-URL kontrollieren";
+"_prevent_http_redirection_"    = "Die Weiterleitung nach HTTP ist nicht erlaubt";
 
 // Favorite
 
