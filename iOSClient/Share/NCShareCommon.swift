@@ -70,14 +70,14 @@ class NCShareCommon: NSObject {
 //        } else {
 //            shareLinkMenuView = Bundle.main.loadNibNamed("NCShareLinkMenuView", owner: self, options: nil)?.first as! NCShareLinkMenuView
 //        }
-//        
+//
 //        shareLinkMenuView.width = 250
 //        if metadata.directory {
 //            shareLinkMenuView.height = 590
 //        } else {
 //            shareLinkMenuView.height = 490
 //        }
-//        
+//
 //        shareLinkMenuView.backgroundColor = NCBrandColor.shared.systemBackground
 //        shareLinkMenuView.metadata = metadata
 //        shareLinkMenuView.viewWindow = viewWindow

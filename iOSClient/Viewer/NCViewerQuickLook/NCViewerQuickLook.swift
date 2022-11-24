@@ -25,9 +25,10 @@
 
 import UIKit
 import QuickLook
-import NCCommunication
+import NextcloudKit
 
 @objc class NCViewerQuickLook: QLPreviewController {
+
     let url: URL
     var previewItems: [PreviewItem] = []
     var isEditingEnabled: Bool
@@ -66,11 +67,8 @@ import NCCommunication
         guard isEditingEnabled else { return }
 
         if metadata?.livePhoto == true {
-            NCContentPresenter.shared.messageNotification(
-                "", description: "_message_disable_overwrite_livephoto_",
-                delay: NCGlobal.shared.dismissAfterSecond,
-                type: NCContentPresenter.messageType.info,
-                errorCode: NCGlobal.shared.errorCharactersForbidden)
+            let error = NKError(errorCode: NCGlobal.shared.errorCharactersForbidden, errorDescription: "_message_disable_overwrite_livephoto_")
+            NCContentPresenter.shared.showInfo(error: error)
         }
     }
 
@@ -116,7 +114,7 @@ extension NCViewerQuickLook: QLPreviewControllerDataSource, QLPreviewControllerD
         previewItems[index]
     }
 
-    @available(iOS 13.0, *)
+
     func previewController(_ controller: QLPreviewController, editingModeFor previewItem: QLPreviewItem) -> QLPreviewItemEditingMode {
         return isEditingEnabled ? .createCopy : .disabled
     }
@@ -146,13 +144,19 @@ extension NCViewerQuickLook: QLPreviewControllerDataSource, QLPreviewControllerD
             serverUrl: metadata.serverUrl,
             urlBase: metadata.urlBase,
             url: url.path,
-            contentType: "",
-            livePhoto: false)
+
+            contentType: "")
+
         metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
-        metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
+        if override {
+            metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFileNODelete
+        } else {
+            metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
+        }
         metadataForUpload.size = size
         metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-        (UIApplication.shared.delegate as? AppDelegate)?.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
+
+        NCNetworkingProcessUpload.shared.createProcessUploads(metadatas: [metadataForUpload]) { _ in }
     }
 
     func previewController(_ controller: QLPreviewController, didSaveEditedCopyOf previewItem: QLPreviewItem, at modifiedContentsURL: URL) {

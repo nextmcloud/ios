@@ -70,15 +70,15 @@ class NCShareSectionHeaderView: UITableViewHeaderFooterView {
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-            NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
-                if errorCode == 0 {
+            NCNetworking.shared.favoriteMetadata(metadata) { error in
+                if error == .success {
                     if !metadata.favorite {
                         self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
                     } else {
                         self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
                     }
                 } else {
-                    NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                    NCContentPresenter.shared.showError(error: error)
                 }
             }
         }

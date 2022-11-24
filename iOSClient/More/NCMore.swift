@@ -22,9 +22,8 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 import MarqueeLabel
-
 
 class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
@@ -36,13 +35,15 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var quotaLabel1: UILabel!
     @IBOutlet weak var quotalabel2: UILabel!
 
-    var functionMenu: [NCCommunicationExternalSite] = []
-    var externalSiteMenu: [NCCommunicationExternalSite] = []
-    var settingsMenu: [NCCommunicationExternalSite] = []
-    var quotaMenu: [NCCommunicationExternalSite] = []
+
+    var functionMenu: [NKExternalSite] = []
+    var externalSiteMenu: [NKExternalSite] = []
+    var settingsMenu: [NKExternalSite] = []
+    var quotaMenu: [NKExternalSite] = []
 
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-
+    let defaultCornerRadius: CGFloat = 10.0
+    
     var tabAccount: tableAccount?
 
     // MARK: - View Life Cycle
@@ -96,6 +97,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         appDelegate.activeViewController = self
 
         loadItems()
+        tableView.reloadData()
     }
 
     // MARK: - NotificationCenter
@@ -103,11 +105,12 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @objc func initialize() {
         loadItems()
     }
+
     // MARK: -
 
     func loadItems() {
 
-        var item = NCCommunicationExternalSite()
+        var item = NKExternalSite()
         var quota: String = ""
 
         // Clear
@@ -116,50 +119,51 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         settingsMenu.removeAll()
         quotaMenu.removeAll()
         labelQuotaExternalSite.text = ""
-        
+        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
+
         // ITEM : Transfer
-//        item = NCCommunicationExternalSite()
-//        item.name = "_transfers_"
-//        item.icon = "load"
-//        item.url = "segueTransfers"
-//        functionMenu.append(item)
+        item = NKExternalSite()
+        item.name = "_transfers_"
+        item.icon = "arrow.left.arrow.right"
+        item.url = "segueTransfers"
+        functionMenu.append(item)
 
 
         // ITEM : Recent
-        item = NCCommunicationExternalSite()
+        item = NKExternalSite()
         item.name = "_recent_"
         item.icon = "recent"
         item.url = "segueRecent"
         functionMenu.append(item)
-        
+
         // ITEM : Notification
-        item = NCCommunicationExternalSite()
+        item = NKExternalSite()
         item.name = "_notifications_"
         item.icon = "notification"
         item.url = "segueNotification"
         functionMenu.append(item)
 
         // ITEM : Activity
-//        item = NCCommunicationExternalSite()
-//        item.name = "_activity_"
-//        item.icon = "activity"
-//        item.url = "segueActivity"
-//        functionMenu.append(item)
+        item = NKExternalSite()
+        item.name = "_activity_"
+        item.icon = "bolt"
+        item.url = "segueActivity"
+        functionMenu.append(item)
 
         // ITEM : Shares
         let isFilesSharingEnabled = NCManageDatabase.shared.getCapabilitiesServerBool(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesFileSharingApiEnabled, exists: false)
         if isFilesSharingEnabled {
-            item = NCCommunicationExternalSite()
+            item = NKExternalSite()
             item.name = "_list_shares_"
-            item.icon = "shareFill"
+            item.icon = "share"
             item.url = "segueShares"
             functionMenu.append(item)
         }
-        
+
         // ITEM : Offline
-        item = NCCommunicationExternalSite()
+        item = NKExternalSite()
         item.name = "_manage_file_offline_"
-        item.icon = "offlineMenu"
+        item.icon = "tray.and.arrow.down"
         item.url = "segueOffline"
         functionMenu.append(item)
 
@@ -175,9 +179,9 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         
         // ITEM : Trash
         let serverVersionMajor = NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesVersionMajor)
-        if serverVersionMajor >= NCBrandGlobal.shared.nextcloudVersion15 {
+        if serverVersionMajor >= NCGlobal.shared.nextcloudVersion15 {
 
-            item = NCCommunicationExternalSite()
+            item = NKExternalSite()
             item.name = "_trash_view_"
             item.icon = "trash"
             item.url = "segueTrash"
@@ -185,18 +189,28 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         }
 
         // ITEM : Settings
-        item = NCCommunicationExternalSite()
+        item = NKExternalSite()
         item.name = "_settings_"
-
         item.icon = "settings"
         item.url = "segueSettings"
         settingsMenu.append(item)
 
-        if (quotaMenu.count > 0) {
+        // ITEM: Test API
+        /*
+        if NCUtility.shared.isSimulator() {
+            item = NKExternalSite()
+            item.name = "Test API"
+            item.icon = "swift"
+            item.url = "test"
+            settingsMenu.append(item)
+        }
+        */
+        
+        if quotaMenu.count > 0 {
             let item = quotaMenu[0]
             labelQuotaExternalSite.text = item.name
         }
-        
+
 
         // ITEM: Test API
 //        if NCUtility.shared.isSimulator() {
@@ -239,11 +253,14 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         if NCBrandOptions.shared.disable_more_external_site == false {
             if let externalSites = NCManageDatabase.shared.getAllExternalSites(account: appDelegate.account) {
                 for externalSite in externalSites {
-                    if (externalSite.type == "link" && externalSite.name != "" && externalSite.url != "") {
-                        item = NCCommunicationExternalSite()
+                    if (externalSite.name != "" && externalSite.url != ""), let urlEncoded = externalSite.url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+                        item = NKExternalSite()
                         item.name = externalSite.name
-                        item.url = externalSite.url
-                        item.icon = "world"
+                        item.url = urlEncoded
+                        item.icon = "network"
+                        if externalSite.type == "settings" {
+                            item.icon = "gear"
+                        }
                         externalSiteMenu.append(item)
                     }
                     if (externalSite.type == "settings") {
@@ -387,7 +404,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
-        var item = NCCommunicationExternalSite()
+        var item = NKExternalSite()
 
         // change color selection and disclosure indicator
         let selectionColor: UIView = UIView()
@@ -470,7 +487,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     // method to run when table view cell is tapped
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
-        var item = NCCommunicationExternalSite()
+        var item = NKExternalSite()
 
         if indexPath.section == 0 {
 //            tapImageLogoManageAccount()
@@ -546,6 +563,22 @@ class CCCellMore: UITableViewCell {
 
     @IBOutlet weak var labelText: UILabel!
     @IBOutlet weak var imageIcon: UIImageView!
+    @IBOutlet weak var separator: UIView!
+    @IBOutlet weak var separatorHeigth: NSLayoutConstraint!
+
+    override var frame: CGRect {
+        get {
+            return super.frame
+        }
+        set (newFrame) {
+            var frame = newFrame
+            let newWidth = frame.width * 0.90
+            let space = (frame.width - newWidth) / 2
+            frame.size.width = newWidth
+            frame.origin.x += space
+            super.frame = frame
+        }
+    }
 }
 
 class NCMoreUserCell: UITableViewCell {
@@ -554,4 +587,18 @@ class NCMoreUserCell: UITableViewCell {
     @IBOutlet weak var avatar: UIImageView!
     @IBOutlet weak var icon: UIImageView!
     @IBOutlet weak var status: MarqueeLabel!
+    
+    override var frame: CGRect {
+        get {
+            return super.frame
+        }
+        set (newFrame) {
+            var frame = newFrame
+            let newWidth = frame.width * 0.90
+            let space = (frame.width - newWidth) / 2
+            frame.size.width = newWidth
+            frame.origin.x += space
+            super.frame = frame
+        }
+    }
 }

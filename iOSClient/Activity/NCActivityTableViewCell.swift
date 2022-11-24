@@ -22,12 +22,14 @@
 //
 
 import Foundation
-import NCCommunication
+import NextcloudKit
+import FloatingPanel
+import JGProgressHUD
 
 class NCActivityCollectionViewCell: UICollectionViewCell {
 
     @IBOutlet weak var imageView: UIImageView!
-
+    var fileId = ""
     override func awakeFromNib() {
         super.awakeFromNib()
     }
@@ -122,7 +124,8 @@ extension NCActivityTableViewCell: UICollectionViewDelegate {
                         viewController.trashPath = result.filePath
                         (responder as? UIViewController)!.navigationController?.pushViewController(viewController, animated: true)
                     } else {
-                        NCContentPresenter.shared.messageNotification("_error_", description: "_trash_file_not_found_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info, errorCode: NCGlobal.shared.errorInternalError)
+                        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_trash_file_not_found_")
+                        NCContentPresenter.shared.showError(error: error)
                     }
                 }
             }
@@ -130,7 +133,7 @@ extension NCActivityTableViewCell: UICollectionViewDelegate {
             return
         }
 
-        if activityPreview.view == "files" && activityPreview.mimeType != "dir" {
+        if activityPreview.view == NCGlobal.shared.appName && activityPreview.mimeType != "dir" {
 
             guard let activitySubjectRich = NCManageDatabase.shared.getActivitySubjectRich(account: activityPreview.account, idActivity: activityPreview.idActivity, id: String(activityPreview.fileId)) else {
                 return
@@ -152,52 +155,39 @@ extension NCActivityTableViewCell: UICollectionViewDelegate {
                     }
                 }
             }
+            let hud = JGProgressHUD()
+            hud.indicatorView = JGProgressHUDRingIndicatorView()
+            if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
+                indicatorView.ringWidth = 1.5
+            }
+            guard let view = appDelegate.window?.rootViewController?.view else { return }
+            hud.show(in: view)
 
-            var pathComponents = activityPreview.link.components(separatedBy: "?")
-            pathComponents = pathComponents[1].components(separatedBy: "&")
-            var serverUrlFileName = pathComponents[0].replacingOccurrences(of: "dir=", with: "").removingPercentEncoding!
-            serverUrlFileName = appDelegate.urlBase + "/" + NCUtilityFileSystem.shared.getWebDAV(account: activityPreview.account) + serverUrlFileName + "/" + activitySubjectRich.name
+            NextcloudKit.shared.getFileFromFileId(fileId: String(activityPreview.fileId)) { account, file, data, error in
+                if let file = file {
 
-            let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(activitySubjectRich.id, fileNameView: activitySubjectRich.name)!
+                    let metadata = NCManageDatabase.shared.convertNCFileToMetadata(file, isEncrypted: file.e2eEncrypted, account: account)
+                    NCManageDatabase.shared.addMetadata(metadata)
 
-            NCUtility.shared.startActivityIndicator(backgroundView: (appDelegate.window?.rootViewController?.view)!, blurEffect: true)
+                    let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
+                    let fileNameLocalPath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
 
-            NCCommunication.shared.download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, requestHandler: { _ in
-
-            }, taskHandler: { _ in
-
-            }, progressHandler: { _ in
-
-            }) { account, _, _, _, _, _, errorCode, _ in
-
-                if account == self.appDelegate.account && errorCode == 0 {
-
-                    let serverUrl = (serverUrlFileName as NSString).deletingLastPathComponent
-                    let fileName = (serverUrlFileName as NSString).lastPathComponent
-                    let serverUrlFileName = serverUrl + "/" + fileName
-
-                    NCNetworking.shared.readFile(serverUrlFileName: serverUrlFileName, account: activityPreview.account) { account, metadata, errorCode, _ in
-
-                        NCUtility.shared.stopActivityIndicator()
-
-                        if account == self.appDelegate.account && errorCode == 0 {
-
-                            // move from id to oc:id + instanceid (ocId)
-                            let atPath = CCUtility.getDirectoryProviderStorage()! + "/" + activitySubjectRich.id
-                            let toPath = CCUtility.getDirectoryProviderStorage()! + "/" + metadata!.ocId
-
-                            CCUtility.moveFile(atPath: atPath, toPath: toPath)
-
-                            NCManageDatabase.shared.addMetadata(metadata!)
+                    NextcloudKit.shared.download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, requestHandler: { _ in
+                    }, taskHandler: { _ in
+                    }, progressHandler: { progress in
+                        hud.progress = Float(progress.fractionCompleted)
+                    }) { account, _, _, _, _, _, error in
+                        hud.dismiss()
+                        if account == self.appDelegate.account && error == .success {
+                            NCManageDatabase.shared.addLocalFile(metadata: metadata)
                             if let viewController = self.viewController {
-                                NCViewer.shared.view(viewController: viewController, metadata: metadata!, metadatas: [metadata!], imageIcon: cell?.imageView.image)
+                                NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata], imageIcon: cell?.imageView.image)
                             }
                         }
                     }
-
-                } else {
-
-                    NCUtility.shared.stopActivityIndicator()
+                } else if error != .success {
+                    hud.dismiss()
+                    NCContentPresenter.shared.showError(error: error)
                 }
             }
         }
@@ -211,7 +201,8 @@ extension NCActivityTableViewCell: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return activityPreviews.count
+        let results = activityPreviews.unique { $0.fileId }
+        return results.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -256,8 +247,7 @@ extension NCActivityTableViewCell: UICollectionViewDataSource {
 
             } else {
 
-                if let activitySubjectRich = NCManageDatabase.shared.getActivitySubjectRich(account: account, idActivity: idActivity, id: fileId) {
-
+                if let activitySubjectRich = NCManageDatabase.shared.getActivitySubjectRich(account: activityPreview.account, idActivity: idActivity, id: fileId) {
                     let fileNamePath = CCUtility.getDirectoryUserData() + "/" + activitySubjectRich.name
 
                     if FileManager.default.fileExists(atPath: fileNamePath) {
@@ -267,12 +257,7 @@ extension NCActivityTableViewCell: UICollectionViewDataSource {
                         }
 
                     } else {
-
-                        NCCommunication.shared.downloadPreview(fileNamePathOrFileId: activityPreview.source, fileNamePreviewLocalPath: fileNamePath, widthPreview: 0, heightPreview: 0, etag: nil, useInternalEndpoint: false) { _, imagePreview, _, _, _, errorCode, _ in
-                            if errorCode == 0 && imagePreview != nil {
-                                self.collectionView.reloadData()
-                            }
-                        }
+                        NCOperationQueue.shared.downloadThumbnailActivity(fileNamePathOrFileId: activityPreview.source, fileNamePreviewLocalPath: fileNamePath, fileId: fileId, cell: cell, collectionView: collectionView)
                     }
                 }
             }

@@ -27,16 +27,25 @@ extension NCShareExtension {
 
     @objc func reloadDatasource(withLoadFolder: Bool) {
 
+        var groupByField = "name"
+
         layoutForView = NCUtility.shared.getLayoutForView(key: keyLayout, serverUrl: serverUrl)
 
-        let metadatasSource = NCManageDatabase.shared.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND directory == true", activeAccount.account, serverUrl))
+        // set GroupField for Grid
+        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+            groupByField = "classFile"
+        }
+
+        let metadatas = NCManageDatabase.shared.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND directory == true", activeAccount.account, serverUrl))
         self.dataSource = NCDataSource(
-            metadatasSource: metadatasSource,
+            metadatas: metadatas,
+            account: activeAccount.account,
             sort: layoutForView?.sort,
             ascending: layoutForView?.ascending,
             directoryOnTop: layoutForView?.directoryOnTop,
             favoriteOnTop: true,
-            filterLivePhoto: true)
+            filterLivePhoto: true,
+            groupByField: groupByField)
 
         if withLoadFolder {
             loadFolder()
@@ -47,8 +56,8 @@ extension NCShareExtension {
         collectionView.reloadData()
     }
 
-
     @objc func didCreateFolder(_ notification: NSNotification) {
+
         guard let userInfo = notification.userInfo as NSDictionary?,
               let ocId = userInfo["ocId"] as? String,
               let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
@@ -64,11 +73,11 @@ extension NCShareExtension {
         networkInProgress = true
         collectionView.reloadData()
 
-        NCNetworking.shared.readFolder(serverUrl: serverUrl, account: activeAccount.account) { _, metadataFolder, _, _, _, _, errorCode, errorDescription in
+        NCNetworking.shared.readFolder(serverUrl: serverUrl, account: activeAccount.account) { _, metadataFolder, _, _, _, _, error in
 
             DispatchQueue.main.async {
-                if errorCode != 0 {
-                    self.showAlert(description: errorDescription)
+                if error != .success {
+                    self.showAlert(description: error.errorDescription)
                 }
                 self.networkInProgress = false
                 self.metadataFolder = metadataFolder

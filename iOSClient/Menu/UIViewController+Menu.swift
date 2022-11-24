@@ -23,11 +23,11 @@
 
 import Foundation
 import SVGKit
-import NCCommunication
+import NextcloudKit
 import UIKit
 
 extension UIViewController {
-    fileprivate func handleProfileAction(_ action: NCHovercard.Action, for userId: String) {
+    fileprivate func handleProfileAction(_ action: NKHovercard.Action, for userId: String) {
         switch action.appId {
         case "email":
             guard
@@ -35,7 +35,8 @@ extension UIViewController {
                 url.scheme == "mailto",
                 let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
             else {
-                NCContentPresenter.shared.showError(description: "_cannot_send_mail_error_")
+                let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_cannot_send_mail_error_")
+                NCContentPresenter.shared.showError(error: error)
                 return
             }
             sendEmail(to: components.path)
@@ -50,7 +51,8 @@ extension UIViewController {
 
         default:
             guard let url = action.hyperlinkUrl, UIApplication.shared.canOpenURL(url) else {
-                NCContentPresenter.shared.showError(description: "_open_url_error_")
+                let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_open_url_error_")
+                NCContentPresenter.shared.showError(error: error)
                 return
             }
             UIApplication.shared.open(url, options: [:])
@@ -96,7 +98,8 @@ extension UIViewController {
 
     func sendEmail(to email: String) {
         guard MFMailComposeViewController.canSendMail() else {
-            NCContentPresenter.shared.showError(description: "_cannot_send_mail_error_")
+            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_cannot_send_mail_error_")
+            NCContentPresenter.shared.showError(error: error)
             return
         }
 
@@ -110,7 +113,8 @@ extension UIViewController {
     func presentMenu(with actions: [NCMenuAction]) {
         guard !actions.isEmpty else { return }
         guard let menuViewController = NCMenu.makeNCMenu(with: actions) else {
-            NCContentPresenter.shared.showError(description: "_internal_generic_error_")
+            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_internal_generic_error_")
+            NCContentPresenter.shared.showError(error: error)
             return
         }
 

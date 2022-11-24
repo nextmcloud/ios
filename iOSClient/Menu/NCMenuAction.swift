@@ -117,7 +117,7 @@ extension NCMenuAction {
         var fileList = ""
         for (ix, metadata) in selectedMetadatas.enumerated() {
             guard ix < 3 else { fileList += "\n - ..."; break }
-            fileList += "\n - " + metadata.fileName
+            fileList += "\n - " + metadata.fileNameView
         }
 
         return NCMenuAction(
@@ -128,7 +128,6 @@ extension NCMenuAction {
                     title: titleDelete,
                     message: NSLocalizedString("_want_delete_", comment: "") + fileList,
                     preferredStyle: .alert)
-
                 if canDeleteServer {
                     alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_delete_", comment: ""), style: .default) { (_: UIAlertAction) in
                         selectedMetadatas.forEach({ NCOperationQueue.shared.delete(metadata: $0, onlyLocalCache: false) })
@@ -155,13 +154,7 @@ extension NCMenuAction {
             title: NSLocalizedString("_open_in_", comment: ""),
             icon: NCUtility.shared.loadImage(named: "open_file",color: NCBrandColor.shared.iconColor),
             action: { _ in
-                if viewController is NCFileViewInFolder {
-                    viewController.dismiss(animated: true) {
-                        NCFunctionCenter.shared.openActivityViewController(selectedMetadata: selectedMetadatas)
-                    }
-                } else {
-                    NCFunctionCenter.shared.openActivityViewController(selectedMetadata: selectedMetadatas)
-                }
+                NCFunctionCenter.shared.openActivityViewController(selectedMetadata: selectedMetadatas)
                 completion?()
             }
         )

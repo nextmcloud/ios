@@ -25,7 +25,7 @@
 import UIKit
 import Parchment
 import DropDown
-import NCCommunication
+import NextcloudKit
 import SVGKit
 class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDelegate, NCShareUserCellDelegate, NCShareNetworkingDelegate {
     
@@ -37,7 +37,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     private var dropDown = DropDown()
     private var networking: NCShareNetworking?
     
-    private var shareeSelected: NCCommunicationSharee?
+    private var shareeSelected: NKSharee?
     public  var tableShareSelected: tableShare?
     private var quickStatusTableShare: tableShare!
     private var shareeEmail: String!
@@ -66,7 +66,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         tableView.tableFooterView = UIView(frame: .zero)
         tableView.separatorStyle = .none
         tableView.isUserInteractionEnabled = false
-        networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
+        networking = NCShareNetworking.init(metadata: metadata!, view: self.view, delegate: self)
         if sharingEnabled {
             networking?.readShare(showLoadingIndicator: true)
         }
@@ -246,12 +246,12 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let metadata = self.metadata else { return }
         
         let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
-        NCNetworking.shared.readFile(serverUrlFileName: serverUrlFileName, account: metadata.account) { (account, metadata, errorCode, errorDescription) in
-            if errorCode == 0 && metadata != nil {
+        NCNetworking.shared.readFile(serverUrlFileName: serverUrlFileName) { _, metadata, error in
+            if error == .success && metadata != nil {
                 let internalLink = self.appDelegate.urlBase + "/index.php/f/" + metadata!.fileId
                 NCShareCommon.shared.copyLink(link: internalLink, viewController: self, sender: sender)
             } else {
-                NCContentPresenter.shared.messageNotification("_share_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                NCContentPresenter.shared.messageNotification("_share_", error: error, delay:  NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error)
             }
         }
     }
@@ -352,7 +352,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         self.reloadData()
     }
     
-    func getSharees(sharees: [NCCommunicationSharee]?) {
+    func getSharees(sharees: [NKSharee]?) {
         
         guard let sharees = sharees else { return }
         guard let searchField = self.view.viewWithTag(Tag.searchField) as? UITextField  else { return }
@@ -409,15 +409,14 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
                 if NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName) == nil {
                     let fileNameLocalPath = String(CCUtility.getDirectoryUserData()) + "/" + fileName
                     let etag = NCManageDatabase.shared.getTableAvatar(fileName: fileName)?.etag
-                    
-                    NCCommunication.shared.downloadAvatar(user: sharee.shareWith, fileNameLocalPath: fileNameLocalPath, sizeImage: NCGlobal.shared.avatarSize, avatarSizeRounded: NCGlobal.shared.avatarSizeRounded, etag: etag) { _, imageAvatar, _, etag, errorCode, _ in
+                    NextcloudKit.shared.downloadAvatar(user: sharee.shareWith, fileNameLocalPath: fileNameLocalPath, sizeImage: NCGlobal.shared.avatarSize, etag: etag) { account, imageAvatar, imageOriginal, etag, error in
                         
-                        if errorCode == 0, let etag = etag, let imageAvatar = imageAvatar {
+                        if error == .success, let etag = etag, let imageAvatar = imageAvatar {
                             
                             NCManageDatabase.shared.addAvatar(fileName: fileName, etag: etag)
                             cell.imageItem.image = imageAvatar
                             
-                        } else if errorCode == NCGlobal.shared.errorNotModified, let imageAvatar = NCManageDatabase.shared.setAvatarLoaded(fileName: fileName) {
+                        } else if error.errorCode == NCGlobal.shared.errorNotModified, let imageAvatar = NCManageDatabase.shared.setAvatarLoaded(fileName: fileName) {
                             
                             cell.imageItem.image = imageAvatar
                         }
@@ -460,7 +459,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             return image
         }
         
-        if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue && !metadata.hasPreview {
+        if metadata.classFile == NKCommon.typeClassFile.video.rawValue && !metadata.hasPreview {
             NCUtility.shared.createImageFrom(fileNameView: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
         }
         
@@ -477,7 +476,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         let ext = CCUtility.getExtension(metadata.fileNameView)
         var image: UIImage?
         
-        if CCUtility.fileProviderStorageExists(metadata) && metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue {
+        if CCUtility.fileProviderStorageExists(metadata) && metadata.classFile == NKCommon.typeClassFile.image.rawValue {
             
             let previewPath = CCUtility.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)!
             let imagePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!

@@ -24,7 +24,7 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 
 class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
@@ -202,7 +202,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func login(_ sender: Any) {
-        if NCCommunication.shared.isNetworkReachable() {
+        if NextcloudKit.shared.isNetworkReachable() {
             appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
         } else {
             showNoInternetAlert()

@@ -22,7 +22,7 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 
 // MARK: - Collection View (target folder)
 
@@ -47,11 +47,11 @@ extension NCShareExtension: UICollectionViewDelegate {
 extension NCShareExtension: UICollectionViewDataSource {
 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        return dataSource.numberOfSections()
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let numberOfItems = dataSource.numberOfItems()
+        let numberOfItems = dataSource.numberOfItemsInSection(section)
         emptyDataSet?.numberOfItemsInSection(numberOfItems, section: section)
         return numberOfItems
     }
@@ -82,7 +82,7 @@ extension NCShareExtension: UICollectionViewDataSource {
         cell.separator.backgroundColor = NCBrandColor.shared.separator
 
         if metadata.directory {
-            setupDirectoryCell(cell, with: metadata)
+            setupDirectoryCell(cell, indexPath: indexPath, with: metadata)
         }
 
         // image Favorite
@@ -107,7 +107,7 @@ extension NCShareExtension: UICollectionViewDataSource {
         return cell
     }
 
-    func setupDirectoryCell(_ cell: NCListCell, with metadata: tableMetadata) {
+    func setupDirectoryCell(_ cell: NCListCell, indexPath: IndexPath, with metadata: tableMetadata) {
         var isShare = false
         var isMounted = false
         if let metadataFolder = metadataFolder {
@@ -115,10 +115,7 @@ extension NCShareExtension: UICollectionViewDataSource {
             isMounted = metadata.permissions.contains(NCGlobal.shared.permissionMounted) && !metadataFolder.permissions.contains(NCGlobal.shared.permissionMounted)
         }
 
-        var tableShare: tableShare?
-        if dataSource.metadataShare[metadata.ocId] != nil {
-            tableShare = dataSource.metadataShare[metadata.ocId]
-        }
+        let tableShare = dataSource.metadatasForSection[indexPath.section].metadataShare[metadata.ocId]
 
         if metadata.e2eEncrypted {
             cell.imageItem.image = NCBrandColor.cacheImages.folderEncrypted

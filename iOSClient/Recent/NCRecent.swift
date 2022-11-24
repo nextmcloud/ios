@@ -22,7 +22,7 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 
 class NCRecent: NCCollectionViewCommon {
 
@@ -34,26 +34,34 @@ class NCRecent: NCCollectionViewCommon {
         titleCurrentFolder = NSLocalizedString("_recent_", comment: "")
         layoutKey = NCGlobal.shared.layoutViewRecent
         enableSearchBar = false
+        headerMenuButtonsCommand = false
+        headerMenuButtonsView = false
+        headerRichWorkspaceDisable = true
         emptyImage = UIImage(named: "recent")?.image(color: .gray, size: UIScreen.main.bounds.width)
         emptyTitle = "_files_no_files_"
         emptyDescription = ""
     }
 
-    // MARK: - Collection View
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
 
-    override func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: 0)
+        navigationController?.setFileAppreance()
     }
 
     // MARK: - DataSource + NC Endpoint
 
-    override func reloadDataSource() {
+    override func reloadDataSource(forced: Bool = true) {
         super.reloadDataSource()
 
         DispatchQueue.global().async {
-
-            self.metadatasSource = NCManageDatabase.shared.getAdvancedMetadatas(predicate: NSPredicate(format: "account == %@", self.appDelegate.account), page: 1, limit: 100, sorted: "date", ascending: false)
-            self.dataSource = NCDataSource(metadatasSource: self.metadatasSource, directoryOnTop: false, favoriteOnTop: false)
+            let metadatas = NCManageDatabase.shared.getAdvancedMetadatas(predicate: NSPredicate(format: "account == %@", self.appDelegate.account), page: 1, limit: 100, sorted: "date", ascending: false)
+            self.dataSource = NCDataSource(metadatas: metadatas,
+                                           account: self.appDelegate.account,
+                                           directoryOnTop: false,
+                                           favoriteOnTop: false,
+                                           groupByField: self.groupByField,
+                                           providers: self.providers,
+                                           searchResults: self.searchResults)
 
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()
@@ -65,10 +73,10 @@ class NCRecent: NCCollectionViewCommon {
     override func reloadDataSourceNetwork(forced: Bool = false) {
         super.reloadDataSourceNetwork(forced: forced)
 
-        if isSearching {
-            networkSearch()
-            return
-        }
+//        if isSearching {
+//            networkSearch()
+//            return
+//        }
 
         let requestBodyRecent =
         """
@@ -141,10 +149,12 @@ class NCRecent: NCCollectionViewCommon {
         isReloadDataSourceNetworkInProgress = true
         collectionView?.reloadData()
 
-        NCCommunication.shared.searchBodyRequest(serverUrl: appDelegate.urlBase, requestBody: requestBody, showHiddenFiles: CCUtility.getShowHiddenFiles(), queue: NCCommunicationCommon.shared.backgroundQueue) { account, files, errorCode, _ in
+        let options = NKRequestOptions(queue: NKCommon.shared.backgroundQueue)
 
-            if errorCode == 0 {
-                NCManageDatabase.shared.convertNCCommunicationFilesToMetadatas(files, useMetadataFolder: false, account: account) { _, metadatasFolder, metadatas in
+        NextcloudKit.shared.searchBodyRequest(serverUrl: appDelegate.urlBase, requestBody: requestBody, showHiddenFiles: CCUtility.getShowHiddenFiles(), options: options) { account, files, data, error in
+
+            if error == .success {
+                NCManageDatabase.shared.convertNKFilesToMetadatas(files, useMetadataFolder: false, account: account) { _, metadatasFolder, metadatas in
 
                     // Update sub directories
                     for metadata in metadatasFolder {

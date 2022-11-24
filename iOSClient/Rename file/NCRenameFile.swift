@@ -23,7 +23,7 @@
 
 import Foundation
 import UIKit
-import NCCommunication
+import NextcloudKit
 
 public protocol NCRenameFileDelegate: AnyObject {
     func rename(fileName: String, fileNameNew: String)
@@ -261,17 +261,19 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 
     func renameMetadata(_ metadata: tableMetadata, fileNameNew: String) {
 
-        NCUtility.shared.startActivityIndicator(backgroundView: nil, blurEffect: true)
+        NCActivityIndicator.shared.start()
 
-        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, viewController: self) { errorCode, errorDescription in
-            NCUtility.shared.stopActivityIndicator()
+        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, viewController: self) { error in
 
-            if errorCode == 0 {
-                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSourceNetworkForced)
+            NCActivityIndicator.shared.stop()
+
+            if error == .success {
+
                 self.dismiss(animated: true)
 
             } else {
-                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+
+                NCContentPresenter.shared.showError(error: error)
             }
         }
     }

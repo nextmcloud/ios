@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 import SVGKit
 
 class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareNetworkingDelegate, NCShareAdvancePermissionHeaderDelegate {
@@ -135,7 +135,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         self.linkLabel = tableShare?.label ?? ""
         self.permissionInt = tableShare?.permissions ?? NCGlobal.shared.permissionReadShare
         self.hideDownload = tableShare?.hideDownload ?? false
-        networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase,  view: self.view, delegate: self)
+        networking = NCShareNetworking.init(metadata: metadata!,  view: self.view, delegate: self)
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         initializeForm()
         changeTheming()
@@ -1042,8 +1042,8 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     
     @objc func favoriteClicked() {
         if let metadata = self.metadata {
-            NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
-                if errorCode == 0 {
+            NCNetworking.shared.favoriteMetadata(metadata) { error in
+                if error == .success {
                     if !metadata.favorite {
                         self.headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
                         self.metadata?.favorite = true
@@ -1052,7 +1052,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
                         self.metadata?.favorite = false
                     }
                 } else {
-                    NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                    NCContentPresenter.shared.messageNotification("_error_", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error)
                 }
             }
         }
@@ -1076,7 +1076,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
     func updateShareWithError(idShare: Int) {
     }
     
-    func getSharees(sharees: [NCCommunicationSharee]?) { }
+    func getSharees(sharees: [NKSharee]?) { }
     
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
         
@@ -1090,7 +1090,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
             return image
         }
         
-        if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue && !metadata.hasPreview {
+        if metadata.classFile == NKCommon.typeClassFile.video.rawValue && !metadata.hasPreview {
             NCUtility.shared.createImageFrom(fileNameView: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
         }
         
@@ -1108,7 +1108,7 @@ class NCShareAdvancePermission: XLFormViewController, NCSelectDelegate, NCShareN
         let ext = CCUtility.getExtension(metadata.fileNameView)
         var image: UIImage?
         
-        if CCUtility.fileProviderStorageExists(metadata) && metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue {
+        if CCUtility.fileProviderStorageExists(metadata) && metadata.classFile == NKCommon.typeClassFile.image.rawValue {
            
             let previewPath = CCUtility.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)!
             let imagePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!

@@ -8,7 +8,7 @@
 
 import Foundation
 import SwiftyJSON
-import NCCommunication
+import NextcloudKit
 import Alamofire
 
 class NMCCommunication: NSObject, XMLParserDelegate {

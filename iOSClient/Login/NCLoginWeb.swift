@@ -23,7 +23,7 @@
 
 import UIKit
 import WebKit
-import NCCommunication
+import NextcloudKit
 import FloatingPanel
 
 class NCLoginWeb: UIViewController {
@@ -31,13 +31,18 @@ class NCLoginWeb: UIViewController {
     var activityIndicator: UIActivityIndicatorView!
     var webView: WKWebView?
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    var titleView: String = ""
+    var urlBase = ""
+    
+    var configServerUrl: String?
+    var configUsername: String?
+    var configPassword: String?
+    var configAppPassword: String?
 
-    @objc var urlBase = ""
-
-    @objc var loginFlowV2Available = false
-    @objc var loginFlowV2Token = ""
-    @objc var loginFlowV2Endpoint = ""
-    @objc var loginFlowV2Login = ""
+    var loginFlowV2Available = false
+    var loginFlowV2Token = ""
+    var loginFlowV2Endpoint = ""
+    var loginFlowV2Login = ""
 
     // MARK: - View Life Cycle
 
@@ -101,8 +106,18 @@ class NCLoginWeb: UIViewController {
         if let url = URL(string: urlBase) {
             loadWebPage(webView: webView!, url: url)
         } else {
-            NCContentPresenter.shared.messageNotification("_error_", description: "_login_url_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError, priority: .max)
+            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_login_url_error_")
+            NCContentPresenter.shared.showError(error: error, priority: .max)
         }
+
+        // TITLE
+        if let host = URL(string: urlBase)?.host {
+            titleView = host
+            if let account = NCManageDatabase.shared.getActiveAccount(), CCUtility.getPassword(account.account).isEmpty {
+                titleView = NSLocalizedString("_user_", comment: "") + " " + account.userId + " " + NSLocalizedString("_in_", comment: "") + " " + host
+            }
+        }
+        self.title = titleView
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -110,6 +125,14 @@ class NCLoginWeb: UIViewController {
 
         // Stop timer error network
         appDelegate.timerErrorNetworking?.invalidate()
+
+        if let account = NCManageDatabase.shared.getActiveAccount(), CCUtility.getPassword(account.account).isEmpty {
+
+            let message = "\n" + NSLocalizedString("_password_not_present_", comment: "")
+            let alertController = UIAlertController(title: titleView, message: message, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
+            present(alertController, animated: true)
+        }
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -135,6 +158,19 @@ class NCLoginWeb: UIViewController {
         request.addValue(language, forHTTPHeaderField: "Accept-Language")
 
         webView.load(request)
+    }
+
+    func getAppPassword(serverUrl: String, username: String, password: String) {
+        
+        NextcloudKit.shared.getAppPassword(serverUrl: serverUrl, username: username, password: password) { token, data, error in
+            self.activityIndicator.stopAnimating()
+            if error == .success, let password = token {
+                self.createAccount(server: serverUrl, username: username, password: password)
+            } else {
+                NCContentPresenter.shared.showError(error: error)
+                self.dismiss(animated: true, completion: nil)
+            }
+        }
     }
 
     @objc func closeView(sender: UIBarButtonItem) {
@@ -188,10 +224,6 @@ extension NCLoginWeb: WKNavigationDelegate {
         }
     }
 
-    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-
-    }
-
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
 
         var errorMessage = error.localizedDescription
@@ -217,40 +249,7 @@ extension NCLoginWeb: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-
         decisionHandler(.allow)
-
-        /* TEST NOT GOOD DON'T WORKS
-        
-         if let data = navigationAction.request.httpBody {
-             let str = String(decoding: data, as: UTF8.self)
-             print(str)
-         }
-         
-         guard let url = navigationAction.request.url else {
-            decisionHandler(.allow)
-            return
-        }
-        
-        if String(describing: url).hasPrefix(NCBrandOptions.shared.webLoginAutenticationProtocol) {
-            decisionHandler(.allow)
-            return
-        } else if navigationAction.request.httpMethod != "GET" || navigationAction.request.value(forHTTPHeaderField: "OCS-APIRequest") != nil {
-            decisionHandler(.allow)
-            return
-        }
-        
-        decisionHandler(.cancel)
-        
-        let language = NSLocale.preferredLanguages[0] as String
-        var request = URLRequest(url: url)
-        
-        request.setValue(CCUtility.getUserAgent(), forHTTPHeaderField: "User-Agent")
-        request.addValue("true", forHTTPHeaderField: "OCS-APIRequest")
-        request.addValue(language, forHTTPHeaderField: "Accept-Language")
-        
-        webView.load(request)
-        */
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -263,8 +262,8 @@ extension NCLoginWeb: WKNavigationDelegate {
 
         if loginFlowV2Available {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                NCCommunication.shared.getLoginFlowV2Poll(token: self.loginFlowV2Token, endpoint: self.loginFlowV2Endpoint) { server, loginName, appPassword, errorCode, _ in
-                    if errorCode == 0 && server != nil && loginName != nil && appPassword != nil {
+                NextcloudKit.shared.getLoginFlowV2Poll(token: self.loginFlowV2Token, endpoint: self.loginFlowV2Endpoint) { server, loginName, appPassword, data, error in
+                    if error == .success && server != nil && loginName != nil && appPassword != nil {
                         self.createAccount(server: server!, username: loginName!, password: appPassword!)
                     }
                 }
@@ -303,12 +302,9 @@ extension NCLoginWeb: WKNavigationDelegate {
         appDelegate.settingAccount(account, urlBase: urlBase, user: username, userId: tableAccount.userId, password: password)
 
         if CCUtility.getIntro() {
-
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitialize)
             self.dismiss(animated: true)
-
         } else {
-
             CCUtility.setIntro(true)
             if self.presentingViewController == nil {
                 if let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() {

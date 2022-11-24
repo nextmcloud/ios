@@ -79,8 +79,6 @@ class NCGlobal: NSObject {
         var directoryOnTop: Bool
         var titleButtonHeader: String
         var itemForLine: Int
-        var imageBackgroud: String
-        var imageBackgroudContentMode: String
     }
 
     // Directory on Group
@@ -100,6 +98,16 @@ class NCGlobal: NSObject {
     let refreshTask                                 = "com.nextcloud.refreshTask"
     let processingTask                              = "com.nextcloud.processingTask"
 
+    // Name
+    //
+    @objc let appName                               = "files"
+    @objc let talkName                              = "talk-message"
+
+    // DAV -
+    //
+    @objc let dav                                   = "remote.php/dav"
+    @objc let davfiles                              = "remote.php/dav/files/"
+
     // Nextcloud version
     //
     let nextcloudVersion12: Int                     =  12
@@ -108,11 +116,13 @@ class NCGlobal: NSObject {
     let nextcloudVersion18: Int                     =  18
     let nextcloudVersion20: Int                     =  20
     let nextcloudVersion23: Int                     =  23
+    let nextcloudVersion24: Int                     =  24
+    let nextcloudVersion25: Int                     =  25
 
     // Database Realm
     //
     let databaseDefault                             = "nextcloud.realm"
-    let databaseSchemaVersion: UInt64               = 222
+    let databaseSchemaVersion: UInt64               = 255
 
     // Intro selector
     //
@@ -135,7 +145,7 @@ class NCGlobal: NSObject {
     let e2eeMaxFileSize: UInt64                     = 500000000     // 500 MB
     let e2eePassphraseTest                          = "more over television factory tendency independence international intellectual impress interest sentence pony"
     @objc let e2eeVersion                           = "1.1"
-    
+
     // Max Cache Proxy Video
     //
     let maxHTTPCache: Int64                         = 10000000000   // 10 GB
@@ -181,6 +191,15 @@ class NCGlobal: NSObject {
     let buttonMoreStop                              = "stop"
     let buttonMoreLock                              = "moreLock"
 
+    // Standard height sections header/footer
+    //
+    let heightButtonsCommand: CGFloat               = 50
+    let heightButtonsView: CGFloat                  = 50
+    let heightSection: CGFloat                      = 30
+    let heightFooter: CGFloat                       = 1
+    let heightFooterButton: CGFloat                 = 30
+    let endHeightFooter: CGFloat                    = 85
+
     // Text -  OnlyOffice - Collabora - QuickLook
     //
     let editorText                                  = "text"
@@ -222,10 +241,15 @@ class NCGlobal: NSObject {
     @objc let errorRequestExplicityCancelled: Int   = 15
     @objc let errorNotModified: Int                 = 304
     @objc let errorBadRequest: Int                  = 400
+    @objc let errorUnauthorized: Int                = 401
+    @objc let errorForbidden: Int                   = 403
     @objc let errorResourceNotFound: Int            = 404
     @objc let errordMethodNotSupported: Int         = 405
     @objc let errorConflict: Int                    = 409
+    @objc let errorPreconditionFailed: Int          = 412
+    @objc let errorNCUnauthorized: Int              = 997
     @objc let errorConnectionLost: Int              = -1005
+    @objc let errorNetworkNotAvailable: Int         = -1009
     @objc let errorBadServerResponse: Int           = -1011
     @objc let errorInternalError: Int               = -99999
     @objc let errorFileNotSaved: Int                = -99998
@@ -248,10 +272,9 @@ class NCGlobal: NSObject {
     @objc let permissionCanDelete                   = "D"
     @objc let permissionCanRename                   = "N"
     @objc let permissionCanMove                     = "V"
-    
-    //Share permission
-    //permissions - (int) 1 = read; 2 = update; 4 = create; 8 = delete; 16 = share; 31 = all (default: 31, for public shares: 1)
 
+    // Share permission
+    // permissions - (int) 1 = read; 2 = update; 4 = create; 8 = delete; 16 = share; 31 = all
     //
     @objc let permissionReadShare: Int              = 1
     @objc let permissionUpdateShare: Int            = 2
@@ -299,6 +322,7 @@ class NCGlobal: NSObject {
     let selectorUploadAutoUpload                    = "uploadAutoUpload"
     let selectorUploadAutoUploadAll                 = "uploadAutoUploadAll"
     let selectorUploadFile                          = "uploadFile"
+    let selectorUploadFileNODelete                  = "UploadFileNODelete"
     let selectorUploadFileShareExtension            = "uploadFileShareExtension"
     let selectorSaveAlbum                           = "saveAlbum"
     let selectorSaveBackground                      = "saveBackground"
@@ -332,7 +356,7 @@ class NCGlobal: NSObject {
     let notificationCenterApplicationDidBecomeActive            = "applicationDidBecomeActive"
     let notificationCenterApplicationWillResignActive           = "applicationWillResignActive"
 
-    @objc let notificationCenterInitialize                      = "initialize"
+    @objc let notificationCenterInitialize                      = "initialize"                      // userInfo?: atStart
     @objc let notificationCenterChangeTheming                   = "changeTheming"
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
@@ -349,26 +373,27 @@ class NCGlobal: NSObject {
     // userInfo: serverUrl, fileName
 
     @objc let notificationCenterReloadDataSource                = "reloadDataSource"                // userInfo: ocId?, serverUrl?
+    let notificationCenterReloadDataSourceNetwork               = "reloadDataSourceNetwork"         // userInfo: serverUrl?
     let notificationCenterReloadDataSourceNetworkForced         = "reloadDataSourceNetworkForced"   // userInfo: serverUrl?
 
     let notificationCenterChangeStatusFolderE2EE                = "changeStatusFolderE2EE"          // userInfo: serverUrl
 
-    let notificationCenterDownloadStartFile                     = "downloadStartFile"               // userInfo: ocId
-    let notificationCenterDownloadedFile                        = "downloadedFile"                  // userInfo: ocId, selector, errorCode, errorDescription
-    let notificationCenterDownloadCancelFile                    = "downloadCancelFile"              // userInfo: ocId
+    let notificationCenterDownloadStartFile                     = "downloadStartFile"               // userInfo: ocId, serverUrl, account
+    let notificationCenterDownloadedFile                        = "downloadedFile"                  // userInfo: ocId, serverUrl, account, selector, error
+    let notificationCenterDownloadCancelFile                    = "downloadCancelFile"              // userInfo: ocId, serverUrl, account
 
-    let notificationCenterUploadStartFile                       = "uploadStartFile"                 // userInfo: ocId
-    @objc let notificationCenterUploadedFile                    = "uploadedFile"                    // userInfo: ocId, ocIdTemp, errorCode, errorDescription
+    let notificationCenterUploadStartFile                       = "uploadStartFile"                 // userInfo: ocId, serverUrl, account, fileName, sessionSelector
+    @objc let notificationCenterUploadedFile                    = "uploadedFile"                    // userInfo: ocId, serverUrl, account, fileName, ocIdTemp, error
     let notificationCenterUploadCancelFile                      = "uploadCancelFile"                // userInfo: ocId, serverUrl, account
 
     let notificationCenterProgressTask                          = "progressTask"                    // userInfo: account, ocId, serverUrl, status, progress, totalBytes, totalBytesExpected
 
-    let notificationCenterCreateFolder                          = "createFolder"                    // userInfo: ocId
-    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: ocId, fileNameView, classFile, onlyLocalCache
-    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: ocId, errorCode, errorDescription
-    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: ocId, serverUrlTo
-    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: ocId, serverUrlFrom
-    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId
+    let notificationCenterCreateFolder                          = "createFolder"                    // userInfo: ocId, serverUrl, account, e2ee
+    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: ocId, fileNameView, serverUrl, account, classFile, onlyLocalCache
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: ocId, account
+    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: ocId, account, serverUrlFrom
+    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: ocId, serverUrlTo
+    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
 
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
@@ -390,7 +415,44 @@ class NCGlobal: NSObject {
     let notificationCenterStatusReadOnly                        = "statusReadOnly"
     let notificationCenterStatusEditing                         = "statusEditing"
     let notificationCenterStatusFileDrop                        = "statusFileDrop"
-    // Tip
+
+    // TIP
     //
     let tipNCViewerPDFThumbnail                                 = "tipncviewerpdfthumbnail"
+    let tipNCCollectionViewCommonAccountRequest                 = "tipnccollectionviewcommonaccountrequest"
+    let tipNCScanAddImage                                       = "tipncscanaddimage"
+    let tipNCViewerMediaDetailView                              = "tipncviewermediadetailview"
+    
+    // ACTION
+    //
+    let actionNoAction                                          = "no-action"
+    let actionUploadAsset                                       = "upload-asset"
+    let actionScanDocument                                      = "add-scan-document"
+    let actionTextDocument                                      = "create-text-document"
+    let actionVoiceMemo                                         = "create-voice-memo"
+    
+    // WIDGET ACTION
+    //
+    let widgetActionNoAction                                    = "nextcloud://open-action?action=no-action"
+    let widgetActionUploadAsset                                 = "nextcloud://open-action?action=upload-asset"
+    let widgetActionScanDocument                                = "nextcloud://open-action?action=add-scan-document"
+    let widgetActionTextDocument                                = "nextcloud://open-action?action=create-text-document"
+    let widgetActionVoiceMemo                                   = "nextcloud://open-action?action=create-voice-memo"
+    
+    // APPCONFIG
+    //
+    let configuration_brand                                     = "brand"
+
+    let configuration_serverUrl                                 = "serverUrl"
+    let configuration_username                                  = "username"
+    let configuration_password                                  = "password"
+    let configuration_apppassword                               = "apppassword"
+    
+    let configuration_disable_intro                             = "disable_intro"
+    let configuration_disable_multiaccount                      = "disable_multiaccount"
+    let configuration_disable_crash_service                     = "disable_crash_service"
+    let configuration_disable_log                               = "disable_log"
+    let configuration_disable_manage_account                    = "disable_manage_account"
+    let configuration_disable_more_external_site                = "disable_more_external_site"
+    let configuration_disable_openin_file                       = "disable_openin_file"
 }

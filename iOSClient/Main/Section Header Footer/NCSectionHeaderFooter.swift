@@ -190,3 +190,13 @@ class NCSectionFooter: UICollectionReusableView {
         }
     }
 }
+
+
+protocol NCSectionFooterDelegate: AnyObject {
+    func tapButtonSection(_ sender: Any, metadataForSection: NCMetadataForSection?)
+}
+
+// optional func
+extension NCSectionFooterDelegate {
+    func tapButtonSection(_ sender: Any, metadataForSection: NCMetadataForSection?) {}
+}

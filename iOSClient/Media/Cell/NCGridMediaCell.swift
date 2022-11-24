@@ -24,6 +24,8 @@
 import UIKit
 
 class NCGridMediaCell: UICollectionViewCell, NCCellProtocol {
+    var fileAvatarImageView: UIImageView?
+    
 
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
@@ -36,30 +38,17 @@ class NCGridMediaCell: UICollectionViewCell, NCCellProtocol {
     var date: Date?
 
     var filePreviewImageView: UIImageView? {
-        get {
-            return imageItem
-        }
-    }
-    var fileAvatarImageView: UIImageView? {
-        get {
-            return nil
-        }
+
+        get { return imageItem }
+        set {}
     }
     var fileObjectId: String? {
-        get {
-            return objectId
-        }
-        set {
-            objectId = newValue ?? ""
-        }
+        get { return objectId }
+        set { objectId = newValue ?? "" }
     }
     var fileUser: String? {
-        get {
-            return user
-        }
-        set {
-            user = newValue ?? ""
-        }
+        get { return user }
+        set { user = newValue ?? "" }
     }
 
     override func awakeFromNib() {
@@ -73,13 +62,9 @@ class NCGridMediaCell: UICollectionViewCell, NCCellProtocol {
     }
 
     func initCell() {
-        imageItem.backgroundColor = UIColor.lightGray
+        imageItem.backgroundColor = .secondarySystemBackground
         imageStatus.image = nil
         imageItem.image = nil
-        imageItem.layer.masksToBounds = true
-        imageItem.layer.cornerRadius = 6
-        imageVisualEffect.layer.cornerRadius = 6
-        imageVisualEffect.clipsToBounds = true
     }
 
     func selectMode(_ status: Bool) {

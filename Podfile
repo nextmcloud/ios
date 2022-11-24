@@ -10,23 +10,23 @@ target 'Nextcloud' do
   pod 'tealium-swift'
   pod "tealium-swift/Core"
   pod 'ChromaColorPicker'
-  pod "MarkdownKit"
-end
-
-target 'Share' do
-  # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
-  pod "MarkdownKit"
-end
-
-target 'File Provider Extension' do
-  # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
-  pod "MarkdownKit"
-end
-
-target 'Notification Service Extension' do
-  # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
-  pod "MarkdownKit"
+#  pod "MarkdownKit"
+#end
+#
+#target 'Share' do
+#  # Comment the next line if you don't want to use dynamic frameworks
+#  use_frameworks!
+#  pod "MarkdownKit"
+#end
+#
+#target 'File Provider Extension' do
+#  # Comment the next line if you don't want to use dynamic frameworks
+#  use_frameworks!
+#  pod "MarkdownKit"
+#end
+#
+#target 'Notification Service Extension' do
+#  # Comment the next line if you don't want to use dynamic frameworks
+#  use_frameworks!
+#  pod "MarkdownKit"
 end

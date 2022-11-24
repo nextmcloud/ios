@@ -8,10 +8,10 @@
 
 import UIKit
 import FSCalendar
-import NCCommunication
+import NextcloudKit
 
 class NCShareFolderOptions: UIViewController ,UIGestureRecognizerDelegate, NCShareNetworkingDelegate, FSCalendarDelegate, FSCalendarDelegateAppearance, UIScrollViewDelegate {
-
+    
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var favorite: UIButton!
     @IBOutlet weak var labelFileName: UILabel!
@@ -40,7 +40,7 @@ class NCShareFolderOptions: UIViewController ,UIGestureRecognizerDelegate, NCSha
     @IBOutlet weak var applyChanges: UIButton!
 //    @IBOutlet weak var scrollView: UIScrollView!
     public var metadata: tableMetadata?
-    public var sharee: NCCommunicationSharee?
+    public var sharee: NKCommon?
     public var tableShare: tableShare?
     
     
@@ -107,7 +107,7 @@ class NCShareFolderOptions: UIViewController ,UIGestureRecognizerDelegate, NCSha
         tfExpirationDate.isEnabled = false
 //        self.scrollView.isDirectionalLockEnabled = true
 //        self.scrollView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.scrollView.frame.height - 50)
-        networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase,  view: self.view, delegate: self)
+        networking = NCShareNetworking.init(metadata: metadata!, view: self.view, delegate: self)
     }
     
 //    func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -120,15 +120,15 @@ class NCShareFolderOptions: UIViewController ,UIGestureRecognizerDelegate, NCSha
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-            NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
-                if errorCode == 0 {
+            NCNetworking.shared.favoriteMetadata(metadata) {error in
+                if error == .success {
                     if !metadata.favorite {
                         self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
                     } else {
                         self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
                     }
                 } else {
-                    NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                    NCContentPresenter.shared.showError(error: error)
                 }
             }
         }
@@ -349,7 +349,7 @@ class NCShareFolderOptions: UIViewController ,UIGestureRecognizerDelegate, NCSha
         
     }
     
-    func getSharees(sharees: [NCCommunicationSharee]?) {
+    func getSharees(sharees: [NKSharee]?) {
         
     }
     

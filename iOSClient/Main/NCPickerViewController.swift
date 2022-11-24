@@ -24,6 +24,8 @@
 import UIKit
 import TLPhotoPicker
 import MobileCoreServices
+import Photos
+import NextcloudKit
 
 // MARK: - Photo Picker
 
@@ -70,8 +72,9 @@ class NCPhotosPickerViewController: NSObject {
         configure.selectedColor = NCBrandColor.shared.brandElement
         configure.singleSelectedMode = singleSelectedMode
         configure.allowedAlbumCloudShared = true
-        
+
         let viewController = customPhotoPickerViewController(withTLPHAssets: { assets in
+
             for asset: TLPHAsset in assets {
                 if asset.phAsset != nil {
                     selectedAssets.append(asset.phAsset!)
@@ -83,15 +86,18 @@ class NCPhotosPickerViewController: NSObject {
         }, didCancel: nil)
 
         viewController.didExceedMaximumNumberOfSelection = { _ in
-            NCContentPresenter.shared.messageNotification("_info_", description: "_limited_dimension_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
+            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_limited_dimension_")
+            NCContentPresenter.shared.showError(error: error)
         }
 
         viewController.handleNoAlbumPermissions = { _ in
-            NCContentPresenter.shared.messageNotification("_info_", description: "_denied_album_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
+            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_denied_album_")
+            NCContentPresenter.shared.showError(error: error)
         }
 
         viewController.handleNoCameraPermissions = { _ in
-            NCContentPresenter.shared.messageNotification("_info_", description: "_denied_camera_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
+            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_denied_camera_")
+            NCContentPresenter.shared.showError(error: error)
         }
 
         viewController.configure = configure
@@ -108,7 +114,6 @@ class customPhotoPickerViewController: TLPhotosPickerViewController {
 
     override func makeUI() {
         super.makeUI()
-
         self.customNavItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brandElement
         self.customNavItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.brandElement
         self.albumPopView.tintColor = NCBrandColor.shared.brandElement
@@ -147,7 +152,7 @@ class NCDocumentPickerViewController: NSObject, UIDocumentPickerDelegate {
 
             if NCUtilityFileSystem.shared.copyFile(atPath: atPath, toPath: toPath) {
 
-                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileName, fileNameView: fileName, ocId: ocId, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileName, fileNameView: fileName, ocId: ocId, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "")
 
                 metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
                 metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
@@ -157,19 +162,21 @@ class NCDocumentPickerViewController: NSObject, UIDocumentPickerDelegate {
                 if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileName: fileName) != nil {
 
                     if let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict {
+
                         conflict.delegate = appDelegate
                         conflict.serverUrl = serverUrl
                         conflict.metadatasUploadInConflict = [metadataForUpload]
+                        conflict.isE2EE = CCUtility.isFolderEncrypted(serverUrl, e2eEncrypted: false, account: appDelegate.account, urlBase: appDelegate.urlBase, userId: appDelegate.userId)
 
                         appDelegate.window?.rootViewController?.present(conflict, animated: true, completion: nil)
                     }
 
                 } else {
-                    appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadataForUpload])
+                    NCNetworkingProcessUpload.shared.createProcessUploads(metadatas: [metadataForUpload], completion: { _ in })
                 }
-
             } else {
-                NCContentPresenter.shared.messageNotification("_error_", description: "_read_file_error_", delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
+                let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_read_file_error_")
+                NCContentPresenter.shared.showError(error: error)
             }
         }
     }

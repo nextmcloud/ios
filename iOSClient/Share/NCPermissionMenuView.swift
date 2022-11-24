@@ -9,7 +9,7 @@
 
 import Foundation
 import FSCalendar
-import NCCommunication
+import NextcloudKit
 
 class NCPermissionMenuView: UIView, UIGestureRecognizerDelegate, NCShareNetworkingDelegate, FSCalendarDelegate, FSCalendarDelegateAppearance {
     @IBOutlet weak var switchReadOnly: UISwitch!

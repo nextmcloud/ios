@@ -22,6 +22,7 @@
 //
 
 import UIKit
+import NextcloudKit
 
 extension UIAlertController {
     /// Creates a alert controller with a textfield, asking to create a new folder
@@ -30,19 +31,17 @@ extension UIAlertController {
     ///   - urlBase: UrlBase object
     ///   - completion: If not` nil` it overrides the default behavior which shows an error using `NCContentPresenter`
     /// - Returns: The presentable alert controller
-    static func createFolder(serverUrl: String, urlBase: NCUserBaseUrl, completion: ((_ errorCode: Int, _ errorDescription: String) -> Void)? = nil) -> UIAlertController {
+    static func createFolder(serverUrl: String, urlBase: NCUserBaseUrl, completion: ((_ error: NKError) -> Void)? = nil) -> UIAlertController {
         let alertController = UIAlertController(title: NSLocalizedString("_create_folder_", comment: ""), message: nil, preferredStyle: .alert)
 
         let okAction = UIAlertAction(title: NSLocalizedString("_save_", comment: ""), style: .default, handler: { _ in
             guard let fileNameFolder = alertController.textFields?.first?.text else { return }
-            NCUtility.shared.startActivityIndicator(backgroundView: nil, blurEffect: true)
-            NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: serverUrl, account: urlBase.account, urlBase: urlBase.urlBase, overwrite: false) { errorCode, errorDescription in
-                NCUtility.shared.stopActivityIndicator()
+            NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: serverUrl, account: urlBase.account, urlBase: urlBase.urlBase, userId: urlBase.userId, overwrite: false) { error in
                 if let completion = completion {
-                    completion(errorCode, errorDescription)
-                } else if errorCode != 0 {
-                    NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
-                }
+                    completion(error)
+                } else if error != .success {
+                    NCContentPresenter.shared.showError(error: error)
+                } // else: successful, no action
             }
         })
 

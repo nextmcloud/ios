@@ -4,8 +4,10 @@
 //
 //  Created by Marino Faggiana on 03/03/2021.
 //  Copyright © 2021 Marino Faggiana. All rights reserved.
+//  Copyright © 2022 Henrik Storch. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//  Author Henrik Storch <henrik.storch@nextcloud.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -23,10 +25,10 @@
 
 import UIKit
 import FloatingPanel
-import NCCommunication
+import NextcloudKit
 
 extension NCTrash {
-    
+
     var selectActions: [NCMenuAction] {
         [
             NCMenuAction(
@@ -69,7 +71,7 @@ extension NCTrash {
             )
         ]
     }
-    
+
     func showSelectionAlert(message: String) {
         let alertController = UIAlertController(title: "", message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { action in }))
@@ -106,13 +108,12 @@ extension NCTrash {
         )
         presentMenu(with: actions)
     }
-    
+
     func toggleMenuMore(with objectId: String, image: UIImage?, isGridCell: Bool) {
-        
+
         guard let tableTrash = NCManageDatabase.shared.getTrashItem(fileId: objectId, account: appDelegate.account) else {
             return
         }
-        
         guard isGridCell else {
             let alert = UIAlertController(title: NSLocalizedString("_want_delete_", comment: ""), message: tableTrash.trashbinFileName, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("_delete_", comment: ""), style: .destructive, handler: { _ in
@@ -120,12 +121,11 @@ extension NCTrash {
             }))
             alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
             self.present(alert, animated: true, completion: nil)
-            
+
             return
         }
-        
+
         var actions: [NCMenuAction] = []
-        
         var iconHeader: UIImage!
         if let icon = UIImage(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(tableTrash.fileId, etag: tableTrash.fileName)) {
             iconHeader = icon
@@ -164,9 +164,7 @@ extension NCTrash {
                 }
             )
         )
-        
         presentMenu(with: actions)
     }
     
 }
-

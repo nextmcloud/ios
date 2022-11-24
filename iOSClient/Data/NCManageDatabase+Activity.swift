@@ -23,12 +23,12 @@
 
 import Foundation
 import RealmSwift
-import NCCommunication
+import NextcloudKit
 import SwiftyJSON
 
 extension NCManageDatabase {
     
-    @objc func addActivity(_ activities: [NCCommunicationActivity], account: String) {
+    @objc func addActivity(_ activities: [NKActivity], account: String) {
 
         let realm = try! Realm()
 
@@ -114,7 +114,7 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
@@ -146,9 +146,17 @@ extension NCManageDatabase {
 
         let realm = try! Realm()
 
-        let results = realm.objects(tableActivitySubjectRich.self).filter("account == %@ && idActivity == %d && id == %@", account, idActivity, id).first
+        let results = realm.objects(tableActivitySubjectRich.self).filter("account == %@ && idActivity == %d && id == %@", account, idActivity, id)
+        var activitySubjectRich = results.first
+        if results.count == 2 {
+            for result in results {
+                if result.key == "newfile" {
+                    activitySubjectRich = result
+                }
+            }
+        }
 
-        return results.map { tableActivitySubjectRich.init(value: $0) }
+        return activitySubjectRich.map { tableActivitySubjectRich.init(value: $0) }
     }
 
     @objc func getActivityPreview(account: String, idActivity: Int, orderKeysId: [String]) -> [tableActivityPreview] {
@@ -166,47 +174,37 @@ extension NCManageDatabase {
         return results
     }
 
-    @objc func updateLatestActivityId(_ activities: [NCCommunicationActivity], account: String) {
+   func updateLatestActivityId(activityFirstKnown: Int, activityLastGiven: Int, account: String) {
         let realm = try! Realm()
-        let previousRecentId = getLatestActivityId(account: account)
 
         do {
             try realm.write {
-                guard
-                    let mostRecentActivityId = activities.map({ $0.idActivity }).max(),
-                    mostRecentActivityId > previousRecentId
-                else { return }
-
                 let newRecentActivity = tableActivityLatestId()
-                newRecentActivity.mostRecentlyLoadedActivityId = mostRecentActivityId
+                newRecentActivity.activityFirstKnown = activityFirstKnown
+                newRecentActivity.activityLastGiven = activityLastGiven
                 newRecentActivity.account = account
                 realm.add(newRecentActivity, update: .all)
             }
         } catch {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
-    @objc func getLatestActivityId(account: String) -> Int {
+    func getLatestActivityId(account: String) -> tableActivityLatestId? {
 
         let realm = try! Realm()
-        guard let maxId = realm.objects(tableActivityLatestId.self)
-                .filter("account == %@", account)
-                .map({ $0.mostRecentlyLoadedActivityId }).max()
-        else { return 0 }
-
-        return maxId
+        return realm.objects(tableActivityLatestId.self).filter("account == %@", account).first
     }
     
     // MARK: -
     // MARK: Table Comments
 
-    @objc func addComments(_ comments: [NCCommunicationComments], account: String, objectId: String) {
+    @objc func addComments(_ comments: [NKComments], account: String, objectId: String) {
 
         let realm = try! Realm()
 
         do {
-            try realm.safeWrite {
+            try realm.write {
 
                 let results = realm.objects(tableComments.self).filter("account == %@ AND objectId == %@", account, objectId)
                 realm.delete(results)
@@ -232,7 +230,7 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
