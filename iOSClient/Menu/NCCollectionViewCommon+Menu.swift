@@ -146,17 +146,17 @@ extension NCCollectionViewCommon {
             }
         }
 
-        if !isFolderEncrypted && !appDelegate.disableSharesView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_details_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "info"),
-                    action: { _ in
-                        NCFunctionCenter.shared.openShare(viewController: self, metadata: metadata, indexPage: .activity)
-                    }
-                )
-            )
-        }
+//        if !isFolderEncrypted && !appDelegate.disableSharesView {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_details_", comment: ""),
+//                    icon: NCUtility.shared.loadImage(named: "info"),
+//                    action: { _ in
+//                        NCFunctionCenter.shared.openShare(viewController: self, metadata: metadata, indexPage: .activity)
+//                    }
+//                )
+//            )
+//        }
 
         //
         // OFFLINE
