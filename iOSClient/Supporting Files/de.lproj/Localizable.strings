@@ -187,6 +187,7 @@
 "_copy_failed_"             = "Kopieren fehlgeschlagen";
 "_certificate_installed_"   = "Zertifikat installiert";
 "_want_delete_account_"     = "Wollen Sie das Konto %@ löschen?";
+"_error_something_wrong_"   = "Etwas ist schiefgelaufen";
 
 /* User status */
 "_online_"                  = "Online";
