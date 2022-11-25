@@ -39,13 +39,13 @@ extension UINavigationController {
 
         standardAppearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
         standardAppearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
-        standardAppearance.backgroundColor = .systemGray6
+        standardAppearance.backgroundColor = NCBrandColor.shared.systemBackground
         navigationBar.standardAppearance = standardAppearance
 
         let scrollEdgeAppearance = UINavigationBarAppearance()
         scrollEdgeAppearance.configureWithDefaultBackground()
 
-        scrollEdgeAppearance.backgroundColor = .systemBackground
+        scrollEdgeAppearance.backgroundColor = NCBrandColor.shared.systemBackground
         scrollEdgeAppearance.shadowColor = .clear
         scrollEdgeAppearance.shadowImage = UIImage()
         navigationBar.scrollEdgeAppearance = scrollEdgeAppearance
@@ -60,13 +60,13 @@ extension UINavigationController {
 
         standardAppearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
         standardAppearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
-        standardAppearance.backgroundColor = .systemGray6
+        standardAppearance.backgroundColor = NCBrandColor.shared.systemBackground
         navigationBar.standardAppearance = standardAppearance
 
         let scrollEdgeAppearance = UINavigationBarAppearance()
         scrollEdgeAppearance.configureWithDefaultBackground()
 
-        scrollEdgeAppearance.backgroundColor = .systemGroupedBackground
+        scrollEdgeAppearance.backgroundColor = NCBrandColor.shared.systemBackground
         scrollEdgeAppearance.shadowColor = .clear
         scrollEdgeAppearance.shadowImage = UIImage()
         navigationBar.scrollEdgeAppearance = scrollEdgeAppearance

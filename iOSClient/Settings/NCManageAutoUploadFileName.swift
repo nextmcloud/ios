@@ -46,25 +46,23 @@ class NCManageAutoUploadFileName: XLFormViewController {
 
     func initializeForm() {
 
-        let form: XLFormDescriptor = XLFormDescriptor() as XLFormDescriptor
+        let form : XLFormDescriptor = XLFormDescriptor() as XLFormDescriptor
         form.rowNavigationOptions = XLFormRowNavigationOptions.stopDisableRow
-
-        var section: XLFormSectionDescriptor
-        var row: XLFormRowDescriptor
+        
+        var section : XLFormSectionDescriptor
+        var row : XLFormRowDescriptor
 
         // Section Mode filename
 
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_mode_filename_", comment: ""))
         form.addFormSection(section)
-
+        
         // Maintain the original fileName
-
+        
         row = XLFormRowDescriptor(tag: "maintainOriginalFileName", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_maintain_original_filename_", comment: ""))
-        row.value = CCUtility.getOriginalFileName(NCGlobal.shared.keyFileNameOriginalAutoUpload)
-        row.cellConfig["backgroundColor"] = UIColor.secondarySystemGroupedBackground
-        
+        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand;
         var isOrignaleFilenamePrfesChanges : Bool?
-        
+
         isOrignaleFilenamePrfesChanges = CCUtility.getOriginalFileNamePrefsChanged(NCBrandGlobal.shared.keyFileNameOriginalAutoUploadPrefs)
         
         if(!(isOrignaleFilenamePrfesChanges ?? false)){
@@ -80,9 +78,9 @@ class NCManageAutoUploadFileName: XLFormViewController {
         row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
 
         section.addFormRow(row)
-
+        
         // Add File Name Type
-
+        
         row = XLFormRowDescriptor(tag: "addFileNameType", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_add_filenametype_", comment: ""))
         row.value = CCUtility.getFileNameType(NCBrandGlobal.shared.keyFileNameAutoUploadType)
 
@@ -92,11 +90,10 @@ class NCManageAutoUploadFileName: XLFormViewController {
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand;
-
         section.addFormRow(row)
-
+                
         // Section: Rename File Name
-
+        
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: ""))
         form.addFormSection(section)
         
@@ -104,7 +101,6 @@ class NCManageAutoUploadFileName: XLFormViewController {
         row.cellClass = TextTableViewCell.self
 
         let fileNameMask : String = CCUtility.getFileNameMask(NCBrandGlobal.shared.keyFileNameAutoUploadMask)
-
         if fileNameMask.count > 0 {
             row.cellConfig["fileNameTextField.text"] = fileNameMask
             row.value = fileNameMask
@@ -143,11 +139,10 @@ class NCManageAutoUploadFileName: XLFormViewController {
 //        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
 //        row.cellConfig["textField.textColor"] = NCBrandColor.shared.label
 
-
         section.addFormRow(row)
-
+        
         // Section: Preview File Name
-
+        
         row = XLFormRowDescriptor(tag: "previewFileName", rowType: XLFormRowDescriptorTypeTextView, title: "")
         row.height = 200
         row.disabled = true
@@ -157,8 +152,9 @@ class NCManageAutoUploadFileName: XLFormViewController {
         row.cellConfig["textView.textColor"] = NCBrandColor.shared.label
         row.cellConfig["backgroundColor"] = NCBrandColor.shared.systemGroupedBackground
 
-        section.addFormRow(row)
 
+        section.addFormRow(row)
+        
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         self.form = form
     }
