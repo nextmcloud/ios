@@ -43,7 +43,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var titleTrailingConstraint: NSLayoutConstraint!
     @IBOutlet weak var infoTrailingConstraint: NSLayoutConstraint!
-
+    @IBOutlet weak var btnMoreRightConstraint: NSLayoutConstraint!
     private var objectId = ""
     private var user = ""
 
@@ -187,12 +187,12 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func titleInfoTrailingFull() {
-        titleTrailingConstraint.constant = 10
+//        titleTrailingConstraint.constant = 10
         infoTrailingConstraint.constant = 10
     }
 
     func titleInfoTrailingDefault() {
-        titleTrailingConstraint.constant = 90
+//        titleTrailingConstraint.constant = 90
         infoTrailingConstraint.constant = 90
     }
     

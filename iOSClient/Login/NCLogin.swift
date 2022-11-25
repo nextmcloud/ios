@@ -104,7 +104,7 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
         navBarAppearance.largeTitleTextAttributes = [.foregroundColor: textColor]
         self.navigationController?.navigationBar.standardAppearance = navBarAppearance
         self.navigationController?.view.backgroundColor = NCBrandColor.shared.customer
-        self.navigationController?.navigationBar.tintColor = textColor
+        self.navigationController?.navigationBar.barTintColor = NCBrandColor.shared.customer
 
         if NCManageDatabase.shared.getAccounts()?.count ?? 0 == 0 {
 

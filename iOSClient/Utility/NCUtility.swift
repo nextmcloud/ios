@@ -981,24 +981,44 @@ class NCUtility: NSObject {
 
     func colorNavigationController(_ navigationController: UINavigationController?, backgroundColor: UIColor, titleColor: UIColor, tintColor: UIColor?, withoutShadow: Bool) {
 
-        let appearance = UINavigationBarAppearance()
-        appearance.titleTextAttributes = [.foregroundColor: titleColor]
-        appearance.largeTitleTextAttributes = [.foregroundColor: titleColor]
+        if #available(iOS 13.0, *) {
 
-        if withoutShadow {
-            appearance.shadowColor = .clear
-            appearance.shadowImage = UIImage()
+            // iOS 14, 15
+            let appearance = UINavigationBarAppearance()
+            appearance.titleTextAttributes = [.foregroundColor: titleColor]
+            appearance.largeTitleTextAttributes = [.foregroundColor: titleColor]
+
+            if withoutShadow {
+                appearance.shadowColor = .clear
+                appearance.shadowImage = UIImage()
+            }
+
+            if let tintColor = tintColor {
+                navigationController?.navigationBar.tintColor = tintColor
+            }
+
+            navigationController?.view.backgroundColor = backgroundColor
+            navigationController?.navigationBar.barTintColor = titleColor
+            navigationController?.navigationBar.standardAppearance = appearance
+            navigationController?.navigationBar.compactAppearance = appearance
+            navigationController?.navigationBar.scrollEdgeAppearance = appearance
+
+        } else {
+
+            navigationController?.navigationBar.isTranslucent = true
+            navigationController?.navigationBar.barTintColor = backgroundColor
+
+            if withoutShadow {
+                navigationController?.navigationBar.shadowImage = UIImage()
+                navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+            }
+
+            let titleDict: NSDictionary = [NSAttributedString.Key.foregroundColor: titleColor]
+            navigationController?.navigationBar.titleTextAttributes = titleDict as? [NSAttributedString.Key: Any]
+            if let tintColor = tintColor {
+                navigationController?.navigationBar.tintColor = tintColor
+            }
         }
-
-        if let tintColor = tintColor {
-            navigationController?.navigationBar.tintColor = tintColor
-        }
-
-        navigationController?.view.backgroundColor = backgroundColor
-        navigationController?.navigationBar.barTintColor = titleColor
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.compactAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
 
     func getEncondingDataType(data: Data) -> String.Encoding? {

@@ -111,13 +111,13 @@ class NCLoginWeb: UIViewController {
         }
 
         // TITLE
-        if let host = URL(string: urlBase)?.host {
-            titleView = host
-            if let account = NCManageDatabase.shared.getActiveAccount(), CCUtility.getPassword(account.account).isEmpty {
-                titleView = NSLocalizedString("_user_", comment: "") + " " + account.userId + " " + NSLocalizedString("_in_", comment: "") + " " + host
-            }
-        }
-        self.title = titleView
+//        if let host = URL(string: urlBase)?.host {
+//            titleView = host
+//            if let account = NCManageDatabase.shared.getActiveAccount(), CCUtility.getPassword(account.account).isEmpty {
+//                titleView = NSLocalizedString("_user_", comment: "") + " " + account.userId + " " + NSLocalizedString("_in_", comment: "") + " " + host
+//            }
+//        }
+//        self.title = titleView
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -302,9 +302,12 @@ extension NCLoginWeb: WKNavigationDelegate {
         appDelegate.settingAccount(account, urlBase: urlBase, user: username, userId: tableAccount.userId, password: password)
 
         if CCUtility.getIntro() {
+
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterInitialize)
             self.dismiss(animated: true)
+
         } else {
+
             CCUtility.setIntro(true)
             if self.presentingViewController == nil {
                 if let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() {
