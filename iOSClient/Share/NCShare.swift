@@ -1062,7 +1062,7 @@ class NCShareUserDropDownCell: DropDownCell {
 
 extension UITableView {
     func setEmptyMessage(_ message: String) {
-        let messageLabel = UILabel(frame: CGRect(x: 10, y: 515, width: self.bounds.size.width, height: 20))
+        let messageLabel = UILabel(frame: CGRect(x: 16, y: 515, width: self.bounds.size.width, height: 20))
         messageLabel.text = message
         messageLabel.textColor = NCBrandColor.shared.textInfo
         messageLabel.numberOfLines = 0
