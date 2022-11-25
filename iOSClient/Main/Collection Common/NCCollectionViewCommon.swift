@@ -1650,15 +1650,23 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         if isShare {
             cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
         } else if tableShare != nil && tableShare?.shareType == 3 {
-            cell.fileSharedImage?.image = NCBrandColor.cacheImages.shareByLink
+            cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
         } else if tableShare != nil && tableShare?.shareType != 3 {
             cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
         } else {
-            cell.fileSharedImage?.image = NCBrandColor.cacheImages.canShare
+            cell.fileSharedImage?.image = NCBrandColor.cacheImages.imgShare.image(color: NCBrandColor.shared.gray60, size: 50)
+        
         }
-        if appDelegate.account != metadata.account {
-            cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
+        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
+        if shares.share!.count > 0 || shares.firstShareLink != nil {
+            cell.fileSharedImage?.image = cell.fileSharedImage?.image?.imageColor(NCBrandColor.shared.customer)
         }
+        if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+            cell.fileSharedImage?.image = NCBrandColor.cacheImages.sharedWithMe
+        }
+//        if appDelegate.account != metadata.account {
+//            cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
+//        }
 
         // Button More
         if metadata.status == NCGlobal.shared.metadataStatusInDownload || metadata.status == NCGlobal.shared.metadataStatusDownloading || metadata.status == NCGlobal.shared.metadataStatusInUpload || metadata.status == NCGlobal.shared.metadataStatusUploading {
