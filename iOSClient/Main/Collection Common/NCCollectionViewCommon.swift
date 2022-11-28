@@ -1773,7 +1773,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegateFlowLayout {
 
     func getHeaderHeight() -> CGFloat {
 
-        var size: CGFloat = -60
+        var size: CGFloat = 0
 
         if headerMenuButtonsCommand && !appDelegate.isSearchingMode {
             size += NCGlobal.shared.heightButtonsCommand
