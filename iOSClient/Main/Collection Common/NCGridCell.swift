@@ -33,7 +33,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var imageFavorite: UIImageView!
     @IBOutlet weak var imageLocal: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
-    @IBOutlet weak var labelInfo: UILabel!
+    @IBOutlet weak var labelInfo: UILabel?
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
     @IBOutlet weak var progressView: UIProgressView!
@@ -117,10 +117,10 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         longPressedGestureMore.delaysTouchesBegan = true
         buttonMore.addGestureRecognizer(longPressedGestureMore)
         
-        labelTitle.text = ""
-        labelInfo.text = ""
-        labelTitle.textColor = .label
-        labelInfo.textColor = .systemGray
+//        labelTitle.text = ""
+//        labelInfo.text = ""
+//        labelTitle.textColor = .label
+//        labelInfo.textColor = .systemGray
     }
 
     override func prepareForReuse() {
@@ -204,7 +204,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         dateFormatter.timeStyle = .none
         dateFormatter.locale = Locale.current
 
-        labelInfo.text = dateFormatter.string(from: date as Date) + " · " + CCUtility.transformedSize(size)
+        labelInfo?.text = dateFormatter.string(from: date as Date) + " · " + CCUtility.transformedSize(size)
     }
 
     func setAccessibility(label: String, value: String) {

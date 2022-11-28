@@ -120,6 +120,8 @@ import XLForm
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
         section.footerTitle = "                                                                               "
         form.addFormSection(section)
+        
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
 
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: fileNameFolder)
         row.action.formSelector = #selector(changeDestinationFolder(_:))
@@ -142,6 +144,11 @@ import XLForm
 
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
         form.addFormSection(section)
+        
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = NCCreateDocumentCustomTextField.self
+        
+        row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = NCCreateDocumentCustomTextField.self
 
         row.cellConfigAtConfigure["backgroundColor"] =  NCBrandColor.shared.secondarySystemGroupedBackground;
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue

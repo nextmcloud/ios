@@ -890,40 +890,31 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         appDelegate.openLogin(viewController: self, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
     }
 
-    func tapButtonSwitch(_ sender: Any) {
+    func tapSwitchHeader(sender: Any) {
+        print("button clicked")
 
-        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
-
+        if collectionView.collectionViewLayout == gridLayout {
             // list layout
             headerMenu?.buttonSwitch.accessibilityLabel = NSLocalizedString("_grid_view_", comment: "")
+            UIView.animate(withDuration: 0.0, animations: {
+                self.collectionView.collectionViewLayout.invalidateLayout()
+                self.collectionView.setCollectionViewLayout(self.listLayout, animated: false, completion: { _ in
+                    self.collectionView.reloadData()
+                })
+            })
             layoutForView?.layout = NCGlobal.shared.layoutList
             NCUtility.shared.setLayoutForView(key: layoutKey, serverUrl: serverUrl, layout: layoutForView?.layout)
-            self.groupByField = "name"
-            if self.dataSource.groupByField != self.groupByField {
-                self.dataSource.changeGroupByField(self.groupByField)
-            }
-
-            self.collectionView.reloadData()
-            self.collectionView.collectionViewLayout.invalidateLayout()
-            self.collectionView.setCollectionViewLayout(self.listLayout, animated: true)
         } else {
-
             // grid layout
             headerMenu?.buttonSwitch.accessibilityLabel = NSLocalizedString("_list_view_", comment: "")
+            UIView.animate(withDuration: 0.0, animations: {
+                self.collectionView.collectionViewLayout.invalidateLayout()
+                self.collectionView.setCollectionViewLayout(self.gridLayout, animated: false, completion: { _ in
+                    self.collectionView.reloadData()
+                })
+            })
             layoutForView?.layout = NCGlobal.shared.layoutGrid
             NCUtility.shared.setLayoutForView(key: layoutKey, serverUrl: serverUrl, layout: layoutForView?.layout)
-            if appDelegate.isSearchingMode {
-                self.groupByField = "name"
-            } else {
-                self.groupByField = "classFile"
-            }
-            if self.dataSource.groupByField != self.groupByField {
-                self.dataSource.changeGroupByField(self.groupByField)
-            }
-
-            self.collectionView.reloadData()
-            self.collectionView.collectionViewLayout.invalidateLayout()
-            self.collectionView.setCollectionViewLayout(self.gridLayout, animated: true)
         }
     }
 
