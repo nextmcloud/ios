@@ -35,7 +35,7 @@ class NCFavorite: NCCollectionViewCommon {
         layoutKey = NCGlobal.shared.layoutViewFavorite
         enableSearchBar = true
         emptyImage = UIImage.init(named: "star.fill")?.image(color: NCBrandColor.shared.nmcYellowFavorite, size: UIScreen.main.bounds.width)
-        enableSearchBar = false
+   //     enableSearchBar = false
         headerMenuButtonsCommand = false
         headerMenuButtonsView = true
         headerRichWorkspaceDisable = true
