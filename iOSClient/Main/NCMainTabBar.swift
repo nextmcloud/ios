@@ -93,6 +93,7 @@ class NCMainTabBar: UITabBar {
     }
 
     override func draw(_ rect: CGRect) {
+        tintColor = NCBrandColor.shared.brand
         addShape()
         createButtons()
     }
