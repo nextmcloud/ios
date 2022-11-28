@@ -918,11 +918,12 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         }
     }
 
-    func tapButtonOrder(_ sender: Any) {
+    func tapOrderHeader(sender: Any) {
 
         let sortMenu = NCSortMenu()
         sortMenu.toggleMenu(viewController: self, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
     }
+
 
     func tapButton1(_ sender: Any) {
 
