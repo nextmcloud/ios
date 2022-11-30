@@ -27,6 +27,8 @@ import UIKit
 import FloatingPanel
 import NextcloudKit
 
+
+
 extension AppDelegate {
 
     func toggleMenu(viewController: UIViewController) {
@@ -97,6 +99,7 @@ extension AppDelegate {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_create_voice_memo_", comment: ""), icon: UIImage(named: "microphoneMenu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
+
                     NCAskAuthorization.shared.askAuthorizationAudioRecord(viewController: viewController) { hasPermission in
                         if hasPermission {
                             let fileName = CCUtility.createFileNameDate(NSLocalizedString("_voice_memo_filename_", comment: ""), extension: "m4a")!
@@ -129,10 +132,11 @@ extension AppDelegate {
                     let cancelAction = UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: nil)
                     let okAction = UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in
                         if let fileNameFolder = alertController.textFields?.first?.text {
-                            NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: appDelegate.activeServerUrl, account: appDelegate.account, urlBase: appDelegate.urlBase, userId: appDelegate.userId, overwrite: false) {error in
+                            NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: appDelegate.activeServerUrl, account: appDelegate.account, urlBase: appDelegate.urlBase, userId: appDelegate.userId,  overwrite: false) { error in
                                 if error != .success {
                                     NCContentPresenter.shared.showError(error: error)
-                                } // else: successful, no a
+                               
+                                }
                             }
                         }
                     })
@@ -149,6 +153,7 @@ extension AppDelegate {
 
                     alertController.addAction(cancelAction)
                     alertController.addAction(okAction)
+
                     appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
                 }
             )

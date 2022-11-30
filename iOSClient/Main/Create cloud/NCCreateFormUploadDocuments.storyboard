@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hTm-e0-ORl">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hTm-e0-ORl">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -11,7 +11,6 @@
         <!--Navigation Controller-->
         <scene sceneID="3OT-UN-0Dc">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="GZJ-Ut-ON6" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="hTm-e0-ORl" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="erz-WY-qOP">
@@ -23,6 +22,7 @@
                         <segue destination="FAW-1o-C2I" kind="relationship" relationship="rootViewController" id="h9g-oE-50X"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="GZJ-Ut-ON6" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="256.80000000000001" y="228.93553223388307"/>
         </scene>
@@ -132,10 +132,10 @@
                     </view>
                     <navigationItem key="navigationItem" id="WZc-zp-pXo"/>
                     <connections>
-                        <outlet property="collectionView" destination="xze-qA-fSw" id="wXJ-TY-Mio"/>
-                        <outlet property="collectionViewHeigth" destination="76o-Y7-IOx" id="QFO-EV-aAq"/>
-                        <outlet property="indicator" destination="eRM-CQ-X4s" id="F2k-8K-MMu"/>
-                        <outlet property="tableView" destination="1XQ-nE-xX1" id="ipV-Zg-KPr"/>
+                        <outlet property="collectionView" destination="xze-qA-fSw" id="4H7-jk-BAt"/>
+                        <outlet property="collectionViewHeigth" destination="y4b-Al-pgv" id="o3m-Kc-a7B"/>
+                        <outlet property="indicator" destination="eRM-CQ-X4s" id="eQm-cV-HJZ"/>
+                        <outlet property="tableView" destination="1XQ-nE-xX1" id="5uU-rt-oms"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1YO-wR-G38" userLabel="First Responder" sceneMemberID="firstResponder"/>

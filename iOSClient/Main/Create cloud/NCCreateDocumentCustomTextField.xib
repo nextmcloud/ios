@@ -22,7 +22,7 @@
                         <rect key="frame" x="0.0" y="2" width="320" height="66"/>
                         <subviews>
                             <textField opaque="NO" contentMode="left" contentHorizontalAlignment="leading" contentVerticalAlignment="center" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="e8z-H9-cgb">
-                                <rect key="frame" x="20" y="8" width="280" height="18.5"/>
+                                <rect key="frame" x="20" y="8.0000000000000018" width="280" height="18.666666666666671"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
@@ -64,7 +64,7 @@
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="w6X-a5-C72"/>
             <connections>
-                <outlet property="fileNameTextField" destination="e8z-H9-cgb" id="fNO-vQ-I7H"/>
+                <outlet property="fileNameTextField" destination="e8z-H9-cgb" id="aLp-X2-Tfl"/>
             </connections>
             <point key="canvasLocation" x="140.57971014492756" y="122.54464285714285"/>
         </tableViewCell>
