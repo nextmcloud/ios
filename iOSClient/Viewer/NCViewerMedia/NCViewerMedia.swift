@@ -130,7 +130,7 @@ class NCViewerMedia: UIViewController {
         preferences.animating.showDuration = 0.5
         preferences.animating.dismissDuration = 0
 
-        tipView = EasyTipView(text: NSLocalizedString("_tip_open_mediadetail_", comment: ""), preferences: preferences, delegate: self)
+//        tipView = EasyTipView(text: NSLocalizedString("_tip_open_mediadetail_", comment: ""), preferences: preferences, delegate: self)
 
         detailViewTopConstraint.constant = 0
         detailView.hide()
