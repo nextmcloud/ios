@@ -177,12 +177,15 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         section.addFormRow(row)
 
         // Section: File Name
-        row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
-        row.cellClass = TextTableViewCell.self
-
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = TextTableViewCell.self
+        
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
         form.addFormSection(section)
 
+        row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = TextTableViewCell.self
+
+        
         row.cellConfigAtConfigure["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)

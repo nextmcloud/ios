@@ -783,15 +783,16 @@ import Photos
 
         // DIR
 
-        guard !metadata.directory else {
-            let submenu = UIMenu(title: "", options: .displayInline, children: [favorite, offline, rename, moveCopy, copyPath, delete])
-            guard appDelegate.disableSharesView == false else { return submenu }
-            return UIMenu(title: "", children: [detail, submenu])
+        if metadata.directory {
+            
+            let submenu = UIMenu(title: "", options: .displayInline, children: [favorite, offline, rename, moveCopy, delete])
+            var childrenArray = isFolderEncrypted ? [submenu] : [detail, submenu]
+            return UIMenu(title: "", children: childrenArray)
         }
 
         // FILE
 
-        var children: [UIMenuElement] = [offline, openIn, moveCopy, copy, copyPath]
+        var children: [UIMenuElement] = [offline, openIn, moveCopy, copy, delete]
         
         if !metadata.lock {
             // Workaround: PROPPATCH doesn't work (favorite)
