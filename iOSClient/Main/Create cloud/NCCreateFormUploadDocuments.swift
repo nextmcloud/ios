@@ -261,6 +261,24 @@ import XLForm
 
         self.tableView.reloadData()
     }
+    override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
+        
+        super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)
+        
+        if formRow.tag == "fileName" {
+            
+            self.form.delegate = nil
+            
+            if let fileNameNew = formRow.value {
+                self.fileName = CCUtility.removeForbiddenCharactersServer(fileNameNew as? String)
+            }
+            
+            formRow.value = self.fileName
+            //self.updateFormRow(formRow)
+            
+            self.form.delegate = self
+        }
+    }
 
     @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {
 
