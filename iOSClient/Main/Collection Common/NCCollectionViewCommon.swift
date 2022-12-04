@@ -1545,7 +1545,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) { }
 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return dataSource.numberOfSections()
+        return 1 //dataSource.numberOfSections()
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -1833,31 +1833,14 @@ extension NCCollectionViewCommon: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
 
-        let (heightHeaderCommands, heightHeaderRichWorkspace, heightHeaderSection) = getHeaderHeight(section: section)
+//        let (heightHeaderCommands, heightHeaderRichWorkspace, heightHeaderSection) = getHeaderHeight(section: section)
 //        let heightHeader = heightHeaderCommands + heightHeaderRichWorkspace + heightHeaderSection
 
         return CGSize(width: collectionView.frame.width, height: headerHeight)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-
-        let sections = dataSource.numberOfSections()
-        let metadataForSection = self.dataSource.getMetadataForSection(section)
-        let isPaginated = metadataForSection?.lastSearchResult?.isPaginated ?? false
-        let metadatasCount: Int = metadataForSection?.lastSearchResult?.entries.count ?? 0
-        var size = CGSize(width: collectionView.frame.width, height: 0)
-
-        if section == sections - 1 {
-            size.height += NCGlobal.shared.endHeightFooter
-        } else {
-            size.height += NCGlobal.shared.heightFooter
-        }
-
-        if appDelegate.isSearchingMode && isPaginated && metadatasCount > 0 {
-            size.height += NCGlobal.shared.heightFooterButton
-        }
-
-        return size
+        return CGSize(width: collectionView.frame.width, height: footerHeight)
     }
 }
 
