@@ -786,13 +786,13 @@ import Photos
         if metadata.directory {
             
             let submenu = UIMenu(title: "", options: .displayInline, children: [favorite, offline, rename, moveCopy, delete])
-            var childrenArray = isFolderEncrypted ? [submenu] : [detail, submenu]
+            let childrenArray = isFolderEncrypted ? [submenu] : [detail, submenu]
             return UIMenu(title: "", children: childrenArray)
         }
 
         // FILE
 
-        var children: [UIMenuElement] = [offline, openIn, moveCopy, copy, delete]
+        var children: [UIMenuElement] = isFolderEncrypted ? [openIn, copy, delete] : [offline, openIn, moveCopy, copy, delete]
         
         if !metadata.lock {
             // Workaround: PROPPATCH doesn't work (favorite)
@@ -816,11 +816,11 @@ import Photos
 //            children.insert(saveAsScan, at: 2)
 //        }
 
-        if (metadata.contentType != "image/svg+xml") && (metadata.classFile == NKCommon.typeClassFile.image.rawValue || metadata.contentType == "application/pdf" || metadata.contentType == "com.adobe.pdf") {
+        if !isFolderEncrypted, (metadata.contentType != "image/svg+xml") && (metadata.classFile == NKCommon.typeClassFile.image.rawValue || metadata.contentType == "application/pdf" || metadata.contentType == "com.adobe.pdf") {
             children.insert(print, at: 2)
         }
 
-        if enableViewInFolder {
+        if !isFolderEncrypted, enableViewInFolder {
 
             children.insert(viewInFolder, at: children.count - 1)
         }
@@ -831,7 +831,8 @@ import Photos
 
         let submenu = UIMenu(title: "", options: .displayInline, children: children)
         guard appDelegate.disableSharesView == false else { return submenu }
-        return UIMenu(title: "", children: [detail, submenu])
+        let childrenArray = isFolderEncrypted ? [submenu] : [detail, submenu]
+        return UIMenu(title: "", children: childrenArray)
     }
 }
 

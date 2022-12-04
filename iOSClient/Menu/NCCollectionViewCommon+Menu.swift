@@ -209,31 +209,31 @@ extension NCCollectionViewCommon {
         //
         // PRINT
         //
-        if metadata.isPrintable {
-            actions.append(.printAction(metadata: metadata))
-        }
+//        if metadata.isPrintable {
+//            actions.append(.printAction(metadata: metadata))
+//        }
 
         //
         // SAVE
         //
-        if (metadata.classFile == NKCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml") || metadata.classFile == NKCommon.typeClassFile.video.rawValue {
-            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata]))
-        }
+//        if (metadata.classFile == NKCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml") || metadata.classFile == NKCommon.typeClassFile.video.rawValue {
+//            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata]))
+//        }
 
         //
         // SAVE AS SCAN
         //
-        if metadata.classFile == NKCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml" {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_save_as_scan_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "viewfinder.circle"),
-                    action: { _ in
-                        NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
-                    }
-                )
-            )
-        }
+//        if metadata.classFile == NKCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml" {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_save_as_scan_", comment: ""),
+//                    icon: NCUtility.shared.loadImage(named: "viewfinder.circle"),
+//                    action: { _ in
+//                        NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan)
+//                    }
+//                )
+//            )
+//        }
 
         //
         // RENAME
