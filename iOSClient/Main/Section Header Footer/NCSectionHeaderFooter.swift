@@ -155,13 +155,30 @@ extension NCSectionHeaderMenuDelegate {
 
 class NCSectionFooter: UICollectionReusableView {
 
+    @IBOutlet weak var buttonSection: UIButton!
+    @IBOutlet weak var activityIndicatorSection: UIActivityIndicatorView!
     @IBOutlet weak var labelSection: UILabel!
-
+    @IBOutlet weak var separator: UIView!
+    @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var buttonSectionHeightConstraint: NSLayoutConstraint!
+    
+    weak var delegate: NCSectionFooterDelegate?
+    var metadataForSection: NCMetadataForSection?
     override func awakeFromNib() {
         super.awakeFromNib()
 
         self.backgroundColor = UIColor.clear
         labelSection.textColor = NCBrandColor.shared.gray
+        labelSection.text = ""
+
+        self.buttonSection.tintColor = NCBrandColor.shared.customer
+        
+        separator.backgroundColor = .separator
+        separatorHeightConstraint.constant = 0.5
+
+        buttonIsHidden(true)
+        activityIndicatorSection.isHidden = true
+        activityIndicatorSection.color = .label
     }
 
     func setTitleLabel(directories: Int, files: Int, size: Int64) {
@@ -188,6 +205,52 @@ class NCSectionFooter: UICollectionReusableView {
         } else {
             labelSection.text = foldersText + ", " + filesText
         }
+    }
+    
+    func setTitleLabel(_ text: String) {
+
+        labelSection.text = text
+    }
+
+    func setButtonText(_ text: String) {
+
+        buttonSection.setTitle(text, for: .normal)
+    }
+
+    func separatorIsHidden(_ isHidden: Bool) {
+
+        separator.isHidden = isHidden
+    }
+
+    func buttonIsHidden(_ isHidden: Bool) {
+
+        buttonSection.isHidden = isHidden
+        if isHidden {
+            buttonSectionHeightConstraint.constant = 0
+        } else {
+            buttonSectionHeightConstraint.constant = NCGlobal.shared.heightFooterButton
+        }
+    }
+
+    func showActivityIndicatorSection() {
+
+        buttonSection.isHidden = true
+        buttonSectionHeightConstraint.constant = NCGlobal.shared.heightFooterButton
+
+        activityIndicatorSection.isHidden = false
+        activityIndicatorSection.startAnimating()
+    }
+
+    func hideActivityIndicatorSection() {
+
+        activityIndicatorSection.stopAnimating()
+        activityIndicatorSection.isHidden = true
+    }
+
+    // MARK: - Action
+
+    @IBAction func touchUpInsideButton(_ sender: Any) {
+        delegate?.tapButtonSection(sender, metadataForSection: metadataForSection)
     }
 }
 

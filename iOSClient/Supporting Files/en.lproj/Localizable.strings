@@ -860,6 +860,7 @@
 "_copy_passphrase_"                 = "Copy passphrase";
 "_ok_copy_passphrase_"              = "OK and copy passphrase";
 "_enter_passphrase_"                = "Enter passphrase (12 words)";
+"_show_more_results_"               = "Show more results";
 "_error_files_upload_"              = "Error uploading files";
 "_start_e2e_encryption_1_"          = "To set up end-to-end encryption, they must first set up the PIN lock to prevent unauthorised people from accessing your key.";
 "_start_e2e_encryption_2_"          = "After starting the encryption, a randomly generated word sequence (passphrase) of 12 words is displayed. This remains in this app and can be displayed again. Nevertheless, we recommend that you write down the passphrase.";

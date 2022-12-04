@@ -5,32 +5,76 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="sectionFooter" id="Gct-iF-lXA" customClass="NCSectionFooter" customModule="Nextcloud" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="375" height="50"/>
+        <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" reuseIdentifier="sectionFooter" id="nTE-ji-QtN" customClass="NCSectionFooter" customModule="Nextcloud" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="103"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="q4R-5H-6p7" userLabel="LabelFooter">
-                    <rect key="frame" x="10" y="17" width="355" height="16"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7NB-AS-x5N">
+                    <rect key="frame" x="10" y="0.0" width="355" height="30"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="30" id="Ndm-c3-KCj"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                    <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                    <state key="normal" title="Button">
+                        <color key="titleColor" systemColor="linkColor"/>
+                    </state>
+                    <connections>
+                        <action selector="touchUpInsideButton:" destination="nTE-ji-QtN" eventType="touchUpInside" id="7CK-Su-ygg"/>
+                    </connections>
+                </button>
+                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="wzG-SB-aqI">
+                    <rect key="frame" x="177.5" y="5" width="20" height="20"/>
+                </activityIndicatorView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KCb-qj-c2f" userLabel="separator">
+                    <rect key="frame" x="10" y="30" width="365" height="1"/>
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="F96-45-Lu8"/>
+                    </constraints>
+                </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nzf-eq-Kgu" userLabel="LabelFooter">
+                    <rect key="frame" x="10" y="43.5" width="355" height="16"/>
                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
-            <viewLayoutGuide key="safeArea" id="SbW-G0-ied"/>
+            <viewLayoutGuide key="safeArea" id="KsC-kS-DNm"/>
             <constraints>
-                <constraint firstItem="q4R-5H-6p7" firstAttribute="leading" secondItem="Gct-iF-lXA" secondAttribute="leading" constant="10" id="3Ye-ta-jMR"/>
-                <constraint firstItem="q4R-5H-6p7" firstAttribute="centerY" secondItem="Gct-iF-lXA" secondAttribute="centerY" id="Akh-9b-XUq"/>
-                <constraint firstAttribute="trailing" secondItem="q4R-5H-6p7" secondAttribute="trailing" constant="10" id="wT2-ez-Xed"/>
+                <constraint firstItem="KsC-kS-DNm" firstAttribute="leading" secondItem="KCb-qj-c2f" secondAttribute="leading" constant="-10" id="4Fh-hR-vJi"/>
+                <constraint firstItem="KsC-kS-DNm" firstAttribute="trailing" secondItem="7NB-AS-x5N" secondAttribute="trailing" constant="10" id="IMu-GM-OHK"/>
+                <constraint firstItem="nzf-eq-Kgu" firstAttribute="centerY" secondItem="nTE-ji-QtN" secondAttribute="centerY" id="Lxk-uX-H25"/>
+                <constraint firstItem="nzf-eq-Kgu" firstAttribute="leading" secondItem="nTE-ji-QtN" secondAttribute="leading" constant="10" id="N3t-Wl-kl1"/>
+                <constraint firstItem="KsC-kS-DNm" firstAttribute="trailing" secondItem="KCb-qj-c2f" secondAttribute="trailing" id="RYw-61-sgh"/>
+                <constraint firstItem="wzG-SB-aqI" firstAttribute="centerX" secondItem="KsC-kS-DNm" secondAttribute="centerX" id="Yns-ye-cfK"/>
+                <constraint firstItem="7NB-AS-x5N" firstAttribute="bottom" secondItem="KCb-qj-c2f" secondAttribute="bottom" constant="-1" id="h28-TX-onp"/>
+                <constraint firstAttribute="trailing" secondItem="nzf-eq-Kgu" secondAttribute="trailing" constant="10" id="jdf-s3-Y8R"/>
+                <constraint firstItem="7NB-AS-x5N" firstAttribute="leading" secondItem="KsC-kS-DNm" secondAttribute="leading" constant="10" id="mG9-cZ-fz9"/>
+                <constraint firstItem="7NB-AS-x5N" firstAttribute="top" secondItem="KsC-kS-DNm" secondAttribute="top" id="pCn-Ma-DHO"/>
+                <constraint firstItem="wzG-SB-aqI" firstAttribute="centerY" secondItem="7NB-AS-x5N" secondAttribute="centerY" id="rx0-5a-ed2"/>
             </constraints>
             <connections>
-                <outlet property="labelSection" destination="q4R-5H-6p7" id="dHP-f5-G9n"/>
+                <outlet property="activityIndicatorSection" destination="wzG-SB-aqI" id="1m0-8G-g5M"/>
+                <outlet property="buttonSection" destination="7NB-AS-x5N" id="HBn-b1-vTw"/>
+                <outlet property="buttonSectionHeightConstraint" destination="Ndm-c3-KCj" id="qRk-sf-1JB"/>
+                <outlet property="labelSection" destination="nzf-eq-Kgu" id="WnL-F0-8Hq"/>
+                <outlet property="separator" destination="KCb-qj-c2f" id="56o-FL-sci"/>
+                <outlet property="separatorHeightConstraint" destination="F96-45-Lu8" id="TMK-If-abQ"/>
             </connections>
-            <point key="canvasLocation" x="111" y="0.0"/>
+            <point key="canvasLocation" x="136.80000000000001" y="113.79310344827587"/>
         </collectionReusableView>
     </objects>
+    <resources>
+        <systemColor name="linkColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>

@@ -222,10 +222,12 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             imageItemLeftConstraint.constant = 45
             imageSelect.isHidden = false
             accessibilityCustomActions = nil
+            btnMoreRightConstraint.constant = -40
         } else {
             imageItemLeftConstraint.constant = 10
             imageSelect.isHidden = true
             backgroundView = nil
+            btnMoreRightConstraint.constant = 0
             setA11yActions()
         }
     }

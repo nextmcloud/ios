@@ -1503,9 +1503,40 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         } else {
 
             let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFooter", for: indexPath) as! NCSectionFooter
+            let sections = dataSource.numberOfSections()
+            let section = indexPath.section
+            let metadataForSection = self.dataSource.getMetadataForSection(indexPath.section)
+            let isPaginated = metadataForSection?.lastSearchResult?.isPaginated ?? false
+            let metadatasCount: Int = metadataForSection?.metadatas.count ?? 0
+            let unifiedSearchInProgress = metadataForSection?.unifiedSearchInProgress ?? false
 
-            let info = dataSource.getFilesInformation()
-            footer.setTitleLabel(directories: info.directories, files: info.files, size: info.size )
+            footer.delegate = self
+            footer.metadataForSection = metadataForSection
+
+            footer.setTitleLabel("")
+            footer.setButtonText(NSLocalizedString("_show_more_results_", comment: ""))
+            footer.separatorIsHidden(true)
+            footer.buttonIsHidden(true)
+            footer.hideActivityIndicatorSection()
+            footer.buttonSection.setTitleColor(NCBrandColor.shared.customer, for: .normal)
+            if appDelegate.isSearchingMode {
+                if sections > 1 && section != sections - 1 {
+                    footer.separatorIsHidden(false)
+                }
+                if appDelegate.isSearchingMode && isPaginated && metadatasCount > 0 {
+                    footer.buttonIsHidden(false)
+                }
+                if unifiedSearchInProgress {
+                    footer.showActivityIndicatorSection()
+                }
+            } else {
+                if sections == 1 || section == sections - 1 {
+                    let info = dataSource.getFooterInformationAllMetadatas()
+                    footer.setTitleLabel(directories: info.directories, files: info.files, size: info.size)
+                } else {
+                    footer.separatorIsHidden(false)
+                }
+            }
 
             return footer
         }
@@ -1570,7 +1601,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         cell.titleInfoTrailingDefault()
 
         if appDelegate.isSearchingMode {
-            cell.fileTitleLabel?.text = metadata.fileName
+            cell.fileTitleLabel?.text = NCUtilityFileSystem.shared.getPath(metadata: metadata)
             cell.fileTitleLabel?.lineBreakMode = .byTruncatingTail
             if metadata.name == NCGlobal.shared.appName {
                 cell.fileInfoLabel?.text = NSLocalizedString("_in_", comment: "") + " " + NCUtilityFileSystem.shared.getPath(path: metadata.path, user: metadata.user)
@@ -1612,7 +1643,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             } else {
                 cell.filePreviewImageView?.image = NCBrandColor.cacheImages.folder
             }
-
+            cell.fileInfoLabel?.text =  CCUtility.dateDiff(metadata.date as Date)
             // Local image: offline
             if let tableDirectory = tableDirectory, tableDirectory.offline {
                 cell.fileLocalImage?.image = NCBrandColor.cacheImages.offlineFlag
@@ -1630,6 +1661,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             } else if CCUtility.fileProviderStorageExists(metadata) {
                 cell.fileLocalImage?.image = NCBrandColor.cacheImages.local
             }
+            cell.fileInfoLabel?.text = CCUtility.dateDiff(metadata.date as Date) + " · " + CCUtility.transformedSize(metadata.size)
         }
 
         // image Favorite
@@ -1802,9 +1834,9 @@ extension NCCollectionViewCommon: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
 
         let (heightHeaderCommands, heightHeaderRichWorkspace, heightHeaderSection) = getHeaderHeight(section: section)
-        let heightHeader = heightHeaderCommands + heightHeaderRichWorkspace + heightHeaderSection
+//        let heightHeader = heightHeaderCommands + heightHeaderRichWorkspace + heightHeaderSection
 
-        return CGSize(width: collectionView.frame.width, height: heightHeader)
+        return CGSize(width: collectionView.frame.width, height: headerHeight)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
