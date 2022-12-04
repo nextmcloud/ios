@@ -61,7 +61,7 @@ extension NCViewer {
         //
         // OFFLINE
         //
-        if (metadata.classFile == NKCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml"), !metadata.livePhoto {
+        if !isFolderEncrypted, (metadata.classFile == NKCommon.typeClassFile.image.rawValue && metadata.contentType != "image/svg+xml"), !metadata.livePhoto {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rotate_", comment: ""),
