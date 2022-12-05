@@ -1053,3 +1053,4 @@
 "_invalid_email_alert_"     =   "Die Email Adresse ist ungültig. Bitte überprüfen Sie ihre Eingabe.";
 
 "_please_enter_file_name_"            = "Bitte geben Sie den Dateinamen ein.";
+"_password_ascii_"          = "Das Passwort darf keine Sonderzeichen enthalten";
