@@ -49,6 +49,7 @@
 		564A96FB287C0DA600D6F3A1 /* RequiredDataCollectionSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564A96F9287C0DA600D6F3A1 /* RequiredDataCollectionSwitch.swift */; };
 		564A96FD287C0DD700D6F3A1 /* OpenSourceSoftwareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564A96FC287C0DD700D6F3A1 /* OpenSourceSoftwareViewController.swift */; };
 		564A9701287C0E0900D6F3A1 /* AnalysisDataCollectionSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564A96FF287C0E0900D6F3A1 /* AnalysisDataCollectionSwitch.swift */; };
+		5658E073293DC34E00AA6A65 /* MagentaCloudVersionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5658E072293DC34E00AA6A65 /* MagentaCloudVersionView.xib */; };
 		565B11C7287581F3006998FA /* NCAudioRecorderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565B11C6287581F3006998FA /* NCAudioRecorderViewController.swift */; };
 		565B11C928758651006998FA /* NCAudioRecorderViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 565B11C828758651006998FA /* NCAudioRecorderViewController.storyboard */; };
 		565B11CF2875A37D006998FA /* OpenSSL.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F70B86802642CF5400ED5349 /* OpenSSL.xcframework */; };
@@ -648,6 +649,7 @@
 		564A96F9287C0DA600D6F3A1 /* RequiredDataCollectionSwitch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequiredDataCollectionSwitch.swift; sourceTree = "<group>"; };
 		564A96FC287C0DD700D6F3A1 /* OpenSourceSoftwareViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenSourceSoftwareViewController.swift; sourceTree = "<group>"; };
 		564A96FF287C0E0900D6F3A1 /* AnalysisDataCollectionSwitch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalysisDataCollectionSwitch.swift; sourceTree = "<group>"; };
+		5658E072293DC34E00AA6A65 /* MagentaCloudVersionView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MagentaCloudVersionView.xib; sourceTree = "<group>"; };
 		565B11C6287581F3006998FA /* NCAudioRecorderViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCAudioRecorderViewController.swift; sourceTree = "<group>"; };
 		565B11C828758651006998FA /* NCAudioRecorderViewController.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCAudioRecorderViewController.storyboard; sourceTree = "<group>"; };
 		565B11CC2875A2ED006998FA /* Share-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Share-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -1818,6 +1820,7 @@
 		F7ACE4281BAC0268006C0017 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				5658E072293DC34E00AA6A65 /* MagentaCloudVersionView.xib */,
 				56F704AE292CF9AF00371907 /* AnalysisDataCollectionSwitch.xib */,
 				56F704AF292CF9B000371907 /* RequiredDataCollectionSwitch.xib */,
 				56F7049F292CF96C00371907 /* HelpViewController.swift */,
@@ -2682,6 +2685,7 @@
 				F749C10D23C4A5340027D966 /* NCIntro.storyboard in Resources */,
 				F7239877253D86D300257F49 /* NCEmptyView.xib in Resources */,
 				F747BA1F22354D2000971601 /* NCCreateFormUploadVoiceNote.storyboard in Resources */,
+				5658E073293DC34E00AA6A65 /* MagentaCloudVersionView.xib in Resources */,
 				F704B5E72430C06700632F5F /* NCCreateFormUploadConflictCell.xib in Resources */,
 				56F704C2292D020200371907 /* Scan.storyboard in Resources */,
 				56F704E8292D027100371907 /* ScanDocumentPathView.xib in Resources */,
