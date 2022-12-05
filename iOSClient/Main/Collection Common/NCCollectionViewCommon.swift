@@ -1643,7 +1643,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             } else {
                 cell.filePreviewImageView?.image = NCBrandColor.cacheImages.folder
             }
-            cell.fileInfoLabel?.text =  CCUtility.dateDiff(metadata.date as Date)
             // Local image: offline
             if let tableDirectory = tableDirectory, tableDirectory.offline {
                 cell.fileLocalImage?.image = NCBrandColor.cacheImages.offlineFlag
@@ -1661,7 +1660,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             } else if CCUtility.fileProviderStorageExists(metadata) {
                 cell.fileLocalImage?.image = NCBrandColor.cacheImages.local
             }
-            cell.fileInfoLabel?.text = CCUtility.dateDiff(metadata.date as Date) + " · " + CCUtility.transformedSize(metadata.size)
         }
 
         // image Favorite
