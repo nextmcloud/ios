@@ -313,7 +313,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NCNetworkingProcessUpload.shared.stopTimer()
 
         // Reload Widget
-        WidgetCenter.shared.reloadAllTimelines()
+        if #available(iOS 14.0, *) {
+            WidgetCenter.shared.reloadAllTimelines()
+        } 
 
         // Clear operation queue
         NCOperationQueue.shared.cancelAllQueue()
@@ -387,7 +389,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuDetailClose)
 
         // Reload Widget
-        WidgetCenter.shared.reloadAllTimelines()
+        if #available(iOS 14.0, *) {
+            WidgetCenter.shared.reloadAllTimelines()
+        } 
 
         // Registeration domain File Provider
         // FileProviderDomain *fileProviderDomain = [FileProviderDomain new];
@@ -506,14 +510,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         NKCommon.shared.writeLog("[INFO] Start handle Events For Background URLSession: \(identifier)")
         // Reload Widget
-        WidgetCenter.shared.reloadAllTimelines()
+        if #available(iOS 14.0, *) {
+            WidgetCenter.shared.reloadAllTimelines()
+        }
         backgroundSessionCompletionHandler = completionHandler
     }
 
     // MARK: - Push Notifications
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.list, .banner, .sound])
+        if #available(iOS 14.0, *) {
+            completionHandler([.list, .banner, .sound])
+        } else {
+            // Fallback on earlier versions
+            completionHandler(UNNotificationPresentationOptions.alert)
+        }
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
