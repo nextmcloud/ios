@@ -1671,6 +1671,8 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         }
 
         // Share image
+        cell.fileLabelShared?.text = NSLocalizedString("_shared_", comment: "")
+        cell.fileLabelShared?.textColor = NCBrandColor.shared.customer
         if isShare {
             cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
         } else if tableShare != nil && tableShare?.shareType == 3 {
@@ -1679,6 +1681,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
         } else {
             cell.fileSharedImage?.image = NCBrandColor.cacheImages.imgShare.image(color: NCBrandColor.shared.gray60, size: 50)
+            cell.fileLabelShared?.text = ""
         
         }
         let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
@@ -1687,6 +1690,8 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         }
         if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
             cell.fileSharedImage?.image = NCBrandColor.cacheImages.sharedWithMe
+            cell.fileLabelShared?.text = NSLocalizedString("_recieved_", comment: "")
+            cell.fileLabelShared?.textColor = NCBrandColor.shared.notificationAction
         }
 //        if appDelegate.account != metadata.account {
 //            cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
@@ -1758,12 +1763,21 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         if appDelegate.disableSharesView {
             cell.hideButtonShare(true)
         }
-
-        // Separator
-        if collectionView.numberOfItems(inSection: indexPath.section) == indexPath.row + 1 || appDelegate.isSearchingMode {
+        // Hide lines on iPhone
+        
+        if !UIDevice.current.orientation.isLandscape && UIDevice.current.model.hasPrefix("iPhone") {
             cell.cellSeparatorView?.isHidden = true
-        } else {
+            cell.fileLabelShared?.isHidden = true
+        }else{
             cell.cellSeparatorView?.isHidden = false
+            cell.fileLabelShared?.isHidden = false
+            
+            // Separator
+            if collectionView.numberOfItems(inSection: indexPath.section) == indexPath.row + 1 || appDelegate.isSearchingMode {
+                cell.cellSeparatorView?.isHidden = true
+            } else {
+                cell.cellSeparatorView?.isHidden = false
+            }
         }
 
         // Edit mode
