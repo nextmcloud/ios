@@ -354,12 +354,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         NCNetworking.shared.cancelAllDownloadTransfer()
 
-        let content = UNMutableNotificationContent()
-        content.title = NCBrandOptions.shared.brand
-        content.body = NSLocalizedString("_keep_running_", comment: "")
-        let req = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
-        let notificationCenter = UNUserNotificationCenter.current()
-        notificationCenter.add(req)
+//        let content = UNMutableNotificationContent()
+//        content.title = NCBrandOptions.shared.brand
+//        content.body = NSLocalizedString("_keep_running_", comment: "")
+//        let req = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+//        let notificationCenter = UNUserNotificationCenter.current()
+//        notificationCenter.add(req)
 
         NKCommon.shared.writeLog("bye bye")
     }

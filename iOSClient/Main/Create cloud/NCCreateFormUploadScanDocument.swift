@@ -277,34 +277,34 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         // Section: Text recognition
 
-        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_text_recognition_", comment: ""))
-        form.addFormSection(section)
-
-        row = XLFormRowDescriptor(tag: "textRecognition", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_text_recognition_", comment: ""))
-        row.value = 0
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
-        
-        row.cellConfig["imageView.image"] = UIImage(named: "textRecognition")!.image(color: NCBrandColor.shared.brandElement, size: 25)
-        
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
-        
-        // Section: File
-
-        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_file_creation_", comment: ""))
-
-        row = XLFormRowDescriptor(tag: "filetype", rowType: XLFormRowDescriptorTypeSelectorSegmentedControl, title: NSLocalizedString("_file_type_", comment: ""))
-        if arrayImages.count == 1 {
-            row.selectorOptions = ["PDF", "JPG"]
-        } else {
-            row.selectorOptions = ["PDF"]
-        }
-        row.value = "PDF"
-        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
-        
-        row.cellConfig["tintColor"] = NCBrandColor.shared.brandElement
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
+//        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_text_recognition_", comment: ""))
+//        form.addFormSection(section)
+//
+//        row = XLFormRowDescriptor(tag: "textRecognition", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_text_recognition_", comment: ""))
+//        row.value = 0
+//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.backgroundForm
+//
+//        row.cellConfig["imageView.image"] = UIImage(named: "textRecognition")!.image(color: NCBrandColor.shared.brandElement, size: 25)
+//
+//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
+//
+//        // Section: File
+//
+//        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_file_creation_", comment: ""))
+//
+//        row = XLFormRowDescriptor(tag: "filetype", rowType: XLFormRowDescriptorTypeSelectorSegmentedControl, title: NSLocalizedString("_file_type_", comment: ""))
+//        if arrayImages.count == 1 {
+//            row.selectorOptions = ["PDF", "JPG"]
+//        } else {
+//            row.selectorOptions = ["PDF"]
+//        }
+//        row.value = "PDF"
+//        row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
+//
+//        row.cellConfig["tintColor"] = NCBrandColor.shared.brandElement
+//        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+//        row.cellConfig["textLabel.textColor"] = NCBrandColor.shared.label
         
         self.form = form
     }
