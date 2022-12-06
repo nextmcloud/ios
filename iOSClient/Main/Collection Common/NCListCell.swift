@@ -235,8 +235,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             setA11yActions()
         }
     }
-
+    
     func selected(_ status: Bool) {
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId), !metadata.isDownloadUpload else {
+            backgroundView = nil
+            separator.isHidden = false
+            return
+        }
         if status {
             var blurEffect: UIVisualEffect?
             var blurEffectView: UIView?

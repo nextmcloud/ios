@@ -151,7 +151,7 @@ class NCTransfers: NCCollectionViewCommon, NCTransferCellDelegate {
         guard let metadata = metadataTemp else { return false }
         if metadata.e2eEncrypted { return false }
 
-        if metadata.status == NCGlobal.shared.metadataStatusWaitUpload || metadata.status == NCGlobal.shared.metadataStatusInUpload || metadata.status == NCGlobal.shared.metadataStatusUploading {
+        if metadata.status == NCGlobal.shared.metadataStatusWaitUpload || metadata.isUpload {
             return true
         }
 
