@@ -462,11 +462,23 @@ class tableMetadata: Object, NCUserBaseUrl {
 
 extension tableMetadata {
     var fileExtension: String { (fileNameView as NSString).pathExtension }
-
+    
     var isPrintable: Bool {
         classFile == NKCommon.typeClassFile.image.rawValue || ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/")
     }
-
+    
+    var isDownloadUpload: Bool {
+        status == NCGlobal.shared.metadataStatusInDownload || status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusInUpload || status == NCGlobal.shared.metadataStatusUploading
+    }
+    
+    var isDownload: Bool {
+        status == NCGlobal.shared.metadataStatusInDownload || status == NCGlobal.shared.metadataStatusDownloading
+    }
+    
+    var isUpload: Bool {
+        status == NCGlobal.shared.metadataStatusInUpload || status == NCGlobal.shared.metadataStatusUploading
+    }
+    
     /// Returns false if the user is lokced out of the file. I.e. The file is locked but by somone else
     func canUnlock(as user: String) -> Bool {
         return !lock || (lockOwner == user && lockOwnerType == 0)
