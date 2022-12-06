@@ -359,6 +359,8 @@ import XLForm
     func createDocument(fileNamePath: String, fileName: String) {
         
         self.navigationItem.rightBarButtonItem?.isEnabled = false
+        var UUID = NSUUID().uuidString
+        UUID = "TEMP" + UUID.replacingOccurrences(of: "-", with: "")
 
         if self.editorId == NCGlobal.shared.editorText || self.editorId == NCGlobal.shared.editorOnlyoffice {
 
@@ -385,7 +387,7 @@ import XLForm
                 }
 
                 self.dismiss(animated: true, completion: {
-            let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileName, fileNameView: fileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url, contentType: results.mimeType)
+                    let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileName, fileNameView: fileName, ocId: UUID, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url, contentType: results.mimeType)
                     if let viewController = self.appDelegate.activeViewController {
                         NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata], imageIcon: nil)
                     }
@@ -404,7 +406,7 @@ import XLForm
 
                 self.dismiss(animated: true, completion: {
                     let createFileName = (fileName as NSString).deletingPathExtension + "." + self.fileNameExtension
-                    let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: createFileName, fileNameView: createFileName, ocId: CCUtility.createRandomString(12), serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url, contentType: "", isLivePhoto: false)
+                    let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: createFileName, fileNameView: createFileName, ocId: UUID, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: url, contentType: "")
                     if let viewController = self.appDelegate.activeViewController {
                         NCViewer.shared.view(viewController: viewController, metadata: metadata, metadatas: [metadata], imageIcon: nil)
                     }
