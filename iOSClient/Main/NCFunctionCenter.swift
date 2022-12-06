@@ -785,8 +785,8 @@ import Photos
 
         if metadata.directory {
             
-            let submenu = UIMenu(title: "", options: .displayInline, children: [favorite, offline, rename, moveCopy, delete])
-            let childrenArray = isFolderEncrypted ? [submenu] : [detail, submenu]
+            let submenu = UIMenu(title: "", options: .displayInline, children: [favorite, offline, delete])
+            let childrenArray = isFolderEncrypted ? [submenu] : [detail, rename, moveCopy, submenu]
             return UIMenu(title: "", children: childrenArray)
         }
 
