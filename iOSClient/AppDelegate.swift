@@ -227,13 +227,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
         }
         
-        if #available(iOS 14.0, *) {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            UINavigationBar.appearance().standardAppearance = appearance
-            UINavigationBar.appearance().scrollEdgeAppearance = appearance
-        }
-        
         
         adjust.configAdjust()
         adjust.subsessionStart()
@@ -399,7 +392,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Reload Widget
         if #available(iOS 14.0, *) {
             WidgetCenter.shared.reloadAllTimelines()
-        } 
+        }
+        if #available(iOS 14.0, *) {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            UINavigationBar.appearance().standardAppearance = appearance
+            UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        }
 
         // Registeration domain File Provider
         // FileProviderDomain *fileProviderDomain = [FileProviderDomain new];
