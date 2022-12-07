@@ -1030,7 +1030,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
         becomeFirstResponder()
 
-        if serverUrl != "" {
+        if serverUrl != "" && !isEncryptedFolder {
             listMenuItems.append(UIMenuItem(title: NSLocalizedString("_paste_file_", comment: ""), action: #selector(pasteFilesMenu)))
         }
 
