@@ -778,7 +778,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                    self.dismissAndUpload(metadataForUpload)
+                    self.dismissAndUpload(metadataForUpload, fileType: "TXT")
                 }
             }
         }
@@ -827,7 +827,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             self.isPDFWithOCRSwitchOn = ocrSwitchOn
-            self.dismissAndUpload(metadataForUpload)
+            self.dismissAndUpload(metadataForUpload, fileType: "PDF")
         }
         
         completion(true)
@@ -909,7 +909,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                     NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        self.dismissAndUpload(metadataForUpload)
+                        self.dismissAndUpload(metadataForUpload, fileType: fileType.uppercased())
                     }
                 }
                 
@@ -919,18 +919,41 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     }
     
     func dismissCreateFormUploadConflict(metadatas: [tableMetadata]?) {
-
+        
         if metadatas != nil && metadatas!.count > 0 {
-
-            NCActivityIndicator.shared.start(backgroundView: self.view)
-
+            
+            NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
+            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.dismissAndUpload(metadatas![0])
+                // if let metadata = metadatas![0] as? tableMetadata{
+                if (metadatas![0].ext == "jpg"){
+                    //TODO for jpg
+                    self.dismissAndUpload(metadatas![0],fileType: "JPG")
+                    NCUtility.shared.stopActivityIndicator()
+                    
+                }else if(metadatas![0].ext == "png") {
+                    //TODO for png
+                    self.dismissAndUpload(metadatas![0],fileType: "PNG")
+                    NCUtility.shared.stopActivityIndicator()
+                    
+                    
+                }else if(metadatas![0].ext == "pdf"){
+                    //TODO for pdf
+                    self.isOCRActivatedFileConflicts = metadatas![0].fileName.contains("_OCR")
+                    self.dismissAndUpload(metadatas![0],fileType: "PDF")
+                    NCUtility.shared.stopActivityIndicator()
+                    
+                }else if(metadatas![0].ext == "txt"){
+                    //TODO for txt
+                    self.dismissAndUpload(metadatas![0],fileType: "TXT")
+                    NCUtility.shared.stopActivityIndicator()
+                    
+                }
             }
         }
     }
 
-    func dismissAndUpload(_ metadata: tableMetadata) {
+    func dismissAndUpload(_ metadata: tableMetadata, fileType: String?) {
 
         guard let fileNameGenerateExport = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView) else {
             NCActivityIndicator.shared.stop()
@@ -942,7 +965,8 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         let fileUrl = URL(fileURLWithPath: fileNameGenerateExport)
 
         // Text Recognition TXT
-        if fileType == "TXT" && self.form.formRow(withTag: "textRecognition")!.value as! Int == 1 {
+       // if fileType == "TXT" && self.form.formRow(withTag: "textRecognition")!.value as! Int == 1 {
+       if fileType == "TXT" {
 
             var textFile = ""
             for image in self.arrayImages {
