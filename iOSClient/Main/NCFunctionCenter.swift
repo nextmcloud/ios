@@ -785,8 +785,8 @@ import Photos
 
         if metadata.directory {
             
-            let submenu = UIMenu(title: "", options: .displayInline, children: [favorite, offline, delete])
-            let childrenArray = isFolderEncrypted ? [submenu] : [detail, rename, moveCopy, submenu]
+            let submenu = UIMenu(title: "", options: .displayInline, children: [favorite, offline, rename, moveCopy, delete])
+            let childrenArray = isFolderEncrypted ? [offline, delete] : [detail,submenu]
             return UIMenu(title: "", children: childrenArray)
         }
 
@@ -797,7 +797,9 @@ import Photos
         if !metadata.lock {
             // Workaround: PROPPATCH doesn't work (favorite)
             // https://github.com/nextcloud/files_lock/issues/68
-            children.insert(favorite, at: 0)
+            if !isFolderEncrypted {
+                children.insert(favorite, at: 0)
+            }
             children.append(delete)
             children.insert(rename, at: 3)
         } else if enableDeleteLocal {

@@ -42,7 +42,7 @@ extension NCViewer {
         // FAVORITE
         // Workaround: PROPPATCH doesn't work
         // https://github.com/nextcloud/files_lock/issues/68
-        if !metadata.lock {
+        if !metadata.lock, !isFolderEncrypted {
             actions.append(
                 NCMenuAction(
                     title: titleFavorite,
