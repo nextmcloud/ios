@@ -3222,7 +3222,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
@@ -3282,7 +3282,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
@@ -3355,7 +3355,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = S5724FNY84;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
@@ -3407,7 +3407,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = S5724FNY84;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
@@ -3464,7 +3464,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = S5724FNY84;
 				"DEVELOPMENT_TEAM[sdk=*]" = S5724FNY84;
@@ -3523,7 +3523,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = S5724FNY84;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
@@ -3570,7 +3570,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = S5724FNY84;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				ENABLE_BITCODE = YES;
@@ -3631,7 +3631,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Heiko Muehle (5N2NPC4PCA)";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = S5724FNY84;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				ENABLE_BITCODE = YES;
