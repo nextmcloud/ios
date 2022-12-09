@@ -1030,7 +1030,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
         becomeFirstResponder()
 
-        if serverUrl != "" {
+        if serverUrl != "" && !isEncryptedFolder {
             listMenuItems.append(UIMenuItem(title: NSLocalizedString("_paste_file_", comment: ""), action: #selector(pasteFilesMenu)))
         }
 
@@ -1604,7 +1604,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.fileTitleLabel?.text = NCUtilityFileSystem.shared.getPath(metadata: metadata)
             cell.fileTitleLabel?.lineBreakMode = .byTruncatingTail
             if metadata.name == NCGlobal.shared.appName {
-                cell.fileInfoLabel?.text = NSLocalizedString("_in_", comment: "") + " " + NCUtilityFileSystem.shared.getPath(path: metadata.path, user: metadata.user)
+                cell.fileInfoLabel?.text = CCUtility.dateDiff(metadata.date as Date) + " · " + CCUtility.transformedSize(metadata.size)
             } else {
                 cell.fileInfoLabel?.text = metadata.subline
                 cell.titleInfoTrailingFull()
