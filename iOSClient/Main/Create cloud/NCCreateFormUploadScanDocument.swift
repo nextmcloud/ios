@@ -888,6 +888,8 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                     }
                 }
                 
+                let image = changeCompressionImage(arrayImages[count])
+                
                 let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "", isLivePhoto: false)
                 
                 metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
@@ -909,7 +911,31 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                     NCUtility.shared.startActivityIndicator(backgroundView: self.view, blurEffect: true)
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        self.dismissAndUpload(metadataForUpload, fileType: fileType.uppercased())
+//                        self.dismissAndUpload(metadataForUpload, fileType: fileType.uppercased())
+                        guard let fileNameGenerateExport = CCUtility.getDirectoryProviderStorageOcId(metadataForUpload.ocId, fileNameView: metadataForUpload.fileNameView) else {
+                            NCUtility.shared.stopActivityIndicator()
+                            let error = NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_")
+                            NCContentPresenter.shared.showError(error: error)
+                            return
+                        }
+                        guard let data = image.jpegData(compressionQuality: CGFloat(0.5)) else {
+                            NCUtility.shared.stopActivityIndicator()
+                            let error = NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_")
+                            NCContentPresenter.shared.showError(error: error)
+                            return
+                        }
+                        
+                        do {
+                            try data.write(to: NSURL.fileURL(withPath: fileNameGenerateExport), options: .atomic)
+                        } catch {
+                            NCUtility.shared.stopActivityIndicator()
+                            let error = NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_")
+                            NCContentPresenter.shared.showError(error: error)
+                            return
+                        }
+ 
+                        NCManageDatabase.shared.addMetadata(metadataForUpload)
+                        NCNetworkingProcessUpload.shared.createProcessUploads(metadatas: [metadataForUpload], completion: { _ in })
                     }
                 }
                 
