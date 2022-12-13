@@ -83,8 +83,8 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
 
         // brand
         if NCBrandOptions.shared.disable_request_login_url {
-            baseUrl.text = NCBrandOptions.shared.loginBaseUrl
-            baseUrl.isHidden = true
+        //    baseUrl.text = NCBrandOptions.shared.loginBaseUrl
+            baseUrl.isHidden = false
         }
 
         // qrcode

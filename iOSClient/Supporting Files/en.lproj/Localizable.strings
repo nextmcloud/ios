@@ -945,6 +945,7 @@
 "_log_in_"                          = "Log in";
 "_sign_up_"                         = "Sign up with provider";
 "_host_your_own_server"             = "Host your own server";
+"_login_address_detail_"            = "The link to your %@ web interface when you open it in the browser.";
 
 // Error
 

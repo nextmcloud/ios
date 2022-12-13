@@ -202,11 +202,9 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func login(_ sender: Any) {
-        if NextcloudKit.shared.isNetworkReachable() {
-            appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
-        } else {
-            showNoInternetAlert()
-        }
+        let loginViewPage = UIStoryboard(name: "NCLogin", bundle: Bundle.main).instantiateViewController(identifier: "NCLogin")
+        navigationController?.pushViewController(loginViewPage, animated: true)
+        
         
     }
 
