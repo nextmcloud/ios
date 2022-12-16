@@ -715,6 +715,41 @@ import Photos
         let openIn = UIAction(title: NSLocalizedString("_open_in_", comment: ""), image: UIImage(systemName: "square.and.arrow.up") ) { _ in
             self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorOpenIn)
         }
+        
+        let decrypt = UIAction(title: NSLocalizedString("_e2e_remove_folder_encrypted_", comment: ""), image: UIImage(systemName: "lock") ) { action in
+            
+                NextcloudKit.shared.markE2EEFolder(fileId: metadata.fileId, delete: true) { account, error in
+                    if error == .success {
+                        NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", self.appDelegate.account, serverUrl))
+                        NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, serverUrlTo: nil, etag: nil, ocId: nil, fileId: nil, encrypted: false, richWorkspace: nil, account: metadata.account)
+                        NCManageDatabase.shared.setMetadataEncrypted(ocId: metadata.ocId, encrypted: false)
+                        
+                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeStatusFolderE2EE, userInfo: ["serverUrl": metadata.serverUrl])
+                    } else {
+                        NCContentPresenter.shared.messageNotification(NSLocalizedString("_e2e_error_delete_mark_folder_", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .error)
+                    }
+                }
+                
+            
+            
+        }
+        
+        let encrypt = UIAction(title: NSLocalizedString("_e2e_set_folder_encrypted_", comment: ""), image: UIImage(systemName: "lock") ) { action in
+          
+                NextcloudKit.shared.markE2EEFolder(fileId: metadata.fileId, delete: false) { account, error in
+                    if error == .success {
+                        NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", self.appDelegate.account, serverUrl))
+                        NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, serverUrlTo: nil, etag: nil, ocId: nil, fileId: nil, encrypted: true, richWorkspace: nil, account: metadata.account)
+                        NCManageDatabase.shared.setMetadataEncrypted(ocId: metadata.ocId, encrypted: true)
+                        
+                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeStatusFolderE2EE, userInfo: ["serverUrl": metadata.serverUrl])
+                    } else {
+                        NCContentPresenter.shared.messageNotification(NSLocalizedString("_e2e_error_mark_folder_", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .error)
+                    }
+                }
+            
+            
+        }
 
         let print = UIAction(title: NSLocalizedString("_print_", comment: ""), image: UIImage(systemName: "printer") ) { _ in
             self.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint)
@@ -785,8 +820,8 @@ import Photos
 
         if metadata.directory {
             
-            let submenu = UIMenu(title: "", options: .displayInline, children: [favorite, offline, rename, moveCopy, delete])
-            let childrenArray = isFolderEncrypted ? [offline, delete] : [detail,submenu]
+            let submenu = UIMenu(title: "", options: .displayInline, children: metadata.size > 0 ? [favorite, offline, rename, moveCopy, delete] : [favorite, offline, rename, moveCopy, encrypt, delete])
+            let childrenArray = isFolderEncrypted ? (metadata.size > 0 ? [offline] : [offline, decrypt]) : [detail,submenu]
             return UIMenu(title: "", children: childrenArray)
         }
 
