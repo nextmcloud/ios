@@ -639,6 +639,7 @@ import Photos
             return UIMenu()
         }
         let isFolderEncrypted = CCUtility.isFolderEncrypted(metadata.serverUrl, e2eEncrypted: metadata.e2eEncrypted, account: metadata.account, urlBase: metadata.urlBase, userId: metadata.userId)
+        let serverUrlHome = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId)
         var titleDeleteConfirmFile = NSLocalizedString("_delete_file_", comment: "")
         if metadata.directory { titleDeleteConfirmFile = NSLocalizedString("_delete_folder_", comment: "") }
         var titleSave: String = NSLocalizedString("_save_selected_files_", comment: "")
@@ -820,8 +821,10 @@ import Photos
 
         if metadata.directory {
             
-            let submenu = UIMenu(title: "", options: .displayInline, children: metadata.size > 0 ? [favorite, offline, rename, moveCopy, delete] : [favorite, offline, rename, moveCopy, encrypt, delete])
-            let childrenArray = isFolderEncrypted ? (metadata.size > 0 ? [offline] : [offline, decrypt]) : [detail,submenu]
+            let isEncryptionDisabled = metadata.e2eEncrypted && metadata.directory && CCUtility.isEnd(toEndEnabled: appDelegate.account) && metadata.serverUrl == serverUrlHome && metadata.size == 0
+            let isEncrytptionEnabled = !metadata.e2eEncrypted && metadata.directory && CCUtility.isEnd(toEndEnabled: appDelegate.account) && metadata.serverUrl == serverUrlHome && metadata.size == 0
+            let submenu = UIMenu(title: "", options: .displayInline, children: isEncrytptionEnabled ? [favorite, offline, rename, moveCopy, encrypt, delete] : [favorite, offline, rename, moveCopy, delete])
+            let childrenArray = isFolderEncrypted ? ( isEncryptionDisabled ? [offline, decrypt] : [offline]) : [detail,submenu]
             return UIMenu(title: "", children: childrenArray)
         }
 
