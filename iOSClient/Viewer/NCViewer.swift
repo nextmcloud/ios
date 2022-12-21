@@ -40,7 +40,8 @@ class NCViewer: NSObject {
 
         self.metadata = metadata
         self.metadatas = metadatas
-
+        let serverUrl = metadata.serverUrl + "/" + metadata.fileName
+        let isFolderEncrypted = CCUtility.isFolderEncrypted(metadata.serverUrl, e2eEncrypted: metadata.e2eEncrypted, account: metadata.account, urlBase: metadata.urlBase, userId: metadata.userId)
         var editor = editor
         var xxxxxxx = NKCommon.shared.getInternalTypeIdentifier(typeIdentifier: metadata.contentType)
 
@@ -113,7 +114,7 @@ class NCViewer: NSObject {
             let availableRichDocument = NCUtility.shared.isRichDocument(metadata)
 
             // RichDocument: Collabora
-            if (isRichDocument || (availableRichDocument && editors.count == 0)) && NextcloudKit.shared.isNetworkReachable() {
+            if (isRichDocument || (!isFolderEncrypted && availableRichDocument && editors.count == 0)) && NextcloudKit.shared.isNetworkReachable() {
 
                 if metadata.url == "" {
 
