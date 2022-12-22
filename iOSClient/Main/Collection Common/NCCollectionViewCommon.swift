@@ -1101,11 +1101,11 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         layoutForView = NCUtility.shared.getLayoutForView(key: layoutKey, serverUrl: serverUrl)
 
         // set GroupField for Grid
-        if !appDelegate.isSearchingMode && layoutForView?.layout == NCGlobal.shared.layoutGrid {
-            groupByField = "classFile"
-        } else {
-            groupByField = "name"
-        }
+//        if !appDelegate.isSearchingMode && layoutForView?.layout == NCGlobal.shared.layoutGrid {
+//            groupByField = "classFile"
+//        } else {
+//            groupByField = "name"
+//        }
     }
 
     @objc func reloadDataSourceNetwork(forced: Bool = false) { }
