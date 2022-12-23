@@ -1497,7 +1497,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             header.setTitleSorted(datasourceTitleButton: layoutForView?.titleButtonHeader ?? "")
             header.viewRichWorkspaceHeightConstraint.constant = headerRichWorkspaceHeight
             header.setRichWorkspaceText(richWorkspaceText: richWorkspaceText)
-            
+            header.isHidden =  !headerMenuButtonsView
             return header
 
         } else {
@@ -1847,6 +1847,9 @@ extension NCCollectionViewCommon: UICollectionViewDelegateFlowLayout {
 
 //        let (heightHeaderCommands, heightHeaderRichWorkspace, heightHeaderSection) = getHeaderHeight(section: section)
 //        let heightHeader = heightHeaderCommands + heightHeaderRichWorkspace + heightHeaderSection
+        if !headerMenuButtonsView {
+            return CGSize(width: collectionView.frame.width, height: 0)
+        }
 
         return CGSize(width: collectionView.frame.width, height: headerHeight)
     }
