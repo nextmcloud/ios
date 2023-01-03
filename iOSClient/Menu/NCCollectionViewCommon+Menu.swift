@@ -394,7 +394,7 @@ extension NCCollectionViewCommon {
         //
         // DELETE
         //
-        if !isFolderEncrypted {
+        if !(isFolderEncrypted && metadata.serverUrl == serverUrlHome), !metadata.lock {
             actions.append(.deleteAction(selectedMetadatas: [metadata], metadataFolder: metadataFolder, viewController: self))
         }
 
