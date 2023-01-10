@@ -74,6 +74,7 @@
 "_transfers_in_queue_"      = "Laufende Übertragungen, bitte warten…";
 "_too_errors_upload_"       = "Zu viele Fehler, bitte überprüfen Sie das Problem.";
 "_create_folder_"           = "Ordner erstellen";
+"_create_folder_e2ee_"      = "Veschlüsselten Ordner erstellen";
 "_create_folder_on_"        = "Geben Sie eine Ordnerbezeichnung ein.";
 "_close_"                   = "Schließen";
 "_postpone_"                = "Zurückstellen";
