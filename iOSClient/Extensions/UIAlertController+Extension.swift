@@ -96,6 +96,12 @@ extension UIAlertController {
     }
     
     
+    /// To Create an Encrypted folder when you click on + button
+    /// - Parameters:
+    ///   - serverUrl: Server url of the location where the folder should be created
+    ///   - urlBase: UrlBase object
+    ///   - fileNameFolder: saves the name of the encrypted folder
+    ///   - completion: It shows an error message
     static func createEncryptedFolder(serverUrl: String, urlBase: NCUserBaseUrl,fileNameFolder:String, completion: (_ error: NKError) -> Void){
         
         
