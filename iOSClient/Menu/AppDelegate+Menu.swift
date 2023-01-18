@@ -40,6 +40,7 @@ extension AppDelegate {
         let isEncrypted = CCUtility.isFolderEncrypted(appDelegate.activeServerUrl, e2eEncrypted: false, account: appDelegate.account, urlBase: appDelegate.urlBase, userId: appDelegate.userId)
         let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, appDelegate.activeServerUrl))
         let serverVersionMajor = NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesVersionMajor)
+        let serverUrlHome = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId)
 
         actions.append(
             NCMenuAction(
@@ -116,48 +117,34 @@ extension AppDelegate {
                 }
             )
         )
-
+        
+        let titleCreateFolder = isEncrypted ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
+        let imageCreateFolder = isEncrypted ? UIImage(named: "encryptedfolder")! : UIImage(named: "addFolder")!
         actions.append(
-            NCMenuAction(title: NSLocalizedString("_create_folder_", comment: ""),
-                icon: UIImage(named: "addFolder")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
-
-                    if appDelegate.activeServerUrl == "" { return }
-
-                    let alertController = UIAlertController(title: NSLocalizedString("_create_folder_on_", comment: ""), message: nil, preferredStyle: .alert)
-
-                    alertController.addTextField { textField in
-                        textField.autocapitalizationType = UITextAutocapitalizationType.sentences
-                    }
-
-                    let cancelAction = UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: nil)
-                    let okAction = UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in
-                        if let fileNameFolder = alertController.textFields?.first?.text {
-                            NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: appDelegate.activeServerUrl, account: appDelegate.account, urlBase: appDelegate.urlBase, userId: appDelegate.userId,  overwrite: false) { error in
-                                if error != .success {
-                                    NCContentPresenter.shared.showError(error: error)
-                               
-                                }
-                            }
-                        }
-                    })
-                    okAction.isEnabled = false
-                     // only allow saving if folder name exists
-                    NotificationCenter.default.addObserver(
-                        forName: UITextField.textDidChangeNotification,
-                        object: alertController.textFields?.first,
-                        queue: .main) { _ in
-                            guard let text = alertController.textFields?.first?.text,
-                                  let folderName = CCUtility.removeForbiddenCharactersServer(text)?.trimmingCharacters(in: .whitespaces) else { return }
-                            okAction.isEnabled = !folderName.isEmpty && folderName != "." && folderName != ".."
-                        }
-
-                    alertController.addAction(cancelAction)
-                    alertController.addAction(okAction)
-
+            NCMenuAction(title: titleCreateFolder,
+                icon: imageCreateFolder.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
+                    guard !appDelegate.activeServerUrl.isEmpty else { return }
+                    let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate)
                     appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
                 }
             )
         )
+
+        // Folder encrypted (ONLY ROOT)
+        if serverUrlHome == appDelegate.activeServerUrl && CCUtility.isEnd(toEndEnabled: appDelegate.account) {
+            
+            actions.append(
+                NCMenuAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
+                             icon: UIImage(named: "encryptedfolder")!.image(color: NCBrandColor.shared.iconColor, size: 50),
+                             action: { _ in
+                                 guard !appDelegate.activeServerUrl.isEmpty else { return }
+                                 
+                                 let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate, markE2ee: true)
+                            
+                                 appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
+                             })
+            )
+        }
 
         if serverVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isEncrypted && NextcloudKit.shared.isNetworkReachable() {
             actions.append(

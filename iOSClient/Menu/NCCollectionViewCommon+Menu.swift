@@ -161,7 +161,7 @@ extension NCCollectionViewCommon {
         //
         // OFFLINE
         //
-        if !isFolderEncrypted {
+        if metadata.directory {
             actions.append(.setAvailableOfflineAction(selectedMetadatas: [metadata], isAnyOffline: isOffline, viewController: self, completion: {
                 self.reloadDataSource()
             }))
@@ -394,7 +394,9 @@ extension NCCollectionViewCommon {
         //
         // DELETE
         //
-        actions.append(.deleteAction(selectedMetadatas: [metadata], metadataFolder: metadataFolder, viewController: self))
+        if !(isFolderEncrypted && metadata.serverUrl == serverUrlHome), !metadata.lock {
+            actions.append(.deleteAction(selectedMetadatas: [metadata], metadataFolder: metadataFolder, viewController: self))
+        }
 
         //
         // SET FOLDER E2EE

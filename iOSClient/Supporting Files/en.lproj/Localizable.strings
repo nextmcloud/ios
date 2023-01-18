@@ -75,6 +75,7 @@
 "_transfers_in_queue_"      = "Tranfers in progress, please wait…";
 "_too_errors_upload_"       = "Too many errors, please verify the problem";
 "_create_folder_"           = "Create folder";
+"_create_folder_e2ee_"      = "Create encrypted folder";
 "_create_folder_on_"        = "Please enter a folder name";
 "_close_"                   = "Close";
 "_postpone_"                = "Postpone";

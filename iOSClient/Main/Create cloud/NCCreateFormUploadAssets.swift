@@ -760,46 +760,7 @@ class NCCreateFormUploadAssets: XLFormViewController, NCSelectDelegate {
                 metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
                 metadataForUpload.size = NCUtilityFileSystem.shared.getFileSize(asset: asset)
                 metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-//>>>>>>> feature_branded_client_4
-                
-                if livePhoto {
-                    
-                    let fileNameMove = (fileName as NSString).deletingPathExtension + ".mov"
-                    let ocId = NSUUID().uuidString
-                    let filePath = CCUtility.getDirectoryProviderStorageOcId(ocId, fileNameView: fileNameMove)!
-                    
-                    let semaphore = Semaphore()
-                    CCUtility.extractLivePhotoAsset(asset, filePath: filePath) { (url) in
-                        if let url = url {
-                            let fileSize = NCUtilityFileSystem.shared.getFileSize(filePath: url.path)
-//<<<<<<< HEAD
-//                            let metadataMOVForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, fileName: fileNameMove,fileNameView: fileName, ocId:ocId, serverUrl: serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", livePhoto: livePhoto, chunk: false)
-//=======
-                            let metadataMOVForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameMove, fileNameView: fileNameMove, ocId: ocId, serverUrl: serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", isLivePhoto: livePhoto)
-//>>>>>>> feature_branded_client_4
-
-                            metadataForUpload.livePhoto = true
-                            metadataMOVForUpload.livePhoto = true
-                            
-                            metadataMOVForUpload.session = self.session
-//<<<<<<< HEAD
-//                            metadataMOVForUpload.sessionSelector = NCBrandGlobal.shared.selectorUploadFile
-//                            metadataMOVForUpload.size = fileSize
-//                            metadataMOVForUpload.status = NCBrandGlobal.shared.metadataStatusWaitUpload
-//                            metadataMOVForUpload.typeFile = NCBrandGlobal.shared.metadataTypeFileVideo
-//=======
-                            metadataMOVForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
-                            metadataMOVForUpload.size = fileSize
-                            metadataMOVForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-                            metadataMOVForUpload.classFile = NKCommon.typeClassFile.video.rawValue
-
-                            metadatasMOV.append(metadataMOVForUpload)
-                        }
-                        semaphore.continue()
-                    }
-                    semaphore.wait()
-                }
-                
+ 
                 if NCManageDatabase.shared.getMetadataConflict(account: self.appDelegate.account, serverUrl: serverUrl, fileName: fileName) != nil {
                     metadatasUploadInConflict.append(metadataForUpload)
                 } else {
