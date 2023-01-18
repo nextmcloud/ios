@@ -146,7 +146,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"removePhotoCameraRoll" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_remove_photo_CameraRoll_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     row.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
-    if (activeAccount.autoUploadDeleteAssetLocalIdentifier) row.value = @1;
+    if ([CCUtility getRemovePhotoCameraRoll]) row.value = @"1";
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
@@ -161,7 +161,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"autoUploadBackground" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_autoupload_background_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
     row.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
-    if (activeAccount.autoUploadDeleteAssetLocalIdentifier) row.value = @1;
+    if (activeAccount.autoUploadBackground) row.value = @1;
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
@@ -319,7 +319,7 @@
     
     if ([rowDescriptor.tag isEqualToString:@"removePhotoCameraRoll"]) {
         
-        [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadDeleteAssetLocalIdentifier" state:[[rowDescriptor.value valueData] boolValue]];
+        [CCUtility setRemovePhotoCameraRoll:[[rowDescriptor.value valueData] boolValue]];
     }
     
     if ([rowDescriptor.tag isEqualToString:@"autoUploadBackground"]) {
@@ -449,7 +449,7 @@
     if (activeAccount.autoUploadWWAnVideo)
         [rowAutoUploadWWAnVideo setValue:@1]; else [rowAutoUploadWWAnVideo setValue:@0];
 
-    if (activeAccount.autoUploadDeleteAssetLocalIdentifier)
+    if ([CCUtility getRemovePhotoCameraRoll])
            [rowRemovePhotoCameraRoll setValue:@1]; else [rowRemovePhotoCameraRoll setValue:@0];
     
     if (activeAccount.autoUploadBackground)
