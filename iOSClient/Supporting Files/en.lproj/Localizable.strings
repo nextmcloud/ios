@@ -1087,3 +1087,6 @@
 
 "_please_enter_file_name_"            = "Please enter the file name.";
 "_password_ascii_"          = "The password cannot contain special characters";
+
+"_change_upload_filename_"  = "Do you want to save the file with a different name ?";
+"_save_file_as_"            = "Save file as %@";

@@ -1056,3 +1056,6 @@
 
 "_please_enter_file_name_"            = "Bitte geben Sie den Dateinamen ein.";
 "_password_ascii_"          = "Das Passwort darf keine Sonderzeichen enthalten";
+
+"_change_upload_filename_"  = "Möchten Sie die Datei unter einem anderen Namen speichern?";
+"_save_file_as_"            = "Datei speichern als %@";
