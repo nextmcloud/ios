@@ -118,11 +118,9 @@ extension AppDelegate {
             )
         )
         
-        let titleCreateFolder = isEncrypted ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
-        let imageCreateFolder = isEncrypted ? UIImage(named: "encryptedfolder")! : UIImage(named: "addFolder")!
         actions.append(
-            NCMenuAction(title: titleCreateFolder,
-                icon: imageCreateFolder.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
+            NCMenuAction(title: NSLocalizedString("_create_folder_", comment: ""),
+                icon: UIImage(named: "addFolder")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     guard !appDelegate.activeServerUrl.isEmpty else { return }
                     let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate)
                     appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
