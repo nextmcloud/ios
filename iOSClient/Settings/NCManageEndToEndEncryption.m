@@ -48,7 +48,8 @@
     NSString *versionE2EE = [[NCManageDatabase shared] getCapabilitiesServerStringWithAccount:appDelegate.account elements:NCElementsJSON.shared.capabilitiesE2EEApiVersion];
     
     if (![versionE2EE isEqual:[[NCGlobal shared] e2eeVersion]] && isE2EEEnabled) {
-        [[NCContentPresenter shared] messageNotification:@"_error_e2ee_" description:@"_err_e2ee_app_version_" delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError errorCode:NCGlobal.shared.errorInternalError];
+        NKError *error = [[NKError alloc] initWithErrorCode:NCGlobal.shared.errorInternalError errorDescription:@"_err_e2ee_app_version_"];
+        [[NCContentPresenter shared] messageNotification:@"_error_e2ee_" error:error delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError];
     }
     
     if (isE2EEEnabled == NO || ![versionE2EE isEqual:[[NCGlobal shared] e2eeVersion]]) {
@@ -358,7 +359,7 @@
         UIAlertAction *copyPassphrase = [UIAlertAction actionWithTitle:NSLocalizedString(@"_copy_passphrase_", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
             UIPasteboard.generalPasteboard.string = e2ePassphrase;
         }];
-        
+
         [alertController addAction:okAction];
         [alertController addAction:copyPassphrase];
         [self presentViewController:alertController animated:YES completion:nil];
@@ -384,25 +385,29 @@
 - (void)deleteCertificate:(XLFormRowDescriptor *)sender
 {
     [self deselectFormRow:sender];
-    
-    [[NCCommunication shared] deleteE2EECertificateWithCustomUserAgent:nil addCustomHeaders:nil queue:dispatch_get_main_queue() completionHandler:^(NSString *account, NSInteger errorCode, NSString *errorDescription) {
-       if (errorCode == 0 && [account isEqualToString:appDelegate.account]) {
-            [[NCContentPresenter shared] messageNotification:@"E2E delete certificate" description:@"Success" delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeSuccess errorCode:NCGlobal.shared.errorInternalError];
-        } else {
-            [[NCContentPresenter shared] messageNotification:@"E2E delete certificate" description:errorDescription  delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError errorCode:errorCode];
-        }
+
+    NKRequestOptions *options = [[NKRequestOptions alloc] initWithEndpoint:nil customHeader:nil customUserAgent:nil contentType:nil e2eToken: nil timeout:60 queue:dispatch_get_main_queue()];
+    [[NextcloudKit shared] deleteE2EECertificateWithOptions:options completionHandler:^(NSString *account, NKError *error) {
+        if (error == NKError.success && [account isEqualToString:appDelegate.account]) {
+            NKError *error = [[NKError alloc] initWithErrorCode:NCGlobal.shared.errorInternalError errorDescription:@"Success"];
+             [[NCContentPresenter shared] messageNotification:@"E2E delete certificate" error:error delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeSuccess];
+         } else {
+             [[NCContentPresenter shared] messageNotification:@"E2E delete certificate" error:error  delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError];
+         }
     }];
 }
 
 - (void)deletePrivateKey:(XLFormRowDescriptor *)sender
 {
     [self deselectFormRow:sender];
-    
-    [[NCCommunication shared] deleteE2EEPrivateKeyWithCustomUserAgent:nil addCustomHeaders:nil queue:dispatch_get_main_queue() completionHandler:^(NSString *account, NSInteger errorCode, NSString *errorDescription) {
-        if (errorCode == 0 && [account isEqualToString:appDelegate.account]) {
-            [[NCContentPresenter shared] messageNotification:@"E2E delete privateKey" description:@"Success" delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeSuccess errorCode:NCGlobal.shared.errorInternalError];
+
+    NKRequestOptions *options = [[NKRequestOptions alloc] initWithEndpoint:nil customHeader:nil customUserAgent:nil contentType:nil e2eToken: nil timeout:60 queue:dispatch_get_main_queue()];
+    [[NextcloudKit shared] deleteE2EEPrivateKeyWithOptions: options completionHandler:^(NSString *account, NKError *error) {
+        if (error == NKError.success && [account isEqualToString:appDelegate.account]) {
+            NKError *error = [[NKError alloc] initWithErrorCode:NCGlobal.shared.errorInternalError errorDescription:@"Success"];
+            [[NCContentPresenter shared] messageNotification:@"E2E delete privateKey" error:error delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeSuccess];
         } else {
-            [[NCContentPresenter shared] messageNotification:@"E2E delete privateKey" description:errorDescription delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError errorCode:errorCode];
+            [[NCContentPresenter shared] messageNotification:@"E2E delete privateKey" error:error delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError];
         }
     }];
 }

@@ -22,7 +22,7 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 import MediaPlayer
 
 class NCViewerMediaPage: UIViewController {
@@ -84,6 +84,7 @@ class NCViewerMediaPage: UIViewController {
         pageViewController.setViewControllers([viewerMedia], direction: .forward, animated: true, completion: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+
         NotificationCenter.default.addObserver(self, selector: #selector(viewUnload), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterMenuDetailClose), object: nil)
 
         progressView.tintColor = NCBrandColor.shared.brandElement
@@ -97,6 +98,7 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(downloadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(triggerProgressTask(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterProgressTask), object: nil)
 
+        NotificationCenter.default.addObserver(self, selector: #selector(uploadStartFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadStartFile), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(uploadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadedFile), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(hidePlayerToolBar(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterHidePlayerToolBar), object: nil)
@@ -106,7 +108,6 @@ class NCViewerMediaPage: UIViewController {
 
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationDidBecomeActive), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(favoriteFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
-
     }
 
     deinit {
@@ -118,6 +119,7 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterProgressTask), object: nil)
 
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadStartFile), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadedFile), object: nil)
 
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterHidePlayerToolBar), object: nil)
@@ -127,7 +129,6 @@ class NCViewerMediaPage: UIViewController {
 
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationDidBecomeActive), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
-
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -207,7 +208,7 @@ class NCViewerMediaPage: UIViewController {
 
         currentScreenMode = mode
 
-        if currentViewController.metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue {
+        if currentViewController.metadata.classFile == NKCommon.typeClassFile.image.rawValue {
             saveScreenModeImage = mode
         }
 
@@ -237,12 +238,23 @@ class NCViewerMediaPage: UIViewController {
         }
     }
 
+    @objc func uploadStartFile(_ notification: NSNotification) {
+
+        /*
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let serverUrl = userInfo["serverUrl"] as? String,
+              let fileName = userInfo["fileName"] as? String,
+              let sessionSelector = userInfo["sessionSelector"] as? String
+        else { return }
+        */
+    }
+
     @objc func uploadedFile(_ notification: NSNotification) {
 
         guard let userInfo = notification.userInfo as NSDictionary?,
               let ocId = userInfo["ocId"] as? String,
-              let errorCode = userInfo["errorCode"] as? Int,
-              errorCode == 0,
+              let error = userInfo["error"] as? NKError,
+              error == .success,
               let index = metadatas.firstIndex(where: {$0.ocId == ocId}),
               let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
         else {
@@ -263,6 +275,11 @@ class NCViewerMediaPage: UIViewController {
               let ocId = userInfo["ocId"] as? String
         else { return }
 
+        // Stop media
+        if let ncplayer = currentViewController.ncplayer, ncplayer.isPlay() {
+            ncplayer.playerPause()
+        }
+
         let metadatas = self.metadatas.filter { $0.ocId != ocId }
         if self.metadatas.count == metadatas.count { return }
         self.metadatas = metadatas
@@ -280,6 +297,10 @@ class NCViewerMediaPage: UIViewController {
               let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
         else { return }
 
+        // Stop media
+        if let ncplayer = currentViewController.ncplayer, ncplayer.isPlay() {
+            ncplayer.playerPause()
+        }
         metadatas[index] = metadata
         if index == currentIndex {
             navigationItem.title = metadata.fileNameView
@@ -294,11 +315,16 @@ class NCViewerMediaPage: UIViewController {
               let ocId = userInfo["ocId"] as? String
         else { return }
 
+        // Stop media
+        if let ncplayer = currentViewController.ncplayer, ncplayer.isPlay() {
+            ncplayer.playerPause()
+        }
+
         if metadatas.firstIndex(where: {$0.ocId == ocId}) != nil {
             deleteFile(notification)
         }
     }
-    
+
     @objc func favoriteFile(_ notification: NSNotification) {
         if let userInfo = notification.userInfo as NSDictionary? {
             if let ocId = userInfo["ocId"] as? String, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
@@ -374,7 +400,8 @@ class NCViewerMediaPage: UIViewController {
         }
 
         // VIDEO / AUDIO () ()
-        if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue || metadata.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue {
+
+        if metadata.classFile == NKCommon.typeClassFile.video.rawValue || metadata.classFile == NKCommon.typeClassFile.audio.rawValue {
 
             MPRemoteCommandCenter.shared().skipForwardCommand.isEnabled = true
             skipForwardCommand = MPRemoteCommandCenter.shared().skipForwardCommand.addTarget { event in
@@ -393,25 +420,6 @@ class NCViewerMediaPage: UIViewController {
             }
         }
 
-        // AUDIO < >
-        /*
-        if metadata?.classFile == NCCommunicationCommon.typeClassFile.audio.rawValue {
-                        
-            MPRemoteCommandCenter.shared().nextTrackCommand.isEnabled = true
-            appDelegate.nextTrackCommand = MPRemoteCommandCenter.shared().nextTrackCommand.addTarget { event in
-                
-                self.forward()
-                return .success
-            }
-            
-            MPRemoteCommandCenter.shared().previousTrackCommand.isEnabled = true
-            appDelegate.previousTrackCommand = MPRemoteCommandCenter.shared().previousTrackCommand.addTarget { event in
-             
-                self.backward()
-                return .success
-            }
-        }
-        */
 
         nowPlayingInfo[MPMediaItemPropertyTitle] = metadata.fileNameView
         nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = ncplayer.durationTime.seconds

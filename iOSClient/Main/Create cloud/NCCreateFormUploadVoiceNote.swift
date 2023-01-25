@@ -22,7 +22,7 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 
 class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAudioPlayerDelegate, NCCreateFormUploadConflictDelegate {
 
@@ -96,6 +96,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         }
     }
 
+
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
@@ -115,7 +116,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
     public func setup(serverUrl: String, fileNamePath: String, fileName: String) {
 
-        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account) {
+        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) {
             titleServerUrl = "/"
         } else {
             titleServerUrl = (serverUrl as NSString).lastPathComponent
@@ -139,15 +140,15 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     //MARK: XLForm
 
     func initializeForm() {
-        
-        let form : XLFormDescriptor = XLFormDescriptor() as XLFormDescriptor
+
+        let form: XLFormDescriptor = XLFormDescriptor() as XLFormDescriptor
         form.rowNavigationOptions = XLFormRowNavigationOptions.stopDisableRow
-        
-        var section : XLFormSectionDescriptor
-        var row : XLFormRowDescriptor
-        
+
+        var section: XLFormSectionDescriptor
+        var row: XLFormRowDescriptor
+
         // Section: Destination Folder
-        
+
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
         section.footerTitle = "                                                                               "
         
@@ -174,18 +175,17 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         }
         row.cellConfig["textLabel.text"] = ""
         section.addFormRow(row)
-        
+
         // Section: File Name
-        
-        
         XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = TextTableViewCell.self
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
         form.addFormSection(section)
-        
+
         row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
         row.cellClass = TextTableViewCell.self
 
+        
         row.cellConfigAtConfigure["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
         row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -199,15 +199,15 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
         self.form = form
     }
-        
+
     override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
-        
+
         super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)
-        
+
         if formRow.tag == "fileName" {
-            
+
             self.form.delegate = nil
-            
+
             if let fileNameNew = formRow.value {
                 self.fileName = CCUtility.removeForbiddenCharactersServer(fileNameNew as? String)
             }
@@ -249,17 +249,17 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     // MARK: - Action
     
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
-        
+    
         if serverUrl != nil {
-            
+
             self.serverUrl = serverUrl!
-            
-            if serverUrl == NCUtilityFileSystem.shared.getHomeServer(account: appDelegate.account) {
+
+            if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) {
                 self.titleServerUrl = "/"
             } else {
                 self.titleServerUrl = (serverUrl! as NSString).lastPathComponent
             }
-            
+
             // Update
             let row : XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!//
             //row.title = self.titleServerUrl
@@ -268,7 +268,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             self.updateFormRow(row)
         }
     }
-    
+
     @objc func save() {
         let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
         let fileNameValue = (rowFileName.value as? String)?.trimmingCharacters(in: .whitespaces)
@@ -290,7 +290,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
                 fileNameSave = (self.fileName as! NSString).deletingPathExtension + ".m4a"
             }
             
-            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", livePhoto: false)
+            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "", isLivePhoto: false)
             
             metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
             metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
@@ -313,11 +313,11 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             }
         }
     }
-    
+
     func dismissCreateFormUploadConflict(metadatas: [tableMetadata]?) {
-        
+
         if metadatas != nil && metadatas!.count > 0 {
-                                
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 self.dismissAndUpload(metadatas![0])
             }
@@ -327,8 +327,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     func dismissAndUpload(_ metadata: tableMetadata) {
 
         CCUtility.copyFile(atPath: self.fileNamePath, toPath: CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
-
-        appDelegate.networkingProcessUpload?.createProcessUploads(metadatas: [metadata])
+        NCNetworkingProcessUpload.shared.createProcessUploads(metadatas: [metadata], completion: { _ in })
 
         self.dismiss(animated: true, completion: nil)
     }
@@ -415,4 +414,3 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         rowFileName.value = textField.text
     }
 }
-

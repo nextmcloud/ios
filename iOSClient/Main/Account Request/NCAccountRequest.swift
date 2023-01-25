@@ -22,7 +22,7 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 
 public protocol NCAccountRequestDelegate: AnyObject {
     func accountRequestAddAccount()
@@ -61,10 +61,13 @@ class NCAccountRequest: UIViewController {
 
         titleLabel.text = NSLocalizedString("_account_select_", comment: "")
 
-        closeButton.setImage(NCUtility.shared.loadImage(named: "xmark", color: NCBrandColor.shared.label), for: .normal)
+        closeButton.setImage(NCUtility.shared.loadImage(named: "xmark", color: .label), for: .normal)
 
         tableView.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 1))
         tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+
+        view.backgroundColor = .secondarySystemBackground
+        tableView.backgroundColor = .secondarySystemBackground
 
         progressView.trackTintColor = .clear
         progressView.progress = 1
@@ -76,8 +79,6 @@ class NCAccountRequest: UIViewController {
 
         NotificationCenter.default.addObserver(self, selector: #selector(startTimer), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationDidBecomeActive), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationDidEnterBackground), object: nil)
-
-        changeTheming()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -100,22 +101,6 @@ class NCAccountRequest: UIViewController {
         super.viewWillDisappear(animated)
 
         timer?.invalidate()
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-
-        changeTheming()
-    }
-
-    // MARK: - Theming
-
-    @objc func changeTheming() {
-
-        view.backgroundColor = NCBrandColor.shared.secondarySystemBackground
-        tableView.backgroundColor = NCBrandColor.shared.secondarySystemBackground
-
-        tableView.reloadData()
     }
 
     // MARK: - Action
@@ -241,11 +226,11 @@ extension NCAccountRequest: UITableViewDataSource {
                    displayName: account.displayName,
                    userBaseUrl: account)
 
-            if account.alias != "" {
-                userLabel?.text = account.alias.uppercased()
-            } else {
+            if account.alias.isEmpty {
                 userLabel?.text = account.user.uppercased()
                 urlLabel?.text = (URL(string: account.urlBase)?.host ?? "")
+            } else {
+                userLabel?.text = account.alias.uppercased()
             }
 
             if account.active {

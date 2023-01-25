@@ -23,8 +23,8 @@
 
 import UIKit
 
-class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProtocol, NCTrashCell {
-    var labelInfo: UILabel?
+class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProtocol, NCTrashCellProtocol {
+    var fileAvatarImageView: UIImageView?
     
 
     @IBOutlet weak var imageItem: UIImageView!
@@ -33,6 +33,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var imageFavorite: UIImageView!
     @IBOutlet weak var imageLocal: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
+    @IBOutlet weak var labelInfo: UILabel?
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
     @IBOutlet weak var progressView: UIProgressView!
@@ -43,35 +44,55 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     weak var delegate: NCGridCellDelegate?
     var namedButtonMore = ""
 
-    var fileAvatarImageView: UIImageView? {
-        get {
-            return nil
-        }
-    }
     var fileObjectId: String? {
-        get {
-            return objectId
-        }
-        set {
-            objectId = newValue ?? ""
-        }
+        get { return objectId }
+        set { objectId = newValue ?? "" }
     }
     var filePreviewImageView: UIImageView? {
-        get {
-            return imageItem
-        }
+        get { return imageItem }
+        set { imageItem = newValue }
     }
     var fileUser: String? {
-        get {
-            return user
-        }
-        set {
-            user = newValue ?? ""
-        }
+        get { return user }
+        set { user = newValue ?? "" }
+    }
+    var fileTitleLabel: UILabel? {
+        get { return labelTitle }
+        set { labelTitle = newValue }
+    }
+    var fileInfoLabel: UILabel? {
+        get { return labelInfo }
+        set { labelInfo = newValue }
+    }
+    var fileProgressView: UIProgressView? {
+        get { return progressView }
+        set { progressView = newValue }
+    }
+    var fileSelectImage: UIImageView? {
+        get { return imageSelect }
+        set { imageSelect = newValue }
+    }
+    var fileStatusImage: UIImageView? {
+        get { return imageStatus }
+        set { imageStatus = newValue }
+    }
+    var fileLocalImage: UIImageView? {
+        get { return imageLocal }
+        set { imageLocal = newValue }
+    }
+    var fileFavoriteImage: UIImageView? {
+        get { return imageFavorite }
+        set { imageFavorite = newValue }
     }
 
     override func awakeFromNib() {
         super.awakeFromNib()
+
+        // use entire cell as accessibility element
+        accessibilityHint = nil
+        accessibilityLabel = nil
+        accessibilityValue = nil
+        isAccessibilityElement = true
 
         imageItem.layer.cornerRadius = 6
         imageItem.layer.masksToBounds = true
@@ -95,11 +116,23 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         longPressedGestureMore.delegate = self
         longPressedGestureMore.delaysTouchesBegan = true
         buttonMore.addGestureRecognizer(longPressedGestureMore)
+        
+//        labelTitle.text = ""
+//        labelInfo.text = ""
+//        labelTitle.textColor = .label
+//        labelInfo.textColor = .systemGray
     }
 
     override func prepareForReuse() {
         super.prepareForReuse()
         imageItem.backgroundColor = nil
+        accessibilityHint = nil
+        accessibilityLabel = nil
+        accessibilityValue = nil
+    }
+
+    override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
+        return nil
     }
 
     @IBAction func touchUpInsideMore(_ sender: Any) {
@@ -114,9 +147,22 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         delegate?.longPressGridItem(with: objectId, gestureRecognizer: gestureRecognizer)
     }
 
+
+    fileprivate func setA11yActions() {
+        let moreName = namedButtonMore == NCGlobal.shared.buttonMoreStop ? "_cancel_" : "_more_"
+        
+        self.accessibilityCustomActions = [
+            UIAccessibilityCustomAction(
+                name: NSLocalizedString(moreName, comment: ""),
+                target: self,
+                selector: #selector(touchUpInsideMore))
+        ]
+    }
+    
     func setButtonMore(named: String, image: UIImage) {
         namedButtonMore = named
         buttonMore.setImage(image, for: .normal)
+        setA11yActions()
     }
 
     func hideButtonMore(_ status: Bool) {
@@ -126,13 +172,20 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     func selectMode(_ status: Bool) {
         if status {
             imageSelect.isHidden = false
+            accessibilityCustomActions = nil
         } else {
             imageSelect.isHidden = true
             imageVisualEffect.isHidden = true
+            setA11yActions()
         }
     }
 
     func selected(_ status: Bool) {
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId), !metadata.isDownloadUpload else {
+            imageSelect.isHidden = true
+            imageVisualEffect.isHidden = true
+            return
+        }
         if status {
             if traitCollection.userInterfaceStyle == .dark {
                 imageVisualEffect.effect = UIBlurEffect(style: .dark)
@@ -147,6 +200,21 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             imageSelect.isHidden = true
             imageVisualEffect.isHidden = true
         }
+    }
+
+    func writeInfoDateSize(date: NSDate, size: Int64) {
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .none
+        dateFormatter.locale = Locale.current
+
+        labelInfo?.text = dateFormatter.string(from: date as Date) + " · " + CCUtility.transformedSize(size)
+    }
+
+    func setAccessibility(label: String, value: String) {
+        accessibilityLabel = label
+        accessibilityValue = value
     }
 }
 
@@ -167,10 +235,12 @@ extension NCGridCellDelegate {
 
 class NCGridLayout: UICollectionViewFlowLayout {
 
-    var heightLabelPlusButton: CGFloat = 45
-    var marginLeftRight: CGFloat = 6
+    var heightLabelPlusButton: CGFloat = 60
+    var marginLeftRight: CGFloat = 10
     var itemForLine: CGFloat = 3
-    var itemWidthDefault: CGFloat = 120
+    var itemWidthDefault: CGFloat = 140
+
+    // MARK: - View Life Cycle
 
     // MARK: - View Life Cycle
 

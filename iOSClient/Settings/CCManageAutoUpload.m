@@ -140,7 +140,21 @@
     [section addFormRow:row];
     
     // Delete asset
+    section = [XLFormSectionDescriptor formSection];
+    [form addFormSection:section];
     
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"removePhotoCameraRoll" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_remove_photo_CameraRoll_", nil)];
+    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
+    row.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
+    if ([CCUtility getRemovePhotoCameraRoll]) row.value = @"1";
+    else row.value = @0;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
+    row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
+
+    [section addFormRow:row];
+    
+    // Auto Upload Background
     section = [XLFormSectionDescriptor formSection];
     [form addFormSection:section];
 
@@ -277,7 +291,7 @@
             
             // Default
             [[NCManageDatabase shared] setAccountAutoUploadFileName:nil];
-            [[NCManageDatabase shared] setAccountAutoUploadDirectory:nil urlBase:appDelegate.urlBase account:appDelegate.account];
+            [[NCManageDatabase shared] setAccountAutoUploadDirectory:nil urlBase:appDelegate.urlBase userId:appDelegate.userId account:appDelegate.account];
             
             // verifichiamo che almeno uno dei servizi (foto video) siano attivi, in caso contrario attiviamo le foto
 
@@ -305,7 +319,7 @@
     
     if ([rowDescriptor.tag isEqualToString:@"removePhotoCameraRoll"]) {
         
-        [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadDeleteAssetLocalIdentifier" state:[[rowDescriptor.value valueData] boolValue]];
+        [CCUtility setRemovePhotoCameraRoll:[[rowDescriptor.value valueData] boolValue]];
     }
     
     if ([rowDescriptor.tag isEqualToString:@"autoUploadBackground"]) {
@@ -432,7 +446,10 @@
     if (activeAccount.autoUploadWWAnVideo)
         [rowAutoUploadWWAnVideo setValue:@1]; else [rowAutoUploadWWAnVideo setValue:@0];
     
-    if (activeAccount.autoUploadDeleteAssetLocalIdentifier)
+    if (activeAccount.autoUploadWWAnVideo)
+        [rowAutoUploadWWAnVideo setValue:@1]; else [rowAutoUploadWWAnVideo setValue:@0];
+
+    if ([CCUtility getRemovePhotoCameraRoll])
            [rowRemovePhotoCameraRoll setValue:@1]; else [rowRemovePhotoCameraRoll setValue:@0];
     
     if (activeAccount.autoUploadBackground)
@@ -478,7 +495,7 @@
 {
     tableAccount *activeAccount = [[NCManageDatabase shared] getActiveAccount];
     NSString *sectionName;
-    NSString *autoUploadPath = [NSString stringWithFormat:@"%@/%@", [[NCManageDatabase shared] getAccountAutoUploadDirectoryWithUrlBase:appDelegate.urlBase account:appDelegate.account], [[NCManageDatabase shared] getAccountAutoUploadFileName]];
+    NSString *autoUploadPath = [NSString stringWithFormat:@"%@/%@", [[NCManageDatabase shared] getAccountAutoUploadDirectoryWithUrlBase:appDelegate.urlBase userId:appDelegate.userId account:appDelegate.account], [[NCManageDatabase shared] getAccountAutoUploadFileName]];
 
     switch (section)
     {
@@ -487,22 +504,26 @@
             break;
         case 1:
 
-            if (activeAccount.autoUpload) sectionName = [NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"_autoupload_current_folder_", nil), [CCUtility returnPathfromServerUrl:autoUploadPath urlBase:appDelegate.urlBase account:appDelegate.account]];
+            if (activeAccount.autoUpload) sectionName = [NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"_autoupload_current_folder_", nil), [CCUtility returnPathfromServerUrl:autoUploadPath urlBase:appDelegate.urlBase userId:appDelegate.userId account:appDelegate.account]];
             else sectionName = @"";
             break;
         case 4:
-            if (activeAccount.autoUpload) sectionName = NSLocalizedString(@"_autoupload_description_background_", nil);
+            if (activeAccount.autoUpload) sectionName = NSLocalizedString(@"_remove_photo_CameraRoll_desc_", nil);
             else sectionName = @"";
             break;
         case 5:
-            if (activeAccount.autoUpload) sectionName =  NSLocalizedString(@"_autoupload_fullphotos_footer_", nil);
+            if (activeAccount.autoUpload) sectionName = NSLocalizedString(@"_autoupload_description_background_", nil);
             else sectionName = @"";
             break;
         case 6:
-            if (activeAccount.autoUpload) sectionName =  NSLocalizedString(@"_autoupload_create_subfolder_footer_", nil);
+            if (activeAccount.autoUpload) sectionName =  NSLocalizedString(@"_autoupload_fullphotos_footer_", nil);
             else sectionName = @"";
             break;
         case 7:
+            if (activeAccount.autoUpload) sectionName =  NSLocalizedString(@"_autoupload_create_subfolder_footer_", nil);
+            else sectionName = @"";
+            break;
+        case 8:
             if (activeAccount.autoUpload) sectionName =  NSLocalizedString(@"_autoupload_filenamemask_footer_", nil);
             else sectionName = @"";
             break;
@@ -514,15 +535,19 @@
 - (void)dismissSelectWithServerUrl:(NSString *)serverUrl metadata:(tableMetadata *)metadata type:(NSString *)type items:(NSArray *)items overwrite:(BOOL)overwrite copy:(BOOL)copy move:(BOOL)move
 {
     if (serverUrl != nil) {
-        
-        if ([serverUrl isEqualToString:[[NCUtilityFileSystem shared] getHomeServerWithAccount:appDelegate.account]]) {
-            [[NCContentPresenter shared] messageNotification:@"_error_" description:@"_autoupload_error_select_folder_" delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError errorCode:NCGlobal.shared.errorInternalError];
+        NSString* home = [[NCUtilityFileSystem shared] getHomeServerWithUrlBase:appDelegate.urlBase userId:appDelegate.userId];
+        if ([serverUrl isEqualToString: [[NCUtilityFileSystem shared] getHomeServerWithUrlBase:appDelegate.urlBase userId:appDelegate.userId]]) {
+            NKError *error = [[NKError alloc] initWithErrorCode:NCGlobal.shared.errorInternalError errorDescription:@"_autoupload_error_select_folder_"];
+            [[NCContentPresenter shared] messageNotification:@"_error_" error:error delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError];
             return;
         }
         
         // Settings new folder Automatatic upload
         [[NCManageDatabase shared] setAccountAutoUploadFileName:serverUrl.lastPathComponent];
-        [[NCManageDatabase shared] setAccountAutoUploadDirectory:[[NCUtilityFileSystem shared] deletingLastPathComponentWithAccount:appDelegate.account serverUrl:serverUrl] urlBase:appDelegate.urlBase account:appDelegate.account];
+        NSString *path = [[NCUtilityFileSystem shared] deleteLastPathWithServerUrlPath:serverUrl home:home];
+        if (path != nil) {
+            [[NCManageDatabase shared] setAccountAutoUploadDirectory:path urlBase:appDelegate.urlBase userId:appDelegate.userId account:appDelegate.account];
+        }
         // Reload
         [self.tableView reloadData];
     }

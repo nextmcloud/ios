@@ -23,7 +23,7 @@
 
 import UIKit
 import WebKit
-import NCCommunication
+import NextcloudKit
 
 class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMessageHandler, NCSelectDelegate {
 
@@ -124,14 +124,13 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
     @objc func favoriteFile(_ notification: NSNotification) {
 
-        if let userInfo = notification.userInfo as NSDictionary? {
-            if let ocId = userInfo["ocId"] as? String, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let ocId = userInfo["ocId"] as? String,
+              ocId == self.metadata.ocId,
+              let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+        else { return }
 
-                if metadata.ocId == self.metadata.ocId {
-                    self.metadata = metadata
-                }
-            }
-        }
+        self.metadata = metadata
     }
 
     @objc func keyboardDidShow(notification: Notification) {
@@ -195,18 +194,19 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
                         NCUtility.shared.startActivityIndicator(backgroundView: view, blurEffect: true)
 
-                        NCCommunication.shared.download(serverUrlFileName: url, fileNameLocalPath: fileNameLocalPath, requestHandler: { _ in
+
+                        NextcloudKit.shared.download(serverUrlFileName: url, fileNameLocalPath: fileNameLocalPath, requestHandler: { _ in
 
                         }, taskHandler: { _ in
 
                         }, progressHandler: { _ in
 
-                        }, completionHandler: { account, _, _, _, allHeaderFields, error, errorCode, errorDescription in
 
-                            NCUtility.shared.stopActivityIndicator()
+                        }, completionHandler: { account, _, _, _, allHeaderFields, afError, error in
 
-                            if errorCode == 0 && account == self.metadata.account {
+                            NCActivityIndicator.shared.stop()
 
+                            if error == .success && account == self.metadata.account {
                                 var item = fileNameLocalPath
 
                                 if let allHeaderFields = allHeaderFields {
@@ -235,7 +235,8 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
                                 }
                             } else {
 
-                                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+
+                                NCContentPresenter.shared.showError(error: error)
                             }
                         })
                     }
@@ -283,14 +284,14 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
         if serverUrl != nil && metadata != nil {
 
-            let path = CCUtility.returnFileNamePath(fromFileName: metadata!.fileName, serverUrl: serverUrl!, urlBase: appDelegate.urlBase, account: metadata!.account)!
+            let path = CCUtility.returnFileNamePath(fromFileName: metadata!.fileName, serverUrl: serverUrl!, urlBase: appDelegate.urlBase, userId: appDelegate.userId, account: metadata!.account)!
 
-            NCCommunication.shared.createAssetRichdocuments(path: path) { account, url, errorCode, errorDescription in
-                if errorCode == 0 && account == self.appDelegate.account {
+            NextcloudKit.shared.createAssetRichdocuments(path: path) { account, url, data, error in
+                if error == .success && account == self.appDelegate.account {
                     let functionJS = "OCA.RichDocuments.documentsMain.postAsset('\(metadata!.fileNameView)', '\(url!)')"
                     self.webView.evaluateJavaScript(functionJS, completionHandler: { _, _ in })
-                } else if errorCode != 0 {
-                    NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
+                } else if error != .success {
+                    NCContentPresenter.shared.showError(error: error)
                 } else {
                     print("[LOG] It has been changed user during networking process, error.")
                 }
@@ -300,14 +301,14 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
     func select(_ metadata: tableMetadata!, serverUrl: String!) {
 
-        let path = CCUtility.returnFileNamePath(fromFileName: metadata!.fileName, serverUrl: serverUrl!, urlBase: appDelegate.urlBase, account: metadata!.account)!
+        let path = CCUtility.returnFileNamePath(fromFileName: metadata!.fileName, serverUrl: serverUrl!, urlBase: appDelegate.urlBase, userId: appDelegate.userId, account: metadata!.account)!
 
-        NCCommunication.shared.createAssetRichdocuments(path: path) { account, url, errorCode, errorDescription in
-            if errorCode == 0 && account == self.appDelegate.account {
+        NextcloudKit.shared.createAssetRichdocuments(path: path) { account, url, data, error in
+            if error == .success && account == self.appDelegate.account {
                 let functionJS = "OCA.RichDocuments.documentsMain.postAsset('\(metadata.fileNameView)', '\(url!)')"
                 self.webView.evaluateJavaScript(functionJS, completionHandler: { _, _ in })
-            } else if errorCode != 0 {
-                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: NCGlobal.shared.errorInternalError)
+            } else if error != .success {
+                NCContentPresenter.shared.showError(error: error)
             } else {
                 print("[LOG] It has been changed user during networking process, error.")
             }
@@ -333,7 +334,7 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        NCUtility.shared.stopActivityIndicator()
+        NCActivityIndicator.shared.stop()
     }
 }
 

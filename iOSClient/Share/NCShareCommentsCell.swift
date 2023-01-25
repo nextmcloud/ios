@@ -22,12 +22,12 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 
 // MARK: - NCShareCommentsCell
 
 class NCShareCommentsCell: UITableViewCell, NCCellProtocol {
-
+    
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var labelUser: UILabel!
     @IBOutlet weak var buttonMenu: UIButton!
@@ -53,9 +53,8 @@ class NCShareCommentsCell: UITableViewCell, NCCellProtocol {
         }
     }
     var fileUser: String? {
-        get {
-            return tableComments?.actorId
-        }
+        get { return tableComments?.actorId }
+        set {}
     }
 
     override func awakeFromNib() {

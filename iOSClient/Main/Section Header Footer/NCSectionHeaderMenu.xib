@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -39,7 +39,7 @@
                                 <color key="titleColor" systemColor="darkTextColor"/>
                             </state>
                             <connections>
-                                <action selector="touchUpInsideOrder:" destination="tys-A2-nDX" eventType="touchUpInside" id="oiL-3O-hMQ"/>
+                                <action selector="touchUpInsideOrder:" destination="tys-A2-nDX" eventType="touchUpInside" id="tkI-la-v8M"/>
                             </connections>
                         </button>
                         <button hidden="YES" opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="D0O-wK-14O" userLabel="buttonSwitch">
@@ -106,7 +106,7 @@
             </constraints>
             <connections>
                 <outlet property="buttonMore" destination="D0O-wK-14O" id="eEx-3R-zCS"/>
-                <outlet property="buttonOrder" destination="0bo-yl-t5k" id="Kbw-BG-73C"/>
+                <outlet property="buttonOrder" destination="0bo-yl-t5k" id="6rg-p9-n5I"/>
                 <outlet property="buttonOrderWidthConstraint" destination="jvv-Ug-l3I" id="E6N-z6-2VC"/>
                 <outlet property="buttonSwitch" destination="1LD-cd-zhc" id="Ec2-cM-CoY"/>
                 <outlet property="separator" destination="LZu-Te-clJ" id="EwO-za-LxT"/>
@@ -120,12 +120,12 @@
     </objects>
     <resources>
         <image name="moreBig" width="50" height="50"/>
-        <image name="switchList" width="25" height="25"/>
+        <image name="switchList" width="36" height="36"/>
         <systemColor name="darkTextColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

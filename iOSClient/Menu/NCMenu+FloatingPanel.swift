@@ -46,7 +46,6 @@ class NCMenuFloatingPanelLayout: FloatingPanelLayout {
         ? min(UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)
         : max(UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)
         let bottomInset = UIApplication.shared.keyWindow?.rootViewController?.view.safeAreaInsets.bottom ?? 0
-
         let panelHeight = CGFloat(actionsHeight) + bottomInset
 
         topInset = max(48, screenHeight - panelHeight)
@@ -77,6 +76,7 @@ class NCMenuPanelController: FloatingPanelController {
         self.isRemovalInteractionEnabled = true
         self.backdropView.dismissalTapGestureRecognizer.isEnabled = true
         self.surfaceView.layer.cornerRadius = 16
+        self.surfaceView.clipsToBounds = true
         surfaceView.grabberHandle.accessibilityLabel = NSLocalizedString("_cart_controller_", comment: "")
 
         let collapseName = NSLocalizedString("_dismiss_menu_", comment: "")
@@ -96,5 +96,4 @@ class NCMenuPanelController: FloatingPanelController {
         DispatchQueue.main.async {
         }
     }
-
 }

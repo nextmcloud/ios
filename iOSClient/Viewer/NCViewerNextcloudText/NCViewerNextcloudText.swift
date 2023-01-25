@@ -44,7 +44,9 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "more")!.image(color: NCBrandColor.shared.label, size: 25), style: .plain, target: self, action: #selector(self.openMenuMore))
+        if !metadata.ocId.hasPrefix("TEMP") {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "more")!.image(color: .label, size: 25), style: .plain, target: self, action: #selector(self.openMenuMore))
+        }
 
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.title = metadata.fileNameView
@@ -117,14 +119,13 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
 
     @objc func favoriteFile(_ notification: NSNotification) {
 
-        if let userInfo = notification.userInfo as NSDictionary? {
-            if let ocId = userInfo["ocId"] as? String, let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let ocId = userInfo["ocId"] as? String,
+              ocId == self.metadata.ocId,
+              let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+        else { return }
 
-                if metadata.ocId == self.metadata.ocId {
-                    self.metadata = metadata
-                }
-            }
-        }
+        self.metadata = metadata
     }
 
     @objc func keyboardDidShow(notification: Notification) {
@@ -195,7 +196,7 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        NCUtility.shared.stopActivityIndicator()
+        NCActivityIndicator.shared.stop()
     }
 }
 

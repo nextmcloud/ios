@@ -35,7 +35,9 @@ extension Array where Element == NCMenuAction {
 class NCMenu: UITableViewController {
 
     var actions = [NCMenuAction]()
-    
+
+    // MARK: - View Life Cycle
+
     static func makeNCMenu(with actions: [NCMenuAction]) -> NCMenu? {
         let menuViewController = UIStoryboard(name: "NCMenu", bundle: nil).instantiateInitialViewController() as? NCMenu
         menuViewController?.actions = actions
@@ -131,27 +133,3 @@ extension NCMenu: FloatingPanelControllerDelegate {
         fpc.dismiss(animated: true, completion: nil)
     }
 }
-
-//public class NCMenuFloatingPanelBehavior: FloatingPanelBehavior {
-//
-//    public func addAnimator(_ fpc: FloatingPanelController, to: FloatingPanelPosition) -> UIViewPropertyAnimator {
-//        return UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut)
-//    }
-//
-//    func floatingPanel(_ fpc: FloatingPanelController, layoutFor newCollection: UITraitCollection) -> FloatingPanelLayout {
-//        return NCMenuFloatingPanelLayout(actionsHeight: self.actions.listHeight)
-//    }
-//
-//    func floatingPanel(_ fpc: FloatingPanelController, animatorForDismissingWith velocity: CGVector) -> UIViewPropertyAnimator {
-//        return UIViewPropertyAnimator(duration: 0.1, curve: .easeInOut)
-//    }
-//
-//    func floatingPanel(_ fpc: FloatingPanelController, animatorForPresentingTo state: FloatingPanelState) -> UIViewPropertyAnimator {
-//        return UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut)
-//    }
-//
-//    func floatingPanelWillEndDragging(_ fpc: FloatingPanelController, withVelocity velocity: CGPoint, targetState: UnsafeMutablePointer<FloatingPanelState>) {
-//        guard velocity.y > 750 else { return }
-//        fpc.dismiss(animated: true, completion: nil)
-//    }
-//}

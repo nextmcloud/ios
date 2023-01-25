@@ -24,7 +24,7 @@
 
 import UIKit
 import RealmSwift
-import NCCommunication
+import NextcloudKit
 
 protocol DateCompareable {
     var dateKey: Date { get }
@@ -39,7 +39,6 @@ class tableAccount: Object, NCUserBaseUrl {
     @objc dynamic var autoUpload: Bool = false
     @objc dynamic var autoUploadBackground: Bool = false
     @objc dynamic var autoUploadCreateSubfolder: Bool = false
-    @objc dynamic var autoUploadDeleteAssetLocalIdentifier: Bool = false
     @objc dynamic var autoUploadDirectory = ""
     @objc dynamic var autoUploadFileName = ""
     @objc dynamic var autoUploadFull: Bool = false
@@ -139,8 +138,11 @@ class tableActivity: Object, DateCompareable {
 }
 
 class tableActivityLatestId: Object {
-    @objc dynamic var account = ""
     @objc dynamic var mostRecentlyLoadedActivityId: Int = 0
+    @objc dynamic var account = ""
+    @objc dynamic var activityFirstKnown: Int = 0
+    @objc dynamic var activityLastGiven: Int = 0
+
     override static func primaryKey() -> String {
         return "account"
     }
@@ -249,6 +251,29 @@ class tableDirectEditingCreators: Object {
     @objc dynamic var templates: Int = 0
 }
 
+class tableDashboardWidget: Object {
+    
+    @Persisted(primaryKey: true) var index = ""
+    @Persisted var account = ""
+    @Persisted var id = ""
+    @Persisted var title = ""
+    @Persisted var order: Int = 0
+    @Persisted var iconClass: String?
+    @Persisted var iconUrl: String?
+    @Persisted var widgetUrl: String?
+    @Persisted var itemIconsRound: Bool = false
+}
+
+class tableDashboardWidgetButton: Object {
+
+    @Persisted(primaryKey: true) var index = ""
+    @Persisted var account = ""
+    @Persisted var id = ""
+    @Persisted var type = ""
+    @Persisted var text = ""
+    @Persisted var link = ""
+}
+
 class tableDirectEditingEditors: Object {
 
     @objc dynamic var account = ""
@@ -262,6 +287,7 @@ class tableDirectEditingEditors: Object {
 class tableDirectory: Object {
 
     @objc dynamic var account = ""
+    @objc dynamic var colorFolder: String?
     @objc dynamic var e2eEncrypted: Bool = false
     @objc dynamic var etag = ""
     @objc dynamic var favorite: Bool = false
@@ -353,6 +379,15 @@ class tableLocalFile: Object {
 
 class tableMetadata: Object, NCUserBaseUrl {
 
+    override func isEqual(_ object: Any?) -> Bool {
+        if let object = object as? tableMetadata {
+            return self.fileId == object.fileId && self.account == object.account
+                   && self.path == object.path && self.fileName == object.fileName
+        } else {
+            return false
+        }
+    }
+
     @objc dynamic var account = ""
     @objc dynamic var assetLocalIdentifier = ""
     @objc dynamic var checksums = ""
@@ -378,8 +413,11 @@ class tableMetadata: Object, NCUserBaseUrl {
     @objc dynamic var fileNameWithoutExt = ""
     @objc dynamic var hasPreview: Bool = false
     @objc dynamic var iconName = ""
+    @objc dynamic var iconUrl = ""
+    @objc dynamic var isExtractFile: Bool = false
     @objc dynamic var livePhoto: Bool = false
     @objc dynamic var mountType = ""
+    @objc dynamic var name = ""                                             // for unifiedSearch is the provider.id
     @objc dynamic var note = ""
     @objc dynamic var ocId = ""
     @objc dynamic var ownerId = ""
@@ -407,6 +445,7 @@ class tableMetadata: Object, NCUserBaseUrl {
     let shareType = List<Int>()
     @objc dynamic var size: Int64 = 0
     @objc dynamic var status: Int = 0
+    @objc dynamic var subline: String?
     @objc dynamic var trashbinFileName = ""
     @objc dynamic var trashbinOriginalLocation = ""
     @objc dynamic var trashbinDeletionTime = NSDate()
@@ -423,11 +462,23 @@ class tableMetadata: Object, NCUserBaseUrl {
 
 extension tableMetadata {
     var fileExtension: String { (fileNameView as NSString).pathExtension }
-
+    
     var isPrintable: Bool {
-        classFile == NCCommunicationCommon.typeClassFile.image.rawValue || ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/")
+        classFile == NKCommon.typeClassFile.image.rawValue || ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/")
     }
-
+    
+    var isDownloadUpload: Bool {
+        status == NCGlobal.shared.metadataStatusInDownload || status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusInUpload || status == NCGlobal.shared.metadataStatusUploading
+    }
+    
+    var isDownload: Bool {
+        status == NCGlobal.shared.metadataStatusInDownload || status == NCGlobal.shared.metadataStatusDownloading
+    }
+    
+    var isUpload: Bool {
+        status == NCGlobal.shared.metadataStatusInUpload || status == NCGlobal.shared.metadataStatusUploading
+    }
+    
     /// Returns false if the user is lokced out of the file. I.e. The file is locked but by somone else
     func canUnlock(as user: String) -> Bool {
         return !lock || (lockOwner == user && lockOwnerType == 0)
@@ -448,7 +499,8 @@ class tablePhotoLibrary: Object {
     }
 }
 
-class tableShare: Object {
+typealias tableShare = tableShareV2
+class tableShareV2: Object {
 
     @objc dynamic var account = ""
     @objc dynamic var canEdit: Bool = false
@@ -473,6 +525,7 @@ class tableShare: Object {
     @objc dynamic var password: String = ""
     @objc dynamic var path = ""
     @objc dynamic var permissions: Int = 0
+    @objc dynamic var primaryKey = ""
     @objc dynamic var sendPasswordByTalk: Bool = false
     @objc dynamic var serverUrl = ""
     @objc dynamic var shareType: Int = 0
@@ -490,7 +543,7 @@ class tableShare: Object {
     @objc dynamic var userStatus = ""
 
     override static func primaryKey() -> String {
-        return "idShare"
+        return "primaryKey"
     }
     
     func setPermission(value: Int) {

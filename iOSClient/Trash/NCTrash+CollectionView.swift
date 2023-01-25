@@ -107,9 +107,10 @@ extension NCTrash: UICollectionViewDataSource {
             }
         }
 
-        var cell: NCTrashCell & UICollectionViewCell
 
-        if collectionView.collectionViewLayout == listLayout {
+        var cell: NCTrashCellProtocol & UICollectionViewCell
+
+        if layoutForView?.layout == NCGlobal.shared.layoutList {
             guard let listCell = collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as? NCTrashListCell else { return UICollectionViewCell() }
             listCell.delegate = self
             cell = listCell
@@ -129,16 +130,57 @@ extension NCTrash: UICollectionViewDataSource {
 
         return cell
     }
-}
+
+
+    func setTextFooter(datasource: [tableTrash]) -> String {
+
+        var folders: Int = 0, foldersText = ""
+        var files: Int = 0, filesText = ""
+        var size: Int64 = 0
+        var text = ""
+
+        for record: tableTrash in datasource {
+            if record.directory {
+                folders += 1
+            } else {
+                files += 1
+                size += record.size
+            }
+        }
+
+        if folders > 1 {
+            foldersText = "\(folders) " + NSLocalizedString("_folders_", comment: "")
+        } else if folders == 1 {
+            foldersText = "1 " + NSLocalizedString("_folder_", comment: "")
+        }
+
+        if files > 1 {
+            filesText = "\(files) " + NSLocalizedString("_files_", comment: "") + " " + CCUtility.transformedSize(size)
+        } else if files == 1 {
+            filesText = "1 " + NSLocalizedString("_file_", comment: "") + " " + CCUtility.transformedSize(size)
+        }
+
+        if foldersText.isEmpty {
+            text = filesText
+        } else if filesText.isEmpty {
+            text = foldersText
+        } else {
+            text = foldersText + ", " + filesText
+        }
+
+        return text
+    }
+
+   }
 
 // MARK: UICollectionViewDelegateFlowLayout
 extension NCTrash: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: highHeader)
+        return CGSize(width: collectionView.frame.width, height: 50)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: highHeader)
+        return CGSize(width: collectionView.frame.width, height: NCGlobal.shared.endHeightFooter)
     }
 }

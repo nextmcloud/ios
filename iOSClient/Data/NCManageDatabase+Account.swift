@@ -23,7 +23,7 @@
 
 import Foundation
 import RealmSwift
-import NCCommunication
+import NextcloudKit
 
 extension NCManageDatabase {
 
@@ -36,7 +36,7 @@ extension NCManageDatabase {
         let realm = try! Realm()
 
         do {
-            try realm.safeWrite {
+            try realm.write {
                 let addObject = tableAccount()
 
                 addObject.account = account
@@ -59,7 +59,7 @@ extension NCManageDatabase {
                 realm.add(addObject, update: .all)
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
@@ -68,11 +68,11 @@ extension NCManageDatabase {
         let realm = try! Realm()
 
         do {
-            try realm.safeWrite {
+            try realm.write {
                 realm.add(account, update: .all)
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
@@ -81,13 +81,13 @@ extension NCManageDatabase {
         let realm = try! Realm()
 
         do {
-            try realm.safeWrite {
+            try realm.write {
                 let result = realm.objects(tableAccount.self).filter("account == %@", account)
 
                 realm.delete(result)
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
@@ -161,7 +161,7 @@ extension NCManageDatabase {
         }
     }
 
-    @objc func getAccountAutoUploadDirectory(urlBase: String, account: String) -> String {
+    @objc func getAccountAutoUploadDirectory(urlBase: String, userId: String, account: String) -> String {
 
         let realm = try! Realm()
 
@@ -172,19 +172,19 @@ extension NCManageDatabase {
         if result.autoUploadDirectory.count > 0 {
             // FIX change webdav -> /dav/files/
             if result.autoUploadDirectory.contains("/webdav") {
-                return NCUtilityFileSystem.shared.getHomeServer(account: account)
+                return NCUtilityFileSystem.shared.getHomeServer(urlBase: urlBase, userId: userId)
             } else {
                 return result.autoUploadDirectory
             }
         } else {
-            return NCUtilityFileSystem.shared.getHomeServer(account: account)
+            return NCUtilityFileSystem.shared.getHomeServer(urlBase: urlBase, userId: userId)
         }
     }
 
-    @objc func getAccountAutoUploadPath(urlBase: String, account: String) -> String {
+    @objc func getAccountAutoUploadPath(urlBase: String, userId: String, account: String) -> String {
 
         let cameraFileName = self.getAccountAutoUploadFileName()
-        let cameraDirectory = self.getAccountAutoUploadDirectory(urlBase: urlBase, account: account)
+        let cameraDirectory = self.getAccountAutoUploadDirectory(urlBase: urlBase, userId: userId, account: account)
 
         let folderPhotos = CCUtility.stringAppendServerUrl(cameraDirectory, addFileName: cameraFileName)!
 
@@ -198,7 +198,7 @@ extension NCManageDatabase {
         var accountReturn = tableAccount()
 
         do {
-            try realm.safeWrite {
+            try realm.write {
 
                 let results = realm.objects(tableAccount.self)
                 for result in results {
@@ -211,7 +211,7 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
             return nil
         }
 
@@ -223,14 +223,14 @@ extension NCManageDatabase {
         let realm = try! Realm()
 
         do {
-            try realm.safeWrite {
+            try realm.write {
 
                 if let result = realm.objects(tableAccount.self).filter("account == %@", account).first {
                     result.password = "********"
                 }
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
@@ -239,7 +239,7 @@ extension NCManageDatabase {
         let realm = try! Realm()
 
         do {
-            try realm.safeWrite {
+            try realm.write {
                 if let result = realm.objects(tableAccount.self).filter("active == true").first {
                     if (tableAccount().objectSchema.properties.contains { $0.name == property }) {
                         result[property] = state
@@ -247,7 +247,7 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
@@ -256,7 +256,7 @@ extension NCManageDatabase {
         let realm = try! Realm()
 
         do {
-            try realm.safeWrite {
+            try realm.write {
                 if let result = realm.objects(tableAccount.self).filter("active == true").first {
                     if let fileName = fileName {
                         result.autoUploadFileName = fileName
@@ -266,30 +266,31 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
-    @objc func setAccountAutoUploadDirectory(_ serverUrl: String?, urlBase: String, account: String) {
+    @objc func setAccountAutoUploadDirectory(_ serverUrl: String?, urlBase: String, userId: String, account: String) {
 
         let realm = try! Realm()
 
         do {
-            try realm.safeWrite {
+            try realm.write {
                 if let result = realm.objects(tableAccount.self).filter("active == true").first {
                     if let serverUrl = serverUrl {
                         result.autoUploadDirectory = serverUrl
                     } else {
-                        result.autoUploadDirectory = self.getAccountAutoUploadDirectory(urlBase: urlBase, account: account)
+                        result.autoUploadDirectory = self.getAccountAutoUploadDirectory(urlBase: urlBase, userId: userId, account: account)
                     }
                 }
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
-    @objc func setAccountUserProfile(_ userProfile: NCCommunicationUserProfile) -> tableAccount? {
+    
+    @objc func setAccountUserProfile(_ userProfile: NKUserProfile) -> tableAccount? {
 
         let realm = try! Realm()
 
@@ -300,7 +301,7 @@ extension NCManageDatabase {
                 return nil
             }
 
-            try realm.safeWrite {
+            try realm.write {
 
                 guard let result = realm.objects(tableAccount.self).filter("account == %@", activeAccount.account).first else {
                     return
@@ -333,7 +334,7 @@ extension NCManageDatabase {
                 returnAccount = result
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
 
         return tableAccount.init(value: returnAccount)
@@ -350,7 +351,7 @@ extension NCManageDatabase {
                 return nil
             }
 
-            try realm.safeWrite {
+            try realm.write {
 
                 guard let result = realm.objects(tableAccount.self).filter("account == %@", activeAccount.account).first else {
                     return
@@ -367,79 +368,23 @@ extension NCManageDatabase {
                 returnAccount = result
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
 
         return tableAccount.init(value: returnAccount)
     }
-
-    /*
-    #if !EXTENSION
-    @objc func setAccountHCFeatures(_ features: HCFeatures) -> tableAccount? {
-        
-        let realm = try! Realm()
-        
-        var returnAccount = tableAccount()
-
-        do {
-            guard let account = self.getAccountActive() else {
-                return nil
-            }
-            
-            try realm.write {
-                
-                guard let result = realm.objects(tableAccount.self).filter("account == %@", account.account).first else {
-                    return
-                }
-                
-                result.hcIsTrial = features.isTrial
-                result.hcTrialExpired = features.trialExpired
-                result.hcTrialRemainingSec = features.trialRemainingSec
-                if features.trialEndTime > 0 {
-                    result.hcTrialEndTime = Date(timeIntervalSince1970: features.trialEndTime) as NSDate
-                } else {
-                    result.hcTrialEndTime = nil
-                }
-                
-                result.hcAccountRemoveExpired = features.accountRemoveExpired
-                result.hcAccountRemoveRemainingSec = features.accountRemoveRemainingSec
-                if features.accountRemoveTime > 0 {
-                    result.hcAccountRemoveTime = Date(timeIntervalSince1970: features.accountRemoveTime) as NSDate
-                } else {
-                    result.hcAccountRemoveTime = nil
-                }
-                
-                result.hcNextGroupExpirationGroup = features.nextGroupExpirationGroup
-                result.hcNextGroupExpirationGroupExpired = features.nextGroupExpirationGroupExpired
-                if features.nextGroupExpirationExpiresTime > 0 {
-                    result.hcNextGroupExpirationExpiresTime = Date(timeIntervalSince1970: features.nextGroupExpirationExpiresTime) as NSDate
-                } else {
-                    result.hcNextGroupExpirationExpiresTime = nil
-                }
-                result.hcNextGroupExpirationExpires = features.nextGroupExpirationExpires
-                
-                returnAccount = result
-            }
-        } catch let error {
-            print("[LOG] Could not write to database: ", error)
-        }
-        
-        return tableAccount.init(value: returnAccount)
-    }
-    #endif
-    */
 
     @objc func setAccountMediaPath(_ path: String, account: String) {
 
         let realm = try! Realm()
         do {
-            try realm.safeWrite {
+            try realm.write {
                 if let result = realm.objects(tableAccount.self).filter("account == %@", account).first {
                     result.mediaPath = path
                 }
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
@@ -447,7 +392,7 @@ extension NCManageDatabase {
 
         let realm = try! Realm()
         do {
-            try realm.safeWrite {
+            try realm.write {
                 if let result = realm.objects(tableAccount.self).filter("account == %@", account).first {
                     result.userStatusClearAt = userStatusClearAt
                     result.userStatusIcon = userStatusIcon
@@ -459,7 +404,7 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 
@@ -469,7 +414,7 @@ extension NCManageDatabase {
         let alias = alias?.trimmingCharacters(in: .whitespacesAndNewlines)
 
         do {
-            try realm.safeWrite {
+            try realm.write {
                 if let result = realm.objects(tableAccount.self).filter("active == true").first {
                     if let alias = alias {
                         result.alias = alias
@@ -479,10 +424,10 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
-
+    
     @objc func setAccountColorFiles(lightColorBackground: String, darkColorBackground: String) {
 
         let realm = try! Realm()
@@ -495,7 +440,7 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NCCommunicationCommon.shared.writeLog("Could not write to database: \(error)")
+            NKCommon.shared.writeLog("Could not write to database: \(error)")
         }
     }
 }

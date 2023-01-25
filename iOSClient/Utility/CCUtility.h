@@ -81,10 +81,7 @@
 
 + (BOOL)getOriginalFileName:(NSString *)key;
 + (void)setOriginalFileName:(BOOL)value key:(NSString *)key;
-
-+ (void)setOriginalFileNamePrefsChanged:(BOOL)value key:(NSString *)key;
 + (BOOL)getOriginalFileNamePrefsChanged:(NSString *)key;
-
 + (NSString *)getFileNameMask:(NSString *)key;
 + (void)setFileNameMask:(NSString *)mask key:(NSString *)key;
 
@@ -194,6 +191,9 @@
 + (BOOL)getRemovePhotoCameraRoll;
 + (void)setRemovePhotoCameraRoll:(BOOL)set;
 
++ (BOOL)getPlayerPlay;
++ (void)setPlayerPlay:(BOOL)set;
+
 // ===== Varius =====
 
 + (BOOL)addSkipBackupAttributeToItemAtURL:(NSURL *)URL;
@@ -230,7 +230,9 @@
 + (NSString *)getDirectoryProviderStorageIconOcId:(NSString *)ocId etag:(NSString *)etag;
 + (NSString *)getDirectoryProviderStoragePreviewOcId:(NSString *)ocId etag:(NSString *)etag;
 + (BOOL)fileProviderStorageExists:(tableMetadata *)metadata;
+
 + (BOOL)fileProviderStorageExists:(NSString *)ocId fileNameView:(NSString *)fileNameView;
+
 + (int64_t)fileProviderStorageSize:(NSString *)ocId fileNameView:(NSString *)fileNameView;
 + (BOOL)fileProviderStoragePreviewIconExists:(NSString *)ocId etag:(NSString *)etag;
 
@@ -248,9 +250,8 @@
 + (void)removeFileAtPath:(NSString *)atPath;
 + (void)createDirectoryAtPath:(NSString *)atPath;
 
-+ (NSString *)returnPathfromServerUrl:(NSString *)serverUrl urlBase:(NSString *)urlBase account:(NSString *)account;
-+ (NSString *)returnFileNamePathFromFileName:(NSString *)metadataFileName serverUrl:(NSString *)serverUrl urlBase:(NSString *)urlBase account:(NSString *)account;
-+ (NSArray *)createNameSubFolder:(NSArray *)assets;
++ (NSString *)returnPathfromServerUrl:(NSString *)serverUrl urlBase:(NSString *)urlBase userId:(NSString *)userId account:(NSString *)account;
++ (NSString *)returnFileNamePathFromFileName:(NSString *)metadataFileName serverUrl:(NSString *)serverUrl urlBase:(NSString *)urlBase userId:(NSString *)userId account:(NSString *)account;
 
 + (NSString *)getDirectoryScan;
 
@@ -262,7 +263,7 @@
 // ===== E2E Encrypted =====
 
 + (NSString *)generateRandomIdentifier;
-+ (BOOL)isFolderEncrypted:(NSString *)serverUrl e2eEncrypted:(BOOL)e2eEncrypted account:(NSString *)account urlBase:(NSString *)urlBase;
++ (BOOL)isFolderEncrypted:(NSString *)serverUrl e2eEncrypted:(BOOL)e2eEncrypted account:(NSString *)account urlBase:(NSString *)urlBase userId:(NSString *)userId;
 
 // ===== Share Permissions =====
 

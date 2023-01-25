@@ -24,10 +24,8 @@
 #import "CCAdvanced.h"
 #import "CCUtility.h"
 #import "NSNotificationCenter+MainThread.h"
-#import <KTVHTTPCache/KTVHTTPCache.h>
 #import "NCBridgeSwift.h"
 #import "AdjustHelper.h"
-
 
 @interface CCAdvanced ()
 {
@@ -65,11 +63,11 @@
 
     [section addFormRow:row];
     
-    // Format Compatibility + Live Photo
+    // Format Compatibility + Live Photo + Delete asset
     
     section = [XLFormSectionDescriptor formSection];
     [form addFormSection:section];
-    section.footerTitle = [NSString stringWithFormat:@"%@\n%@", NSLocalizedString(@"_format_compatibility_footer_", nil), NSLocalizedString(@"_upload_mov_livephoto_footer_", nil)];
+    section.footerTitle = [NSString stringWithFormat:@"%@\n%@\n%@", NSLocalizedString(@"_format_compatibility_footer_", nil), NSLocalizedString(@"_upload_mov_livephoto_footer_", nil), NSLocalizedString(@"_remove_photo_CameraRoll_desc_", nil)];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"formatCompatibility" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_format_compatibility_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
@@ -129,7 +127,6 @@
         [form addFormSection:section];
         section.footerTitle = NSLocalizedString(@"_disable_files_app_footer_", nil);
 
-        
         // Disable Files App
 
         //custom cell
@@ -155,7 +152,6 @@
         row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
 
         [section addFormRow:row];
-
     }
     
 //=======
@@ -209,6 +205,7 @@
 
         //[section addFormRow:row];
     
+
     // Section : Privacy --------------------------------------------------------------
 
     if (!NCBrandOptions.shared.disable_crash_service) {
@@ -225,7 +222,6 @@
         row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
         if ([CCUtility getDisableCrashservice]) row.value = @"1";
         else row.value = @"0";
-        
         [section addFormRow:row];
     }
     
@@ -398,6 +394,7 @@
     
     self.tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground;
     adjust = [[AdjustHelper alloc] init];
+
     [self initializeForm];
     [self calculateSize];
 }
@@ -429,17 +426,12 @@
         
         [CCUtility setLivePhoto:[[rowDescriptor.value valueData] boolValue]];
     }
-    
-    if ([rowDescriptor.tag isEqualToString:@"disableLocalCacheAfterUpload"]) {
-        
-        [CCUtility setDisableLocalCacheAfterUpload:[[rowDescriptor.value valueData] boolValue]];
+
+    if ([rowDescriptor.tag isEqualToString:@"removePhotoCameraRoll"]) {
+
+        [CCUtility setRemovePhotoCameraRoll:[[rowDescriptor.value valueData] boolValue]];
     }
-    
-    if ([rowDescriptor.tag isEqualToString:@"automaticDownloadImage"]) {
-        
-        [CCUtility setAutomaticDownloadImage:[[rowDescriptor.value valueData] boolValue]];
-    }
-    
+
     if ([rowDescriptor.tag isEqualToString:@"disablefilesapp"]) {
         
         [CCUtility setDisableFilesApp:[[rowDescriptor.value valueData] boolValue]];
@@ -462,7 +454,19 @@
         
         NSInteger levelLog = [[rowDescriptor.value valueData] intValue];
         [CCUtility setLogLevel:levelLog];
-        [[NCCommunicationCommon shared] setLevelLog:levelLog];
+        [[NKCommon shared] setLevelLog:levelLog];
+    }
+    
+    if ([rowDescriptor.tag isEqualToString:@"chunk"]) {
+        
+        NSInteger chunkSize = [[rowDescriptor.value valueData] intValue];
+        [CCUtility setChunkSize:chunkSize];
+    }
+    
+    if ([rowDescriptor.tag isEqualToString:@"deleteoldfiles"]) {
+        
+        NSInteger days = [[rowDescriptor.value valueData] intValue];
+        [CCUtility setCleanUpDay:days];
     }
     
     if ([rowDescriptor.tag isEqualToString:@"chunk"]) {
@@ -488,15 +492,16 @@
     
     [[NSURLCache sharedURLCache] setMemoryCapacity:0];
     [[NSURLCache sharedURLCache] setDiskCapacity:0];
-    [KTVHTTPCache cacheDeleteAllCaches];
     
     [[NCManageDatabase shared] clearDatabaseWithAccount:appDelegate.account removeAccount:false];
     
     [CCUtility removeGroupDirectoryProviderStorage];
     [CCUtility removeGroupLibraryDirectory];
-    
+
     [CCUtility removeDocumentsDirectory];
     [CCUtility removeTemporaryDirectory];
+
+    [[NCKTVHTTPCache shared] deleteAllCache];
     
     [CCUtility createDirectoryStandard];
 
@@ -542,7 +547,6 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-
 - (void)calculateSize
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -570,7 +574,6 @@
         [adjust trackEvent:Logout];
         [[NSURLCache sharedURLCache] setMemoryCapacity:0];
         [[NSURLCache sharedURLCache] setDiskCapacity:0];
-        [KTVHTTPCache cacheDeleteAllCaches];
 
         [CCUtility removeGroupDirectoryProviderStorage];
         [CCUtility removeGroupApplicationSupport];

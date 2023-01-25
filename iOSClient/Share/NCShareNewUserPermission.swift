@@ -9,7 +9,7 @@
 
 import UIKit
 import FSCalendar
-import NCCommunication
+import NextcloudKit
 import SVGKit
 
 class NCShareNewUserPermission: UIViewController, UIGestureRecognizerDelegate, NCShareNetworkingDelegate, FSCalendarDelegate, FSCalendarDelegateAppearance, CellPermissionEditDelegate, UITextFieldDelegate {

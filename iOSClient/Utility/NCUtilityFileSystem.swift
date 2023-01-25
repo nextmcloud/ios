@@ -166,29 +166,43 @@ class NCUtilityFileSystem: NSObject {
 
     // MARK: - 
 
-    @objc func getWebDAV(account: String) -> String {
-        // return NCManageDatabase.shared.getCapabilitiesServerString(account: account, elements: NCElementsJSON.shared.capabilitiesWebDavRoot) ?? "remote.php/webdav"
-        return "remote.php/dav"
+
+    @objc func getHomeServer(urlBase: String, userId: String) -> String {
+        return urlBase + "/remote.php/dav/files/" + userId
     }
 
-    @objc func getHomeServer(account: String) -> String {
-        var home = self.getWebDAV(account: account)
-        if let tableAccount = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", account)) {
-            home = tableAccount.urlBase + "/" + self.getWebDAV(account: account) + "/files/" + tableAccount.userId
+    @objc func getPath(path: String, user: String, fileName: String? = nil) -> String {
+
+        var path = path.replacingOccurrences(of: "/remote.php/dav/files/" + user, with: "")
+        if let fileName = fileName {
+            path += fileName
         }
-        return home
+        return path
     }
 
     @objc func getPath(metadata: tableMetadata) -> String {
 
         return metadata.path.replacingOccurrences(of: "/remote.php/dav/files/"+metadata.user, with: "") + metadata.fileName
     }
+    
+    @objc func deleteLastPath(serverUrlPath: String, home: String? = nil) -> String? {
 
-    @objc func deletingLastPathComponent(account: String, serverUrl: String) -> String {
-        if getHomeServer(account: account) == serverUrl { return serverUrl }
-        let fileName = (serverUrl as NSString).lastPathComponent
-        let serverUrl = serverUrl.replacingOccurrences(of: "/"+fileName, with: "", options: String.CompareOptions.backwards, range: nil)
-        return serverUrl
+        var returnString: String?
+
+        if home == serverUrlPath {
+            return serverUrlPath
+        }
+        
+        if let serverUrlPath = serverUrlPath.urlEncoded, let url = URL(string: serverUrlPath) {
+            if let path = url.deletingLastPathComponent().absoluteString.removingPercentEncoding {
+                if path.last == "/" {
+                    returnString = String(path.dropLast())
+                } else {
+                    returnString = path
+                }
+            }
+        }
+        return returnString
     }
 
     @objc func createFileName(_ fileName: String, serverUrl: String, account: String) -> String {

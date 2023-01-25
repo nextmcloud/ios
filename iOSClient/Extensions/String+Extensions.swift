@@ -69,6 +69,13 @@ extension String {
 
         return digestData.map { String(format: "%02hhx", $0) }.joined()
     }
+    
+    var urlEncoded: String? {
+        // +        for historical reason, most web servers treat + as a replacement of whitespace
+        // ?, &     mark query pararmeter which should not be part of a url string, but added seperately
+        let urlAllowedCharSet = CharacterSet.urlQueryAllowed.subtracting(["+", "?", "&"])
+        return addingPercentEncoding(withAllowedCharacters: urlAllowedCharSet)
+    }
 }
 
 extension Date {
@@ -77,4 +84,8 @@ extension Date {
    var dayAfter: Date {
       return Calendar.current.date(byAdding: .day, value: 1, to: Date())!
    }
+}
+
+extension StringProtocol {
+    var firstUppercased: String { lowercased().prefix(1).uppercased() + dropFirst() }
 }

@@ -22,8 +22,9 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+
 import Foundation
-import NCCommunication
+import NextcloudKit
 import Realm
 import UIKit
 
@@ -35,6 +36,7 @@ extension RealmSwiftObject {
 }
 
 protocol NCSelectableNavigationView: AnyObject {
+
     var appDelegate: AppDelegate { get }
     var selectableDataSource: [RealmSwiftObject] { get }
     var collectionView: UICollectionView! { get set }
@@ -44,7 +46,8 @@ protocol NCSelectableNavigationView: AnyObject {
     var navigationItem: UINavigationItem { get }
     var selectActions: [NCMenuAction] { get }
 
-    func reloadDataSource()
+    func reloadDataSource(forced: Bool)
+
     func setNavigationItem()
 
     func tapSelectMenu()
@@ -52,8 +55,11 @@ protocol NCSelectableNavigationView: AnyObject {
 }
 
 extension NCSelectableNavigationView {
-    func setNavigationItem() { setNavigationHeader() }
-    
+
+    func setNavigationItem() {
+        setNavigationHeader()
+    }
+
     func setNavigationHeader() {
         if isEditMode {
             navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "navigationMore"), style: .plain, action: tapSelectMenu)
@@ -102,10 +108,10 @@ extension NCSelectableNavigationView where Self: UIViewController {
         for ocId in selectOcId {
             guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
             selectedMetadatas.append(metadata)
-            if [NCCommunicationCommon.typeClassFile.image.rawValue, NCCommunicationCommon.typeClassFile.video.rawValue].contains(metadata.classFile) {
+
+            if [NKCommon.typeClassFile.image.rawValue, NKCommon.typeClassFile.video.rawValue].contains(metadata.classFile) {
                 selectedMediaMetadatas.append(metadata)
             }
-
             if metadata.directory { isAnyFolder = true }
             if metadata.lock {
                 isAnyLocked = true
@@ -133,7 +139,8 @@ extension NCSelectableNavigationView where Self: UIViewController {
             actions.append(.saveMediaAction(selectedMediaMetadatas: selectedMediaMetadatas, completion: tapSelect))
         }
         actions.append(.setAvailableOfflineAction(selectedMetadatas: selectedMetadatas, isAnyOffline: isAnyOffline, viewController: self, completion: {
-            self.reloadDataSource()
+
+            self.reloadDataSource(forced: true)
             self.tapSelect()
         }))
 

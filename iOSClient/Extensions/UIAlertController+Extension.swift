@@ -22,6 +22,7 @@
 //
 
 import UIKit
+import NextcloudKit
 
 extension UIAlertController {
     /// Creates a alert controller with a textfield, asking to create a new folder
@@ -30,20 +31,23 @@ extension UIAlertController {
     ///   - urlBase: UrlBase object
     ///   - completion: If not` nil` it overrides the default behavior which shows an error using `NCContentPresenter`
     /// - Returns: The presentable alert controller
-    static func createFolder(serverUrl: String, urlBase: NCUserBaseUrl, completion: ((_ errorCode: Int, _ errorDescription: String) -> Void)? = nil) -> UIAlertController {
+    static func createFolder(serverUrl: String, urlBase: NCUserBaseUrl,markE2ee: Bool = false, completion: ((_ error: NKError) -> Void)? = nil) -> UIAlertController {
         let alertController = UIAlertController(title: NSLocalizedString("_create_folder_", comment: ""), message: nil, preferredStyle: .alert)
 
         let okAction = UIAlertAction(title: NSLocalizedString("_save_", comment: ""), style: .default, handler: { _ in
             guard let fileNameFolder = alertController.textFields?.first?.text else { return }
-            NCUtility.shared.startActivityIndicator(backgroundView: nil, blurEffect: true)
-            NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: serverUrl, account: urlBase.account, urlBase: urlBase.urlBase, overwrite: false) { errorCode, errorDescription in
-                NCUtility.shared.stopActivityIndicator()
-                if let completion = completion {
-                    completion(errorCode, errorDescription)
-                } else if errorCode != 0 {
-                    NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+            if markE2ee {
+                UIAlertController.createEncryptedFolder(serverUrl: serverUrl, urlBase: urlBase, fileNameFolder: fileNameFolder) { error in
+                    completion?(error)
+                }} else {
+                    NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: serverUrl, account: urlBase.account, urlBase: urlBase.urlBase, userId: urlBase.userId, overwrite: false) { error in
+                        if let completion = completion {
+                            completion(error)
+                        } else if error != .success {
+                            NCContentPresenter.shared.showError(error: error)
+                        } // else: successful, no action
+                    }
                 }
-            }
         })
 
         // text field is initially empty, no action
@@ -88,6 +92,48 @@ extension UIAlertController {
             textField.isSecureTextEntry = true
             textField.placeholder = NSLocalizedString("_password_", comment: "")
         }, completion: completion)
-
+        
+    }
+    
+    
+    /// To Create an Encrypted folder when you click on + button
+    /// - Parameters:
+    ///   - serverUrl: Server url of the location where the folder should be created
+    ///   - urlBase: UrlBase object
+    ///   - fileNameFolder: saves the name of the encrypted folder
+    ///   - completion: It shows an error message
+    static func createEncryptedFolder(serverUrl: String, urlBase: NCUserBaseUrl,fileNameFolder:String, completion: (_ error: NKError) -> Void){
+        
+        
+        let serverUrlFileName = serverUrl + "/" + fileNameFolder
+        var errors = NKError()
+        let options = NKRequestOptions(queue: NKCommon.shared.backgroundQueue)
+        NextcloudKit.shared.createFolder(serverUrlFileName, options: options) { _, _, _, error in
+            if error != .success {
+                errors = error
+            } else {
+                NextcloudKit.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "1", showHiddenFiles: CCUtility.getShowHiddenFiles(), options: options) { account, files, _, error in
+                    if error == .success, let file = files.first {
+                        NextcloudKit.shared.markE2EEFolder(fileId: file.fileId, delete: false) { account, error in
+                            if error != .success {
+                                errors = error
+                            } else {
+                                file.e2eEncrypted = true
+                                let isDirectoryE2EE = NCUtility.shared.isDirectoryE2EE(serverUrl: serverUrl, account: urlBase.account, urlBase: urlBase.urlBase, userId: urlBase.userId)
+                                if let metadata = NCManageDatabase.shared.addMetadata(NCManageDatabase.shared.convertNCFileToMetadata(file, isEncrypted: isDirectoryE2EE, account: urlBase.account)) {
+                                    NCManageDatabase.shared.addDirectory(encrypted: true, favorite: metadata.favorite, ocId: metadata.ocId, fileId: metadata.fileId, etag: nil, permissions: metadata.permissions, serverUrl: serverUrlFileName, account: metadata.account)
+                                    NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", metadata.account, serverUrlFileName))
+                                    
+                                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeStatusFolderE2EE, userInfo: ["serverUrl": serverUrl])
+                                }
+                            }
+                        }
+                    }else {
+                        errors = error
+                    }
+                }
+            }
+        }
+        completion(errors)
     }
 }

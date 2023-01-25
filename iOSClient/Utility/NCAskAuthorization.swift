@@ -40,7 +40,10 @@ class NCAskAuthorization: NSObject {
         case AVAudioSession.RecordPermission.denied:
             let alert = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: NSLocalizedString("_err_permission_microphone_", comment: ""), preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("_open_settings_", comment: ""), style: .default, handler: { _ in
+
+                #if !EXTENSION
                 UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                #endif
                 completion(false)
             }))
             alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: { _ in
@@ -76,7 +79,9 @@ class NCAskAuthorization: NSObject {
         case PHAuthorizationStatus.denied, PHAuthorizationStatus.limited, PHAuthorizationStatus.restricted:
             let alert = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: NSLocalizedString("_err_permission_photolibrary_", comment: ""), preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("_open_settings_", comment: ""), style: .default, handler: { _ in
+                #if !EXTENSION
                 UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                #endif
                 completion(false)
             }))
             alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: { _ in
@@ -94,10 +99,13 @@ class NCAskAuthorization: NSObject {
             }
         case PHAuthorizationStatus.notDetermined:
             isRequesting = true
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            appDelegate.isPrivacyProtectionWindowNeedToShow = false
-            PHPhotoLibrary.requestAuthorization { (allowed) in
+            PHPhotoLibrary.requestAuthorization { allowed in
                 self.isRequesting = false
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                appDelegate.isPrivacyProtectionWindowNeedToShow = false
+                #if !EXTENSION
+                DispatchQueue.main.async { (UIApplication.shared.delegate as? AppDelegate)?.hidePrivacyProtectionWindow() }
+                #endif
                 DispatchQueue.main.async {
                     (UIApplication.shared.delegate as? AppDelegate)?.hidePrivacyProtectionWindow()
                 }
@@ -138,11 +146,25 @@ class NCAskAuthorization: NSObject {
              break
              */
         default:
-            DispatchQueue.main.async {
-                NCAutoUpload.shared.startSignificantChangeUpdates()
-            }
-            completion(false)
-            break
+            print("Unknown property")
         }
     }
+
+    #if !EXTENSION
+    func checkBackgroundRefreshStatus() {
+        switch UIApplication.shared.backgroundRefreshStatus {
+        case .available:
+            print("Background fetch is enabled")
+        case .denied:
+            print("Background fetch is explicitly disabled")
+            // Redirect user to Settings page only once; Respect user's choice is important
+            UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+        case .restricted:
+            // Should not redirect user to Settings since he / she cannot toggle the settings
+            print("Background fetch is restricted, e.g. under parental control")
+        default:
+            print("Unknown property")
+        }
+    }
+    #endif
 }

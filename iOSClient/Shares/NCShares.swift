@@ -22,7 +22,7 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 
 class NCShares: NCCollectionViewCommon {
 
@@ -30,6 +30,7 @@ class NCShares: NCCollectionViewCommon {
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        headerMenuButtonsCommand = false
 
         titleCurrentFolder = NSLocalizedString("_list_shares_", comment: "")
         layoutKey = NCGlobal.shared.layoutViewShares
@@ -41,20 +42,30 @@ class NCShares: NCCollectionViewCommon {
 
     // MARK: - DataSource + NC Endpoint
 
-    override func reloadDataSource() {
+    override func reloadDataSource(forced: Bool = true) {
         super.reloadDataSource()
 
         DispatchQueue.global().async {
-            self.metadatasSource.removeAll()
             let sharess = NCManageDatabase.shared.getTableShares(account: self.appDelegate.account)
+            var metadatas: [tableMetadata] = []
             for share in sharess {
                 if let metadata = NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", self.appDelegate.account, share.serverUrl, share.fileName)) {
-                    if !(self.metadatasSource.contains { $0.ocId == metadata.ocId }) {
-                        self.metadatasSource.append(metadata)
+                    if !(metadatas.contains { $0.ocId == metadata.ocId }) {
+                        metadatas.append(metadata)
                     }
                 }
             }
-            self.dataSource = NCDataSource(metadatasSource: self.metadatasSource, sort: self.layoutForView?.sort, ascending: self.layoutForView?.ascending, directoryOnTop: self.layoutForView?.directoryOnTop, favoriteOnTop: true, filterLivePhoto: true)
+
+            self.dataSource = NCDataSource(metadatas: metadatas,
+                                           account: self.appDelegate.account,
+                                           sort: self.layoutForView?.sort,
+                                           ascending: self.layoutForView?.ascending,
+                                           directoryOnTop: self.layoutForView?.directoryOnTop,
+                                           favoriteOnTop: true,
+                                           filterLivePhoto: true,
+                                           groupByField: self.groupByField,
+                                           providers: self.providers,
+                                           searchResults: self.searchResults)
 
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()
@@ -66,7 +77,7 @@ class NCShares: NCCollectionViewCommon {
     override func reloadDataSourceNetwork(forced: Bool = false) {
         super.reloadDataSourceNetwork(forced: forced)
 
-        if isSearching {
+        if appDelegate.isSearchingMode {
             networkSearch()
             return
         }
@@ -75,17 +86,19 @@ class NCShares: NCCollectionViewCommon {
         collectionView?.reloadData()
 
         // Shares network
-        NCCommunication.shared.readShares(parameters: NCCShareParameter(), queue: NCCommunicationCommon.shared.backgroundQueue) { account, shares, errorCode, errorDescription in
+        let options = NKRequestOptions(queue: NKCommon.shared.backgroundQueue)
+        NextcloudKit.shared.readShares(parameters: NKShareParameter(), options: options) { account, shares, data, error in
+
 
             DispatchQueue.main.async {
                 self.refreshControl.endRefreshing()
                 self.isReloadDataSourceNetworkInProgress = false
             }
 
-            if errorCode == 0 {
+            if error == .success {
                 NCManageDatabase.shared.deleteTableShare(account: account)
                 if shares != nil {
-                    NCManageDatabase.shared.addShare(urlBase: self.appDelegate.urlBase, account: account, shares: shares!)
+                    NCManageDatabase.shared.addShare(account: account, urlBase: self.appDelegate.urlBase, userId: self.appDelegate.userId, shares: shares!)
                 }
                 self.appDelegate.shares = NCManageDatabase.shared.getTableShares(account: account)
                 self.reloadDataSource()
@@ -94,7 +107,7 @@ class NCShares: NCCollectionViewCommon {
 
                 DispatchQueue.main.async {
                     self.collectionView?.reloadData()
-                    NCContentPresenter.shared.messageNotification("_share_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                    NCContentPresenter.shared.showError(error: error)
                 }
             }
         }

@@ -74,6 +74,7 @@
 "_transfers_in_queue_"      = "Laufende Übertragungen, bitte warten…";
 "_too_errors_upload_"       = "Zu viele Fehler, bitte überprüfen Sie das Problem.";
 "_create_folder_"           = "Ordner erstellen";
+"_create_folder_e2ee_"      = "Veschlüsselten Ordner erstellen";
 "_create_folder_on_"        = "Geben Sie eine Ordnerbezeichnung ein.";
 "_close_"                   = "Schließen";
 "_postpone_"                = "Zurückstellen";
@@ -187,6 +188,7 @@
 "_copy_failed_"             = "Kopieren fehlgeschlagen";
 "_certificate_installed_"   = "Zertifikat installiert";
 "_want_delete_account_"     = "Wollen Sie das Konto %@ löschen?";
+"_error_something_wrong_"   = "Etwas ist schiefgelaufen";
 
 /* User status */
 "_online_"                  = "Online";
@@ -517,6 +519,7 @@
 "_files_"                       = "Dateien";
 "_file_"                        = "Datei";
 "_folder_blocked_"              = "Ordner gesperrt";
+"_downloading_"                 = "Wird heruntergeladen";
 "_downloading_progress_"        = "Das Herunterladen von Dateien wird eingeleitet …";
 "_no_file_pull_down_"           = "Laden Sie eine Datei hoch oder ziehen Sie herunter, um zu aktualisieren";
 "_browse_images_"               = "Bilder durchsuchen";
@@ -831,6 +834,7 @@
 "_copy_passphrase_"                 = "Passphrase kopieren";
 "_ok_copy_passphrase_"              = "OK und Passphrase kopieren";
 "_enter_passphrase_"                = "Passphrase eingeben (12 Wörter)";
+"_show_more_results_"       = "Weitere Ergebnisse anzeigen";
 "_start_e2e_encryption_1_"          = "Um die Ende-zu-Ende Verschlüsselung einzurichten, müssen sie zunächst die PIN-Sperre einrichten, um den Zugriff von unberechtigten Personen auf ihren Schlüssel zu verhindern.";
 "_start_e2e_encryption_2_"          = "Nach dem Start der Verschlüsselung wird ihnen eine aus 12 Wörtern zufällig erzeugte Wortfolge (Passphrase) angezeigt. Diese bleibt in dieser App erhalten und kann erneut angezeigt werden. Dennoch empfehlen wir ihnen, die Passphrase zu notieren.";
 "_start_e2e_encryption_3_"          = "Die Passphrase ist ihr persönliches Kennwort mit dem sie auf verschlüsselte Daten in ihrer MagentaCLOUD zugreifen können oder den Zugriff auf diese Dateien auf anderen Geräten wie ihrem PC zu ermöglichen.";
@@ -1049,3 +1053,8 @@
 "_tip_pdf_thumbnails_"      = "Wischen Sie vom rechten Bildschirmrand nach links, um die Miniaturansichten anzuzeigen.";
 "_invalid_email_alert_"     =   "Die Email Adresse ist ungültig. Bitte überprüfen Sie ihre Eingabe.";
 
+"_please_enter_file_name_"            = "Bitte geben Sie den Dateinamen ein.";
+"_password_ascii_"          = "Das Passwort darf keine Sonderzeichen enthalten";
+
+"_change_upload_filename_"  = "Möchten Sie die Datei unter einem anderen Namen speichern?";
+"_save_file_as_"            = "Datei speichern als %@";

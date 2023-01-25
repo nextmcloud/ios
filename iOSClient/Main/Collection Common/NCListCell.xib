@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -169,8 +169,9 @@
                 <outlet property="imageSelect" destination="AyA-hP-r6w" id="c1t-yz-HBg"/>
                 <outlet property="imageShared" destination="jc6-Vg-TaS" id="6CL-wO-WaN"/>
                 <outlet property="imageStatus" destination="7Q9-Tv-9yo" id="Qug-Q7-rRZ"/>
+                <outlet property="infoTrailingConstraint" destination="p0M-zU-aDG" id="h1m-jn-nmp"/>
                 <outlet property="labelInfo" destination="AXX-71-9Q6" id="krb-tZ-UQ7"/>
-                <outlet property="labelShared" destination="7XT-XP-794" id="ZX8-tU-tox"/>
+                <outlet property="labelShared" destination="7XT-XP-794" id="OzN-f2-76l"/>
                 <outlet property="labelTitle" destination="UtT-L6-mgW" id="Xv6-zM-2v1"/>
                 <outlet property="progressView" destination="m2p-oJ-j15" id="yFv-KS-nEy"/>
                 <outlet property="separator" destination="Egg-cb-EhZ" id="uhq-Nc-z8K"/>

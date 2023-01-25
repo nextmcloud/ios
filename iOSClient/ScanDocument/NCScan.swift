@@ -22,8 +22,9 @@
 //
 
 import UIKit
+import Photos
+import EasyTipView
 
-@available(iOS 13.0, *)
 class NCScan: UIViewController, NCScanCellCellDelegate {
 
     @IBOutlet weak var collectionViewSource: UICollectionView!
@@ -43,6 +44,8 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
     internal var itemsDestination: [String] = []
 
     internal let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+
+    private var tipView: EasyTipView?
 
     enum TypeFilter {
         case original
@@ -68,6 +71,7 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
         collectionViewDestination.dropDelegate = self
         collectionViewDestination.dragDelegate = self
         collectionViewDestination.reorderingCadence = .fast // default value - .immediate
+
         collectionViewDestination.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
 
         cancel.title = NSLocalizedString("_cancel_", comment: "")
@@ -81,6 +85,7 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
         segmentControlFilter.setTitle(NSLocalizedString("_filter_grayscale_", comment: ""), forSegmentAt: 1)
         segmentControlFilter.setTitle(NSLocalizedString("_filter_bn_", comment: ""), forSegmentAt: 2)
 
+
         add.setImage(UIImage(named: "plus")?.image(color: NCBrandColor.shared.label, size: 25), for: .normal)
         transferDown.setImage(UIImage(named: "transferDown")?.image(color: NCBrandColor.shared.label, size: 25), for: .normal)
 
@@ -89,11 +94,55 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
         let longPressRecognizerPlus = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture(recognizer:)))
         add.addGestureRecognizer(longPressRecognizerPlus)
 
+
+        // TIP
+        var preferences = EasyTipView.Preferences()
+        preferences.drawing.foregroundColor = .white
+        preferences.drawing.backgroundColor = NCBrandColor.shared.nextcloud
+        preferences.drawing.textAlignment = .left
+        preferences.drawing.arrowPosition = .left
+        preferences.drawing.cornerRadius = 10
+
+        preferences.animating.dismissTransform = CGAffineTransform(translationX: 0, y: 100)
+        preferences.animating.showInitialTransform = CGAffineTransform(translationX: 0, y: -100)
+        preferences.animating.showInitialAlpha = 0
+        preferences.animating.showDuration = 1.5
+        preferences.animating.dismissDuration = 1.5
+
+        tipView = EasyTipView(text: NSLocalizedString("_tip_addcopyimage_", comment: ""), preferences: preferences, delegate: self)
+
         collectionViewSource.reloadData()
         collectionViewDestination.reloadData()
 
         loadImage()
     }
+
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        showTip()
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        self.tipView?.dismiss()
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.showTip()
+        }
+    }
+
+    // MARK: - Tip
+
+    func showTip() {
+
+        if !NCManageDatabase.shared.tipExists(NCGlobal.shared.tipNCScanAddImage) {
+            self.tipView?.show(forView: add, withinSuperview: self.view)
+        }
+    }
+
+    // MARK: -
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -133,22 +182,22 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
 
     @IBAction func add(sender: UIButton) {
 
+        // TIP
+        dismissTip()
+
         NCCreateScanDocument.shared.openScannerDocument(viewController: self)
     }
 
     @IBAction func transferDown(sender: UIButton) {
 
-        for fileName in itemsSource {
 
-            if !itemsDestination.contains(fileName) {
+        for fileName in itemsSource where !itemsDestination.contains(fileName) {
 
-                let fileNamePathAt = CCUtility.getDirectoryScan() + "/" + fileName
+            let fileNamePathAt = CCUtility.getDirectoryScan() + "/" + fileName
+            guard let data = try? Data(contentsOf: URL(fileURLWithPath: fileNamePathAt)), let image = UIImage(data: data) else { return }
 
-                guard let data = try? Data(contentsOf: URL(fileURLWithPath: fileNamePathAt)), let image = UIImage(data: data) else { return }
-
-                imagesDestination.append(image)
-                itemsDestination.append(fileName)
-            }
+            imagesDestination.append(image)
+            itemsDestination.append(fileName)
         }
 
         // Save button
@@ -314,6 +363,10 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
                 UIMenuController.shared.setTargetRect(recognizerView.frame, in: recognizerSuperView)
                 UIMenuController.shared.setMenuVisible(true, animated: true)
             }
+
+
+            // TIP
+            dismissTip()
         }
     }
 
@@ -368,5 +421,20 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
             imagesDestination[imageIndex] = image
             cell.customImageView.image = image
         }
+    }
+}
+
+extension NCScan: EasyTipViewDelegate {
+
+    // TIP
+    func easyTipViewDidTap(_ tipView: EasyTipView) {
+        NCManageDatabase.shared.addTip(NCGlobal.shared.tipNCScanAddImage)
+    }
+
+    func easyTipViewDidDismiss(_ tipView: EasyTipView) { }
+
+    func dismissTip() {
+        NCManageDatabase.shared.addTip(NCGlobal.shared.tipNCScanAddImage)
+        self.tipView?.dismiss()
     }
 }

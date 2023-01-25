@@ -24,7 +24,7 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 import JGProgressHUD
 
 enum NCShareExtensionError: Error {
@@ -115,16 +115,24 @@ class NCShareExtension: UIViewController {
         let levelLog = CCUtility.getLogLevel()
         let isSimulatorOrTestFlight = NCUtility.shared.isSimulatorOrTestFlight()
         let versionNextcloudiOS = String(format: NCBrandOptions.shared.textCopyrightNextcloudiOS, NCUtility.shared.getVersionApp())
-
-        NCCommunicationCommon.shared.levelLog = levelLog
+        
+        NKCommon.shared.levelLog = levelLog
         if let pathDirectoryGroup = CCUtility.getDirectoryGroup()?.path {
-            NCCommunicationCommon.shared.pathLog = pathDirectoryGroup
+            NKCommon.shared.pathLog = pathDirectoryGroup
         }
         if isSimulatorOrTestFlight {
-            NCCommunicationCommon.shared.writeLog("Start session with level \(levelLog) " + versionNextcloudiOS + " (Simulator / TestFlight)")
+            NKCommon.shared.writeLog("[INFO] Start Share session with level \(levelLog) " + versionNextcloudiOS + " (Simulator / TestFlight)")
         } else {
-            NCCommunicationCommon.shared.writeLog("Start session with level \(levelLog) " + versionNextcloudiOS)
+            NKCommon.shared.writeLog("[INFO] Start Share session with level \(levelLog) " + versionNextcloudiOS)
         }
+
+//        // Colors
+//        if let activeAccount = NCManageDatabase.shared.getActiveAccount() {
+//            NCBrandColor.shared.settingThemingColor(account: activeAccount.account)
+//        } else {
+//            NCBrandColor.shared.createImagesThemingColor()
+//        }
+//        NCBrandColor.shared.createUserColors()
 
         hud.indicatorView = JGProgressHUDRingIndicatorView()
         if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
@@ -203,6 +211,7 @@ class NCShareExtension: UIViewController {
         backButton.semanticContentAttribute = .forceLeftToRight
         backButton.setTitle(" "+NSLocalizedString("_back_", comment: ""), for: .normal)
         backButton.setTitleColor(NCBrandColor.shared.customer, for: .normal)
+        
         backButton.action(for: .touchUpInside) { _ in
             if !self.uploadStarted {
                 while self.serverUrl.last != "/" { self.serverUrl.removeLast() }
@@ -211,14 +220,14 @@ class NCShareExtension: UIViewController {
                 self.reloadDatasource(withLoadFolder: true)
 
                 var navigationTitle = (self.serverUrl as NSString).lastPathComponent
-                if NCUtilityFileSystem.shared.getHomeServer(account: self.activeAccount.account) == self.serverUrl {
+                if NCUtilityFileSystem.shared.getHomeServer(urlBase: self.activeAccount.urlBase, userId: self.activeAccount.userId) == self.serverUrl {
                     navigationTitle = NCBrandOptions.shared.brand
                 }
                 self.setNavigationBar(navigationTitle: navigationTitle)
             }
         }
         
-        if serverUrl != NCUtilityFileSystem.shared.getHomeServer(account: activeAccount.account) {
+        if serverUrl != NCUtilityFileSystem.shared.getHomeServer(urlBase: activeAccount.urlBase, userId: activeAccount.userId) {
             navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         } else {
             navigationItem.leftBarButtonItem = nil
@@ -285,9 +294,9 @@ class NCShareExtension: UIViewController {
     }
 
     @objc func actionCreateFolder() {
-        let alertController = UIAlertController.createFolder(serverUrl: serverUrl, urlBase: activeAccount) { errorCode, errorDescription in
-            guard errorCode != 0 else { return }
-            self.showAlert(title: "_error_createsubfolders_upload_", description: errorDescription)
+        let alertController = UIAlertController.createFolder(serverUrl: serverUrl, urlBase: activeAccount) { error in
+            guard error != .success else { return }
+            self.showAlert(title: "_error_createsubfolders_upload_", description: error.errorDescription)
         }
         self.present(alertController, animated: true)
     }
@@ -313,9 +322,8 @@ extension NCShareExtension {
                 fileName: fileName, fileNameView: fileName,
                 ocId: ocId,
                 serverUrl: serverUrl, urlBase: activeAccount.urlBase, url: "",
-                contentType: "",
-                livePhoto: false)
-            metadata.session = NCCommunicationCommon.shared.sessionIdentifierUpload
+                contentType: "")
+            metadata.session = NKCommon.shared.sessionIdentifierUpload
             metadata.sessionSelector = NCGlobal.shared.selectorUploadFileShareExtension
             metadata.size = NCUtilityFileSystem.shared.getFileSize(filePath: toPath)
             metadata.status = NCGlobal.shared.metadataStatusWaitUpload
@@ -332,6 +340,7 @@ extension NCShareExtension {
             conflict.serverUrl = self.serverUrl
             conflict.metadatasUploadInConflict = conflicts
             conflict.delegate = self
+            conflict.isE2EE = CCUtility.isFolderEncrypted(self.serverUrl, e2eEncrypted: false, account: activeAccount.account, urlBase: activeAccount.urlBase, userId: activeAccount.userId)
             self.present(conflict, animated: true, completion: nil)
         } else {
             upload()
@@ -343,16 +352,21 @@ extension NCShareExtension {
         guard uploadMetadata.count > counterUploaded else { return finishedUploading() }
         let metadata = uploadMetadata[counterUploaded]
 
+        let results = NKCommon.shared.getInternalType(fileName: metadata.fileNameView, mimeType: metadata.contentType, directory: false)
+        metadata.contentType = results.mimeType
+        metadata.iconName = results.iconName
+        metadata.classFile = results.classFile
         // E2EE
-        metadata.e2eEncrypted = CCUtility.isFolderEncrypted(metadata.serverUrl, e2eEncrypted: metadata.e2eEncrypted, account: metadata.account, urlBase: metadata.urlBase)
+        metadata.e2eEncrypted = CCUtility.isFolderEncrypted(metadata.serverUrl, e2eEncrypted: metadata.e2eEncrypted, account: metadata.account, urlBase: metadata.urlBase, userId: activeAccount.userId)
         // CHUNCK
         metadata.chunk = chunckSize != 0 && metadata.size > chunckSize
 
         hud.textLabel.text = NSLocalizedString("_upload_file_", comment: "") + " \(counterUploaded + 1) " + NSLocalizedString("_of_", comment: "") + " \(filesName.count)"
         hud.progress = 0
         hud.show(in: self.view)
-        NCNetworking.shared.upload(metadata: metadata) { } completion: { errorCode, _ in
-            if errorCode != 0 {
+
+        NCNetworking.shared.upload(metadata: metadata) { } completion: { error in
+            if error != .success {
                 let path = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId)!
                 NCManageDatabase.shared.deleteMetadata(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
                 NCManageDatabase.shared.deleteChunks(account: metadata.account, ocId: metadata.ocId)

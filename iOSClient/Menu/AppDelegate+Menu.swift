@@ -25,7 +25,9 @@
 
 import UIKit
 import FloatingPanel
-import NCCommunication
+import NextcloudKit
+
+
 
 extension AppDelegate {
 
@@ -35,9 +37,10 @@ extension AppDelegate {
 
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let directEditingCreators = NCManageDatabase.shared.getDirectEditingCreators(account: appDelegate.account)
-        let isEncrypted = CCUtility.isFolderEncrypted(appDelegate.activeServerUrl, e2eEncrypted: false, account: appDelegate.account, urlBase: appDelegate.urlBase)
+        let isEncrypted = CCUtility.isFolderEncrypted(appDelegate.activeServerUrl, e2eEncrypted: false, account: appDelegate.account, urlBase: appDelegate.urlBase, userId: appDelegate.userId)
         let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, appDelegate.activeServerUrl))
         let serverVersionMajor = NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesVersionMajor)
+        let serverUrlHome = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId)
 
         actions.append(
             NCMenuAction(
@@ -61,7 +64,7 @@ extension AppDelegate {
             )
         )
 
-        if NCCommunication.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorText}) && !isEncrypted {
+        if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorText}) && !isEncrypted {
             let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorText})!
             actions.append(
                 NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt_menu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
@@ -114,49 +117,34 @@ extension AppDelegate {
                 }
             )
         )
-
+        
         actions.append(
             NCMenuAction(title: NSLocalizedString("_create_folder_", comment: ""),
                 icon: UIImage(named: "addFolder")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
-
-                    if appDelegate.activeServerUrl == "" { return }
-
-                    let alertController = UIAlertController(title: NSLocalizedString("_create_folder_on_", comment: ""), message: nil, preferredStyle: .alert)
-
-                    alertController.addTextField { textField in
-                        textField.autocapitalizationType = UITextAutocapitalizationType.sentences
-                    }
-
-                    let cancelAction = UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: nil)
-                    let okAction = UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in
-                        if let fileNameFolder = alertController.textFields?.first?.text {
-                            NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: appDelegate.activeServerUrl, account: appDelegate.account, urlBase: appDelegate.urlBase, overwrite: false) { errorCode, errorDescription in
-                                if errorCode != 0 {
-                                NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
-                                }
-                            }
-                        }
-                    })
-                    okAction.isEnabled = false
-                     // only allow saving if folder name exists
-                    NotificationCenter.default.addObserver(
-                        forName: UITextField.textDidChangeNotification,
-                        object: alertController.textFields?.first,
-                        queue: .main) { _ in
-                            guard let text = alertController.textFields?.first?.text,
-                                  let folderName = CCUtility.removeForbiddenCharactersServer(text)?.trimmingCharacters(in: .whitespaces) else { return }
-                            okAction.isEnabled = !folderName.isEmpty && folderName != "." && folderName != ".."
-                        }
-
-                    alertController.addAction(cancelAction)
-                    alertController.addAction(okAction)
-
+                    guard !appDelegate.activeServerUrl.isEmpty else { return }
+                    let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate)
                     appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
                 }
             )
         )
 
-        if serverVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isEncrypted && NCCommunication.shared.isNetworkReachable() {
+        // Folder encrypted (ONLY ROOT)
+        if serverUrlHome == appDelegate.activeServerUrl && CCUtility.isEnd(toEndEnabled: appDelegate.account) {
+            
+            actions.append(
+                NCMenuAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
+                             icon: UIImage(named: "encryptedfolder")!.image(color: NCBrandColor.shared.iconColor, size: 50),
+                             action: { _ in
+                                 guard !appDelegate.activeServerUrl.isEmpty else { return }
+                                 
+                                 let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate, markE2ee: true)
+                            
+                                 appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
+                             })
+            )
+        }
+
+        if serverVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isEncrypted && NextcloudKit.shared.isNetworkReachable() {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_add_folder_info_", comment: ""), icon: UIImage(named: "addFolderInfo")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
@@ -173,7 +161,7 @@ extension AppDelegate {
             )
         }
 
-        if NCCommunication.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeDocx}) && !isEncrypted {
+        if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeDocx}) && !isEncrypted {
             let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeDocx})!
             actions.append(
                 NCMenuAction(
@@ -196,7 +184,7 @@ extension AppDelegate {
             )
         }
 
-        if NCCommunication.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeXlsx}) && !isEncrypted {
+        if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeXlsx}) && !isEncrypted {
             let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeXlsx})!
             actions.append(
                 NCMenuAction(
@@ -219,7 +207,7 @@ extension AppDelegate {
             )
         }
 
-        if NCCommunication.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficePptx}) && !isEncrypted {
+        if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficePptx}) && !isEncrypted {
             let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficePptx})!
             actions.append(
                 NCMenuAction(
@@ -243,7 +231,7 @@ extension AppDelegate {
         }
 
         if let richdocumentsMimetypes = NCManageDatabase.shared.getCapabilitiesServerArray(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesRichdocumentsMimetypes) {
-            if richdocumentsMimetypes.count > 0 &&  NCCommunication.shared.isNetworkReachable() && !isEncrypted {
+            if richdocumentsMimetypes.count > 0 &&  NextcloudKit.shared.isNetworkReachable() && !isEncrypted {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_create_new_document_", comment: ""), icon: UIImage(named: "create_file_document")!, action: { _ in

@@ -54,26 +54,21 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
         durationLabel.text = ""
         startStopLabel.text = NSLocalizedString("_voice_memo_start_", comment: "")
 
-        changeTheming()
+        view.backgroundColor = .clear
+        contentContainerView.backgroundColor = UIColor.lightGray
+        voiceRecordHUD.fillColor = UIColor.green
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-
-        changeTheming()
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
     }
 
-    // MARK: - Colors
-
-    func changeTheming() {
-
-        view.backgroundColor = .clear
-        contentContainerView.backgroundColor = UIColor.lightGray
-        voiceRecordHUD.fillColor = UIColor.green
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
     }
 
     // MARK: - Action
@@ -92,6 +87,7 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
     @IBAction func startStop() {
 
         if recording.state == .record {
+
             recording.stop()
             voiceRecordHUD.update(0.0)
 
@@ -147,6 +143,7 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
 
         voiceRecordHUD.update(CGFloat(rate))
         voiceRecordHUD.fillColor = UIColor.green
+        
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.second]
         formatter.unitsStyle = .full
@@ -276,7 +273,6 @@ open class NCAudioRecorder: NSObject {
     }
 
     fileprivate func stopMetering() {
-
         link?.invalidate()
         link = nil
     }

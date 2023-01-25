@@ -8,7 +8,7 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 import SVGKit
 
 class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNetworkingDelegate {
@@ -83,7 +83,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         commentTextView.showsVerticalScrollIndicator = false
         setTitle()
         changeTheming()
-        networking = NCShareNetworking.init(metadata: metadata!, urlBase: appDelegate.urlBase, view: self.view, delegate: self)
+        networking = NCShareNetworking(metadata: metadata!, view: self.view, delegate: self)
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         buttonContainerView.addShadow(location: .top)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -143,7 +143,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
             return image
         }
         
-        if metadata.classFile == NCCommunicationCommon.typeClassFile.video.rawValue && !metadata.hasPreview {
+        if metadata.classFile == NKCommon.typeClassFile.video.rawValue && !metadata.hasPreview {
             NCUtility.shared.createImageFrom(fileNameView: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
         }
         
@@ -160,8 +160,8 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         if let metadata = self.metadata {
-            NCNetworking.shared.favoriteMetadata(metadata) { errorCode, errorDescription in
-                if errorCode == 0 {
+            NCNetworking.shared.favoriteMetadata(metadata) { error in
+                if error == .success {
                     if !metadata.favorite {
                         self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
                         self.metadata?.favorite = true
@@ -170,7 +170,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
                         self.metadata?.favorite = false
                     }
                 } else {
-                    NCContentPresenter.shared.messageNotification("_error_", description: errorDescription, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, errorCode: errorCode)
+                    NCContentPresenter.shared.messageNotification("_error_", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error)
                 }
             }
         }
@@ -181,7 +181,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         let ext = CCUtility.getExtension(metadata.fileNameView)
         var image: UIImage?
         
-        if CCUtility.fileProviderStorageExists(metadata) && metadata.classFile == NCCommunicationCommon.typeClassFile.image.rawValue {
+        if CCUtility.fileProviderStorageExists(metadata) && metadata.classFile == NKCommon.typeClassFile.image.rawValue {
            
             let previewPath = CCUtility.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)!
             let imagePath = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)!
@@ -253,7 +253,7 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
         popToShare()
     }
     
-    func getSharees(sharees: [NCCommunicationSharee]?) {}
+    func getSharees(sharees: [NKSharee]?) {}
     
     @objc func adjustForKeyboard(notification: Notification) {
         guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue,

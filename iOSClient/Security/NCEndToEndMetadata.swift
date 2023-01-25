@@ -22,7 +22,7 @@
 //
 
 import UIKit
-import NCCommunication
+import NextcloudKit
 
 class NCEndToEndMetadata: NSObject {
 
@@ -140,7 +140,8 @@ class NCEndToEndMetadata: NSObject {
     }
 
     @discardableResult
-    @objc func decoderMetadata(_ e2eMetaDataJSON: String, privateKey: String, serverUrl: String, account: String, urlBase: String) -> Bool {
+
+    @objc func decoderMetadata(_ e2eMetaDataJSON: String, privateKey: String, serverUrl: String, account: String, urlBase: String, userId: String) -> Bool {
 
         let jsonDecoder = JSONDecoder()
         let data = e2eMetaDataJSON.data(using: .utf8)
@@ -199,7 +200,7 @@ class NCEndToEndMetadata: NSObject {
                         object.authenticationTag = filesCodable.authenticationTag ?? ""
                         object.fileName = encryptedFileAttributes.filename
                         object.fileNameIdentifier = fileNameIdentifier
-                        object.fileNamePath = CCUtility.returnFileNamePath(fromFileName: encryptedFileAttributes.filename, serverUrl: serverUrl, urlBase: urlBase, account: account)
+                        object.fileNamePath = CCUtility.returnFileNamePath(fromFileName: encryptedFileAttributes.filename, serverUrl: serverUrl, urlBase: urlBase, userId: userId, account: account)
                         object.key = encryptedFileAttributes.key
                         object.initializationVector = filesCodable.initializationVector
                         object.metadataKey = metadataKey!
@@ -219,7 +220,7 @@ class NCEndToEndMetadata: NSObject {
                         metadata.fileNameView = encryptedFileAttributes.filename
                         metadata.fileNameWithoutExt = (encryptedFileAttributes.filename as NSString).deletingPathExtension
 
-                        let results = NCCommunicationCommon.shared.getInternalType(fileName: encryptedFileAttributes.filename, mimeType: metadata.contentType, directory: metadata.directory)
+                        let results = NKCommon.shared.getInternalType(fileName: encryptedFileAttributes.filename, mimeType: metadata.contentType, directory: metadata.directory)
 
                         metadata.contentType = results.mimeType
                         metadata.iconName = results.iconName

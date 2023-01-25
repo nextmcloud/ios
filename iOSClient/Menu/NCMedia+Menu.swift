@@ -23,10 +23,9 @@
 
 import UIKit
 import FloatingPanel
-import NCCommunication
+import NextcloudKit
 
 extension NCMedia {
-    
     func tapSelect() {
         self.isEditMode = false
         self.selectOcId.removeAll()
@@ -36,6 +35,8 @@ extension NCMedia {
     func toggleMenu() {
 
         var actions: [NCMenuAction] = []
+        defer { presentMenu(with: actions) }
+
         defer { presentMenu(with: actions) }
 
         if !isEditMode {
@@ -64,7 +65,7 @@ extension NCMedia {
                     }
                 )
             )
-            
+
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_viewvideo_hide_", comment: ""),
@@ -152,7 +153,7 @@ extension NCMedia {
             // OPEN IN
             //
             actions.append(.openInAction(selectedMetadatas: selectedMetadatas, viewController: self, completion: tapSelect))
-            
+
             //
             // SAVE TO PHOTO GALLERY
             //

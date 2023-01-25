@@ -53,9 +53,8 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         }
     }
     var fileUser: String? {
-        get {
-            return tableShare?.shareWith
-        }
+        get { return tableShare?.shareWith }
+        set {}
     }
 
     override func awakeFromNib() {
