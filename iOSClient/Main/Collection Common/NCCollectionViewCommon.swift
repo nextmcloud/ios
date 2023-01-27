@@ -713,6 +713,17 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             }
         }
     }
+    
+    func tapRichWorkspace(sender: Any) {
+        if let navigationController = UIStoryboard(name: "NCViewerRichWorkspace", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+                  if let viewerRichWorkspace = navigationController.topViewController as? NCViewerRichWorkspace {
+                      viewerRichWorkspace.richWorkspaceText = richWorkspaceText ?? ""
+                      viewerRichWorkspace.serverUrl = serverUrl
+                      navigationController.modalPresentationStyle = .fullScreen
+                      self.present(navigationController, animated: true, completion: nil)
+                  }
+              }
+    }
 
     // MARK: - Layout
 
@@ -973,18 +984,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         }
     }
 
-    func tapRichWorkspace(_ sender: Any) {
-
-        if let navigationController = UIStoryboard(name: "NCViewerRichWorkspace", bundle: nil).instantiateInitialViewController() as? UINavigationController {
-            if let viewerRichWorkspace = navigationController.topViewController as? NCViewerRichWorkspace {
-                viewerRichWorkspace.richWorkspaceText = richWorkspaceText ?? ""
-                viewerRichWorkspace.serverUrl = serverUrl
-                viewerRichWorkspace.delegate = self
-                navigationController.modalPresentationStyle = .fullScreen
-                self.present(navigationController, animated: true, completion: nil)
-            }
-        }
-    }
+  
 
     func tapButtonSection(_ sender: Any, metadataForSection: NCMetadataForSection?) {
         unifiedSearchMore(metadataForSection: metadataForSection)
@@ -1847,11 +1847,19 @@ extension NCCollectionViewCommon: UICollectionViewDelegateFlowLayout {
 
 //        let (heightHeaderCommands, heightHeaderRichWorkspace, heightHeaderSection) = getHeaderHeight(section: section)
 //        let heightHeader = heightHeaderCommands + heightHeaderRichWorkspace + heightHeaderSection
+        headerRichWorkspaceHeight = 0
+
+        if let richWorkspaceText = richWorkspaceText {
+            let trimmed = richWorkspaceText.trimmingCharacters(in: .whitespaces)
+            if trimmed.count > 0 && !appDelegate.isSearchingMode {
+                headerRichWorkspaceHeight = 80
+            }
+        }
         if !headerMenuButtonsView {
             return CGSize(width: collectionView.frame.width, height: 0)
         }
 
-        return CGSize(width: collectionView.frame.width, height: headerHeight)
+        return CGSize(width: collectionView.frame.width, height: headerHeight + headerRichWorkspaceHeight)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
