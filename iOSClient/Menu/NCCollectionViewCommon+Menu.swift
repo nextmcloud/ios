@@ -276,7 +276,7 @@ extension NCCollectionViewCommon {
         //
         // MODIFY
         //
-        if !(isFolderEncrypted && metadata.serverUrl == serverUrlHome), !metadata.lock {
+        if !isFolderEncrypted, !metadata.lock {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
