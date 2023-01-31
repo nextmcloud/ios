@@ -146,7 +146,7 @@
                                                             <rect key="frame" x="0.0" y="0.0" width="404" height="191"/>
                                                             <subviews>
                                                                 <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="Ux0-jX-m7K">
-                                                                    <rect key="frame" x="11" y="30" width="392" height="40"/>
+                                                                    <rect key="frame" x="11" y="14" width="392" height="40"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="40" id="7zg-0X-XEC"/>
                                                                     </constraints>
@@ -154,7 +154,7 @@
                                                                     <textInputTraits key="textInputTraits" keyboardType="emailAddress"/>
                                                                 </textField>
                                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHU-uP-AUG">
-                                                                    <rect key="frame" x="11" y="74" width="34" height="16"/>
+                                                                    <rect key="frame" x="11" y="58" width="34" height="30.5"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="16" id="lqq-ze-kgQ"/>
                                                                     </constraints>
@@ -163,7 +163,7 @@
                                                                     <nil key="highlightedColor"/>
                                                                 </label>
                                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c4J-wA-Csa">
-                                                                    <rect key="frame" x="11" y="106" width="129" height="40"/>
+                                                                    <rect key="frame" x="11" y="104.5" width="129" height="40"/>
                                                                     <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="40" id="YMh-DJ-uHK"/>
@@ -173,8 +173,8 @@
                                                                     <inset key="contentEdgeInsets" minX="24" minY="0.0" maxX="24" maxY="0.0"/>
                                                                     <state key="normal" title="Create link"/>
                                                                 </button>
-                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your shares" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L5e-tE-Vu3">
-                                                                    <rect key="frame" x="14" y="170" width="390" height="19"/>
+                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Your shares" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L5e-tE-Vu3">
+                                                                    <rect key="frame" x="14" y="168.5" width="389" height="20.5"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="19" id="Akb-VQ-DLb"/>
                                                                     </constraints>
@@ -184,8 +184,8 @@
                                                                 </label>
                                                             </subviews>
                                                             <constraints>
-                                                                <constraint firstAttribute="trailing" secondItem="L5e-tE-Vu3" secondAttribute="trailing" constant="10" id="AbL-Mv-Xve"/>
-                                                                <constraint firstItem="Ux0-jX-m7K" firstAttribute="top" secondItem="4KX-V9-Oni" secondAttribute="top" constant="30" id="RFf-Ge-E1g"/>
+                                                                <constraint firstAttribute="trailing" secondItem="L5e-tE-Vu3" secondAttribute="trailing" constant="11" id="AbL-Mv-Xve"/>
+                                                                <constraint firstItem="Ux0-jX-m7K" firstAttribute="top" secondItem="4KX-V9-Oni" secondAttribute="top" constant="14" id="RFf-Ge-E1g"/>
                                                                 <constraint firstAttribute="trailing" secondItem="Ux0-jX-m7K" secondAttribute="trailing" constant="11" id="Sds-dO-jYO"/>
                                                                 <constraint firstItem="L5e-tE-Vu3" firstAttribute="top" secondItem="c4J-wA-Csa" secondAttribute="bottom" constant="24" id="V8b-fr-blK"/>
                                                                 <constraint firstItem="Ux0-jX-m7K" firstAttribute="leading" secondItem="4KX-V9-Oni" secondAttribute="leading" constant="11" id="Wca-g5-Qaq"/>
