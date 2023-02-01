@@ -57,10 +57,7 @@ class NCRecent: NCCollectionViewCommon {
             var metadatas = NCManageDatabase.shared.getAdvancedMetadatas(predicate: NSPredicate(format: "account == %@", self.appDelegate.account), page: 1, limit: 100, sorted: "date", ascending: false)
             metadatas = metadatas.filter({ metadata in
                 if metadata.serverUrl.contains(serverUrlHome) {
-                    if metadata.serverUrl != serverUrlHome {
-                        return metadata.directory
-                    }
-                    return true
+                    return metadata.serverUrl == serverUrlHome
                 }
                 return true
             })
