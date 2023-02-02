@@ -117,7 +117,12 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             } else if UIScreen.main.bounds.height < 850 {
                 if view.frame.origin.y == 0 {
                     self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                    self.view.frame.origin.y -= 100
+                    self.view.frame.origin.y -= 120
+                }
+            } else {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 40
                 }
             }
         }
@@ -373,8 +378,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             dropDown.topOffset = CGPoint(x: 0, y: -searchField.bounds.height)
             dropDown.direction = .top
         } else {
-            dropDown.bottomOffset = CGPoint(x: 0, y: searchField.bounds.height)
-            dropDown.direction = .bottom
+            dropDown.bottomOffset = CGPoint(x: 0, y: searchField.bounds.height - 80)
+            dropDown.direction = .any
         }
         
         dropDown.cellNib = UINib(nibName: "NCShareUserDropDownCell", bundle: nil)
