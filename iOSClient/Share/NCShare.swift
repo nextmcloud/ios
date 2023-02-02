@@ -31,7 +31,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     @IBOutlet weak var tableView: UITableView!
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
-
+    var shares: (firstShareLink: tableShare?, share: [tableShare]?) = (nil, nil)
     public var metadata: tableMetadata?
     public var sharingEnabled = true
     private var dropDown = DropDown()
@@ -193,16 +193,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     @objc func reloadData() {
-        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
-        if shares.firstShareLink == nil {
-            // buttonMenu.setImage(UIImage.init(named: "shareAdd")?.image(color: .gray, size: 50), for: .normal)
-            // buttonMenu.isHidden = true
-            // buttonCopy.isHidden = true
-        } else {
-            // buttonMenu.setImage(UIImage.init(named: "shareMenu")?.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
-            // buttonMenu.isHidden = true
-            // buttonCopy.isHidden = true
-            self.tableView.setEmptyMessage(NSLocalizedString("", comment: ""))
+        if let metadata = metadata {
+            shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
         }
         tableView.reloadData()
         tableView.isUserInteractionEnabled = true
@@ -384,7 +376,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         dropDown.width = searchField.bounds.width
         if (UIDevice.current.userInterfaceIdiom == .phone || UIDevice.current.orientation.isLandscape), UIScreen.main.bounds.width < 1111  {
             dropDown.topOffset = CGPoint(x: 0, y: -searchField.bounds.height)
-            dropDown.direction = .any
+            dropDown.direction = .top
         } else {
             dropDown.bottomOffset = CGPoint(x: 0, y: searchField.bounds.height - 80)
             dropDown.direction = .any
@@ -539,7 +531,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     func getShareFromIndex(index: Int) -> tableShare? {
-        var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+      //  var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
         if let shareLink = shares.firstShareLink {
             shares.share?.insert(shareLink, at: 0)
         }
@@ -721,7 +713,7 @@ extension NCShare: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
         var numOfRows = 0
-        var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+       // var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
         if let shareLink = shares.firstShareLink {
             shares.share?.insert(shareLink, at: 0)
         }
@@ -758,7 +750,7 @@ extension NCShare: UITableViewDataSource {
             return cell
         }
         
-        var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        //var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
         if let shareLink = shares.firstShareLink {
             shares.share?.insert(shareLink, at: 0)
         }
