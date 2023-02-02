@@ -176,19 +176,25 @@ import Photos
     // MARK: -
 
     func openShare(viewController: UIViewController, metadata: tableMetadata, indexPage: NCGlobal.NCSharePagingIndex) {
-        
-        let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as! UINavigationController
-        let shareViewController = shareNavigationController.topViewController as! NCShare
-        
-        shareViewController.metadata = metadata
-//        shareViewController.indexPage = indexPage
-        
-        if #available(iOS 13.0, *) {
-            shareNavigationController.modalPresentationStyle = .automatic
-        } else {
-            shareNavigationController.modalPresentationStyle = .pageSheet
+        let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
+        NCActivityIndicator.shared.start(backgroundView: viewController.view)
+        NCNetworking.shared.readFile(serverUrlFileName: serverUrlFileName, queue: .main) { account, metadata, error in
+            NCActivityIndicator.shared.stop()
+            if let metadata = metadata, error == .success {
+                let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as! UINavigationController
+                let shareViewController = shareNavigationController.topViewController as! NCShare
+                
+                shareViewController.metadata = metadata
+                //        shareViewController.indexPage = indexPage
+                
+                if #available(iOS 13.0, *) {
+                    shareNavigationController.modalPresentationStyle = .automatic
+                } else {
+                    shareNavigationController.modalPresentationStyle = .pageSheet
+                }
+                viewController.present(shareNavigationController, animated: true, completion: nil)
+            }
         }
-        viewController.present(shareNavigationController, animated: true, completion: nil)
     }
 
     // MARK: -
@@ -824,7 +830,7 @@ import Photos
             let isEncryptionDisabled = metadata.e2eEncrypted && metadata.directory && CCUtility.isEnd(toEndEnabled: appDelegate.account) && metadata.serverUrl == serverUrlHome && metadata.size == 0
             let isEncrytptionEnabled = !metadata.e2eEncrypted && metadata.directory && CCUtility.isEnd(toEndEnabled: appDelegate.account) && metadata.serverUrl == serverUrlHome && metadata.size == 0
             let submenu = UIMenu(title: "", options: .displayInline, children: isEncrytptionEnabled ? [favorite, offline, rename, moveCopy, encrypt, delete] : [favorite, offline, rename, moveCopy, delete])
-            let childrenArray = isFolderEncrypted ? ( isEncryptionDisabled ? [offline, decrypt] : [offline]) : [detail,submenu]
+            let childrenArray = isFolderEncrypted ? ( isEncryptionDisabled ? [offline, decrypt] : (metadata.serverUrl == serverUrlHome) ? [offline] : [offline, delete]) : [detail,submenu]
             return UIMenu(title: "", children: childrenArray)
         }
 
