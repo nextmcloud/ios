@@ -161,11 +161,9 @@ extension NCCollectionViewCommon {
         //
         // OFFLINE
         //
-        if metadata.directory {
-            actions.append(.setAvailableOfflineAction(selectedMetadatas: [metadata], isAnyOffline: isOffline, viewController: self, completion: {
-                self.reloadDataSource()
-            }))
-        }
+        actions.append(.setAvailableOfflineAction(selectedMetadatas: [metadata], isAnyOffline: isOffline, viewController: self, completion: {
+            self.reloadDataSource()
+        }))
 
         //
         // OPEN with external editor
