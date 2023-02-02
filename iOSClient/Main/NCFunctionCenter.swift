@@ -176,19 +176,25 @@ import Photos
     // MARK: -
 
     func openShare(viewController: UIViewController, metadata: tableMetadata, indexPage: NCGlobal.NCSharePagingIndex) {
-        
-        let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as! UINavigationController
-        let shareViewController = shareNavigationController.topViewController as! NCShare
-        
-        shareViewController.metadata = metadata
-//        shareViewController.indexPage = indexPage
-        
-        if #available(iOS 13.0, *) {
-            shareNavigationController.modalPresentationStyle = .automatic
-        } else {
-            shareNavigationController.modalPresentationStyle = .pageSheet
+        let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
+        NCActivityIndicator.shared.start(backgroundView: viewController.view)
+        NCNetworking.shared.readFile(serverUrlFileName: serverUrlFileName, queue: .main) { account, metadata, error in
+            NCActivityIndicator.shared.stop()
+            if let metadata = metadata, error == .success {
+                let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as! UINavigationController
+                let shareViewController = shareNavigationController.topViewController as! NCShare
+                
+                shareViewController.metadata = metadata
+                //        shareViewController.indexPage = indexPage
+                
+                if #available(iOS 13.0, *) {
+                    shareNavigationController.modalPresentationStyle = .automatic
+                } else {
+                    shareNavigationController.modalPresentationStyle = .pageSheet
+                }
+                viewController.present(shareNavigationController, animated: true, completion: nil)
+            }
         }
-        viewController.present(shareNavigationController, animated: true, completion: nil)
     }
 
     // MARK: -
