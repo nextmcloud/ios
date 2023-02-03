@@ -281,6 +281,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Request Service Server Nextcloud
         NCService.shared.startRequestServicesServer()
         
+        // Unlock E2EE
+        NCNetworkingE2EE.shared.unlockAll(account: account)
+        
         // Request TouchID, FaceID
         enableTouchFaceID()
         
@@ -376,6 +379,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         // Registeration push notification
         NCPushNotification.shared().pushNotification()
+        
+        // Unlock E2EE
+        NCNetworkingE2EE.shared.unlockAll(account: account)
         
         // Setting Theming
         NCBrandColor.shared.settingThemingColor(account: account)
