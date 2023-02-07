@@ -1089,3 +1089,6 @@
 
 "_change_upload_filename_"  = "Do you want to save the file with a different name ?";
 "_save_file_as_"            = "Save file as %@";
+
+"_video_not_streamed_"      = "The server does not allow video streaming, do you want to download it?";
+"_video_not_streamed_e2ee_" = "The server does not allow video streaming because it is encrypted, do you want to download it?";
