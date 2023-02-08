@@ -130,6 +130,9 @@ class NCShareNewUserAddComment: UIViewController, UITextViewDelegate, NCShareNet
             shareData.shareWith = sharee!.shareWith
             shareData.shareType = sharee!.shareType
             shareData.hideDownload = hideDownload
+            if let pass = self.password {
+                shareData.password = pass
+            }
             self.networking?.createShare(option: shareData)
         }
         self.creatingShare = true
