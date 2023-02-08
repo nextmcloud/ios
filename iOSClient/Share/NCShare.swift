@@ -597,7 +597,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let tableShare = share else { return }
         let directory = self.metadata?.directory ?? false
         let editingAllowed = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: tableShare.shareType)
-        if editingAllowed {
+        if editingAllowed || checkIsCollaboraFile() {
             self.quickStatusTableShare = tableShare
             let quickStatusMenu = NCShareQuickStatusMenu()
             quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, tableShare: tableShare)
@@ -859,7 +859,7 @@ extension NCShare: UITableViewDataSource {
                 }
                 
                 let isEditingAllowed = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: tableShare.shareType)
-                if isEditingAllowed {
+                if isEditingAllowed || checkIsCollaboraFile() {
                     cell.btnQuickStatus.isEnabled = true
                 } else {
                     cell.btnQuickStatus.isEnabled = false
@@ -932,7 +932,7 @@ extension NCShare: UITableViewDataSource {
                 }
                 
                 let isEditingAllowed = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: tableShare.shareType)
-                if isEditingAllowed {
+                if isEditingAllowed || checkIsCollaboraFile(){
                     cell.btnQuickStatus.isEnabled = true
                 } else {
                     cell.btnQuickStatus.isEnabled = false
