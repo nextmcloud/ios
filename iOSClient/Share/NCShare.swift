@@ -531,7 +531,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     func getShareFromIndex(index: Int) -> tableShare? {
-      //  var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
         if let shareLink = shares.firstShareLink {
             shares.share?.insert(shareLink, at: 0)
         }
@@ -713,7 +713,7 @@ extension NCShare: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
         var numOfRows = 0
-       // var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
         if let shareLink = shares.firstShareLink {
             shares.share?.insert(shareLink, at: 0)
         }
@@ -750,7 +750,7 @@ extension NCShare: UITableViewDataSource {
             return cell
         }
         
-        //var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
+        var shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
         if let shareLink = shares.firstShareLink {
             shares.share?.insert(shareLink, at: 0)
         }
