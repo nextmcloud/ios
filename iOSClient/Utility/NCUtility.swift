@@ -1173,6 +1173,10 @@ class NCUtility: NSObject {
         return returnImage
     }
     
+    @objc func isDirectoryE2EE(metadata: tableMetadata) -> Bool {
+        return isDirectoryE2EE(serverUrl: metadata.serverUrl, account: metadata.account, urlBase: metadata.urlBase, userId: metadata.userId)
+    }
+    
     @objc func isDirectoryE2EE(serverUrl: String, account: String, urlBase: String, userId: String) -> Bool {
         if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: urlBase, userId: userId) || serverUrl == ".." { return false }
         if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl)) {

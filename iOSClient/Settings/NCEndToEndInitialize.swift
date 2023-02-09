@@ -196,7 +196,7 @@ class NCEndToEndInitialize: NSObject {
                     }
                 })
 
-                let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ -> Void in
+                let cancel = UIAlertAction(title: NSLocalizedString("Cancel", comment: "") , style: .cancel) { _ -> Void in
                 }
 
                 alertController.addAction(ok)

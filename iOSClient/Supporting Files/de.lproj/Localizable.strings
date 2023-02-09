@@ -1059,3 +1059,6 @@
 
 "_change_upload_filename_"  = "Möchten Sie die Datei unter einem anderen Namen speichern?";
 "_save_file_as_"            = "Datei speichern als %@";
+
+"_video_not_streamed_"      = "Der Server erlaubt kein Video-Streaming, möchten Sie es herunterladen?";
+"_video_not_streamed_e2ee_" = "Der Server erlaubt wegen Verschlüsselung kein Video-Streaming. Möchten Sie es herunterladen?";
