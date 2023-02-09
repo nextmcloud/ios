@@ -203,7 +203,12 @@ class NCViewerMedia: UIViewController {
 
         self.tipView?.dismiss()
     }
-
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCBrandGlobal.shared.notificationImagePreviewRotateImage), object: nil)
+        super.viewDidDisappear(animated)
+    }
+    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
