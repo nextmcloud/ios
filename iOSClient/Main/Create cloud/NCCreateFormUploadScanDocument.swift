@@ -655,8 +655,10 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     
     
     @objc func save() {
+        let password = (getPasswordFromField() ?? "").trimmingCharacters(in: .whitespaces)
+        self.password = password
         
-        if(isSetpasswordEnable && password.count <= 0){
+        if(isSetpasswordEnable && password == ""){
             showAlert()
             return
         }
@@ -1310,6 +1312,18 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         }else{
             return false
         }
+    }
+    
+    func getPasswordFromField() -> String? {
+        if let setPasswordInputField : XLFormRowDescriptor = self.form.formRow(withTag: "SetPasswordInputField") {
+            var password = ""
+            if let indexPath = self.form.indexPath(ofFormRow: setPasswordInputField) {
+                let cell = tableView.cellForRow(at: indexPath) as? PasswordInputField
+                password = cell?.fileNameInputTextField.text ?? ""
+            }
+            return password
+        }
+        return nil
     }
 }
 
