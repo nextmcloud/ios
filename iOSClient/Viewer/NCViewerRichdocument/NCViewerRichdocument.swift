@@ -31,7 +31,6 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
     var webView = WKWebView()
     var bottomConstraint: NSLayoutConstraint?
     var documentController: UIDocumentInteractionController?
-
     var link: String = ""
     var metadata: tableMetadata = tableMetadata()
     var imageIcon: UIImage?
@@ -45,6 +44,12 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        if !metadata.ocId.hasPrefix("TEMP") {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "more")!.image(color: .label, size: 25), style: .plain, target: self, action: #selector(self.openMenuMore))
+        }
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.title = metadata.fileNameView
+
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
         let contentController = config.userContentController
@@ -55,10 +60,10 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
         view.addSubview(webView)
 
         webView.translatesAutoresizingMaskIntoConstraints = false
-        webView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
-        webView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
-        webView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
-        bottomConstraint = webView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
+        webView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 0).isActive = true
+        webView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: 0).isActive = true
+        webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        bottomConstraint = webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 0)
         bottomConstraint?.isActive = true
 
         var request = URLRequest(url: URL(string: link)!)
@@ -76,7 +81,6 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
         appDelegate.activeViewController = self
 
-        //
         NotificationCenter.default.addObserver(self, selector: #selector(favoriteFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(viewUnload), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterMenuDetailClose), object: nil)
@@ -84,13 +88,6 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-
-        //
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "more")!.image(color: NCBrandColor.shared.label, size: 25), style: .plain, target: self, action: #selector(self.openMenuMore))
-
-        navigationItem.hidesBackButton = true
-        navigationController?.navigationBar.prefersLargeTitles = false
-        navigationItem.title = metadata.fileNameView
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -105,7 +102,6 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
             }
         }
 
-        //
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
 
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterMenuDetailClose), object: nil)
@@ -116,7 +112,6 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
     }
 
     @objc func viewUnload() {
-
         navigationController?.popViewController(animated: true)
     }
 
@@ -143,7 +138,6 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
     }
 
     @objc func keyboardWillHide(notification: Notification) {
-
         bottomConstraint?.constant = 0
     }
 
@@ -190,55 +184,67 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
                         guard let type = values["Type"] as? String else { return }
                         guard let urlString = values["URL"] as? String else { return }
                         guard let url = URL(string: urlString) else { return }
-                        let fileNameLocalPath = CCUtility.getDirectoryUserData() + "/" + metadata.fileNameWithoutExt
+                        let fileNameLocalPath = CCUtility.getDirectoryUserData() + "/" + (metadata.fileName as NSString).deletingPathExtension
 
-                        NCUtility.shared.startActivityIndicator(backgroundView: view, blurEffect: true)
+                        if type == "slideshow" {
 
+                            let browserWebVC = UIStoryboard(name: "NCBrowserWeb", bundle: nil).instantiateInitialViewController() as! NCBrowserWeb
+                            browserWebVC.urlBase = urlString
+                            browserWebVC.isHiddenButtonExit = false
+                            self.present(browserWebVC, animated: true)
 
-                        NextcloudKit.shared.download(serverUrlFileName: url, fileNameLocalPath: fileNameLocalPath, requestHandler: { _ in
+                            return
+                            
+                        } else {
 
-                        }, taskHandler: { _ in
+                            // TYPE PRINT - DOWNLOAD
 
-                        }, progressHandler: { _ in
+                            NCActivityIndicator.shared.start(backgroundView: view)
 
+                            NextcloudKit.shared.download(serverUrlFileName: url, fileNameLocalPath: fileNameLocalPath, requestHandler: { _ in
 
-                        }, completionHandler: { account, _, _, _, allHeaderFields, afError, error in
+                            }, taskHandler: { _ in
 
-                            NCActivityIndicator.shared.stop()
+                            }, progressHandler: { _ in
 
-                            if error == .success && account == self.metadata.account {
-                                var item = fileNameLocalPath
+                            }, completionHandler: { account, _, _, _, allHeaderFields, afError, error in
 
-                                if let allHeaderFields = allHeaderFields {
-                                    if let disposition = allHeaderFields["Content-Disposition"] as? String {
-                                        let components = disposition.components(separatedBy: "filename=")
-                                        if let filename = components.last?.replacingOccurrences(of: "\"", with: "") {
-                                            item = CCUtility.getDirectoryUserData() + "/" + filename
-                                            _ = NCUtilityFileSystem.shared.moveFile(atPath: fileNameLocalPath, toPath: item)
+                                NCActivityIndicator.shared.stop()
+
+                                if error == .success && account == self.metadata.account {
+
+                                    var item = fileNameLocalPath
+
+                                    if let allHeaderFields = allHeaderFields {
+                                        if let disposition = allHeaderFields["Content-Disposition"] as? String {
+                                            let components = disposition.components(separatedBy: "filename=")
+                                            if let filename = components.last?.replacingOccurrences(of: "\"", with: "") {
+                                                item = CCUtility.getDirectoryUserData() + "/" + filename
+                                                _ = NCUtilityFileSystem.shared.moveFile(atPath: fileNameLocalPath, toPath: item)
+                                            }
                                         }
                                     }
-                                }
 
-                                if type == "print" {
-                                    let pic = UIPrintInteractionController.shared
-                                    let printInfo = UIPrintInfo.printInfo()
-                                    printInfo.outputType = UIPrintInfo.OutputType.general
-                                    printInfo.orientation = UIPrintInfo.Orientation.portrait
-                                    printInfo.jobName = "Document"
-                                    pic.printInfo = printInfo
-                                    pic.printingItem = URL(fileURLWithPath: item)
-                                    pic.present(from: CGRect.zero, in: self.view, animated: true, completionHandler: { _, _, _ in })
+                                    if type == "print" {
+                                        let pic = UIPrintInteractionController.shared
+                                        let printInfo = UIPrintInfo.printInfo()
+                                        printInfo.outputType = UIPrintInfo.OutputType.general
+                                        printInfo.orientation = UIPrintInfo.Orientation.portrait
+                                        printInfo.jobName = "Document"
+                                        pic.printInfo = printInfo
+                                        pic.printingItem = URL(fileURLWithPath: item)
+                                        pic.present(from: CGRect.zero, in: self.view, animated: true, completionHandler: { _, _, _ in })
+                                    } else {
+                                        self.documentController = UIDocumentInteractionController()
+                                        self.documentController?.url = URL(fileURLWithPath: item)
+                                        self.documentController?.presentOptionsMenu(from: CGRect.zero, in: self.view, animated: true)
+                                    }
                                 } else {
-                                    self.documentController = UIDocumentInteractionController()
-                                    self.documentController?.url = URL(fileURLWithPath: item)
-                                    self.documentController?.presentOptionsMenu(from: CGRect.zero, in: self.view, animated: true)
+
+                                    NCContentPresenter.shared.showError(error: error)
                                 }
-                            } else {
-
-
-                                NCContentPresenter.shared.showError(error: error)
-                            }
-                        })
+                            })
+                        }
                     }
                 } else if param["MessageName"] as? String == "fileRename" {
                     if let values = param["Values"] as? [AnyHashable: Any] {
@@ -318,10 +324,12 @@ class NCViewerRichdocument: UIViewController, WKNavigationDelegate, WKScriptMess
     // MARK: -
 
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        if let serverTrust = challenge.protectionSpace.serverTrust {
-            completionHandler(Foundation.URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust: serverTrust))
-        } else {
-            completionHandler(URLSession.AuthChallengeDisposition.useCredential, nil)
+        DispatchQueue.global().async {
+            if let serverTrust = challenge.protectionSpace.serverTrust {
+                completionHandler(Foundation.URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust: serverTrust))
+            } else {
+                completionHandler(URLSession.AuthChallengeDisposition.useCredential, nil)
+            }
         }
     }
 
