@@ -378,7 +378,7 @@ import Alamofire
 
         NextcloudKit.shared.lockE2EEFolder(fileId: directory.fileId, e2eToken: e2eToken, method: "DELETE") { account, e2eToken, data, error in
             if error == .success {
-                NCManageDatabase.shared.deteleE2ETokenLock(account: account, serverUrl: serverUrl)
+                NCManageDatabase.shared.deleteE2ETokenLock(account: account, serverUrl: serverUrl)
             }
             completion(directory, e2eToken, error)
         }
@@ -431,6 +431,19 @@ import Alamofire
                 }
             } else {
                 completion(e2eToken, error)
+            }
+        }
+    }
+    
+    func unlockAll(account: String) {
+        guard CCUtility.isEnd(toEndEnabled: account) else { return }
+
+        Task {
+            for result in NCManageDatabase.shared.getE2EAllTokenLock(account: account) {
+                let lockE2EEFolderResults = await NextcloudKit.shared.lockE2EEFolder(fileId: result.fileId, e2eToken: result.e2eToken, method: "DELETE")
+                if lockE2EEFolderResults.error == .success {
+                    NCManageDatabase.shared.deleteE2ETokenLock(account: account, serverUrl: result.serverUrl)
+                }
             }
         }
     }

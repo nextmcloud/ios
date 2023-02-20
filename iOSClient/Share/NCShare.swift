@@ -31,7 +31,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     
     @IBOutlet weak var tableView: UITableView!
     private let appDelegate = UIApplication.shared.delegate as! AppDelegate
-
+    var shares: (firstShareLink: tableShare?, share: [tableShare]?) = (nil, nil)
     public var metadata: tableMetadata?
     public var sharingEnabled = true
     private var dropDown = DropDown()
@@ -117,7 +117,12 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
             } else if UIScreen.main.bounds.height < 850 {
                 if view.frame.origin.y == 0 {
                     self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                    self.view.frame.origin.y -= 100
+                    self.view.frame.origin.y -= 120
+                }
+            } else {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 40
                 }
             }
         }
@@ -188,16 +193,8 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
     }
     
     @objc func reloadData() {
-        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata!)
-        if shares.firstShareLink == nil {
-            // buttonMenu.setImage(UIImage.init(named: "shareAdd")?.image(color: .gray, size: 50), for: .normal)
-            // buttonMenu.isHidden = true
-            // buttonCopy.isHidden = true
-        } else {
-            // buttonMenu.setImage(UIImage.init(named: "shareMenu")?.image(color: NCBrandColor.shared.customer, size: 50), for: .normal)
-            // buttonMenu.isHidden = true
-            // buttonCopy.isHidden = true
-            self.tableView.setEmptyMessage(NSLocalizedString("", comment: ""))
+        if let metadata = metadata {
+            shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
         }
         tableView.reloadData()
         tableView.isUserInteractionEnabled = true
@@ -379,10 +376,10 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         dropDown.width = searchField.bounds.width
         if (UIDevice.current.userInterfaceIdiom == .phone || UIDevice.current.orientation.isLandscape), UIScreen.main.bounds.width < 1111  {
             dropDown.topOffset = CGPoint(x: 0, y: -searchField.bounds.height)
-            dropDown.direction = .any
+            dropDown.direction = .top
         } else {
-            dropDown.bottomOffset = CGPoint(x: 0, y: searchField.bounds.height)
-            dropDown.direction = .bottom
+            dropDown.bottomOffset = CGPoint(x: 0, y: searchField.bounds.height - 80)
+            dropDown.direction = .any
         }
         
         dropDown.cellNib = UINib(nibName: "NCShareUserDropDownCell", bundle: nil)
@@ -600,7 +597,7 @@ class NCShare: UIViewController, UIGestureRecognizerDelegate, NCShareLinkCellDel
         guard let tableShare = share else { return }
         let directory = self.metadata?.directory ?? false
         let editingAllowed = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: tableShare.shareType)
-        if editingAllowed {
+        if editingAllowed || checkIsCollaboraFile() {
             self.quickStatusTableShare = tableShare
             let quickStatusMenu = NCShareQuickStatusMenu()
             quickStatusMenu.toggleMenu(viewController: self, directory: metadata!.directory, tableShare: tableShare)
@@ -848,7 +845,7 @@ extension NCShare: UITableViewDataSource {
                 }
                 
                 let isEditingAllowed = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: tableShare.shareType)
-                if isEditingAllowed {
+                if isEditingAllowed || checkIsCollaboraFile() {
                     cell.btnQuickStatus.isEnabled = true
                 } else {
                     cell.btnQuickStatus.isEnabled = false
@@ -921,7 +918,7 @@ extension NCShare: UITableViewDataSource {
                 }
                 
                 let isEditingAllowed = NCShareCommon.shared.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.ext ?? "", shareType: tableShare.shareType)
-                if isEditingAllowed {
+                if isEditingAllowed || checkIsCollaboraFile(){
                     cell.btnQuickStatus.isEnabled = true
                 } else {
                     cell.btnQuickStatus.isEnabled = false

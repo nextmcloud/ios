@@ -114,16 +114,19 @@
 //    [section addFormRow:row];
     
     // EndToEnd Encryption
-    NSString *title = NSLocalizedString(@"_e2e_settings_", nil);
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"e2eEncryption" rowType:XLFormRowDescriptorTypeButton title:title];
-    row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
-    [row.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
-
-    row.action.viewControllerClass = [NCManageEndToEndEncryption class];
-
-    [section addFormRow:row];
+    BOOL isE2EESupported = [[NCManageDatabase shared] getCapabilitiesServerBoolWithAccount:appDelegate.account elements:NCElementsJSON.shared.capabilitiesE2EEEnabled exists:false];
+    if (isE2EESupported){
+        NSString *title = NSLocalizedString(@"_e2e_settings_", nil);
+        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"e2eEncryption" rowType:XLFormRowDescriptorTypeButton title:title];
+        row.cellConfigAtConfigure[@"backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground;
+        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+        [row.cellConfig setObject:NCBrandColor.shared.label forKey:@"textLabel.textColor"];
+        [row.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
+        
+        row.action.viewControllerClass = [NCManageEndToEndEncryption class];
+        
+        [section addFormRow:row];
+    }
     
     // Section : Screen --------------------------------------------------------------
     
