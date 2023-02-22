@@ -233,6 +233,12 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterProgressTask), object: nil)
 
         pushed = false
+     
+        if searchController?.isActive ?? false  {
+            searchController?.isActive = false
+            appDelegate.isSearchingMode = false
+        }
+        
 
         // REQUEST
         NCNetworking.shared.cancelUnifiedSearchFiles()
