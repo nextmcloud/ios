@@ -103,7 +103,9 @@ import Photos
             NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, offline: true)
             
         case NCGlobal.shared.selectorPrint:
-            printDocument(metadata: metadata)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.printDocument(metadata: metadata)
+            }
             
         case NCGlobal.shared.selectorSaveAlbum:
             saveAlbum(metadata: metadata)
