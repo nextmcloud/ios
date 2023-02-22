@@ -24,12 +24,11 @@
 import UIKit
 import WebKit
 
-class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMessageHandler {
+class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
 
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     var webView = WKWebView()
     var bottomConstraint: NSLayoutConstraint?
-
     var link: String = ""
     var editor: String = ""
     var metadata: tableMetadata = tableMetadata()
@@ -47,7 +46,6 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
         if !metadata.ocId.hasPrefix("TEMP") {
             navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "more")!.image(color: .label, size: 25), style: .plain, target: self, action: #selector(self.openMenuMore))
         }
-
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.title = metadata.fileNameView
 
@@ -55,9 +53,14 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
         let contentController = config.userContentController
         contentController.add(self, name: "DirectEditingMobileInterface")
-
+        //FIXME: ONLYOFFICE Due to the WK Shared Workers issue the editors cannot be opened on the devices with iOS 16.1.
+        if editor == NCGlobal.shared.editorOnlyoffice {
+            let dropSharedWorkersScript = WKUserScript(source: "delete window.SharedWorker;", injectionTime: WKUserScriptInjectionTime.atDocumentStart, forMainFrameOnly: false)
+            config.userContentController.addUserScript(dropSharedWorkersScript)
+        }
         webView = WKWebView(frame: CGRect.zero, configuration: config)
         webView.navigationDelegate = self
+        webView.uiDelegate = self
         view.addSubview(webView)
 
         webView.translatesAutoresizingMaskIntoConstraints = false
@@ -86,7 +89,6 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
 
         appDelegate.activeViewController = self
 
-        //
         NotificationCenter.default.addObserver(self, selector: #selector(favoriteFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(viewUnload), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterMenuDetailClose), object: nil)
 
@@ -97,12 +99,6 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        if let navigationController = self.navigationController {
-            if !navigationController.viewControllers.contains(self) {
-            }
-        }
-
-        //
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterMenuDetailClose), object: nil)
 
@@ -111,7 +107,6 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     }
 
     @objc func viewUnload() {
-
         navigationController?.popViewController(animated: true)
     }
 
@@ -138,7 +133,6 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     }
 
     @objc func keyboardWillHide(notification: Notification) {
-
         bottomConstraint?.constant = 0
     }
 
@@ -180,10 +174,12 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     // MARK: -
 
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        if let serverTrust = challenge.protectionSpace.serverTrust {
-            completionHandler(Foundation.URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust: serverTrust))
-        } else {
-            completionHandler(URLSession.AuthChallengeDisposition.useCredential, nil)
+        DispatchQueue.global().async {
+            if let serverTrust = challenge.protectionSpace.serverTrust {
+                completionHandler(Foundation.URLSession.AuthChallengeDisposition.useCredential, URLCredential(trust: serverTrust))
+            } else {
+                completionHandler(URLSession.AuthChallengeDisposition.useCredential, nil)
+            }
         }
     }
 
@@ -198,6 +194,16 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         NCActivityIndicator.shared.stop()
     }
+
+    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        if navigationAction.targetFrame == nil {
+            if let url = navigationAction.request.url, UIApplication.shared.canOpenURL(url) {
+               UIApplication.shared.open(url)
+            }
+        }
+        return nil
+    }
+
 }
 
 extension NCViewerNextcloudText: UINavigationControllerDelegate {

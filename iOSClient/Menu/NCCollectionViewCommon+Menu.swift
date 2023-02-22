@@ -207,9 +207,9 @@ extension NCCollectionViewCommon {
         //
         // PRINT
         //
-//        if metadata.isPrintable {
-//            actions.append(.printAction(metadata: metadata))
-//        }
+        if metadata.isPrintable {
+            actions.append(.printAction(metadata: metadata))
+        }
 
         //
         // SAVE
