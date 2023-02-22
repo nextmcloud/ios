@@ -972,7 +972,8 @@ extension NCShare: UITableViewDataSource {
                 //                let image = UIImage.init(named: "folder")!
                 //                headerView.imageView.image = image.image(color: NCBrandColor.shared.customerDefault, size: image.size.width)
             } else if metadata!.iconName.count > 0 {
-                headerView.imageView.image = UIImage.init(named: metadata!.iconName)
+                headerView.imageView.image = metadata!.ext == "odg" ? UIImage(named: "file-diagram") : UIImage.init(named: metadata!.iconName)
+
             } else {
                 headerView.imageView.image = UIImage.init(named: "file")
             }
