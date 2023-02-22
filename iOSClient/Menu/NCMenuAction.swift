@@ -230,7 +230,7 @@ extension NCMenuAction {
     static func printAction(metadata: tableMetadata) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_print_", comment: ""),
-            icon: NCUtility.shared.loadImage(named: "printer"),
+            icon: NCUtility.shared.loadImage(named: "printer",color: NCBrandColor.shared.iconColor),
             action: { _ in
                 NCFunctionCenter.shared.openDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint)
             }
