@@ -203,6 +203,10 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         }
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateFilesScreenView)
+    }
+    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
@@ -289,8 +293,11 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 
     func tapSwitchHeader(sender: Any) {
 
-        if collectionView.collectionViewLayout == gridLayout {
+        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+
             // list layout
+            headerMenu?.buttonSwitch.accessibilityLabel = NSLocalizedString("_grid_view_", comment: "")
+            headerMenu?.buttonSwitch.setImage(UIImage(named: "switchGrid")?.image(color: NCBrandColor.shared.gray, size: 25), for: .normal)
             UIView.animate(withDuration: 0.0, animations: {
                 self.collectionView.collectionViewLayout.invalidateLayout()
                 self.collectionView.setCollectionViewLayout(self.listLayout, animated: false, completion: { _ in
@@ -298,16 +305,24 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
                 })
             })
             layoutForView?.layout = NCGlobal.shared.layoutList
+            NCUtility.shared.setLayoutForView(key: layoutKey, serverUrl: serverUrl, layout: layoutForView?.layout)
+
         } else {
 
             // grid layout
+
+            headerMenu?.buttonSwitch.accessibilityLabel = NSLocalizedString("_list_view_", comment: "")
+            headerMenu?.buttonSwitch.setImage(UIImage(named: "switchList")?.image(color: NCBrandColor.shared.gray, size: 25), for: .normal)
+            
             UIView.animate(withDuration: 0.0, animations: {
                 self.collectionView.collectionViewLayout.invalidateLayout()
                 self.collectionView.setCollectionViewLayout(self.gridLayout, animated: false, completion: { _ in
                     self.collectionView.reloadData()
                 })
             })
+            
             layoutForView?.layout = NCGlobal.shared.layoutGrid
+            NCUtility.shared.setLayoutForView(key: layoutKey, serverUrl: serverUrl, layout: layoutForView?.layout)
         }
     }
 

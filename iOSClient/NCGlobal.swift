@@ -415,6 +415,7 @@ class NCGlobal: NSObject {
     let notificationCenterStatusReadOnly                        = "statusReadOnly"
     let notificationCenterStatusEditing                         = "statusEditing"
     let notificationCenterStatusFileDrop                        = "statusFileDrop"
+    let notificationCenterUpdateFilesScreenView                 = "updateFilesScreenView"  
 
     // TIP
     //
