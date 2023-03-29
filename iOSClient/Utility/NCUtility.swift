@@ -966,7 +966,7 @@ class NCUtility: NSObject {
 
     func stringFromTime(_ time: CMTime) -> String {
 
-        let interval = Int(CMTimeGetSeconds(time))
+        let interval = Int(CMTimeGetSeconds(time).rounded())
 
         let seconds = interval % 60
         let minutes = (interval / 60) % 60

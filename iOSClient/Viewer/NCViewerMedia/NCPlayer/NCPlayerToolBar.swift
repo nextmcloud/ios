@@ -343,7 +343,7 @@ class NCPlayerToolBar: UIView {
 
         guard let ncplayer = ncplayer, let player = ncplayer.player else { return }
 
-        let currentTime = player.currentTime()
+        let currentTime = CMTimeConvertScale(player.currentTime(), timescale: 1, method: .roundHalfAwayFromZero)
         var newTime: CMTime = .zero
         let timeToAdd: CMTime = CMTimeMakeWithSeconds(abs(seconds), preferredTimescale: 1)
 
