@@ -56,8 +56,8 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AF8ED1F82757821000B8DBC4"
-               BuildableName = "NextcloudTests"
+               BlueprintIdentifier = "567A77D729D7198C00F46C05"
+               BuildableName = "NextcloudTests.xctest"
                BlueprintName = "NextcloudTests"
                ReferencedContainer = "container:Nextcloud.xcodeproj">
             </BuildableReference>

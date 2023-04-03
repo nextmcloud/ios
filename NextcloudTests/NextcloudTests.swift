@@ -2,13 +2,14 @@
 //  NextcloudTests.swift
 //  NextcloudTests
 //
-//  Created by Henrik Storch on 01.12.21.
-//  Copyright © 2021 Marino Faggiana. All rights reserved.
+//  Created by A200020526 on 31/03/23.
+//  Copyright © 2023 Marino Faggiana. All rights reserved.
 //
 
 import XCTest
+@testable import Nextcloud
 
-class NextcloudTests: XCTestCase {
+final class NextcloudTests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -21,6 +22,9 @@ class NextcloudTests: XCTestCase {
     func testExample() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+        // Any test you write for XCTest can be annotated as throws and async.
+        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
+        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
     }
 
     func testPerformanceExample() throws {
