@@ -176,8 +176,11 @@ code_sign_if_enabled() {
 }
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/Adjust-iOS13.0/Adjust.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ChromaColorPicker/ChromaColorPicker.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/UICKeyChainStore-iOS13.0/UICKeyChainStore.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/XLForm-iOS13.0/XLForm.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/tealium-swift/TealiumSwift.framework"
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MORichNotification/MORichNotification.framework"
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MoEngage.framework"
@@ -186,8 +189,11 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MOMessaging.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/Adjust-iOS13.0/Adjust.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/ChromaColorPicker/ChromaColorPicker.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/UICKeyChainStore-iOS13.0/UICKeyChainStore.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/XLForm-iOS13.0/XLForm.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/tealium-swift/TealiumSwift.framework"
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MORichNotification/MORichNotification.framework"
   install_framework "${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MoEngage.framework"

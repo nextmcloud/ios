@@ -7,13 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01BF35F629DD7BC100AC9199 /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 01BF35F529DD7BC100AC9199 /* Realm */; };
+		01BF35F929DD7D8F00AC9199 /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 01BF35F829DD7D8F00AC9199 /* JGProgressHUD */; };
+		01BF35FB29DD7E0A00AC9199 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = 01BF35FA29DD7E0A00AC9199 /* SVGKit */; };
+		01BF35FD29DD7E3900AC9199 /* FSCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = 01BF35FC29DD7E3900AC9199 /* FSCalendar */; };
+		01BF35FF29DD7EEE00AC9199 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 01BF35FE29DD7EEE00AC9199 /* FirebaseCrashlytics */; };
+		01BF360229DD881100AC9199 /* XLForm in Frameworks */ = {isa = PBXBuildFile; productRef = 01BF360129DD881100AC9199 /* XLForm */; };
+		01BF360529DD88BB00AC9199 /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = 01BF360429DD88BB00AC9199 /* Adjust */; };
+		01BF360829DD893A00AC9199 /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = 01BF360729DD893A00AC9199 /* UICKeyChainStore */; };
 		2C1D5D7523E2DE3300334ABB /* NCDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB41ED5A87C00B7EAD4 /* NCDatabase.swift */; };
 		2C1D5D7623E2DE3300334ABB /* NCManageDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB51ED5A87C00B7EAD4 /* NCManageDatabase.swift */; };
 		2C1D5D7923E2DE9100334ABB /* NCBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B3CCD1EAE01BD00921AC9 /* NCBrand.swift */; };
 		2C33C48223E2C475005F963B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C33C48123E2C475005F963B /* NotificationService.swift */; };
 		2C33C48623E2C475005F963B /* Notification Service Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2C33C47F23E2C475005F963B /* Notification Service Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2C3B2DEA4B78183632BF9F3F /* Pods_NextcloudTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C2756562728C0939D175577 /* Pods_NextcloudTests.framework */; };
 		2CB7D1CA23E2EDCB00376EF9 /* NCPushNotificationEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F72D1005210B6882009C96B7 /* NCPushNotificationEncryption.m */; };
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
+		51AE6E9F09E742C9CC40B9F6 /* Pods_File_Provider_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F642653EA47807C279DA87E5 /* Pods_File_Provider_Extension.framework */; };
+		5435E1158AAED730677E00EE /* Pods_Share.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8AB01E9438AF238B12F183C1 /* Pods_Share.framework */; };
 		56007DDD282B98CA00EA4115 /* EasyTipView in Frameworks */ = {isa = PBXBuildFile; productRef = 56007DDC282B98CA00EA4115 /* EasyTipView */; };
 		5610960128769C7F00292C4C /* UIAlertController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5610960028769C7F00292C4C /* UIAlertController+Extension.swift */; };
 		5610960228769EEF00292C4C /* NCSelectableNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565B11E22875CF97006998FA /* NCSelectableNavigationView.swift */; };
@@ -25,7 +36,6 @@
 		5610960F2876B53100292C4C /* NCCollectionViewCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565B11E32875CF97006998FA /* NCCollectionViewCommon.swift */; };
 		561096122876B6BD00292C4C /* NCTrashListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78ACD4821903F850088454D /* NCTrashListCell.swift */; };
 		561096142876C22000292C4C /* UIAlertController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5610960028769C7F00292C4C /* UIAlertController+Extension.swift */; };
-		56151A762874747700A83F13 /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = F7EBCDD0277B820D00A4EF67 /* UICKeyChainStore */; };
 		56151A772874747700A83F13 /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = F7EBCDD6277B834400A4EF67 /* Queuer */; };
 		561B3B522880448B00ED7D40 /* KTVCocoaHTTPServer.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; };
 		561B3B532880448B00ED7D40 /* KTVCocoaHTTPServer.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -111,7 +121,6 @@
 		5696256F27B289C6003F774D /* SwiftEntryKit in Frameworks */ = {isa = PBXBuildFile; productRef = F73ADD1B265546890069EA0D /* SwiftEntryKit */; };
 		5696257027B289C6003F774D /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = F75EAED726D2552E00F4320E /* MarqueeLabel */; };
 		5696257227B289C6003F774D /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = F76DA962277B760E0082465B /* Queuer */; };
-		5696257327B289C6003F774D /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = F76DA965277B76F30082465B /* UICKeyChainStore */; };
 		5696257527B289C6003F774D /* FSCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = F76DA96B277B78400082465B /* FSCalendar */; };
 		5696257627B289C6003F774D /* TLPhotoPicker in Frameworks */ = {isa = PBXBuildFile; productRef = F76DA96E277B78AE0082465B /* TLPhotoPicker */; };
 		5696257727B289C6003F774D /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC79277B7D0000AA9FBF /* Realm */; };
@@ -125,7 +134,6 @@
 		5696258227B289C6003F774D /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = F72CD01127A7E92400E59476 /* JGProgressHUD */; };
 		5696258827B289C6003F774D /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC85277B7D3F00AA9FBF /* Realm */; };
 		5696258927B289C6003F774D /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC87277B7D3F00AA9FBF /* RealmSwift */; };
-		5696258A27B289C6003F774D /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = F7EBCDD2277B821700A4EF67 /* UICKeyChainStore */; };
 		5696258B27B289C6003F774D /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = F7EBCDD8277B834F00A4EF67 /* Queuer */; };
 		5696258F27B28DB8003F774D /* QRCodeReader in Frameworks */ = {isa = PBXBuildFile; productRef = 5696258E27B28DB8003F774D /* QRCodeReader */; };
 		5696259227B28E46003F774D /* SwiftRichString in Frameworks */ = {isa = PBXBuildFile; productRef = 5696259127B28E46003F774D /* SwiftRichString */; };
@@ -133,7 +141,6 @@
 		569625D327B291E6003F774D /* SwiftEntryKit in Frameworks */ = {isa = PBXBuildFile; productRef = 569625D227B291E6003F774D /* SwiftEntryKit */; };
 		569625D927B29589003F774D /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 569625D827B29589003F774D /* MarqueeLabel */; };
 		569625DC27B295ED003F774D /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = 569625DB27B295ED003F774D /* Queuer */; };
-		569625DF27B29670003F774D /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = 569625DE27B29670003F774D /* UICKeyChainStore */; };
 		569625E527B29844003F774D /* FSCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = 569625E427B29844003F774D /* FSCalendar */; };
 		569625E827B2991A003F774D /* TLPhotoPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 569625E727B2991A003F774D /* TLPhotoPicker */; };
 		569625EB27B299A0003F774D /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = 569625EA27B299A0003F774D /* Realm */; };
@@ -216,11 +223,6 @@
 		56E9FB6F2877EF3D0006B408 /* JPGImageSaveSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FB5D2877EF3C0006B408 /* JPGImageSaveSwitchView.swift */; };
 		56E9FB702877EF3D0006B408 /* TextFileWithOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FB5E2877EF3C0006B408 /* TextFileWithOcrSwitchView.swift */; };
 		56E9FB712877EF3D0006B408 /* TextFileWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56E9FB5F2877EF3C0006B408 /* TextFileWithOcrSwitchView.xib */; };
-		56E9FB772878040D0006B408 /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = 56E9FB762878040D0006B408 /* Adjust */; };
-		56E9FB792878040D0006B408 /* Criteo in Frameworks */ = {isa = PBXBuildFile; productRef = 56E9FB782878040D0006B408 /* Criteo */; };
-		56E9FB7B2878040D0006B408 /* Sociomantic in Frameworks */ = {isa = PBXBuildFile; productRef = 56E9FB7A2878040D0006B408 /* Sociomantic */; };
-		56E9FB7D2878040D0006B408 /* Trademob in Frameworks */ = {isa = PBXBuildFile; productRef = 56E9FB7C2878040D0006B408 /* Trademob */; };
-		56E9FB7F2878040D0006B408 /* WebBridge in Frameworks */ = {isa = PBXBuildFile; productRef = 56E9FB7E2878040D0006B408 /* WebBridge */; };
 		56E9FB8028780CEA0006B408 /* NCListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565B11E12875CF97006998FA /* NCListCell.swift */; };
 		56E9FBB42878196D0006B408 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E9FBB32878196D0006B408 /* NCShare+Helper.swift */; };
 		56E9FBB5287827A00006B408 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
@@ -267,7 +269,6 @@
 		56F704B5292CF9B000371907 /* RequiredDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56F704AF292CF9B000371907 /* RequiredDataCollectionSwitch.xib */; };
 		56F704B6292CF9B000371907 /* RequiredDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56F704AF292CF9B000371907 /* RequiredDataCollectionSwitch.xib */; };
 		56F704B7292CF9B000371907 /* RequiredDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56F704AF292CF9B000371907 /* RequiredDataCollectionSwitch.xib */; };
-		56F704BB292CFF1B00371907 /* XLForm in Frameworks */ = {isa = PBXBuildFile; productRef = 56F704BA292CFF1B00371907 /* XLForm */; };
 		56F704BD292D01CD00371907 /* ScanCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56F704BC292D01CD00371907 /* ScanCell.swift */; };
 		56F704BE292D01CD00371907 /* ScanCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56F704BC292D01CD00371907 /* ScanCell.swift */; };
 		56F704BF292D01CD00371907 /* ScanCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56F704BC292D01CD00371907 /* ScanCell.swift */; };
@@ -339,7 +340,6 @@
 		8402B1332889245200CBAC94 /* SubFolderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B12F2889245200CBAC94 /* SubFolderCustomCell.swift */; };
 		8402B1342889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8402B1302889245200CBAC94 /* OriginalFileNameCustomSwitchCell.swift */; };
 		8402B1372889298600CBAC94 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8402B1352889298600CBAC94 /* NCCreateDocumentCustomTextField.xib */; };
-		840FA6F4289980A60012F0AE /* UICKeyChainStore in Frameworks */ = {isa = PBXBuildFile; productRef = 840FA6F3289980A60012F0AE /* UICKeyChainStore */; };
 		8489357528892F14004D4278 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8489357428892F14004D4278 /* Images.xcassets */; };
 		84924AA9289A2FC300154220 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5610960A2876B50500292C4C /* NCRenameFile.storyboard */; };
 		849B4561289920D2009254A7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8489357428892F14004D4278 /* Images.xcassets */; };
@@ -349,6 +349,7 @@
 		95BB20D326600FB900AF4344 /* NCNetworkingProcessUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20D226600FB900AF4344 /* NCNetworkingProcessUpload.swift */; };
 		95BB20F22660E25200AF4344 /* NCPopupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95BB20F12660E25200AF4344 /* NCPopupViewController.swift */; };
 		95BB21172660F55900AF4344 /* NCLogin.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 95BB21162660F55900AF4344 /* NCLogin.storyboard */; };
+		9BA88BD900A306FAE6E49BF7 /* Pods_Notification_Service_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93BD01F9D59FB7DB3C39D9F3 /* Pods_Notification_Service_Extension.framework */; };
 		B15AD4B6273D940D00490E0B /* ShareDownloadLimitNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15AD4B5273D940D00490E0B /* ShareDownloadLimitNetwork.swift */; };
 		B176BA9926F8B83A009A0F33 /* NCShareTextInputCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B176BA9826F8B83A009A0F33 /* NCShareTextInputCell.swift */; };
 		B176BAB626F8F7A0009A0F33 /* NCShareTextInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B176BAB526F8F7A0009A0F33 /* NCShareTextInputCell.xib */; };
@@ -630,6 +631,7 @@
 		08EA97451E6554FC004C83FA /* FirebaseCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseCore.framework; sourceTree = "<group>"; };
 		08EA97461E6554FC004C83FA /* FirebaseInstanceID.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseInstanceID.framework; sourceTree = "<group>"; };
 		08EA97471E6554FC004C83FA /* GoogleToolboxForMac.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleToolboxForMac.framework; sourceTree = "<group>"; };
+		255BF652BF6D4DBD759B0E38 /* Pods-Share.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share.debug.xcconfig"; path = "Target Support Files/Pods-Share/Pods-Share.debug.xcconfig"; sourceTree = "<group>"; };
 		2C33C47F23E2C475005F963B /* Notification Service Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Notification Service Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C33C48123E2C475005F963B /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		2C33C48A23E2CC26005F963B /* Notification_Service_Extension-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Notification_Service_Extension-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -638,6 +640,7 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+		3B31B83CBDE128E65CA2B0CE /* Pods-Notification Service Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notification Service Extension.debug.xcconfig"; path = "Target Support Files/Pods-Notification Service Extension/Pods-Notification Service Extension.debug.xcconfig"; sourceTree = "<group>"; };
 		5610960028769C7F00292C4C /* UIAlertController+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extension.swift"; sourceTree = "<group>"; };
 		5610960A2876B50500292C4C /* NCRenameFile.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCRenameFile.storyboard; sourceTree = "<group>"; };
 		5610960B2876B50500292C4C /* NCRenameFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCRenameFile.swift; sourceTree = "<group>"; };
@@ -768,6 +771,9 @@
 		56F704CF292D027100371907 /* FileNameInputTextField.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FileNameInputTextField.xib; sourceTree = "<group>"; };
 		56F704F8292D0FF900371907 /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
 		56F70502292D27F300371907 /* UINavigationController+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Extension.swift"; sourceTree = "<group>"; };
+		5BCAF7B1483B858128E31CE4 /* Pods-Share.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Share.release.xcconfig"; path = "Target Support Files/Pods-Share/Pods-Share.release.xcconfig"; sourceTree = "<group>"; };
+		6DEF7591B39F1403EA6A31A6 /* Pods-Notification Service Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notification Service Extension.release.xcconfig"; path = "Target Support Files/Pods-Notification Service Extension/Pods-Notification Service Extension.release.xcconfig"; sourceTree = "<group>"; };
+		7924C3DBC5B188F10B119325 /* Pods-File Provider Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-File Provider Extension.release.xcconfig"; path = "Target Support Files/Pods-File Provider Extension/Pods-File Provider Extension.release.xcconfig"; sourceTree = "<group>"; };
 		7A4619A127BF71F40042D595 /* NCTrash+CollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCTrash+CollectionView.swift"; sourceTree = "<group>"; };
 		7A4619A527BF72440042D595 /* UIBarButton+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIBarButton+Extension.swift"; sourceTree = "<group>"; };
 		7A70DE1927B56B040018F47E /* KTVCocoaHTTPServer.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = KTVCocoaHTTPServer.xcframework; path = Carthage/Build/KTVCocoaHTTPServer.xcframework; sourceTree = "<group>"; };
@@ -785,6 +791,7 @@
 		7AE63BF926DE5FCD00CEAAD5 /* NCSelectCommandViewSelect+CreateFolder.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "NCSelectCommandViewSelect+CreateFolder.xib"; sourceTree = "<group>"; };
 		7AE63BFA26DE5FCD00CEAAD5 /* NCSelectCommandViewCopyMove.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCSelectCommandViewCopyMove.xib; sourceTree = "<group>"; };
 		7AE63BFB26DE5FCD00CEAAD5 /* NCSelectCommandViewSelect.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCSelectCommandViewSelect.xib; sourceTree = "<group>"; };
+		7BA78D819E7192AA1214BD55 /* Pods-NextcloudTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NextcloudTests.release.xcconfig"; path = "Target Support Files/Pods-NextcloudTests/Pods-NextcloudTests.release.xcconfig"; sourceTree = "<group>"; };
 		8402B117288920F700CBAC94 /* AutoUploadFolderCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AutoUploadFolderCustomCell.xib; sourceTree = "<group>"; };
 		8402B118288920F700CBAC94 /* TypeInFileNameCustomSwitchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TypeInFileNameCustomSwitchCell.xib; sourceTree = "<group>"; };
 		8402B119288920F700CBAC94 /* OriginalFileNameCustomSwitchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OriginalFileNameCustomSwitchCell.xib; sourceTree = "<group>"; };
@@ -802,12 +809,17 @@
 		8402B1352889298600CBAC94 /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
 		8402B1362889298600CBAC94 /* NCCreateMenuAdd.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCreateMenuAdd.swift; sourceTree = "<group>"; };
 		8489357428892F14004D4278 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		8AB01E9438AF238B12F183C1 /* Pods_Share.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Share.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9191194E03D4DBFE47BA9B89 /* Pods-NextcloudTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NextcloudTests.debug.xcconfig"; path = "Target Support Files/Pods-NextcloudTests/Pods-NextcloudTests.debug.xcconfig"; sourceTree = "<group>"; };
+		93BD01F9D59FB7DB3C39D9F3 /* Pods_Notification_Service_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Notification_Service_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		95BB2054265FE2AE00AF4344 /* NCGlobal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCGlobal.swift; sourceTree = "<group>"; };
 		95BB206D265FEE2F00AF4344 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		95BB20CC26600F6100AF4344 /* NCLogin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCLogin.swift; sourceTree = "<group>"; };
 		95BB20D226600FB900AF4344 /* NCNetworkingProcessUpload.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCNetworkingProcessUpload.swift; sourceTree = "<group>"; };
 		95BB20F12660E25200AF4344 /* NCPopupViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCPopupViewController.swift; sourceTree = "<group>"; };
 		95BB21162660F55900AF4344 /* NCLogin.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NCLogin.storyboard; sourceTree = "<group>"; };
+		9C2756562728C0939D175577 /* Pods_NextcloudTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NextcloudTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E66100AC140416560628AA3 /* Pods-File Provider Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-File Provider Extension.debug.xcconfig"; path = "Target Support Files/Pods-File Provider Extension/Pods-File Provider Extension.debug.xcconfig"; sourceTree = "<group>"; };
 		A78BD6E8AC22358517785D56 /* Pods-Nextcloud.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Nextcloud.debug.xcconfig"; path = "Target Support Files/Pods-Nextcloud/Pods-Nextcloud.debug.xcconfig"; sourceTree = "<group>"; };
 		AF3E5E0B7186F36A6B26BCB4 /* Pods-Nextcloud.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Nextcloud.release.xcconfig"; path = "Target Support Files/Pods-Nextcloud/Pods-Nextcloud.release.xcconfig"; sourceTree = "<group>"; };
 		B15AD4B5273D940D00490E0B /* ShareDownloadLimitNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareDownloadLimitNetwork.swift; sourceTree = "<group>"; };
@@ -838,6 +850,7 @@
 		C0D7888F26809F9800B876BB /* NCShareNewUserAddComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareNewUserAddComment.swift; sourceTree = "<group>"; };
 		C0D788A5268AEE8400B876BB /* NCShareMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareMenu.swift; sourceTree = "<group>"; };
 		C0D788CB268C656C00B876BB /* NCShareQuickStatusMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareQuickStatusMenu.swift; sourceTree = "<group>"; };
+		F642653EA47807C279DA87E5 /* Pods_File_Provider_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_File_Provider_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F700222B1EC479840080073F /* Custom.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Custom.xcassets; sourceTree = "<group>"; };
 		F700510022DF63AC003A3356 /* NCShare.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCShare.storyboard; sourceTree = "<group>"; };
 		F700510222DF6897003A3356 /* Parchment.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Parchment.framework; path = Carthage/Build/iOS/Parchment.framework; sourceTree = "<group>"; };
@@ -1135,10 +1148,10 @@
 				567BAA51292BFA9000C07960 /* NextcloudKit in Frameworks */,
 				5696258B27B289C6003F774D /* Queuer in Frameworks */,
 				5696258827B289C6003F774D /* Realm in Frameworks */,
-				5696258A27B289C6003F774D /* UICKeyChainStore in Frameworks */,
 				F75E57C325BF0ED2002B72C2 /* SVGKit in Frameworks */,
 				56F70488292CED8900371907 /* JGProgressHUD in Frameworks */,
 				56BE8A98287842DD0024C78B /* DropDown in Frameworks */,
+				9BA88BD900A306FAE6E49BF7 /* Pods_Notification_Service_Extension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1146,6 +1159,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				01BF35F929DD7D8F00AC9199 /* JGProgressHUD in Frameworks */,
+				01BF35F629DD7BC100AC9199 /* Realm in Frameworks */,
+				01BF35FB29DD7E0A00AC9199 /* SVGKit in Frameworks */,
+				01BF35FF29DD7EEE00AC9199 /* FirebaseCrashlytics in Frameworks */,
+				01BF35FD29DD7E3900AC9199 /* FSCalendar in Frameworks */,
+				2C3B2DEA4B78183632BF9F3F /* Pods_NextcloudTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1159,11 +1178,11 @@
 				565B11CF2875A37D006998FA /* OpenSSL.xcframework in Frameworks */,
 				567BAA4D292BFA7400C07960 /* NextcloudKit in Frameworks */,
 				5696258127B289C6003F774D /* Queuer in Frameworks */,
-				840FA6F4289980A60012F0AE /* UICKeyChainStore in Frameworks */,
 				567BAA4B292BFA1A00C07960 /* MarkdownKit in Frameworks */,
 				5696258227B289C6003F774D /* JGProgressHUD in Frameworks */,
 				5696257E27B289C6003F774D /* Realm in Frameworks */,
 				56BE8A94287842C10024C78B /* DropDown in Frameworks */,
+				5435E1158AAED730677E00EE /* Pods_Share.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1174,13 +1193,13 @@
 				F75E57C125BF0ECD002B72C2 /* SVGKit in Frameworks */,
 				56151A772874747700A83F13 /* Queuer in Frameworks */,
 				F73ADD2426554FE20069EA0D /* SwiftEntryKit in Frameworks */,
-				56151A762874747700A83F13 /* UICKeyChainStore in Frameworks */,
 				56F7048A292CED9700371907 /* JGProgressHUD in Frameworks */,
 				F710FC82277B7D3500AA9FBF /* Realm in Frameworks */,
 				F710FC84277B7D3500AA9FBF /* RealmSwift in Frameworks */,
 				567BAA4F292BFA8200C07960 /* NextcloudKit in Frameworks */,
 				567BAA49292BFA0B00C07960 /* MarkdownKit in Frameworks */,
 				56BE8A96287842D30024C78B /* DropDown in Frameworks */,
+				51AE6E9F09E742C9CC40B9F6 /* Pods_File_Provider_Extension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1188,7 +1207,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				56E9FB7F2878040D0006B408 /* WebBridge in Frameworks */,
 				5696257227B289C6003F774D /* Queuer in Frameworks */,
 				5696258F27B28DB8003F774D /* QRCodeReader in Frameworks */,
 				561B3B542880448F00ED7D40 /* KTVHTTPCache.xcframework in Frameworks */,
@@ -1198,25 +1216,21 @@
 				569625F627B29BA7003F774D /* JGProgressHUD in Frameworks */,
 				569625D327B291E6003F774D /* SwiftEntryKit in Frameworks */,
 				569625F027B29B07003F774D /* ChromaColorPicker in Frameworks */,
-				56F704BB292CFF1B00371907 /* XLForm in Frameworks */,
-				56E9FB792878040D0006B408 /* Criteo in Frameworks */,
 				5696256A27B289C6003F774D /* QRCodeReader in Frameworks */,
 				5696257627B289C6003F774D /* TLPhotoPicker in Frameworks */,
 				5696259527B28E9E003F774D /* FloatingPanel in Frameworks */,
 				5696257A27B289C6003F774D /* Parchment in Frameworks */,
+				01BF360529DD88BB00AC9199 /* Adjust in Frameworks */,
 				5696256C27B289C6003F774D /* FloatingPanel in Frameworks */,
 				5696256F27B289C6003F774D /* SwiftEntryKit in Frameworks */,
-				569625DF27B29670003F774D /* UICKeyChainStore in Frameworks */,
-				56E9FB7D2878040D0006B408 /* Trademob in Frameworks */,
 				5696257027B289C6003F774D /* MarqueeLabel in Frameworks */,
-				56E9FB772878040D0006B408 /* Adjust in Frameworks */,
 				5696259227B28E46003F774D /* SwiftRichString in Frameworks */,
 				561B3B522880448B00ED7D40 /* KTVCocoaHTTPServer.xcframework in Frameworks */,
 				5696257727B289C6003F774D /* Realm in Frameworks */,
 				56E9FB142877E4560006B408 /* DropDown in Frameworks */,
+				01BF360829DD893A00AC9199 /* UICKeyChainStore in Frameworks */,
 				569625D927B29589003F774D /* MarqueeLabel in Frameworks */,
 				569625DC27B295ED003F774D /* Queuer in Frameworks */,
-				5696257327B289C6003F774D /* UICKeyChainStore in Frameworks */,
 				561B3B562880449800ED7D40 /* OpenSSL.xcframework in Frameworks */,
 				569625F327B29B57003F774D /* Parchment in Frameworks */,
 				567BAA42292BE42000C07960 /* NextcloudKit in Frameworks */,
@@ -1225,8 +1239,8 @@
 				569625E827B2991A003F774D /* TLPhotoPicker in Frameworks */,
 				569625E527B29844003F774D /* FSCalendar in Frameworks */,
 				F75E57BD25BF0EC1002B72C2 /* SVGKit in Frameworks */,
+				01BF360229DD881100AC9199 /* XLForm in Frameworks */,
 				567BAA45292BF9A400C07960 /* MarkdownKit in Frameworks */,
-				56E9FB7B2878040D0006B408 /* Sociomantic in Frameworks */,
 				5696257527B289C6003F774D /* FSCalendar in Frameworks */,
 				561B3B582880449B00ED7D40 /* Pods_Nextcloud.framework in Frameworks */,
 				56007DDD282B98CA00EA4115 /* EasyTipView in Frameworks */,
@@ -1433,6 +1447,14 @@
 			children = (
 				A78BD6E8AC22358517785D56 /* Pods-Nextcloud.debug.xcconfig */,
 				AF3E5E0B7186F36A6B26BCB4 /* Pods-Nextcloud.release.xcconfig */,
+				9191194E03D4DBFE47BA9B89 /* Pods-NextcloudTests.debug.xcconfig */,
+				7BA78D819E7192AA1214BD55 /* Pods-NextcloudTests.release.xcconfig */,
+				3B31B83CBDE128E65CA2B0CE /* Pods-Notification Service Extension.debug.xcconfig */,
+				6DEF7591B39F1403EA6A31A6 /* Pods-Notification Service Extension.release.xcconfig */,
+				9E66100AC140416560628AA3 /* Pods-File Provider Extension.debug.xcconfig */,
+				7924C3DBC5B188F10B119325 /* Pods-File Provider Extension.release.xcconfig */,
+				255BF652BF6D4DBD759B0E38 /* Pods-Share.debug.xcconfig */,
+				5BCAF7B1483B858128E31CE4 /* Pods-Share.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -2275,6 +2297,10 @@
 				08DC3BD41E64727E00F036D3 /* AdSupport.framework */,
 				F7FC7D551DC1F93800BB2C6A /* libz.tbd */,
 				B64780EEA33C832A268BB870 /* Pods_Nextcloud.framework */,
+				9C2756562728C0939D175577 /* Pods_NextcloudTests.framework */,
+				93BD01F9D59FB7DB3C39D9F3 /* Pods_Notification_Service_Extension.framework */,
+				F642653EA47807C279DA87E5 /* Pods_File_Provider_Extension.framework */,
+				8AB01E9438AF238B12F183C1 /* Pods_Share.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2308,6 +2334,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2C33C48923E2C475005F963B /* Build configuration list for PBXNativeTarget "Notification Service Extension" */;
 			buildPhases = (
+				A6611EEE9BDC8690E8E645A4 /* [CP] Check Pods Manifest.lock */,
 				2C33C47B23E2C475005F963B /* Sources */,
 				2C33C47C23E2C475005F963B /* Frameworks */,
 				2C33C47D23E2C475005F963B /* Resources */,
@@ -2321,7 +2348,6 @@
 				F75E57C225BF0ED2002B72C2 /* SVGKit */,
 				F710FC85277B7D3F00AA9FBF /* Realm */,
 				F710FC87277B7D3F00AA9FBF /* RealmSwift */,
-				F7EBCDD2277B821700A4EF67 /* UICKeyChainStore */,
 				F7EBCDD8277B834F00A4EF67 /* Queuer */,
 				56BE8A97287842DD0024C78B /* DropDown */,
 				567BAA46292BF9FA00C07960 /* MarkdownKit */,
@@ -2336,9 +2362,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 567A77DE29D7198C00F46C05 /* Build configuration list for PBXNativeTarget "NextcloudTests" */;
 			buildPhases = (
+				0580CBA67F844AE69AF9DB94 /* [CP] Check Pods Manifest.lock */,
 				567A77D429D7198C00F46C05 /* Sources */,
 				567A77D529D7198C00F46C05 /* Frameworks */,
 				567A77D629D7198C00F46C05 /* Resources */,
+				748ACD59D76BB936EEA54C80 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2346,6 +2374,13 @@
 				567A77DD29D7198C00F46C05 /* PBXTargetDependency */,
 			);
 			name = NextcloudTests;
+			packageProductDependencies = (
+				01BF35F529DD7BC100AC9199 /* Realm */,
+				01BF35F829DD7D8F00AC9199 /* JGProgressHUD */,
+				01BF35FA29DD7E0A00AC9199 /* SVGKit */,
+				01BF35FC29DD7E3900AC9199 /* FSCalendar */,
+				01BF35FE29DD7EEE00AC9199 /* FirebaseCrashlytics */,
+			);
 			productName = NextcloudTests;
 			productReference = 567A77D829D7198C00F46C05 /* NextcloudTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -2354,6 +2389,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F7145A251D12E3B700CAFEEC /* Build configuration list for PBXNativeTarget "Share" */;
 			buildPhases = (
+				F3727A0EB9F8B1B3231D9D59 /* [CP] Check Pods Manifest.lock */,
 				F71459B51D12E3B700CAFEEC /* Sources */,
 				F7145A141D12E3B700CAFEEC /* Frameworks */,
 				F7145A181D12E3B700CAFEEC /* Resources */,
@@ -2371,7 +2407,6 @@
 				F7EBCDD4277B82DE00A4EF67 /* Queuer */,
 				F72CD01127A7E92400E59476 /* JGProgressHUD */,
 				56BE8A93287842C10024C78B /* DropDown */,
-				840FA6F3289980A60012F0AE /* UICKeyChainStore */,
 				567BAA4A292BFA1A00C07960 /* MarkdownKit */,
 				567BAA4C292BFA7400C07960 /* NextcloudKit */,
 			);
@@ -2383,6 +2418,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F771E3EF20E2392E00AFB62D /* Build configuration list for PBXNativeTarget "File Provider Extension" */;
 			buildPhases = (
+				F22295A7120ECDD781480D4B /* [CP] Check Pods Manifest.lock */,
 				F771E3CC20E2392D00AFB62D /* Sources */,
 				F771E3CD20E2392D00AFB62D /* Frameworks */,
 				F771E3CE20E2392D00AFB62D /* Resources */,
@@ -2397,7 +2433,6 @@
 				F73ADD2326554FE20069EA0D /* SwiftEntryKit */,
 				F710FC81277B7D3500AA9FBF /* Realm */,
 				F710FC83277B7D3500AA9FBF /* RealmSwift */,
-				F7EBCDD0277B820D00A4EF67 /* UICKeyChainStore */,
 				F7EBCDD6277B834400A4EF67 /* Queuer */,
 				56BE8A95287842D30024C78B /* DropDown */,
 				567BAA48292BFA0B00C07960 /* MarkdownKit */,
@@ -2438,7 +2473,6 @@
 				F73ADD1B265546890069EA0D /* SwiftEntryKit */,
 				F75EAED726D2552E00F4320E /* MarqueeLabel */,
 				F76DA962277B760E0082465B /* Queuer */,
-				F76DA965277B76F30082465B /* UICKeyChainStore */,
 				F76DA96B277B78400082465B /* FSCalendar */,
 				F76DA96E277B78AE0082465B /* TLPhotoPicker */,
 				F710FC79277B7D0000AA9FBF /* Realm */,
@@ -2451,7 +2485,6 @@
 				569625D227B291E6003F774D /* SwiftEntryKit */,
 				569625D827B29589003F774D /* MarqueeLabel */,
 				569625DB27B295ED003F774D /* Queuer */,
-				569625DE27B29670003F774D /* UICKeyChainStore */,
 				569625E427B29844003F774D /* FSCalendar */,
 				569625E727B2991A003F774D /* TLPhotoPicker */,
 				569625EA27B299A0003F774D /* Realm */,
@@ -2461,14 +2494,11 @@
 				569625F527B29BA7003F774D /* JGProgressHUD */,
 				56007DDC282B98CA00EA4115 /* EasyTipView */,
 				56E9FB132877E4560006B408 /* DropDown */,
-				56E9FB762878040D0006B408 /* Adjust */,
-				56E9FB782878040D0006B408 /* Criteo */,
-				56E9FB7A2878040D0006B408 /* Sociomantic */,
-				56E9FB7C2878040D0006B408 /* Trademob */,
-				56E9FB7E2878040D0006B408 /* WebBridge */,
 				567BAA41292BE42000C07960 /* NextcloudKit */,
 				567BAA44292BF9A400C07960 /* MarkdownKit */,
-				56F704BA292CFF1B00371907 /* XLForm */,
+				01BF360129DD881100AC9199 /* XLForm */,
+				01BF360429DD88BB00AC9199 /* Adjust */,
+				01BF360729DD893A00AC9199 /* UICKeyChainStore */,
 			);
 			productName = "Crypto Cloud";
 			productReference = F7CE8AFA1DC1F8D8009CAE48 /* Nextcloud.app */;
@@ -2540,10 +2570,8 @@
 				5696259027B28E46003F774D /* XCRemoteSwiftPackageReference "SwiftRichString" */,
 				5696259327B28E9E003F774D /* XCRemoteSwiftPackageReference "FloatingPanel" */,
 				569625D127B291E6003F774D /* XCRemoteSwiftPackageReference "SwiftEntryKit" */,
-				569625D427B292EE003F774D /* XCRemoteSwiftPackageReference "XLForm" */,
 				569625D727B29588003F774D /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
 				569625DA27B295ED003F774D /* XCRemoteSwiftPackageReference "Queuer" */,
-				569625DD27B29670003F774D /* XCRemoteSwiftPackageReference "UICKeyChainStore" */,
 				569625E327B29844003F774D /* XCRemoteSwiftPackageReference "FSCalendar" */,
 				569625E627B2991A003F774D /* XCRemoteSwiftPackageReference "TLPhotoPicker" */,
 				569625E927B299A0003F774D /* XCRemoteSwiftPackageReference "realm-swift" */,
@@ -2553,9 +2581,11 @@
 				56A229E527B3B57400C35F8B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				56007DDB282B98C900EA4115 /* XCRemoteSwiftPackageReference "EasyTipView" */,
 				56E9FB122877E4550006B408 /* XCRemoteSwiftPackageReference "DropDown" */,
-				56E9FB752878040D0006B408 /* XCRemoteSwiftPackageReference "ios_sdk" */,
 				567BAA40292BE41F00C07960 /* XCRemoteSwiftPackageReference "NextcloudKit" */,
 				567BAA43292BF9A300C07960 /* XCRemoteSwiftPackageReference "MarkdownKit" */,
+				01BF360029DD881000AC9199 /* XCRemoteSwiftPackageReference "XLForm" */,
+				01BF360329DD88BA00AC9199 /* XCRemoteSwiftPackageReference "ios_sdk" */,
+				01BF360629DD893A00AC9199 /* XCRemoteSwiftPackageReference "UICKeyChainStore" */,
 			);
 			productRefGroup = F7F67B9F1A24D27800EE80DA;
 			projectDirPath = "";
@@ -2762,6 +2792,28 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		0580CBA67F844AE69AF9DB94 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-NextcloudTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		29C8CA4BB2EACD8DFED0164E /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2769,8 +2821,11 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Nextcloud/Pods-Nextcloud-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Adjust-iOS13.0/Adjust.framework",
 				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/ChromaColorPicker/ChromaColorPicker.framework",
+				"${BUILT_PRODUCTS_DIR}/UICKeyChainStore-iOS13.0/UICKeyChainStore.framework",
+				"${BUILT_PRODUCTS_DIR}/XLForm-iOS13.0/XLForm.framework",
 				"${BUILT_PRODUCTS_DIR}/tealium-swift/TealiumSwift.framework",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/MORichNotification/MORichNotification.framework/MORichNotification",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/MoEngage-iOS-SDK/MoEngage.framework/MoEngage",
@@ -2780,8 +2835,11 @@
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Adjust.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ChromaColorPicker.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/UICKeyChainStore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/XLForm.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TealiumSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MORichNotification.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MoEngage.framework",
@@ -2792,6 +2850,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Nextcloud/Pods-Nextcloud-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		748ACD59D76BB936EEA54C80 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-NextcloudTests/Pods-NextcloudTests-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Adjust-iOS14.0/Adjust.framework",
+				"${BUILT_PRODUCTS_DIR}/UICKeyChainStore-iOS14.0/UICKeyChainStore.framework",
+				"${BUILT_PRODUCTS_DIR}/XLForm-iOS14.0/XLForm.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Adjust.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/UICKeyChainStore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/XLForm.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-NextcloudTests/Pods-NextcloudTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8CA09DB1383F4CBB39A265D3 /* [CP] Check Pods Manifest.lock */ = {
@@ -2810,6 +2890,72 @@
 			);
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-Nextcloud-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A6611EEE9BDC8690E8E645A4 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Notification Service Extension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F22295A7120ECDD781480D4B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-File Provider Extension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F3727A0EB9F8B1B3231D9D59 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Share-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3240,6 +3386,7 @@
 /* Begin XCBuildConfiguration section */
 		2C33C48723E2C475005F963B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3B31B83CBDE128E65CA2B0CE /* Pods-Notification Service Extension.debug.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -3298,6 +3445,7 @@
 		};
 		2C33C48823E2C475005F963B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6DEF7591B39F1403EA6A31A6 /* Pods-Notification Service Extension.release.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -3354,6 +3502,7 @@
 		};
 		567A77DF29D7198C00F46C05 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9191194E03D4DBFE47BA9B89 /* Pods-NextcloudTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -3384,7 +3533,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -3393,7 +3542,6 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/iOSClient/Nextcloud-Bridging-Header.h";
-				SWIFT_PRECOMPILE_BRIDGING_HEADER = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nextcloud.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nextcloud";
@@ -3403,6 +3551,7 @@
 		};
 		567A77E029D7198C00F46C05 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7BA78D819E7192AA1214BD55 /* Pods-NextcloudTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -3429,7 +3578,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -3437,7 +3586,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/iOSClient/Nextcloud-Bridging-Header.h";
-				SWIFT_PRECOMPILE_BRIDGING_HEADER = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nextcloud.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Nextcloud";
@@ -3447,6 +3595,7 @@
 		};
 		F7145A261D12E3B700CAFEEC /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 255BF652BF6D4DBD759B0E38 /* Pods-Share.debug.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
@@ -3497,6 +3646,7 @@
 		};
 		F7145A271D12E3B700CAFEEC /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5BCAF7B1483B858128E31CE4 /* Pods-Share.release.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
@@ -3545,6 +3695,7 @@
 		};
 		F771E3F020E2392E00AFB62D /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9E66100AC140416560628AA3 /* Pods-File Provider Extension.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -3601,6 +3752,7 @@
 		};
 		F771E3F120E2392E00AFB62D /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7924C3DBC5B188F10B119325 /* Pods-File Provider Extension.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -3948,6 +4100,30 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		01BF360029DD881000AC9199 /* XCRemoteSwiftPackageReference "XLForm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/xmartlabs/XLForm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+		01BF360329DD88BA00AC9199 /* XCRemoteSwiftPackageReference "ios_sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/adjust/ios_sdk";
+			requirement = {
+				kind = exactVersion;
+				version = 4.29.5;
+			};
+		};
+		01BF360629DD893A00AC9199 /* XCRemoteSwiftPackageReference "UICKeyChainStore" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/UICKeyChainStore";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		56007DDB282B98C900EA4115 /* XCRemoteSwiftPackageReference "EasyTipView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/marinofaggiana/EasyTipView";
@@ -4004,14 +4180,6 @@
 				minimumVersion = 1.2.7;
 			};
 		};
-		569625D427B292EE003F774D /* XCRemoteSwiftPackageReference "XLForm" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/xmartlabs/XLForm";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
-			};
-		};
 		569625D727B29588003F774D /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cbpowell/MarqueeLabel";
@@ -4026,14 +4194,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.0.0;
-			};
-		};
-		569625DD27B29670003F774D /* XCRemoteSwiftPackageReference "UICKeyChainStore" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kishikawakatsumi/UICKeyChainStore";
-			requirement = {
-				branch = master;
-				kind = branch;
 			};
 		};
 		569625E327B29844003F774D /* XCRemoteSwiftPackageReference "FSCalendar" */ = {
@@ -4098,14 +4258,6 @@
 			requirement = {
 				branch = master;
 				kind = branch;
-			};
-		};
-		56E9FB752878040D0006B408 /* XCRemoteSwiftPackageReference "ios_sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/adjust/ios_sdk";
-			requirement = {
-				kind = exactVersion;
-				version = 4.29.5;
 			};
 		};
 		F70B86732642CE3B00ED5349 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
@@ -4180,14 +4332,6 @@
 				minimumVersion = 2.0.0;
 			};
 		};
-		F76DA964277B76F10082465B /* XCRemoteSwiftPackageReference "UICKeyChainStore" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kishikawakatsumi/UICKeyChainStore";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		F76DA96A277B78400082465B /* XCRemoteSwiftPackageReference "FSCalendar" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/WenchaoD/FSCalendar";
@@ -4231,6 +4375,46 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		01BF35F529DD7BC100AC9199 /* Realm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 569625E927B299A0003F774D /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = Realm;
+		};
+		01BF35F829DD7D8F00AC9199 /* JGProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
+			productName = JGProgressHUD;
+		};
+		01BF35FA29DD7E0A00AC9199 /* SVGKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKit;
+		};
+		01BF35FC29DD7E3900AC9199 /* FSCalendar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 569625E327B29844003F774D /* XCRemoteSwiftPackageReference "FSCalendar" */;
+			productName = FSCalendar;
+		};
+		01BF35FE29DD7EEE00AC9199 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A229E527B3B57400C35F8B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		01BF360129DD881100AC9199 /* XLForm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 01BF360029DD881000AC9199 /* XCRemoteSwiftPackageReference "XLForm" */;
+			productName = XLForm;
+		};
+		01BF360429DD88BB00AC9199 /* Adjust */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 01BF360329DD88BA00AC9199 /* XCRemoteSwiftPackageReference "ios_sdk" */;
+			productName = Adjust;
+		};
+		01BF360729DD893A00AC9199 /* UICKeyChainStore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 01BF360629DD893A00AC9199 /* XCRemoteSwiftPackageReference "UICKeyChainStore" */;
+			productName = UICKeyChainStore;
+		};
 		56007DDC282B98CA00EA4115 /* EasyTipView */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 56007DDB282B98C900EA4115 /* XCRemoteSwiftPackageReference "EasyTipView" */;
@@ -4306,11 +4490,6 @@
 			package = 569625DA27B295ED003F774D /* XCRemoteSwiftPackageReference "Queuer" */;
 			productName = Queuer;
 		};
-		569625DE27B29670003F774D /* UICKeyChainStore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 569625DD27B29670003F774D /* XCRemoteSwiftPackageReference "UICKeyChainStore" */;
-			productName = UICKeyChainStore;
-		};
 		569625E427B29844003F774D /* FSCalendar */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 569625E327B29844003F774D /* XCRemoteSwiftPackageReference "FSCalendar" */;
@@ -4366,31 +4545,6 @@
 			package = 56E9FB122877E4550006B408 /* XCRemoteSwiftPackageReference "DropDown" */;
 			productName = DropDown;
 		};
-		56E9FB762878040D0006B408 /* Adjust */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 56E9FB752878040D0006B408 /* XCRemoteSwiftPackageReference "ios_sdk" */;
-			productName = Adjust;
-		};
-		56E9FB782878040D0006B408 /* Criteo */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 56E9FB752878040D0006B408 /* XCRemoteSwiftPackageReference "ios_sdk" */;
-			productName = Criteo;
-		};
-		56E9FB7A2878040D0006B408 /* Sociomantic */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 56E9FB752878040D0006B408 /* XCRemoteSwiftPackageReference "ios_sdk" */;
-			productName = Sociomantic;
-		};
-		56E9FB7C2878040D0006B408 /* Trademob */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 56E9FB752878040D0006B408 /* XCRemoteSwiftPackageReference "ios_sdk" */;
-			productName = Trademob;
-		};
-		56E9FB7E2878040D0006B408 /* WebBridge */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 56E9FB752878040D0006B408 /* XCRemoteSwiftPackageReference "ios_sdk" */;
-			productName = WebBridge;
-		};
 		56F70487292CED8900371907 /* JGProgressHUD */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
@@ -4400,16 +4554,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 569625F427B29BA7003F774D /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
 			productName = JGProgressHUD;
-		};
-		56F704BA292CFF1B00371907 /* XLForm */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 569625D427B292EE003F774D /* XCRemoteSwiftPackageReference "XLForm" */;
-			productName = XLForm;
-		};
-		840FA6F3289980A60012F0AE /* UICKeyChainStore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 569625DD27B29670003F774D /* XCRemoteSwiftPackageReference "UICKeyChainStore" */;
-			productName = UICKeyChainStore;
 		};
 		F70B86742642CE3B00ED5349 /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -4516,11 +4660,6 @@
 			package = F76DA961277B760E0082465B /* XCRemoteSwiftPackageReference "Queuer" */;
 			productName = Queuer;
 		};
-		F76DA965277B76F30082465B /* UICKeyChainStore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F76DA964277B76F10082465B /* XCRemoteSwiftPackageReference "UICKeyChainStore" */;
-			productName = UICKeyChainStore;
-		};
 		F76DA96B277B78400082465B /* FSCalendar */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F76DA96A277B78400082465B /* XCRemoteSwiftPackageReference "FSCalendar" */;
@@ -4540,16 +4679,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F7BB7E4527A18C56009B9F29 /* XCRemoteSwiftPackageReference "Parchment" */;
 			productName = Parchment;
-		};
-		F7EBCDD0277B820D00A4EF67 /* UICKeyChainStore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F76DA964277B76F10082465B /* XCRemoteSwiftPackageReference "UICKeyChainStore" */;
-			productName = UICKeyChainStore;
-		};
-		F7EBCDD2277B821700A4EF67 /* UICKeyChainStore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F76DA964277B76F10082465B /* XCRemoteSwiftPackageReference "UICKeyChainStore" */;
-			productName = UICKeyChainStore;
 		};
 		F7EBCDD4277B82DE00A4EF67 /* Queuer */ = {
 			isa = XCSwiftPackageProductDependency;

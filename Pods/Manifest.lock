@@ -1,4 +1,7 @@
 PODS:
+  - Adjust (4.29.7):
+    - Adjust/Core (= 4.29.7)
+  - Adjust/Core (4.29.7)
   - AppAuth (1.5.0):
     - AppAuth/Core (= 1.5.0)
     - AppAuth/ExternalUserAgent (= 1.5.0)
@@ -13,29 +16,40 @@ PODS:
     - tealium-swift/TealiumFull (= 2.7.0)
   - tealium-swift/Core (2.7.0)
   - tealium-swift/TealiumFull (2.7.0)
+  - UICKeyChainStore (2.2.1)
+  - XLForm (4.3.0)
 
 DEPENDENCIES:
+  - Adjust (~> 4.29.7)
   - AppAuth
   - ChromaColorPicker
   - MoEngage-iOS-SDK (~> 7.0)
   - tealium-swift
   - tealium-swift/Core
+  - UICKeyChainStore
+  - XLForm (~> 4.0)
 
 SPEC REPOS:
   trunk:
+    - Adjust
     - AppAuth
     - ChromaColorPicker
     - MoEngage-iOS-SDK
     - MORichNotification
     - tealium-swift
+    - UICKeyChainStore
+    - XLForm
 
 SPEC CHECKSUMS:
+  Adjust: 91a06a01e4bb35b432e26b5d5bb8995b95fc381c
   AppAuth: 80317d99ac7ff2801a2f18ff86b48cd315ed465d
   ChromaColorPicker: 307585f2dc23d4d72f24cad320c1e08825cb5c09
   MoEngage-iOS-SDK: 8c61e4be7cad51c9377da3bf29cb21cdc0fa3104
   MORichNotification: 3f4c3f3e6aa4f961811b15e9b6d25c27d923812c
   tealium-swift: da6605540fc647f795932de24a17e031f73ae943
+  UICKeyChainStore: ba3bff2c762b12db1e516f395c837dd25298b05e
+  XLForm: a439f9512078ed538e8335c8b06d3f3286bbfd37
 
-PODFILE CHECKSUM: affbec613f8f7ac97b444849bb2bb3ee73f192c0
+PODFILE CHECKSUM: dd83505f1f7d162d33fda13ed8863b52f5b33c5d
 
 COCOAPODS: 1.11.3
