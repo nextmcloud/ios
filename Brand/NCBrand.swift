@@ -23,11 +23,7 @@
 
 import UIKit
 
-let userAgent: String = {
-    let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-    // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
-    return "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
-}()
+// MARK: - Options
 
 @objc class NCBrandOptions: NSObject {
     @objc static let shared: NCBrandOptions = {
@@ -38,7 +34,7 @@ let userAgent: String = {
     @objc public var brand: String = "Nextcloud"
     @objc public var textCopyrightNextcloudiOS: String = "Nextcloud Liquid for iOS %@ © 2023"
     @objc public var textCopyrightNextcloudServer: String = "Nextcloud Server %@"
-    @objc public var loginBaseUrl: String = "https://cloud.nextcloud.com"
+    @objc public var loginBaseUrl: String = "https://magentacloud.de/"
     @objc public var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost: String = "https://nextcloud.com/install"
     @objc public var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
@@ -58,31 +54,33 @@ let userAgent: String = {
     @objc public var capabilitiesGroups: String = "group.it.twsweb.Crypto-Cloud"
     @objc public var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
 
+    // User Agent
+    @objc public var userAgent: String = "Nextcloud-iOS"                                                            // Don't touch me !!
+
     // BRAND ONLY
-    @objc public var use_login_web_personalized: Bool = false                                   // Don't touch me !!
-    @objc public var use_AppConfig: Bool = false                                                // Don't touch me !!
-    @objc public var use_GroupApps: Bool = true                                                 // Don't touch me !!
+    @objc public var use_login_web_personalized:        Bool = true                                                // Don't touch me !!
+    @objc public var use_AppConfig:                     Bool = false                                                // Don't touch me !!
+    @objc public var use_GroupApps:                     Bool = true                                                 // Don't touch me !!
 
     // Options
-    @objc public var use_default_auto_upload: Bool = false
-    @objc public var use_themingColor: Bool = true
-    @objc public var use_themingLogo: Bool = false
-    @objc public var use_storeLocalAutoUploadAll: Bool = false
-    @objc public var use_loginflowv2: Bool = false                                              // Don't touch me !!
+    @objc public var use_default_auto_upload:           Bool = false
+    @objc public var use_themingColor:                  Bool = true
+    @objc public var use_themingLogo:                   Bool = false
+    @objc public var use_storeLocalAutoUploadAll:       Bool = false
+    @objc public var use_loginflowv2:                   Bool = false                                                // Don't touch me !!
 
-    @objc public var disable_intro: Bool = false
-    @objc public var disable_request_login_url: Bool = false
-    @objc public var disable_multiaccount: Bool = false
-    @objc public var disable_manage_account: Bool = false
-    @objc public var disable_more_external_site: Bool = false
-    @objc public var disable_openin_file: Bool = false                                          // Don't touch me !!
-    @objc public var disable_crash_service: Bool = false
-    @objc public var disable_log: Bool = false
-    @objc public var disable_mobileconfig: Bool = false
-    @objc public var disable_show_more_nextcloud_apps_in_settings: Bool = false
+    @objc public var disable_intro:                     Bool = false
+    @objc public var disable_request_login_url:         Bool = false
+    @objc public var disable_multiaccount:              Bool = false
+    @objc public var disable_manage_account:            Bool = false
+    @objc public var disable_more_external_site:        Bool = false
+    @objc public var disable_openin_file:               Bool = false                                                // Don't touch me !!
+    @objc public var disable_crash_service:             Bool = false
+    @objc public var disable_log:                       Bool = false
+    @objc public var disable_mobileconfig:              Bool = false
 
     // Internal option behaviour
-    @objc public var cleanUpDay: Int = 0                                                        // Set default "Delete, in the cache, all files older than" possible days value are: 0, 1, 7, 30, 90, 180, 365
+    @objc public var cleanUpDay:                        Int = 0                                                     // Set default "Delete, in the cache, all files older than" possible days value are: 0, 1, 7, 30, 90, 180, 365
 
     // Info Paging
     enum NCInfoPagingTab: Int, CaseIterable {
@@ -94,10 +92,10 @@ let userAgent: String = {
         if folderBrandAutoUpload != "" {
             folderDefaultAutoUpload = folderBrandAutoUpload
         }
-
+        
         // wrapper AppConfig
         if let configurationManaged = UserDefaults.standard.dictionary(forKey: "com.apple.configuration.managed"), use_AppConfig {
-
+            
             if let str = configurationManaged[NCGlobal.shared.configuration_brand] as? String {
                 brand = str
             }
@@ -124,11 +122,9 @@ let userAgent: String = {
             }
         }
     }
-
-    @objc func getUserAgent() -> String {
-        return userAgent
-    }
 }
+
+// MARK: - Color
 
 class NCBrandColor: NSObject {
     @objc static let shared: NCBrandColor = {
@@ -176,15 +172,15 @@ class NCBrandColor: NSObject {
     }
 
     // Color
-    @objc public let customer: UIColor = UIColor(red: 0.0 / 255.0, green: 130.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)         // BLU NC : #0082c9
+    @objc public let customer:   UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)    // BLU NC : #0082c9
     @objc public var customerText: UIColor = .white
 
     @objc public var brand: UIColor                                                                                         // don't touch me
     @objc public var brandElement: UIColor                                                                                  // don't touch me
     @objc public var brandText: UIColor                                                                                     // don't touch me
 
-    @objc public let nextcloud: UIColor = UIColor(red: 0.0 / 255.0, green: 130.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)
-    @objc public let yellowFavorite: UIColor = UIColor(red: 248.0 / 255.0, green: 205.0 / 255.0, blue: 70.0 / 255.0, alpha: 1.0)
+    @objc public let nextcloud: UIColor = UIColor(red: 0.0/255.0, green: 130.0/255.0, blue: 201.0/255.0, alpha: 1.0)
+    @objc public let yellowFavorite: UIColor = UIColor(red: 248.0/255.0, green: 205.0/255.0, blue: 70.0/255.0, alpha: 1.0)
 
     public var userColors: [CGColor] = []
     public var themingColor: String = ""
@@ -196,7 +192,15 @@ class NCBrandColor: NSObject {
             return UIColor(red: 0.0 / 255.0, green: 199.0 / 255.0, blue: 190.0 / 255.0, alpha: 1.0)
         }
     }
-
+    @objc public var label: UIColor {
+        get {
+            if #available(iOS 13, *) {
+                return .label
+            } else {
+                return .black
+            }
+        }
+    }
     override init() {
         brand = customer
         brandElement = customer
@@ -228,7 +232,7 @@ class NCBrandColor: NSObject {
         cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folder = UIImage(named: "folder")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folder =  UIImage(named: "folder")!.image(color: brandElement, size: folderWidth)
 
         cacheImages.checkedYes = NCUtility.shared.loadImage(named: "checkmark.circle.fill", color: .systemBlue)
         cacheImages.checkedNo = NCUtility.shared.loadImage(named: "circle", color: .systemGray)
@@ -319,7 +323,7 @@ class NCBrandColor: NSObject {
             brand = customer
             brandText = customerText
         }
-
+        
         createImagesThemingColor()
 #if !EXTENSION
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming)
@@ -356,9 +360,9 @@ class NCBrandColor: NSObject {
      3 colors \* 6 will result in 18 generated colors
      */
     func generateColors(steps: Int = 6) -> [CGColor] {
-        let red = UIColor(red: 182 / 255, green: 70 / 255, blue: 157 / 255, alpha: 1).cgColor
-        let yellow = UIColor(red: 221 / 255, green: 203 / 255, blue: 85 / 255, alpha: 1).cgColor
-        let blue = UIColor(red: 0 / 255, green: 130 / 255, blue: 201 / 255, alpha: 1).cgColor
+        let red = UIColor(red: 182/255, green: 70/255, blue: 157/255, alpha: 1).cgColor
+        let yellow = UIColor(red: 221/255, green: 203/255, blue: 85/255, alpha: 1).cgColor
+        let blue = UIColor(red: 0/255, green: 130/255, blue: 201/255, alpha: 1).cgColor
 
         let palette1 = mixPalette(steps: steps, color1: red, color2: yellow)
         let palette2 = mixPalette(steps: steps, color1: yellow, color2: blue)
