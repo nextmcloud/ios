@@ -145,14 +145,6 @@ class NCLoginWeb: UIViewController {
         }
         self.navigationController?.navigationBar.backgroundColor = NCBrandColor.shared.customer
 
-        // TITLE
-//        if let host = URL(string: urlBase)?.host {
-//            titleView = host
-//            if let account = NCManageDatabase.shared.getActiveAccount(), CCUtility.getPassword(account.account).isEmpty {
-//                titleView = NSLocalizedString("_user_", comment: "") + " " + account.userId + " " + NSLocalizedString("_in_", comment: "") + " " + host
-//            }
-//        }
-//        self.title = titleView
     }
 
     override func viewDidAppear(_ animated: Bool) {
