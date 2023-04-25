@@ -164,7 +164,7 @@ class NCBrandColor: NSObject {
     }
 
     // Color
-    @objc public let customer: UIColor = UIColor(red: 0.0/255.0, green: 130.0/255.0, blue: 201.0/255.0, alpha: 1.0)         // BLU NC : #0082c9
+    @objc public let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // BLU NC : #0082c9
     @objc public var customerText: UIColor = .white
 
     @objc public var brand: UIColor                                                                                         // don't touch me
@@ -173,6 +173,7 @@ class NCBrandColor: NSObject {
 
     @objc public let nextcloud: UIColor = UIColor(red: 0.0/255.0, green: 130.0/255.0, blue: 201.0/255.0, alpha: 1.0)
     @objc public let yellowFavorite: UIColor = UIColor(red: 248.0/255.0, green: 205.0/255.0, blue: 70.0/255.0, alpha: 1.0)
+    @objc public var backgroundForm:        UIColor = UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
 
     public var userColors: [CGColor] = []
     public var themingColor: String = ""
@@ -184,6 +185,17 @@ class NCBrandColor: NSObject {
             return UIColor(red: 0.0 / 255.0, green: 199.0 / 255.0, blue: 190.0 / 255.0, alpha: 1.0)
         }
     }
+    
+    @objc public var systemGroupedBackground: UIColor {
+        get {
+            if #available(iOS 13, *) {
+                return .systemGroupedBackground
+            } else {
+                return UIColor(red: 0.95, green: 0.95, blue: 0.97, alpha: 1.0)
+            }
+        }
+    }
+    
 
     override init() {
         brand = customer
