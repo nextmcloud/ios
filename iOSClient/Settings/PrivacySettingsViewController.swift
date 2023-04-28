@@ -16,7 +16,7 @@ class PrivacySettingsViewController: XLFormViewController{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = NSLocalizedString("_privacy_settings_", comment: "")
+        self.title = NSLocalizedString("_privacy_settings_title_", comment: "")
 
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
 
@@ -28,7 +28,7 @@ class PrivacySettingsViewController: XLFormViewController{
     }
     
     @objc func changeTheming() {
-        tableView.backgroundColor = NCBrandColor.shared.systemGroupedBackground
+        tableView.backgroundColor = .systemGroupedBackground
         tableView.separatorColor = .none
         tableView.separatorColor = .clear
         tableView.reloadData()

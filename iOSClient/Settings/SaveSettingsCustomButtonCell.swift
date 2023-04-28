@@ -16,7 +16,6 @@ class SaveSettingsCustomButtonCell: XLFormButtonCell {
         override func awakeFromNib() {
             super.awakeFromNib()
             // Initialization code
-            self.backgroundColor = NCBrandColor.shared.backgroundForm
             self.selectionStyle = .none
             self.separatorInset = UIEdgeInsets(top: 0, left: .greatestFiniteMagnitude, bottom: 0, right: .greatestFiniteMagnitude)
             saveSettingsButton.setTitle(NSLocalizedString("_save_settings_", comment: ""), for: .normal)
@@ -37,9 +36,6 @@ class SaveSettingsCustomButtonCell: XLFormButtonCell {
         override func update() {
             super.update()
             
-            let backgroundView = UIView()
-            backgroundView.backgroundColor = NCBrandColor.shared.backgroundForm
-            self.selectedBackgroundView = backgroundView
         }
     
     @objc func saveButtonClicked(sender: UIButton) {
