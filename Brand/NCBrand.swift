@@ -34,7 +34,7 @@ import UIKit
     @objc public var brand: String = "Nextcloud"
     @objc public var textCopyrightNextcloudiOS: String = "Nextcloud Liquid for iOS %@ © 2023"
     @objc public var textCopyrightNextcloudServer: String = "Nextcloud Server %@"
-    @objc public var loginBaseUrl: String = "https://magentacloud.de"
+    @objc public var loginBaseUrl: String = "https://cloud.nextcloud.com"
     @objc public var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost: String = "https://nextcloud.com/install"
     @objc public var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
@@ -172,7 +172,7 @@ class NCBrandColor: NSObject {
     }
 
     // Color
-    @objc public let customer:   UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)    // BLU NC : #0082c9
+    @objc public let customer: UIColor = UIColor(red: 0.0/255.0, green: 130.0/255.0, blue: 201.0/255.0, alpha: 1.0)         // BLU NC : #0082c9
     @objc public var customerText: UIColor = .white
 
     @objc public var brand: UIColor                                                                                         // don't touch me
@@ -192,15 +192,7 @@ class NCBrandColor: NSObject {
             return UIColor(red: 0.0 / 255.0, green: 199.0 / 255.0, blue: 190.0 / 255.0, alpha: 1.0)
         }
     }
-    @objc public var label: UIColor {
-        get {
-            if #available(iOS 13, *) {
-                return .label
-            } else {
-                return .black
-            }
-        }
-    }
+    
     override init() {
         brand = customer
         brandElement = customer
