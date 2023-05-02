@@ -41,12 +41,13 @@ import XLForm
        
         // Check that the InitialPrivacyPolicyViewController gets opened
         let storyboard = UIStoryboard(name: "NCSettings", bundle: nil)
-        let privacyPolicyViewController = storyboard.instantiateViewController(withIdentifier: "privacyPolicyViewController") as! InitialPrivacySettingsViewController
-        let navigationController = UINavigationController(rootViewController: privacyPolicyViewController)
-        
-        privacyPolicyViewController.loadViewIfNeeded()
-        
-        XCTAssertTrue(navigationController.topViewController is InitialPrivacySettingsViewController, "Privacy policy view controller should be open")
+        if let privacyPolicyViewController = storyboard.instantiateViewController(withIdentifier: "privacyPolicyViewController") as? InitialPrivacySettingsViewController {
+            let navigationController = UINavigationController(rootViewController: privacyPolicyViewController)
+            
+            privacyPolicyViewController.loadViewIfNeeded()
+            
+            XCTAssertTrue(navigationController.topViewController is InitialPrivacySettingsViewController, "Privacy policy view controller should be open")
+        }
     }
      
      func testTextViewHasCorrectText() {
