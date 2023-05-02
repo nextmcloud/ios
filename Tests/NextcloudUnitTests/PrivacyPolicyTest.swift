@@ -14,7 +14,7 @@ import XLForm
 
  class PrivacyPolicyTest: XCTestCase {
     
-     var viewController: InitialPrivacySettingsViewController!
+     var viewController: InitialPrivacySettingsViewController?
      var privacySettingsView = PrivacySettingsViewController()
      
     override func setUpWithError() throws {
@@ -26,10 +26,10 @@ import XLForm
         viewController = storyboard.instantiateViewController(withIdentifier: "privacyPolicyViewController") as? InitialPrivacySettingsViewController
         
         // Outlets are connected
-        let _ = viewController.view
+        let _ = viewController?.view
         
         // Make the viewDidLoad() execute.
-        viewController.loadViewIfNeeded()
+        viewController?.loadViewIfNeeded()
 
     }
 
@@ -53,16 +53,16 @@ import XLForm
          
          //Check that the text displayed is correct
          let expectedText = NSLocalizedString("_privacy_help_text_after_login_", comment: "")
-         viewController.privacySettingsHelpText?.text = expectedText
+         viewController?.privacySettingsHelpText?.text = expectedText
          
-         let actualText = viewController.privacySettingsHelpText?.text
+         let actualText = viewController?.privacySettingsHelpText?.text
          XCTAssertEqual(actualText, expectedText, "The text view does not have the expected text")
      }
      
      func testHasAcceptButton() {
          
          // Check that view has the accept button
-         let acceptButton = viewController.acceptButton
+         let acceptButton = viewController?.acceptButton
          
          XCTAssertNotNil(acceptButton, "View controller does not have an accept button")
          
@@ -74,10 +74,10 @@ import XLForm
          let linkType = LinkType.settings
          
          UserDefaults.standard.set(true, forKey: "showSettingsButton")
-         viewController.privacySettingsHelpText.hyperLink(originalText: viewController.privacyHelpText, linkTextsAndTypes: [NSLocalizedString("_key_settings_help_", comment: ""): linkType.rawValue])
+         viewController?.privacySettingsHelpText.hyperLink(originalText: viewController?.privacyHelpText ?? "", linkTextsAndTypes: [NSLocalizedString("_key_settings_help_", comment: ""): linkType.rawValue])
 
          // Check that the correct view controller was pushed onto the navigation stack
-         XCTAssertNotNil(viewController.navigationController?.visibleViewController is PrivacySettingsViewController)
+         XCTAssertNotNil(viewController?.navigationController?.visibleViewController is PrivacySettingsViewController)
      }
      
      func testPrivacyPolicyLinkType_NavigatesToPrivacyPolicyViewController() {
@@ -85,10 +85,10 @@ import XLForm
          // Simulate tapping the "Privacy Policy" link type
          let linkType = LinkType.privacyPolicy
     
-         viewController.privacySettingsHelpText.hyperLink(originalText: viewController.privacyHelpText, linkTextsAndTypes: [NSLocalizedString("_key_privacy_help_", comment: ""): linkType.rawValue])
+         viewController?.privacySettingsHelpText.hyperLink(originalText: viewController?.privacyHelpText ?? "", linkTextsAndTypes: [NSLocalizedString("_key_privacy_help_", comment: ""): linkType.rawValue])
     
          // Check that the correct view controller was pushed onto the navigation
-         XCTAssertNotNil(viewController.navigationController?.visibleViewController is PrivacyPolicyViewController)
+         XCTAssertNotNil(viewController?.navigationController?.visibleViewController is PrivacyPolicyViewController)
      }
      
      func testCorrectImagePresentOnInitialPrivacySettingsViewController() {
@@ -102,7 +102,7 @@ import XLForm
          
          // Check that the accept button has the correct background color
          let expectedColor = NCBrandColor.shared.brand
-         XCTAssertEqual(viewController.acceptButton.backgroundColor, expectedColor)
+         XCTAssertEqual(viewController?.acceptButton.backgroundColor, expectedColor)
          
      }
      
