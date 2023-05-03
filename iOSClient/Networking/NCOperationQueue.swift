@@ -66,7 +66,7 @@ import JGProgressHUD
             if metadata.iconName.isEmpty {
                 cell?.filePreviewImageView?.image = NCBrandColor.cacheImages.file
             } else {
-                cell?.filePreviewImageView?.image = UIImage(named: metadata.iconName)
+                cell?.filePreviewImageView?.image = metadata.fileExtension == "odg" ? UIImage(named: "diagram") : UIImage(named: metadata.iconName)
             }
         }
 
