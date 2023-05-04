@@ -870,6 +870,7 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        5629C00129ED3E5D003C5D95 /* NCNotificationTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNotificationTest.swift; sourceTree = "<group>"; };
 		8491B1CC273BBA82001C8C5B /* UIViewController+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Menu.swift"; sourceTree = "<group>"; };
 		AF1A9B6327D0CA1E00F17A9E /* UIAlertController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extension.swift"; sourceTree = "<group>"; };
 		AF22B20B277C6F4D00DAB0CC /* NCShareCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareCell.swift; sourceTree = "<group>"; };
@@ -1642,6 +1643,12 @@
 			isa = PBXGroup;
 			children = (
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
+				AF8ED2022757822700B8DBC4 /* NCGlobalTests.swift */,
+				AF36077527BFB019001A243D /* ParallelWorkerTest.swift */,
+				AF70C14C27F3484D00E13DF2 /* SharePermissionTest.swift */,
+				AF3F909928213BEA0048A93E /* UserAgentTests.swift */,
+				AF8ED1FB2757821000B8DBC4 /* NextcloudTests.swift */,
+                5629C00129ED3E5D003C5D95 /* NCNotificationTest.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
@@ -3468,6 +3475,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF8ED1FC2757821000B8DBC4 /* NextcloudUnitTests.swift in Sources */,
+				AF70C14D27F3484D00E13DF2 /* SharePermissionTest.swift in Sources */,
+				AF3F909A28213BEA0048A93E /* UserAgentTests.swift in Sources */,
+				AF36077627BFB019001A243D /* ParallelWorkerTest.swift in Sources */,
+                5629C00229ED3E5D003C5D95 /* NCNotificationTest.swift in Sources */,
+				AF8ED1FC2757821000B8DBC4 /* NextcloudTests.swift in Sources */,
+				AF8ED2032757822700B8DBC4 /* NCGlobalTests.swift in Sources */,
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
 			);
