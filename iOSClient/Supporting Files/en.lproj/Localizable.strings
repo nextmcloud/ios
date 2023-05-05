@@ -729,6 +729,8 @@
 "_delete_all_scanned_images_"       = "Delete all scanned images";
 "_text_recognition_"                = "Text recognition";
 
+"_prefix_upload_path_"              = "MagentaCLOUD/";
+"_please_enter_file_name_"          = "Please enter the file name";
 /* The title on the navigation bar of the Scanning screen. */
 "wescan.scanning.title"             = "Scanning";
 /* The "Next" button on the right side of the navigation bar on the Edit screen. */
