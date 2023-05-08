@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+        0142C77E2A038DF50008E448 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0142C77C2A038DF50008E448 /* FolderPathCustomCell.swift */; };
+        0142C77F2A038DF50008E448 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0142C77D2A038DF50008E448 /* FolderPathCustomCell.xib */; };
+        0142C7822A038ED00008E448 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0142C7802A038ED00008E448 /* NCCreateDocumentCustomTextField.swift */; };
+        0142C7832A038ED00008E448 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0142C7812A038ED00008E448 /* NCCreateDocumentCustomTextField.xib */; };
+        018D3E0A2A067F8100C5CB8E /* CollaboraTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018D3E092A067F8100C5CB8E /* CollaboraTestCase.swift */; };
         010E052529FA361600507CE6 /* PrivacyPolicyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010E052429FA361600507CE6 /* PrivacyPolicyTest.swift */; };
         01324F6229F79C9D001E02E4 /* InitialPrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01324F6129F79C9D001E02E4 /* InitialPrivacySettingsViewController.swift */; };
         01324F6429F7A48A001E02E4 /* PrivacyPolicyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01324F6329F7A48A001E02E4 /* PrivacyPolicyViewController.swift */; };
@@ -869,6 +874,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+        0142C77C2A038DF50008E448 /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
+        0142C77D2A038DF50008E448 /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
+        0142C7802A038ED00008E448 /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
+        0142C7812A038ED00008E448 /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
         010E052429FA361600507CE6 /* PrivacyPolicyTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyTest.swift; sourceTree = "<group>"; };
         01324F6129F79C9D001E02E4 /* InitialPrivacySettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitialPrivacySettingsViewController.swift; sourceTree = "<group>"; };
         01324F6329F7A48A001E02E4 /* PrivacyPolicyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyViewController.swift; sourceTree = "<group>"; };
@@ -880,6 +889,7 @@
         01324F6F29F7AD73001E02E4 /* SaveSettingsCustomButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSettingsCustomButtonCell.swift; sourceTree = "<group>"; };
         01324F7029F7AD73001E02E4 /* SaveSettingsCustomButtonCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SaveSettingsCustomButtonCell.xib; sourceTree = "<group>"; };
         0164E58129F2679B0056671C /* OnboardingTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTestCase.swift; sourceTree = "<group>"; };
+        018D3E092A067F8100C5CB8E /* CollaboraTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaboraTestCase.swift; sourceTree = "<group>"; };
 		08DC3BD41E64727E00F036D3 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		08EA97441E6554FC004C83FA /* FirebaseAnalytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseAnalytics.framework; sourceTree = "<group>"; };
 		08EA97451E6554FC004C83FA /* FirebaseCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseCore.framework; sourceTree = "<group>"; };
@@ -1630,6 +1640,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+        0142C77B2A038DA70008E448 /* NMC Custom Views */ = {
+            isa = PBXGroup;
+            children = (
+                0142C77C2A038DF50008E448 /* FolderPathCustomCell.swift */,
+                0142C77D2A038DF50008E448 /* FolderPathCustomCell.xib */,
+                0142C7802A038ED00008E448 /* NCCreateDocumentCustomTextField.swift */,
+                0142C7812A038ED00008E448 /* NCCreateDocumentCustomTextField.xib */,
+            );
+            path = "NMC Custom Views";
+            sourceTree = "<group>";
+        };
 		2C33C48023E2C475005F963B /* Notification Service Extension */ = {
 			isa = PBXGroup;
 			children = (
@@ -1674,6 +1695,7 @@
                 5629C00129ED3E5D003C5D95 /* NCNotificationTest.swift */,
                 0164E58129F2679B0056671C /* OnboardingTestCase.swift */,
                 010E052429FA361600507CE6 /* PrivacyPolicyTest.swift */,
+                018D3E092A067F8100C5CB8E /* CollaboraTestCase.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
@@ -2586,6 +2608,7 @@
 		F7F67BAA1A24D27800EE80DA /* iOSClient */ = {
 			isa = PBXGroup;
 			children = (
+                0142C77B2A038DA70008E448 /* NMC Custom Views */,
 				F702F2CC25EE5B4F008F8E80 /* AppDelegate.swift */,
 				F76B649B2ADFFAED00014640 /* NCImageCache.swift */,
 				F702F2CE25EE5B5C008F8E80 /* NCGlobal.swift */,
@@ -3345,6 +3368,7 @@
 				AF93471C27E2361E002537EE /* NCShareAdvancePermissionHeader.xib in Resources */,
 				F7F1E54C2492369A00E42386 /* NCMediaCommandView.xib in Resources */,
 				F76032A0252F0F8E0015A421 /* NCTransferCell.xib in Resources */,
+                0142C7832A038ED00008E448 /* NCCreateDocumentCustomTextField.xib in Resources */,
 				F7F4F10527ECDBDB008676F9 /* Inconsolata-SemiBold.ttf in Resources */,
 				F7A48415297028FC00BD1B49 /* Nextcloud Hub.png in Resources */,
 				F74C0437253F1CDC009762AB /* NCShares.storyboard in Resources */,
@@ -3390,6 +3414,7 @@
 				F774264A22EB4D0000B23912 /* NCSearchUserDropDownCell.xib in Resources */,
 				F7CB689A2541676B0050EC94 /* NCMore.storyboard in Resources */,
 				F77B0F7D1D118A16002130FE /* Images.xcassets in Resources */,
+                0142C77F2A038DF50008E448 /* FolderPathCustomCell.xib in Resources */,
 				F73CB3B222E072A000AD728E /* NCShareHeaderView.xib in Resources */,
 				F7AE00FA230E81EB007ACF8A /* NCBrowserWeb.storyboard in Resources */,
                 01324F7229F7AD73001E02E4 /* SaveSettingsCustomButtonCell.xib in Resources */,
@@ -3523,6 +3548,7 @@
                 5629C00229ED3E5D003C5D95 /* NCNotificationTest.swift in Sources */,
 				AF8ED1FC2757821000B8DBC4 /* NextcloudTests.swift in Sources */,
 				AF8ED2032757822700B8DBC4 /* NCGlobalTests.swift in Sources */,
+                018D3E0A2A067F8100C5CB8E /* CollaboraTestCase.swift in Sources */,
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
 			);
@@ -3913,6 +3939,7 @@
 				F7682FE023C36B0500983A04 /* NCMainTabBar.swift in Sources */,
 				F7A0D1352591FBC5008F8A13 /* String+Extension.swift in Sources */,
 				F77B0E5F1D118A16002130FE /* NCSettings.m in Sources */,
+                0142C77E2A038DF50008E448 /* FolderPathCustomCell.swift in Sources */,
 				F7F9D1BB25397CE000D9BFF5 /* NCViewer.swift in Sources */,
 				AF730AF827834B1400B7520E /* NCShare+NCCellDelegate.swift in Sources */,
 				F70460522499061800BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
@@ -4010,6 +4037,7 @@
 				F7BC288026663F85004D46C5 /* NCViewCertificateDetails.swift in Sources */,
 				F73EF7AF2B0224350087E6E9 /* NCManageDatabase+DirectEditing.swift in Sources */,
 				F702F2E625EE5C86008F8E80 /* NCAudioRecorderViewController.swift in Sources */,
+                0142C7822A038ED00008E448 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */,
 				F745B253222D88AE00346520 /* NCLoginQRCode.swift in Sources */,
 				F7CBC31C24F78E79004D3812 /* NCSortMenu.swift in Sources */,
