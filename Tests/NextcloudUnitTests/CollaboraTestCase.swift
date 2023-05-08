@@ -31,8 +31,8 @@ class CollaboraTestCase: XCTestCase {
                     return
                 }
                 
-                let viewController = navigationController.topViewController as! NCCreateFormUploadDocuments
-                viewController.titleForm = NSLocalizedString("_create_new_document_", comment: "")
+                let viewController = navigationController.topViewController as? NCCreateFormUploadDocuments
+                viewController?.titleForm = NSLocalizedString("_create_new_document_", comment: "")
             })
         }
         
@@ -50,8 +50,8 @@ class CollaboraTestCase: XCTestCase {
                     return
                 }
                 
-                let viewController = navigationController.topViewController as! NCCreateFormUploadDocuments
-                viewController.titleForm = NSLocalizedString("_create_new_presentation_", comment: "")
+                let viewController = navigationController.topViewController as? NCCreateFormUploadDocuments
+                viewController?.titleForm = NSLocalizedString("_create_new_presentation_", comment: "")
             })
         }
         
@@ -69,8 +69,8 @@ class CollaboraTestCase: XCTestCase {
                     return
                 }
                 
-                let viewController = navigationController.topViewController as! NCCreateFormUploadDocuments
-                viewController.titleForm = NSLocalizedString("_create_new_spreadsheet_", comment: "")
+                let viewController = navigationController.topViewController as? NCCreateFormUploadDocuments
+                viewController?.titleForm = NSLocalizedString("_create_new_spreadsheet_", comment: "")
             })
         }
         
@@ -88,8 +88,8 @@ class CollaboraTestCase: XCTestCase {
                     return
                 }
                 
-                let viewController = navigationController.topViewController as! NCCreateFormUploadDocuments
-                viewController.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
+                let viewController = navigationController.topViewController as? NCCreateFormUploadDocuments
+                viewController?.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
             })
         }
         
