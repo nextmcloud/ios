@@ -69,7 +69,7 @@
 "_experimental_"            = "Experimental";
 "_select_dir_media_tab_"    = "Select as folder \"Media\"";
 "_error_creation_file_"     = "Oops! Could not create the file";
-"_save_path_"               = "Storage path";
+"_save_path_"               = "Save path";
 "_save_settings_"           = "Save settings";
 "_mode_filename_"           = "Filename mode";
 "_warning_owncloud_"        = "You are connected to an ownCloud server. This is untested and unsupported, use at your own risk. To upgrade to Nextcloud, see https://nextcloud.com/migration.";
@@ -92,7 +92,7 @@
 "_error_parameter_schema_"  = "Wrong parameters, impossible to continue";
 "_comments_"                = "Comments";
 "_sharing_"                 = "Sharing";
-"_details_"                 = "Share";
+"_details_"                 = "Details";
 "_sub_details_"             = "Subscription Details";
 "_subscriptions_"           = "Subscriptions";
 "_dark_mode_"               = "Dark mode";
@@ -154,6 +154,7 @@
 
 /* MARK: Files lock */
 
+"_lock_"                            = "Lock";
 "_unlock_"                          = "Unlock";
 "_lock_file_"                       = "Lock file";
 "_unlock_file_"                     = "Unlock file";
@@ -177,7 +178,7 @@
 "_source_code_"             = "Get source code";
 "_account_select_"          = "Select the account";
 "_account_select_to_add_"   = "Select the account to add";
-"_host_insert_"             = "Insert the host name, for example:";
+"_host_insert_"             = "Insert the hostname, for example:";
 "_certificate_not_found_"   = "File %@ in documents directory not found.";
 "_copy_failed_"             = "Copy failed";
 "_certificate_installed_"   = "Certificate installed";
@@ -255,9 +256,7 @@
 "_notifications_"               = "Notifications";
 "_quota_space_unlimited_"       = "Unlimited";
 "_quota_space_unknown_"         = "Unknown";
-"_quota_using_"                 = "%@ ";
-"_quota_using_of_"              = "of %@";
-"_quota_using_percentage_"      = "Memory to %@ occupied";
+"_quota_using_"                 = "You are using %@ of %@";
 "_acknowledgements_"            = "Acknowledgements";
 "_settings_"                    = "Settings";
 "_enter_password_"              = "Enter password …";
@@ -266,13 +265,6 @@
 "_lock_not_active_"             = "Lock: Off";
 "_lock_protection_no_screen_"        = "Do not ask at startup";
 "_enable_touch_face_id_"        = "Enable Touch/Face ID";
-"_security_"                    = "Security";
-"_data_protection_"             = "Data protection";
-"_privacy_settings_"            = "Privacy Settings";
-"_used_opensource_software_"    = "OpenSource software used";
-"_service_"                     = "Service";
-"_imprint_"                     = "Imprint";
-"_magentacloud_version_"        = "MagentaCLOUD Version";
 "_url_"                         = "URL";
 "_username_"                    = "Username";
 "_change_credentials_"          = "Change your credentials";
@@ -442,6 +434,7 @@
 "_media_viewimage_show_"        = "Show only images";
 "_media_viewvideo_show_"        = "Show only video";
 "_media_show_all_"              = "Show both";
+"_media_view_options_"          = "View options";
 "_media_by_created_date_"       = "Sort by created date";
 "_media_by_upload_date_"        = "Sort by upload date";
 "_media_by_modified_date_"      = "Sort by modified date";
@@ -504,12 +497,16 @@
 "_share_hide_download_"         = "Prevent download";
 "_share_note_recipient_"        = "YOUR MESSAGE";
 "_shareLinksearch_placeholder_" = "Contact name or email address";
+"_shareLinksearch_placeholder_" = "Type a name and press Search";
 "_shareLinksearch_mail_placeholder_" = "Type a name or an email and press Enter";
 "_new_comment_"                 = "New comment …";
 "_edit_comment_"                = "Edit comment";
 "_delete_comment_"              = "Delete comment";
 "_share_allow_editing_"         = "Allow editing";
+"_share_read_only_"             = "View only";
+"_share_editing_"               = "Editing";
 "_share_allow_upload_"          = "Allow upload and editing";
+"_share_file_drop_"             = "File drop (upload only)";
 "_share_secure_file_drop_"      = "Secure file drop (upload only)";
 "_share_hide_download_"         = "Hide download";
 "_share_allowed_downloads_"     = "Allowed downloads";
