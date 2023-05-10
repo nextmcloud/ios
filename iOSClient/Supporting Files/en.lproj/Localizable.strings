@@ -67,7 +67,7 @@
 "_experimental_"            = "Experimental";
 "_select_dir_media_tab_"    = "Select as folder \"Media\"";
 "_error_creation_file_"     = "Oops! Could not create the file";
-"_save_path_"               = "Storage path";
+"_save_path_"               = "Save path";
 "_save_settings_"           = "Save settings";
 "_mode_filename_"           = "Filename mode";
 "_warning_owncloud_"        = "You are connected to an ownCloud server. This is untested and unsupported, use at your own risk. To upgrade to Nextcloud, see https://nextcloud.com/migration.";
@@ -80,7 +80,7 @@
 "_save_to_camera_roll_"        = "Save to camera roll";
 "_save_to_camera_roll_desc_"   = "When enabled, photos and videos taken with the in-app camera will also be saved to your iOS camera roll.";
 "_sharing_"                 = "Sharing";
-"_details_"                 = "Share";
+"_details_"                 = "Details";
 "_sub_details_"             = "Subscription Details";
 "_subscriptions_"           = "Subscriptions";
 "_dark_mode_"               = "Dark mode";
@@ -233,9 +233,7 @@
 "_notifications_"               = "Notifications";
 "_quota_space_unlimited_"       = "Unlimited";
 "_quota_space_unknown_"         = "Unknown";
-"_quota_using_"                 = "%@ ";
-"_quota_using_of_"              = "of %@";
-"_quota_using_percentage_"      = "Memory to %@ occupied";
+"_quota_using_"                 = "You are using %@ of %@";
 "_acknowledgements_"            = "Acknowledgements";
 "_settings_"                    = "Settings";
 "_enter_password_"              = "Enter password …";
@@ -481,7 +479,10 @@
 "_share_editing_"               = "Can edit";
 "_share_file_drop_"             = "File request";
 "_share_allow_editing_"         = "Allow editing";
+"_share_read_only_"             = "View only";
+"_share_editing_"               = "Editing";
 "_share_allow_upload_"          = "Allow upload and editing";
+"_share_file_drop_"             = "File drop (upload only)";
 "_share_secure_file_drop_"      = "Secure file drop (upload only)";
 //"_share_hide_download_"         = "Hide download";
 "_share_allowed_downloads_"     = "Allowed downloads";
