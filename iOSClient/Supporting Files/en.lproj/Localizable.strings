@@ -1017,3 +1017,16 @@
 "Mantis.Reset"                  = "Reset";
 "Mantis.Original"               = "Original";
 "Mantis.Square"                 = "Square";
+
+// MARK: Privacy Policy
+"_privacy_settings_title_"      = "Privacy Settings";
+"_privacy_help_text_after_login_"   = "This app uses Cookies and similiar technolgies (tools). By clicking Accept, you accept the processing and also the Transfer of your data to third parties. The data will be used for Analysis, retargeting and to Display personalized Content and Advertising on  sites and third-party sites. You can find further informatin, including Information on data processing by third-party Providers, in the settings and in our Privacy Policy.You can reject the use of the Tools or customize them at any time in the Settings.";
+"_key_privacy_help_"            = "Privacy Policy";
+"_key_reject_help_"             = "reject";
+"_key_settings_help_"           = "Settings";
+"_accept_button_title_"         = "Accept";
+"_privacy_settings_help_text_"  = "To optimize your app, we collect anonymous data. For this we use software solutions of different partners. We would like to give you full transparency and decision-making power over the processin and collection of your anonymized usage data. You can also change your settings at any time later in the app settings under data protection. Please note, however, that data collection makes a considerable contribution to the optimization of this app and you prevent this optimization by preventing data transmission.";
+"_required_data_collection_"    = "Required data collection";
+"_required_data_collection_help_text_" = "The collection of this data is necessary to be able to use essential functions of the app.";
+"_analysis_data_acqusition_"    = "Analysis-data acqusition for the design";
+"_analysis_data_acqusition_help_text_" = "This data helps us to optimize the app usage for you and to identify system crashes and errors more quickly.";
