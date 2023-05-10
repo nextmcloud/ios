@@ -1010,6 +1010,3 @@
 "Mantis.Reset"                  = "Reset";
 "Mantis.Original"               = "Original";
 "Mantis.Square"                 = "Square";
-
-"_prefix_upload_path_"              = "MagentaCLOUD/";
-"_please_enter_file_name_"          = "Please enter the file name";
