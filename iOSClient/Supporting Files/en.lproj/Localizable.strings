@@ -68,7 +68,7 @@
 "_experimental_"            = "Experimental";
 "_select_dir_media_tab_"    = "Select as folder \"Media\"";
 "_error_creation_file_"     = "Oops! Could not create the file";
-"_save_path_"               = "Storage path";
+"_save_path_"               = "Save path";
 "_save_settings_"           = "Save settings";
 "_mode_filename_"           = "Filename mode";
 "_warning_owncloud_"        = "You are connected to an ownCloud server. This is untested and unsupported, use at your own risk. To upgrade to Nextcloud, see https://nextcloud.com/migration.";
@@ -90,7 +90,7 @@
 "_error_parameter_schema_"  = "Wrong parameters, impossible to continue";
 "_comments_"                = "Comments";
 "_sharing_"                 = "Sharing";
-"_details_"                 = "Share";
+"_details_"                 = "Details";
 "_sub_details_"             = "Subscription Details";
 "_subscriptions_"           = "Subscriptions";
 "_dark_mode_"               = "Dark mode";
@@ -136,6 +136,7 @@
 
 /* MARK: Files lock */
 
+"_lock_"                            = "Lock";
 "_unlock_"                          = "Unlock";
 "_lock_file_"                       = "Lock file";
 "_unlock_file_"                     = "Unlock file";
@@ -158,7 +159,7 @@
 "_source_code_"             = "Get source code";
 "_account_select_"          = "Select the account";
 "_account_select_to_add_"   = "Select the account to add";
-"_host_insert_"             = "Insert the host name, for example:";
+"_host_insert_"             = "Insert the hostname, for example:";
 "_certificate_not_found_"   = "File %@ in documents directory not found.";
 "_copy_failed_"             = "Copy failed";
 "_certificate_installed_"   = "Certificate installed";
@@ -229,9 +230,7 @@
 "_notifications_"               = "Notifications";
 "_quota_space_unlimited_"       = "Unlimited";
 "_quota_space_unknown_"         = "Unknown";
-"_quota_using_"                 = "%@ ";
-"_quota_using_of_"              = "of %@";
-"_quota_using_percentage_"      = "Memory to %@ occupied";
+"_quota_using_"                 = "You are using %@ of %@";
 "_acknowledgements_"            = "Acknowledgements";
 "_settings_"                    = "Settings";
 "_enter_password_"              = "Enter password …";
@@ -240,13 +239,6 @@
 "_lock_not_active_"             = "Lock: Off";
 "_lock_protection_no_screen_"        = "Do not ask at startup";
 "_enable_touch_face_id_"        = "Enable Touch/Face ID";
-"_security_"                    = "Security";
-"_data_protection_"             = "Data protection";
-"_privacy_settings_"            = "Privacy Settings";
-"_used_opensource_software_"    = "OpenSource software used";
-"_service_"                     = "Service";
-"_imprint_"                     = "Imprint";
-"_magentacloud_version_"        = "MagentaCLOUD Version";
 "_url_"                         = "URL";
 "_username_"                    = "Username";
 "_change_credentials_"          = "Change your credentials";
@@ -412,6 +404,7 @@
 "_media_viewimage_show_"        = "Show only images";
 "_media_viewvideo_show_"        = "Show only video";
 "_media_show_all_"              = "Show both";
+"_media_view_options_"          = "View options";
 "_media_by_created_date_"       = "Sort by created date";
 "_media_by_upload_date_"        = "Sort by upload date";
 "_media_by_modified_date_"      = "Sort by modified date";
@@ -474,12 +467,16 @@
 "_share_hide_download_"         = "Prevent download";
 "_share_note_recipient_"        = "YOUR MESSAGE";
 "_shareLinksearch_placeholder_" = "Contact name or email address";
+"_shareLinksearch_placeholder_" = "Type a name and press Search";
 "_shareLinksearch_mail_placeholder_" = "Type a name or an email and press Enter";
 "_new_comment_"                 = "New comment …";
 "_edit_comment_"                = "Edit comment";
 "_delete_comment_"              = "Delete comment";
 "_share_allow_editing_"         = "Allow editing";
+"_share_read_only_"             = "View only";
+"_share_editing_"               = "Editing";
 "_share_allow_upload_"          = "Allow upload and editing";
+"_share_file_drop_"             = "File drop (upload only)";
 "_share_secure_file_drop_"      = "Secure file drop (upload only)";
 "_share_hide_download_"         = "Hide download";
 "_share_limit_download_"        = "Limit downloads";
@@ -550,32 +547,6 @@
 "_e2e_goto_settings_for_enable_"    = "This is an encrypted directory, go to \"Settings\" and enable end-to-end encryption";
 "_e2e_error_"                       = "An internal end-to-end encryption error occurred";
 "_e2e_in_upload_"                   = "Upload in progress, please wait for all files to be transferred";
-"_e2e_delete_folder_not_permitted_" = "Deletion of the directory marked as \"encrypted\" is not allowed";
-"_e2e_error_encode_metadata_"       = "Serious internal error in encoding metadata";
-"_e2e_error_decode_metadata_"       = "Serious internal error in decoding metadata";
-"_e2e_error_create_encrypted_"      = "Could not create encrypted file";
-"_e2e_error_update_metadata_"       = "Update metadata error";
-"_e2e_error_store_metadata_"        = "Could not save metadata";
-"_e2e_error_send_metadata_"         = "Could not send metadata";
-"_e2e_error_delete_metadata_"       = "Could not delete metadata";
-"_e2e_error_get_metadata_"          = "Could not fetch metadata";
-"_e2e_error_not_enabled_"           = "Serious internal error. End-to-end encryption not enabled";
-"_e2e_error_record_not_found_"      = "Serious internal error. Records not found";
-"_e2e_error_unlock_"                = "Could not unlock folder";
-"_e2e_error_lock_"                  = "Could not lock folder";
-"_e2e_error_delete_mark_folder_"    = "Decrypt marked folder";
-"_e2e_error_mark_folder_"           = "Encrypt folder";
-"_e2e_error_directory_not_empty_"   = "The directory is not empty";
-"_e2e_error_not_move_"              = "It is not possible move files to encrypted directory";
-"_e2e_error_not_versionwriteable_"  = "The E2EE version of the server is not compatible with this client";
-"_start_e2e_encryption_1_"          = "To set up end-to-end encryption, they must first set up the PIN lock to prevent unauthorised people from accessing your key.";
-"_start_e2e_encryption_2_"          = "After starting the encryption, a randomly generated word sequence (passphrase) of 12 words is displayed. This remains in this app and can be displayed again. Nevertheless, we recommend that you write down the passphrase.";
-"_start_e2e_encryption_3_"          = "The passphrase is your personal password with which you can access encrypted data in your MagentaCLOUD or enable access to these files on other devices such as your PC.";
-"_read_passphrase_description_"     = "Here you can display the passphrase again and also copy it. You need the passphrase if you want to decrypt the data on another device with access to MagentaCLOUD, for example your PC or another smartphone or tablet.";
-"_remove_passphrase_desc_1_"        = "You can remove the passphrase on this device. This will not affect the encrypted content, but this device will no longer be able to decrypt your data.";
-"_remove_passphrase_desc_2_"        = "You can re-enter the passphrase here at any time to ensure access to your encrypted content from this device.";
-"_e2e_error_incorrect_passphrase_"  = "Wrong password?";
-"_e2e_error_passphrase_title"       = "Error while decrypting.";
 "_scans_document_"                  = "Scan document";
 "_scanned_images_"                  = "Scanned images";
 "_scan_document_pdf_page_"          = "Page";
