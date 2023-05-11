@@ -53,6 +53,7 @@ let userAgent: String = {
 
     // Auto Upload default folder
     @objc public var folderDefaultAutoUpload: String  = Locale.current.languageCode == "de" ? "Kamera-Medien" : "Camera-Media"
+
     // Capabilities Group
     @objc public var capabilitiesGroups: String = "group.it.twsweb.Crypto-Cloud"
     @objc public var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
