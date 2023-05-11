@@ -308,6 +308,13 @@
 "_lock_protection_no_screen_"        = "Do not ask at startup";
 "_lock_protection_no_screen_footer_" = "Use \"Do not ask at startup\" for the encryption option.";
 "_enable_touch_face_id_"        = "Enable Touch/Face ID";
+"_security_"                    = "Security";
+"_data_protection_"             = "Data protection";
+"_privacy_settings_"            = "Privacy Settings";
+"_used_opensource_software_"    = "OpenSource software used";
+"_service_"                     = "Service";
+"_imprint_"                     = "Imprint";
+"_magentacloud_version_"        = "MagentaCLOUD Version";
 "_url_"                         = "URL";
 "_username_"                    = "Username";
 "_change_credentials_"          = "Change your credentials";
