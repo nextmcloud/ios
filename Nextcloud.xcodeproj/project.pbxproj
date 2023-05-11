@@ -23,7 +23,6 @@
         01324F7129F7AD73001E02E4 /* SaveSettingsCustomButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01324F6F29F7AD73001E02E4 /* SaveSettingsCustomButtonCell.swift */; };
         01324F7229F7AD73001E02E4 /* SaveSettingsCustomButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 01324F7029F7AD73001E02E4 /* SaveSettingsCustomButtonCell.xib */; };
         0164E58229F2679B0056671C /* OnboardingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0164E58129F2679B0056671C /* OnboardingTestCase.swift */; };
-        012818FA2A0A5D8C003B5C6F /* AutoUploadTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012818F92A0A5D8C003B5C6F /* AutoUploadTestCase.swift */; };
 		2C1D5D7523E2DE3300334ABB /* NCDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB41ED5A87C00B7EAD4 /* NCDatabase.swift */; };
 		2C1D5D7623E2DE3300334ABB /* NCManageDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB51ED5A87C00B7EAD4 /* NCManageDatabase.swift */; };
 		2C1D5D7923E2DE9100334ABB /* NCBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B3CCD1EAE01BD00921AC9 /* NCBrand.swift */; };
@@ -891,7 +890,6 @@
         01324F7029F7AD73001E02E4 /* SaveSettingsCustomButtonCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SaveSettingsCustomButtonCell.xib; sourceTree = "<group>"; };
         0164E58129F2679B0056671C /* OnboardingTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTestCase.swift; sourceTree = "<group>"; };
         018D3E092A067F8100C5CB8E /* CollaboraTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaboraTestCase.swift; sourceTree = "<group>"; };
-        012818F92A0A5D8C003B5C6F /* AutoUploadTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoUploadTestCase.swift; sourceTree = "<group>"; };
 		08DC3BD41E64727E00F036D3 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		08EA97441E6554FC004C83FA /* FirebaseAnalytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseAnalytics.framework; sourceTree = "<group>"; };
 		08EA97451E6554FC004C83FA /* FirebaseCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseCore.framework; sourceTree = "<group>"; };
@@ -1698,7 +1696,6 @@
                 0164E58129F2679B0056671C /* OnboardingTestCase.swift */,
                 010E052429FA361600507CE6 /* PrivacyPolicyTest.swift */,
                 018D3E092A067F8100C5CB8E /* CollaboraTestCase.swift */,
-                012818F92A0A5D8C003B5C6F /* AutoUploadTestCase.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
@@ -3551,7 +3548,6 @@
                 5629C00229ED3E5D003C5D95 /* NCNotificationTest.swift in Sources */,
 				AF8ED1FC2757821000B8DBC4 /* NextcloudTests.swift in Sources */,
 				AF8ED2032757822700B8DBC4 /* NCGlobalTests.swift in Sources */,
-                012818FA2A0A5D8C003B5C6F /* AutoUploadTestCase.swift in Sources */,
                 018D3E0A2A067F8100C5CB8E /* CollaboraTestCase.swift in Sources */,
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
