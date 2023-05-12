@@ -97,6 +97,8 @@
 + (BOOL)getFormatCompatibility;
 + (void)setFormatCompatibility:(BOOL)set;
 
++ (BOOL)getAutomaticDownloadImage;
++ (void)setAutomaticDownloadImage:(BOOL)set;
 // E2EE -------------------------------------------
 
 + (NSString *)getEndToEndCertificate:(NSString *)account;
