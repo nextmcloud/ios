@@ -23,6 +23,13 @@
         01324F7129F7AD73001E02E4 /* SaveSettingsCustomButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01324F6F29F7AD73001E02E4 /* SaveSettingsCustomButtonCell.swift */; };
         01324F7229F7AD73001E02E4 /* SaveSettingsCustomButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 01324F7029F7AD73001E02E4 /* SaveSettingsCustomButtonCell.xib */; };
         0164E58229F2679B0056671C /* OnboardingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0164E58129F2679B0056671C /* OnboardingTestCase.swift */; };
+        012818FA2A0A5D8C003B5C6F /* AutoUploadTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012818F92A0A5D8C003B5C6F /* AutoUploadTestCase.swift */; };
+        0111FFF52A0E1CC100750034 /* SettingsTestCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0111FFF42A0E1CC100750034 /* SettingsTestCases.swift */; };
+        01335AEC2A0CE4AC0096E796 /* OpenSourceSoftwareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01335AEB2A0CE4AC0096E796 /* OpenSourceSoftwareViewController.swift */; };
+        01335AEE2A0CE52F0096E796 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01335AED2A0CE52F0096E796 /* HelpViewController.swift */; };
+        01335AF02A0CE5E70096E796 /* ImprintViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01335AEF2A0CE5E70096E796 /* ImprintViewController.swift */; };
+        01335AF32A0CE7410096E796 /* MagentaCloudVersionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01335AF12A0CE7410096E796 /* MagentaCloudVersionView.swift */; };
+        01335AF42A0CE7410096E796 /* MagentaCloudVersionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 01335AF22A0CE7410096E796 /* MagentaCloudVersionView.xib */; };
 		2C1D5D7523E2DE3300334ABB /* NCDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB41ED5A87C00B7EAD4 /* NCDatabase.swift */; };
 		2C1D5D7623E2DE3300334ABB /* NCManageDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB51ED5A87C00B7EAD4 /* NCManageDatabase.swift */; };
 		2C1D5D7923E2DE9100334ABB /* NCBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B3CCD1EAE01BD00921AC9 /* NCBrand.swift */; };
@@ -890,6 +897,13 @@
         01324F7029F7AD73001E02E4 /* SaveSettingsCustomButtonCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SaveSettingsCustomButtonCell.xib; sourceTree = "<group>"; };
         0164E58129F2679B0056671C /* OnboardingTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTestCase.swift; sourceTree = "<group>"; };
         018D3E092A067F8100C5CB8E /* CollaboraTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaboraTestCase.swift; sourceTree = "<group>"; };
+        012818F92A0A5D8C003B5C6F /* AutoUploadTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoUploadTestCase.swift; sourceTree = "<group>"; };
+        0111FFF42A0E1CC100750034 /* SettingsTestCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTestCases.swift; sourceTree = "<group>"; };
+        01335AEB2A0CE4AC0096E796 /* OpenSourceSoftwareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenSourceSoftwareViewController.swift; sourceTree = "<group>"; };
+        01335AED2A0CE52F0096E796 /* HelpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
+        01335AEF2A0CE5E70096E796 /* ImprintViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImprintViewController.swift; sourceTree = "<group>"; };
+        01335AF12A0CE7410096E796 /* MagentaCloudVersionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MagentaCloudVersionView.swift; sourceTree = "<group>"; };
+        01335AF22A0CE7410096E796 /* MagentaCloudVersionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MagentaCloudVersionView.xib; sourceTree = "<group>"; };
 		08DC3BD41E64727E00F036D3 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		08EA97441E6554FC004C83FA /* FirebaseAnalytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseAnalytics.framework; sourceTree = "<group>"; };
 		08EA97451E6554FC004C83FA /* FirebaseCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseCore.framework; sourceTree = "<group>"; };
@@ -1696,6 +1710,8 @@
                 0164E58129F2679B0056671C /* OnboardingTestCase.swift */,
                 010E052429FA361600507CE6 /* PrivacyPolicyTest.swift */,
                 018D3E092A067F8100C5CB8E /* CollaboraTestCase.swift */,
+                012818F92A0A5D8C003B5C6F /* AutoUploadTestCase.swift */,
+                0111FFF42A0E1CC100750034 /* SettingsTestCases.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
@@ -3544,6 +3560,7 @@
 				AF70C14D27F3484D00E13DF2 /* SharePermissionTest.swift in Sources */,
 				AF3F909A28213BEA0048A93E /* UserAgentTests.swift in Sources */,
                 0164E58229F2679B0056671C /* OnboardingTestCase.swift in Sources */,
+                0111FFF52A0E1CC100750034 /* SettingsTestCases.swift in Sources */,
 				AF36077627BFB019001A243D /* ParallelWorkerTest.swift in Sources */,
                 5629C00229ED3E5D003C5D95 /* NCNotificationTest.swift in Sources */,
 				AF8ED1FC2757821000B8DBC4 /* NextcloudTests.swift in Sources */,
