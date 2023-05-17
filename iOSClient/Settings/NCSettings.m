@@ -125,6 +125,10 @@
     section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_data_protection_", nil)];
     [form addFormSection:section];
     
+    PrivacySettingsViewController *privacySettingsViewController = [[PrivacySettingsViewController alloc] init];
+    
+    privacySettingsViewController.isShowSettingsButton = true;
+    
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showSettingsButton"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -134,7 +138,7 @@
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-    //[row.cellConfig setObject:[[UIImage imageNamed:@"gear"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
+    row.action.viewControllerClass = [privacySettingsViewController class];
     [section addFormRow:row];
     
     
@@ -144,7 +148,7 @@
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-    //[row.cellConfig setObject:[[UIImage imageNamed:@"gear"] imageWithColor:NCBrandColor.shared.icon size:25] forKey:@"imageView.image"];
+    row.action.viewControllerClass = [PrivacyPolicyViewController class];
     [section addFormRow:row];
     
     // Used OpenSource Software
