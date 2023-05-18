@@ -98,6 +98,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         let value = CCUtility.getTextRecognitionStatus()
         SetTextRecognition(newValue: value)
+        NotificationCenter.default.addObserver(self, selector: #selector(appTerminateNotify), name: UIApplication.willTerminateNotification, object: nil)
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -106,6 +107,14 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         changeTheming()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self)
+        showDeleteAlert()
+    }
+    
+    @objc func appTerminateNotify() {
+        showDeleteAlert()
+    }
     // MARK: - Theming
     
     @objc func changeTheming() {
