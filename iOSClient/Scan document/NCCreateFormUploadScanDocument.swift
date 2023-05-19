@@ -693,15 +693,15 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             
             if (ext == "") {
                 if(count != 0){
-                    fileNameSave = name as! String + "(\(count)" + ")" + "." + ".txt"
+                    fileNameSave = (name as? String ?? "") + "(\(count)" + ")" + "." + ".txt"
                 }else {
-                    fileNameSave = name as! String + "." + ".txt"
+                    fileNameSave = (name as? String ?? "") + "." + ".txt"
                 }
             } else {
                 if(count != 0){
-                    fileNameSave = (name as! NSString).deletingPathExtension + "(\(count)" + ")" + "." + "txt"
+                    fileNameSave = ((name as? NSString)?.deletingPathExtension ?? "") + "(\(count)" + ")" + "." + "txt"
                 }else{
-                    fileNameSave = (name as! NSString).deletingPathExtension  + "." + "txt"
+                    fileNameSave = ((name as? NSString)?.deletingPathExtension ?? "")  + "." + "txt"
                 }
             }
             
@@ -739,29 +739,29 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         guard var name = rowFileName.value else {
             return
         }
-        if name as! String == "" {
+        if name as? String == "" {
             return
         }
         
         if (ocrSwitchOn){
-            name = name as! String
+            name = name as? String
         }
         
-        let ext = (name as! NSString).pathExtension.uppercased()
+        let ext = (name as? NSString)?.pathExtension.uppercased()
         var fileNameSave = ""
         
         if (ext == "") {
             if (ocrSwitchOn){
-                fileNameSave = name as! String + "_OCR" + "." + "pdf"
+                fileNameSave = (name as? String ?? "") + "_OCR" + "." + "pdf"
             }else{
-                fileNameSave = name as! String +  "." + "pdf"
+                fileNameSave = (name as? String ?? "") +  "." + "pdf"
             }
         } else {
             if(ocrSwitchOn){
-                fileNameSave = (name as! NSString).deletingPathExtension + "_OCR" + "." + fileType.lowercased()
+                fileNameSave = ((name as? NSString)?.deletingPathExtension ?? "") + "_OCR" + "." + fileType.lowercased()
                 
             }else{
-                fileNameSave = (name as! NSString).deletingPathExtension + "." + fileType.lowercased()
+                fileNameSave = ((name as? NSString)?.deletingPathExtension ?? "") + "." + fileType.lowercased()
             }
         }
         
@@ -811,28 +811,28 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             guard var name = rowFileName.value else {
                 return
             }
-            if name as! String == "" {
+            if name as? String == "" {
                 return
             }
             
             for count in 0..<arrayImages.count {
                 
-                name = name as! String
+                name = name as? String
                 
-                let ext = (name as! NSString).pathExtension.uppercased()
+                let ext = (name as? NSString)?.pathExtension.uppercased()
                 var fileNameSave = ""
                 
                 if (ext == "") {
                     if(count != 0){
-                        fileNameSave = name as! String + "(\(count)" + ")" + "." + fileType
+                        fileNameSave = (name as? String ?? "") + "(\(count)" + ")" + "." + fileType
                     }else {
-                        fileNameSave = name as! String + "." + fileType
+                        fileNameSave = (name as? String ?? "") + "." + fileType
                     }
                 } else {
                     if(count != 0){
-                        fileNameSave = (name as! NSString).deletingPathExtension + "(\(count)" + ")" + "." + fileType
+                        fileNameSave = ((name as? NSString)?.deletingPathExtension ?? "") + "(\(count)" + ")" + "." + fileType
                     }else{
-                        fileNameSave = (name as! NSString).deletingPathExtension  + "." + fileType
+                        fileNameSave = ((name as? NSString)?.deletingPathExtension ?? "")  + "." + fileType
                     }
                 }
                 
@@ -1147,14 +1147,13 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
         self.deselectFormRow(sender)
         let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
-        let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
-        let viewController = navigationController.topViewController as! NCSelect
-
-        viewController.delegate = self
-        viewController.typeOfCommandView = .selectCreateFolder
-        viewController.includeDirectoryE2EEncryption = true
-
-        self.present(navigationController, animated: true, completion: nil)
+        if let navigationController = storyboard.instantiateInitialViewController() as? UINavigationController {
+            let viewController = navigationController.topViewController as? NCSelect
+            viewController?.delegate = self
+            viewController?.typeOfCommandView = .selectCreateFolder
+            viewController?.includeDirectoryE2EEncryption = true
+            self.present(navigationController, animated: true, completion: nil)
+        }
         
     }
 
