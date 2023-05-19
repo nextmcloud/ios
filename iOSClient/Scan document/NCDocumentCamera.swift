@@ -16,7 +16,8 @@ class NCDocumentCamera: NSObject, VNDocumentCameraViewControllerDelegate {
     }()
 
     var viewController: UIViewController?
-    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    
+    let appDelegate = UIApplication.shared.delegate as? AppDelegate
     
     func openScannerDocument(viewController: UIViewController) {
 
@@ -98,7 +99,7 @@ class NCDocumentCamera: NSObject, VNDocumentCameraViewControllerDelegate {
         if imagesDestination.count > 0 {
             
             var images: [UIImage] = []
-            var serverUrl = appDelegate.activeServerUrl
+            var serverUrl = appDelegate?.activeServerUrl ?? ""
             
             for image in imagesDestination {
                 images.append(image)
