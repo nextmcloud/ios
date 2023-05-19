@@ -1204,6 +1204,8 @@
 
 // MARK: Scan
 "_location_"                        = "Location";
+"_prefix_upload_path_"              = "MagentaCLOUD/";
+
 "_save_with_text_recognition_"      = "SAVE WITH TEXT RECOGNITION (OCR)";
 "_pdf_with_ocr_"                    = "PDF (OCR)";
 "_text_file_ocr_"                   = "Textfile (txt)";
