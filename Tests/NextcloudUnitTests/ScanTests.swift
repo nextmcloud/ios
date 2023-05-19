@@ -12,18 +12,15 @@ import XLForm
 
 final class ScanTests: XCTestCase {
     
-    var viewController :  NCCreateFormUploadScanDocument?
-    
+    var viewController:  NCCreateFormUploadScanDocument?
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         viewController = NCCreateFormUploadScanDocument()
     }
-    
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         viewController = nil
     }
-    
     func testExample() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
@@ -31,31 +28,24 @@ final class ScanTests: XCTestCase {
         // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
         // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
     }
-    
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         self.measure {
             // Put the code you want to measure the time of here.
         }
     }
-    
     public func testImageColor() {
         // Create a test color
         let testColor = UIColor.red
-        
         // Create a test image
         let testImage = UIImage(named: "activityTypeInfo") // Replace "your_image_name" with the name of your test image
-        
         // Call the imageColor function with the test color
         let resultImage = testImage?.imageColor(testColor)
-        
         // Assert that the result image is not nil
         XCTAssertNotNil(resultImage, "Result image should not be nil")
-        
         // Assert that the result image has the same size as the test image
         XCTAssertEqual(resultImage?.size, testImage?.size, "Result image should have the same size as the test image")
     }
-    
     func testIsAtleastOneFiletypeSelected() {
         // Set up the initial switch states
         viewController?.isPDFWithOCRSwitchOn = false
