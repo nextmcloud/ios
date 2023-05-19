@@ -32,12 +32,12 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
     let appDelegate = UIApplication.shared.delegate as? AppDelegate
 
-    enum typeQuality {
+    enum TypeQuality {
         case low
         case medium
         case high
     }
-    var quality: typeQuality = .medium
+    var quality: TypeQuality = .medium
 
     var editorId = ""
     var serverUrl = ""
@@ -97,7 +97,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         initializeForm()
         
         let value = CCUtility.getTextRecognitionStatus()
-        SetTextRecognition(newValue: value)
+        setTextRecognition(newValue: value)
         NotificationCenter.default.addObserver(self, selector: #selector(appTerminateNotify), name: UIApplication.willTerminateNotification, object: nil)
     }
     
@@ -412,7 +412,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         if formRow.tag == "TextFileWithOCRSwitch" {
             isTextFileSwitchOn = (formRow.value! as AnyObject).boolValue
-            self.SetTextRecognition(newValue: newValue as? Bool ?? false)
+            self.setTextRecognition(newValue: newValue as? Bool ?? false)
         }
         if formRow.tag == "JPGWithoutOCRSwitch" {
             isJPGFormatSwitchOn = (formRow.value! as AnyObject).boolValue
@@ -428,7 +428,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 4
     }
-    func SetTextRecognition(newValue: Bool) {
+    func setTextRecognition(newValue: Bool) {
         
         let rowFileName: XLFormRowDescriptor = self.form.formRow(withTag: "fileName")!
         
