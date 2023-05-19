@@ -7,6 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+        5620A0E32A136C2700CE534B /* NCCreateFormUploadScanDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5620A0E22A136C2700CE534B /* NCCreateFormUploadScanDocument.swift */; };
+        5620A0E72A13977800CE534B /* FileNameInputTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5620A0E52A13977800CE534B /* FileNameInputTextField.swift */; };
+        5620A0E82A13977800CE534B /* FileNameInputTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5620A0E62A13977800CE534B /* FileNameInputTextField.xib */; };
+        5620A0EB2A13988100CE534B /* ScanDocumentPathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5620A0E92A13988100CE534B /* ScanDocumentPathView.swift */; };
+        5620A0EC2A13988100CE534B /* ScanDocumentPathView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5620A0EA2A13988100CE534B /* ScanDocumentPathView.xib */; };
+        562817E42A14ACF300AA7669 /* PdfWithOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562817E22A14ACF200AA7669 /* PdfWithOcrSwitchView.swift */; };
+        562817E52A14ACF300AA7669 /* PdfWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 562817E32A14ACF300AA7669 /* PdfWithOcrSwitchView.xib */; };
+        562817E82A14D31700AA7669 /* TextFileWithOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562817E62A14D31600AA7669 /* TextFileWithOcrSwitchView.swift */; };
+        562817E92A14D31700AA7669 /* TextFileWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 562817E72A14D31700AA7669 /* TextFileWithOcrSwitchView.xib */; };
+        562817EC2A14D33700AA7669 /* PdfWithoutOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 562817EA2A14D33700AA7669 /* PdfWithoutOcrSwitchView.xib */; };
+        562817ED2A14D33700AA7669 /* PdfWithoutOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562817EB2A14D33700AA7669 /* PdfWithoutOcrSwitchView.swift */; };
+        562817F02A14D34300AA7669 /* JPGImageSaveSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562817EE2A14D34300AA7669 /* JPGImageSaveSwitchView.swift */; };
+        562817F12A14D34300AA7669 /* JPGImageSaveSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 562817EF2A14D34300AA7669 /* JPGImageSaveSwitchView.xib */; };
+        562817F42A14D35200AA7669 /* PNGImageSaveSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562817F22A14D35100AA7669 /* PNGImageSaveSwitchView.swift */; };
+        562817F52A14D35200AA7669 /* PNGImageSaveSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 562817F32A14D35200AA7669 /* PNGImageSaveSwitchView.xib */; };
+        562817F82A14D35F00AA7669 /* SetPDFPasswordSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562817F62A14D35E00AA7669 /* SetPDFPasswordSwitchView.swift */; };
+        562817F92A14D35F00AA7669 /* SetPDFPasswordSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 562817F72A14D35F00AA7669 /* SetPDFPasswordSwitchView.xib */; };
+        562817FC2A14D36F00AA7669 /* PasswordInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562817FA2A14D36E00AA7669 /* PasswordInputField.swift */; };
+        562817FD2A14D36F00AA7669 /* PasswordInputField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 562817FB2A14D36F00AA7669 /* PasswordInputField.xib */; };
+        56175BD82A1639E900EACD4B /* ScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56175BD72A1639E900EACD4B /* ScanTests.swift */; };
         0142C77E2A038DF50008E448 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0142C77C2A038DF50008E448 /* FolderPathCustomCell.swift */; };
         0142C77F2A038DF50008E448 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0142C77D2A038DF50008E448 /* FolderPathCustomCell.xib */; };
         0142C7822A038ED00008E448 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0142C7802A038ED00008E448 /* NCCreateDocumentCustomTextField.swift */; };
@@ -881,6 +901,26 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+        5620A0E22A136C2700CE534B /* NCCreateFormUploadScanDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadScanDocument.swift; sourceTree = "<group>"; };
+        5620A0E52A13977800CE534B /* FileNameInputTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileNameInputTextField.swift; sourceTree = "<group>"; };
+        5620A0E62A13977800CE534B /* FileNameInputTextField.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FileNameInputTextField.xib; sourceTree = "<group>"; };
+        5620A0E92A13988100CE534B /* ScanDocumentPathView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanDocumentPathView.swift; sourceTree = "<group>"; };
+        5620A0EA2A13988100CE534B /* ScanDocumentPathView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ScanDocumentPathView.xib; sourceTree = "<group>"; };
+        562817E22A14ACF200AA7669 /* PdfWithOcrSwitchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PdfWithOcrSwitchView.swift; sourceTree = "<group>"; };
+        562817E32A14ACF300AA7669 /* PdfWithOcrSwitchView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PdfWithOcrSwitchView.xib; sourceTree = "<group>"; };
+        562817E62A14D31600AA7669 /* TextFileWithOcrSwitchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFileWithOcrSwitchView.swift; sourceTree = "<group>"; };
+        562817E72A14D31700AA7669 /* TextFileWithOcrSwitchView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TextFileWithOcrSwitchView.xib; sourceTree = "<group>"; };
+        562817EA2A14D33700AA7669 /* PdfWithoutOcrSwitchView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PdfWithoutOcrSwitchView.xib; sourceTree = "<group>"; };
+        562817EB2A14D33700AA7669 /* PdfWithoutOcrSwitchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PdfWithoutOcrSwitchView.swift; sourceTree = "<group>"; };
+        562817EE2A14D34300AA7669 /* JPGImageSaveSwitchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JPGImageSaveSwitchView.swift; sourceTree = "<group>"; };
+        562817EF2A14D34300AA7669 /* JPGImageSaveSwitchView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = JPGImageSaveSwitchView.xib; sourceTree = "<group>"; };
+        562817F22A14D35100AA7669 /* PNGImageSaveSwitchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PNGImageSaveSwitchView.swift; sourceTree = "<group>"; };
+        562817F32A14D35200AA7669 /* PNGImageSaveSwitchView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PNGImageSaveSwitchView.xib; sourceTree = "<group>"; };
+        562817F62A14D35E00AA7669 /* SetPDFPasswordSwitchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetPDFPasswordSwitchView.swift; sourceTree = "<group>"; };
+        562817F72A14D35F00AA7669 /* SetPDFPasswordSwitchView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SetPDFPasswordSwitchView.xib; sourceTree = "<group>"; };
+        562817FA2A14D36E00AA7669 /* PasswordInputField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordInputField.swift; sourceTree = "<group>"; };
+        562817FB2A14D36F00AA7669 /* PasswordInputField.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PasswordInputField.xib; sourceTree = "<group>"; };
+        56175BD72A1639E900EACD4B /* ScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanTests.swift; sourceTree = "<group>"; };
         0142C77C2A038DF50008E448 /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
         0142C77D2A038DF50008E448 /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
         0142C7802A038ED00008E448 /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
@@ -1697,6 +1737,31 @@
 			path = Menu;
 			sourceTree = "<group>";
 		};
+          5620A0E42A13973500CE534B /* NMC Views */ = {
+            isa = PBXGroup;
+            children = (
+                562817E22A14ACF200AA7669 /* PdfWithOcrSwitchView.swift */,
+                562817E32A14ACF300AA7669 /* PdfWithOcrSwitchView.xib */,
+                5620A0E92A13988100CE534B /* ScanDocumentPathView.swift */,
+                5620A0EA2A13988100CE534B /* ScanDocumentPathView.xib */,
+                5620A0E52A13977800CE534B /* FileNameInputTextField.swift */,
+                5620A0E62A13977800CE534B /* FileNameInputTextField.xib */,
+                562817E62A14D31600AA7669 /* TextFileWithOcrSwitchView.swift */,
+                562817E72A14D31700AA7669 /* TextFileWithOcrSwitchView.xib */,
+                562817EB2A14D33700AA7669 /* PdfWithoutOcrSwitchView.swift */,
+                562817EA2A14D33700AA7669 /* PdfWithoutOcrSwitchView.xib */,
+                562817EE2A14D34300AA7669 /* JPGImageSaveSwitchView.swift */,
+                562817EF2A14D34300AA7669 /* JPGImageSaveSwitchView.xib */,
+                562817F22A14D35100AA7669 /* PNGImageSaveSwitchView.swift */,
+                562817F32A14D35200AA7669 /* PNGImageSaveSwitchView.xib */,
+                562817F62A14D35E00AA7669 /* SetPDFPasswordSwitchView.swift */,
+                562817F72A14D35F00AA7669 /* SetPDFPasswordSwitchView.xib */,
+                562817FA2A14D36E00AA7669 /* PasswordInputField.swift */,
+                562817FB2A14D36F00AA7669 /* PasswordInputField.xib */,
+            );
+            path = "NMC Views";
+            sourceTree = "<group>";
+        };
 		AF8ED1FA2757821000B8DBC4 /* NextcloudUnitTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -1712,6 +1777,7 @@
                 018D3E092A067F8100C5CB8E /* CollaboraTestCase.swift */,
                 012818F92A0A5D8C003B5C6F /* AutoUploadTestCase.swift */,
                 0111FFF42A0E1CC100750034 /* SettingsTestCases.swift */,
+                56175BD72A1639E900EACD4B /* ScanTests.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
@@ -2052,12 +2118,14 @@
 		F758B41E212C516300515F55 /* Scan document */ = {
 			isa = PBXGroup;
 			children = (
+                5620A0E42A13973500CE534B /* NMC Views */,
 				F758B457212C564000515F55 /* NCScan.storyboard */,
 				F758B45D212C569C00515F55 /* NCScanCell.swift */,
 				F758B45F212C56A400515F55 /* NCScan.swift */,
 				F7B6B70327C4E7FA00A7F6EB /* NCScan+CollectionView.swift */,
 				F765E9CC295C585800A09ED8 /* NCUploadScanDocument.swift */,
 				F714560F296433C80038D028 /* NCDocumentCamera.swift */,
+                5620A0E22A136C2700CE534B /* NCCreateFormUploadScanDocument.swift */,
 			);
 			path = "Scan document";
 			sourceTree = "<group>";
@@ -3361,12 +3429,14 @@
 				F78ACD4621903D010088454D /* NCGridCell.xib in Resources */,
 				F7F4F10827ECDBDB008676F9 /* Inconsolata-ExtraLight.ttf in Resources */,
 				F72685E727C78E490019EF5E /* InfoPlist.strings in Resources */,
+                562817F52A14D35200AA7669 /* PNGImageSaveSwitchView.xib in Resources */,
 				F769453C22E9CFFF000A798A /* NCShareUserCell.xib in Resources */,
 				F7F4F10927ECDBDB008676F9 /* Inconsolata-Bold.ttf in Resources */,
 				F76D3CF52428D0C1005DFA87 /* NCViewerPDF.storyboard in Resources */,
 				F700222C1EC479840080073F /* Custom.xcassets in Resources */,
 				F702F2F125EE5CDB008F8E80 /* NCLogin.storyboard in Resources */,
 				F723985C253C95CE00257F49 /* NCViewerRichdocument.storyboard in Resources */,
+                562817F12A14D34300AA7669 /* JPGImageSaveSwitchView.xib in Resources */,
 				F758B45A212C564000515F55 /* NCScan.storyboard in Resources */,
 				F70D87CF25EE6E58008CBBBD /* NCRenameFile.storyboard in Resources */,
 				F33AAF9A2A60394C006ECCBD /* NCMoreUserCell.xib in Resources */,
@@ -3380,7 +3450,9 @@
 				F702F2E725EE5C86008F8E80 /* NCAudioRecorderViewController.storyboard in Resources */,
 				AF56C1DC2784856200D8BAE2 /* NCActivityCommentView.xib in Resources */,
 				F7F4F10B27ECDBDB008676F9 /* Inconsolata-Light.ttf in Resources */,
+                562817E52A14ACF300AA7669 /* PdfWithOcrSwitchView.xib in Resources */,
 				3704EB2A23D5A58400455C5B /* NCMenu.storyboard in Resources */,
+                562817F92A14D35F00AA7669 /* SetPDFPasswordSwitchView.xib in Resources */,
 				AF93471C27E2361E002537EE /* NCShareAdvancePermissionHeader.xib in Resources */,
 				F7F1E54C2492369A00E42386 /* NCMediaCommandView.xib in Resources */,
 				F76032A0252F0F8E0015A421 /* NCTransferCell.xib in Resources */,
@@ -3389,6 +3461,7 @@
 				F7A48415297028FC00BD1B49 /* Nextcloud Hub.png in Resources */,
 				F74C0437253F1CDC009762AB /* NCShares.storyboard in Resources */,
 				F7F4F10C27ECDBDB008676F9 /* Inconsolata-Regular.ttf in Resources */,
+                562817FD2A14D36F00AA7669 /* PasswordInputField.xib in Resources */,
 				F7B8B83025681C3400967775 /* GoogleService-Info.plist in Resources */,
 				F7381EE5218218C9000B1560 /* NCOffline.storyboard in Resources */,
 				F7E0CDCF265CE8610044854E /* NCUserStatus.storyboard in Resources */,
@@ -3414,6 +3487,7 @@
 				F7651A8A23A2A3F2001403D2 /* NCCreateFormUploadDocuments.storyboard in Resources */,
 				F7F4F10A27ECDBDB008676F9 /* Inconsolata-ExtraBold.ttf in Resources */,
 				F704B5E72430C06700632F5F /* NCCreateFormUploadConflictCell.xib in Resources */,
+                562817E92A14D31700AA7669 /* TextFileWithOcrSwitchView.xib in Resources */,
 				F7C9555321F0C4CA0024296E /* NCActivity.storyboard in Resources */,
 				F7BC287E26663F6C004D46C5 /* NCViewCertificateDetails.storyboard in Resources */,
 				F78ACD54219047D40088454D /* NCSectionFooter.xib in Resources */,
@@ -3433,12 +3507,15 @@
                 0142C77F2A038DF50008E448 /* FolderPathCustomCell.xib in Resources */,
 				F73CB3B222E072A000AD728E /* NCShareHeaderView.xib in Resources */,
 				F7AE00FA230E81EB007ACF8A /* NCBrowserWeb.storyboard in Resources */,
+                5620A0E82A13977800CE534B /* FileNameInputTextField.xib in Resources */,
+                5620A0EC2A13988100CE534B /* ScanDocumentPathView.xib in Resources */,
                 01324F7229F7AD73001E02E4 /* SaveSettingsCustomButtonCell.xib in Resources */,
 				F7EDE514262DC2CD00414FE6 /* NCSelectCommandViewSelect+CreateFolder.xib in Resources */,
 				F78ACD58219048040088454D /* NCSectionHeaderMenu.xib in Resources */,
                 01324F6E29F7AD12001E02E4 /* AnalysisDataCollectionSwitch.xib in Resources */,
 				F7501C322212E57500FB1415 /* NCMedia.storyboard in Resources */,
 				F74DE14425135B6800917068 /* NCTransfers.storyboard in Resources */,
+                562817EC2A14D33700AA7669 /* PdfWithoutOcrSwitchView.xib in Resources */,
 				F77910A525DD517B00CEDB9E /* Settings.bundle in Resources */,
 				F7CB68A0254169530050EC94 /* NCSettings.storyboard in Resources */,
 			);
@@ -3561,6 +3638,7 @@
 				AF3F909A28213BEA0048A93E /* UserAgentTests.swift in Sources */,
                 0164E58229F2679B0056671C /* OnboardingTestCase.swift in Sources */,
                 0111FFF52A0E1CC100750034 /* SettingsTestCases.swift in Sources */,
+                56175BD82A1639E900EACD4B /* ScanTests.swift in Sources */,
 				AF36077627BFB019001A243D /* ParallelWorkerTest.swift in Sources */,
                 5629C00229ED3E5D003C5D95 /* NCNotificationTest.swift in Sources */,
 				AF8ED1FC2757821000B8DBC4 /* NextcloudTests.swift in Sources */,
@@ -3924,13 +4002,19 @@
 				AF4BF61927562A4B0081CEEF /* NCManageDatabase+Metadata.swift in Sources */,
 				F73EF7E72B0226B90087E6E9 /* NCManageDatabase+UserStatus.swift in Sources */,
 				F78A18B623CDD07D00F681F3 /* NCViewerRichWorkspaceWebView.swift in Sources */,
+                562817ED2A14D33700AA7669 /* PdfWithoutOcrSwitchView.swift in Sources */,
 				AFA2AC8527849604008E1EA7 /* NCActivityCommentView.swift in Sources */,
 				AFCE353727E4ED7B00FEA6C2 /* NCShareCells.swift in Sources */,
 				AF36077127BFA4E8001A243D /* ParallelWorker.swift in Sources */,
 				F75A9EE623796C6F0044CFCE /* NCNetworking.swift in Sources */,
+                562817E82A14D31700AA7669 /* TextFileWithOcrSwitchView.swift in Sources */,
 				F758B460212C56A400515F55 /* NCScan.swift in Sources */,
 				F78ACD52219046DC0088454D /* NCSectionHeaderMenu.swift in Sources */,
 				F72944F52A8424F800246839 /* NCEndToEndMetadataV1.swift in Sources */,
+                5620A0E72A13977800CE534B /* FileNameInputTextField.swift in Sources */,
+				F78ACD52219046DC0088454D /* NCSectionHeaderFooter.swift in Sources */,
+				F7490E902988F0C2009DCE94 /* NCCreateFormUploadAssets.swift in Sources */,
+				F749C10C23C4A5340027D966 /* NCIntroViewController.swift in Sources */,
 				F710D2022405826100A6033D /* NCViewer+Menu.swift in Sources */,
 				F765E9CD295C585800A09ED8 /* NCUploadScanDocument.swift in Sources */,
 				F77A697D250A0FBC00FF1708 /* NCCollectionViewCommon+Menu.swift in Sources */,
@@ -3943,6 +4027,7 @@
 				F77BB746289984CA0090FC19 /* UIViewController+Extension.swift in Sources */,
 				F700510522DF6A89003A3356 /* NCShare.swift in Sources */,
 				F72D1007210B6882009C96B7 /* NCPushNotificationEncryption.m in Sources */,
+                562817F82A14D35F00AA7669 /* SetPDFPasswordSwitchView.swift in Sources */,
 				F785EE9D246196DF00B3F945 /* NCNetworkingE2EE.swift in Sources */,
 				F76673ED22C901F6007ED366 /* FileProviderDomain.swift in Sources */,
 				F7A321AD1E9E6AD50069AD1B /* CCAdvanced.m in Sources */,
@@ -3950,6 +4035,7 @@
 				F75C0C4823D1FAE300163CC8 /* NCRichWorkspaceCommon.swift in Sources */,
 				F78ACD4A21903F850088454D /* NCTrashListCell+NCTrashCellProtocol.swift in Sources */,
 				F757CC8D29E82D0500F31428 /* NCGroupfolders.swift in Sources */,
+                562817F02A14D34300AA7669 /* JPGImageSaveSwitchView.swift in Sources */,
 				F760329F252F0F8E0015A421 /* NCTransferCell.swift in Sources */,
 				F3BB46542A3A1E9D00461F6E /* CCCellMore.swift in Sources */,
 				AF68326A27BE65A90010BF0B /* NCMenuAction.swift in Sources */,
@@ -3971,6 +4057,7 @@
 				F7651A8B23A2A3F2001403D2 /* NCCreateFormUploadDocuments.swift in Sources */,
 				F74AF3A4247FB6AE00AC767B /* NCUtilityFileSystem.swift in Sources */,
 				F7239871253D86B600257F49 /* NCEmptyDataSet.swift in Sources */,
+                562817E42A14ACF300AA7669 /* PdfWithOcrSwitchView.swift in Sources */,
 				AFCE353327E4ED1900FEA6C2 /* UIToolbar+Extension.swift in Sources */,
 				8491B1CD273BBA82001C8C5B /* UIViewController+Menu.swift in Sources */,
 				F73EF7BF2B02250B0087E6E9 /* NCManageDatabase+GPS.swift in Sources */,
@@ -3995,6 +4082,8 @@
 				F79EDAA526B004980007D134 /* NCPlayer.swift in Sources */,
 				F7C1EEA525053A9C00866ACC /* NCDataSource.swift in Sources */,
 				F713FF002472764100214AF6 /* UIImage+animatedGIF.m in Sources */,
+				F749C10B23C4A5340027D966 /* NCIntroCollectionViewCell.swift in Sources */,
+                562817FC2A14D36F00AA7669 /* PasswordInputField.swift in Sources */,
 				AFCE353527E4ED5900FEA6C2 /* DateFormatter+Extension.swift in Sources */,
 				F718C24E254D507B00C5C256 /* NCViewerMediaDetailView.swift in Sources */,
 				F7145610296433C80038D028 /* NCDocumentCamera.swift in Sources */,
@@ -4005,6 +4094,7 @@
 				F79B646026CA661600838ACA /* UIControl+Extension.swift in Sources */,
 				F7CA212D25F1333300826ABB /* NCAccountRequest.swift in Sources */,
 				F765F73125237E3F00391DBE /* NCRecent.swift in Sources */,
+                5620A0E32A136C2700CE534B /* NCCreateFormUploadScanDocument.swift in Sources */,
 				F76B3CCE1EAE01BD00921AC9 /* NCBrand.swift in Sources */,
 				F359D8672A7D03420023F405 /* NCUtility+Exif.swift in Sources */,
 				F7581D2425EFDDDF004DC699 /* NCMedia+Menu.swift in Sources */,
@@ -4022,6 +4112,7 @@
 				F755BD9B20594AC7008C5FBB /* NCService.swift in Sources */,
 				F7E8A391295DC5E0006CB2D0 /* View+Extension.swift in Sources */,
 				F79B869B265E19D40085C0E0 /* NSMutableAttributedString+Extension.swift in Sources */,
+                5620A0EB2A13988100CE534B /* ScanDocumentPathView.swift in Sources */,
 				F7B7504B2397D38F004E13EC /* UIImage+Extension.swift in Sources */,
 				F7EFC0CD256BF8DD00461AAD /* NCUserStatus.swift in Sources */,
 				AF3FDCC22796ECC300710F60 /* NCTrash+CollectionView.swift in Sources */,
@@ -4043,6 +4134,7 @@
 				F749B651297B0F2400087535 /* NCManageDatabase+Avatar.swift in Sources */,
 				F7FAFD3A28BFA948000777FE /* NCNotification+Menu.swift in Sources */,
 				F74C0436253F1CDC009762AB /* NCShares.swift in Sources */,
+                562817F42A14D35200AA7669 /* PNGImageSaveSwitchView.swift in Sources */,
 				F7AC1CB028AB94490032D99F /* Array+Extension.swift in Sources */,
 				F7AE00F5230D5F9E007ACF8A /* NCLoginWeb.swift in Sources */,
 				F707C26521A2DC5200F6181E /* NCStoreReview.swift in Sources */,
