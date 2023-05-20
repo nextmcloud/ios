@@ -196,6 +196,18 @@ class NCBrandColor: NSObject {
             return UIColor(red: 0.0 / 255.0, green: 199.0 / 255.0, blue: 190.0 / 255.0, alpha: 1.0)
         }
     }
+    
+    @objc public var iconColor: UIColor{
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
+            }else {
+                return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+            }
+        } else {
+            return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+        }
+    }
 
     override init() {
         brand = customer
@@ -364,6 +376,10 @@ class NCBrandColor: NSObject {
         let palette2 = mixPalette(steps: steps, color1: yellow, color2: blue)
         let palette3 = mixPalette(steps: steps, color1: blue, color2: red)
         return palette1 + palette2 + palette3
+    }
+    
+    @objc public var notificationAction: UIColor {
+        return UIColor(red: 0/255.0, green: 153/255.0, blue: 255/255.0, alpha: 1.0)
     }
     
     @objc public var secondarySystemGroupedBackground: UIColor = UIColor.secondarySystemGroupedBackground
