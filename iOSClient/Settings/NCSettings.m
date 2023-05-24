@@ -89,6 +89,11 @@
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
+    if([[CCUtility getPasscode] length]){
+        row.disabled = @NO;
+    }else{
+        row.disabled = @YES;
+    }
     [section addFormRow:row];
 
     // Section : E2EEncryption --------------------------------------------------------------
@@ -287,14 +292,17 @@
     if ([[CCUtility getPasscode] length]) {
         rowBloccoPasscode.title = NSLocalizedString(@"_lock_active_", nil);
         [rowBloccoPasscode.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
+        rowEnableTouchDaceID.disabled = @NO;
+        rowNotPasscodeAtStart.disabled = @NO;
     } else {
         rowBloccoPasscode.title = NSLocalizedString(@"_lock_not_active_", nil);
         [rowBloccoPasscode.cellConfig setObject:[[UIImage imageNamed:@"lock_open"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
+        rowEnableTouchDaceID.disabled = @YES;
+        rowNotPasscodeAtStart.disabled = @YES;
     }
     
-    if ([CCUtility getEnableTouchFaceID]) [rowEnableTouchDaceID setValue:@1]; else [rowEnableTouchDaceID setValue:@0];
-    if ([CCUtility getNotPasscodeAtStart]) [rowNotPasscodeAtStart setValue:@1]; else [rowNotPasscodeAtStart setValue:@0];
-
+    if ([CCUtility getEnableTouchFaceID] && [[CCUtility getPasscode] length]) [rowEnableTouchDaceID setValue:@1]; else [rowEnableTouchDaceID setValue:@0];
+    if ([CCUtility getNotPasscodeAtStart] && [[CCUtility getPasscode] length]) [rowNotPasscodeAtStart setValue:@1]; else [rowNotPasscodeAtStart setValue:@0];
 
     // -----------------------------------------------------------------
     
