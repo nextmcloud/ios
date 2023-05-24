@@ -171,55 +171,58 @@ struct NCViewE2EE: View {
             if manageE2EE.isEndToEndEnabled {
 
                 List {
-
-                    Section(header: Text(""), footer: Text(manageE2EE.statusOfService + "\n\n" + "End-to-End Encryption " + versionE2EE)) {
+                 
+                    Section(header: Text(""), footer: Text("End-to-End Encryption" + versionE2EE))
+                    {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_activated_", comment: ""))
                         } icon: {
-                            Image(systemName: "checkmark.circle.fill")
+                            Image("checkmark.circle.fill")
                                 .resizable()
                                 .scaledToFit()
                                 .foregroundColor(.green)
                         }
                     }
-
-                    HStack {
+                    
+                    
+                    Section(header: Text(""), footer: Text(NSLocalizedString("_read_passphrase_description_", comment: "")))
+                    {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_read_passphrase_", comment: ""))
                         } icon: {
-                            Image(systemName: "eye")
+                            Image("show_password")
                                 .resizable()
                                 .scaledToFit()
-                                .foregroundColor(Color(UIColor.systemGray))
+                                .foregroundColor(.green)
                         }
-                        Spacer()
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        if CCUtility.getPasscode().isEmpty {
-                            NCContentPresenter.shared.showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
-                        } else {
-                            manageE2EE.requestPasscodeType("readPassphrase")
+                        .onTapGesture {
+                            if CCUtility.getPasscode().isEmpty {
+                                NCContentPresenter.shared.showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
+                            } else {
+                                manageE2EE.requestPasscodeType("readPassphrase")
+                            }
                         }
                     }
-
-                    HStack {
+                    
+                    let removeStrDesc1 = NSLocalizedString("_remove_passphrase_desc_1_", comment: "")
+                    let removeStrDesc2 = NSLocalizedString("_remove_passphrase_desc_2_", comment: "")
+                    let removeStrDesc = String(format: "%@\n\n%@", removeStrDesc1, removeStrDesc2)
+                    Section(header: Text(""), footer: Text(removeStrDesc))
+                    {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_remove_", comment: ""))
                         } icon: {
-                            Image(systemName: "trash.circle")
+                            Image("delete")
                                 .resizable()
                                 .scaledToFit()
-                                .foregroundColor(Color.red)
+                                .foregroundColor(.green)
                         }
-                        Spacer()
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        if CCUtility.getPasscode().isEmpty {
-                            NCContentPresenter.shared.showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
-                        } else {
-                            manageE2EE.requestPasscodeType("removeLocallyEncryption")
+                        .onTapGesture {
+                            if CCUtility.getPasscode().isEmpty {
+                                NCContentPresenter.shared.showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
+                            } else {
+                                manageE2EE.requestPasscodeType("removeLocallyEncryption")
+                            }
                         }
                     }
 
@@ -227,20 +230,20 @@ struct NCViewE2EE: View {
                     DeleteCerificateSection()
 #endif
                 }
+                .listStyle(GroupedListStyle())
 
             } else {
 
                 List {
-
-                    Section(header: Text(""), footer:Text(manageE2EE.statusOfService + "\n\n" + "End-to-End Encryption " + versionE2EE)) {
+                    let startE2EDesc1 = NSLocalizedString("_start_e2e_encryption_1_", comment: "");
+                    let startE2EDesc2 = NSLocalizedString("_start_e2e_encryption_2_", comment: "");
+                    let startE2EDesc3 = NSLocalizedString("_start_e2e_encryption_3_", comment: "");
+                    let startE2EDesc  = String(format: "%@\n\n%@\n\n%@",startE2EDesc1,startE2EDesc2,startE2EDesc3)
+                    Section(header: Text(""), footer:Text(startE2EDesc)) {
                         HStack {
                             Label {
                                 Text(NSLocalizedString("_e2e_settings_start_", comment: ""))
                             } icon: {
-                                Image(systemName: "play.circle")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundColor(.green)
                             }
                             Spacer()
                         }
@@ -258,6 +261,7 @@ struct NCViewE2EE: View {
                     DeleteCerificateSection()
 #endif
                 }
+                .listStyle(GroupedListStyle())
             }
         }
         .background(Color(UIColor.systemGroupedBackground))

@@ -135,7 +135,7 @@ extension AppDelegate {
         //if !isDirectoryE2EE && CCUtility.isEnd(toEndEnabled: appDelegate.account) {
             actions.append(
                 NCMenuAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
-                             icon: UIImage(named: "folderEncrypted")!.image(color: NCBrandColor.shared.brandElement, size: 50),
+                             icon: UIImage(named: "encryptedfolder")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                              action: { _ in
                                  guard !appDelegate.activeServerUrl.isEmpty else { return }
                                  let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate, markE2ee: true)
