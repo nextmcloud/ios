@@ -197,6 +197,18 @@ class NCBrandColor: NSObject {
         }
     }
 
+    @objc public var iconColor: UIColor{
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
+            }else {
+                return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+            }
+        } else {
+            return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+        }
+    }
+    
     override init() {
         brand = customer
         brandElement = customer
@@ -222,7 +234,7 @@ class NCBrandColor: NSObject {
         cacheImages.local = UIImage(named: "local")!
 
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
-        cacheImages.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folderEncrypted = UIImage(named: "folder-encrypted")!
         cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)

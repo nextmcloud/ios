@@ -1,15 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "folderEncrypted.pdf",
+      "filename" : "default@500w.pdf",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true
   }
 }
