@@ -24,11 +24,14 @@
 #import "CCAdvanced.h"
 #import "CCUtility.h"
 #import "NCBridgeSwift.h"
+#import "AdjustHelper.h"
 
 @interface CCAdvanced ()
 {
     AppDelegate *appDelegate;
     XLFormSectionDescriptor *sectionSize;
+    TealiumHelper *tealium;
+    AdjustHelper *adjust;
 }
 @end
 
@@ -100,6 +103,23 @@
         [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
         [section addFormRow:row];
     }
+    
+    // Section : Chunk --------------------------------------------------------------
+
+    section = [XLFormSectionDescriptor formSection];
+    [form addFormSection:section];
+    section.footerTitle = NSLocalizedString(@"_chunk_footer_title_", nil);
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"chunk" rowType:XLFormRowDescriptorTypeStepCounter title:NSLocalizedString(@"_chunk_size_mb_", nil)];
+    row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+    row.value = [NSString stringWithFormat:@"%ld", CCUtility.getChunkSize];
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+    [row.cellConfigAtConfigure setObject:@YES forKey:@"stepControl.wraps"];
+    [row.cellConfigAtConfigure setObject:@1 forKey:@"stepControl.stepValue"];
+    [row.cellConfigAtConfigure setObject:@0 forKey:@"stepControl.minimumValue"];
+    [row.cellConfigAtConfigure setObject:@100 forKey:@"stepControl.maximumValue"];
+    [section addFormRow:row];
 
     // Section : Privacy --------------------------------------------------------------
 
@@ -236,6 +256,7 @@
                             [XLFormOptionsObject formOptionsObjectWithValue:@(90) displayText:NSLocalizedString(@"_3_months_", nil)],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(30) displayText:NSLocalizedString(@"_1_month_", nil)],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(7) displayText:NSLocalizedString(@"_1_week_", nil)],
+                            //[XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:NSLocalizedString(@"_1_day_", nil)],
                             ];
     [sectionSize addFormRow:row];
     
@@ -278,7 +299,7 @@
     self.title = NSLocalizedString(@"_advanced_", nil);
     appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     self.view.backgroundColor = UIColor.systemGroupedBackgroundColor;
-    
+    adjust = [[AdjustHelper alloc] init];
     self.tableView.backgroundColor = UIColor.systemGroupedBackgroundColor;
     
     [self initializeForm];
@@ -342,7 +363,13 @@
         [[NCKeychain alloc] init].logLevel = levelLog;
         [[[NextcloudKit shared] nkCommonInstance] setLevelLog:levelLog];
     }
-
+    
+    if ([rowDescriptor.tag isEqualToString:@"chunk"]) {
+        
+        NSInteger chunkSize = [[rowDescriptor.value valueData] intValue];
+        [CCUtility setChunkSize:chunkSize];
+    }
+    
     if ([rowDescriptor.tag isEqualToString:@"deleteoldfiles"]) {
         
         NSInteger days = [[rowDescriptor.value valueData] intValue];
@@ -356,6 +383,17 @@
 {
     [[NCNetworking shared] cancelAllTask];
 
+
+    [CCUtility removeDocumentsDirectory];
+    [CCUtility removeTemporaryDirectory];
+    
+    [CCUtility createDirectoryStandard];
+
+    [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
+
+    // Inizialized home
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadName:NCGlobal.shared.notificationCenterInitialize object:nil userInfo:nil];
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void) {
 
         NCUtilityFileSystem *ufs = [[NCUtilityFileSystem alloc] init];
@@ -378,6 +416,9 @@
         [[NCImageCache shared] createMediaCacheWithAccount:appDelegate.account withCacheSize:true];
 
         [[NCActivityIndicator shared] stop];
+        tealium = [[TealiumHelper alloc] init];
+        [tealium trackEventWithTitle:@"magentacloud-app.settings.reset" data:nil];
+        [adjust trackEvent:ResetsApp];
         [self calculateSize];
     });
 }
@@ -406,6 +447,13 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
+
+- (void)clearAllCacheRequest:(XLFormRowDescriptor *)sender
+{
+    [self deselectFormRow:sender];
+    [self clearCache:nil];
+}
+
 - (void)calculateSize
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -430,6 +478,23 @@
     
     [alertController addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"_ok_", nil) style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
         [appDelegate resetApplication];
+        tealium = [[TealiumHelper alloc] init];
+        [tealium trackEventWithTitle:@"magentacloud-app.settings.logout" data:nil];
+        [adjust trackEvent:Logout];
+        [[NSURLCache sharedURLCache] setMemoryCapacity:0];
+        [[NSURLCache sharedURLCache] setDiskCapacity:0];
+
+        [CCUtility removeGroupDirectoryProviderStorage];
+        [CCUtility removeGroupApplicationSupport];
+        
+        [CCUtility removeDocumentsDirectory];
+        [CCUtility removeTemporaryDirectory];
+        
+        [CCUtility deleteAllChainStore];
+        
+        [[NCManageDatabase shared] removeDB];
+        
+        exit(0);
     }]];
     
     [alertController addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"_cancel_", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
@@ -447,7 +512,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    if (indexPath.section == 4 && indexPath.row == 2) {
+    if (indexPath.section == 5 && indexPath.row == 2) {
         return 80;
     } else {
         return NCGlobal.shared.heightCellSettings;
