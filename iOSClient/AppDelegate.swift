@@ -54,6 +54,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var documentPickerViewController: NCDocumentPickerViewController?
     var timerErrorNetworking: Timer?
     private var privacyProtectionWindow: UIWindow?
+
+    let downloadQueue = Queuer(name: "downloadQueue", maxConcurrentOperationCount: NCGlobal.shared.maxConcurrentOperationCountDownload, qualityOfService: .default)
+    let downloadThumbnailQueue = Queuer(name: "downloadThumbnailQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let downloadThumbnailActivityQueue = Queuer(name: "downloadThumbnailActivityQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let downloadAvatarQueue = Queuer(name: "downloadAvatarQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let unifiedSearchQueue = Queuer(name: "unifiedSearchQueue", maxConcurrentOperationCount: 1, qualityOfService: .default)
+    let saveLivePhotoQueue = Queuer(name: "saveLivePhotoQueue", maxConcurrentOperationCount: 1, qualityOfService: .default)
+    @objc let adjust = AdjustHelper()
+
     var isAppRefresh: Bool = false
     var isAppProcessing: Bool = false
 
@@ -175,7 +184,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         self.presentPasscode {
             self.enableTouchFaceID()
         }
-
+        adjust.configAdjust()
+        adjust.subsessionStart()
+        TealiumHelper.shared.start()
         return true
     }
 
