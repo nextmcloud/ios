@@ -7,5 +7,4 @@
 #import "UIImage+animatedGIF.h"
 #import "NCPushNotificationEncryption.h"
 #import "TOPasscodeViewController.h"
-#import "TOPasscodeSettingsViewController.h"
 #import "AdjustHelper.h"

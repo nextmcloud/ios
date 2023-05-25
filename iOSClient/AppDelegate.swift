@@ -145,14 +145,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             NCPreferences().requestPasscodeAtStart = true
         }
 
+        /// Activation singleton
+        _ = NCAppStateManager.shared
+        _ = NCNetworking.shared
+        _ = NCDownloadAction.shared
+        _ = NCNetworkingProcess.shared
+
+        if account.isEmpty {
+            if NCBrandOptions.shared.disable_intro {
+                openLogin(viewController: nil, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+            } else {
+                if let viewController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() {
+                    let navigationController = NCLoginNavigationController(rootViewController: viewController)
+                    window?.rootViewController = navigationController
+                    window?.makeKeyAndVisible()
+                }
+            }
+        } else {
+            NCPasscode.shared.presentPasscode(delegate: self) {
+                NCPasscode.shared.enableTouchFaceID()
+            }
+        }
+
         adjust.configAdjust()
         adjust.subsessionStart()
         TealiumHelper.shared.start()
         FirebaseApp.configure()
-        
+
         // Initialize MoEngage early in app lifecycle
         MoEngageAnalytics.setupIfNeeded()
-                
         return true
     }
 
