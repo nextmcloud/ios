@@ -69,6 +69,7 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        5636E1BF2A20BE9E0059F1B1 /* E2EETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636E1BE2A20BE9E0059F1B1 /* E2EETests.swift */; };
 		8491B1CD273BBA82001C8C5B /* UIViewController+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8491B1CC273BBA82001C8C5B /* UIViewController+Menu.swift */; };
 		AF1A9B6427D0CA1E00F17A9E /* UIAlertController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1A9B6327D0CA1E00F17A9E /* UIAlertController+Extension.swift */; };
 		AF1A9B6527D0CC0500F17A9E /* UIAlertController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1A9B6327D0CA1E00F17A9E /* UIAlertController+Extension.swift */; };
@@ -970,6 +971,7 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        5636E1BE2A20BE9E0059F1B1 /* E2EETests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = E2EETests.swift; sourceTree = "<group>"; };
         5629C00129ED3E5D003C5D95 /* NCNotificationTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNotificationTest.swift; sourceTree = "<group>"; };
 		8491B1CC273BBA82001C8C5B /* UIViewController+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Menu.swift"; sourceTree = "<group>"; };
 		AF1A9B6327D0CA1E00F17A9E /* UIAlertController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extension.swift"; sourceTree = "<group>"; };
@@ -1809,6 +1811,7 @@
                 012818F92A0A5D8C003B5C6F /* AutoUploadTestCase.swift */,
                 0111FFF42A0E1CC100750034 /* SettingsTestCases.swift */,
                 56175BD72A1639E900EACD4B /* ScanTests.swift */,
+                5636E1BE2A20BE9E0059F1B1 /* E2EETests.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
@@ -3688,6 +3691,7 @@
                 018D3E0A2A067F8100C5CB8E /* CollaboraTestCase.swift in Sources */,
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
+                5636E1BF2A20BE9E0059F1B1 /* E2EETests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
