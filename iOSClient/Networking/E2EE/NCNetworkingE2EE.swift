@@ -34,12 +34,14 @@ class NCNetworkingE2EE: NSObject {
     func isE2EEVersionWriteable(account: String) -> NKError? {
 
         let versionE2EE = NCManageDatabase.shared.getCapabilitiesServerString(account: account, elements: NCElementsJSON.shared.capabilitiesE2EEApiVersion) ?? ""
+        //Bypass for issue nmc 2134
+        return nil
 
-        if NCGlobal.shared.e2eeReadVersions.last == versionE2EE {
-            return nil
-        }
-        
-        return NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_e2e_error_not_versionwriteable_")
+//        if NCGlobal.shared.e2eeReadVersions.last == versionE2EE {
+//            return nil
+//        }
+//
+//        return NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_e2e_error_not_versionwriteable_")
     }
 
     func generateRandomIdentifier() -> String {
