@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina3_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -41,13 +41,14 @@
                             <nil key="highlightedColor"/>
                         </label>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WCL-bl-0j0">
-                            <rect key="frame" x="20" y="70" width="120" height="30"/>
+                            <rect key="frame" x="20" y="70" width="138" height="30"/>
                             <color key="backgroundColor" systemColor="systemGray4Color"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="30" id="AHg-gX-UT0"/>
-                                <constraint firstAttribute="width" constant="120" id="e9E-Zi-Svf"/>
+                                <constraint firstAttribute="width" constant="138" id="e9E-Zi-Svf"/>
                             </constraints>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <state key="normal" title="Create  folder">
                                 <color key="titleColor" systemColor="labelColor"/>
                             </state>
@@ -56,11 +57,10 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Mg4-vG-Xr7">
-                            <rect key="frame" x="180" y="0.0" width="120" height="30"/>
+                            <rect key="frame" x="162" y="0.0" width="138" height="30"/>
                             <color key="backgroundColor" systemColor="systemGray4Color"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="30" id="aRa-Cb-dIJ"/>
-                                <constraint firstAttribute="width" constant="120" id="q7x-Zg-aFX"/>
                             </constraints>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <state key="normal" title="Copy">
@@ -71,10 +71,9 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Oq2-Kg-sDp">
-                            <rect key="frame" x="180" y="70" width="120" height="30"/>
+                            <rect key="frame" x="162" y="70" width="138" height="30"/>
                             <color key="backgroundColor" systemColor="systemGray4Color"/>
                             <constraints>
-                                <constraint firstAttribute="width" constant="120" id="JyD-uF-cFT"/>
                                 <constraint firstAttribute="height" constant="30" id="QAO-kF-IOZ"/>
                             </constraints>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -88,6 +87,7 @@
                     </subviews>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
+                        <constraint firstItem="Oq2-Kg-sDp" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="WCL-bl-0j0" secondAttribute="trailing" id="A5Z-US-5Cd"/>
                         <constraint firstItem="tE2-bY-JfT" firstAttribute="leading" secondItem="h1j-Bi-at4" secondAttribute="trailing" constant="8" symbolic="YES" id="BBW-Mt-T2Q"/>
                         <constraint firstItem="h1j-Bi-at4" firstAttribute="leading" secondItem="DhT-bZ-rgC" secondAttribute="leading" constant="20" id="BK8-FJ-PCw"/>
                         <constraint firstAttribute="trailing" secondItem="Mg4-vG-Xr7" secondAttribute="trailing" constant="20" id="Efe-Jl-OSp"/>
@@ -97,6 +97,8 @@
                         <constraint firstAttribute="height" constant="100" id="dTc-rJ-Jrz"/>
                         <constraint firstItem="tE2-bY-JfT" firstAttribute="centerY" secondItem="h1j-Bi-at4" secondAttribute="centerY" id="fRN-zY-g9L"/>
                         <constraint firstItem="Mg4-vG-Xr7" firstAttribute="top" secondItem="DhT-bZ-rgC" secondAttribute="top" id="fzS-ny-eXi"/>
+                        <constraint firstItem="Mg4-vG-Xr7" firstAttribute="width" secondItem="Oq2-Kg-sDp" secondAttribute="width" id="gbA-1i-PhG"/>
+                        <constraint firstItem="Oq2-Kg-sDp" firstAttribute="width" secondItem="WCL-bl-0j0" secondAttribute="width" id="gpp-cP-twM"/>
                         <constraint firstAttribute="bottom" secondItem="Oq2-Kg-sDp" secondAttribute="bottom" id="omd-Zc-koD"/>
                         <constraint firstAttribute="trailing" secondItem="Oq2-Kg-sDp" secondAttribute="trailing" constant="20" id="pkS-bX-XZ5"/>
                     </constraints>
@@ -113,6 +115,7 @@
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="xmS-E7-44n" secondAttribute="trailing" id="sg2-b1-tqE"/>
             </constraints>
             <connections>
+                <outlet property="buttonsWidthConstraint" destination="e9E-Zi-Svf" id="RJO-eW-K9f"/>
                 <outlet property="copyButton" destination="Mg4-vG-Xr7" id="uVT-up-NYH"/>
                 <outlet property="createFolderButton" destination="WCL-bl-0j0" id="8oW-69-vDk"/>
                 <outlet property="moveButton" destination="Oq2-Kg-sDp" id="Ty9-NQ-ila"/>

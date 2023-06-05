@@ -167,6 +167,15 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         autoUploadDirectory = NCManageDatabase.shared.getAccountAutoUploadDirectory(urlBase: activeAccount.urlBase, userId: activeAccount.userId, account: activeAccount.account)
 
         loadDatasource(withLoadFolder: true)
+        if let item = items.first as? tableMetadata, item.serverUrl == serverUrl {
+            selectCommandViewSelect?.moveButton?.isEnabled = false
+            selectCommandViewSelect?.copyButton?.isEnabled = false
+            selectCommandViewSelect?.copyButton?.alpha = 0.5
+        } else {
+            selectCommandViewSelect?.moveButton?.isEnabled = true
+            selectCommandViewSelect?.copyButton?.isEnabled = true
+            selectCommandViewSelect?.copyButton?.alpha = 1.0
+        }
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -576,46 +585,55 @@ class NCSelectCommandView: UIView {
     @IBOutlet weak var overwriteSwitch: UISwitch?
     @IBOutlet weak var overwriteLabel: UILabel?
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var buttonsWidthConstraint: NSLayoutConstraint!
 
     var selectView: NCSelect?
     private let gradient: CAGradientLayer = CAGradientLayer()
 
     override func awakeFromNib() {
 
-        separatorHeightConstraint.constant = 0.5
+        separatorHeightConstraint.constant = 1.0
         separatorView.backgroundColor = .separator
 
-        overwriteSwitch?.onTintColor = NCBrandColor.shared.brand
+        overwriteSwitch?.onTintColor = NCBrandColor.shared.customer
         overwriteLabel?.text = NSLocalizedString("_overwrite_", comment: "")
 
-        selectButton?.layer.cornerRadius = 15
+        selectButton?.layer.cornerRadius = 10
         selectButton?.layer.masksToBounds = true
         selectButton?.setTitle(NSLocalizedString("_select_", comment: ""), for: .normal)
-        selectButton?.backgroundColor = NCBrandColor.shared.brand
-        selectButton?.setTitleColor(UIColor(white: 1, alpha: 0.3), for: .highlighted)
-        selectButton?.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
+        selectButton?.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
+        selectButton?.setTitleColor(.white, for: .normal)
 
-        createFolderButton?.layer.cornerRadius = 15
+        createFolderButton?.layer.cornerRadius = 10
         createFolderButton?.layer.masksToBounds = true
         createFolderButton?.setTitle(NSLocalizedString("_create_folder_", comment: ""), for: .normal)
-        createFolderButton?.backgroundColor = NCBrandColor.shared.brand
-        createFolderButton?.setTitleColor(UIColor(white: 1, alpha: 0.3), for: .highlighted)
-        createFolderButton?.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
+        createFolderButton?.backgroundColor = .clear
+        createFolderButton?.setTitleColor(UIColor.label, for: .normal)
+        createFolderButton?.setImage(UIImage(named: "addFolder")?.withTintColor(UIColor.label), for: .normal)
+        createFolderButton?.layer.borderWidth = 1
+        createFolderButton?.layer.borderColor = UIColor.label.cgColor
 
-        copyButton?.layer.cornerRadius = 15
+        copyButton?.layer.cornerRadius = 10
         copyButton?.layer.masksToBounds = true
         copyButton?.setTitle(NSLocalizedString("_copy_", comment: ""), for: .normal)
-        copyButton?.backgroundColor = NCBrandColor.shared.brand
-        copyButton?.setTitleColor(UIColor(white: 1, alpha: 0.3), for: .highlighted)
-        copyButton?.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
+        copyButton?.backgroundColor = .clear
+        copyButton?.setTitleColor(UIColor.label, for: .normal)
+        copyButton?.layer.borderWidth = 1
+        copyButton?.layer.borderColor = UIColor.label.cgColor
 
-        moveButton?.layer.cornerRadius = 15
+        moveButton?.layer.cornerRadius = 10
         moveButton?.layer.masksToBounds = true
         moveButton?.setTitle(NSLocalizedString("_move_", comment: ""), for: .normal)
-        moveButton?.backgroundColor = NCBrandColor.shared.brand
-        moveButton?.setTitleColor(UIColor(white: 1, alpha: 0.3), for: .highlighted)
-        moveButton?.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
+        moveButton?.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
+        moveButton?.setTitleColor(.white, for: .normal)
+        buttonsWidthConstraint?.constant = UIScreen.main.bounds.width > 321 ? 150 : 132
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        createFolderButton?.layer.borderColor = UIColor.label.cgColor
+    }
+
 
     @IBAction func createFolderButtonPressed(_ sender: UIButton) {
         selectView?.createFolderButtonPressed(sender)
