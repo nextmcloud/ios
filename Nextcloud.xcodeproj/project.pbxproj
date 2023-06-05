@@ -60,6 +60,7 @@
         01B1E0632A1E2CE4002D5537 /* TealiumVisitorService in Frameworks */ = {isa = PBXBuildFile; productRef = 01B1E0622A1E2CE4002D5537 /* TealiumVisitorService */; };
         01EE3D662A14D67C00E0AA70 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 01EE3D652A14D67C00E0AA70 /* AdjustHelper.m */; };
         01EE3D692A14D76500E0AA70 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01EE3D682A14D76500E0AA70 /* TealiumHelper.swift */; };
+        01C0DDB92A2DC97200C9E04B /* MoveAndCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C0DDB82A2DC97200C9E04B /* MoveAndCopyTests.swift */; };
 		2C1D5D7523E2DE3300334ABB /* NCDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB41ED5A87C00B7EAD4 /* NCDatabase.swift */; };
 		2C1D5D7623E2DE3300334ABB /* NCManageDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB51ED5A87C00B7EAD4 /* NCManageDatabase.swift */; };
 		2C1D5D7923E2DE9100334ABB /* NCBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B3CCD1EAE01BD00921AC9 /* NCBrand.swift */; };
@@ -958,6 +959,7 @@
         01EE3D652A14D67C00E0AA70 /* AdjustHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
         01EE3D672A14D6A900E0AA70 /* AdjustHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
         01EE3D682A14D76500E0AA70 /* TealiumHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
+        01C0DDB82A2DC97200C9E04B /* MoveAndCopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveAndCopyTests.swift; sourceTree = "<group>"; };
 		08DC3BD41E64727E00F036D3 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		08EA97441E6554FC004C83FA /* FirebaseAnalytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseAnalytics.framework; sourceTree = "<group>"; };
 		08EA97451E6554FC004C83FA /* FirebaseCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseCore.framework; sourceTree = "<group>"; };
@@ -1812,6 +1814,7 @@
                 0111FFF42A0E1CC100750034 /* SettingsTestCases.swift */,
                 56175BD72A1639E900EACD4B /* ScanTests.swift */,
                 5636E1BE2A20BE9E0059F1B1 /* E2EETests.swift */,
+                01C0DDB82A2DC97200C9E04B /* MoveAndCopyTests.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
@@ -3692,6 +3695,7 @@
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
                 5636E1BF2A20BE9E0059F1B1 /* E2EETests.swift in Sources */,
+                01C0DDB92A2DC97200C9E04B /* MoveAndCopyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
