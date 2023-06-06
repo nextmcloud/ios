@@ -15,6 +15,18 @@
         562817E42A14ACF300AA7669 /* PdfWithOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562817E22A14ACF200AA7669 /* PdfWithOcrSwitchView.swift */; };
         562817E52A14ACF300AA7669 /* PdfWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 562817E32A14ACF300AA7669 /* PdfWithOcrSwitchView.xib */; };
         562817E82A14D31700AA7669 /* TextFileWithOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562817E62A14D31600AA7669 /* TextFileWithOcrSwitchView.swift */; };
+        56033E832A28B06600C2B5CF /* NCShareEmailFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56033E812A28B06600C2B5CF /* NCShareEmailFieldCell.swift */; };
+        56033E842A28B06600C2B5CF /* NCShareEmailFieldCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56033E822A28B06600C2B5CF /* NCShareEmailFieldCell.xib */; };
+        56262D192A26200B006707C8 /* UIButton+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56262D182A26200B006707C8 /* UIButton+Extension.swift */; };
+        56262D1B2A2623BB006707C8 /* ShareDownloadLimitNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56262D1A2A2623BB006707C8 /* ShareDownloadLimitNetwork.swift */; };
+        56EC20522A2DD424006EF6D9 /* NCFilePermissionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56EC20502A2DD423006EF6D9 /* NCFilePermissionCell.swift */; };
+        56EC20532A2DD424006EF6D9 /* NCFilePermissionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56EC20512A2DD423006EF6D9 /* NCFilePermissionCell.xib */; };
+        56EC20562A2DD498006EF6D9 /* NCShareHeaderCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56EC20542A2DD498006EF6D9 /* NCShareHeaderCustomCell.xib */; };
+        56EC20572A2DD498006EF6D9 /* NCShareHeaderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56EC20552A2DD498006EF6D9 /* NCShareHeaderCustomCell.swift */; };
+        56EC205A2A2DD8F8006EF6D9 /* NCShareTextInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56EC20582A2DD8F7006EF6D9 /* NCShareTextInputCell.xib */; };
+        56EC205B2A2DD8F8006EF6D9 /* NCShareTextInputCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56EC20592A2DD8F7006EF6D9 /* NCShareTextInputCell.swift */; };
+        56EC205E2A2DD954006EF6D9 /* NCFilePermissionEditCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56EC205C2A2DD953006EF6D9 /* NCFilePermissionEditCell.swift */; };
+        56EC205F2A2DD954006EF6D9 /* NCFilePermissionEditCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56EC205D2A2DD954006EF6D9 /* NCFilePermissionEditCell.xib */; };
         562817E92A14D31700AA7669 /* TextFileWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 562817E72A14D31700AA7669 /* TextFileWithOcrSwitchView.xib */; };
         562817EC2A14D33700AA7669 /* PdfWithoutOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 562817EA2A14D33700AA7669 /* PdfWithoutOcrSwitchView.xib */; };
         562817ED2A14D33700AA7669 /* PdfWithoutOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562817EB2A14D33700AA7669 /* PdfWithoutOcrSwitchView.swift */; };
@@ -979,6 +991,18 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        56033E812A28B06600C2B5CF /* NCShareEmailFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareEmailFieldCell.swift; sourceTree = "<group>"; };
+        56033E822A28B06600C2B5CF /* NCShareEmailFieldCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareEmailFieldCell.xib; sourceTree = "<group>"; };
+        56262D182A26200B006707C8 /* UIButton+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extension.swift"; sourceTree = "<group>"; };
+        56262D1A2A2623BB006707C8 /* ShareDownloadLimitNetwork.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShareDownloadLimitNetwork.swift; sourceTree = "<group>"; };
+        56EC20502A2DD423006EF6D9 /* NCFilePermissionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCFilePermissionCell.swift; sourceTree = "<group>"; };
+        56EC20512A2DD423006EF6D9 /* NCFilePermissionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCFilePermissionCell.xib; sourceTree = "<group>"; };
+        56EC20542A2DD498006EF6D9 /* NCShareHeaderCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCShareHeaderCustomCell.xib; sourceTree = "<group>"; };
+        56EC20552A2DD498006EF6D9 /* NCShareHeaderCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCShareHeaderCustomCell.swift; sourceTree = "<group>"; };
+        56EC20582A2DD8F7006EF6D9 /* NCShareTextInputCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCShareTextInputCell.xib; sourceTree = "<group>"; };
+        56EC20592A2DD8F7006EF6D9 /* NCShareTextInputCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCShareTextInputCell.swift; sourceTree = "<group>"; };
+        56EC205C2A2DD953006EF6D9 /* NCFilePermissionEditCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCFilePermissionEditCell.swift; sourceTree = "<group>"; };
+        56EC205D2A2DD954006EF6D9 /* NCFilePermissionEditCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCFilePermissionEditCell.xib; sourceTree = "<group>"; };
         5636E1BE2A20BE9E0059F1B1 /* E2EETests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = E2EETests.swift; sourceTree = "<group>"; };
         5629C00129ED3E5D003C5D95 /* NCNotificationTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNotificationTest.swift; sourceTree = "<group>"; };
 		8491B1CC273BBA82001C8C5B /* UIViewController+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Menu.swift"; sourceTree = "<group>"; };
@@ -1828,6 +1852,14 @@
 		AF93471327E235EB002537EE /* Advanced */ = {
 			isa = PBXGroup;
 			children = (
+                56EC205C2A2DD953006EF6D9 /* NCFilePermissionEditCell.swift */,
+                56EC205D2A2DD954006EF6D9 /* NCFilePermissionEditCell.xib */,
+                56EC20592A2DD8F7006EF6D9 /* NCShareTextInputCell.swift */,
+                56EC20582A2DD8F7006EF6D9 /* NCShareTextInputCell.xib */,
+                56EC20502A2DD423006EF6D9 /* NCFilePermissionCell.swift */,
+                56EC20512A2DD423006EF6D9 /* NCFilePermissionCell.xib */,
+                56EC20552A2DD498006EF6D9 /* NCShareHeaderCustomCell.swift */,
+                56EC20542A2DD498006EF6D9 /* NCShareHeaderCustomCell.xib */,
 				AF93471627E2361E002537EE /* NCShareAdvancePermission.swift */,
 				AF93471827E2361E002537EE /* NCShareAdvancePermissionFooter.swift */,
 				AF93471427E2361E002537EE /* NCShareAdvancePermissionFooter.xib */,
@@ -2045,6 +2077,7 @@
 		F728CE741BF6322C00E69702 /* Share */ = {
 			isa = PBXGroup;
 			children = (
+                56262D1A2A2623BB006707C8 /* ShareDownloadLimitNetwork.swift */,
 				AF93471327E235EB002537EE /* Advanced */,
 				F700510022DF63AC003A3356 /* NCShare.storyboard */,
 				F700510422DF6A89003A3356 /* NCShare.swift */,
@@ -2061,6 +2094,8 @@
 				F774264822EB4D0000B23912 /* NCSearchUserDropDownCell.xib */,
 				F769453B22E9CFFF000A798A /* NCShareUserCell.xib */,
 				AF2D7C7D2742559100ADF566 /* NCShareUserCell.swift */,
+                56033E812A28B06600C2B5CF /* NCShareEmailFieldCell.swift */,
+                56033E822A28B06600C2B5CF /* NCShareEmailFieldCell.xib */,
 			);
 			path = Share;
 			sourceTree = "<group>";
@@ -2398,6 +2433,7 @@
 				F77BB745289984CA0090FC19 /* UIViewController+Extension.swift */,
 				F7E8A390295DC5E0006CB2D0 /* View+Extension.swift */,
 				F7EE66AC2A20B226009AE765 /* UILabel+Extension.swift */,
+                56262D182A26200B006707C8 /* UIButton+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -3492,6 +3528,7 @@
 				F76D3CF52428D0C1005DFA87 /* NCViewerPDF.storyboard in Resources */,
 				F700222C1EC479840080073F /* Custom.xcassets in Resources */,
 				F702F2F125EE5CDB008F8E80 /* NCLogin.storyboard in Resources */,
+                56EC205A2A2DD8F8006EF6D9 /* NCShareTextInputCell.xib in Resources */,
 				F723985C253C95CE00257F49 /* NCViewerRichdocument.storyboard in Resources */,
                 562817F12A14D34300AA7669 /* JPGImageSaveSwitchView.xib in Resources */,
 				F758B45A212C564000515F55 /* NCScan.storyboard in Resources */,
@@ -3534,12 +3571,15 @@
 				F700510122DF63AC003A3356 /* NCShare.storyboard in Resources */,
 				F787704F22E7019900F287A9 /* NCShareLinkCell.xib in Resources */,
 				F70753F72542A9C000972D44 /* NCViewerMediaPage.storyboard in Resources */,
+                56EC20532A2DD424006EF6D9 /* NCFilePermissionCell.xib in Resources */,
+                56EC20562A2DD498006EF6D9 /* NCShareHeaderCustomCell.xib in Resources */,
 				F7F4F10627ECDBDB008676F9 /* Inconsolata-Medium.ttf in Resources */,
 				F7AC934A296193050002BC0F /* Reasons to use Nextcloud.pdf in Resources */,
 				F7A60F87292D215000FCE1F2 /* NCShareAccounts.storyboard in Resources */,
 				F7239877253D86D300257F49 /* NCEmptyView.xib in Resources */,
                 012466452A3305BA004356E9 /* NCTrashSectionFooter.xib in Resources */,
 				F761856A29E98543006EB3B0 /* NCIntro.storyboard in Resources */,
+                56EC205F2A2DD954006EF6D9 /* NCFilePermissionEditCell.xib in Resources */,
 				F747BA1F22354D2000971601 /* NCCreateFormUploadVoiceNote.storyboard in Resources */,
 				F719D9E0288D37A300762E33 /* NCColorPicker.storyboard in Resources */,
 				F7651A8A23A2A3F2001403D2 /* NCCreateFormUploadDocuments.storyboard in Resources */,
@@ -3557,6 +3597,7 @@
 				F7EDE51B262DD0C400414FE6 /* NCSelectCommandViewCopyMove.xib in Resources */,
 				F73B422B2476764F00A30FD3 /* NCNotification.storyboard in Resources */,
 				F7FF2CB12842159500EBB7A1 /* NCSectionHeader.xib in Resources */,
+                56033E842A28B06600C2B5CF /* NCShareEmailFieldCell.xib in Resources */,
 				F7D1612023CF19E30039EBBF /* NCViewerRichWorkspace.storyboard in Resources */,
                 012466472A332472004356E9 /* NCTrashSectionHeaderMenu.xib in Resources */,
 				F77B0F631D118A16002130FE /* Localizable.strings in Resources */,
@@ -4064,6 +4105,7 @@
 				AF4BF61927562A4B0081CEEF /* NCManageDatabase+Metadata.swift in Sources */,
 				F73EF7E72B0226B90087E6E9 /* NCManageDatabase+UserStatus.swift in Sources */,
 				F78A18B623CDD07D00F681F3 /* NCViewerRichWorkspaceWebView.swift in Sources */,
+                56EC20522A2DD424006EF6D9 /* NCFilePermissionCell.swift in Sources */,
                 562817ED2A14D33700AA7669 /* PdfWithoutOcrSwitchView.swift in Sources */,
 				AFA2AC8527849604008E1EA7 /* NCActivityCommentView.swift in Sources */,
 				AFCE353727E4ED7B00FEA6C2 /* NCShareCells.swift in Sources */,
@@ -4090,6 +4132,7 @@
 				F700510522DF6A89003A3356 /* NCShare.swift in Sources */,
 				F72D1007210B6882009C96B7 /* NCPushNotificationEncryption.m in Sources */,
                 562817F82A14D35F00AA7669 /* SetPDFPasswordSwitchView.swift in Sources */,
+                56033E832A28B06600C2B5CF /* NCShareEmailFieldCell.swift in Sources */,
 				F785EE9D246196DF00B3F945 /* NCNetworkingE2EE.swift in Sources */,
 				F76673ED22C901F6007ED366 /* FileProviderDomain.swift in Sources */,
 				F7A321AD1E9E6AD50069AD1B /* CCAdvanced.m in Sources */,
@@ -4127,10 +4170,12 @@
 				F75DD765290ABB25002EB562 /* Intent.intentdefinition in Sources */,
 				F74B6D952A7E239A00F03C5F /* NCManageDatabase+Chunk.swift in Sources */,
 				F702F2F725EE5CED008F8E80 /* NCLogin.swift in Sources */,
+                56262D192A26200B006707C8 /* UIButton+Extension.swift in Sources */,
 				F7E98C1627E0D0FC001F9F19 /* NCManageDatabase+Video.swift in Sources */,
 				F7F4F11227ECDC52008676F9 /* UIFont+Extension.swift in Sources */,
 				AF93471A27E2361E002537EE /* NCShareAdvancePermissionHeader.swift in Sources */,
                 01324F6D29F7AD12001E02E4 /* AnalysisDataCollectionSwitch.swift in Sources */,
+                56EC205E2A2DD954006EF6D9 /* NCFilePermissionEditCell.swift in Sources */,
 				F7F878AE1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */,
                 01324F6629F7A4C7001E02E4 /* PrivacySettingsViewController.swift in Sources */,
                 01324F6229F79C9D001E02E4 /* InitialPrivacySettingsViewController.swift in Sources */,
@@ -4149,6 +4194,8 @@
 				AFCE353527E4ED5900FEA6C2 /* DateFormatter+Extension.swift in Sources */,
 				F718C24E254D507B00C5C256 /* NCViewerMediaDetailView.swift in Sources */,
 				F7145610296433C80038D028 /* NCDocumentCamera.swift in Sources */,
+                56EC20572A2DD498006EF6D9 /* NCShareHeaderCustomCell.swift in Sources */,
+                56EC205B2A2DD8F8006EF6D9 /* NCShareTextInputCell.swift in Sources */,
 				F7381EE1218218C9000B1560 /* NCOffline.swift in Sources */,
 				F719D9E2288D396100762E33 /* NCColorPicker.swift in Sources */,
 				F73EF7DF2B02266D0087E6E9 /* NCManageDatabase+Trash.swift in Sources */,
@@ -4186,6 +4233,7 @@
 				F7134186259747BA00768D21 /* NCPushNotification.m in Sources */,
 				F3BB464F2A39EBE500461F6E /* NCMoreUserCell.swift in Sources */,
 				F726EEEC1FED1C820030B9C8 /* NCEndToEndInitialize.swift in Sources */,
+                56262D1B2A2623BB006707C8 /* ShareDownloadLimitNetwork.swift in Sources */,
 				F79A65C62191D95E00FF6DCC /* NCSelect.swift in Sources */,
 				F75D19E325EFE09000D74598 /* NCTrash+Menu.swift in Sources */,
 				F7FC5EE12A1768D700D921F5 /* NCCapabilitiesView.swift in Sources */,
