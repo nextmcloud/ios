@@ -52,7 +52,7 @@ class NCSharePaging: UIViewController {
         view.backgroundColor = .systemBackground
         title = NSLocalizedString("_details_", comment: "")
 
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_close_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(notification:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationDidEnterBackground), object: nil)
@@ -265,129 +265,72 @@ class NCSharePagingView: PagingView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func setupConstraints() {
-
-        guard let headerView = Bundle.main.loadNibNamed("NCShareHeaderView", owner: self, options: nil)?.first as? NCShareHeaderView else { return }
-        headerView.backgroundColor = .systemBackground
-        headerView.ocId = metadata.ocId
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        dateFormatter.timeStyle = .short
-        dateFormatter.locale = Locale.current
-
-        if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)) {
-            headerView.imageView.image = UIImage(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag))
-        } else {
-            if metadata.directory {
-                let image = metadata.e2eEncrypted ? UIImage(named: "folderEncrypted") : UIImage(named: "folder")
-                headerView.imageView.image = image?.image(color: NCBrandColor.shared.brandElement, size: image?.size.width ?? 0)
-                headerView.imageView.image = headerView.imageView.image?.colorizeFolder(metadata: metadata)
-            } else if !metadata.iconName.isEmpty {
-                headerView.imageView.image = UIImage(named: metadata.iconName)
-            } else {
-                headerView.imageView.image = UIImage(named: "file")
-            }
-        }
-        headerView.path.text = NCUtilityFileSystem.shared.getPath(path: metadata.path, user: metadata.user, fileName: metadata.fileName)
-        headerView.path.textColor = .label
-        headerView.path.trailingBuffer = headerView.path.frame.width
-        if metadata.favorite {
-            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 20), for: .normal)
-        } else {
-            headerView.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: .systemGray, size: 20), for: .normal)
-        }
-        headerView.info.text = CCUtility.transformedSize(metadata.size) + ", " + NSLocalizedString("_modified_", comment: "") + " " + dateFormatter.string(from: metadata.date as Date)
-        headerView.info.textColor = .systemGray
-        headerView.creation.text = NSLocalizedString("_creation_", comment: "") + " " + dateFormatter.string(from: metadata.creationDate as Date)
-        headerView.creation.textColor = .systemGray
-        headerView.upload.text = NSLocalizedString("_upload_", comment: "") + " " + dateFormatter.string(from: metadata.uploadDate as Date)
-        headerView.upload.textColor = .systemGray
-
-        headerView.details.setTitleColor(.label, for: .normal)
-        headerView.details.setTitle(NSLocalizedString("_details_", comment: ""), for: .normal)
-        headerView.details.layer.cornerRadius = 9
-        headerView.details.layer.masksToBounds = true
-        headerView.details.layer.backgroundColor = UIColor(red: 152.0 / 255.0, green: 167.0 / 255.0, blue: 181.0 / 255.0, alpha: 0.8).cgColor
-
-        for tag in metadata.tags {
-            headerView.tagListView.addTag(tag)
-        }
-
-        if metadata.tags.isEmpty {
-            NCSharePagingView.tagHeaderHeight = 0
-        } else {
-            NCSharePagingView.tagHeaderHeight = headerView.tagListView.intrinsicContentSize.height + 10
-        }
-
-        addSubview(headerView)
-
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        pageView.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            collectionView.heightAnchor.constraint(equalToConstant: options.menuHeight),
-            collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
-
-            headerView.topAnchor.constraint(equalTo: topAnchor),
-            headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            headerView.heightAnchor.constraint(equalToConstant: NCSharePagingView.headerHeight + NCSharePagingView.tagHeaderHeight),
-
-            pageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            pageView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            pageView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            pageView.topAnchor.constraint(equalTo: topAnchor, constant: 10)
-        ])
-    }
 }
 
 class NCShareHeaderView: UIView {
 
     @IBOutlet weak var imageView: UIImageView!
-    @IBOutlet weak var path: MarqueeLabel!
+    @IBOutlet weak var fileName: UILabel!
     @IBOutlet weak var info: UILabel!
-    @IBOutlet weak var creation: UILabel!
-    @IBOutlet weak var upload: UILabel!
     @IBOutlet weak var favorite: UIButton!
-    @IBOutlet weak var details: UIButton!
-    @IBOutlet weak var tagListView: TagListView!
+    @IBOutlet weak var labelSharing: UILabel!
+    @IBOutlet weak var labelSharingInfo: UILabel!
+    @IBOutlet weak var fullWidthImageView: UIImageView!
+    @IBOutlet weak var canShareInfoView: UIView!
+    @IBOutlet weak var sharedByLabel: UILabel!
+    @IBOutlet weak var resharingAllowedLabel: UILabel!
+    @IBOutlet weak var sharedByImageView: UIImageView!
+    @IBOutlet weak var constraintTopSharingLabel: NSLayoutConstraint!
 
     var ocId = ""
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.longTap))
-        path.addGestureRecognizer(longGesture)
+        setupUI()
     }
 
+    func setupUI() {
+        labelSharing.text = NSLocalizedString("_sharing_", comment: "")
+        labelSharingInfo.text = NSLocalizedString("_sharing_message_", comment: "")
+        
+        if UIScreen.main.bounds.width < 350 {
+            constraintTopSharingLabel.constant = 15
+        }
+    }
+    
+    func updateCanReshareUI() {
+        let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+        var isCurrentUser = true
+        if let ownerId = metadata?.ownerId, !ownerId.isEmpty {
+            isCurrentUser = NCShareCommon.shared.isCurrentUserIsFileOwner(fileOwnerId: ownerId)
+        }
+        let canReshare = NCShareCommon.shared.canReshare(withPermission: metadata?.permissions ?? "")
+        canShareInfoView.isHidden = isCurrentUser
+        labelSharingInfo.isHidden = !isCurrentUser
+        
+        if !isCurrentUser {
+            sharedByImageView.image = UIImage(named: "cloudUpload")?.image(color: .systemBlue, size: 26)
+            let ownerName = metadata?.ownerDisplayName ?? ""
+            sharedByLabel.text = NSLocalizedString("_shared_with_you_by_", comment: "") + " " + ownerName
+            let resharingAllowedMessage =  NSLocalizedString("_share_reshare_allowed_", comment: "")
+            let resharingNotAllowedMessage = NSLocalizedString("_share_reshare_not_allowed_", comment: "")
+            resharingAllowedLabel.text = canReshare ? resharingAllowedMessage  : resharingNotAllowedMessage
+        }
+    }
+    
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
         NCNetworking.shared.favoriteMetadata(metadata) { error in
             if error == .success {
                 guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-                self.favorite.setImage(NCUtility.shared.loadImage(
-                    named: "star.fill",
-                    color: metadata.favorite ? NCBrandColor.shared.yellowFavorite : .systemGray,
-                    size: 20), for: .normal)
+                if metadata.favorite {
+                    self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
+                } else {
+                    self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
+                }
             } else {
                 NCContentPresenter.shared.showError(error: error)
             }
         }
-    }
-
-    @IBAction func touchUpInsideDetails(_ sender: UIButton) {
-
-        creation.isHidden = !creation.isHidden
-        upload.isHidden = !upload.isHidden
-    }
-
-    @objc func longTap(sender: UIGestureRecognizer) {
-        UIPasteboard.general.string = path.text
-        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_copied_path_")
-        NCContentPresenter.shared.showInfo(error: error)
     }
 }

@@ -27,25 +27,54 @@ class NCShareAdvancePermissionHeader: UIView {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var fileName: UILabel!
     @IBOutlet weak var info: UILabel!
+    @IBOutlet weak var favorite: UIButton!
     @IBOutlet weak var fullWidthImageView: UIImageView!
-
+    var ocId = ""
+        
     func setupUI(with metadata: tableMetadata) {
+        backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        fileName.textColor = NCBrandColor.shared.label
+        info.textColor = NCBrandColor.shared.textInfo
+        backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)) {
             fullWidthImageView.image = NCUtility.shared.getImageMetadata(metadata, for: frame.height)
             fullWidthImageView.contentMode = .scaleAspectFill
             imageView.isHidden = true
         } else {
             if metadata.directory {
-                imageView.image = metadata.e2eEncrypted ? UIImage(named: "folderEncrypted") : UIImage(named: "folder")
+                imageView.image = UIImage.init(named: "folder")
             } else if !metadata.iconName.isEmpty {
-                imageView.image = UIImage(named: metadata.iconName)
+                imageView.image = UIImage.init(named: metadata.iconName)
             } else {
-                imageView.image = NCBrandColor.cacheImages.file
+                imageView.image = UIImage.init(named: "file")
             }
         }
+        favorite.setNeedsUpdateConstraints()
+        favorite.layoutIfNeeded()
         fileName.text = metadata.fileNameView
-        fileName.textColor = .label
-        info.textColor = .secondaryLabel
+        fileName.textColor = NCBrandColor.shared.fileFolderName
+        if metadata.favorite {
+            favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
+        } else {
+            favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
+        }
+        info.textColor = NCBrandColor.shared.optionItem
         info.text = CCUtility.transformedSize(metadata.size) + ", " + CCUtility.dateDiff(metadata.date as Date)
+    }
+    
+    @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
+        NCNetworking.shared.favoriteMetadata(metadata) { error in
+            if error == .success {
+                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
+                if metadata.favorite {
+                    self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
+                } else {
+                    self.favorite.setImage(NCUtility.shared.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
+                }
+            } else {
+                NCContentPresenter.shared.showError(error: error)
+            }
+        }
     }
 }

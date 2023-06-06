@@ -32,32 +32,33 @@ class NCShareAdvancePermissionFooter: UIView {
     @IBOutlet weak var buttonCancel: UIButton!
     @IBOutlet weak var buttonNext: UIButton!
     weak var delegate: NCShareAdvanceFotterDelegate?
-
+    
     func setupUI(delegate: NCShareAdvanceFotterDelegate?) {
         self.delegate = delegate
-        backgroundColor = .clear
-
+        buttonCancel.addTarget(self, action: #selector(cancelClicked), for: .touchUpInside)
+        buttonNext.addTarget(self, action: #selector(nextClicked), for: .touchUpInside)
         buttonCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
-        buttonCancel.layer.cornerRadius = 25
+        buttonNext.setTitle(NSLocalizedString(delegate?.isNewShare == true ? "_next_" : "_apply_changes_", comment: ""), for: .normal)
+        buttonCancel.layer.cornerRadius = 10
         buttonCancel.layer.masksToBounds = true
         buttonCancel.layer.borderWidth = 1
-        buttonCancel.layer.borderColor = UIColor.systemGray.cgColor
-        buttonCancel.backgroundColor = .secondarySystemBackground
-        buttonCancel.addTarget(self, action: #selector(cancelClicked), for: .touchUpInside)
-        buttonCancel.setTitleColor(.systemGray, for: .normal)
-
-        buttonNext.setTitle(NSLocalizedString(delegate?.isNewShare == true ? "_share_" : "_save_", comment: ""), for: .normal)
-        buttonNext.layer.cornerRadius = 25
+        addShadow(location: .top)
+        layer.cornerRadius = 10
+        layer.masksToBounds = true
+        backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        buttonCancel.setTitleColor(NCBrandColor.shared.label, for: .normal)
+        buttonCancel.layer.borderColor = NCBrandColor.shared.label.cgColor
+        buttonCancel.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        buttonNext.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
+        buttonNext.setTitleColor(.white, for: .normal)
+        buttonNext.layer.cornerRadius = 10
         buttonNext.layer.masksToBounds = true
-        buttonNext.backgroundColor = NCBrandColor.shared.brand
-        buttonNext.addTarget(self, action: #selector(nextClicked), for: .touchUpInside)
-        buttonNext.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
     }
-
+    
     @objc func cancelClicked() {
         delegate?.dismissShareAdvanceView(shouldSave: false)
     }
-
+    
     @objc func nextClicked() {
         delegate?.dismissShareAdvanceView(shouldSave: true)
     }

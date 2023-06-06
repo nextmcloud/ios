@@ -72,6 +72,13 @@ class tableShareV2: Object {
     override static func primaryKey() -> String {
         return "primaryKey"
     }
+    
+    func setPermission(value: Int) {
+        let realm = try! Realm()
+        try! realm.write {
+            permissions = value
+        }
+    }
 }
 
 extension NCManageDatabase {
