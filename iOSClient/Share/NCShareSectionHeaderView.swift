@@ -22,8 +22,7 @@ class NCShareSectionHeaderView: UITableViewHeaderFooterView {
     @IBOutlet weak var resharingAllowedLabel: UILabel!
     @IBOutlet weak var sharedByImageView: UIImageView!
     @IBOutlet weak var constraintTopSharingLabel: NSLayoutConstraint!
-    
-    private let appDelegate = UIApplication.shared.delegate as! AppDelegate
+
     var ocId = ""
     
     static var nib: UINib {
