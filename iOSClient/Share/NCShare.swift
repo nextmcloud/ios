@@ -424,7 +424,7 @@ extension NCShare: UITableViewDataSource {
         
         
         if FileManager.default.fileExists(atPath: CCUtility.getDirectoryProviderStorageIconOcId(metadata?.ocId, etag: metadata?.etag)) {
-            headerView.imageView.image = UIImage(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata?.ocId, etag: metadata?.etag))
+            headerView.fullWidthImageView.image = UIImage(contentsOfFile: CCUtility.getDirectoryProviderStorageIconOcId(metadata?.ocId, etag: metadata?.etag))
             headerView.fullWidthImageView.contentMode = .scaleAspectFill
             headerView.imageView.isHidden = true
         } else {

@@ -52,10 +52,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="X2m-IC-J1u" userLabel="View container">
-                                <rect key="frame" x="5" y="0.0" width="404" height="726"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="726"/>
                                 <subviews>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="c94-b9-Sim">
-                                        <rect key="frame" x="0.0" y="0.0" width="404" height="726"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="726"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                     </tableView>
                                 </subviews>
@@ -71,9 +71,9 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="eAi-wv-a4Y" firstAttribute="bottom" secondItem="X2m-IC-J1u" secondAttribute="bottom" constant="10" id="Gvn-eF-b0b"/>
-                            <constraint firstItem="X2m-IC-J1u" firstAttribute="leading" secondItem="eAi-wv-a4Y" secondAttribute="leading" constant="5" id="Ufw-7y-DMv"/>
+                            <constraint firstItem="X2m-IC-J1u" firstAttribute="leading" secondItem="eAi-wv-a4Y" secondAttribute="leading" id="Ufw-7y-DMv"/>
                             <constraint firstItem="X2m-IC-J1u" firstAttribute="top" secondItem="aV2-U6-JTf" secondAttribute="top" id="aXO-v9-CBF"/>
-                            <constraint firstItem="eAi-wv-a4Y" firstAttribute="trailing" secondItem="X2m-IC-J1u" secondAttribute="trailing" constant="5" id="hVX-vu-qJn"/>
+                            <constraint firstItem="eAi-wv-a4Y" firstAttribute="trailing" secondItem="X2m-IC-J1u" secondAttribute="trailing" id="hVX-vu-qJn"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="K1x-gm-0EZ"/>
