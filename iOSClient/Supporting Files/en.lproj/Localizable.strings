@@ -650,7 +650,6 @@
 "_password_obligatory_"         = "Enforce password protection enabled, password obligatory";
 "_shared_with_you_by_"          = "Shared with you by";
 "_share_reshare_not_allowed_"   = "Resharing is not allowed.";
-"_shareLinksearch_placeholder_" = "Contact name or email address";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
 "_create_link_"                 = "Create Link";
 "personal_share_by_mail"        = "Personal share by mail";
@@ -679,7 +678,7 @@
 "_share_file_drop_"             = "Filedrop only";
 "_share_hide_download_"         = "Prevent download";
 "_share_note_recipient_"        = "YOUR MESSAGE";
-"_shareLinksearch_placeholder_" = "Type a name and press Enter";
+"_shareLinksearch_placeholder_" = "Contact name or email address";
 "_shareLinksearch_mail_placeholder_" = "Type a name or an email and press Enter";
 "_new_comment_"                 = "New comment …";
 "_edit_comment_"                = "Edit comment";
