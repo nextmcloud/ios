@@ -27,10 +27,10 @@ import NextcloudKit
 
 extension NCViewer {
 
-    func toggleMenu(viewController: UIViewController, metadata: tableMetadata, webView: Bool, imageIcon: UIImage?, indexPath: IndexPath = IndexPath()) {
+    func toggleMenu(viewController: UIViewController, metadata: tableMetadata, webView: Bool, imageIcon: UIImage?) {
 
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-
+        
         var actions = [NCMenuAction]()
         var titleFavorite = NSLocalizedString("_add_favorites_", comment: "")
         if metadata.favorite { titleFavorite = NSLocalizedString("_remove_favorites_", comment: "") }
@@ -59,8 +59,8 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_view_in_folder_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "questionmark.folder"),
-                    action: { _ in
+                    icon: NCUtility.shared.loadImage(named: "arrow.forward.square", color: NCBrandColor.shared.iconColor),
+                    action: { menuAction in
                         NCActionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileNameBlink: metadata.fileName, fileNameOpen: nil)
                     }
                 )
@@ -108,7 +108,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_print_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "printer"),
+                    icon: NCUtility.shared.loadImage(named: "printer", color: NCBrandColor.shared.iconColor),
                     action: { _ in
                         if CCUtility.fileProviderStorageExists(metadata) {
                             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorPrint, "error": NKError(), "account": metadata.account])
@@ -119,7 +119,7 @@ extension NCViewer {
                 )
             )
         }
-
+        
         //
         // CONVERSION VIDEO TO MPEG4 (MFFF Lib)
         //
@@ -174,7 +174,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "pencil"),
+                    icon: NCUtility.shared.loadImage(named: "rename", color: NCBrandColor.shared.iconColor),
                     action: { _ in
 
                         if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
@@ -182,7 +182,6 @@ extension NCViewer {
                             vcRename.metadata = metadata
                             vcRename.disableChangeExt = true
                             vcRename.imagePreview = imageIcon
-                            vcRename.indexPath = indexPath
 
                             let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
 
@@ -197,14 +196,14 @@ extension NCViewer {
         // COPY - MOVE
         //
         if !webView, metadata.isCopyableMovable {
-            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], indexPath: []))
+            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata]))
         }
 
         //
         // COPY IN PASTEBOARD
         //
         if !webView, metadata.isCopyableInPasteboard {
-            actions.append(.copyAction(selectOcId: [metadata.ocId]))
+            actions.append(.copyAction(selectOcId: [metadata.ocId], hudView: viewController.view))
         }
 
         //
@@ -229,7 +228,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_search_", comment: ""),
-                    icon: UIImage(named: "search")!.image(color: UIColor.systemGray, size: 50),
+                    icon: UIImage(named: "search")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                     action: { _ in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuSearchTextPDF)
                     }
@@ -239,7 +238,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_go_to_page_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "repeat"),
+                    icon: NCUtility.shared.loadImage(named: "go-to-page", color: NCBrandColor.shared.iconColor),
                     action: { _ in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuGotToPageInPDF)
                     }
@@ -254,7 +253,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_modify_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "pencil.tip.crop.circle"),
+                    icon: NCUtility.shared.loadImage(named: "pencil.tip.crop.circle", color: NCBrandColor.shared.iconColor),
                     action: { _ in
                         if CCUtility.fileProviderStorageExists(metadata) {
                             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorLoadFileQuickLook, "error": NKError(), "account": metadata.account])
@@ -270,7 +269,7 @@ extension NCViewer {
         // DELETE
         //
         if !webView, metadata.isDeletable {
-            actions.append(.deleteAction(selectedMetadatas: [metadata], indexPath: [], metadataFolder: nil, viewController: viewController))
+            actions.append(.deleteAction(selectedMetadatas: [metadata], metadataFolder: nil, viewController: viewController))
         }
 
         viewController.presentMenu(with: actions)
