@@ -443,7 +443,6 @@
 //"_share_editing_"               = "Can edit";
 "_share_reshare_allowed_"       = "Resharing is allowed.";
 "_share_reshare_not_allowed_"   = "Resharing is not allowed.";
-"_shareLinksearch_placeholder_" = "Contact name or email address";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
 "_create_link_"                 = "Create Link";
 "personal_share_by_mail"        = "Personal share by mail";
