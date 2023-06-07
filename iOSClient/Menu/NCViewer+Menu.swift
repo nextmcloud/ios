@@ -38,21 +38,6 @@ extension NCViewer {
         let isOffline = localFile?.offline == true
 
         //
-        // DETAIL
-        //
-        if !appDelegate.disableSharesView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_details_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "info"),
-                    action: { _ in
-                        NCActionCenter.shared.openShare(viewController: viewController, metadata: metadata, page: .activity)
-                    }
-                )
-            )
-        }
-
-        //
         // VIEW IN FOLDER
         //
         if !webView {
@@ -146,25 +131,6 @@ extension NCViewer {
         //
         if !webView, metadata.isSavebleInCameraRoll {
             actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata]))
-        }
-
-        //
-        // SAVE AS SCAN
-        //
-        if !webView, metadata.isSavebleAsImage {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_save_as_scan_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "viewfinder.circle"),
-                    action: { _ in
-                        if CCUtility.fileProviderStorageExists(metadata) {
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorSaveAsScan, "error": NKError(), "account": metadata.account])
-                        } else {
-                            NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan) { _, _ in }
-                        }
-                    }
-                )
-            )
         }
 
         //
