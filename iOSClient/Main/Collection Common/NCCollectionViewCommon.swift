@@ -617,13 +617,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         
         let activeAccount = NCManageDatabase.shared.getActiveAccount()
         
-        let image = NCUtility.shared.loadUserImage(
-            for: appDelegate.user,
-               displayName: activeAccount?.displayName,
-               userBaseUrl: appDelegate)
-        
         let button = UIButton(type: .custom)
-        button.setImage(image, for: .normal)
         
         if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) {
             
@@ -668,7 +662,6 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 self.dismissTip()
             }
         }
-        navigationItem.setLeftBarButton(UIBarButtonItem(customView: button), animated: true)
         navigationItem.leftItemsSupplementBackButton = true
     }
 
@@ -704,7 +697,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 view.emptyTitle.text = NSLocalizedString(emptyTitle, comment: "")
                 view.emptyDescription.text = NSLocalizedString(emptyDescription, comment: "")
             } else {
-                view.emptyImage.image = UIImage(named: "folder")?.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width)
+                view.emptyImage.image = UIImage.init(named: "folder_nmcloud")
                 view.emptyTitle.text = NSLocalizedString("_files_no_files_", comment: "")
                 view.emptyDescription.text = NSLocalizedString("_no_file_pull_down_", comment: "")
             }
@@ -1546,17 +1539,31 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         }
 
         // Share image
+        cell.fileLabelShared?.text = NSLocalizedString("_shared_", comment: "")
+        cell.fileLabelShared?.textColor = NCBrandColor.shared.customer
         if isShare {
             cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
         } else if !metadata.shareType.isEmpty {
             metadata.shareType.contains(3) ?
-            (cell.fileSharedImage?.image = NCBrandColor.cacheImages.shareByLink) :
+            (cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared) :
             (cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared)
         } else {
-            cell.fileSharedImage?.image = NCBrandColor.cacheImages.canShare
+         //   cell.fileSharedImage?.image = NCBrandColor.cacheImages.canShare
+            cell.fileSharedImage?.image = NCBrandColor.cacheImages.imgShare.image(color: NCBrandColor.shared.gray60, size: 50)
+            cell.fileLabelShared?.text = ""
         }
-        if appDelegate.account != metadata.account {
-            cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
+//        if appDelegate.account != metadata.account {
+//            cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
+
+        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
+        if shares.share!.count > 0 || shares.firstShareLink != nil {
+            cell.fileSharedImage?.image = cell.fileSharedImage?.image?.imageColor(NCBrandColor.shared.customer)
+        }
+        
+        if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+            cell.fileSharedImage?.image = NCBrandColor.cacheImages.sharedWithMe
+            cell.fileLabelShared?.text = NSLocalizedString("_recieved_", comment: "")
+            cell.fileLabelShared?.textColor = NCBrandColor.shared.notificationAction
         }
 
         // Button More
@@ -1621,13 +1628,22 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.hideButtonShare(true)
         }
 
-        // Separator
-        if collectionView.numberOfItems(inSection: indexPath.section) == indexPath.row + 1 || isSearchingMode {
+        // Hide lines on iPhone
+        
+        if !UIDevice.current.orientation.isLandscape && UIDevice.current.model.hasPrefix("iPhone") {
             cell.cellSeparatorView?.isHidden = true
-        } else {
+            cell.fileLabelShared?.isHidden = true
+        }else{
             cell.cellSeparatorView?.isHidden = false
+            cell.fileLabelShared?.isHidden = false
+            
+            // Separator
+            if collectionView.numberOfItems(inSection: indexPath.section) == indexPath.row + 1 || isSearchingMode {
+                cell.cellSeparatorView?.isHidden = true
+            } else {
+                cell.cellSeparatorView?.isHidden = false
+            }
         }
-
         // Edit mode
         if isEditMode {
             cell.selectMode(true)
@@ -1643,14 +1659,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
         // Accessibility
         cell.setAccessibility(label: metadata.fileNameView + ", " + (cell.fileInfoLabel?.text ?? ""), value: a11yValues.joined(separator: ", "))
-
-        // Color string find in search
-        if isSearchingMode, let literalSearch = self.literalSearch, let title = cell.fileTitleLabel?.text {
-            let longestWordRange = (title.lowercased() as NSString).range(of: literalSearch)
-            let attributedString = NSMutableAttributedString(string: title, attributes: [NSAttributedString.Key.font : UIFont.systemFont(ofSize: 15)])
-            attributedString.setAttributes([NSAttributedString.Key.font : UIFont.boldSystemFont(ofSize: 15), NSAttributedString.Key.foregroundColor : UIColor.systemBlue], range: longestWordRange)
-            cell.fileTitleLabel?.attributedText = attributedString
-        }
 
         // Add TAGS
         cell.setTags(tags: Array(metadata.tags))

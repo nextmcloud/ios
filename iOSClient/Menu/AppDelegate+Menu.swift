@@ -114,15 +114,9 @@ extension AppDelegate {
             )
         )
 
-        if CCUtility.isEnd(toEndEnabled: appDelegate.account) {
-            actions.append(.seperator(order: 0))
-        }
-
-        let titleCreateFolder = isDirectoryE2EE ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
-        let imageCreateFolder = isDirectoryE2EE ? UIImage(named: "folderEncrypted")! : UIImage(named: "folder")!
         actions.append(
-            NCMenuAction(title: titleCreateFolder,
-                icon: imageCreateFolder.image(color: NCBrandColor.shared.brandElement, size: 50), action: { _ in
+            NCMenuAction(title: NSLocalizedString("_create_folder_", comment: ""),
+                icon: UIImage(named: "addFolder")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     guard !appDelegate.activeServerUrl.isEmpty else { return }
                     let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate)
                     appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
@@ -142,10 +136,6 @@ extension AppDelegate {
                                  appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
                              })
             )
-        }
-
-        if CCUtility.isEnd(toEndEnabled: appDelegate.account) {
-            actions.append(.seperator(order: 0))
         }
 
         if serverVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isDirectoryE2EE && NextcloudKit.shared.isNetworkReachable() {

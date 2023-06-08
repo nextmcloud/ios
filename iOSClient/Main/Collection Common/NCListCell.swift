@@ -39,11 +39,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var separator: UIView!
+    @IBOutlet weak var labelShared: UILabel!
 
     @IBOutlet weak var imageItemLeftConstraint: NSLayoutConstraint!
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var titleTrailingConstraint: NSLayoutConstraint!
     @IBOutlet weak var infoTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var btnMoreRightConstraint: NSLayoutConstraint!
 
     @IBOutlet weak var tagListView: TagListView!
 
@@ -99,6 +101,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     var fileSharedImage: UIImageView? {
         get { return imageShared }
         set { imageShared = newValue }
+    }
+    var fileLabelShared: UILabel? {
+        get { return labelShared }
+        set { labelShared = newValue }
     }
     var fileMoreImage: UIImageView? {
         get { return imageMore }
@@ -193,12 +199,12 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func titleInfoTrailingFull() {
-        titleTrailingConstraint.constant = 10
+       // titleTrailingConstraint.constant = 10
         infoTrailingConstraint.constant = 10
     }
 
     func titleInfoTrailingDefault() {
-        titleTrailingConstraint.constant = 90
+       // titleTrailingConstraint.constant = 90
         infoTrailingConstraint.constant = 90
     }
     
@@ -232,6 +238,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             buttonShared.isHidden = true
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
+            btnMoreRightConstraint.constant = -40
         } else {
             imageItemLeftConstraint.constant = 10
             imageSelect.isHidden = true
@@ -240,6 +247,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             buttonShared.isHidden = false
             buttonMore.isHidden = false
             backgroundView = nil
+            btnMoreRightConstraint.constant = 0
             setA11yActions()
         }
     }
@@ -283,31 +291,31 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         accessibilityValue = value
     }
 
-    func setTags(tags: [String]) {
-        tagListView.removeAllTags()
-        if tags.isEmpty {
-            tagListView.isHidden = true
-            labelInfo.isHidden = false
-        } else {
-            tagListView.isHidden = false
-            labelInfo.isHidden = true
-            if let tag = tags.first {
-                tagListView.addTag(tag)
-                if UIDevice.current.userInterfaceIdiom == .pad {
-                    if tags.count >= 2 {
-                        tagListView.addTag(tags[1])
-                    }
-                    if tags.count > 2 {
-                        tagListView.addTag("+\(tags.count-2)")
-                    }
-                } else {
-                    if tags.count > 1 {
-                        tagListView.addTag("+\(tags.count-1)")
-                    }
-                }
-            }
-        }
-    }
+//    func setTags(tags: [String]) {
+//        tagListView.removeAllTags()
+//        if tags.isEmpty {
+//            tagListView.isHidden = true
+//            labelInfo.isHidden = false
+//        } else {
+//            tagListView.isHidden = false
+//            labelInfo.isHidden = true
+//            if let tag = tags.first {
+//                tagListView.addTag(tag)
+//                if UIDevice.current.userInterfaceIdiom == .pad {
+//                    if tags.count >= 2 {
+//                        tagListView.addTag(tags[1])
+//                    }
+//                    if tags.count > 2 {
+//                        tagListView.addTag("+\(tags.count-2)")
+//                    }
+//                } else {
+//                    if tags.count > 1 {
+//                        tagListView.addTag("+\(tags.count-1)")
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
 
 protocol NCListCellDelegate: AnyObject {
