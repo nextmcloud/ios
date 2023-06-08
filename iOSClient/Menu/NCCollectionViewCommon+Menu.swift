@@ -32,19 +32,20 @@ import Queuer
 
 extension NCCollectionViewCommon {
 
-    func toggleMenu(metadata: tableMetadata, indexPath: IndexPath, imageIcon: UIImage?) {
+    func toggleMenu(metadata: tableMetadata, imageIcon: UIImage?) {
 
         var actions = [NCMenuAction]()
 
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
         let serverUrl = metadata.serverUrl + "/" + metadata.fileName
-        var isOffline: Bool = false
+        let serverUrlHome = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId)
+        let isOffline: Bool
 
         if metadata.directory, let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl)) {
             isOffline = directory.offline
         } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
             isOffline = localFile.offline
-        }
+        } else { isOffline = false }
 
         let editors = NCUtility.shared.isDirectEditing(account: metadata.account, contentType: metadata.contentType)
         let isRichDocument = NCUtility.shared.isRichDocument(metadata)
@@ -70,22 +71,6 @@ extension NCCollectionViewCommon {
                 action: nil
             )
         )
-
-        //
-        // DETAILS
-        //
-        if !appDelegate.disableSharesView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_details_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "info"),
-                    order: 10,
-                    action: { _ in
-                        NCActionCenter.shared.openShare(viewController: self, metadata: metadata, page: .activity)
-                    }
-                )
-            )
-        }
 
         if metadata.lock {
             var lockOwnerName = metadata.lockOwnerDisplayName.isEmpty ? metadata.lockOwner : metadata.lockOwnerDisplayName
@@ -129,7 +114,7 @@ extension NCCollectionViewCommon {
                     title: NSLocalizedString("_view_in_folder_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "questionmark.folder"),
                     order: 21,
-                    action: { _ in
+                    action: { menuAction in
                         NCActionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileNameBlink: metadata.fileName, fileNameOpen: nil)
                     }
                 )
@@ -144,19 +129,24 @@ extension NCCollectionViewCommon {
         }
 
         //
-        // SET FOLDER E2EE
+        // SET FOLDER E2EE (ONLY ROOT)
         //
-        if metadata.isDirectoySettableE2EE {
+        if metadata.serverUrl == serverUrlHome, metadata.isDirectoySettableE2EE {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_e2e_set_folder_encrypted_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "lock"),
                     order: 30,
                     action: { _ in
-                        Task {
-                            let error = await NCNetworkingE2EEMarkFolder().markFolderE2ee(account: metadata.account, fileName: metadata.fileName, serverUrl: metadata.serverUrl, userId: metadata.userId)
-                            if error != .success {
-                                NCContentPresenter.shared.showError(error: error)
+                        NextcloudKit.shared.markE2EEFolder(fileId: metadata.fileId, delete: false) { account, error in
+                            if error == .success {
+                                NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", self.appDelegate.account, serverUrl))
+                                NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, serverUrlTo: nil, etag: nil, ocId: nil, fileId: nil, encrypted: true, richWorkspace: nil, account: metadata.account)
+                                NCManageDatabase.shared.setMetadataEncrypted(ocId: metadata.ocId, encrypted: true)
+
+                                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeStatusFolderE2EE, userInfo: ["serverUrl": metadata.serverUrl])
+                            } else {
+                                NCContentPresenter.shared.messageNotification(NSLocalizedString("_e2e_error_mark_folder_", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .error)
                             }
                         }
                     }
@@ -174,7 +164,7 @@ extension NCCollectionViewCommon {
                     icon: NCUtility.shared.loadImage(named: "lock"),
                     order: 30,
                     action: { _ in
-                        NextcloudKit.shared.markE2EEFolder(fileId: metadata.fileId, delete: true) { _, error in
+                        NextcloudKit.shared.markE2EEFolder(fileId: metadata.fileId, delete: true) { account, error in
                             if error == .success {
                                 NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", self.appDelegate.account, serverUrl))
                                 NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, serverUrlTo: nil, etag: nil, ocId: nil, fileId: nil, encrypted: false, richWorkspace: nil, account: metadata.account)
@@ -182,7 +172,7 @@ extension NCCollectionViewCommon {
 
                                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeStatusFolderE2EE, userInfo: ["serverUrl": metadata.serverUrl])
                             } else {
-                                NCContentPresenter.shared.messageNotification(NSLocalizedString("_e2e_error_", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .error)
+                                NCContentPresenter.shared.messageNotification(NSLocalizedString("_e2e_error_delete_mark_folder_", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .error)
                             }
                         }
                     }
@@ -241,7 +231,7 @@ extension NCCollectionViewCommon {
                 icon = NCUtility.shared.loadImage(named: "collabora")
             }
 
-            if !editor.isEmpty {
+            if editor != "" {
                 actions.append(
                     NCMenuAction(
                         title: title,
@@ -311,7 +301,6 @@ extension NCCollectionViewCommon {
 
                             vcRename.metadata = metadata
                             vcRename.imagePreview = imageIcon
-                            vcRename.indexPath = indexPath
 
                             let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
 
@@ -326,16 +315,16 @@ extension NCCollectionViewCommon {
         // COPY - MOVE
         //
         if metadata.isCopyableMovable {
-            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], indexPath: [indexPath], order: 130))
+            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], order: 130))
         }
 
         //
         // COPY IN PASTEBOARD
         //
         if metadata.isCopyableInPasteboard {
-            actions.append(.copyAction(selectOcId: [metadata.ocId], order: 140))
+            actions.append(.copyAction(selectOcId: [metadata.ocId], hudView: self.view, order: 140))
         }
-
+        
         //
         // MODIFY WITH QUICK LOOK
         //
@@ -345,7 +334,7 @@ extension NCCollectionViewCommon {
                     title: NSLocalizedString("_modify_", comment: ""),
                     icon: NCUtility.shared.loadImage(named: "pencil.tip.crop.circle"),
                     order: 150,
-                    action: { _ in
+                    action: { menuAction in
                         if CCUtility.fileProviderStorageExists(metadata) {
                             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorLoadFileQuickLook, "error": NKError(), "account": metadata.account])
                         } else {
@@ -355,33 +344,12 @@ extension NCCollectionViewCommon {
                 )
             )
         }
-
-        //
-        // COLOR FOLDER
-        //
-        if self is NCFiles, metadata.directory {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_change_color_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "palette"),
-                    order: 160,
-                    action: { _ in
-                        if let picker = UIStoryboard(name: "NCColorPicker", bundle: nil).instantiateInitialViewController() as? NCColorPicker {
-                            picker.metadata = metadata
-                            let popup = NCPopupViewController(contentController: picker, popupWidth: 200, popupHeight: 320)
-                            popup.backgroundAlpha = 0
-                            self.present(popup, animated: true)
-                        }
-                    }
-                )
-            )
-        }
-
+        
         //
         // DELETE
         //
         if metadata.isDeletable {
-            actions.append(.deleteAction(selectedMetadatas: [metadata], indexPath: [indexPath], metadataFolder: metadataFolder, viewController: self, order: 170))
+            actions.append(.deleteAction(selectedMetadatas: [metadata], metadataFolder: metadataFolder, viewController: self, order: 170))
         }
 
         applicationHandle.addCollectionViewCommonMenu(metadata: metadata, imageIcon: imageIcon, actions: &actions)
