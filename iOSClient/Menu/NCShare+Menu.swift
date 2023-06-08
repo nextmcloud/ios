@@ -151,7 +151,7 @@ extension NCShare {
         self.presentMenu(with: actions)
     }
 
-    fileprivate func hasUploadPermission(tableShare: tableShare) -> Bool {
+    func hasUploadPermission(tableShare: tableShare) -> Bool {
         let uploadPermissions = [
             NCGlobal.shared.permissionMaxFileShare,
             NCGlobal.shared.permissionMaxFolderShare,
