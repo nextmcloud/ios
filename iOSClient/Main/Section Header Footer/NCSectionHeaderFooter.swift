@@ -26,28 +26,15 @@ import MarkdownKit
 
 class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate {
 
+    @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var buttonSwitch: UIButton!
     @IBOutlet weak var buttonOrder: UIButton!
-    @IBOutlet weak var buttonMore: UIButton!
-
-    @IBOutlet weak var button1: UIButton!
-    @IBOutlet weak var button2: UIButton!
-    @IBOutlet weak var button3: UIButton!
-
-    @IBOutlet weak var viewButtonsCommand: UIView!
-    @IBOutlet weak var viewButtonsView: UIView!
-    @IBOutlet weak var viewSeparator: UIView!
+    @IBOutlet weak var buttonOrderWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewRichWorkspace: UIView!
-    @IBOutlet weak var viewSection: UIView!
-
-    @IBOutlet weak var viewButtonsCommandHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var viewButtonsViewHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var viewSeparatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewRichWorkspaceHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var viewSectionHeightConstraint: NSLayoutConstraint!
-
     @IBOutlet weak var textViewRichWorkspace: UITextView!
-    @IBOutlet weak var labelSection: UILabel!
+    @IBOutlet weak var separator: UIView!
+    @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
 
     weak var delegate: NCSectionHeaderMenuDelegate?
 
@@ -61,35 +48,11 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
 
         backgroundColor = .clear
 
-        buttonSwitch.setImage(UIImage(named: "switchList")!.image(color: .systemGray, size: 25), for: .normal)
+        buttonSwitch.setImage(UIImage(named: "switchList")!.image(color: .gray, size: 25), for: .normal)
 
         buttonOrder.setTitle("", for: .normal)
-        buttonOrder.setTitleColor(.systemBlue, for: .normal)
-        buttonMore.setImage(UIImage(named: "more")!.image(color: .systemGray, size: 25), for: .normal)
-
-        button1.setImage(nil, for: .normal)
-        button1.isHidden = true
-        button1.backgroundColor = .clear
-        button1.setTitleColor(.systemBlue, for: .normal)
-        button1.layer.borderColor = UIColor.systemGray.cgColor
-        button1.layer.borderWidth = 0.4
-        button1.layer.cornerRadius = 3
-
-        button2.setImage(nil, for: .normal)
-        button2.isHidden = true
-        button2.backgroundColor = .clear
-        button2.setTitleColor(.systemBlue, for: .normal)
-        button2.layer.borderColor = UIColor.systemGray.cgColor
-        button2.layer.borderWidth = 0.4
-        button2.layer.cornerRadius = 3
-
-        button3.setImage(nil, for: .normal)
-        button3.isHidden = true
-        button3.backgroundColor = .clear
-        button3.setTitleColor(.systemBlue, for: .normal)
-        button3.layer.borderColor = UIColor.systemGray.cgColor
-        button3.layer.borderWidth = 0.4
-        button3.layer.cornerRadius = 3
+        buttonOrder.setTitleColor(NCBrandColor.shared.brand, for: .normal)
+        buttonMore.setImage(UIImage.init(named: "more")!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
 
         // Gradient
         gradient.startPoint = CGPoint(x: 0, y: 0.50)
@@ -100,8 +63,8 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
         tap.delegate = self
         viewRichWorkspace?.addGestureRecognizer(tap)
 
-        viewSeparatorHeightConstraint.constant = 0.5
-        viewSeparator.backgroundColor = .separator
+        separator.backgroundColor = .separator
+        separatorHeightConstraint.constant = 0.5
 
         markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: 15), color: .label)
         markdownParser.header.font = UIFont.systemFont(ofSize: 25)
@@ -109,16 +72,13 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
             textViewRichWorkspace.attributedText = markdownParser.parse(richWorkspaceText)
         }
         textViewColor = .label
-
-        labelSection.text = ""
-        viewSectionHeightConstraint.constant = 0
+        setInterfaceColor()
     }
 
     override func layoutSublayers(of layer: CALayer) {
         super.layoutSublayers(of: layer)
 
         gradient.frame = viewRichWorkspace.bounds
-        setInterfaceColor()
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -127,99 +87,30 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
         setInterfaceColor()
     }
 
-    //MARK: - Command
-
-    func setStatusButtonsCommand(enable: Bool) {
-
-        button1.isEnabled = enable
-        button2.isEnabled = enable
-        button3.isEnabled = enable
-    }
-
-    func setButtonsCommand(heigt :CGFloat, imageButton1: UIImage? = nil, titleButton1: String? = nil, imageButton2: UIImage? = nil, titleButton2: String? = nil, imageButton3: UIImage? = nil, titleButton3: String? = nil) {
-
-        viewButtonsCommandHeightConstraint.constant = heigt
-        if heigt == 0 {
-            viewButtonsView.isHidden = true
-            button1.isHidden = true
-            button2.isHidden = true
-            button3.isHidden = true
-        } else {
-            viewButtonsView.isHidden = false
-            if var image = imageButton1, let title = titleButton1 {
-                image = image.image(color: .systemGray, size: 25)
-                button1.setImage(image, for: .normal)
-                button1.isHidden = false
-                button1.setTitle(title.firstUppercased, for: .normal)
-            }
-            if var image = imageButton2, let title = titleButton2 {
-                image = image.image(color: .systemGray, size: 25)
-                button2.setImage(image, for: .normal)
-                button2.isHidden = false
-                button2.setTitle(title.firstUppercased, for: .normal)
-            }
-            if var image = imageButton3, let title = titleButton3 {
-                image = image.image(color: .systemGray, size: 25)
-                button3.setImage(image, for: .normal)
-                button3.isHidden = false
-                button3.setTitle(title.firstUppercased, for: .normal)
-            }
-        }
-    }
-
     //MARK: - View
 
-    func setStatusButtonsView(enable: Bool) {
+    func setStatusButton(count: Int) {
 
-        buttonSwitch.isEnabled = enable
-        buttonOrder.isEnabled = enable
-        buttonMore.isEnabled = enable
-    }
-
-    func buttonMoreIsHidden(_ isHidden: Bool) {
-
-        buttonMore.isHidden = isHidden
-    }
-
-    func setImageSwitchList() {
-
-        buttonSwitch.setImage(UIImage(named: "switchList")!.image(color: .systemGray, size: 50), for: .normal)
-    }
-
-    func setImageSwitchGrid() {
-
-        buttonSwitch.setImage(UIImage(named: "switchGrid")!.image(color: .systemGray, size: 50), for: .normal)
-    }
-
-    func setButtonsView(heigt :CGFloat) {
-
-        viewButtonsViewHeightConstraint.constant = heigt
-        if heigt == 0 {
-            viewButtonsView.isHidden = true
+        if count == 0 {
+            buttonOrder.isEnabled = false
+            buttonMore.isEnabled = false
         } else {
-            viewButtonsView.isHidden = false
+            buttonOrder.isEnabled = true
+            buttonMore.isEnabled = true
         }
     }
+    
+    func setTitleSorted(datasourceTitleButton: String) {
 
-    func setSortedTitle(_ title: String) {
-
-        let title = NSLocalizedString(title, comment: "")
-        //let size = title.size(withAttributes: [.font: buttonOrder.titleLabel?.font as Any])
+        let title = NSLocalizedString(datasourceTitleButton, comment: "")
+        let size = title.size(withAttributes: [.font: buttonOrder.titleLabel?.font as Any])
 
         buttonOrder.setTitle(title, for: .normal)
+        buttonOrderWidthConstraint.constant = size.width + 5
     }
 
     //MARK: - RichWorkspace
 
-    func setRichWorkspaceHeight(_ size: CGFloat) {
-
-        viewRichWorkspaceHeightConstraint.constant = size
-        if size == 0 {
-            viewRichWorkspace.isHidden = true
-        } else {
-            viewRichWorkspace.isHidden = false
-        }
-    }
 
     func setInterfaceColor() {
 
@@ -230,89 +121,46 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
         }
     }
 
-    func setRichWorkspaceText(_ text: String?) {
-        guard let text = text else { return }
-
-        if text != self.richWorkspaceText {
-            textViewRichWorkspace.attributedText = markdownParser.parse(text)
-            self.richWorkspaceText = text
-        }
-    }
-
-    //MARK: - Section
-
-    func setSectionHeight(_ size:CGFloat) {
-
-        viewSectionHeightConstraint.constant = size
-        if size == 0 {
-            viewSection.isHidden = true
-        } else {
-            viewSection.isHidden = false
+    func setRichWorkspaceText(richWorkspaceText: String?) {
+        guard let richWorkspaceText = richWorkspaceText else { return }
+        if richWorkspaceText != self.richWorkspaceText {
+            textViewRichWorkspace.attributedText = markdownParser.parse(richWorkspaceText)
+            self.richWorkspaceText = richWorkspaceText
         }
     }
 
     // MARK: - Action
 
+    @IBAction func touchUpInsideMore(_ sender: Any) {
+        delegate?.tapMoreHeader(sender: sender)
+    }
+
     @IBAction func touchUpInsideSwitch(_ sender: Any) {
-        delegate?.tapButtonSwitch(sender)
+        delegate?.tapSwitchHeader(sender: sender)
     }
 
     @IBAction func touchUpInsideOrder(_ sender: Any) {
-        delegate?.tapButtonOrder(sender)
-    }
-
-    @IBAction func touchUpInsideMore(_ sender: Any) {
-        delegate?.tapButtonMore(sender)
-    }
-
-    @IBAction func touchUpInsideButton1(_ sender: Any) {
-       delegate?.tapButton1(sender)
-    }
-
-    @IBAction func touchUpInsideButton2(_ sender: Any) {
-        delegate?.tapButton2(sender)
-    }
-
-    @IBAction func touchUpInsideButton3(_ sender: Any) {
-        delegate?.tapButton3(sender)
+        delegate?.tapOrderHeader(sender: sender)
     }
 
     @objc func touchUpInsideViewRichWorkspace(_ sender: Any) {
-        delegate?.tapRichWorkspace(sender)
+        delegate?.tapRichWorkspace(sender: sender)
     }
 }
 
 protocol NCSectionHeaderMenuDelegate: AnyObject {
-    func tapButtonSwitch(_ sender: Any)
-    func tapButtonOrder(_ sender: Any)
-    func tapButtonMore(_ sender: Any)
-    func tapButton1(_ sender: Any)
-    func tapButton2(_ sender: Any)
-    func tapButton3(_ sender: Any)
-    func tapRichWorkspace(_ sender: Any)
+    func tapSwitchHeader(sender: Any)
+    func tapMoreHeader(sender: Any)
+    func tapOrderHeader(sender: Any)
+    func tapRichWorkspace(sender: Any)
 }
 
 // optional func
 extension NCSectionHeaderMenuDelegate {
-    func tapButtonSwitch(_ sender: Any) {}
-    func tapButtonOrder(_ sender: Any) {}
-    func tapButtonMore(_ sender: Any) {}
-    func tapButton1(_ sender: Any) {}
-    func tapButton2(_ sender: Any) {}
-    func tapButton3(_ sender: Any) {}
-    func tapRichWorkspace(_ sender: Any) {}
-}
-
-class NCSectionHeader: UICollectionReusableView {
-
-    @IBOutlet weak var labelSection: UILabel!
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-
-        self.backgroundColor = UIColor.clear
-        self.labelSection.text = ""
-    }
+    func tapSwitchHeader(sender: Any) {}
+    func tapMoreHeader(sender: Any) {}
+    func tapOrderHeader(sender: Any) {}
+    func tapRichWorkspace(sender: Any) {}
 }
 
 class NCSectionFooter: UICollectionReusableView, NCSectionFooterDelegate {
@@ -333,7 +181,7 @@ class NCSectionFooter: UICollectionReusableView, NCSectionFooterDelegate {
         self.backgroundColor = UIColor.clear
         labelSection.textColor = UIColor.systemGray
         labelSection.text = ""
-
+        self.buttonSection.tintColor = NCBrandColor.shared.customer
         separator.backgroundColor = .separator
         separatorHeightConstraint.constant = 0.5
 

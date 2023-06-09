@@ -136,6 +136,7 @@ class NCBrandColor: NSObject {
         static var file = UIImage()
 
         static var shared = UIImage()
+        static var sharedWithMe = UIImage()
         static var canShare = UIImage()
         static var shareByLink = UIImage()
 
@@ -169,6 +170,9 @@ class NCBrandColor: NSObject {
         static var iconMail = UIImage()
         static var iconConfirm = UIImage()
         static var iconPages = UIImage()
+        
+        static var imgShare = UIImage()
+        static var imgMore = UIImage()
     }
 
     // Color
@@ -207,8 +211,9 @@ class NCBrandColor: NSObject {
 
         cacheImages.file = UIImage(named: "file")!
 
-        cacheImages.shared = UIImage(named: "share")!.image(color: .systemGray, size: 50)
-        cacheImages.canShare = UIImage(named: "share")!.image(color: .systemGray, size: 50)
+        cacheImages.shared = UIImage(named: "share")!.image(color: gray60, size: 50)
+        cacheImages.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: nmcIconSharedWithMe, size: 50)
+        cacheImages.canShare = UIImage(named: "share")!.image(color: gray60, size: 50)
         cacheImages.shareByLink = UIImage(named: "sharebylink")!.image(color: .systemGray, size: 50)
 
         cacheImages.favorite = NCUtility.shared.loadImage(named: "star.fill", color: yellowFavorite)
@@ -218,18 +223,19 @@ class NCBrandColor: NSObject {
         cacheImages.local = UIImage(named: "local")!
 
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
-        cacheImages.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folder =  UIImage(named: "folder")!.image(color: brandElement, size: folderWidth)
+        cacheImages.folderEncrypted = UIImage(named: "folderEncrypted")!
+        cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
+        cacheImages.folderPublic = UIImage(named: "folder_public")!
+        cacheImages.folderGroup = UIImage(named: "folder_group")!
+        cacheImages.folderExternal = UIImage(named: "folder_external")!
+        cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!
+        cacheImages.folder =  UIImage(named: "folder_nmcloud")!
+        cacheImages.imgShare = UIImage(named: "share")!
 
         cacheImages.checkedYes = NCUtility.shared.loadImage(named: "checkmark.circle.fill", color: .systemBlue)
         cacheImages.checkedNo = NCUtility.shared.loadImage(named: "circle", color: .systemGray)
 
-        cacheImages.buttonMore = UIImage(named: "more")!.image(color: .systemGray, size: 50)
+        cacheImages.buttonMore = UIImage(named: "more")!.image(color: gray60, size: 50)
         cacheImages.buttonStop = UIImage(named: "stop")!.image(color: .systemGray, size: 50)
         cacheImages.buttonMoreLock = UIImage(named: "moreLock")!.image(color: .systemGray, size: 50)
         cacheImages.buttonRestore = UIImage(named: "restore")!.image(color: .systemGray, size: 50)
