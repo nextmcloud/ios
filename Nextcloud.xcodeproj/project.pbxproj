@@ -86,6 +86,7 @@
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
         568B87132A31E725005F9347 /* SharingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568B87122A31E725005F9347 /* SharingTest.swift */; };
+        568B87132A31E725005F9347 /* SharingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568B87122A31E725005F9347 /* SharingTest.swift */; };
         5636E1BF2A20BE9E0059F1B1 /* E2EETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636E1BE2A20BE9E0059F1B1 /* E2EETests.swift */; };
 		8491B1CD273BBA82001C8C5B /* UIViewController+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8491B1CC273BBA82001C8C5B /* UIViewController+Menu.swift */; };
 		AF1A9B6427D0CA1E00F17A9E /* UIAlertController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1A9B6327D0CA1E00F17A9E /* UIAlertController+Extension.swift */; };
@@ -993,6 +994,7 @@
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
         568B87122A31E725005F9347 /* SharingTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharingTest.swift; sourceTree = "<group>"; };
+        568B87122A31E725005F9347 /* SharingTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharingTest.swift; sourceTree = "<group>"; };
         56033E812A28B06600C2B5CF /* NCShareEmailFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareEmailFieldCell.swift; sourceTree = "<group>"; };
         56033E822A28B06600C2B5CF /* NCShareEmailFieldCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareEmailFieldCell.xib; sourceTree = "<group>"; };
         56262D182A26200B006707C8 /* UIButton+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Extension.swift"; sourceTree = "<group>"; };
@@ -1830,6 +1832,7 @@
 			isa = PBXGroup;
 			children = (
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
+                568B87122A31E725005F9347 /* SharingTest.swift */,
                 568B87122A31E725005F9347 /* SharingTest.swift */,
 				AF8ED2022757822700B8DBC4 /* NCGlobalTests.swift */,
 				AF36077527BFB019001A243D /* ParallelWorkerTest.swift */,
@@ -3732,6 +3735,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF8ED1FC2757821000B8DBC4 /* NextcloudUnitTests.swift in Sources */,
+                568B87132A31E725005F9347 /* SharingTest.swift in Sources */,
                 568B87132A31E725005F9347 /* SharingTest.swift in Sources */,
                 010E052529FA361600507CE6 /* PrivacyPolicyTest.swift in Sources */,
 				AF70C14D27F3484D00E13DF2 /* SharePermissionTest.swift in Sources */,
