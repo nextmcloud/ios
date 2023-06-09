@@ -61,6 +61,9 @@
         01EE3D662A14D67C00E0AA70 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 01EE3D652A14D67C00E0AA70 /* AdjustHelper.m */; };
         01EE3D692A14D76500E0AA70 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01EE3D682A14D76500E0AA70 /* TealiumHelper.swift */; };
         01C0DDB92A2DC97200C9E04B /* MoveAndCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C0DDB82A2DC97200C9E04B /* MoveAndCopyTests.swift */; };
+        012466402A330020004356E9 /* NCTrashSectionHeaderFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0124663E2A330020004356E9 /* NCTrashSectionHeaderFooter.swift */; };
+        012466452A3305BA004356E9 /* NCTrashSectionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 012466442A3305BA004356E9 /* NCTrashSectionFooter.xib */; };
+        012466472A332472004356E9 /* NCTrashSectionHeaderMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 012466462A332472004356E9 /* NCTrashSectionHeaderMenu.xib */; };
 		2C1D5D7523E2DE3300334ABB /* NCDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB41ED5A87C00B7EAD4 /* NCDatabase.swift */; };
 		2C1D5D7623E2DE3300334ABB /* NCManageDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB51ED5A87C00B7EAD4 /* NCManageDatabase.swift */; };
 		2C1D5D7923E2DE9100334ABB /* NCBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B3CCD1EAE01BD00921AC9 /* NCBrand.swift */; };
@@ -960,6 +963,9 @@
         01EE3D672A14D6A900E0AA70 /* AdjustHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
         01EE3D682A14D76500E0AA70 /* TealiumHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
         01C0DDB82A2DC97200C9E04B /* MoveAndCopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveAndCopyTests.swift; sourceTree = "<group>"; };
+        0124663E2A330020004356E9 /* NCTrashSectionHeaderFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCTrashSectionHeaderFooter.swift; sourceTree = "<group>"; };
+        012466442A3305BA004356E9 /* NCTrashSectionFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCTrashSectionFooter.xib; sourceTree = "<group>"; };
+        012466462A332472004356E9 /* NCTrashSectionHeaderMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCTrashSectionHeaderMenu.xib; sourceTree = "<group>"; };
 		08DC3BD41E64727E00F036D3 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		08EA97441E6554FC004C83FA /* FirebaseAnalytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseAnalytics.framework; sourceTree = "<group>"; };
 		08EA97451E6554FC004C83FA /* FirebaseCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseCore.framework; sourceTree = "<group>"; };
@@ -2300,6 +2306,9 @@
 				F78F74332163757000C2ADAD /* NCTrash.storyboard */,
 				F78F74352163781100C2ADAD /* NCTrash.swift */,
 				AF3FDCC12796ECC300710F60 /* NCTrash+CollectionView.swift */,
+                0124663E2A330020004356E9 /* NCTrashSectionHeaderFooter.swift */,
+                012466442A3305BA004356E9 /* NCTrashSectionFooter.xib */,
+                012466462A332472004356E9 /* NCTrashSectionHeaderMenu.xib */,
 			);
 			path = Trash;
 			sourceTree = "<group>";
@@ -3529,6 +3538,7 @@
 				F7AC934A296193050002BC0F /* Reasons to use Nextcloud.pdf in Resources */,
 				F7A60F87292D215000FCE1F2 /* NCShareAccounts.storyboard in Resources */,
 				F7239877253D86D300257F49 /* NCEmptyView.xib in Resources */,
+                012466452A3305BA004356E9 /* NCTrashSectionFooter.xib in Resources */,
 				F761856A29E98543006EB3B0 /* NCIntro.storyboard in Resources */,
 				F747BA1F22354D2000971601 /* NCCreateFormUploadVoiceNote.storyboard in Resources */,
 				F719D9E0288D37A300762E33 /* NCColorPicker.storyboard in Resources */,
@@ -3548,6 +3558,7 @@
 				F73B422B2476764F00A30FD3 /* NCNotification.storyboard in Resources */,
 				F7FF2CB12842159500EBB7A1 /* NCSectionHeader.xib in Resources */,
 				F7D1612023CF19E30039EBBF /* NCViewerRichWorkspace.storyboard in Resources */,
+                012466472A332472004356E9 /* NCTrashSectionHeaderMenu.xib in Resources */,
 				F77B0F631D118A16002130FE /* Localizable.strings in Resources */,
 				F774264A22EB4D0000B23912 /* NCSearchUserDropDownCell.xib in Resources */,
 				F7CB689A2541676B0050EC94 /* NCMore.storyboard in Resources */,
@@ -4036,6 +4047,7 @@
 				F72CD63A25C19EBF00F46F9A /* NCAutoUpload.swift in Sources */,
 				AF93471D27E2361E002537EE /* NCShareAdvancePermissionFooter.swift in Sources */,
 				AF1A9B6427D0CA1E00F17A9E /* UIAlertController+Extension.swift in Sources */,
+                012466402A330020004356E9 /* NCTrashSectionHeaderFooter.swift in Sources */,
 				F73B422C2476764F00A30FD3 /* NCNotification.swift in Sources */,
 				371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */,
 				F757CC8229E7F88B00F31428 /* NCManageDatabase+Groupfolders.swift in Sources */,
