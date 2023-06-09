@@ -35,8 +35,6 @@ class NCShares: NCCollectionViewCommon {
         layoutKey = NCGlobal.shared.layoutViewShares
         enableSearchBar = false
         headerMenuButtonsCommand = false
-        headerMenuButtonsView = true
-        headerRichWorkspaceDisable = true
         emptyImage = UIImage(named: "share")?.image(color: .gray, size: UIScreen.main.bounds.width)
         emptyTitle = "_list_shares_no_files_"
         emptyDescription = "_tutorial_list_shares_view_"

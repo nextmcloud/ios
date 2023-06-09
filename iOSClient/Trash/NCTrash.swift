@@ -27,7 +27,7 @@ import Realm
 import UIKit
 import NextcloudKit
 
-class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDelegate, NCSectionHeaderMenuDelegate, NCEmptyDataSetDelegate, NCGridCellDelegate {
+class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDelegate, NCSectionHeaderMenuDelegate, NCEmptyDataSetDelegate, NCGridCellDelegate, NCTrashSectionHeaderMenuDelegate {
 
     @IBOutlet weak var collectionView: UICollectionView!
 
@@ -61,8 +61,8 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
         collectionView.register(UINib(nibName: "NCGridCell", bundle: nil), forCellWithReuseIdentifier: "gridCell")
 
         // Header - Footer
-        collectionView.register(UINib(nibName: "NCSectionHeaderMenu", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionHeaderMenu")
-        collectionView.register(UINib(nibName: "NCSectionFooter", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "sectionFooter")
+        collectionView.register(UINib(nibName: "NCTrashSectionHeaderMenu", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionHeaderMenu")
+        collectionView.register(UINib(nibName: "NCTrashSectionFooter", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "sectionFooter")
 
         collectionView.alwaysBounceVertical = true
         collectionView.backgroundColor = .systemBackground
@@ -124,36 +124,40 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
 
     // MARK: TAP EVENT
 
-    func tapButtonSwitch(_ sender: Any) {
+    func tapSwitchHeaderMenu(sender: Any) {
 
         if collectionView.collectionViewLayout == gridLayout {
 
             // list layout
+            UIView.animate(withDuration: 0.0, animations: {
+                self.collectionView.collectionViewLayout.invalidateLayout()
+                self.collectionView.setCollectionViewLayout(self.listLayout, animated: false, completion: { _ in
+                    self.collectionView.reloadData()
+                })
+            })
             layoutForView?.layout = NCGlobal.shared.layoutList
             NCManageDatabase.shared.setLayoutForView(account: appDelegate.account, key: NCGlobal.shared.layoutViewTrash, serverUrl: "", layout: layoutForView?.layout)
-
-            self.collectionView.reloadData()
-            self.collectionView.collectionViewLayout.invalidateLayout()
-            self.collectionView.setCollectionViewLayout(self.listLayout, animated: true)
 
         } else {
 
             // grid layout
+            UIView.animate(withDuration: 0.0, animations: {
+                self.collectionView.collectionViewLayout.invalidateLayout()
+                self.collectionView.setCollectionViewLayout(self.gridLayout, animated: false, completion: { _ in
+                    self.collectionView.reloadData()
+                })
+            })
             layoutForView?.layout = NCGlobal.shared.layoutGrid
             NCManageDatabase.shared.setLayoutForView(account: appDelegate.account, key: NCGlobal.shared.layoutViewTrash, serverUrl: "", layout: layoutForView?.layout)
-
-            self.collectionView.reloadData()
-            self.collectionView.collectionViewLayout.invalidateLayout()
-            self.collectionView.setCollectionViewLayout(self.gridLayout, animated: true)
         }
     }
 
-    func tapButtonOrder(_ sender: Any) {
+    func tapOrderHeaderMenu(sender: Any) {
         let sortMenu = NCSortMenu()
         sortMenu.toggleMenu(viewController: self, account: appDelegate.account, key: NCGlobal.shared.layoutViewTrash, sortButton: sender as? UIButton, serverUrl: "", hideDirectoryOnTop: true)
     }
 
-    func tapButtonMore(_ sender: Any) {
+    func tapMoreHeaderMenu(sender: Any) {
         toggleMenuMoreHeader()
     }
 

@@ -31,6 +31,14 @@ extension NCTrash {
     var selectActions: [NCMenuAction] {
         [
             NCMenuAction(
+                title: NSLocalizedString("_select_all_", comment: ""),
+                icon: NCUtility.shared.loadImage(named: "checkmark.circle.fill"),
+                action: { menuAction in
+                    self.collectionViewSelectAll()
+                }
+            ),
+            
+            NCMenuAction(
                 title: NSLocalizedString("_trash_restore_selected_", comment: ""),
                 icon: NCUtility.shared.loadImage(named: "restore"),
                 action: { _ in

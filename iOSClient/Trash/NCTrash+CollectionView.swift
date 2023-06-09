@@ -143,43 +143,30 @@ extension NCTrash: UICollectionViewDataSource {
 
         if kind == UICollectionView.elementKindSectionHeader {
 
-            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionHeaderMenu", for: indexPath) as? NCSectionHeaderMenu
+            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionHeaderMenu", for: indexPath) as? NCTrashSectionHeaderMenu
             else { return UICollectionReusableView() }
 
-            if layoutForView?.layout == NCGlobal.shared.layoutGrid {
-                header.setImageSwitchList()
-                header.buttonSwitch.accessibilityLabel = NSLocalizedString("_list_view_", comment: "")
+            if collectionView.collectionViewLayout == gridLayout {
+                header.buttonSwitch.setImage(UIImage(named: "switchList")?.image(color: NCBrandColor.shared.gray, size: 25), for: .normal)
             } else {
-                header.setImageSwitchGrid()
+                header.buttonSwitch.setImage(UIImage(named: "switchGrid")?.image(color: NCBrandColor.shared.gray, size: 25), for: .normal)
                 header.buttonSwitch.accessibilityLabel = NSLocalizedString("_grid_view_", comment: "")
             }
 
             header.delegate = self
-            header.setStatusButtonsView(enable: !datasource.isEmpty)
-            header.setSortedTitle(layoutForView?.titleButtonHeader ?? "")
-            if isEditMode {
-                header.setButtonsCommand(heigt: NCGlobal.shared.heightButtonsCommand,
-                                         imageButton1: UIImage(named: "restore"), titleButton1: NSLocalizedString("_trash_restore_selected_", comment: ""),
-                                         imageButton2: UIImage(named: "trash"), titleButton2: NSLocalizedString("_trash_delete_selected_", comment: ""))
-            } else {
-                header.setButtonsCommand(heigt: NCGlobal.shared.heightButtonsCommand,
-                                         imageButton1: UIImage(named: "restore"), titleButton1: NSLocalizedString("_trash_restore_all_", comment: ""),
-                                         imageButton2: UIImage(named: "trash"), titleButton2: NSLocalizedString("_trash_delete_all_", comment: ""))
-            }
-            header.setButtonsView(heigt: NCGlobal.shared.heightButtonsView)
-            header.setRichWorkspaceHeight(0)
-            header.setSectionHeight(0)
+            header.backgroundColor = .systemBackground
+            header.separator.backgroundColor = .separator
+            header.setStatusButton(datasource: datasource)
+            header.setTitleSorted(datasourceTitleButton: layoutForView?.titleButtonHeader ?? "")
 
             return header
 
         } else {
 
-            guard let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFooter", for: indexPath) as? NCSectionFooter
+            guard let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFooter", for: indexPath) as? NCTrashSectionFooter
             else { return UICollectionReusableView() }
 
-            footer.setTitleLabel(setTextFooter(datasource: datasource))
-            footer.separatorIsHidden(true)
-
+            footer.setTitleLabelFooter(datasource: datasource)
             return footer
         }
     }
@@ -189,7 +176,7 @@ extension NCTrash: UICollectionViewDataSource {
 extension NCTrash: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: NCGlobal.shared.heightButtonsView + NCGlobal.shared.heightButtonsCommand)
+        return CGSize(width: collectionView.frame.width, height: 50)
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {

@@ -33,7 +33,7 @@ class NCFavorite: NCCollectionViewCommon {
 
         titleCurrentFolder = NSLocalizedString("_favorites_", comment: "")
         layoutKey = NCGlobal.shared.layoutViewFavorite
-        enableSearchBar = false
+        enableSearchBar = true
         headerMenuButtonsCommand = false
         headerMenuButtonsView = true
         headerRichWorkspaceDisable = true
