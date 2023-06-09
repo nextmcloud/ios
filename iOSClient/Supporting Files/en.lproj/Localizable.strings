@@ -298,7 +298,9 @@
 "_logout_"                      = "Log out";
 "_quota_space_unlimited_"       = "Unlimited";
 "_quota_space_unknown_"         = "Unknown";
-"_quota_using_"                 = "You are using %@ of %@";
+"_quota_using_"                 = "%@ ";
+"_quota_using_of_"              = "of %@";
+"_quota_using_percentage_"      = "Memory to %@ occupied";
 "_acknowledgements_"            = "Acknowledgements";
 "_settings_"                    = "Settings";
 "_passcode_"                    = "Password";
