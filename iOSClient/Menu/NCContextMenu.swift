@@ -29,13 +29,14 @@ import JGProgressHUD
 class NCContextMenu: NSObject {
 
     func viewMenu(ocId: String, viewController: UIViewController, image: UIImage?, enableDeleteLocal: Bool, enableViewInFolder: Bool) -> UIMenu {
+        
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return UIMenu() }
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
         var downloadRequest: DownloadRequest?
         var titleDeleteConfirmFile = NSLocalizedString("_delete_file_", comment: "")
         var titleSave: String = NSLocalizedString("_save_selected_files_", comment: "")
         let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
-        let serverUrlHome = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId)
+        let serverUrlHome = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate?.urlBase ?? "", userId: appDelegate?.userId ?? "")
         let serverUrl = metadata.serverUrl + "/" + metadata.fileName
         let titleFavorite = metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: "")
         var isOffline = false
@@ -52,7 +53,7 @@ class NCContextMenu: NSObject {
             }
         }
         if metadata.directory {
-            if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl)) {
+            if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate?.account ?? "", serverUrl)) {
                 isOffline = directory.offline
             }
         } else {
@@ -118,7 +119,7 @@ class NCContextMenu: NSObject {
             
             NextcloudKit.shared.markE2EEFolder(fileId: metadata.fileId, delete: true) { account, error in
                 if error == .success {
-                    NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl))
+                    NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate?.account ?? "", serverUrl))
                     NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, serverUrlTo: nil, etag: nil, ocId: nil, fileId: nil, encrypted: false, richWorkspace: nil, account: metadata.account)
                     NCManageDatabase.shared.setMetadataEncrypted(ocId: metadata.ocId, encrypted: false)
                     
@@ -133,7 +134,7 @@ class NCContextMenu: NSObject {
             
             NextcloudKit.shared.markE2EEFolder(fileId: metadata.fileId, delete: false) { account, error in
                 if error == .success {
-                    NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl))
+                    NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate?.account ?? "", serverUrl))
                     NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, serverUrlTo: nil, etag: nil, ocId: nil, fileId: nil, encrypted: true, richWorkspace: nil, account: metadata.account)
                     NCManageDatabase.shared.setMetadataEncrypted(ocId: metadata.ocId, encrypted: true)
                     
@@ -288,8 +289,8 @@ class NCContextMenu: NSObject {
         // DIRECTORY
         if metadata.directory {
             
-            let isEncryptionDisabled = metadata.e2eEncrypted && metadata.directory && CCUtility.isEnd(toEndEnabled: appDelegate.account) && metadata.serverUrl == serverUrlHome && metadata.size == 0
-            let isEncrytptionEnabled = !metadata.e2eEncrypted && metadata.directory && CCUtility.isEnd(toEndEnabled: appDelegate.account) && metadata.serverUrl == serverUrlHome && metadata.size == 0
+            let isEncryptionDisabled = metadata.isDirectoryUnsettableE2EE
+            let isEncrytptionEnabled = metadata.serverUrl == serverUrlHome && metadata.isDirectoySettableE2EE
             let submenu = UIMenu(title: "", options: .displayInline, children: isEncrytptionEnabled ? [favorite, offline, rename, moveCopy, encrypt, delete] : [favorite, offline, rename, moveCopy, delete])
             let childrenArray = metadata.e2eEncrypted ? ( isEncryptionDisabled ? [offline, decrypt] : (metadata.serverUrl == serverUrlHome) ? [offline] : [offline, delete]) : [detail,submenu]
             return UIMenu(title: "", children: childrenArray)
@@ -311,7 +312,7 @@ class NCContextMenu: NSObject {
                 children.append(deleteConfirmLocal)
             }
         
-        if NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesFilesLockVersion) >= 1, metadata.canUnlock(as: appDelegate.userId) {
+        if NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate?.account ?? "", elements: NCElementsJSON.shared.capabilitiesFilesLockVersion) >= 1, metadata.canUnlock(as: appDelegate?.userId ?? "") {
             children.insert(lockUnlock, at: metadata.lock ? 0 : 1)
         }
         
@@ -333,7 +334,7 @@ class NCContextMenu: NSObject {
         }
         
         let submenu = UIMenu(title: "", options: .displayInline, children: children)
-        guard appDelegate.disableSharesView == false else { return submenu }
+        guard appDelegate?.disableSharesView == false else { return submenu }
         let childrenArray = metadata.e2eEncrypted ? [submenu] : [detail, submenu]
         return UIMenu(title: "", children: childrenArray)
 
