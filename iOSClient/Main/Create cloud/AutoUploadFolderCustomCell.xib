@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="oOe-Nw-yBB" userLabel="AutoUploadFolderCustomCell" customClass="AutoUploadFolderCustomCell" customModule="Nextcloud" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="397" height="93"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="obu-RT-6lf">
+                    <rect key="frame" x="332" y="31" width="51" height="31"/>
+                </switch>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R72-2Y-Br0">
+                    <rect key="frame" x="20" y="36.5" width="310" height="20.5"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ChA-Mq-nZI" userLabel="topline">
+                    <rect key="frame" x="20" y="0.0" width="377" height="1"/>
+                    <color key="backgroundColor" systemColor="separatorColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="lVP-Vn-Pyq"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TyK-YY-Czq" userLabel="bottomline">
+                    <rect key="frame" x="20" y="92" width="377" height="1"/>
+                    <color key="backgroundColor" systemColor="separatorColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="7iA-0j-PM7"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="Ubq-QH-2oY"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="ChA-Mq-nZI" firstAttribute="leading" secondItem="oOe-Nw-yBB" secondAttribute="leading" constant="20" id="0tv-UL-EjY"/>
+                <constraint firstAttribute="trailing" secondItem="ChA-Mq-nZI" secondAttribute="trailing" id="2ej-sz-BBG"/>
+                <constraint firstItem="TyK-YY-Czq" firstAttribute="leading" secondItem="oOe-Nw-yBB" secondAttribute="leading" constant="20" id="9H2-ja-sio"/>
+                <constraint firstItem="Ubq-QH-2oY" firstAttribute="trailing" secondItem="obu-RT-6lf" secondAttribute="trailing" constant="16" id="BaD-h1-RX9"/>
+                <constraint firstItem="obu-RT-6lf" firstAttribute="centerY" secondItem="oOe-Nw-yBB" secondAttribute="centerY" id="Eb0-WO-USR"/>
+                <constraint firstItem="Ubq-QH-2oY" firstAttribute="bottom" secondItem="TyK-YY-Czq" secondAttribute="bottom" id="HlH-sK-zYl"/>
+                <constraint firstItem="R72-2Y-Br0" firstAttribute="centerY" secondItem="oOe-Nw-yBB" secondAttribute="centerY" id="Nhc-Jv-zLz"/>
+                <constraint firstItem="obu-RT-6lf" firstAttribute="leading" secondItem="R72-2Y-Br0" secondAttribute="trailing" constant="2" id="Vtb-cY-d0L"/>
+                <constraint firstAttribute="trailing" secondItem="TyK-YY-Czq" secondAttribute="trailing" id="gv3-PL-Oc3"/>
+                <constraint firstItem="R72-2Y-Br0" firstAttribute="leading" secondItem="Ubq-QH-2oY" secondAttribute="leading" constant="20" id="ipy-JH-Gkd"/>
+                <constraint firstItem="ChA-Mq-nZI" firstAttribute="top" secondItem="oOe-Nw-yBB" secondAttribute="top" id="vzn-3w-c2s"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="autoUploadSwitchControl" destination="obu-RT-6lf" id="DMV-Rz-ga5"/>
+                <outlet property="cellLabel" destination="R72-2Y-Br0" id="1zw-ve-fVh"/>
+            </connections>
+            <point key="canvasLocation" x="125.36231884057972" y="189.17410714285714"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="separatorColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.28999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

@@ -366,4 +366,6 @@ class NCBrandColor: NSObject {
         let palette3 = mixPalette(steps: steps, color1: blue, color2: red)
         return palette1 + palette2 + palette3
     }
+    @objc public let graySoft:              UIColor = UIColor(red: 162.0/255.0, green: 162.0/255.0, blue: 162.0/255.0, alpha: 0.5)
+    
 }
