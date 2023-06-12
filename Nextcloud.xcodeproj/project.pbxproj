@@ -97,6 +97,7 @@
         5666D45A2A36F6910013CEC5 /* TypeInFileNameCustomSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5666D4582A36F6910013CEC5 /* TypeInFileNameCustomSwitchCell.swift */; };
         5666D45D2A36F81C0013CEC5 /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5666D45B2A36F81B0013CEC5 /* TextTableViewCell.swift */; };
         5666D45E2A36F81C0013CEC5 /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5666D45C2A36F81C0013CEC5 /* TextTableViewCell.xib */; };
+        5666D4642A3722EE0013CEC5 /* AssetUploadTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5666D4632A3722EE0013CEC5 /* AssetUploadTest.swift */; };
         568B87132A31E725005F9347 /* SharingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568B87122A31E725005F9347 /* SharingTest.swift */; };
         568B87132A31E725005F9347 /* SharingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568B87122A31E725005F9347 /* SharingTest.swift */; };
         5636E1BF2A20BE9E0059F1B1 /* E2EETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636E1BE2A20BE9E0059F1B1 /* E2EETests.swift */; };
@@ -1017,6 +1018,7 @@
         5666D4582A36F6910013CEC5 /* TypeInFileNameCustomSwitchCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeInFileNameCustomSwitchCell.swift; sourceTree = "<group>"; };
         5666D45B2A36F81B0013CEC5 /* TextTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
         5666D45C2A36F81C0013CEC5 /* TextTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
+        5666D4632A3722EE0013CEC5 /* AssetUploadTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetUploadTest.swift; sourceTree = "<group>"; };
         568B87122A31E725005F9347 /* SharingTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharingTest.swift; sourceTree = "<group>"; };
         568B87122A31E725005F9347 /* SharingTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharingTest.swift; sourceTree = "<group>"; };
         56033E812A28B06600C2B5CF /* NCShareEmailFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareEmailFieldCell.swift; sourceTree = "<group>"; };
@@ -1872,6 +1874,7 @@
                 56175BD72A1639E900EACD4B /* ScanTests.swift */,
                 5636E1BE2A20BE9E0059F1B1 /* E2EETests.swift */,
                 01C0DDB82A2DC97200C9E04B /* MoveAndCopyTests.swift */,
+                5666D4632A3722EE0013CEC5 /* AssetUploadTest.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
@@ -3794,6 +3797,7 @@
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
                 5636E1BF2A20BE9E0059F1B1 /* E2EETests.swift in Sources */,
                 01C0DDB92A2DC97200C9E04B /* MoveAndCopyTests.swift in Sources */,
+                5666D4642A3722EE0013CEC5 /* AssetUploadTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
