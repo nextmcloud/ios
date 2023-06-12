@@ -28,20 +28,22 @@ import JGProgressHUD
 
 class NCContextMenu: NSObject {
 
-    func viewMenu(ocId: String, indexPath: IndexPath, viewController: UIViewController, image: UIImage?) -> UIMenu {
+    func viewMenu(ocId: String, viewController: UIViewController, image: UIImage?, enableDeleteLocal: Bool, enableViewInFolder: Bool) -> UIMenu {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return UIMenu() }
-
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         var downloadRequest: DownloadRequest?
         var titleDeleteConfirmFile = NSLocalizedString("_delete_file_", comment: "")
         var titleSave: String = NSLocalizedString("_save_selected_files_", comment: "")
         let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
-
+        let serverUrlHome = NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId)
+        let serverUrl = metadata.serverUrl + "/" + metadata.fileName
+        let titleFavorite = metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: "")
+        var isOffline = false
         if metadata.directory { titleDeleteConfirmFile = NSLocalizedString("_delete_folder_", comment: "") }
         if metadataMOV != nil { titleSave = NSLocalizedString("_livephoto_save_", comment: "") }
 
         let hud = JGProgressHUD()
         hud.indicatorView = JGProgressHUDRingIndicatorView()
-        hud.textLabel.text = NSLocalizedString("_downloading_", comment: "")
         hud.detailTextLabel.text = NSLocalizedString("_tap_to_cancel_", comment: "")
         if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView { indicatorView.ringWidth = 1.5 }
         hud.tapOnHUDViewBlock = { _ in
@@ -49,11 +51,28 @@ class NCContextMenu: NSObject {
                 request.cancel()
             }
         }
+        if metadata.directory {
+            if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl)) {
+                isOffline = directory.offline
+            }
+        } else {
+            if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
+                isOffline = localFile.offline
+            }
+        }
 
         // MENU ITEMS
+        
+        let titleLock = metadata.lock ? NSLocalizedString("_unlock_file_", comment: "") :  NSLocalizedString("_lock_file_", comment: "")
+        let iconLock = metadata.lock ? "lock.open" : "lock"
+        
+        let lockUnlock = UIAction(title: titleLock, image: UIImage(systemName: iconLock)) { _ in
+            NCNetworking.shared.lockUnlockFile(metadata, shoulLock: !metadata.lock)
+        }
+        
+        let titleOffline = isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: "")
 
-        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""),
-                              image: UIImage(systemName: "info")) { _ in
+        let detail = UIAction(title: NSLocalizedString("_details_", comment: "")) { _ in
             NCActionCenter.shared.openShare(viewController: viewController, metadata: metadata, page: .activity)
         }
 
@@ -66,6 +85,65 @@ class NCContextMenu: NSObject {
                     NCContentPresenter.shared.showError(error: error)
                 }
             }
+        }
+        
+        let offline = UIAction(title: titleOffline, image: UIImage(systemName: "tray.and.arrow.down")) { _ in
+            NCActionCenter.shared.setMetadataAvalableOffline(metadata, isOffline: isOffline)
+            if let viewController = viewController as? NCCollectionViewCommon {
+                viewController.reloadDataSource()
+            }
+        }
+        
+        let print = UIAction(title: NSLocalizedString("_print_", comment: ""), image: UIImage(systemName: "printer") ) { _ in
+            NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorPrint) { _, _ in }
+        }
+        
+        let moveCopy = UIAction(title: NSLocalizedString("_move_or_copy_", comment: ""), image: UIImage(systemName: "arrow.up.right.square")) { action in
+            NCActionCenter.shared.openSelectView(items: [metadata])
+        }
+        
+        let rename = UIAction(title: NSLocalizedString("_rename_", comment: ""), image: UIImage(systemName: "pencil")) { action in
+            
+            if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
+                vcRename.metadata = metadata
+                vcRename.imagePreview = image
+                
+                let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
+                
+                viewController.present(popup, animated: true)
+            }
+        }
+        
+        let decrypt = UIAction(title: NSLocalizedString("_e2e_remove_folder_encrypted_", comment: ""), image: UIImage(systemName: "lock") ) { action in
+            
+            NextcloudKit.shared.markE2EEFolder(fileId: metadata.fileId, delete: true) { account, error in
+                if error == .success {
+                    NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl))
+                    NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, serverUrlTo: nil, etag: nil, ocId: nil, fileId: nil, encrypted: false, richWorkspace: nil, account: metadata.account)
+                    NCManageDatabase.shared.setMetadataEncrypted(ocId: metadata.ocId, encrypted: false)
+                    
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeStatusFolderE2EE, userInfo: ["serverUrl": metadata.serverUrl])
+                } else {
+                    NCContentPresenter.shared.messageNotification(NSLocalizedString("_e2e_error_delete_mark_folder_", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .error)
+                }
+            }
+        }
+        
+        let encrypt = UIAction(title: NSLocalizedString("_e2e_set_folder_encrypted_", comment: ""), image: UIImage(systemName: "lock") ) { action in
+            
+            NextcloudKit.shared.markE2EEFolder(fileId: metadata.fileId, delete: false) { account, error in
+                if error == .success {
+                    NCManageDatabase.shared.deleteE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl))
+                    NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, serverUrlTo: nil, etag: nil, ocId: nil, fileId: nil, encrypted: true, richWorkspace: nil, account: metadata.account)
+                    NCManageDatabase.shared.setMetadataEncrypted(ocId: metadata.ocId, encrypted: true)
+                    
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeStatusFolderE2EE, userInfo: ["serverUrl": metadata.serverUrl])
+                } else {
+                    NCContentPresenter.shared.messageNotification(NSLocalizedString("_e2e_error_mark_folder_", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .error)
+                }
+            }
+            
+            
         }
 
         let openIn = UIAction(title: NSLocalizedString("_open_in_", comment: ""),
@@ -98,7 +176,7 @@ class NCContextMenu: NSObject {
         let save = UIAction(title: titleSave,
                             image: UIImage(systemName: "square.and.arrow.down")) { _ in
             if let metadataMOV = metadataMOV {
-                NCOperationQueue.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV)
+                NCActionCenter.shared.saveLivePhoto(metadata: metadata, metadataMOV: metadataMOV)
             } else {
                 if CCUtility.fileProviderStorageExists(metadata) {
                     NCActionCenter.shared.saveAlbum(metadata: metadata)
@@ -120,6 +198,13 @@ class NCContextMenu: NSObject {
                 }
             }
         }
+
+        
+        let copy = UIAction(title: NSLocalizedString("_copy_file_", comment: ""),
+                            image: UIImage(systemName: "doc.on.doc")) { _ in
+            NCActionCenter.shared.copyPasteboard(pasteboardOcIds: [metadata.ocId], hudView: viewController.view)
+        }
+        
 
         let modify = UIAction(title: NSLocalizedString("_modify_", comment: ""),
                               image: UIImage(systemName: "pencil.tip.crop.circle")) { _ in
@@ -152,21 +237,16 @@ class NCContextMenu: NSObject {
             }
             let alertController = UIAlertController(title: nil, message: nil, preferredStyle: alertStyle)
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_delete_file_", comment: ""), style: .destructive) { _ in
-                let hud = JGProgressHUD()
-                hud.textLabel.text = NSLocalizedString("_deletion_progess_", comment: "")
-                if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-                   let view = appDelegate.window?.rootViewController?.view {
-                    hud.show(in: view)
-                }
                 Task {
                     var ocId: [String] = []
+                    let account: String = metadata.account
                     let error = await NCNetworking.shared.deleteMetadata(metadata, onlyLocalCache: false)
                     if error == .success {
                         ocId.append(metadata.ocId)
                     } else {
                         NCContentPresenter.shared.showError(error: error)
                     }
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteFile, userInfo: ["ocId": ocId, "indexPath": [indexPath], "onlyLocalCache": false, "error": error, "hud": hud])
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteFile, userInfo: ["account": account, "ocId": ocId, "error": error])
                 }
             })
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel) { _ in })
@@ -177,13 +257,14 @@ class NCContextMenu: NSObject {
                                           image: UIImage(systemName: "trash"), attributes: .destructive) { _ in
             Task {
                 var ocId: [String] = []
+                let account: String = metadata.account
                 let error = await NCNetworking.shared.deleteMetadata(metadata, onlyLocalCache: true)
                 if error == .success {
                     ocId.append(metadata.ocId)
                 } else {
                     NCContentPresenter.shared.showError(error: error)
                 }
-                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteFile, userInfo: ["ocId": ocId, "indexPath": [indexPath], "onlyLocalCache": true, "error": error])
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteFile, userInfo: ["account": account, "ocId": ocId, "error": error])
             }
         }
 
@@ -191,57 +272,70 @@ class NCContextMenu: NSObject {
                                    image: UIImage(systemName: "trash"),
                                    options: .destructive,
                                    children: [deleteConfirmLocal, deleteConfirmFile])
+        
+        var delete = UIMenu(title: NSLocalizedString("_delete_file_", comment: ""), image: UIImage(systemName: "trash"), options: .destructive, children: [deleteConfirmLocal, deleteConfirmFile])
+        
+        if metadata.directory {
+            delete = UIMenu(title: NSLocalizedString("_delete_folder_", comment: ""), image: UIImage(systemName: "trash"), options: .destructive, children: [deleteConfirmFile])
+        }
+        
+        if !enableDeleteLocal {
+            delete = UIMenu(title: NSLocalizedString("_delete_file_", comment: ""), image: UIImage(systemName: "trash"), options: .destructive, children: [deleteConfirmFile])
+        }
 
         // ------ MENU -----
-
-        var menu: [UIMenuElement] = []
-
+        
+        // DIRECTORY
         if metadata.directory {
-
-            if metadata.isDirectoryE2EE || metadata.e2eEncrypted {
-                menu.append(favorite)
-            } else {
-                menu.append(favorite)
-                menu.append(deleteConfirmFile)
-            }
-            return UIMenu(title: "", children: [detail, UIMenu(title: "", options: .displayInline, children: menu)])
-
-        } else {
-
-            if metadata.lock {
-                menu.append(favorite)
-                if metadata.isDocumentViewableOnly {
-                    //
-                } else {
-                    menu.append(openIn)
-                    // SAVE CAMERA ROLL
-                    menu.append(save)
-                }
-            } else {
-                menu.append(favorite)
-                if metadata.isDocumentViewableOnly {
-                    if viewController is NCMedia {
-                        menu.append(viewInFolder)
-                    }
-                } else {
-                    menu.append(openIn)
-                    // SAVE CAMERA ROLL
-                    menu.append(save)
-                    if viewController is NCMedia {
-                        menu.append(viewInFolder)
-                    }
-                    // MODIFY WITH QUICK LOOK
-                    if metadata.isModifiableWithQuickLook {
-                        menu.append(modify)
-                    }
-                }
-                if viewController is NCMedia {
-                    menu.append(deleteConfirmFile)
-                } else {
-                    menu.append(deleteSubMenu)
-                }
-            }
-            return UIMenu(title: "", children: [detail, UIMenu(title: "", options: .displayInline, children: menu)])
+            
+            let isEncryptionDisabled = metadata.e2eEncrypted && metadata.directory && CCUtility.isEnd(toEndEnabled: appDelegate.account) && metadata.serverUrl == serverUrlHome && metadata.size == 0
+            let isEncrytptionEnabled = !metadata.e2eEncrypted && metadata.directory && CCUtility.isEnd(toEndEnabled: appDelegate.account) && metadata.serverUrl == serverUrlHome && metadata.size == 0
+            let submenu = UIMenu(title: "", options: .displayInline, children: isEncrytptionEnabled ? [favorite, offline, rename, moveCopy, encrypt, delete] : [favorite, offline, rename, moveCopy, delete])
+            let childrenArray = metadata.e2eEncrypted ? ( isEncryptionDisabled ? [offline, decrypt] : (metadata.serverUrl == serverUrlHome) ? [offline] : [offline, delete]) : [detail,submenu]
+            return UIMenu(title: "", children: childrenArray)
         }
+        
+        // File
+        
+        var children: [UIMenuElement] = metadata.e2eEncrypted ? [openIn, copy, delete] : [offline, openIn, moveCopy, copy, delete]
+
+        if !metadata.lock {
+            // Workaround: PROPPATCH doesn't work (favorite)
+            // https://github.com/nextcloud/files_lock/issues/68
+            if !metadata.isDirectoryE2EE {
+                children.insert(favorite, at: 0)
+            }
+            children.append(delete)
+            children.insert(rename, at: 3)
+            } else if enableDeleteLocal {
+                children.append(deleteConfirmLocal)
+            }
+        
+        if NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate.account, elements: NCElementsJSON.shared.capabilitiesFilesLockVersion) >= 1, metadata.canUnlock(as: appDelegate.userId) {
+            children.insert(lockUnlock, at: metadata.lock ? 0 : 1)
+        }
+        
+        if (metadata.contentType != "image/svg+xml") && (metadata.classFile == NKCommon.TypeClassFile.image.rawValue || metadata.classFile == NKCommon.TypeClassFile.video.rawValue) {
+            children.insert(save, at: 2)
+        }
+        
+        if !metadata.e2eEncrypted, (metadata.contentType != "image/svg+xml") && (metadata.classFile == NKCommon.TypeClassFile.image.rawValue || metadata.contentType == "application/pdf" || metadata.contentType == "com.adobe.pdf") {
+            children.insert(print, at: 2)
+        }
+        
+        if !metadata.e2eEncrypted, enableViewInFolder {
+
+            children.insert(viewInFolder, at: children.count - 1)
+        }
+        
+        if (!metadata.e2eEncrypted && metadata.contentType != "image/gif" && metadata.contentType != "image/svg+xml") && (metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" || metadata.classFile == NKCommon.TypeClassFile.image.rawValue) {
+            children.insert(modify, at: children.count - 1)
+        }
+        
+        let submenu = UIMenu(title: "", options: .displayInline, children: children)
+        guard appDelegate.disableSharesView == false else { return submenu }
+        let childrenArray = metadata.e2eEncrypted ? [submenu] : [detail, submenu]
+        return UIMenu(title: "", children: childrenArray)
+
     }
 }
