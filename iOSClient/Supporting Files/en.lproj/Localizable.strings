@@ -68,7 +68,7 @@
 "_experimental_"            = "Experimental";
 "_select_dir_media_tab_"    = "Select as folder \"Media\"";
 "_error_creation_file_"     = "Oops! Could not create the file";
-"_save_path_"               = "Save path";
+"_save_path_"               = "Storage path";
 "_save_settings_"           = "Save settings";
 "_mode_filename_"           = "Filename mode";
 "_warning_owncloud_"        = "You are connected to an ownCloud server. This is untested and unsupported, use at your own risk. To upgrade to Nextcloud, see https://nextcloud.com/migration.";
