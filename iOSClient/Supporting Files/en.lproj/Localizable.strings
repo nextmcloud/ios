@@ -98,7 +98,7 @@
 "_experimental_"            = "Experimental";
 "_select_dir_media_tab_"    = "Select as folder \"Media\"";
 "_error_creation_file_"     = "Oops! Could not create the file";
-"_save_path_"               = "Save path";
+"_save_path_"               = "Storage path";
 "_save_settings_"           = "Save settings";
 "_mode_filename_"           = "Filename mode";
 "_warning_owncloud_"        = "You are connected to an ownCloud server. This is untested and unsupported, use at your own risk. To upgrade to Nextcloud, see https://nextcloud.com/migration";
@@ -1169,7 +1169,6 @@
 
 // MARK: Scan
 "_location_"                        = "Location";
-"_prefix_upload_path_"              = "MagentaCLOUD/";
 "_save_with_text_recognition_"      = "SAVE WITH TEXT RECOGNITION (OCR)";
 "_pdf_with_ocr_"                    = "PDF (OCR)";
 "_text_file_ocr_"                   = "Textfile (txt)";
@@ -1181,6 +1180,6 @@
 "_no_password_warn_"                = "Please enter a password for the PDF you want to create or disable the function.";
 "_saved_info_alert_"                = "Saving will take some time, especially if you have selected several pages and file formats.";
 "_no_file_type_selection_error_"    = "Please select at least one filetype";
-
-"_no_internet_alert_message_"   =   "A data connection is not currently allowed.";
-"_no_internet_alert_title_"     =   "Connection error";
+"_no_internet_alert_message_"       = "A data connection is not currently allowed.";
+"_no_internet_alert_title_"         = "Connection error";
+"_auto_upload_help_text_"           = "With this option, you upload your photos or videos to the same folder that you selected for \"Automatic upload.\"";
