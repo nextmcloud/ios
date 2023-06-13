@@ -1111,3 +1111,7 @@
 "_no_internet_alert_message_"       = "A data connection is not currently allowed.";
 "_no_internet_alert_title_"         = "Connection error";
 "_auto_upload_help_text_"           = "With this option, you upload your photos or videos to the same folder that you selected for \"Automatic upload.\"";
+
+// MARK: Dashboard
+"_shared_"                          = "Shared";
+"_recieved_"                        = "Received";
