@@ -85,6 +85,7 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        568CE0A72A3850C400F50789 /* AudioUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568CE0A62A3850C400F50789 /* AudioUploadTests.swift */; };
         5666D4492A36E46B0013CEC5 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5666D4472A36E46A0013CEC5 /* FolderPathCustomCell.swift */; };
         5666D44A2A36E46B0013CEC5 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5666D4482A36E46B0013CEC5 /* FolderPathCustomCell.xib */; };
         5666D44F2A36F31E0013CEC5 /* AutoUploadFolderCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5666D44B2A36F31D0013CEC5 /* AutoUploadFolderCustomCell.xib */; };
@@ -1006,6 +1007,7 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        568CE0A62A3850C400F50789 /* AudioUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUploadTests.swift; sourceTree = "<group>"; };
         5666D4472A36E46A0013CEC5 /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
         5666D4482A36E46B0013CEC5 /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
         5666D44B2A36F31D0013CEC5 /* AutoUploadFolderCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AutoUploadFolderCustomCell.xib; sourceTree = "<group>"; };
@@ -1875,6 +1877,7 @@
                 5636E1BE2A20BE9E0059F1B1 /* E2EETests.swift */,
                 01C0DDB82A2DC97200C9E04B /* MoveAndCopyTests.swift */,
                 5666D4632A3722EE0013CEC5 /* AssetUploadTest.swift */,
+                568CE0A62A3850C400F50789 /* AudioUploadTests.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
@@ -3798,6 +3801,7 @@
                 5636E1BF2A20BE9E0059F1B1 /* E2EETests.swift in Sources */,
                 01C0DDB92A2DC97200C9E04B /* MoveAndCopyTests.swift in Sources */,
                 5666D4642A3722EE0013CEC5 /* AssetUploadTest.swift in Sources */,
+                568CE0A72A3850C400F50789 /* AudioUploadTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
