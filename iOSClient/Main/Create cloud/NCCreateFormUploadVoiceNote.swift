@@ -31,9 +31,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     @IBOutlet weak var labelDuration: UILabel!
     @IBOutlet weak var progressView: UIProgressView!
 
-    // swiftlint:disable force_cast
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
-    // swiftlint:enable force_cast
 
     private var serverUrl = ""
     private var titleServerUrl = ""
@@ -68,8 +66,11 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
         // Progress view
         progressView.progress = 0
-        progressView.progressTintColor = .green
-        progressView.trackTintColor = UIColor(red: 247.0 / 255.0, green: 247.0 / 255.0, blue: 247.0 / 255.0, alpha: 1.0)
+        progressView.layer.borderWidth = 1
+        progressView.layer.cornerRadius = 5.0
+        progressView.layer.borderColor = NCBrandColor.shared.customer.cgColor
+        progressView.progressTintColor = NCBrandColor.shared.customer
+        progressView.trackTintColor = .white
 
         labelTimer.textColor = .label
         labelDuration.textColor = .label
@@ -127,36 +128,44 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         // Section: Destination Folder
 
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
+        section.footerTitle = "                                                                               "
         form.addFormSection(section)
 
-        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: self.titleServerUrl)
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
+        
+        
+        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
+        row.cellConfig["backgroundColor"] = UIColor.secondarySystemGroupedBackground
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["backgroundColor"] = cellBackgoundColor
-
-        row.cellConfig["imageView.image"] = UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
-
-        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = UIColor.label
-
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder_nmcloud")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+        
+        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
+        row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
+        if(self.titleServerUrl == "/"){
+            row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
+        }else{
+            row.cellConfig["photoLabel.text"] = self.titleServerUrl
+        }
+        row.cellConfig["textLabel.text"] = ""
         section.addFormRow(row)
 
         // Section: File Name
 
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = TextTableViewCell.self
+        
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
         form.addFormSection(section)
 
-        row = XLFormRowDescriptor(tag: "fileName", rowType: XLFormRowDescriptorTypeText, title: NSLocalizedString("_filename_", comment: ""))
-        row.value = self.fileName
-        row.cellConfig["backgroundColor"] = cellBackgoundColor
+        row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = TextTableViewCell.self
 
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = UIColor.label
-
-        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textField.textColor"] = UIColor.label
-
+        
+        row.cellConfigAtConfigure["backgroundColor"] = UIColor.secondarySystemGroupedBackground;
+        row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["fileNameTextField.textColor"] = UIColor.label
+        row.cellConfig["fileNameTextField.text"] = self.fileName
         section.addFormRow(row)
 
         self.form = form
@@ -184,15 +193,15 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     // MARK: TableViewDelegate
 
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        let header = view as? UITableViewHeaderFooterView
-        header?.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
-        header?.textLabel?.textColor = .gray
-        header?.tintColor = cellBackgoundColor
+        let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
+        header.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
+        header.textLabel?.textColor = .gray
+        header.tintColor = cellBackgoundColor
     }
 
     // MARK: - Action
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], indexPath: [IndexPath], overwrite: Bool, copy: Bool, move: Bool) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
 
         if serverUrl != nil {
 
@@ -205,7 +214,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             }
 
             // Update
-            let row: XLFormRowDescriptor = self.form.formRow(withTag: "ButtonDestinationFolder")!
+            let row: XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
             row.title = self.titleServerUrl
             self.updateFormRow(row)
         }
@@ -213,15 +222,17 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
     @objc func save() {
 
-        let rowFileName: XLFormRowDescriptor = self.form.formRow(withTag: "fileName")!
-        guard let name = rowFileName.value as? String else { return }
-        let ext = (name as NSString).pathExtension.uppercased()
+        let rowFileName: XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
+        guard let name = rowFileName.value else {
+            return
+        }
+        let ext = (name as! NSString).pathExtension.uppercased()
         var fileNameSave = ""
 
-        if ext.isEmpty {
-            fileNameSave = name + ".m4a"
+        if ext == "" {
+            fileNameSave = name as! String + ".m4a"
         } else {
-            fileNameSave = (name as NSString).deletingPathExtension + ".m4a"
+            fileNameSave = (name as! NSString).deletingPathExtension + ".m4a"
         }
 
         let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "")
@@ -234,7 +245,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
 
             guard let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
-
+            
             conflict.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
             conflict.serverUrl = serverUrl
             conflict.metadatasUploadInConflict = [metadataForUpload]
@@ -250,9 +261,10 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
     func dismissCreateFormUploadConflict(metadatas: [tableMetadata]?) {
 
-        if let metadatas {
+        if metadatas != nil && metadatas!.count > 0 {
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                self.dismissAndUpload(metadatas[0])
+                self.dismissAndUpload(metadatas![0])
             }
         }
     }
@@ -277,21 +289,20 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         self.deselectFormRow(sender)
 
         let storyboard = UIStoryboard(name: "NCSelect", bundle: nil)
-        if let navigationController = storyboard.instantiateInitialViewController() as? UINavigationController,
-           let viewController = navigationController.topViewController as? NCSelect {
+        let navigationController = storyboard.instantiateInitialViewController() as! UINavigationController
+        let viewController = navigationController.topViewController as! NCSelect
 
-            viewController.delegate = self
-            viewController.typeOfCommandView = .selectCreateFolder
-            viewController.includeDirectoryE2EEncryption = true
+        viewController.delegate = self
+        viewController.typeOfCommandView = .selectCreateFolder
+        viewController.includeDirectoryE2EEncryption = true
 
-            self.present(navigationController, animated: true, completion: nil)
-        }
+        self.present(navigationController, animated: true, completion: nil)
     }
 
     // MARK: Player - Timer
 
     func updateTimerUI() {
-        labelTimer.text = String().formatSecondsToString(counterSecondPlayer)
+        labelTimer.text =  String().formatSecondsToString(counterSecondPlayer)
         labelDuration.text = String().formatSecondsToString(durationPlayer)
         progressView.progress = Float(counterSecondPlayer / durationPlayer)
     }
