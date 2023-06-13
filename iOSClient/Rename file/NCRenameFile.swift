@@ -138,7 +138,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
         cancelButton.layer.masksToBounds = true
         cancelButton.layer.borderWidth = 0.3
         cancelButton.layer.borderColor = NCBrandColor.shared.iconImageColor.cgColor
-        
+
         renameButton.setTitle(NSLocalizedString("_rename_", comment: ""), for: .normal)
         renameButton.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
         renameButton.layer.cornerRadius = 5
@@ -255,7 +255,6 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 
         NCActivityIndicator.shared.start()
 
-//        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew)
         NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, indexPath: indexPath, viewController: self) { error in
 
             NCActivityIndicator.shared.stop()
