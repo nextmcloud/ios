@@ -164,15 +164,13 @@ struct NCViewE2EE: View {
 
     var body: some View {
 
-        let versionE2EE = NCManageDatabase.shared.getCapabilitiesServerString(account: account, elements: NCElementsJSON.shared.capabilitiesE2EEApiVersion) ?? ""
-
         VStack {
 
             if manageE2EE.isEndToEndEnabled {
 
                 List {
                  
-                    Section(header: Text(""), footer: Text("End-to-End Encryption" + versionE2EE))
+                    Section(header: Text(""), footer: Text("End-to-End Encryption" + NCGlobal.shared.capabilityE2EEApiVersion))
                     {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_activated_", comment: ""))
@@ -196,10 +194,10 @@ struct NCViewE2EE: View {
                                 .foregroundColor(.green)
                         }
                         .onTapGesture {
-                            if CCUtility.getPasscode().isEmpty {
-                                NCContentPresenter.shared.showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
-                            } else {
+                            if let passcode = CCUtility.getPasscode(), !passcode.isEmpty {
                                 manageE2EE.requestPasscodeType("readPassphrase")
+                            } else {
+                                NCContentPresenter.shared.showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
                             }
                         }
                     }
@@ -218,10 +216,10 @@ struct NCViewE2EE: View {
                                 .foregroundColor(.green)
                         }
                         .onTapGesture {
-                            if CCUtility.getPasscode().isEmpty {
-                                NCContentPresenter.shared.showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
-                            } else {
+                            if let passcode = CCUtility.getPasscode(), !passcode.isEmpty {
                                 manageE2EE.requestPasscodeType("removeLocallyEncryption")
+                            } else {
+                                NCContentPresenter.shared.showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
                             }
                         }
                     }
