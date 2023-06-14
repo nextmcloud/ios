@@ -185,7 +185,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     @IBAction func touchUpInsideButtonMenu(_ sender: Any) {
         
         guard let metadata = metadata else { return }
-        let isFilesSharingPublicPasswordEnforced = NCManageDatabase.shared.getCapabilitiesServerBool(account: metadata.account, elements: NCElementsJSON.shared.capabilitiesFileSharingPubPasswdEnforced, exists: false)
+        let isFilesSharingPublicPasswordEnforced = NCGlobal.shared.capabilityFileSharingPubPasswdEnforced
         let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
         
         if isFilesSharingPublicPasswordEnforced && shares.firstShareLink == nil {
