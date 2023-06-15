@@ -230,7 +230,7 @@ class NCBrandColor: NSObject {
         cacheImages.local = UIImage(named: "local")!
 
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
-        cacheImages.folderEncrypted = UIImage(named: "folder-encrypted")!
+        cacheImages.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: brandElement, size: folderWidth)
         cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
