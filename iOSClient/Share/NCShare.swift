@@ -225,7 +225,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     }
 
     func shareCompleted() {
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSourceNetworkForced)
     }
 
     func unShareCompleted() {
