@@ -111,7 +111,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             searchController?.searchBar.delegate = self
             searchController?.searchBar.autocapitalizationType = .none
             navigationItem.searchController = searchController
-            navigationItem.hidesSearchBarWhenScrolling = true
+            navigationItem.hidesSearchBarWhenScrolling = false
         }
 
         // Cell
@@ -1415,10 +1415,10 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         cell.titleInfoTrailingDefault()
 
         if isSearchingMode {
-            cell.fileTitleLabel?.text = metadata.fileName
+            cell.fileTitleLabel?.text = NCUtilityFileSystem.shared.getPath(path: metadata.path, user: metadata.user) + metadata.fileName
             cell.fileTitleLabel?.lineBreakMode = .byTruncatingTail
             if metadata.name == NCGlobal.shared.appName {
-                cell.fileInfoLabel?.text = NSLocalizedString("_in_", comment: "") + " " + NCUtilityFileSystem.shared.getPath(path: metadata.path, user: metadata.user)
+                cell.fileInfoLabel?.text = CCUtility.dateDiff(metadata.date as Date) + " · " + CCUtility.transformedSize(metadata.size)
             } else {
                 cell.fileInfoLabel?.text = metadata.subline
             }
