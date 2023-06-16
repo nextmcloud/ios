@@ -106,6 +106,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         collectionView.backgroundColor = .systemBackground
 
         buttonCancel.title = NSLocalizedString("_cancel_", comment: "")
+        buttonCancel.tintColor = NCBrandColor.shared.customer
 
         bottomContraint?.constant = window?.rootViewController?.view.safeAreaInsets.bottom ?? 0
 
@@ -609,7 +610,7 @@ class NCSelectCommandView: UIView {
         createFolderButton?.setTitle(NSLocalizedString("_create_folder_", comment: ""), for: .normal)
         createFolderButton?.backgroundColor = .clear
         createFolderButton?.setTitleColor(UIColor.label, for: .normal)
-        createFolderButton?.setImage(UIImage(named: "addFolder")?.withTintColor(UIColor.label), for: .normal)
+        createFolderButton?.setImage(UIImage(named: "addFolder")?.imageColor(UIColor.label), for: .normal)
         createFolderButton?.layer.borderWidth = 1
         createFolderButton?.layer.borderColor = UIColor.label.cgColor
 
