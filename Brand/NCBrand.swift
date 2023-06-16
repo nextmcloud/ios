@@ -242,7 +242,7 @@ class NCBrandColor: NSObject {
         cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
         cacheImages.folder = UIImage(named: "folder")!.image(color: brandElement, size: folderWidth)
 
-        cacheImages.checkedYes = NCUtility.shared.loadImage(named: "checkmark.circle.fill", color: .systemBlue)
+        cacheImages.checkedYes = UIImage(named: "checkedYes")!
         cacheImages.checkedNo = NCUtility.shared.loadImage(named: "circle", color: .systemGray)
 
         cacheImages.buttonMore = UIImage(named: "more")!.image(color: .systemGray, size: 50)
