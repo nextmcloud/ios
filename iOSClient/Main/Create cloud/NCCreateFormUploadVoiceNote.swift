@@ -52,6 +52,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancel))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_save_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(save))
+        self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
+        self.navigationItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.brand
 
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
 
@@ -62,7 +64,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         self.title = NSLocalizedString("_voice_memo_title_", comment: "")
 
         // Button Play Stop
-        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: UIColor.systemGray, size: 100), for: .normal)
+        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
 
         // Progress view
         progressView.progress = 0
