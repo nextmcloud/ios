@@ -267,26 +267,6 @@ extension NCCollectionViewCommon {
         }
 
         //
-        // SAVE AS SCAN
-        //
-        if metadata.isSavebleAsImage {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_save_as_scan_", comment: ""),
-                    icon: NCUtility.shared.loadImage(named: "viewfinder.circle"),
-                    order: 110,
-                    action: { _ in
-                        if CCUtility.fileProviderStorageExists(metadata) {
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorSaveAsScan, "error": NKError(), "account": metadata.account])
-                        } else {
-                            NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan) { _, _ in }
-                        }
-                    }
-                )
-            )
-        }
-
-        //
         // RENAME
         //
         if metadata.isRenameable {

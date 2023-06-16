@@ -244,7 +244,7 @@ class NCBrandColor: NSObject {
         cacheImages.folder =  UIImage(named: "folder_nmcloud")!
         cacheImages.imgShare = UIImage(named: "share")!
 
-        cacheImages.checkedYes = NCUtility.shared.loadImage(named: "checkmark.circle.fill", color: .systemBlue)
+        cacheImages.checkedYes = UIImage(named: "checkedYes")!
         cacheImages.checkedNo = NCUtility.shared.loadImage(named: "circle", color: .systemGray)
 
         cacheImages.buttonMore = UIImage(named: "more")!.image(color: gray60, size: 50)
