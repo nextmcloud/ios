@@ -61,6 +61,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     private var privacyProtectionWindow: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
+        UIToolbar.appearance().tintColor = NCBrandColor.shared.customer
 
         NCSettingsBundleHelper.checkAndExecuteSettings(delay: 0)
 
