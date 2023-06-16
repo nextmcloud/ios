@@ -188,10 +188,11 @@ struct NCViewE2EE: View {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_read_passphrase_", comment: ""))
                         } icon: {
-                            Image("show_password")
+                            Image(systemName: "eye")
                                 .resizable()
                                 .scaledToFit()
-                                .foregroundColor(.green)
+                                .frame(width: 20, height: 30)
+                                .foregroundColor(Color(NCBrandColor.shared.iconColor))
                         }
                         .onTapGesture {
                             if let passcode = CCUtility.getPasscode(), !passcode.isEmpty {
@@ -210,10 +211,11 @@ struct NCViewE2EE: View {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_remove_", comment: ""))
                         } icon: {
-                            Image("delete")
+                            Image(systemName: "trash")
                                 .resizable()
                                 .scaledToFit()
-                                .foregroundColor(.green)
+                                .frame(width: 20, height: 30)
+                                .foregroundColor(Color(NCBrandColor.shared.iconColor))
                         }
                         .onTapGesture {
                             if let passcode = CCUtility.getPasscode(), !passcode.isEmpty {
