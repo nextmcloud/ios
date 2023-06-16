@@ -126,7 +126,7 @@ import XLForm
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: "")
         row.action.formSelector = #selector(changeDestinationFolder(_:))
 
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.imageColor(NCBrandColor.shared.customer)
         
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
