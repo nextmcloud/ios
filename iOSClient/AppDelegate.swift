@@ -66,6 +66,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         if isUiTestingEnabled {
             deleteAllAccounts()
         }
+        
+        UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
+        UIToolbar.appearance().tintColor = NCBrandColor.shared.customer
 
         NCSettingsBundleHelper.checkAndExecuteSettings(delay: 0)
 
