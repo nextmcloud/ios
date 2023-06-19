@@ -24,7 +24,7 @@ class NMCCommunication: NSObject, XMLParserDelegate {
     
     func getDownloadLimit(token: String, completion: @escaping (_ downloadLimit: DownloadLimit?, _ errorDescription: String) -> Void)  {
         let baseUrl = NCBrandOptions.shared.loginBaseUrl
-        let endPoint = "ocs/v2.php/apps/files_downloadlimit/\(token)/limit"
+        let endPoint = "/ocs/v2.php/apps/files_downloadlimit/\(token)/limit"
         let path = baseUrl+endPoint
         do {
             var urlRequest = try URLRequest(url: URL(string: path)!, method: .get)
@@ -62,7 +62,7 @@ class NMCCommunication: NSObject, XMLParserDelegate {
 
     func setDownloadLimit(deleteLimit: Bool, limit: String, token: String, completion: @escaping (_ success: Bool, _ errorDescription: String) -> Void)  {
         let baseUrl = NCBrandOptions.shared.loginBaseUrl
-        let endPoint = "ocs/v2.php/apps/files_downloadlimit/\(token)/limit"
+        let endPoint = "/ocs/v2.php/apps/files_downloadlimit/\(token)/limit"
         let path = baseUrl+endPoint
         do {
             
