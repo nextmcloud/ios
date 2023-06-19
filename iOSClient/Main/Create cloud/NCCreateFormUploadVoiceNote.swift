@@ -185,9 +185,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
                 self.fileName = CCUtility.removeForbiddenCharactersServer(fileNameNew as? String)
             }
 
-            formRow.value = self.fileName
-            self.updateFormRow(formRow)
-
             self.form.delegate = self
         }
     }
@@ -224,40 +221,45 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
     @objc func save() {
 
-        let rowFileName: XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
-        guard let name = rowFileName.value else {
-            return
-        }
-        let ext = (name as! NSString).pathExtension.uppercased()
-        var fileNameSave = ""
-
-        if ext == "" {
-            fileNameSave = name as! String + ".m4a"
+        let rowFileName : XLFormRowDescriptor  = self.form.formRow(withTag: "fileName")!
+        let fileNameValue = (rowFileName.value as? String)?.trimmingCharacters(in: .whitespaces)
+        if (fileNameValue?.isEmpty ?? true), fileNameValue != nil {
+            let alert = UIAlertController(title: "", message: NSLocalizedString("_prompt_insert_file_name", comment: ""), preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
+            self.present(alert, animated: true)
         } else {
-            fileNameSave = (name as! NSString).deletingPathExtension + ".m4a"
-        }
-
-        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "")
-
-        metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
-        metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
-        metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-        metadataForUpload.size = NCUtilityFileSystem.shared.getFileSize(filePath: fileNamePath)
-
-        if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
-
-            guard let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
             
-            conflict.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
-            conflict.serverUrl = serverUrl
-            conflict.metadatasUploadInConflict = [metadataForUpload]
-            conflict.delegate = self
-
-            self.present(conflict, animated: true, completion: nil)
-
-        } else {
-
-            dismissAndUpload(metadataForUpload)
+            let ext = (self.fileName as! NSString).pathExtension.uppercased()
+            var fileNameSave = ""
+            
+            if (ext == "") {
+                fileNameSave = self.fileName as! String + ".m4a"
+            } else {
+                fileNameSave = (self.fileName as! NSString).deletingPathExtension + ".m4a"
+            }
+            
+            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "")
+            
+            metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
+            metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
+            metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
+            metadataForUpload.size = NCUtilityFileSystem.shared.getFileSize(filePath: fileNamePath)
+            
+            if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
+                
+                guard let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
+                
+                conflict.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
+                conflict.serverUrl = serverUrl
+                conflict.metadatasUploadInConflict = [metadataForUpload]
+                conflict.delegate = self
+                
+                self.present(conflict, animated: true, completion: nil)
+                
+            } else {
+                
+                dismissAndUpload(metadataForUpload)
+            }
         }
     }
 
