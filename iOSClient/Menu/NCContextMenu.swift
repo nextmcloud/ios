@@ -64,13 +64,6 @@ class NCContextMenu: NSObject {
 
         // MENU ITEMS
         
-        let titleLock = metadata.lock ? NSLocalizedString("_unlock_file_", comment: "") :  NSLocalizedString("_lock_file_", comment: "")
-        let iconLock = metadata.lock ? "lock.open" : "lock"
-        
-        let lockUnlock = UIAction(title: titleLock, image: UIImage(systemName: iconLock)) { _ in
-            NCNetworking.shared.lockUnlockFile(metadata, shoulLock: !metadata.lock)
-        }
-        
         let titleOffline = isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: "")
 
         let detail = UIAction(title: NSLocalizedString("_details_", comment: "")) { _ in
@@ -170,7 +163,7 @@ class NCContextMenu: NSObject {
         }
 
         let viewInFolder = UIAction(title: NSLocalizedString("_view_in_folder_", comment: ""),
-                                    image: UIImage(systemName: "questionmark.folder")) { _ in
+                                    image: UIImage(systemName: "arrow.forward.square")) { _ in
             NCActionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileNameBlink: metadata.fileName, fileNameOpen: nil)
         }
 
@@ -298,23 +291,20 @@ class NCContextMenu: NSObject {
         
         // File
         
-        var children: [UIMenuElement] = metadata.e2eEncrypted ? [openIn, copy, delete] : [offline, openIn, moveCopy, copy, delete]
+        var children: [UIMenuElement] = metadata.e2eEncrypted ? [openIn, copy, delete] : [offline, openIn, copy, delete]
 
         if !metadata.lock {
             // Workaround: PROPPATCH doesn't work (favorite)
             // https://github.com/nextcloud/files_lock/issues/68
             if !metadata.isDirectoryE2EE {
                 children.insert(favorite, at: 0)
+                children.insert(moveCopy, at: 2)
+                children.insert(rename, at: 3)
             }
             children.append(delete)
-            children.insert(rename, at: 3)
             } else if enableDeleteLocal {
                 children.append(deleteConfirmLocal)
             }
-        
-        if NCManageDatabase.shared.getCapabilitiesServerInt(account: appDelegate?.account ?? "", elements: NCElementsJSON.shared.capabilitiesFilesLockVersion) >= 1, metadata.canUnlock(as: appDelegate?.userId ?? "") {
-            children.insert(lockUnlock, at: metadata.lock ? 0 : 1)
-        }
         
         if (metadata.contentType != "image/svg+xml") && (metadata.classFile == NKCommon.TypeClassFile.image.rawValue || metadata.classFile == NKCommon.TypeClassFile.video.rawValue) {
             children.insert(save, at: 2)
@@ -329,7 +319,7 @@ class NCContextMenu: NSObject {
             children.insert(viewInFolder, at: children.count - 1)
         }
         
-        if (!metadata.e2eEncrypted && metadata.contentType != "image/gif" && metadata.contentType != "image/svg+xml") && (metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" || metadata.classFile == NKCommon.TypeClassFile.image.rawValue) {
+        if (!metadata.isDirectoryE2EE && metadata.contentType != "image/gif" && metadata.contentType != "image/svg+xml") && (metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" || metadata.classFile == NKCommon.TypeClassFile.image.rawValue) {
             children.insert(modify, at: children.count - 1)
         }
         
