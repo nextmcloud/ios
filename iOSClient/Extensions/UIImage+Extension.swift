@@ -137,7 +137,7 @@ extension UIImage {
 
         return newImage
     }
-
+    
     func imageColor(_ color: UIColor) -> UIImage {
         if #available(iOS 13.0, *) {
             return self.withTintColor(color, renderingMode: .alwaysOriginal)
