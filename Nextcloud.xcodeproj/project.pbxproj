@@ -39,8 +39,6 @@
         562817FC2A14D36F00AA7669 /* PasswordInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562817FA2A14D36E00AA7669 /* PasswordInputField.swift */; };
         562817FD2A14D36F00AA7669 /* PasswordInputField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 562817FB2A14D36F00AA7669 /* PasswordInputField.xib */; };
         56175BD82A1639E900EACD4B /* ScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56175BD72A1639E900EACD4B /* ScanTests.swift */; };
-        0142C77E2A038DF50008E448 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0142C77C2A038DF50008E448 /* FolderPathCustomCell.swift */; };
-        0142C77F2A038DF50008E448 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0142C77D2A038DF50008E448 /* FolderPathCustomCell.xib */; };
         0142C7822A038ED00008E448 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0142C7802A038ED00008E448 /* NCCreateDocumentCustomTextField.swift */; };
         0142C7832A038ED00008E448 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0142C7812A038ED00008E448 /* NCCreateDocumentCustomTextField.xib */; };
         018D3E0A2A067F8100C5CB8E /* CollaboraTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 018D3E092A067F8100C5CB8E /* CollaboraTestCase.swift */; };
@@ -965,8 +963,6 @@
         562817FA2A14D36E00AA7669 /* PasswordInputField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasswordInputField.swift; sourceTree = "<group>"; };
         562817FB2A14D36F00AA7669 /* PasswordInputField.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PasswordInputField.xib; sourceTree = "<group>"; };
         56175BD72A1639E900EACD4B /* ScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanTests.swift; sourceTree = "<group>"; };
-        0142C77C2A038DF50008E448 /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
-        0142C77D2A038DF50008E448 /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
         0142C7802A038ED00008E448 /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
         0142C7812A038ED00008E448 /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
         010E052429FA361600507CE6 /* PrivacyPolicyTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyTest.swift; sourceTree = "<group>"; };
@@ -1783,8 +1779,6 @@
         0142C77B2A038DA70008E448 /* NMC Custom Views */ = {
             isa = PBXGroup;
             children = (
-                0142C77C2A038DF50008E448 /* FolderPathCustomCell.swift */,
-                0142C77D2A038DF50008E448 /* FolderPathCustomCell.xib */,
                 0142C7802A038ED00008E448 /* NCCreateDocumentCustomTextField.swift */,
                 0142C7812A038ED00008E448 /* NCCreateDocumentCustomTextField.xib */,
             );
