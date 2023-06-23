@@ -124,7 +124,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
             } else if UIScreen.main.bounds.height < 850 {
                 if view.frame.origin.y == 0 {
                     self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                    self.view.frame.origin.y -= 120
+                    self.view.frame.origin.y -= 70
                 }
             } else {
                 if view.frame.origin.y == 0 {
