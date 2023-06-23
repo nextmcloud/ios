@@ -113,6 +113,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             searchController?.searchBar.autocapitalizationType = .none
             navigationItem.searchController = searchController
             navigationItem.hidesSearchBarWhenScrolling = false
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_back_", comment: ""), style: .plain, target: nil, action: nil)
         }
 
         // Cell
@@ -676,11 +677,6 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             }
         }
         navigationItem.leftItemsSupplementBackButton = true
-        if titlePreviusFolder == nil {
-            navigationController?.navigationBar.topItem?.title = getNavigationTitle()
-        } else {
-            navigationController?.navigationBar.topItem?.title = titlePreviusFolder
-        }
     }
 
     func getNavigationTitle() -> String {
