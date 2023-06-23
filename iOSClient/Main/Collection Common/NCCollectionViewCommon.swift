@@ -1477,7 +1477,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         cell.titleInfoTrailingDefault()
 
         if isSearchingMode {
-            cell.fileTitleLabel?.text = NCUtilityFileSystem.shared.getPath(path: metadata.path, user: metadata.user) + metadata.fileName
+            cell.fileTitleLabel?.text = metadata.fileName
             cell.fileTitleLabel?.lineBreakMode = .byTruncatingTail
             if metadata.name == NCGlobal.shared.appName {
                 cell.fileInfoLabel?.text = CCUtility.dateDiff(metadata.date as Date) + " · " + CCUtility.transformedSize(metadata.size)
@@ -1719,6 +1719,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
             footer.setTitleLabel("")
             footer.setButtonText(NSLocalizedString("_show_more_results_", comment: ""))
+            footer.buttonSection.setTitleColor(NCBrandColor.shared.customer, for: .normal)
             footer.separatorIsHidden(true)
             footer.buttonIsHidden(true)
             footer.hideActivityIndicatorSection()
