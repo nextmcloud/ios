@@ -80,7 +80,7 @@
 "_save_to_camera_roll_"        = "Save to camera roll";
 "_save_to_camera_roll_desc_"   = "When enabled, photos and videos taken with the in-app camera will also be saved to your iOS camera roll.";
 "_sharing_"                 = "Sharing";
-"_details_"                 = "Details";
+"_details_"                 = "Share";
 "_sub_details_"             = "Subscription Details";
 "_subscriptions_"           = "Subscriptions";
 "_dark_mode_"               = "Dark mode";
