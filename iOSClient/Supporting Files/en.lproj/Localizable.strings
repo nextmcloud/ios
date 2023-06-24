@@ -675,12 +675,9 @@
 "_edit_comment_"                = "Edit comment";
 "_delete_comment_"              = "Delete comment";
 "_share_allow_editing_"         = "Allow editing";
-"_share_read_only_"             = "View only";
 "_share_editing_"               = "Editing";
 "_share_allow_upload_"          = "Allow upload and editing";
-"_share_file_drop_"             = "File drop (upload only)";
 "_share_secure_file_drop_"      = "Secure file drop (upload only)";
-"_share_hide_download_"         = "Hide download";
 "_share_password_protect_"      = "Password protect";
 "_share_expiration_date_"       = "Set expiration date";
 "_share_note_recipient_"        = "Note to recipient";
