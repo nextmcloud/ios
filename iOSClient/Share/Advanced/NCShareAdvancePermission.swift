@@ -28,17 +28,18 @@ import CloudKit
 
 class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelegate, NCShareDetail {
     func dismissShareAdvanceView(shouldSave: Bool) {
-        if isNewShare {
-            let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
-            guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
-            viewNewUserComment.metadata = self.metadata
-            viewNewUserComment.share = self.share
-            viewNewUserComment.networking = self.networking
-            self.navigationController?.pushViewController(viewNewUserComment, animated: true)
-//            networking?.createShare(option: share)
-        } else {
-            if let downloadSwitchCell = getDownloadLimitSwitchCell() {
-                let isDownloadLimitOn = downloadSwitchCell.switchControl.isOn
+        if shouldSave {
+            if isNewShare {
+                let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+                guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
+                viewNewUserComment.metadata = self.metadata
+                viewNewUserComment.share = self.share
+                viewNewUserComment.networking = self.networking
+                self.navigationController?.pushViewController(viewNewUserComment, animated: true)
+                //            networking?.createShare(option: share)
+            } else {
+                if let downloadSwitchCell = getDownloadLimitSwitchCell() {
+                    let isDownloadLimitOn = downloadSwitchCell.switchControl.isOn
                     if !isDownloadLimitOn {
                         setDownloadLimit(deleteLimit: true, limit: "")
                     } else {
@@ -55,8 +56,11 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                         setDownloadLimit(deleteLimit: false, limit: enteredDownloadLimit)
                     }
                 }
-
-            networking?.updateShare(option: share)
+                
+                networking?.updateShare(option: share)
+                navigationController?.popViewController(animated: true)
+            }
+        } else {
             navigationController?.popViewController(animated: true)
         }
     }
@@ -185,6 +189,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         }
         if isNewShare {
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+            share.permissions = NCGlobal.shared.permissionReadShare
         }
         section.addFormRow(row)
         

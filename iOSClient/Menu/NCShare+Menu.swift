@@ -143,7 +143,8 @@ extension NCShare {
                     selected: false,
                     on: false,
                     action: { menuAction in
-                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterStatusFileDrop, object: tableShare)
+                        let permissions = NCGlobal.shared.permissionCreateShare
+                        self.updateSharePermissions(share: tableShare, permissions: permissions)
                     }
                 )
             )
