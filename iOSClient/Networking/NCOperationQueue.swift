@@ -111,7 +111,14 @@ import NextcloudKit
             if metadata.iconName.isEmpty {
                 cell?.filePreviewImageView?.image = NCBrandColor.cacheImages.file
             } else {
-                cell?.filePreviewImageView?.image = UIImage(named: metadata.iconName)
+                switch metadata.fileExtension {
+                case "odg":
+                    cell?.filePreviewImageView?.image = UIImage(named: "diagram")
+                case "csv":
+                    cell?.filePreviewImageView?.image = UIImage(named: "file_xls")
+                default:
+                    cell?.filePreviewImageView?.image = UIImage(named: metadata.iconName)
+                }
             }
         }
 
