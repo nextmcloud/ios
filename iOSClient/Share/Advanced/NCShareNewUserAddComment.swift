@@ -74,6 +74,9 @@ class NCShareNewUserAddComment: UIViewController, NCShareDetail {
         btnSendShare.layer.masksToBounds = true
         labelSharing.text = NSLocalizedString("_sharing_", comment: "")
         labelNote.text = NSLocalizedString("_share_note_recipient_", comment: "")
+        commentTextView.inputAccessoryView = UIToolbar.doneToolbar { [weak self] in
+            self?.commentTextView.resignFirstResponder()
+        }
     }
     
     func setupHeader(){

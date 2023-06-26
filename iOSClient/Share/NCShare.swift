@@ -225,11 +225,12 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     }
 
     func shareCompleted() {
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSourceNetworkForced)
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
         self.reloadData()
     }
 
     func unShareCompleted() {
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
         self.reloadData()
     }
 
@@ -280,6 +281,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
         }
 
         dropDown.selectionAction = { index, _ in
+            self.textField?.text = ""
             self.textField?.resignFirstResponder()
             let sharee = sharees[index]
             guard
