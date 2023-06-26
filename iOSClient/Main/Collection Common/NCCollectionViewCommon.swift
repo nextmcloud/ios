@@ -1392,6 +1392,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         var isShare = false
         var isMounted = false
         var a11yValues: [String] = []
+        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
 
         if metadataFolder != nil {
             isShare = metadata.permissions.contains(NCGlobal.shared.permissionShared) && !metadataFolder!.permissions.contains(NCGlobal.shared.permissionShared)
@@ -1443,7 +1444,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 cell.filePreviewImageView?.image = NCBrandColor.cacheImages.folderEncrypted
             } else if isShare {
                 cell.filePreviewImageView?.image = NCBrandColor.cacheImages.folderSharedWithMe
-            } else if !metadata.shareType.isEmpty {
+            } else if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)) {
                 metadata.shareType.contains(3) ?
                 (cell.filePreviewImageView?.image = NCBrandColor.cacheImages.folderPublic) :
                 (cell.filePreviewImageView?.image = NCBrandColor.cacheImages.folderSharedWithMe)
@@ -1485,8 +1486,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         }
 
         // Share image
-        cell.fileLabelShared?.text = NSLocalizedString("_shared_", comment: "")
-        cell.fileLabelShared?.textColor = NCBrandColor.shared.customer
         if isShare {
             cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
         } else if !metadata.shareType.isEmpty {
@@ -1501,9 +1500,13 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 //        if appDelegate.account != metadata.account {
 //            cell.fileSharedImage?.image = NCBrandColor.cacheImages.shared
 
-        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
-        if shares.share!.count > 0 || shares.firstShareLink != nil {
+        cell.fileLabelShared?.text = NSLocalizedString("_shared_", comment: "")
+        cell.fileLabelShared?.textColor = NCBrandColor.shared.customer
+        if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)){
             cell.fileSharedImage?.image = cell.fileSharedImage?.image?.imageColor(NCBrandColor.shared.customer)
+        } else {
+            cell.fileSharedImage?.image = NCBrandColor.cacheImages.imgShare.image(color: NCBrandColor.shared.gray60, size: 50)
+            cell.fileLabelShared?.text = ""
         }
         
         if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
