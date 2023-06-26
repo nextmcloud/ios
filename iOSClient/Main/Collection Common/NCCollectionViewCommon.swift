@@ -113,6 +113,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             searchController?.searchBar.autocapitalizationType = .none
             navigationItem.searchController = searchController
             navigationItem.hidesSearchBarWhenScrolling = false
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_back_", comment: ""), style: .plain, target: nil, action: nil)
         }
 
         // Cell
@@ -233,7 +234,12 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-
+        
+        // Deselect items when back to previous view controller
+        if isEditMode {
+            self.tapSelect()
+        }
+        
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationWillResignActive), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterCloseRichWorkspaceWebView), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeStatusFolderE2EE), object: nil)
@@ -671,11 +677,6 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             }
         }
         navigationItem.leftItemsSupplementBackButton = true
-        if titlePreviusFolder == nil {
-            navigationController?.navigationBar.topItem?.title = getNavigationTitle()
-        } else {
-            navigationController?.navigationBar.topItem?.title = titlePreviusFolder
-        }
     }
 
     func getNavigationTitle() -> String {
@@ -858,7 +859,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         }
     }
 
-    func tapRichWorkspace(_ sender: Any) {
+    func tapRichWorkspace(sender: Any) {
 
         if let navigationController = UIStoryboard(name: "NCViewerRichWorkspace", bundle: nil).instantiateInitialViewController() as? UINavigationController {
             if let viewerRichWorkspace = navigationController.topViewController as? NCViewerRichWorkspace {
@@ -1473,7 +1474,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         cell.titleInfoTrailingDefault()
 
         if isSearchingMode {
-            cell.fileTitleLabel?.text = NCUtilityFileSystem.shared.getPath(path: metadata.path, user: metadata.user) + metadata.fileName
+            cell.fileTitleLabel?.text = metadata.fileName
             cell.fileTitleLabel?.lineBreakMode = .byTruncatingTail
             if metadata.name == NCGlobal.shared.appName {
                 cell.fileInfoLabel?.text = CCUtility.dateDiff(metadata.date as Date) + " · " + CCUtility.transformedSize(metadata.size)
@@ -1717,6 +1718,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
             footer.setTitleLabel("")
             footer.setButtonText(NSLocalizedString("_show_more_results_", comment: ""))
+            footer.buttonSection.setTitleColor(NCBrandColor.shared.customer, for: .normal)
             footer.separatorIsHidden(true)
             footer.buttonIsHidden(true)
             footer.hideActivityIndicatorSection()
