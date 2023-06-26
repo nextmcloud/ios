@@ -746,7 +746,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         
         guard let oldTableShare = oldTableShare else {
             self.oldTableShare?.setPermission(value: 0)
-            self.share.permissions = 0
+            self.share.permissions = isOn ? self.share.permissions + NCGlobal.shared.permissionShareShare : self.share.permissions
             return
         }
 
