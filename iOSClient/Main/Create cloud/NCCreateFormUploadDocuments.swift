@@ -258,7 +258,7 @@ import XLForm
         }
 
         let buttonDestinationFolder: XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
-        buttonDestinationFolder.title = fileNameFolder
+        buttonDestinationFolder.cellConfig["photoLabel.text"] = fileNameFolder
 
         self.tableView.reloadData()
     }
