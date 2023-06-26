@@ -214,7 +214,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
             // Update
             let row: XLFormRowDescriptor  = self.form.formRow(withTag: "ButtonDestinationFolder")!
-            row.title = self.titleServerUrl
+            row.cellConfig["photoLabel.text"] = self.titleServerUrl
             self.updateFormRow(row)
         }
     }
