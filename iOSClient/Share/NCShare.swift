@@ -340,7 +340,7 @@ extension NCShare: UITableViewDataSource {
             shares.share?.insert(shareLink, at: 0)
         }
         
-        self.tableView.setEmptyMessage(NSLocalizedString("", comment: ""))
+        self.tableView.setEmptyMessage(NSLocalizedString("", comment: ""), isReshared: (metadata?.ownerId != appDelegate?.userId))
         if shares.share != nil {
             numOfRows = shares.share!.count
         }
@@ -349,7 +349,7 @@ extension NCShare: UITableViewDataSource {
                 messageView.removeFromSuperview()
             }
             if canReshare {
-                self.tableView.setEmptyMessage(NSLocalizedString("no_shares_created", comment: ""))
+                self.tableView.setEmptyMessage(NSLocalizedString("no_shares_created", comment: ""), isReshared: (metadata?.ownerId != appDelegate?.userId))
             }
         } else {
             self.tableView.restore()
@@ -456,14 +456,14 @@ extension NCShare: UITableViewDataSource {
         return 320
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 320
+        return metadata?.ownerId != appDelegate?.userId ? 350 : 320
     }
 }
 
 
 extension UITableView {
-    func setEmptyMessage(_ message: String) {
-        let messageLabel = UILabel(frame: CGRect(x: 16, y: 515, width: self.bounds.size.width, height: 20))
+    func setEmptyMessage(_ message: String, isReshared: Bool) {
+        let messageLabel = UILabel(frame: CGRect(x: 16, y: isReshared ? 545 : 515, width: self.bounds.size.width, height: 20))
         messageLabel.text = message
         messageLabel.textColor = NCBrandColor.shared.textInfo
         messageLabel.numberOfLines = 0

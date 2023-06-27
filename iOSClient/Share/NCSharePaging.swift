@@ -312,7 +312,7 @@ class NCShareHeaderView: UIView {
             sharedByImageView.image = UIImage(named: "cloudUpload")?.image(color: .systemBlue, size: 26)
             let ownerName = metadata?.ownerDisplayName ?? ""
             sharedByLabel.text = NSLocalizedString("_shared_with_you_by_", comment: "") + " " + ownerName
-            let resharingAllowedMessage =  NSLocalizedString("_share_reshare_allowed_", comment: "")
+            let resharingAllowedMessage =  NSLocalizedString("_share_reshare_allowed_", comment: "") + " " + NSLocalizedString("_sharing_message_", comment: "")
             let resharingNotAllowedMessage = NSLocalizedString("_share_reshare_not_allowed_", comment: "")
             resharingAllowedLabel.text = canReshare ? resharingAllowedMessage  : resharingNotAllowedMessage
         }
