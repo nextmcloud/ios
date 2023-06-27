@@ -172,6 +172,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"autoUploadSubfolderGranularity" rowType:XLFormRowDescriptorTypeSelectorPush title:NSLocalizedString(@"_autoupload_subfolder_granularity_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
     row.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
+    row.cellConfigForSelector[@"tintColor"] = NCBrandColor.shared.customer;
     row.selectorOptions = @[
         [XLFormOptionsObject formOptionsObjectWithValue:@(NCGlobal.shared.subfolderGranularityYearly) displayText:NSLocalizedString(@"_yearly_", nil)],
         [XLFormOptionsObject formOptionsObjectWithValue:@(NCGlobal.shared.subfolderGranularityMonthly) displayText:NSLocalizedString(@"_monthly_", nil)],
