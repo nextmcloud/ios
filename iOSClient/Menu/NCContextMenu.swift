@@ -325,7 +325,7 @@ class NCContextMenu: NSObject {
         
         let submenu = UIMenu(title: "", options: .displayInline, children: children)
         guard appDelegate?.disableSharesView == false else { return submenu }
-        let childrenArray = metadata.e2eEncrypted ? [submenu] : [detail, submenu]
+        let childrenArray = metadata.isDirectoryE2EE ? [submenu] : [detail, submenu]
         return UIMenu(title: "", children: childrenArray)
 
     }
