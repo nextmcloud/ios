@@ -31,6 +31,9 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
         get { return imageStatus }
         set { imageStatus = newValue }
     }
+    var account = ""
+    var indexPath = IndexPath()
+    let utility = NCUtility()
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -57,8 +60,10 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
 
         ]
 
-        imageRestore.image = NCUtility().loadImage(named: "arrow.counterclockwise", colors: [NCBrandColor.shared.iconImageColor])
-        imageMore.image = NCUtility().loadImage(named: "trash", colors: [.red])
+        imageRestore.image = utility.loadImage(named: "restore", color: NCBrandColor.shared.iconColor)
+        imageMore.image = UIImage(systemName: "trash")
+        imageMore.tintColor = NCBrandColor.shared.iconColor
+
         image.layer.cornerRadius = 6
         image.layer.masksToBounds = true
 
