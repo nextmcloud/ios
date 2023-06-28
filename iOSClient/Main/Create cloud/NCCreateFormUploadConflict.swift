@@ -167,9 +167,9 @@ class NCCreateFormUploadConflict: UIViewController {
         }))
 
         // MORE
-        conflictAlert.addAction(UIAlertAction(title: NSLocalizedString("_more_action_title_", comment: ""), style: .default, handler: { _ in
-            self.blurView.removeFromSuperview()
-        }))
+//        conflictAlert.addAction(UIAlertAction(title: NSLocalizedString("_more_action_title_", comment: ""), style: .default, handler: { _ in
+//            self.blurView.removeFromSuperview()
+//        }))
 
         // CANCEL
         conflictAlert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_keep_existing_action_title_", comment: ""), style: .cancel, handler: { _ in
