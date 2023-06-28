@@ -27,7 +27,7 @@ import UIKit
 import NextcloudKit
 import RealmSwift
 
-class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegate {
+class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegate, NCSectionHeaderMenuDelegate {
     @IBOutlet weak var collectionView: UICollectionView!
 
     var filePath = ""
@@ -70,6 +70,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         collectionView.register(UINib(nibName: "NCTrashGridCell", bundle: nil), forCellWithReuseIdentifier: "gridCell")
 
         collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
+        collectionView.register(UINib(nibName: "NCSectionHeaderMenu", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionHeaderMenu")
         collectionView.register(UINib(nibName: "NCSectionFooter", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "sectionFooter")
 
         collectionView.alwaysBounceVertical = true
@@ -149,6 +150,20 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
             let indexPath = collectionView.indexPathForItem(at: buttonPosition)
             collectionView(self.collectionView, didSelectItemAt: indexPath!)
         }
+    }
+
+    func tapButtonSwitch(_ sender: Any) {
+        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+            onListSelected()
+        } else {
+            onGridSelected()
+        }
+    }
+    
+    func tapButtonOrder(_ sender: Any) {
+
+        let sortMenu = NCSortMenu()
+        sortMenu.toggleMenu(viewController: self, account: appDelegate.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
     }
 
     func longPressGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) { }
