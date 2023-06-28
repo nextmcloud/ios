@@ -134,6 +134,7 @@ final class NCGlobal: Sendable {
     //
     let buttonMoreMore                              = "more"
     let buttonMoreLock                              = "moreLock"
+    let buttonMoreStop                              = "stop"
 
     // Rich Workspace
     //
