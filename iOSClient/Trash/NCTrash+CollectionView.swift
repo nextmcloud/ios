@@ -4,9 +4,11 @@
 
 import UIKit
 import RealmSwift
+import Foundation
 
 // MARK: UICollectionViewDelegate
 extension NCTrash: UICollectionViewDelegate {
+
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let resultTableTrash = datasource?[indexPath.item] else { return }
         guard !isEditMode else {
@@ -16,7 +18,7 @@ extension NCTrash: UICollectionViewDelegate {
                 selectOcId.append(resultTableTrash.fileId)
             }
             collectionView.reloadItems(at: [indexPath])
-            tabBarSelect.update(selectOcId: selectOcId)
+            setNavigationRightItems()
             return
         }
 
@@ -32,7 +34,9 @@ extension NCTrash: UICollectionViewDelegate {
 
 // MARK: UICollectionViewDataSource
 extension NCTrash: UICollectionViewDataSource {
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        setNavigationRightItems()
         return datasource?.count ?? 0
     }
 
@@ -46,7 +50,7 @@ extension NCTrash: UICollectionViewDataSource {
             cell = listCell
         } else {
             let gridCell = (collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as? NCTrashGridCell)!
-            gridCell.setButtonMore(image: NCImageCache.shared.getImageButtonMore())
+            gridCell.setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCImageCache.shared.getImageButtonMore())
             gridCell.delegate = self
             cell = gridCell
         }
@@ -166,6 +170,7 @@ extension NCTrash: UICollectionViewDataSource {
             header.emptyTitle.text = NSLocalizedString("_trash_no_trash_", comment: "")
             header.emptyDescription.text = NSLocalizedString("_trash_no_trash_description_", comment: "")
             return header
+            
         } else {
             guard let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFooter", for: indexPath) as? NCSectionFooter
             else { return NCSectionFooter() }
@@ -181,12 +186,9 @@ extension NCTrash: UICollectionViewDataSource {
 
 // MARK: UICollectionViewDelegateFlowLayout
 extension NCTrash: UICollectionViewDelegateFlowLayout {
+
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        var height: Double = 0
-        if let datasource, datasource.isEmpty {
-            height = utility.getHeightHeaderEmptyData(view: view, portraitOffset: 0, landscapeOffset: 0)
-        }
-        return CGSize(width: collectionView.frame.width, height: height)
+        return CGSize(width: collectionView.frame.width, height: NCGlobal.shared.heightButtonsView)
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 85)
