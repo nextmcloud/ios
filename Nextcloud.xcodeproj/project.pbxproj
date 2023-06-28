@@ -75,6 +75,8 @@
         012466452A3305BA004356E9 /* NCTrashSectionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 012466442A3305BA004356E9 /* NCTrashSectionFooter.xib */; };
         012466472A332472004356E9 /* NCTrashSectionHeaderMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 012466462A332472004356E9 /* NCTrashSectionHeaderMenu.xib */; };
         01A0EFCC2A39912900D61FB2 /* RenameFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A0EFCB2A39912900D61FB2 /* RenameFileTests.swift */; };
+        013786092A4B0E3B00B14CAB /* NCTrashGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 013786072A4B0E3B00B14CAB /* NCTrashGridCell.swift */; };
+        0137860A2A4B0E3B00B14CAB /* NCTrashGridCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 013786082A4B0E3B00B14CAB /* NCTrashGridCell.xib */; };
 		2C1D5D7523E2DE3300334ABB /* NCDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB41ED5A87C00B7EAD4 /* NCDatabase.swift */; };
 		2C1D5D7623E2DE3300334ABB /* NCManageDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB51ED5A87C00B7EAD4 /* NCManageDatabase.swift */; };
 		2C1D5D7923E2DE9100334ABB /* NCBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B3CCD1EAE01BD00921AC9 /* NCBrand.swift */; };
@@ -992,6 +994,8 @@
         012466442A3305BA004356E9 /* NCTrashSectionFooter.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCTrashSectionFooter.xib; sourceTree = "<group>"; };
         012466462A332472004356E9 /* NCTrashSectionHeaderMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCTrashSectionHeaderMenu.xib; sourceTree = "<group>"; };
         01A0EFCB2A39912900D61FB2 /* RenameFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameFileTests.swift; sourceTree = "<group>"; };
+        013786072A4B0E3B00B14CAB /* NCTrashGridCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCTrashGridCell.swift; sourceTree = "<group>"; };
+        013786082A4B0E3B00B14CAB /* NCTrashGridCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCTrashGridCell.xib; sourceTree = "<group>"; };
 		08DC3BD41E64727E00F036D3 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		08EA97441E6554FC004C83FA /* FirebaseAnalytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseAnalytics.framework; sourceTree = "<group>"; };
 		08EA97451E6554FC004C83FA /* FirebaseCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseCore.framework; sourceTree = "<group>"; };
@@ -2349,6 +2353,8 @@
 			children = (
 				F78ACD4821903F850088454D /* NCTrashListCell+NCTrashCellProtocol.swift */,
 				F78ACD4921903F850088454D /* NCTrashListCell.xib */,
+                013786072A4B0E3B00B14CAB /* NCTrashGridCell.swift */,
+                013786082A4B0E3B00B14CAB /* NCTrashGridCell.xib */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -3640,6 +3646,7 @@
 				F7EDE509262DA9D600414FE6 /* NCSelectCommandViewSelect.xib in Resources */,
 				F732D23327CF8AED000B0F1B /* NCPlayerToolBar.xib in Resources */,
 				F73D11FA253C5F4800DF9BEC /* NCViewerNextcloudText.storyboard in Resources */,
+                0137860A2A4B0E3B00B14CAB /* NCTrashGridCell.xib in Resources */,
 				F7EDE51B262DD0C400414FE6 /* NCSelectCommandViewCopyMove.xib in Resources */,
 				F73B422B2476764F00A30FD3 /* NCNotification.storyboard in Resources */,
 				F7FF2CB12842159500EBB7A1 /* NCSectionHeader.xib in Resources */,
@@ -4241,6 +4248,7 @@
 				F7C30DF6291BC0CA0017149B /* NCNetworkingE2EEUpload.swift in Sources */,
 				F7501C332212E57500FB1415 /* NCMedia.swift in Sources */,
 				F72944F22A84246400246839 /* NCEndToEndMetadataV20.swift in Sources */,
+                013786092A4B0E3B00B14CAB /* NCTrashGridCell.swift in Sources */,
 				F70BFC7420E0FA7D00C67599 /* NCUtility.swift in Sources */,
 				F79EDAA526B004980007D134 /* NCPlayer.swift in Sources */,
 				F7C1EEA525053A9C00866ACC /* NCDataSource.swift in Sources */,
