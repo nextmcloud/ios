@@ -11,12 +11,15 @@ protocol NCTrashGridCellDelegate: AnyObject {
 class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageSelect: UIImageView!
+    @IBOutlet weak var imageStatus: UIImageView!
+    @IBOutlet weak var imageFavorite: UIImageView!
+    @IBOutlet weak var imageLocal: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var labelExtension: UILabel!
     @IBOutlet weak var labelInfo: UILabel!
-    @IBOutlet weak var labelSubinfo: UILabel!
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
+    @IBOutlet weak var progressView: UIProgressView!
 
     weak var delegate: NCTrashGridCellDelegate?
     var objectId = ""
@@ -50,6 +53,26 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
     var fileInfoLabel: UILabel? {
         get { return labelInfo }
         set { labelInfo = newValue }
+    }
+    var fileProgressView: UIProgressView? {
+        get { return progressView }
+        set { progressView = newValue }
+    }
+    var fileSelectImage: UIImageView? {
+        get { return imageSelect }
+        set { imageSelect = newValue }
+    }
+    var fileStatusImage: UIImageView? {
+        get { return imageStatus }
+        set { imageStatus = newValue }
+    }
+    var fileLocalImage: UIImageView? {
+        get { return imageLocal }
+        set { imageLocal = newValue }
+    }
+    var fileFavoriteImage: UIImageView? {
+        get { return imageFavorite }
+        set { imageFavorite = newValue }
     }
 
     override func awakeFromNib() {
@@ -144,7 +167,10 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         delegate?.tapMoreGridItem(with: objectId, image: imageItem.image, sender: sender)
     }
 
+
     fileprivate func setA11yActions() {
+        let moreName = namedButtonMore == NCGlobal.shared.buttonMoreStop ? "_cancel_" : "_more_"
+        
         self.accessibilityCustomActions = [
             UIAccessibilityCustomAction(
                 name: NSLocalizedString("_more_", comment: ""),
@@ -153,7 +179,8 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         ]
     }
 
-    func setButtonMore(image: UIImage) {
+    func setButtonMore(named: String, image: UIImage) {
+        namedButtonMore = named
         buttonMore.setImage(image, for: .normal)
         setA11yActions()
     }
@@ -186,68 +213,11 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         dateFormatter.timeStyle = .none
         dateFormatter.locale = Locale.current
 
-        labelInfo.text = dateFormatter.string(from: date as Date)
-        labelSubinfo.text = NCUtilityFileSystem().transformedSize(size)
+        labelInfo.text = dateFormatter.string(from: date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
     }
 
     func setAccessibility(label: String, value: String) {
         accessibilityLabel = label
         accessibilityValue = value
-    }
-}
-
-// MARK: - Grid Layout
-
-class NCTrashGridLayout: UICollectionViewFlowLayout {
-
-    var heightLabelPlusButton: CGFloat = 60
-    var marginLeftRight: CGFloat = 10
-    var itemForLine: CGFloat = 3
-    var itemWidthDefault: CGFloat = 140
-
-    // MARK: - View Life Cycle
-
-    override init() {
-        super.init()
-
-        sectionHeadersPinToVisibleBounds = false
-
-        minimumInteritemSpacing = 1
-        minimumLineSpacing = marginLeftRight
-
-        self.scrollDirection = .vertical
-        self.sectionInset = UIEdgeInsets(top: 10, left: marginLeftRight, bottom: 0, right: marginLeftRight)
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override var itemSize: CGSize {
-        get {
-            if let collectionView = collectionView {
-
-                if collectionView.frame.width < 400 {
-                    itemForLine = 3
-                } else {
-                    itemForLine = collectionView.frame.width / itemWidthDefault
-                }
-
-                let itemWidth: CGFloat = (collectionView.frame.width - marginLeftRight * 2 - marginLeftRight * (itemForLine - 1)) / itemForLine
-                let itemHeight: CGFloat = itemWidth + heightLabelPlusButton
-
-                return CGSize(width: itemWidth, height: itemHeight)
-            }
-
-            // Default fallback
-            return CGSize(width: itemWidthDefault, height: itemWidthDefault)
-        }
-        set {
-            super.itemSize = newValue
-        }
-    }
-
-    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
-        return proposedContentOffset
     }
 }
