@@ -31,22 +31,6 @@ extension NCTrash {
     var selectActions: [NCMenuAction] {
         [
             NCMenuAction(
-                title: NSLocalizedString("_cancel_", comment: ""),
-                icon: utility.loadImage(named: "xmark"),
-                action: { _ in
-                    self.tapSelect()
-                }
-            ),
-            NCMenuAction(
-                title: NSLocalizedString("_select_all_", comment: ""),
-                icon: utility.loadImage(named: "checkmark.circle.fill"),
-                action: { _ in
-                    self.selectOcId = self.datasource.map { $0.fileId }
-                    self.collectionView.reloadData()
-                }
-            ),
-            NCMenuAction.seperator(),
-            NCMenuAction(
                 title: NSLocalizedString("_trash_restore_selected_", comment: ""),
                 icon: utility.loadImage(named: "restore").image(color: NCBrandColor.shared.iconColor, size: 50),
                 action: { _ in
@@ -125,9 +109,9 @@ extension NCTrash {
             iconHeader = icon
         } else {
             if tableTrash.directory {
-                iconHeader = UIImage(named: "folder")
+                iconHeader = UIImage(named: "folder")!.image(color: NCBrandColor.shared.iconColor, size: 50)
             } else {
-                iconHeader = UIImage(named: tableTrash.iconName)
+                iconHeader = UIImage(named: tableTrash.iconName)!.image(color: NCBrandColor.shared.iconColor, size: 50)
             }
         }
 
