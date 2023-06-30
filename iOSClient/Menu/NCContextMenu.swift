@@ -291,7 +291,7 @@ class NCContextMenu: NSObject {
         
         // File
         
-        var children: [UIMenuElement] = metadata.e2eEncrypted ? [openIn, copy, delete] : [offline, openIn, copy, delete]
+        var children: [UIMenuElement] = metadata.e2eEncrypted ? [openIn, copy, delete] : [offline, openIn, delete]
 
         if !metadata.lock {
             // Workaround: PROPPATCH doesn't work (favorite)
@@ -300,6 +300,7 @@ class NCContextMenu: NSObject {
                 children.insert(favorite, at: 0)
                 children.insert(moveCopy, at: 2)
                 children.insert(rename, at: 3)
+                children.insert(copy, at: 3)
             }
             children.append(delete)
             } else if enableDeleteLocal {
