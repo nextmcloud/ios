@@ -71,7 +71,7 @@ extension NCViewer {
         // FAVORITE
         // Workaround: PROPPATCH doesn't work
         // https://github.com/nextcloud/files_lock/issues/68
-        if !metadata.lock {
+        if !metadata.lock, !metadata.isDirectoryE2EE {
             actions.append(
                 NCMenuAction(
                     title: titleFavorite,
@@ -170,7 +170,7 @@ extension NCViewer {
         //
         // RENAME
         //
-        if !webView, metadata.isRenameable {
+        if !webView, metadata.isRenameable, !metadata.isDirectoryE2EE {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
@@ -202,7 +202,7 @@ extension NCViewer {
         //
         // COPY IN PASTEBOARD
         //
-        if !webView, metadata.isCopyableInPasteboard {
+        if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
             actions.append(.copyAction(selectOcId: [metadata.ocId], hudView: viewController.view))
         }
 
