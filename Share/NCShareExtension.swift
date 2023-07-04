@@ -217,6 +217,12 @@ class NCShareExtension: UIViewController {
                 self.setNavigationBar(navigationTitle: navigationTitle)
             }
         }
+        
+        if serverUrl != utilityFileSystem.getHomeServer(urlBase: activeAccount.urlBase, userId: activeAccount.userId) {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        } else {
+            navigationItem.leftBarButtonItem = nil
+        }
     }
 
     func setCommandView() {
