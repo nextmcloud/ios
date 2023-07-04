@@ -87,7 +87,7 @@ extension NCMenuAction {
     static func cancelAction(action: @escaping () -> Void) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_cancel_", comment: ""),
-            icon: NCUtility.shared.loadImage(named: "xmark"),
+            icon: NCUtility.shared.loadImage(named: "xmark", color: NCBrandColor.shared.iconColor),
             action: { _ in action() }
         )
     }
