@@ -70,6 +70,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     private var pushed: Bool = false
 
     private var tipView: EasyTipView?
+    
+    private var isLastPage: Bool = false
 
     // DECLARE
     internal var layoutKey = ""
@@ -968,7 +970,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             self.refreshControl.endRefreshing()
             return
         }
-
+        
+        isLastPage = false
         isReloadDataSourceNetworkInProgress = true
         self.dataSource.clearDataSource()
         self.refreshControl.beginRefreshing()
@@ -1021,12 +1024,12 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     func unifiedSearchMore(metadataForSection: NCMetadataForSection?) {
 
-        guard let metadataForSection = metadataForSection, let searchResult = metadataForSection.lastSearchResult, let cursor = searchResult.cursor, let term = literalSearch else { return }
+        guard let metadataForSection = metadataForSection, let lastSearchResult = metadataForSection.lastSearchResult, let cursor = lastSearchResult.cursor, let term = literalSearch else { return }
 
         metadataForSection.unifiedSearchInProgress = true
         self.collectionView?.reloadData()
 
-        NCNetworking.shared.unifiedSearchFilesProvider(userBaseUrl: appDelegate, id: searchResult.id, term: term, limit: 5, cursor: cursor) { account, searchResult, metadatas, error in
+        NCNetworking.shared.unifiedSearchFilesProvider(userBaseUrl: appDelegate, id: lastSearchResult.id, term: term, limit: 5, cursor: cursor) { account, searchResult, metadatas, error in
 
             if error != .success {
                 NCContentPresenter.shared.showError(error: error)
@@ -1034,6 +1037,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
             metadataForSection.unifiedSearchInProgress = false
             guard let searchResult = searchResult, let metadatas = metadatas else { return }
+            self.isLastPage = searchResult.entries.isEmpty
             self.dataSource.appendMetadatasToSection(metadatas, metadataForSection: metadataForSection, lastSearchResult: searchResult)
 
             DispatchQueue.main.async {
@@ -1727,7 +1731,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 if sections > 1 && section != sections - 1 {
                     footer.separatorIsHidden(false)
                 }
-                if isSearchingMode && isPaginated && metadatasCount > 0 {
+                if isSearchingMode && isPaginated && metadatasCount > 0 && !isLastPage {
                     footer.buttonIsHidden(false)
                 }
                 if unifiedSearchInProgress {
