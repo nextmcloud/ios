@@ -70,6 +70,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     private var pushed: Bool = false
 
     private var tipView: EasyTipView?
+    
+    private var isLastPage: Bool = false
 
     // DECLARE
     internal var layoutKey = ""
@@ -920,7 +922,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             self.refreshControl.endRefreshing()
             return
         }
-
+        
+        isLastPage = false
         isReloadDataSourceNetworkInProgress = true
         self.dataSource.clearDataSource()
         self.refreshControl.beginRefreshing()
@@ -985,6 +988,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
             metadataForSection.unifiedSearchInProgress = false
             guard let searchResult = searchResult, let metadatas = metadatas else { return }
+            self.isLastPage = searchResult.entries.isEmpty
             self.dataSource.appendMetadatasToSection(metadatas, metadataForSection: metadataForSection, lastSearchResult: searchResult)
 
             DispatchQueue.main.async {
