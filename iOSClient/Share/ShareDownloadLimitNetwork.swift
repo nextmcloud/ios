@@ -21,9 +21,10 @@ class NMCCommunication: NSObject, XMLParserDelegate {
     var message = ""
     var foundCharacters = "";
     var downloadLimit = DownloadLimit()
+    private lazy var appDelegate = UIApplication.shared.delegate as? AppDelegate
     
     func getDownloadLimit(token: String, completion: @escaping (_ downloadLimit: DownloadLimit?, _ errorDescription: String) -> Void)  {
-        let baseUrl = NCBrandOptions.shared.loginBaseUrl
+        let baseUrl = appDelegate?.urlBase ?? ""       // NCBrandOptions.shared.loginBaseUrl
         let endPoint = "/ocs/v2.php/apps/files_downloadlimit/\(token)/limit"
         let path = baseUrl+endPoint
         do {
@@ -61,7 +62,7 @@ class NMCCommunication: NSObject, XMLParserDelegate {
     }
 
     func setDownloadLimit(deleteLimit: Bool, limit: String, token: String, completion: @escaping (_ success: Bool, _ errorDescription: String) -> Void)  {
-        let baseUrl = NCBrandOptions.shared.loginBaseUrl
+        let baseUrl = appDelegate?.urlBase ?? ""         //NCBrandOptions.shared.loginBaseUrl
         let endPoint = "/ocs/v2.php/apps/files_downloadlimit/\(token)/limit"
         let path = baseUrl+endPoint
         do {
