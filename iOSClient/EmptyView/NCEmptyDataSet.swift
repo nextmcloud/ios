@@ -49,7 +49,7 @@ class NCEmptyDataSet: NSObject {
     init(view: UIView, offset: CGFloat = 0, delegate: NCEmptyDataSetDelegate?) {
         super.init()
 
-        if let emptyView = UINib(nibName: "NCEmptyView", bundle: nil).instantiate(withOwner: self, options: nil).first as? NCEmptyView {
+        guard let emptyView = NCEmptyView.fromNib().instantiate(withOwner: self, options: nil).first as? NCEmptyView else { return }
 
             self.delegate = delegate
             self.emptyView = emptyView
@@ -59,9 +59,6 @@ class NCEmptyDataSet: NSObject {
 
 //            emptyView.backgroundColor = .red
 //            emptyView.isHidden = false
-
-            emptyView.emptyTitle.sizeToFit()
-            emptyView.emptyDescription.sizeToFit()
 
             view.addSubview(emptyView)
 
@@ -78,7 +75,7 @@ class NCEmptyDataSet: NSObject {
 
             centerXAnchor?.isActive = true
             centerYAnchor?.isActive = true
-        }
+        
     }
 
     func setOffset(_ offset: CGFloat) {
@@ -123,6 +120,10 @@ public class NCEmptyView: UIView {
     @IBOutlet weak var emptyImage: UIImageView!
     @IBOutlet weak var emptyTitle: UILabel!
     @IBOutlet weak var emptyDescription: UILabel!
+    
+    static func fromNib() -> UINib {
+            return UINib(nibName: "NCEmptyView", bundle: nil)
+        }
 
     public override func awakeFromNib() {
         super.awakeFromNib()
