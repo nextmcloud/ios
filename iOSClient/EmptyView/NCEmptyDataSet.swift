@@ -116,6 +116,10 @@ public class NCEmptyView: UIView {
     @IBOutlet weak var emptyImage: UIImageView!
     @IBOutlet weak var emptyTitle: UILabel!
     @IBOutlet weak var emptyDescription: UILabel!
+    
+    static func fromNib() -> UINib {
+            return UINib(nibName: "NCEmptyView", bundle: nil)
+        }
 
     static func fromNib() -> UINib {
         return UINib(nibName: "NCEmptyView", bundle: nil)
