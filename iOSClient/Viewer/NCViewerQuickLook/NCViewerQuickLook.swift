@@ -256,12 +256,14 @@ extension NCViewerQuickLook: CropViewControllerDelegate {
 
     func cropViewControllerDidCrop(_ cropViewController: Mantis.CropViewController, cropped: UIImage, transformation: Mantis.Transformation, cropInfo: Mantis.CropInfo) {
         cropViewController.dismiss(animated: true)
-        guard let data = cropped.jpegData(compressionQuality: 1) else { return }
+        guard let data = cropped.jpegData(compressionQuality: 0.9) else { return }
         do {
             try data.write(to: self.url)
             hasChangesQuickLook = true
             reloadData()
-        } catch {  }
+        } catch {
+            print(error)
+        }
     }
 
     func cropViewControllerDidCancel(_ cropViewController: Mantis.CropViewController, original: UIImage) {
