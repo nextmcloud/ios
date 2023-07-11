@@ -162,8 +162,8 @@ class NCEndToEndInitialize: NSObject {
                         CCUtility.setEndToEndPrivateKey(self.appDelegate.account, privateKey: privateKey)
                     } else {
 
-                        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to decrypt Private Key")
-                        NCContentPresenter.shared.messageNotification("E2E decrypt privateKey", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
+                        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: NSLocalizedString("_e2e_error_incorrect_passphrase_", comment: ""))
+                        NCContentPresenter.shared.messageNotification(NSLocalizedString("_e2e_error_passphrase_title", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
 
                         return
                     }
