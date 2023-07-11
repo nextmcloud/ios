@@ -563,6 +563,8 @@
 "_read_passphrase_description_"     = "Here you can display the passphrase again and also copy it. You need the passphrase if you want to decrypt the data on another device with access to MagentaCLOUD, for example your PC or another smartphone or tablet.";
 "_remove_passphrase_desc_1_"        = "You can remove the passphrase on this device. This will not affect the encrypted content, but this device will no longer be able to decrypt your data.";
 "_remove_passphrase_desc_2_"        = "You can re-enter the passphrase here at any time to ensure access to your encrypted content from this device.";
+"_e2e_error_incorrect_passphrase_"  = "Wrong password?";
+"_e2e_error_passphrase_title"       = "Error while decrypting.";
 "_scans_document_"                  = "Scan document";
 "_scanned_images_"                  = "Scanned images";
 "_scan_document_pdf_page_"          = "Page";
