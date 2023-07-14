@@ -126,18 +126,8 @@ class NCViewerMediaDetailView: UIView {
         sizeValue.textColor = textColor
 
         // Date
-        if let date = date {
-            let formatter = DateFormatter()
-            formatter.dateStyle = .full
-            formatter.timeStyle = .medium
-            let dateString = formatter.string(from: date as Date)
-
-            dateLabel.text = NSLocalizedString("_date_", comment: "")
-            dateValue.text = dateString
-        } else {
-            dateLabel.text = NSLocalizedString("_date_", comment: "")
-            dateValue.text = NSLocalizedString("_not_available_", comment: "")
-        }
+        dateLabel.text = NSLocalizedString("_date_", comment: "")
+        dateValue.text = CCUtility.dateDiff(metadata.date as Date)
         dateValue.textColor = textColor
 
         // Dimension
