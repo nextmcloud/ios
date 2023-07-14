@@ -57,12 +57,12 @@ class ParallelWorker {
             hud.tapOnHUDViewBlock = { hud in
                 self.isCancelled = true
                 // Cancel all download / upload
-                for uploadRequest in NCNetworking.shared.uploadRequest {
-                    uploadRequest.value.cancel()
-                }
-                for downloadRequest in NCNetworking.shared.downloadRequest {
-                    downloadRequest.value.cancel()
-                }
+//                for uploadRequest in NCNetworking.shared.uploadRequest {
+//                    uploadRequest.value.cancel()
+//                }
+//                for downloadRequest in NCNetworking.shared.downloadRequest {
+//                    downloadRequest.value.cancel()
+//                }
                 hud.dismiss()
             }
             self.hud = hud
