@@ -39,7 +39,6 @@ protocol NCCellProtocol {
     var fileSharedImage: UIImageView? { get set }
     var fileMoreImage: UIImageView? { get set }
     var cellSeparatorView: UIView? { get set }
-    var cellTagListView: TagListView? { get set }
     var fileLabelShared: UILabel? { get set }
 
     func titleInfoTrailingDefault()

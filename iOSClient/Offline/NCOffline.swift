@@ -34,7 +34,6 @@ class NCOffline: NCCollectionViewCommon {
         titleCurrentFolder = NSLocalizedString("_manage_file_offline_", comment: "")
         layoutKey = NCGlobal.shared.layoutViewOffline
         enableSearchBar = false
-        headerMenuButtonsCommand = false
         emptyImage = UIImage(named: "folder")!
         emptyTitle = "_files_no_files_"
         emptyDescription = "_tutorial_offline_view_"
