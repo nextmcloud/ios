@@ -316,6 +316,8 @@ import XLForm
             let result = NextcloudKit.shared.nkCommonInstance.getInternalType(fileName: fileName , mimeType: "", directory: false)
             if NCUtility.shared.isDirectEditing(account: appDelegate.account, contentType: result.mimeType).count == 0 {
                 fileName = (fileName as NSString).deletingPathExtension + "." + fileNameExtension
+            } else {
+                fileName = fileName + "." + fileNameExtension
             }
             
             if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileNameView: String(describing: fileName)) != nil {
