@@ -200,29 +200,17 @@ struct UploadAssetsView: View {
         )
 
         let trimmedPreview = preview.trimmingCharacters(in: .whitespacesAndNewlines)
-
-            if !fileName.isEmpty {
-
-                CCUtility.setFileNameMask(fileName, key: NCGlobal.shared.keyFileNameMask)
-                preview = CCUtility.createFileName(asset.value(forKey: "filename") as? String,
-                                                   fileDate: creationDate, fileType: asset.mediaType,
-                                                   keyFileName: NCGlobal.shared.keyFileNameMask,
-                                                   keyFileNameType: NCGlobal.shared.keyFileNameType,
-                                                   keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal,
-                                                   forcedNewFileName: false)
-
-            } else {
-
-                CCUtility.setFileNameMask("", key: NCGlobal.shared.keyFileNameMask)
-                preview = CCUtility.createFileName(asset.value(forKey: "filename") as? String,
-                                                   fileDate: creationDate,
-                                                   fileType: asset.mediaType,
-                                                   keyFileName: nil,
-                                                   keyFileNameType: NCGlobal.shared.keyFileNameType,
-                                                   keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal,
-                                                   forcedNewFileName: false)
-            }
-
+        
+        if !(fileName?.isEmpty ?? false) {
+            
+            CCUtility.setFileNameMask(fileName, key: NCGlobal.shared.keyFileNameMask)
+            preview = CCUtility.createFileName(asset.value(forKey: "filename") as? String,
+                                               fileDate: creationDate, fileType: asset.mediaType,
+                                               keyFileName: NCGlobal.shared.keyFileNameMask,
+                                               keyFileNameType: NCGlobal.shared.keyFileNameType,
+                                               keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginal,
+                                               forcedNewFileName: false)
+            
         } else {
 
             CCUtility.setFileNameMask("", key: NCGlobal.shared.keyFileNameMask)
@@ -374,15 +362,15 @@ struct UploadAssetsView: View {
                     //Save Path
                     Section(header: Text(NSLocalizedString("_save_path_", comment: "").uppercased()), footer: Text(NSLocalizedString("_auto_upload_help_text_", comment: ""))) {
                         HStack {
-                                if NCUtilityFileSystem.shared.getHomeServer(urlBase: uploadAssets.userBaseUrl.urlBase, userId: uploadAssets.userBaseUrl.userId) == uploadAssets.serverUrl {
-                                    Text(NSLocalizedString("_prefix_upload_path_", comment: ""))
-                                        .font(.system(size: 15))
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                          } else {
-                                    Text(self.getTextServerUrl(uploadAssets.serverUrl))
-                                        .font(.system(size: 15))
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                }
+                            if NCUtilityFileSystem.shared.getHomeServer(urlBase: uploadAssets.userBaseUrl.urlBase, userId: uploadAssets.userBaseUrl.userId) == uploadAssets.serverUrl {
+                                Text(NSLocalizedString("_prefix_upload_path_", comment: ""))
+                                    .font(.system(size: 15))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            } else {
+                                Text(self.getTextServerUrl(uploadAssets.serverUrl))
+                                    .font(.system(size: 15))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                             
                             Image("folder")
                                 .renderingMode(.template)
@@ -412,7 +400,7 @@ struct UploadAssetsView: View {
                     }
                     
                     //File Name
-                    Section(header: Text(NSLocalizedString("_filename_", comment: "").uppercased()), footer: Text(setFileNameMask(fileName: fileName))) {
+                    Section(header: Text(NSLocalizedString("_filename_", comment: "").uppercased()), footer: Text(setFileNameMaskForPreview(fileName: fileName))) {
                         Toggle(isOn: $isMaintainOriginalFilename, label: {
                             Text(NSLocalizedString("_maintain_original_filename_", comment: ""))
                                 .font(.system(size: 15))
@@ -427,7 +415,7 @@ struct UploadAssetsView: View {
                             .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.brand)))
                             HStack {
                                 if isMaintainOriginalFilename {
-                                    Text(getOriginalFilename())
+                                    Text(getOriginalFilenameForPreview() as? String ?? "")
                                         .font(.system(size: 15))
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .foregroundColor(Color.gray)
