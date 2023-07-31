@@ -70,6 +70,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
         NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadDataNCShare), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         guard let metadata = metadata else { return }
         
         reloadData()
@@ -150,6 +151,9 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
         textField?.layer.borderColor = NCBrandColor.shared.label.cgColor
     }
 
+    @objc func appWillEnterForeground(notification: Notification) {
+        reloadData()
+    }
     // MARK: -
 
     @objc func reloadData() {
@@ -177,8 +181,8 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     }
     
     @IBAction func createLinkClicked(_ sender: Any) {
-//        appDelegate.adjust.trackEvent(TriggerEvent(CreateLink.rawValue))
-//        TealiumHelper.shared.trackEvent(title: "magentacloud-app.sharing.create", data: ["": ""])
+        appDelegate?.adjust.trackEvent(TriggerEvent(CreateLink.rawValue))
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.sharing.create", data: ["": ""])
         self.touchUpInsideButtonMenu(sender)
     }
     
