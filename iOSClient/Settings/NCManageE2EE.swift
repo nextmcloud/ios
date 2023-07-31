@@ -170,7 +170,7 @@ struct NCViewE2EE: View {
 
                 List {
                  
-                    Section(header: Text(""), footer: Text("End-to-End Encryption" + versionE2EE))
+                    Section(header: Text(""), footer: Text("End-to-End Encryption" + NCGlobal.shared.capabilityE2EEApiVersion))
                     {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_activated_", comment: ""))
