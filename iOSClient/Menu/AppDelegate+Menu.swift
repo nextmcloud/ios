@@ -65,7 +65,7 @@ extension AppDelegate {
         if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorText}) && !isDirectoryE2EE {
             let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorText})!
             actions.append(
-                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt_menu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
+                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
                         return
                     }
@@ -85,7 +85,7 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility.shared.loadImage(named: "scan").image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
+                title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility.shared.loadImage(named: "doc.text.viewfinder"), action: { _ in
                     if let viewController = appDelegate.window?.rootViewController {
                         NCDocumentCamera.shared.openScannerDocument(viewController: viewController)
                     }
@@ -113,9 +113,15 @@ extension AppDelegate {
             )
         )
 
+        if CCUtility.isEnd(toEndEnabled: appDelegate.account) {
+            actions.append(.seperator(order: 0))
+        }
+
+        let titleCreateFolder = isDirectoryE2EE ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
+        let imageCreateFolder = isDirectoryE2EE ? UIImage(named: "folderEncrypted")! : UIImage(named: "folder")!
         actions.append(
-            NCMenuAction(title: NSLocalizedString("_create_folder_", comment: ""),
-                icon: UIImage(named: "addFolder")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
+            NCMenuAction(title: titleCreateFolder,
+                icon: imageCreateFolder.image(color: NCBrandColor.shared.brandElement, size: 50), action: { _ in
                     guard !appDelegate.activeServerUrl.isEmpty else { return }
                     let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate)
                     appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
@@ -137,6 +143,9 @@ extension AppDelegate {
             )
         }
 
+        if CCUtility.isEnd(toEndEnabled: appDelegate.account) {
+            actions.append(.seperator(order: 0))
+        }
 
         if NCGlobal.shared.capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isDirectoryE2EE && NextcloudKit.shared.isNetworkReachable() {
             actions.append(
