@@ -86,6 +86,11 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        5663AD3E2AAF0FD900185808 /* MagentaCloudVersionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5663AD392AAF0FD800185808 /* MagentaCloudVersionView.swift */; };
+        5663AD3F2AAF0FD900185808 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5663AD3A2AAF0FD800185808 /* HelpViewController.swift */; };
+        5663AD402AAF0FD900185808 /* MagentaCloudVersionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5663AD3B2AAF0FD800185808 /* MagentaCloudVersionView.xib */; };
+        5663AD412AAF0FD900185808 /* ImprintViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5663AD3C2AAF0FD800185808 /* ImprintViewController.swift */; };
+        5663AD422AAF0FD900185808 /* OpenSourceSoftwareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5663AD3D2AAF0FD900185808 /* OpenSourceSoftwareViewController.swift */; };
         568CE0A72A3850C400F50789 /* AudioUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568CE0A62A3850C400F50789 /* AudioUploadTests.swift */; };
         5666D4492A36E46B0013CEC5 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5666D4472A36E46A0013CEC5 /* FolderPathCustomCell.swift */; };
         5666D44A2A36E46B0013CEC5 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5666D4482A36E46B0013CEC5 /* FolderPathCustomCell.xib */; };
@@ -1009,6 +1014,11 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        5663AD392AAF0FD800185808 /* MagentaCloudVersionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MagentaCloudVersionView.swift; sourceTree = "<group>"; };
+        5663AD3A2AAF0FD800185808 /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
+        5663AD3B2AAF0FD800185808 /* MagentaCloudVersionView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MagentaCloudVersionView.xib; sourceTree = "<group>"; };
+        5663AD3C2AAF0FD800185808 /* ImprintViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImprintViewController.swift; sourceTree = "<group>"; };
+        5663AD3D2AAF0FD900185808 /* OpenSourceSoftwareViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenSourceSoftwareViewController.swift; sourceTree = "<group>"; };
         568CE0A62A3850C400F50789 /* AudioUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUploadTests.swift; sourceTree = "<group>"; };
         5666D4472A36E46A0013CEC5 /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
         5666D4482A36E46B0013CEC5 /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
@@ -2498,6 +2508,14 @@
 		F7ACE4281BAC0268006C0017 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+                5663AD3A2AAF0FD800185808 /* HelpViewController.swift */,
+                5663AD3C2AAF0FD800185808 /* ImprintViewController.swift */,
+                5663AD392AAF0FD800185808 /* MagentaCloudVersionView.swift */,
+                5663AD3B2AAF0FD800185808 /* MagentaCloudVersionView.xib */,
+                5663AD3D2AAF0FD900185808 /* OpenSourceSoftwareViewController.swift */,
+				F77910A425DD517B00CEDB9E /* Settings.bundle */,
+				F77910AA25DD53C700CEDB9E /* NCSettingsBundleHelper.swift */,
+				F7CB689F254169530050EC94 /* NCSettings.storyboard */,
 				F7ACE4291BAC0268006C0017 /* Acknowledgements.h */,
 				F7ACE42A1BAC0268006C0017 /* Acknowledgements.m */,
 				F7ACE42B1BAC0268006C0017 /* Acknowledgements.rtf */,
@@ -3602,6 +3620,7 @@
 				F7F4F10527ECDBDB008676F9 /* Inconsolata-SemiBold.ttf in Resources */,
 				F7A48415297028FC00BD1B49 /* Nextcloud Hub.png in Resources */,
 				F74C0437253F1CDC009762AB /* NCShares.storyboard in Resources */,
+                5663AD402AAF0FD900185808 /* MagentaCloudVersionView.xib in Resources */,
 				F7F4F10C27ECDBDB008676F9 /* Inconsolata-Regular.ttf in Resources */,
                 562817FD2A14D36F00AA7669 /* PasswordInputField.xib in Resources */,
 				F7B8B83025681C3400967775 /* GoogleService-Info.plist in Resources */,
@@ -4127,6 +4146,7 @@
 				F733598125C1C188002ABA72 /* NCAskAuthorization.swift in Sources */,
 				370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */,
 				F77B0DF51D118A16002130FE /* CCUtility.m in Sources */,
+                5663AD3E2AAF0FD900185808 /* MagentaCloudVersionView.swift in Sources */,
 				F70D87D025EE6E58008CBBBD /* NCRenameFile.swift in Sources */,
 				F71CD6CA2930D7B1006C95C1 /* NCApplicationHandle.swift in Sources */,
 				F73EF7D72B0226080087E6E9 /* NCManageDatabase+Tip.swift in Sources */,
@@ -4141,6 +4161,7 @@
 				F7EE66AD2A20B226009AE765 /* UILabel+Extension.swift in Sources */,
 				F78ACD4221903CE00088454D /* NCListCell.swift in Sources */,
 				F76D3CF12428B40E005DFA87 /* NCViewerPDFSearch.swift in Sources */,
+                5663AD412AAF0FD900185808 /* ImprintViewController.swift in Sources */,
 				F7245924289BB50C00474787 /* ThreadSafeDictionary.swift in Sources */,
 				F73F537F1E929C8500F8678D /* NCMore.swift in Sources */,
 				F702F2CF25EE5B5C008F8E80 /* NCGlobal.swift in Sources */,
@@ -4156,7 +4177,7 @@
 				F77BB74A2899857B0090FC19 /* UINavigationController+Extension.swift in Sources */,
 				F769454622E9F1B0000A798A /* NCShareCommon.swift in Sources */,
 				F70753F12542A9A200972D44 /* NCViewerMedia.swift in Sources */,
-				F76B649C2ADFFAED00014640 /* NCImageCache.swift in Sources */,
+                5663AD422AAF0FD900185808 /* OpenSourceSoftwareViewController.swift in Sources */,
 				F78A18B823CDE2B300F681F3 /* NCViewerRichWorkspace.swift in Sources */,
 				F7A60F86292D215000FCE1F2 /* NCShareAccounts.swift in Sources */,
 				F77910AB25DD53C700CEDB9E /* NCSettingsBundleHelper.swift in Sources */,
@@ -4359,6 +4380,7 @@
 				F7E4D9C422ED929B003675FD /* NCShareCommentsCell.swift in Sources */,
 				F717402E24F699A5000C87D5 /* NCFavorite.swift in Sources */,
 				AF2D7C7E2742559100ADF566 /* NCShareUserCell.swift in Sources */,
+                5663AD3F2AAF0FD900185808 /* HelpViewController.swift in Sources */,
 				AF7E505027A2D92300B5E4AF /* NCSelectableNavigationView.swift in Sources */,
 				F74DE14325135B6800917068 /* NCTransfers.swift in Sources */,
 				AF4BF614275629E20081CEEF /* NCManageDatabase+Account.swift in Sources */,
