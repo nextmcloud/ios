@@ -109,9 +109,9 @@ extension NCTrash {
             iconHeader = icon
         } else {
             if tableTrash.directory {
-                iconHeader = UIImage(named: "folder")!.image(color: NCBrandColor.shared.iconColor, size: 50)
+                iconHeader = UIImage(named: "folder")
             } else {
-                iconHeader = UIImage(named: tableTrash.iconName)!.image(color: NCBrandColor.shared.iconColor, size: 50)
+                iconHeader = UIImage(named: tableTrash.iconName)
             }
         }
 
