@@ -17,6 +17,7 @@ class NCShareEmailFieldCell: UITableViewCell {
     @IBOutlet weak var btnCreateLink: UIButton!
     @IBOutlet weak var labelYourShare: UILabel!
     @IBOutlet weak var labelShareByMail: UILabel!
+    @IBOutlet weak var btnContact: UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -57,6 +58,13 @@ class NCShareEmailFieldCell: UITableViewCell {
         searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
         searchField.tag = Tag.searchField
         setDoneButton(sender: searchField)
+        
+        btnContact.layer.cornerRadius = 5
+        btnContact.layer.masksToBounds = true
+        btnContact.layer.borderWidth = 1
+        btnContact.layer.borderColor = NCBrandColor.shared.label.cgColor
+        btnContact.tintColor = NCBrandColor.shared.label
+        btnContact.setImage(UIImage(named: "contact"), for: .normal)
     }
     
     @objc func cancelDatePicker() {
