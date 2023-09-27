@@ -64,7 +64,7 @@ class NCShareEmailFieldCell: UITableViewCell {
         btnContact.layer.borderWidth = 1
         btnContact.layer.borderColor = NCBrandColor.shared.label.cgColor
         btnContact.tintColor = NCBrandColor.shared.label
-        btnContact.setImage(UIImage(named: "contact"), for: .normal)
+        btnContact.setImage(NCUtility.shared.loadImage(named: "contact").image(color: NCBrandColor.shared.label, size: 24), for: .normal)
     }
     
     @objc func cancelDatePicker() {

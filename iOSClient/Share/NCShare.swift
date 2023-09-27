@@ -488,7 +488,6 @@ extension NCShare: CNContactPickerDelegate {
     }
     
     func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
-        print("Cancel Contact Picker")
         self.keyboardWillHide(notification: Notification(name: Notification.Name("dismiss")))
     }
     

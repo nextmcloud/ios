@@ -293,7 +293,7 @@ class NCShareHeaderView: UIView {
         labelSharing.text = NSLocalizedString("_sharing_", comment: "")
         labelSharingInfo.text = NSLocalizedString("_sharing_message_", comment: "")
         
-        if UIScreen.main.bounds.width < 350 {
+        if UIScreen.main.bounds.width < 376 {
             constraintTopSharingLabel.constant = 15
         }
     }
