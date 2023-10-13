@@ -86,6 +86,8 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        5628EB302AD3FF6A00CAA639 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5628EB2F2AD3FF6A00CAA639 /* AppUpdater.swift */; };
+        563016C82AD81F59004EAA29 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 563016C72AD81F59004EAA29 /* FirebaseRemoteConfig */; };
         5663AD3E2AAF0FD900185808 /* MagentaCloudVersionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5663AD392AAF0FD800185808 /* MagentaCloudVersionView.swift */; };
         5663AD3F2AAF0FD900185808 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5663AD3A2AAF0FD800185808 /* HelpViewController.swift */; };
         5663AD402AAF0FD900185808 /* MagentaCloudVersionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5663AD3B2AAF0FD800185808 /* MagentaCloudVersionView.xib */; };
@@ -1014,6 +1016,7 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        5628EB2F2AD3FF6A00CAA639 /* AppUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdater.swift; sourceTree = "<group>"; };
         5663AD392AAF0FD800185808 /* MagentaCloudVersionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MagentaCloudVersionView.swift; sourceTree = "<group>"; };
         5663AD3A2AAF0FD800185808 /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
         5663AD3B2AAF0FD800185808 /* MagentaCloudVersionView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MagentaCloudVersionView.xib; sourceTree = "<group>"; };
@@ -1742,6 +1745,7 @@
                 01B1E05D2A1E2C4E002D5537 /* TealiumRemoteCommands in Frameworks */,
 				F7ED547C25EEA65400956C55 /* QRCodeReader in Frameworks */,
 				F788ECC7263AAAFA00ADC67F /* MarkdownKit in Frameworks */,
+                563016C82AD81F59004EAA29 /* FirebaseRemoteConfig in Frameworks */,
                 01B1E0592A1E2C37002D5537 /* TealiumAutotracking in Frameworks */,
 				F77BC3EB293E5268005F2B08 /* Swifter in Frameworks */,
 				F7BB7E4727A18C56009B9F29 /* Parchment in Frameworks */,
@@ -1864,6 +1868,14 @@
                 562817FB2A14D36F00AA7669 /* PasswordInputField.xib */,
             );
             path = "NMC Views";
+            sourceTree = "<group>";
+        };
+        5628EB2D2AD3FE7800CAA639 /* AppUpdate */ = {
+            isa = PBXGroup;
+            children = (
+                5628EB2F2AD3FF6A00CAA639 /* AppUpdater.swift */,
+            );
+            path = AppUpdate;
             sourceTree = "<group>";
         };
 		AF8ED1FA2757821000B8DBC4 /* NextcloudUnitTests */ = {
@@ -2842,6 +2854,7 @@
 			children = (
                 0142C77B2A038DA70008E448 /* NMC Custom Views */,
                 01EE3D642A14D61300E0AA70 /* Helper */,
+                5628EB2D2AD3FE7800CAA639 /* AppUpdate */,
 				F702F2CC25EE5B4F008F8E80 /* AppDelegate.swift */,
 				F76B649B2ADFFAED00014640 /* NCImageCache.swift */,
 				F702F2CE25EE5B5C008F8E80 /* NCGlobal.swift */,
@@ -3290,6 +3303,7 @@
 				F7F623B42A5EF4D30022D3D4 /* Gzip */,
 				F76B649D2ADFFDEC00014640 /* LRUCache */,
 				F760DE022AE66EA80027D78A /* KeychainAccess */,
+                563016C72AD81F59004EAA29 /* FirebaseRemoteConfig */,
 			);
 			productName = "Crypto Cloud";
 			productReference = F7CE8AFA1DC1F8D8009CAE48 /* Nextcloud.app */;
@@ -4323,6 +4337,7 @@
 				F75D19E325EFE09000D74598 /* NCTrash+Menu.swift in Sources */,
 				F7FC5EE12A1768D700D921F5 /* NCCapabilitiesView.swift in Sources */,
 				F70CAE3A1F8CF31A008125FD /* NCEndToEndEncryption.m in Sources */,
+                5628EB302AD3FF6A00CAA639 /* AppUpdater.swift in Sources */,
 				AF93471B27E2361E002537EE /* NCShareAdvancePermission.swift in Sources */,
 				F77BC3ED293E528A005F2B08 /* NCConfigServer.swift in Sources */,
 				F7A560422AE1593700BE8FD6 /* NCOperationSaveLivePhoto.swift in Sources */,
@@ -5719,7 +5734,12 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F3131EDC2B038E4A0018DB28 /* XLForm */ = {
+        563016C72AD81F59004EAA29 /* FirebaseRemoteConfig */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = F70B86732642CE3B00ED5349 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+            productName = FirebaseRemoteConfig;
+        };
+		C03BA1492A17BC57002C8BA3 /* XLForm */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F74E771E277A2EF40013B958 /* XCRemoteSwiftPackageReference "XLForm" */;
 			productName = XLForm;
