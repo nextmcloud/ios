@@ -110,7 +110,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             NCPreferences().removeAll()
 
             if let bundleID = Bundle.main.bundleIdentifier {
+                let lastUpdateCheckDate = UserDefaults.standard.object(forKey: AppUpdaterKey.lastUpdateCheckDate)
                 UserDefaults.standard.removePersistentDomain(forName: bundleID)
+                if lastUpdateCheckDate != nil {
+                    UserDefaults.standard.setValue(lastUpdateCheckDate, forKey: AppUpdaterKey.lastUpdateCheckDate)
+                }
             }
 
             if NCBrandOptions.shared.disable_intro {
@@ -206,12 +210,45 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let session = SceneManager.shared.getSession(scene: scene)
         let controller = SceneManager.shared.getController(scene: scene)
 
-        activateSceneForAccount(scene, account: session.account, controller: controller)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            Task {
+                if let tableAccount = await self.database.getTableAccountAsync(account: session.account) {
+                    let num = await NCAutoUpload.shared.initAutoUpload(tblAccount: tableAccount)
+                    nkLog(start: "Auto upload with \(num) photo")
+                }
+            }
+        }
+        AppUpdater().checkForUpdate()
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
+        let session = SceneManager.shared.getSession(scene: scene)
+        let controller = SceneManager.shared.getController(scene: scene)
+        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene did become active")
+
         hidePrivacyProtectionWindow()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            NCService().startRequestServicesServer(account: session.account, controller: controller)
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            Task {
+                await NCNetworking.shared.verifyZombie()
+            }
+        }
+
+        NotificationCenter.default.postOnMainThread(name: global.notificationCenterRichdocumentGrabFocus)
+
     }
+
+//    func sceneDidBecomeActive(_ scene: UIScene) {
+//        let session = SceneManager.shared.getSession(scene: scene)
+//        guard !session.account.isEmpty else { return }
+//
+//        hidePrivacyProtectionWindow()
+//    }
 
     func sceneWillResignActive(_ scene: UIScene) {
         nkLog(debug: "Scene will resign active")
