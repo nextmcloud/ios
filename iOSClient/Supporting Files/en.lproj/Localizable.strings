@@ -1141,3 +1141,9 @@
 // MARK: Dashboard
 "_shared_"                          = "Shared";
 "_recieved_"                        = "Received";
+
+// MARK: App Updater
+"update_available"              = "Update available";
+"update_description"            = "MagentaCLOUD version %@ is now available";
+"update"                        = "Update";
+"not_now"                       = "Not Now";
