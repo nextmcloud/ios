@@ -138,7 +138,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
             NCKeychain().removeAll()
             if let bundleID = Bundle.main.bundleIdentifier {
+                let lastUpdateCheckDate = UserDefaults.standard.object(forKey: AppUpdaterKey.lastUpdateCheckDate)
                 UserDefaults.standard.removePersistentDomain(forName: bundleID)
+                if lastUpdateCheckDate != nil {
+                    UserDefaults.standard.setValue(lastUpdateCheckDate, forKey: AppUpdaterKey.lastUpdateCheckDate)
+                }
             }
         }
 
@@ -184,6 +188,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             self.enableTouchFaceID()
         }
 
+        AppUpdater().checkForUpdate()
         return true
     }
 
@@ -247,6 +252,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Application will enter in foreground")
 
+        AppUpdater().checkForUpdate()
         guard !account.isEmpty else { return }
 
         enableTouchFaceID()
