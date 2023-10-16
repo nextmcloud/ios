@@ -1,11 +1,7 @@
 {
   "images" : [
     {
-<<<<<<<< HEAD:iOSClient/Images.xcassets/create_file_ppt.imageset/Contents.json
       "filename" : "file_ppt.pdf",
-========
-      "filename" : "copy.pdf",
->>>>>>>> 3017e8cdb7 (NMC 2611 - Branding changes):iOSClient/Images.xcassets/copy.imageset/Contents.json
       "idiom" : "universal"
     }
   ],
