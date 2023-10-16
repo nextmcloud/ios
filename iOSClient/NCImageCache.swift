@@ -8,8 +8,8 @@ import LRUCache
 import NextcloudKit
 import RealmSwift
 
-final class NCImageCache: @unchecked Sendable {
-    static let shared = NCImageCache()
+@objc class NCImageCache: NSObject {
+    @objc static let shared = NCImageCache()
 
     private let utility = NCUtility()
     private let utilityFileSystem = NCUtilityFileSystem()
