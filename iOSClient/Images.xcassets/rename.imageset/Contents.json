@@ -1,15 +1,23 @@
 {
   "images" : [
     {
-      "filename" : "Rename.svg",
-      "idiom" : "universal"
+      "filename" : "actionSheetRename.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "actionSheetRename@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "actionSheetRename@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true
   }
 }
