@@ -99,8 +99,67 @@ import UIKit
         utility.loadImage(named: "doc", colors: colors)
     }
 
-    func getImageShared(account: String) -> UIImage {
-        return UIImage(named: "share")!.image(color: NCBrandColor.shared.getElement(account: account))
+    struct images {
+        static var file = UIImage()
+
+        static var shared = UIImage()
+        static var canShare = UIImage()
+        static var shareByLink = UIImage()
+        static var sharedWithMe = UIImage()
+
+        static var favorite = UIImage()
+        static var livePhoto = UIImage()
+        static var offlineFlag = UIImage()
+        static var local = UIImage()
+
+        static var folderEncrypted = UIImage()
+        static var folderSharedWithMe = UIImage()
+        static var folderPublic = UIImage()
+        static var folderGroup = UIImage()
+        static var folderExternal = UIImage()
+        static var folderAutomaticUpload = UIImage()
+        static var folder = UIImage()
+
+        static var checkedYes = UIImage()
+        static var checkedNo = UIImage()
+
+        static var buttonMore = UIImage()
+        static var buttonStop = UIImage()
+        static var buttonMoreLock = UIImage()
+
+        static var iconContacts = UIImage()
+        static var iconTalk = UIImage()
+        static var iconCalendar = UIImage()
+        static var iconDeck = UIImage()
+        static var iconMail = UIImage()
+        static var iconConfirm = UIImage()
+        static var iconPages = UIImage()
+        static var iconFile = UIImage()
+    }
+
+    func createImagesCache() {
+        let utility = NCUtility()
+
+        images.file = utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor2])
+
+        images.shared = UIImage(named: "share")!.image(color: .systemGray, size: 50)
+        images.canShare = UIImage(named: "share")!.image(color: .systemGray, size: 50)
+        images.shareByLink = UIImage(named: "sharebylink")!.image(color: .systemGray, size: 50)
+        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 50)
+        
+        images.favorite = utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
+        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
+        images.offlineFlag = UIImage(named: "offlineFlag")!
+        images.local = utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen])
+
+        images.checkedYes = UIImage(named: "checkedYes")!
+        images.checkedNo = UIImage(named: "local")!
+
+        images.buttonMore = utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor])
+        images.buttonStop = utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor])
+        images.buttonMoreLock = utility.loadImage(named: "lock.fill", colors: [NCBrandColor.shared.iconImageColor])
+
+        createImagesBrandCache()
     }
 
     func getImageCanShare() -> UIImage {
