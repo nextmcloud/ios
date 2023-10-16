@@ -243,7 +243,7 @@ import UIKit
     }
 
     func getFolderAutomaticUpload(account: String) -> UIImage {
-        UIImage(named: "folderAutomaticUpload")!.image(color: NCBrandColor.shared.getElement(account: account))
+        return UIImage(named: "folderAutomaticUpload")!.image(color: NCBrandColor.shared.getElement(account: account))
     }
 }
 
@@ -402,5 +402,29 @@ private actor MediaWindowCache {
 
     private func imageCacheKey(ocId: String, etag: String, ext: String) -> String {
         "\(ocId)-\(etag)-\(ext)"
+    }
+
+    func createImagesBrandCache() {
+
+        let brandElement = NCBrandColor.shared.brandElement
+        guard brandElement != self.brandElementColor else { return }
+        self.brandElementColor = brandElement
+        let utility = NCUtility()
+
+        images.folderEncrypted = UIImage(named: "folderEncrypted")!
+        images.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
+        images.folderPublic = UIImage(named: "folder_public")!
+        images.folderGroup = UIImage(named: "folder_group")!
+        images.folderExternal = UIImage(named: "folder_external")!
+        images.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!
+        images.folder = UIImage(named: "folder")!
+        images.iconContacts = utility.loadImage(named: "person.crop.rectangle.stack", colors: [NCBrandColor.shared.iconImageColor])
+        images.iconTalk = UIImage(named: "talk-template")!.image(color: brandElement)
+        images.iconCalendar = utility.loadImage(named: "calendar", colors: [NCBrandColor.shared.iconImageColor])
+        images.iconDeck = utility.loadImage(named: "square.stack.fill", colors: [NCBrandColor.shared.iconImageColor])
+        images.iconMail = utility.loadImage(named: "mail", colors: [NCBrandColor.shared.iconImageColor])
+        images.iconConfirm = utility.loadImage(named: "arrow.right", colors: [NCBrandColor.shared.iconImageColor])
+        images.iconPages = utility.loadImage(named: "doc.richtext", colors: [NCBrandColor.shared.iconImageColor])
+        images.iconFile = utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor])
     }
 }
