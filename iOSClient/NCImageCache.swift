@@ -27,8 +27,8 @@ import LRUCache
 import NextcloudKit
 import RealmSwift
 
-final class NCImageCache: @unchecked Sendable {
-    static let shared = NCImageCache()
+@objc class NCImageCache: NSObject {
+    @objc static let shared = NCImageCache()
 
     private let utility = NCUtility()
     private let global = NCGlobal.shared
@@ -179,12 +179,12 @@ final class NCImageCache: @unchecked Sendable {
         return utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor2])
     }
 
-    func getImageShared() -> UIImage {
-        return utility.loadImage(named: "person.fill.badge.plus", colors: NCBrandColor.shared.iconImageMultiColors)
+    func getImageShared(account: String) -> UIImage {
+        return UIImage(named: "share")!.image(color: NCBrandColor.shared.getElement(account: account))
     }
 
     func getImageCanShare() -> UIImage {
-        return utility.loadImage(named: "person.fill.badge.plus", colors: NCBrandColor.shared.iconImageMultiColors)
+        return UIImage(named: "share")!.imageColor(.systemGray)
     }
 
     func getImageShareByLink() -> UIImage {
@@ -212,7 +212,7 @@ final class NCImageCache: @unchecked Sendable {
     }
 
     func getImageButtonMore() -> UIImage {
-        return utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor])
+        return UIImage(named: "more")!.imageColor(.systemGray)
     }
 
     func getImageButtonStop() -> UIImage {
@@ -227,8 +227,20 @@ final class NCImageCache: @unchecked Sendable {
         return UIImage(named: "folder")!.image(color: NCBrandColor.shared.getElement(account: account))
     }
 
+    func getAddFolder() -> UIImage {
+        return UIImage(named: "addFolder")!
+    }
+
+    func getAddFolderInfo() -> UIImage {
+        return UIImage(named: "addFolderInfo")!.imageColor(NCBrandColor.shared.iconImageColor)
+    }
+
     func getFolderEncrypted(account: String) -> UIImage {
         return UIImage(named: "folderEncrypted")!.image(color: NCBrandColor.shared.getElement(account: account))
+    }
+
+    func getEncryptedFolder() -> UIImage {
+        return UIImage(named: "encryptedfolder")!.imageColor(NCBrandColor.shared.iconImageColor)
     }
 
     func getFolderSharedWithMe(account: String) -> UIImage {
