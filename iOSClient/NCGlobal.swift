@@ -164,6 +164,7 @@ final class NCGlobal: Sendable {
     let layoutViewShareExtension                    = "LayoutShareExtension"
     let layoutViewGroupfolders                      = "LayoutGroupfolders"
     let layoutViewMedia                             = "LayoutMedia"
+    let layoutViewMove                              = "LayoutMove"
 
     // Button Type in Cell list/grid
     //
@@ -298,8 +299,14 @@ final class NCGlobal: Sendable {
 
     // Notification Center
     //
-    let notificationCenterChangeUser                            = "changeUser"                      // userInfo: account, controller
-    let notificationCenterChangeTheming                         = "changeTheming"                   // userInfo: account
+    let notificationCenterChangeUser                            = "changeUser"
+    let notificationCenterChangeTheming                         = "changeTheming"
+    @objc let notificationCenterApplicationDidEnterBackground   = "applicationDidEnterBackground"
+    @objc let notificationCenterApplicationDidBecomeActive      = "applicationDidBecomeActive"
+    @objc let notificationCenterApplicationWillResignActive     = "applicationWillResignActive"
+    @objc let notificationCenterApplicationWillEnterForeground  = "applicationWillEnterForeground"
+
+    @objc let notificationCenterInitialize                      = "initialize"
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
