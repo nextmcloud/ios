@@ -8,8 +8,8 @@ import LRUCache
 import NextcloudKit
 import RealmSwift
 
-final class NCImageCache: @unchecked Sendable {
-    static let shared = NCImageCache()
+@objc class NCImageCache: NSObject {
+    @objc static let shared = NCImageCache()
 
     private let utility = NCUtility()
     private let utilityFileSystem = NCUtilityFileSystem()
@@ -274,6 +274,10 @@ final class NCImageCache: @unchecked Sendable {
 //        images.buttonTrash = UIImage(named: "trashIcon")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
 
         createImagesBrandCache()
+    }
+
+    func getImageShared(account: String) -> UIImage {
+        return UIImage(named: "share")!.image(color: NCBrandColor.shared.getElement(account: account))
     }
 
     func getImageCanShare() -> UIImage {

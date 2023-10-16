@@ -42,7 +42,6 @@ final class NCBrandOptions: @unchecked Sendable {
     // Get the app's preferred language (the language the app is using, not the system language)
     var folderDefaultAutoUpload: String = (Locale.preferredLanguages.first?.prefix(2) ?? "en") == "de" ? "Kamera-Medien" : "Camera-Media"
     
-
     // Capabilities Group
 //    var capabilitiesGroup: String = "group.it.twsweb.Crypto-Cloud"
 //    var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
