@@ -188,7 +188,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             self.enableTouchFaceID()
         }
 
-        AppUpdater().checkForUpdate()
         return true
     }
 
@@ -219,6 +218,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
 
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterApplicationDidBecomeActive)
+        AppUpdater().checkForUpdate()
     }
 
     // L' applicazione si dimetterà dallo stato di attivo
@@ -252,7 +252,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Application will enter in foreground")
 
-        AppUpdater().checkForUpdate()
         guard !account.isEmpty else { return }
 
         enableTouchFaceID()
