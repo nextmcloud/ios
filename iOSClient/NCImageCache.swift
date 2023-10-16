@@ -5,8 +5,8 @@
 import Foundation
 import UIKit
 
-final class NCImageCache: @unchecked Sendable {
-    static let shared = NCImageCache()
+@objc class NCImageCache: NSObject {
+    @objc static let shared = NCImageCache()
 
     private let utility = NCUtility()
     private let cache = NSCache<NSString, UIImage>()
