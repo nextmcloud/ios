@@ -247,37 +247,30 @@ import RealmSwift
         static var iconPages = UIImage()
         static var iconFile = UIImage()
     }
-    
+
     func createImagesCache() {
         let utility = NCUtility()
 
-//        images.file = UIImage(named: "file")!
-//
-//        images.shared = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.canShare = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.shareByLink = UIImage(named: "sharebylink")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)//50)
-//
-////        images.favorite = utility.loadImage(named: "star", colors: [NCBrandColor.shared.yellowFavorite]) //utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
-//        images.comment = UIImage(named: "comment")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
-//        images.offlineFlag = utility.loadImage(named: "arrow.down.circle.fill", colors: [.systemGreen], size: 24)
-//        images.local = utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen], size: 24)
-//
-//        images.checkedYes = UIImage(named: "checkedYes")!
-//        images.checkedNo = utility.loadImage(named: "circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
-//
-//        images.buttonMore = UIImage(named: "more")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.buttonStop = utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
-//        images.buttonMoreLock = utility.loadImage(named: "lock.fill", colors: [NCBrandColor.shared.iconImageColor], size: 24)
-//        images.buttonRestore = UIImage(named: "restore")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.buttonTrash = UIImage(named: "trashIcon")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.file = utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor2])
+
+        images.shared = UIImage(named: "share")!.image(color: .systemGray, size: 50)
+        images.canShare = UIImage(named: "share")!.image(color: .systemGray, size: 50)
+        images.shareByLink = UIImage(named: "sharebylink")!.image(color: .systemGray, size: 50)
+        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 50)
+        
+        images.favorite = utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
+        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
+        images.offlineFlag = UIImage(named: "offlineFlag")!
+        images.local = utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen])
+
+        images.checkedYes = UIImage(named: "checkedYes")!
+        images.checkedNo = UIImage(named: "local")!
+
+        images.buttonMore = utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor])
+        images.buttonStop = utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor])
+        images.buttonMoreLock = utility.loadImage(named: "lock.fill", colors: [NCBrandColor.shared.iconImageColor])
 
         createImagesBrandCache()
-    }
-
-    func getImageShared(account: String) -> UIImage {
-        return UIImage(named: "share")!.image(color: NCBrandColor.shared.getElement(account: account))
     }
 
     func getImageCanShare() -> UIImage {
