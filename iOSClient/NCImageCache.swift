@@ -239,7 +239,12 @@ import RealmSwift
     }
 
     func createImagesBrandCache() {
-        
+
+        let brandElement = NCBrandColor.shared.brandElement
+        guard brandElement != self.brandElementColor else { return }
+        self.brandElementColor = brandElement
+        let utility = NCUtility()
+
         images.folderEncrypted = UIImage(named: "folderEncrypted")!
         images.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
         images.folderPublic = UIImage(named: "folder_public")!
