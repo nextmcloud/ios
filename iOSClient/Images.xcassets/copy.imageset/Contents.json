@@ -1,11 +1,7 @@
 {
   "images" : [
     {
-<<<<<<<< HEAD:iOSClient/Images.xcassets/copy.imageset/Contents.json
-      "filename" : "copy.pdf",
-========
-      "filename" : "default@500w.pdf",
->>>>>>>> 3017e8cdb7 (NMC 2611 - Branding changes):iOSClient/Images.xcassets/trash.imageset/Contents.json
+      "filename" : "diagram.svg",
       "idiom" : "universal"
     }
   ],
