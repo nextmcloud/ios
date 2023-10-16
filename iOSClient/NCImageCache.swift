@@ -364,6 +364,8 @@ import RealmSwift
         self.brandElementColor = brandElement
         
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
+        let utility = NCUtility()
+
         images.folderEncrypted = UIImage(named: "folderEncrypted")!
         images.folderSharedWithMe = UIImage(named: "folder-share")!
         images.folderPublic = UIImage(named: "folder-share")!
