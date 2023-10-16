@@ -1,11 +1,7 @@
 {
   "images" : [
     {
-<<<<<<<< HEAD:iOSClient/Images.xcassets/notification.imageset/Contents.json
       "filename" : "bell.pdf",
-========
-      "filename" : "default@500w.pdf",
->>>>>>>> 7106aeb109 (NMC 2611 - Branding changes):iOSClient/Images.xcassets/trash.imageset/Contents.json
       "idiom" : "universal"
     }
   ],
