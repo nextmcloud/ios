@@ -180,6 +180,7 @@ class NCGlobal: NSObject {
     let layoutViewShareExtension                    = "LayoutShareExtension"
     let layoutViewGroupfolders                      = "LayoutGroupfolders"
     let layoutViewMedia                             = "LayoutMedia"
+    let layoutViewMove                              = "LayoutMove"
 
     // Button Type in Cell list/grid
     //
@@ -323,6 +324,12 @@ class NCGlobal: NSObject {
     //
     let notificationCenterChangeUser                            = "changeUser"
     let notificationCenterChangeTheming                         = "changeTheming"
+    @objc let notificationCenterApplicationDidEnterBackground   = "applicationDidEnterBackground"
+    @objc let notificationCenterApplicationDidBecomeActive      = "applicationDidBecomeActive"
+    @objc let notificationCenterApplicationWillResignActive     = "applicationWillResignActive"
+    @objc let notificationCenterApplicationWillEnterForeground  = "applicationWillEnterForeground"
+
+    @objc let notificationCenterInitialize                      = "initialize"
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
