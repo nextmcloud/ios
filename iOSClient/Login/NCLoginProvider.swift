@@ -5,7 +5,7 @@
 
 import AuthenticationServices
 import UIKit
-@preconcurrency import WebKit
+import WebKit
 import NextcloudKit
 
 protocol NCLoginProviderDelegate: AnyObject {
@@ -19,6 +19,12 @@ protocol NCLoginProviderDelegate: AnyObject {
 /// Handles login authentication using ASWebAuthenticationSession with WKWebView fallback for mTLS.
 ///
 class NCLoginProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
+    
+    var webView: WKWebView?
+    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+    let utility = NCUtility()
+    var titleView: String = ""
+
     var initialURLString = ""
     weak var delegate: NCLoginProviderDelegate?
     var controller: NCMainTabBarController?
@@ -94,6 +100,26 @@ class NCLoginProvider: NSObject, ASWebAuthenticationPresentationContextProviding
             // Fall back to WKWebView if ASWebAuthenticationSession fails to start
             fallbackToWebView(url: url)
         }
+//        if #available(iOS 13, *) {
+//            let keyWindow = UIApplication.shared.connectedScenes
+//                .filter({$0.activationState == .foregroundActive})
+//                .map({$0 as? UIWindowScene})
+//                .compactMap({$0})
+//                .first?.windows
+//                .filter({$0.isKeyWindow}).first
+//            let statusBar = UIView(frame: (keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
+//            statusBar.backgroundColor = NCBrandColor.shared.customer
+//            keyWindow?.addSubview(statusBar)
+//        } else {
+//            if let statusBar = UIApplication.shared.value(forKey: "statusBar") as? UIView {
+//                statusBar.backgroundColor = NCBrandColor.shared.customer
+//            }
+//        }
+//        loadWebPage(url: url)
+//        self.title = titleView
+//        self.navigationController?.navigationBar.backgroundColor = NCBrandColor.shared.customer
+//    
+//        appDelegate.timerErrorNetworkingDisabled = true
     }
 
     ///
@@ -398,4 +424,58 @@ class NCLoginProviderWebViewFallback: UIViewController, WKNavigationDelegate {
         nkLog(debug: "Web view did finish navigation to \(webView.url?.absoluteString ?? "nil")")
         NCActivityIndicator.shared.stop()
     }
+
+    // MARK: -
+
+//    func createAccount(server: String, username: String, password: String) {
+//        var urlBase = server
+//        if urlBase.last == "/" { urlBase = String(urlBase.dropLast()) }
+//        let account: String = "\(username) \(urlBase)"
+//        let user = username
+//
+//        NextcloudKit.shared.setup(account: account, user: user, userId: user, password: password, urlBase: urlBase)
+//        NextcloudKit.shared.getUserProfile(account: account) { _, userProfile, _, error in
+//            if error == .success, let userProfile {
+//                NextcloudKit.shared.appendSession(account: account,
+//                                                  urlBase: urlBase,
+//                                                  user: user,
+//                                                  userId: user,
+//                                                  password: password,
+//                                                  userAgent: userAgent,
+//                                                  nextcloudVersion: NCCapabilities.shared.getCapabilities(account: account).capabilityServerVersionMajor,
+//                                                  httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
+//                                                  httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
+//                                                  httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
+//                                                  groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
+//                NCSession.shared.appendSession(account: account, urlBase: urlBase, user: user, userId: userProfile.userId)
+//                NCManageDatabase.shared.deleteAccount(account)
+//                NCManageDatabase.shared.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
+//                self.appDelegate.changeAccount(account, userProfile: userProfile) { }
+//                let window = UIApplication.shared.firstWindow
+//                if window?.rootViewController is NCMainTabBarController {
+//                    self.dismiss(animated: true)
+//                } else {
+//                    if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as? NCMainTabBarController {
+//                        controller.modalPresentationStyle = .fullScreen
+//                        controller.view.alpha = 0
+//
+//                        window?.rootViewController = controller
+//                        window?.makeKeyAndVisible()
+//
+//                        if let scene = window?.windowScene {
+//                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
+//                        }
+//
+//                        UIView.animate(withDuration: 0.5) {
+//                            controller.view.alpha = 1
+//                        }
+//                    }
+//                }
+//            } else {
+//                let alertController = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: error.errorDescription, preferredStyle: .alert)
+//                alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
+//                self.present(alertController, animated: true)
+//            }
+//        }
+//    }
 }
