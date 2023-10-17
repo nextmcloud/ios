@@ -22,12 +22,13 @@
 //
 
 import UIKit
-@preconcurrency import WebKit
+import WebKit
 import NextcloudKit
 import FloatingPanel
 
 class NCLoginProvider: UIViewController {
     var webView: WKWebView?
+    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     let utility = NCUtility()
     var titleView: String = ""
     var urlBase = ""
@@ -55,19 +56,34 @@ class NCLoginProvider: UIViewController {
             NCContentPresenter().showError(error: error, priority: .max)
         }
 
-        if let host = URL(string: urlBase)?.host {
-            titleView = host
-            if let activeTableAccount = NCManageDatabase.shared.getActiveTableAccount(), NCKeychain().getPassword(account: activeTableAccount.account).isEmpty {
-                titleView = NSLocalizedString("_user_", comment: "") + " " + activeTableAccount.userId + " " + NSLocalizedString("_in_", comment: "") + " " + host
+        if #available(iOS 13, *) {
+            let keyWindow = UIApplication.shared.connectedScenes
+                .filter({$0.activationState == .foregroundActive})
+                .map({$0 as? UIWindowScene})
+                .compactMap({$0})
+                .first?.windows
+                .filter({$0.isKeyWindow}).first
+            let statusBar = UIView(frame: (keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
+            statusBar.backgroundColor = NCBrandColor.shared.customer
+            keyWindow?.addSubview(statusBar)
+        } else {
+            if let statusBar = UIApplication.shared.value(forKey: "statusBar") as? UIView {
+                statusBar.backgroundColor = NCBrandColor.shared.customer
             }
         }
+        self.navigationController?.navigationBar.backgroundColor = NCBrandColor.shared.customer
+    }
 
-        self.title = titleView
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // Stop timer error network
+        appDelegate.timerErrorNetworkingDisabled = true
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         NCActivityIndicator.shared.stop()
+        appDelegate.timerErrorNetworkingDisabled = false
     }
 
     func loadWebPage(webView: WKWebView, url: URL) {
@@ -158,27 +174,17 @@ extension NCLoginProvider: WKNavigationDelegate {
         let account: String = "\(username) \(urlBase)"
         let user = username
 
-        NextcloudKit.shared.getUserProfile(account: account) { account, userProfile, _, error in
+        NextcloudKit.shared.setup(account: account, user: user, userId: user, password: password, urlBase: urlBase)
+        NextcloudKit.shared.getUserProfile(account: account) { _, userProfile, _, error in
             if error == .success, let userProfile {
-                NextcloudKit.shared.appendSession(account: account,
-                                                  urlBase: urlBase,
-                                                  user: user,
-                                                  userId: user,
-                                                  password: password,
-                                                  userAgent: userAgent,
-                                                  nextcloudVersion: NCCapabilities.shared.getCapabilities(account: account).capabilityServerVersionMajor,
-                                                  groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
-                NCSession.shared.appendSession(account: account, urlBase: urlBase, user: user, userId: userProfile.userId)
+                NCManageDatabase.shared.deleteAccount(account)
                 NCManageDatabase.shared.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
-                NCAccount().changeAccount(account, userProfile: userProfile, controller: nil) { }
-
+                self.appDelegate.changeAccount(account, userProfile: userProfile) { }
                 let window = UIApplication.shared.firstWindow
-                if let controller = window?.rootViewController as? NCMainTabBarController {
-                    controller.account = account
+                if window?.rootViewController is NCMainTabBarController {
                     self.dismiss(animated: true)
                 } else {
                     if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as? NCMainTabBarController {
-                        controller.account = account
                         controller.modalPresentationStyle = .fullScreen
                         controller.view.alpha = 0
                         window?.rootViewController = controller
