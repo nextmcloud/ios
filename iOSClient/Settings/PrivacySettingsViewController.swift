@@ -35,9 +35,7 @@ class PrivacySettingsViewController: XLFormViewController{
         tableView.reloadData()
         initializeForm()
     }
-
     
-
     //MARK: XLForm
 
     func initializeForm() {
@@ -58,7 +56,6 @@ class PrivacySettingsViewController: XLFormViewController{
         section.footerTitle = NSLocalizedString("_privacy_settings_help_text_", comment: "")
         form.addFormSection(section)
         
-        
         //custom cell
         section = XLFormSectionDescriptor.formSection(withTitle: "")
         section.footerTitle = NSLocalizedString("_required_data_collection_help_text_", comment: "")
@@ -66,7 +63,6 @@ class PrivacySettingsViewController: XLFormViewController{
 
         
         XLFormViewController.cellClassesForRowDescriptorTypes()["RequiredDataCollectionCustomCellType"] = RequiredDataCollectionSwitch.self
-        
         
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "RequiredDataCollectionCustomCellType", title: "")
         row.cellConfig["requiredDataCollectionSwitchControl.onTintColor"] = NCBrandColor.shared.brand
@@ -82,7 +78,6 @@ class PrivacySettingsViewController: XLFormViewController{
         
         XLFormViewController.cellClassesForRowDescriptorTypes()["AnalysisDataCollectionCustomCellType"] = AnalysisDataCollectionSwitch.self
         
-        
         row = XLFormRowDescriptor(tag: "AnalysisDataCollectionSwitch", rowType: "AnalysisDataCollectionCustomCellType", title: "")
         row.cellConfig["analysisDataCollectionSwitchControl.onTintColor"] = NCBrandColor.shared.brand
         row.cellConfig["cellLabel.textAlignment"] = NSTextAlignment.left.rawValue
@@ -97,12 +92,10 @@ class PrivacySettingsViewController: XLFormViewController{
         
         section.addFormRow(row)
         
-        
         XLFormViewController.cellClassesForRowDescriptorTypes()["SaveSettingsButton"] = SaveSettingsCustomButtonCell.self
         
         section = XLFormSectionDescriptor.formSection(withTitle: "")
         form.addFormSection(section)
-        
         
         row = XLFormRowDescriptor(tag: "SaveSettingsButton", rowType: "SaveSettingsButton", title: "")
         row.cellConfig["backgroundColor"] = UIColor.clear
@@ -111,10 +104,8 @@ class PrivacySettingsViewController: XLFormViewController{
             section.addFormRow(row)
         }
         
-
         self.form = form
     }
-    
     
     override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
         super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)
