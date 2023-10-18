@@ -488,6 +488,19 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         newViewController.modalPresentationStyle = .fullScreen
         self.present(newViewController, animated: true, completion: nil)
     }
+    
+    func isApplicationUpdated() -> Bool{
+        let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String ?? ""
+        let currentVersion = UserDefaults.standard.string(forKey: "CurrentAppVersion")
+        return currentVersion != appVersion
+    }
+
+    func redirectToPrivacyViewController(){
+        let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
+        newViewController.modalPresentationStyle = .fullScreen
+        self.present(newViewController, animated: true, completion: nil)
+    }
 
     func presentationControllerDidDismiss( _ presentationController: UIPresentationController) {
         let viewController = presentationController.presentedViewController
