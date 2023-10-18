@@ -23,6 +23,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
     @IBOutlet weak var progressView: UIProgressView!
 
     internal var objectId = ""
+    var indexPath = IndexPath()
     private var user = ""
 
     weak var delegate: NCGridCellDelegate?
@@ -108,7 +109,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
     }
 
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        delegate?.tapMoreGridItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
+        delegate?.tapMoreGridItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, indexPath: indexPath, sender: sender)
     }
 
 
