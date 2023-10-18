@@ -9,7 +9,6 @@
 import UIKit
 import XLForm
 
-
 class SaveSettingsCustomButtonCell: XLFormButtonCell {
                 
     @IBOutlet weak var saveSettingsButton: UIButton!
