@@ -13,7 +13,7 @@ import XLForm
 
 class PrivacySettingsViewController: XLFormViewController{
     
-   @objc public var isShowSettingsButton: Bool = false
+    @objc public var isShowSettingsButton: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,9 +37,7 @@ class PrivacySettingsViewController: XLFormViewController{
     }
 
     //MARK: XLForm
-
     func initializeForm() {
-        
         let form : XLFormDescriptor = XLFormDescriptor() as XLFormDescriptor
         form.rowNavigationOptions = XLFormRowNavigationOptions.stopDisableRow
         
