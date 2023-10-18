@@ -86,6 +86,7 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        5633225D2ADEB30D0005A2B9 /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5633225C2ADEB30D0005A2B9 /* AppUtility.swift */; };
         5628EB302AD3FF6A00CAA639 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5628EB2F2AD3FF6A00CAA639 /* AppUpdater.swift */; };
         563016C82AD81F59004EAA29 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 563016C72AD81F59004EAA29 /* FirebaseRemoteConfig */; };
         5663AD3E2AAF0FD900185808 /* MagentaCloudVersionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5663AD392AAF0FD800185808 /* MagentaCloudVersionView.swift */; };
@@ -1016,6 +1017,7 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        5633225C2ADEB30D0005A2B9 /* AppUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUtility.swift; sourceTree = "<group>"; };
         5628EB2F2AD3FF6A00CAA639 /* AppUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdater.swift; sourceTree = "<group>"; };
         5663AD392AAF0FD800185808 /* MagentaCloudVersionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MagentaCloudVersionView.swift; sourceTree = "<group>"; };
         5663AD3A2AAF0FD800185808 /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
@@ -2895,6 +2897,7 @@
 				F7EFC0CB256BF89300461AAD /* UserStatus */,
 				F7BFFA991A24D7BB0044ED85 /* Utility */,
 				F79630EC215526B60015EEA5 /* Viewer */,
+                5633225C2ADEB30D0005A2B9 /* AppUtility.swift */,
 			);
 			path = iOSClient;
 			sourceTree = "<group>";
@@ -4205,6 +4208,7 @@
 				AFCE353727E4ED7B00FEA6C2 /* NCShareCells.swift in Sources */,
 				AF36077127BFA4E8001A243D /* ParallelWorker.swift in Sources */,
 				F75A9EE623796C6F0044CFCE /* NCNetworking.swift in Sources */,
+                5633225D2ADEB30D0005A2B9 /* AppUtility.swift in Sources */,
                 562817E82A14D31700AA7669 /* TextFileWithOcrSwitchView.swift in Sources */,
 				F758B460212C56A400515F55 /* NCScan.swift in Sources */,
 				F78ACD52219046DC0088454D /* NCSectionHeaderMenu.swift in Sources */,
