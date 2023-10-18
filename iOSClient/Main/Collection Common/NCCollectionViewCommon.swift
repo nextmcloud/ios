@@ -226,6 +226,14 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
         let dropInteraction = UIDropInteraction(delegate: self)
         self.navigationController?.navigationItem.leftBarButtonItems?.first?.customView?.addInteraction(dropInteraction)
+        
+        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed") || isApplicationUpdated()){
+            redirectToPrivacyViewController()
+            
+            //set current app version
+            let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String
+            UserDefaults.standard.set(appVersion, forKey: "CurrentAppVersion")
+        }
 
         registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: NCCollectionViewCommon, _) in
             guard let self else { return }
@@ -314,6 +322,19 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterCloseRichWorkspaceWebView), object: nil)
 
         removeImageCache(metadatas: self.dataSource.getMetadatas())
+    }
+    
+    func isApplicationUpdated() -> Bool{
+        let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String ?? ""
+        let currentVersion = UserDefaults.standard.string(forKey: "CurrentAppVersion")
+        return currentVersion != appVersion
+    }
+
+    func redirectToPrivacyViewController(){
+        let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
+        newViewController.modalPresentationStyle = .fullScreen
+        self.present(newViewController, animated: true, completion: nil)
     }
 
     func presentationControllerDidDismiss( _ presentationController: UIPresentationController) {
