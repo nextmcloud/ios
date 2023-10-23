@@ -47,6 +47,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 50.0
         tableView.backgroundColor = .systemBackground
+        tableView.allowsSelection = false
 
         refreshControl?.addTarget(self, action: #selector(getNetwokingNotification), for: .valueChanged)
 
@@ -67,10 +68,22 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         super.viewDidAppear(animated)
         appDelegate.activeViewController = self
         getNetwokingNotification()
+        NotificationCenter.default.addObserver(self, selector: #selector(initialize), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
     }
 
     @objc func viewClose() {
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    // MARK: - NotificationCenter
+    @objc func initialize() {
+        getNetwokingNotification()
     }
 
     // MARK: - Table
@@ -81,19 +94,12 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
-        guard let notification = NCApplicationHandle().didSelectNotification(notifications[indexPath.row], viewController: self) else { return }
+        let notification = notifications[indexPath.row]
 
-        do {
-            if let subjectRichParameters = notification.subjectRichParameters,
-               let json = try JSONSerialization.jsonObject(with: subjectRichParameters, options: .mutableContainers) as? [String: Any],
-               let file = json["file"] as? [String: Any],
-               file["type"] as? String == "file" {
-                if let id = file["id"] {
-                    NCActionCenter.shared.viewerFile(account: appDelegate.account, fileId: ("\(id)"), viewController: self)
-                }
-            }
-        } catch {
-            print("Something went wrong")
+        if notification.app == "files_sharing" {
+            NCActionCenter.shared.viewerFile(account: appDelegate.account, fileId: notification.objectId, viewController: self)
+        } else {
+            NCApplicationHandle().didSelectNotification(notification, viewController: self)
         }
     }
 
@@ -114,30 +120,14 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         }
 
         if let image = image {
-            cell.icon.image = image.withTintColor(NCBrandColor.shared.brandElement, renderingMode: .alwaysOriginal)
+            cell.icon.image = image.withTintColor(NCBrandColor.shared.iconColor, renderingMode: .alwaysOriginal)
         } else {
-            cell.icon.image = utility.loadImage(named: "bell", color: NCBrandColor.shared.brandElement)
+            cell.icon.image = utility.loadImage(named: "bell", color: NCBrandColor.shared.iconColor)
         }
 
         // Avatar
         cell.avatar.isHidden = true
         cell.avatarLeadingMargin.constant = 10
-        if let subjectRichParameters = notification.subjectRichParameters,
-           let json = JSON(subjectRichParameters).dictionary,
-           let user = json["user"]?["id"].stringValue {
-            cell.avatar.isHidden = false
-            cell.avatarLeadingMargin.constant = 50
-
-            let fileName = appDelegate.userBaseUrl + "-" + user + ".png"
-            let fileNameLocalPath = utilityFileSystem.directoryUserData + "/" + fileName
-
-            if let image = UIImage(contentsOfFile: fileNameLocalPath) {
-                cell.avatar.image = image
-            } else if !FileManager.default.fileExists(atPath: fileNameLocalPath) {
-                cell.fileUser = user
-                NCNetworking.shared.downloadAvatar(user: user, dispalyName: json["user"]?["name"].string, fileName: fileName, cell: cell, view: tableView, cellImageView: cell.fileAvatarImageView)
-            }
-        }
 
         cell.date.text = DateFormatter.localizedString(from: notification.date as Date, dateStyle: .medium, timeStyle: .medium)
         cell.notification = notification
@@ -153,28 +143,20 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         cell.primary.isEnabled = false
         cell.primary.isHidden = true
         cell.primary.titleLabel?.font = .systemFont(ofSize: 15)
-        cell.primary.layer.cornerRadius = 15
+        cell.primary.setTitleColor(.white, for: .normal)
+        cell.primary.layer.cornerRadius = 10
         cell.primary.layer.masksToBounds = true
-        cell.primary.layer.backgroundColor = NCBrandColor.shared.brandElement.cgColor
-        cell.primary.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
-
-        cell.more.isEnabled = false
-        cell.more.isHidden = true
-        cell.more.titleLabel?.font = .systemFont(ofSize: 15)
-        cell.more.layer.cornerRadius = 15
-        cell.more.layer.masksToBounds = true
-        cell.more.layer.backgroundColor = NCBrandColor.shared.brandElement.cgColor
-        cell.more.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
+        cell.primary.layer.backgroundColor = NCBrandColor.shared.notificationAction.cgColor
 
         cell.secondary.isEnabled = false
         cell.secondary.isHidden = true
         cell.secondary.titleLabel?.font = .systemFont(ofSize: 15)
-        cell.secondary.layer.cornerRadius = 15
+        cell.secondary.layer.cornerRadius = 10
         cell.secondary.layer.masksToBounds = true
         cell.secondary.layer.borderWidth = 1
-        cell.secondary.layer.borderColor = UIColor.systemGray.cgColor
-        cell.secondary.layer.backgroundColor = UIColor.secondarySystemBackground.cgColor
-        cell.secondary.setTitleColor(.gray, for: .normal)
+        cell.secondary.layer.borderColor =  NCBrandColor.shared.notificationAction.cgColor
+        cell.secondary.layer.backgroundColor =  UIColor.clear.cgColor
+        cell.secondary.setTitleColor(NCBrandColor.shared.notificationAction, for: .normal)
 
         // Action
         if let actions = notification.actions,
@@ -205,11 +187,17 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
                         cell.secondary.setTitle(label, for: .normal)
                     }
                 }
-            } else if jsonActions.count >= 3 {
+            }
+    
+            let widthPrimary = cell.primary.intrinsicContentSize.width + 48;
+            let widthSecondary = cell.secondary.intrinsicContentSize.width + 48;
 
-                cell.more.isEnabled = true
-                cell.more.isHidden = false
-                cell.more.setTitle("…", for: .normal)
+            if widthPrimary > widthSecondary {
+                cell.primaryWidth.constant = widthPrimary
+                cell.secondaryWidth.constant = widthPrimary
+            } else {
+                cell.primaryWidth.constant = widthSecondary
+                cell.secondaryWidth.constant = widthSecondary
             }
 
             var buttonWidth = max(cell.primary.intrinsicContentSize.width, cell.secondary.intrinsicContentSize.width)
@@ -319,7 +307,6 @@ class NCNotificationCell: UITableViewCell, NCCellProtocol {
     @IBOutlet weak var remove: UIButton!
     @IBOutlet weak var primary: UIButton!
     @IBOutlet weak var secondary: UIButton!
-    @IBOutlet weak var more: UIButton!
     @IBOutlet weak var avatarLeadingMargin: NSLayoutConstraint!
     @IBOutlet weak var primaryWidth: NSLayoutConstraint!
     @IBOutlet weak var secondaryWidth: NSLayoutConstraint!
@@ -367,10 +354,6 @@ class NCNotificationCell: UITableViewCell, NCCellProtocol {
         delegate?.tapAction(with: notification, label: label)
     }
 
-    @IBAction func touchUpInsideMore(_ sender: Any) {
-        guard let notification = notification else { return }
-        delegate?.tapMore(with: notification)
-    }
 }
 
 protocol NCNotificationCellDelegate: AnyObject {
