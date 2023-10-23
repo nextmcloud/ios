@@ -56,6 +56,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 50.0
         tableView.backgroundColor = .systemBackground
+        tableView.allowsSelection = false
 
         refreshControl?.action(for: .valueChanged) { _ in
             Task {
@@ -88,6 +89,11 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
 
     @objc func viewClose() {
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    // MARK: - NotificationCenter
+    @objc func initialize() {
+        getNetwokingNotification()
     }
 
     // MARK: - Table
@@ -133,6 +139,8 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
 
         if let image = image {
             cell.icon.image = image.withTintColor(NCBrandColor.shared.getElement(account: session.account), renderingMode: .alwaysOriginal)
+        } else {
+            cell.icon.image = utility.loadImage(named: "bell", color: NCBrandColor.shared.iconColor)
         }
 
         // Avatar
@@ -173,23 +181,15 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         cell.primary.isEnabled = false
         cell.primary.isHidden = true
         cell.primary.titleLabel?.font = .systemFont(ofSize: 15)
-        cell.primary.layer.cornerRadius = 15
-        cell.primary.layer.masksToBounds = true
-        cell.primary.layer.backgroundColor = NCBrandColor.shared.getElement(account: session.account).cgColor
         cell.primary.setTitleColor(.white, for: .normal)
-
-        cell.more.isEnabled = false
-        cell.more.isHidden = true
-        cell.more.titleLabel?.font = .systemFont(ofSize: 15)
-        cell.more.layer.cornerRadius = 15
-        cell.more.layer.masksToBounds = true
-        cell.more.layer.backgroundColor = NCBrandColor.shared.getElement(account: session.account).cgColor
-        cell.more.setTitleColor(.white, for: .normal)
+        cell.primary.layer.cornerRadius = 10
+        cell.primary.layer.masksToBounds = true
+        cell.primary.layer.backgroundColor = NCBrandColor.shared.notificationAction.cgColor
 
         cell.secondary.isEnabled = false
         cell.secondary.isHidden = true
         cell.secondary.titleLabel?.font = .systemFont(ofSize: 15)
-        cell.secondary.layer.cornerRadius = 15
+        cell.secondary.layer.cornerRadius = 10
         cell.secondary.layer.masksToBounds = true
         cell.secondary.layer.borderWidth = 1
         cell.secondary.layer.borderColor = NCBrandColor.shared.iconImageColor2.cgColor
@@ -225,7 +225,10 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
                         cell.secondary.setTitle(label, for: .normal)
                     }
                 }
-            } else if jsonActions.count >= 3 {
+            }
+    
+            let widthPrimary = cell.primary.intrinsicContentSize.width + 48;
+            let widthSecondary = cell.secondary.intrinsicContentSize.width + 48;
 
                 cell.more.isEnabled = true
                 cell.more.isHidden = false
@@ -369,7 +372,6 @@ class NCNotificationCell: UITableViewCell {
     @IBOutlet weak var remove: UIButton!
     @IBOutlet weak var primary: UIButton!
     @IBOutlet weak var secondary: UIButton!
-    @IBOutlet weak var more: UIButton!
     @IBOutlet weak var avatarLeadingMargin: NSLayoutConstraint!
     @IBOutlet weak var primaryWidth: NSLayoutConstraint!
     @IBOutlet weak var secondaryWidth: NSLayoutConstraint!
