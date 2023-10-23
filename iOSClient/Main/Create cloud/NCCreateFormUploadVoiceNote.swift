@@ -53,6 +53,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancel))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_save_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(save))
+        self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
+        self.navigationItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.brand
 
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
 
@@ -63,12 +65,15 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         self.title = NSLocalizedString("_voice_memo_title_", comment: "")
 
         // Button Play Stop
-        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: UIColor.systemGray, size: 100), for: .normal)
+        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
 
         // Progress view
         progressView.progress = 0
-        progressView.progressTintColor = .green
-        progressView.trackTintColor = UIColor(red: 247.0 / 255.0, green: 247.0 / 255.0, blue: 247.0 / 255.0, alpha: 1.0)
+        progressView.progressTintColor = NCBrandColor.shared.customer
+        progressView.trackTintColor = .white
+        progressView.layer.borderWidth = 1
+        progressView.layer.cornerRadius = 5.0
+        progressView.layer.borderColor = NCBrandColor.shared.customer.cgColor
 
         labelTimer.textColor = .label
         labelDuration.textColor = .label
@@ -126,36 +131,40 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         // Section: Destination Folder
 
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
+        section.footerTitle = ""
         form.addFormSection(section)
 
-        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: self.titleServerUrl)
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
+
+        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
+        row.cellConfig["backgroundColor"] = UIColor.secondarySystemGroupedBackground
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["backgroundColor"] = cellBackgoundColor
-
-        row.cellConfig["imageView.image"] = UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
-
-        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = UIColor.label
-
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder_nmcloud")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
+        row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
+        if(self.titleServerUrl == "/"){
+            row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
+        }else{
+            row.cellConfig["photoLabel.text"] = self.titleServerUrl
+        }
+        row.cellConfig["textLabel.text"] = ""
         section.addFormRow(row)
 
         // Section: File Name
 
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = TextTableViewCell.self
+        
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
         form.addFormSection(section)
 
-        row = XLFormRowDescriptor(tag: "fileName", rowType: XLFormRowDescriptorTypeText, title: NSLocalizedString("_filename_", comment: ""))
-        row.value = self.fileName
-        row.cellConfig["backgroundColor"] = cellBackgoundColor
-
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = UIColor.label
-
-        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textField.textColor"] = UIColor.label
-
+        row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = TextTableViewCell.self
+        row.cellConfigAtConfigure["backgroundColor"] = UIColor.secondarySystemGroupedBackground;
+        row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["fileNameTextField.textColor"] = UIColor.label
+        row.cellConfig["fileNameTextField.text"] = self.fileName
         section.addFormRow(row)
 
         self.form = form
@@ -173,8 +182,6 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
                 self.fileName = utility.removeForbiddenCharacters(fileNameNew)
             }
 
-            formRow.value = self.fileName
-            self.updateFormRow(formRow)
 
             self.form.delegate = self
         }
@@ -205,7 +212,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
             // Update
             let row: XLFormRowDescriptor = self.form.formRow(withTag: "ButtonDestinationFolder")!
-            row.title = self.titleServerUrl
+            row.cellConfig["photoLabel.text"] = self.titleServerUrl
             self.updateFormRow(row)
         }
     }
@@ -213,7 +220,12 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     @objc func save() {
 
         let rowFileName: XLFormRowDescriptor = self.form.formRow(withTag: "fileName")!
-        guard let name = rowFileName.value as? String else { return }
+        guard let name = (rowFileName.value as? String)?.trimmingCharacters(in: .whitespaces) else {
+            let alert = UIAlertController(title: "", message: NSLocalizedString("_prompt_insert_file_name", comment: ""), preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+            return
+        }
         let ext = (name as NSString).pathExtension.uppercased()
         var fileNameSave = ""
 
@@ -249,7 +261,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
     func dismissCreateFormUploadConflict(metadatas: [tableMetadata]?) {
 
-        if let metadatas {
+        if let metadatas, metadatas.count > 0 {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 self.dismissAndUpload(metadatas[0])
             }
