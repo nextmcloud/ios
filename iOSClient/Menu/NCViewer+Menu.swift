@@ -194,6 +194,11 @@ extension NCViewer {
                 )
             )
         }
+        // COPY IN PASTEBOARD
+        //
+        if !webView, metadata.isCopyableInPasteboard {
+            actions.append(.copyAction(selectOcId: [metadata.ocId]))
+        }
 
         //
         // PDF
