@@ -32,6 +32,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var labelQuotaExternalSite: UILabel!
     @IBOutlet weak var progressQuota: UIProgressView!
     @IBOutlet weak var viewQuota: UIView!
+    @IBOutlet weak var quotaLabel1: UILabel!
+    @IBOutlet weak var quotalabel2: UILabel!
 
     private var functionMenu: [NKExternalSite] = []
     private var externalSiteMenu: [NKExternalSite] = []
@@ -82,10 +84,21 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         appDelegate.activeViewController = self
         navigationController?.setGroupAppearance()
         loadItems()
+        changeTheming()
         tableView.reloadData()
     }
 
     // MARK: -
+    
+    @objc func changeTheming() {
+        viewQuota.backgroundColor = NCBrandColor.shared.memoryConsuptionBackground
+        quotaLabel1.textColor = NCBrandColor.shared.label
+        quotalabel2.textColor = NCBrandColor.shared.label
+        labelQuota.textColor = NCBrandColor.shared.label
+        labelQuotaExternalSite.textColor = NCBrandColor.shared.label
+        progressQuota.progressTintColor = NCBrandColor.shared.brandElement
+        progressQuota.trackTintColor = NCBrandColor.shared.commonViewInfoText
+    }
 
     func loadItems() {
 
@@ -107,14 +120,22 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         item.icon = "arrow.left.arrow.right"
         item.url = "segueTransfers"
         item.order = 10
-        functionMenu.append(item)
+//        functionMenu.append(item)
 
         // ITEM : Recent
         item = NKExternalSite()
         item.name = "_recent_"
-        item.icon = "clock.arrow.circlepath"
+        item.icon = "recent"
         item.url = "segueRecent"
         item.order = 20
+        functionMenu.append(item)
+        
+        // ITEM : Notification
+        item = NKExternalSite()
+        item.name = "_notifications_"
+        item.icon = "notification"
+        item.url = "segueNotification"
+        item.order = 30
         functionMenu.append(item)
 
         // ITEM : Activity
@@ -123,13 +144,13 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         item.icon = "bolt"
         item.url = "segueActivity"
         item.order = 40
-        functionMenu.append(item)
+//        functionMenu.append(item)
 
         // ITEM : Shares
         if NCGlobal.shared.capabilityFileSharingApiEnabled {
             item = NKExternalSite()
             item.name = "_list_shares_"
-            item.icon = "share"
+            item.icon = "shareFill"
             item.url = "segueShares"
             item.order = 50
             functionMenu.append(item)
@@ -138,7 +159,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : Offline
         item = NKExternalSite()
         item.name = "_manage_file_offline_"
-        item.icon = "tray.and.arrow.down"
+        item.icon = "offlineMenu"
         item.url = "segueOffline"
         item.order = 60
         functionMenu.append(item)
@@ -150,7 +171,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             item.icon = "person.2"
             item.url = "segueGroupfolders"
             item.order = 61
-            functionMenu.append(item)
+//            functionMenu.append(item)
         }
         // ITEM : Scan
         item = NKExternalSite()
@@ -158,7 +179,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         item.icon = "doc.text.viewfinder"
         item.url = "openStoryboardNCScan"
         item.order = 70
-        functionMenu.append(item)
+//        functionMenu.append(item)
 
         // ITEM : Trash
         if NCGlobal.shared.capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion15 {
@@ -179,7 +200,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : Settings
         item = NKExternalSite()
         item.name = "_settings_"
-        item.icon = "gear"
+        item.icon = "settings"
         item.url = "segueSettings"
         settingsMenu.append(item)
 
@@ -212,8 +233,14 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             }
 
             let quotaUsed: String = utilityFileSystem.transformedSize(activeAccount.quotaUsed)
+            let quota2: String = utilityFileSystem.transformedSize(activeAccount.quotaTotal)
+            let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
 
-            labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed, quota)
+            labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
+            
+            quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
+            quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
+
         }
 
         // ITEM : External
@@ -240,10 +267,6 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     private func loadSections() {
         if tabAccount != nil {
             sections.append(Section(items: [NKExternalSite()], type: .account))
-        }
-
-        if !NCBrandOptions.shared.disable_show_more_nextcloud_apps_in_settings {
-            sections.append(Section(items: [NKExternalSite()], type: .moreApps))
         }
 
         if !functionMenu.isEmpty {
@@ -286,7 +309,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if sections[indexPath.section].type == .account {
-            return 75
+            return 100
         } else {
             return NCGlobal.shared.heightCellSettings
         }
@@ -325,7 +348,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             cell.displayName.text = ""
 
             if let account = tabAccount {
-                cell.avatar.image = utility.loadUserImage(for: account.user, displayName: account.displayName, userBaseUrl: appDelegate)
+                cell.avatar.image = UIImage.init(named: "user_settings")?.image(color: NCBrandColor.shared.iconColor, size: 25)
 
                 if account.alias.isEmpty {
                     cell.displayName?.text = account.displayName
@@ -334,22 +357,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                 }
                 cell.displayName.textColor = .label
             }
-            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
-
-            if NCGlobal.shared.capabilityUserStatusEnabled, let account = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", appDelegate.account)) {
-                let status = utility.getUserStatus(userIcon: account.userStatusIcon, userStatus: account.userStatusStatus, userMessage: account.userStatusMessage)
-                cell.icon.image = status.onlineStatus
-                cell.status.text = status.statusMessage
-                cell.status.textColor = .label
-                cell.status.trailingBuffer = cell.status.frame.width
-                if cell.status.labelShouldScroll() {
-                    cell.status.tapToScroll = true
-                } else {
-                    cell.status.tapToScroll = false
-                }
-            }
-
-            cell.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner, .layerMaxXMaxYCorner, .layerMinXMaxYCorner]
+            cell.removeCornerRadius()
 
             return cell
 
@@ -362,32 +370,11 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
             let item = sections[indexPath.section].items[indexPath.row]
 
-            cell.imageIcon?.image = utility.loadImage(named: item.icon)
+            cell.imageIcon?.image = utility.loadImage(named: item.icon).image(color: NCBrandColor.shared.iconColor, size: 25)
             cell.imageIcon?.contentMode = .scaleAspectFit
             cell.labelText?.text = NSLocalizedString(item.name, comment: "")
             cell.labelText.textColor = .label
-
-            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
-
-            cell.separator.backgroundColor = .separator
-            cell.separatorHeigth.constant = 0.4
-
             cell.removeCornerRadius()
-            let rows = tableView.numberOfRows(inSection: indexPath.section)
-
-            if indexPath.row == 0 {
-                cell.applyCornerRadius()
-                if indexPath.row == rows - 1 {
-                    cell.separator.backgroundColor = .clear
-                    cell.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner, .layerMaxXMaxYCorner, .layerMinXMaxYCorner]
-                } else {
-                    cell.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
-                }
-            } else if indexPath.row == rows - 1 {
-                cell.applyCornerRadius()
-                cell.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
-                cell.separator.backgroundColor = .clear
-            }
 
             return cell
         }
