@@ -64,19 +64,19 @@
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-    [row.cellConfig setObject:[[UIImage imageNamed:@"autoUpload"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
+    [row.cellConfig setObject:[[UIImage imageNamed:@"autoUpload"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
     row.action.viewControllerClass = [CCManageAutoUpload class];
     [section addFormRow:row];
 
-    // Section : PRIVACY --------------------------------------------------------------
+    // Section : SECURITY --------------------------------------------------------------
     
-    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_privacy_", nil)];
+    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_security_", nil)];
     [form addFormSection:section];
 
     // Lock active YES/NO
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"bloccopasscode" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_lock_not_active_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
-    [row.cellConfig setObject:[[UIImage imageNamed:@"lock_open"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
+    [row.cellConfig setObject:[[UIImage imageNamed:@"lock_open"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
@@ -88,42 +88,13 @@
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-    [section addFormRow:row];
-    // Lock no screen
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"notPasscodeAtStart" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_lock_protection_no_screen_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-    [section addFormRow:row];
-    // Privacy screen
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"privacyScreen" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_privacy_screen_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-    [section addFormRow:row];
-    // Reset app wrong attemps
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"resetAppAttemps" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_reset_wrong_passcode_", nil)];
-    row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
-    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-    [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-    [section addFormRow:row];
-
-    // Section : CALDAV CARDAV --------------------------------------------------------------
-
-    if (!NCBrandOptions.shared.disable_mobileconfig) {
-
-        section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_calendar_contacts_", nil)];
-        [form addFormSection:section];
-
-        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"caldavcardav" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_mobile_config_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
-        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-        [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-        [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-        [row.cellConfig setObject:[[UIImage imageNamed:@"caldavcardav"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
-        row.action.formSelector = @selector(CalDAVCardDAV:);
-        [section addFormRow:row];
+    row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
+    if([[NCKeychain alloc] init].passcode){
+        row.disabled = @NO;
+    }else{
+        row.disabled = @YES;
     }
+    [section addFormRow:row];
 
     // Section : E2EEncryption --------------------------------------------------------------
 
@@ -132,9 +103,6 @@
 
     if (isE2EEEnabled == YES && [NCGlobal.shared.e2eeVersions containsObject:versionE2EE]) {
 
-        section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_e2e_settings_title_", nil)];
-        [form addFormSection:section];
-
         // EndToEnd Encryption
         NSString *title = [NSString stringWithFormat:@"%@",NSLocalizedString(@"_e2e_settings_", nil)];
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"e2eEncryption" rowType:XLFormRowDescriptorTypeButton title:title];
@@ -142,7 +110,7 @@
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
         [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
         [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-        [row.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
+        [row.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
         row.action.formSelector = @selector(manageE2EE:);
         [section addFormRow:row];
     }
@@ -157,50 +125,91 @@
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-    [row.cellConfig setObject:[[UIImage imageNamed:@"gear"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
+    [row.cellConfig setObject:[[UIImage imageNamed:@"gear"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
     row.action.viewControllerClass = [CCAdvanced class];
     [section addFormRow:row];
 
-    // Section : INFORMATION ------------------------------------------------
+    // Section : DATA PROTECTION ------------------------------------------------
 
-    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_information_", nil)];
+    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_data_protection_", nil)];
     [form addFormSection:section];
     
-    // Acknowledgements
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"buttonLeftAligned" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_acknowledgements_", nil)];
+    // Privacy Settings
+    PrivacySettingsViewController *privacySettingsViewController = [[PrivacySettingsViewController alloc] init];
+    privacySettingsViewController.isShowSettingsButton = true;
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showSettingsButton"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"privacySettings" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_privacy_settings_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-    [row.cellConfig setObject:[[UIImage imageNamed:@"acknowledgements"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
-    row.action.formBlock = ^(XLFormRowDescriptor * sender){
-        [self performSegueWithIdentifier:@"AcknowledgementsSegue" sender:sender];
-        [self deselectFormRow:sender];
-    };
+    row.action.viewControllerClass = [privacySettingsViewController class];
+    [section addFormRow:row];
+
+    // Privacy Policy
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"advanced" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_privacy_policy_", nil)];
+    row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+    [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
+    row.action.viewControllerClass = [PrivacyPolicyViewController class];
     [section addFormRow:row];
     
-    if (!NCBrandOptions.shared.disable_crash_service) {
-        
-        // Privacy and Legal Policy
-        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"privacy" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_privacy_legal_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
-        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-        [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-        [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-        [row.cellConfig setObject:[[UIImage imageNamed:@"shield.checkerboard"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
-        row.action.formSelector = @selector(privacy:);
-        [section addFormRow:row];
-        
-        // Source code
-        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"sourcecode" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_source_code_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
-        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-        [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-        [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-        [row.cellConfig setObject:[[UIImage imageNamed:@"gitHub"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
-        row.action.formSelector = @selector(sourceCode:);
-        [section addFormRow:row];
-    }
+    // Used OpenSource Software
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"buttonLeftAligned" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_used_opensource_software_", nil)];
+    row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
+    [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+    row.action.viewControllerClass = [OpenSourceSoftwareViewController class];
+    [section addFormRow:row];
+    
+    
+    // Section : SERVICE ------------------------------------------------
+
+    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_service_", nil)];
+    [form addFormSection:section];
+
+    // HELP
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"buttonLeftAligned" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_help_", nil)];
+    row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
+    [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+    row.action.viewControllerClass = [HelpViewController class];
+    [section addFormRow:row];
+
+    // Imprint
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"buttonLeftAligned" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_imprint_", nil)];
+    row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
+    [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+    row.action.viewControllerClass = [ImprintViewController class];
+    [section addFormRow:row];
+
+    // Section : INFO ------------------------------------------------
+
+    section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_info_", nil)];
+    [form addFormSection:section];
+
+    //MagentaCloud Version
+
+    //custom cell
+
+    [[XLFormViewController cellClassesForRowDescriptorTypes] setObject:[MagentaCloudVersionView class] forKey:@"kNMCCustomCellType"];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"disablefilesapp" rowType:@"kNMCCustomCellType" title:NSLocalizedString(@"_magentacloud_version_", nil)];
+    NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleInfoDictionaryVersion"];
+    row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+    row.cellConfigAtConfigure[@"cellLabel.text"] = NSLocalizedString(@"_magentacloud_version_", nil);
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"cellLabel.font"];
+    [row.cellConfig setObject:UIColor.labelColor forKey:@"cellLabel.textColor"];
+    row.cellConfigAtConfigure[@"versionLabel.text"] = appVersion;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"versionLabel.font"];
+    [row.cellConfig setObject:UIColor.systemGrayColor forKey:@"versionLabel.textColor"];
+    [section addFormRow:row];
     
     self.tableView.showsVerticalScrollIndicator = NO;
     self.tableView.contentInset = UIEdgeInsetsMake(0, 0, 35, 0);
@@ -219,7 +228,7 @@
     appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground) name:NCGlobal.shared.notificationCenterApplicationDidEnterBackground object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeUser) name:NCGlobal.shared.notificationCenterChangeUser object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeUser) name:NCGlobal.shared.notificationCenterInitialize object:nil];
 
     [self initializeForm];
     [self reloadForm];
@@ -267,23 +276,23 @@
     XLFormRowDescriptor *rowBloccoPasscode = [self.form formRowWithTag:@"bloccopasscode"];
     XLFormRowDescriptor *rowNotPasscodeAtStart = [self.form formRowWithTag:@"notPasscodeAtStart"];
     XLFormRowDescriptor *rowEnableTouchDaceID = [self.form formRowWithTag:@"enableTouchDaceID"];
-    XLFormRowDescriptor *rowResetAppAttemps = [self.form formRowWithTag:@"resetAppAttemps"];
-    XLFormRowDescriptor *rowPrivacyScreen = [self.form formRowWithTag:@"privacyScreen"];
 
     // ------------------------------------------------------------------
     
     if ([[NCKeychain alloc] init].passcode) {
         rowBloccoPasscode.title = NSLocalizedString(@"_lock_active_", nil);
-        [rowBloccoPasscode.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
+        [rowBloccoPasscode.cellConfig setObject:[[UIImage imageNamed:@"lock"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
+        rowEnableTouchDaceID.disabled = @NO;
+        rowNotPasscodeAtStart.disabled = @NO;
     } else {
         rowBloccoPasscode.title = NSLocalizedString(@"_lock_not_active_", nil);
-        [rowBloccoPasscode.cellConfig setObject:[[UIImage imageNamed:@"lock_open"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
+        [rowBloccoPasscode.cellConfig setObject:[[UIImage imageNamed:@"lock_open"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
+        rowEnableTouchDaceID.disabled = @YES;
+        rowNotPasscodeAtStart.disabled = @YES;
     }
-
-    if ([[NCKeychain alloc] init].resetAppCounterFail) [rowResetAppAttemps setValue:@1]; else [rowResetAppAttemps setValue:@0];
+    
     if ([[NCKeychain alloc] init].touchFaceID) [rowEnableTouchDaceID setValue:@1]; else [rowEnableTouchDaceID setValue:@0];
     if ([[NCKeychain alloc] init].requestPasscodeAtStart) [rowNotPasscodeAtStart setValue:@0]; else [rowNotPasscodeAtStart setValue:@1];
-    if ([[NCKeychain alloc] init].privacyScreenEnabled) [rowPrivacyScreen setValue:@1]; else [rowPrivacyScreen setValue:@0];
 
 
     // -----------------------------------------------------------------
@@ -314,21 +323,6 @@
             [[NCKeychain alloc] init].touchFaceID = false;
         }
     }
-    
-    if ([rowDescriptor.tag isEqualToString:@"privacyScreen"]) {
-        
-        if ([[rowDescriptor.value valueData] boolValue] == YES) {
-            [[NCKeychain alloc] init].privacyScreenEnabled = true;
-        } else {
-            [[NCKeychain alloc] init].privacyScreenEnabled = false;
-        }
-    }
-
-    if ([rowDescriptor.tag isEqualToString:@"resetAppAttemps"]) {
-
-        NSInteger value = [[rowDescriptor.value valueData] intValue];
-        [[NCKeychain alloc] init].resetAppCounterFail = value;
-    }
 }
 
 #pragma mark -
@@ -340,42 +334,6 @@
     UIViewController *vc = [[NCManageE2EEInterface alloc] makeShipDetailsUIWithAccount:appDelegate.account];
     [self.navigationController pushViewController:vc animated:YES];
 }
-
-- (void)privacy:(XLFormRowDescriptor *)sender
-{
-    [self deselectFormRow:sender];
-    
-    NCBrowserWeb* browserWebVC = [[UIStoryboard storyboardWithName:@"NCBrowserWeb" bundle:nil] instantiateInitialViewController];
-    
-    browserWebVC.urlBase = NCBrandOptions.shared.privacy;
-    browserWebVC.isHiddenButtonExit = false;
-    browserWebVC.titleBrowser = NSLocalizedString(@"_privacy_", nil);
-    
-    [self presentViewController:browserWebVC animated:YES completion:nil];
-}
-
-- (void)sourceCode:(XLFormRowDescriptor *)sender
-{
-    [self deselectFormRow:sender];
-    
-    NCBrowserWeb* browserWebVC = [[UIStoryboard storyboardWithName:@"NCBrowserWeb" bundle:nil] instantiateInitialViewController];
-    
-    browserWebVC.urlBase = NCBrandOptions.shared.sourceCode;
-    browserWebVC.isHiddenButtonExit = false;
-    browserWebVC.titleBrowser = NSLocalizedString(@"_source_code_", nil);
-    
-    [self presentViewController:browserWebVC animated:YES completion:nil];
-}
-
-- (void)CalDAVCardDAV:(XLFormRowDescriptor *)sender
-{
-    [self deselectFormRow:sender];
-
-    NSString *url = [appDelegate.urlBase stringByAppendingString:NCBrandOptions.shared.mobileconfig];
-    NCConfigServer *configServer = [NCConfigServer new];
-    [configServer startServiceWithUrl:[NSURL URLWithString: url]];
-}
-
 
 #pragma mark - Passcode
 
@@ -477,11 +435,6 @@
         sectionName = [NSString stringWithFormat:@"%@\n%@", lock, reset];
     } else if (section == 2 && !NCBrandOptions.shared.disable_mobileconfig) {
         sectionName = NSLocalizedString(@"_calendar_contacts_footer_", nil);
-    } else if (section == numSections) {
-        NSString *versionNextcloud = [NSString stringWithFormat:[NCBrandOptions shared].textCopyrightNextcloudServer, versionServer];
-        NSString *versionNextcloudiOS = [NSString stringWithFormat:[NCBrandOptions shared].textCopyrightNextcloudiOS, [[[NCUtility alloc] init] getVersionAppWithBuild:true]];
-        NSString *nameSlogan = [NSString stringWithFormat:@"%@ - %@", themingName, themingSlogan];
-        sectionName = [NSString stringWithFormat:@"\n%@\n\n%@\n%@", versionNextcloudiOS, versionNextcloud, nameSlogan];
     }
     return sectionName;
 }
