@@ -343,6 +343,18 @@ extension tableMetadata {
         return !lock || (lockOwner == user && lockOwnerType == 0)
     }
 
+    // Return if is sharable
+    func isSharable() -> Bool {
+        guard let capabilities = NCNetworking.shared.capabilities[account] else {
+            return false
+        }
+        if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE) {
+//        if !NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingApiEnabled || (NCCapabilities.shared.getCapabilities(account: account).capabilityE2EEEnabled && isDirectoryE2EE), !e2eEncrypted {
+            return false
+        }
+        return true
+    }
+
     /// Returns a detached (unmanaged) deep copy of the current `tableMetadata` object.
     ///
     /// - Note: Primitive properties and lists of primitive values (for example `shareType`)
@@ -382,6 +394,7 @@ extension tableMetadata {
 
 extension NCManageDatabase {
 #if !EXTENSION
+
     func isMetadataShareOrMounted(metadata: tableMetadata, metadataFolder: tableMetadata?) -> Bool {
         var isShare = false
         var isMounted = false
