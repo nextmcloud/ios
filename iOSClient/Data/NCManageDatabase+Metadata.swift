@@ -307,7 +307,7 @@ extension tableMetadata {
 
     // Return if is sharable
     func isSharable() -> Bool {
-        if !NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingApiEnabled || (NCCapabilities.shared.getCapabilities(account: account).capabilityE2EEEnabled && isDirectoryE2EE) {
+        if !NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingApiEnabled || (NCCapabilities.shared.getCapabilities(account: account).capabilityE2EEEnabled && isDirectoryE2EE), !e2eEncrypted {
             return false
         }
         return true
@@ -355,7 +355,14 @@ extension NCManageDatabase {
         metadata.fileNameView = file.fileName
         metadata.hasPreview = file.hasPreview
         metadata.hidden = file.hidden
-        metadata.iconName = file.iconName
+        switch (file.fileName as NSString).pathExtension {
+        case "odg":
+            metadata.iconName = "diagram"
+        case "csv", "xlsm" :
+            metadata.iconName = "file_xls"
+        default:
+            metadata.iconName = file.iconName
+        }
         metadata.mountType = file.mountType
         metadata.name = file.name
         metadata.note = file.note
@@ -1400,5 +1407,33 @@ extension NCManageDatabase {
         } else {
             completion(metadatas)
         }
+    }
+    
+    func getMediaMetadatas(predicate: NSPredicate, sorted: String? = nil, ascending: Bool = false) -> ThreadSafeArray<tableMetadata>? {
+
+        do {
+            let realm = try Realm()
+            if let sorted {
+                var results: [tableMetadata] = []
+                switch NCKeychain().mediaSortDate {
+                case "date":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.date as Date) > ($1.date as Date) }
+                case "creationDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.creationDate as Date) > ($1.creationDate as Date) }
+                case "uploadDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.uploadDate as Date) > ($1.uploadDate as Date) }
+                default:
+                    let results = realm.objects(tableMetadata.self).filter(predicate)
+                    return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+                }
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            } else {
+                let results = realm.objects(tableMetadata.self).filter(predicate)
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            }
+        } catch let error as NSError {
+            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+        }
+        return nil
     }
 }
