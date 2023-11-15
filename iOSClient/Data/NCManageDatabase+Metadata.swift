@@ -300,7 +300,7 @@ extension NCManageDatabase {
         metadata.fileNameView = file.fileName
         metadata.hasPreview = file.hasPreview
         metadata.hidden = file.hidden
-        metadata.iconName = file.iconName
+        metadata.iconName = (file.fileName as NSString).pathExtension == "odg" ? "diagram" : file.iconName
         metadata.mountType = file.mountType
         metadata.name = file.name
         metadata.note = file.note
