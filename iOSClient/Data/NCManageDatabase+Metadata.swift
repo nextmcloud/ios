@@ -318,6 +318,7 @@ extension tableMetadata {
             return false
         }
         if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE) {
+//        if !NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingApiEnabled || (NCCapabilities.shared.getCapabilities(account: account).capabilityE2EEEnabled && isDirectoryE2EE), !e2eEncrypted {
             return false
         }
         return true
@@ -343,6 +344,229 @@ extension tableMetadata {
 }
 
 extension NCManageDatabase {
+
+    // MARK: - Create Metadata
+
+    func convertFileToMetadata(_ file: NKFile, isDirectoryE2EE: Bool) -> tableMetadata {
+        let metadata = tableMetadata()
+
+        metadata.account = file.account
+        metadata.checksums = file.checksums
+        metadata.commentsUnread = file.commentsUnread
+        metadata.contentType = file.contentType
+        if let date = file.creationDate {
+            metadata.creationDate = date as NSDate
+        } else {
+            metadata.creationDate = file.date as NSDate
+        }
+        metadata.dataFingerprint = file.dataFingerprint
+        metadata.date = file.date as NSDate
+        if let datePhotosOriginal = file.datePhotosOriginal {
+            metadata.datePhotosOriginal = datePhotosOriginal as NSDate
+        } else {
+            metadata.datePhotosOriginal = metadata.date
+        }
+        metadata.directory = file.directory
+        metadata.downloadURL = file.downloadURL
+        metadata.e2eEncrypted = file.e2eEncrypted
+        metadata.etag = file.etag
+        for dict in file.exifPhotos {
+            for (key, value) in dict {
+                let keyValue = NCKeyValue()
+                keyValue.key = key
+                keyValue.value = value
+                metadata.exifPhotos.append(keyValue)
+            }
+        }
+        metadata.favorite = file.favorite
+        metadata.fileId = file.fileId
+        metadata.fileName = file.fileName
+        metadata.fileNameView = file.fileName
+        metadata.hasPreview = file.hasPreview
+        metadata.hidden = file.hidden
+        switch (file.fileName as NSString).pathExtension {
+        case "odg":
+            metadata.iconName = "diagram"
+        case "csv", "xlsm" :
+            metadata.iconName = "file_xls"
+        default:
+            metadata.iconName = file.iconName
+        }
+        metadata.mountType = file.mountType
+        metadata.name = file.name
+        metadata.note = file.note
+        metadata.ocId = file.ocId
+        metadata.ocIdTransfer = file.ocId
+        metadata.ownerId = file.ownerId
+        metadata.ownerDisplayName = file.ownerDisplayName
+        metadata.lock = file.lock
+        metadata.lockOwner = file.lockOwner
+        metadata.lockOwnerEditor = file.lockOwnerEditor
+        metadata.lockOwnerType = file.lockOwnerType
+        metadata.lockOwnerDisplayName = file.lockOwnerDisplayName
+        metadata.lockTime = file.lockTime
+        metadata.lockTimeOut = file.lockTimeOut
+        metadata.path = file.path
+        metadata.permissions = file.permissions
+        metadata.placePhotos = file.placePhotos
+        metadata.quotaUsedBytes = file.quotaUsedBytes
+        metadata.quotaAvailableBytes = file.quotaAvailableBytes
+        metadata.richWorkspace = file.richWorkspace
+        metadata.resourceType = file.resourceType
+        metadata.serverUrl = file.serverUrl
+        metadata.serveUrlFileName = file.serverUrl + "/" + file.fileName
+        metadata.sharePermissionsCollaborationServices = file.sharePermissionsCollaborationServices
+
+        for element in file.shareType {
+            metadata.shareType.append(element)
+        }
+        for element in file.tags {
+            metadata.tags.append(element)
+        }
+        metadata.size = file.size
+        metadata.classFile = file.classFile
+        // iOS 12.0,* don't detect UTI text/markdown, text/x-markdown
+        if (metadata.contentType == "text/markdown" || metadata.contentType == "text/x-markdown") && metadata.classFile == NKCommon.TypeClassFile.unknow.rawValue {
+            metadata.classFile = NKCommon.TypeClassFile.document.rawValue
+        }
+        if let date = file.uploadDate {
+            metadata.uploadDate = date as NSDate
+        } else {
+            metadata.uploadDate = file.date as NSDate
+        }
+        metadata.urlBase = file.urlBase
+        metadata.user = file.user
+        metadata.userId = file.userId
+        metadata.latitude = file.latitude
+        metadata.longitude = file.longitude
+        metadata.altitude = file.altitude
+        metadata.height = Int(file.height)
+        metadata.width = Int(file.width)
+        metadata.livePhotoFile = file.livePhotoFile
+        metadata.isFlaggedAsLivePhotoByServer = file.isFlaggedAsLivePhotoByServer
+
+        // E2EE find the fileName for fileNameView
+        if isDirectoryE2EE || file.e2eEncrypted {
+            if let tableE2eEncryption = getE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameIdentifier == %@", file.account, file.serverUrl, file.fileName)) {
+                metadata.fileNameView = tableE2eEncryption.fileName
+                let results = NextcloudKit.shared.nkCommonInstance.getInternalType(fileName: metadata.fileNameView, mimeType: file.contentType, directory: file.directory, account: file.account)
+                metadata.contentType = results.mimeType
+                metadata.iconName = results.iconName
+                metadata.classFile = results.classFile
+            }
+        }
+        return metadata
+    }
+
+    func convertFilesToMetadatas(_ files: [NKFile], useFirstAsMetadataFolder: Bool, completion: @escaping (_ metadataFolder: tableMetadata, _ metadatas: [tableMetadata]) -> Void) {
+        var counter: Int = 0
+        var isDirectoryE2EE: Bool = false
+        let listServerUrl = ThreadSafeDictionary<String, Bool>()
+        var metadataFolder = tableMetadata()
+        var metadatas: [tableMetadata] = []
+
+        for file in files {
+            if let key = listServerUrl[file.serverUrl] {
+                isDirectoryE2EE = key
+            } else {
+                isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(file: file)
+                listServerUrl[file.serverUrl] = isDirectoryE2EE
+            }
+
+            let metadata = convertFileToMetadata(file, isDirectoryE2EE: isDirectoryE2EE)
+
+            if counter == 0 && useFirstAsMetadataFolder {
+                metadataFolder = metadata
+            } else {
+                metadatas.append(metadata)
+            }
+
+            counter += 1
+        }
+        completion(tableMetadata(value: metadataFolder), metadatas)
+    }
+
+    func convertFilesToMetadatasAsync(_ files: [NKFile], useFirstAsMetadataFolder: Bool) async -> (metadataFolder: tableMetadata, metadatas: [tableMetadata]) {
+        await withCheckedContinuation { continuation in
+            convertFilesToMetadatas(files, useFirstAsMetadataFolder: useFirstAsMetadataFolder) { metadataFolder, metadatas in
+                continuation.resume(returning: (metadataFolder, metadatas))
+            }
+        }
+    }
+
+    func getMetadataDirectoryFrom(files: [NKFile]) -> tableMetadata? {
+        guard let file = files.first else { return nil }
+        let isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(file: file)
+        let metadata = convertFileToMetadata(file, isDirectoryE2EE: isDirectoryE2EE)
+
+        return metadata
+    }
+
+    func convertFilesToMetadatas(_ files: [NKFile], useFirstAsMetadataFolder: Bool) async -> (metadataFolder: tableMetadata, metadatas: [tableMetadata]) {
+        await withUnsafeContinuation({ continuation in
+            convertFilesToMetadatas(files, useFirstAsMetadataFolder: useFirstAsMetadataFolder) { metadataFolder, metadatas in
+                continuation.resume(returning: (metadataFolder, metadatas))
+            }
+        })
+    }
+
+    func createMetadata(fileName: String, fileNameView: String, ocId: String, serverUrl: String, url: String, contentType: String, isUrl: Bool = false, name: String = NCGlobal.shared.appName, subline: String? = nil, iconName: String? = nil, iconUrl: String? = nil, directory: Bool = false, session: NCSession.Session, sceneIdentifier: String?) -> tableMetadata {
+        let metadata = tableMetadata()
+
+        if isUrl {
+            metadata.contentType = "text/uri-list"
+            if let iconName = iconName {
+                metadata.iconName = iconName
+            } else {
+                metadata.iconName = NKCommon.TypeClassFile.url.rawValue
+            }
+            metadata.classFile = NKCommon.TypeClassFile.url.rawValue
+        } else {
+            let (mimeType, classFile, iconName, _, _, _) = NextcloudKit.shared.nkCommonInstance.getInternalType(fileName: fileName, mimeType: contentType, directory: directory, account: session.account)
+            metadata.contentType = mimeType
+            metadata.iconName = iconName
+            metadata.classFile = classFile
+            // iOS 12.0,* don't detect UTI text/markdown, text/x-markdown
+            if classFile == NKCommon.TypeClassFile.unknow.rawValue && (mimeType == "text/x-markdown" || mimeType == "text/markdown") {
+                metadata.iconName = NKCommon.TypeIconFile.txt.rawValue
+                metadata.classFile = NKCommon.TypeClassFile.document.rawValue
+            }
+        }
+        if let iconUrl = iconUrl {
+            metadata.iconUrl = iconUrl
+        }
+
+        let fileName = fileName.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        metadata.account = session.account
+        metadata.creationDate = Date() as NSDate
+        metadata.date = Date() as NSDate
+        metadata.directory = directory
+        metadata.hasPreview = true
+        metadata.etag = ocId
+        metadata.fileName = fileName
+        metadata.fileNameView = fileName
+        metadata.name = name
+        metadata.ocId = ocId
+        metadata.ocIdTransfer = ocId
+        metadata.permissions = "RGDNVW"
+        metadata.serverUrl = serverUrl
+        metadata.serveUrlFileName = serverUrl + "/" + fileName
+        metadata.subline = subline
+        metadata.uploadDate = Date() as NSDate
+        metadata.url = url
+        metadata.urlBase = session.urlBase
+        metadata.user = session.user
+        metadata.userId = session.userId
+        metadata.sceneIdentifier = sceneIdentifier
+        metadata.nativeFormat = !NCKeychain().formatCompatibility
+
+        if !metadata.urlBase.isEmpty, metadata.serverUrl.hasPrefix(metadata.urlBase) {
+            metadata.path = String(metadata.serverUrl.dropFirst(metadata.urlBase.count)) + "/"
+        }
+        return metadata
+    }
+
     func isMetadataShareOrMounted(metadata: tableMetadata, metadataFolder: tableMetadata?) -> Bool {
         var isShare = false
         var isMounted = false
@@ -1318,12 +1542,123 @@ extension NCManageDatabase {
         guard let decodedBaseUrl = baseUrl.removingPercentEncoding else {
             return nil
         }
-
+        
         return performRealmRead { realm in
             let object = realm.objects(tableMetadata.self)
                 .filter("account == %@ AND serverUrl == %@ AND fileName == %@", account, decodedBaseUrl, fileName)
                 .first
             return object?.detachedCopy()
         }
+    }
+
+    func createMetadatasFolder(assets: [PHAsset],
+                               useSubFolder: Bool,
+                               session: NCSession.Session, completion: @escaping ([tableMetadata]) -> Void) {
+        var foldersCreated: Set<String> = []
+        var metadatas: [tableMetadata] = []
+        let serverUrlBase = getAccountAutoUploadDirectory(session: session)
+        let fileNameBase = getAccountAutoUploadFileName(account: session.account)
+        let predicate = NSPredicate(format: "account == %@ AND serverUrl BEGINSWITH %@ AND directory == true", session.account, serverUrlBase)
+
+        func createMetadata(serverUrl: String, fileName: String, metadata: tableMetadata?) {
+            guard !foldersCreated.contains(serverUrl + "/" + fileName) else {
+                return
+            }
+            foldersCreated.insert(serverUrl + "/" + fileName)
+
+            if let metadata {
+                metadata.status = NCGlobal.shared.metadataStatusWaitCreateFolder
+                metadata.sessionSelector = NCGlobal.shared.selectorUploadAutoUpload
+                metadata.sessionDate = Date()
+                metadatas.append(tableMetadata(value: metadata))
+            } else {
+                let metadata = NCManageDatabase.shared.createMetadata(fileName: fileName,
+                                                                      fileNameView: fileName,
+                                                                      ocId: NSUUID().uuidString,
+                                                                      serverUrl: serverUrl,
+                                                                      url: "",
+                                                                      contentType: "httpd/unix-directory",
+                                                                      directory: true,
+                                                                      session: session,
+                                                                      sceneIdentifier: nil)
+                metadata.status = NCGlobal.shared.metadataStatusWaitCreateFolder
+                metadata.sessionSelector = NCGlobal.shared.selectorUploadAutoUpload
+                metadata.sessionDate = Date()
+                metadatas.append(metadata)
+            }
+        }
+
+        let metadatasFolder = getMetadatas(predicate: predicate)
+        let targetPath = serverUrlBase + "/" + fileNameBase
+        let metadata = metadatasFolder.first(where: { $0.serverUrl + "/" + $0.fileNameView == targetPath })
+        createMetadata(serverUrl: serverUrlBase, fileName: fileNameBase, metadata: metadata)
+
+        if useSubFolder {
+            let autoUploadServerUrlBase = self.getAccountAutoUploadServerUrlBase(session: session)
+            let autoUploadSubfolderGranularity = self.getAccountAutoUploadSubfolderGranularity()
+            let folders = Set(assets.map { self.utilityFileSystem.createGranularityPath(asset: $0) }).sorted()
+
+            for folder in folders {
+                let componentsDate = folder.split(separator: "/")
+                let year = componentsDate[0]
+                let serverUrl = autoUploadServerUrlBase
+                let fileName = String(year)
+                let targetPath = serverUrl + "/" + fileName
+                let metadata = metadatasFolder.first(where: { $0.serverUrl + "/" + $0.fileNameView == targetPath })
+
+                createMetadata(serverUrl: serverUrl, fileName: fileName, metadata: metadata)
+
+                if autoUploadSubfolderGranularity >= NCGlobal.shared.subfolderGranularityMonthly {
+                    let month = componentsDate[1]
+                    let serverUrl = autoUploadServerUrlBase + "/" + year
+                    let fileName = String(month)
+                    let targetPath = serverUrl + "/" + fileName
+                    let metadata = metadatasFolder.first(where: { $0.serverUrl + "/" + $0.fileNameView == targetPath })
+
+                    createMetadata(serverUrl: serverUrl, fileName: fileName, metadata: metadata)
+
+                    if autoUploadSubfolderGranularity == NCGlobal.shared.subfolderGranularityDaily {
+                        let day = componentsDate[2]
+                        let serverUrl = autoUploadServerUrlBase + "/" + year + "/" + month
+                        let fileName = String(day)
+                        let targetPath = serverUrl + "/" + fileName
+                        let metadata = metadatasFolder.first(where: { $0.serverUrl + "/" + $0.fileNameView == targetPath })
+
+                        createMetadata(serverUrl: serverUrl, fileName: fileName, metadata: metadata)
+                    }
+                }
+            }
+            completion(metadatas)
+        } else {
+            completion(metadatas)
+        }
+    }
+    
+    func getMediaMetadatas(predicate: NSPredicate, sorted: String? = nil, ascending: Bool = false) -> ThreadSafeArray<tableMetadata>? {
+
+        do {
+            let realm = try Realm()
+            if let sorted {
+                var results: [tableMetadata] = []
+                switch NCKeychain().mediaSortDate {
+                case "date":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.date as Date) > ($1.date as Date) }
+                case "creationDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.creationDate as Date) > ($1.creationDate as Date) }
+                case "uploadDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.uploadDate as Date) > ($1.uploadDate as Date) }
+                default:
+                    let results = realm.objects(tableMetadata.self).filter(predicate)
+                    return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+                }
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            } else {
+                let results = realm.objects(tableMetadata.self).filter(predicate)
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            }
+        } catch let error as NSError {
+            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+        }
+        return nil
     }
 }
