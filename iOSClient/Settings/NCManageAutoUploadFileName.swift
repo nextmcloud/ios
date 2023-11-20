@@ -47,6 +47,7 @@ class NCManageAutoUploadFileName: XLFormViewController {
 
         row = XLFormRowDescriptor(tag: "maintainOriginalFileName", rowType: XLFormRowDescriptorTypeBooleanSwitch, title: NSLocalizedString("_maintain_original_filename_", comment: ""))
         row.value = NCKeychain().getOriginalFileName(key: NCGlobal.shared.keyFileNameOriginalAutoUpload)
+        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand;
         row.cellConfig["backgroundColor"] = UIColor.secondarySystemGroupedBackground
 
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
@@ -60,6 +61,7 @@ class NCManageAutoUploadFileName: XLFormViewController {
         row.value = NCKeychain().getFileNameType(key: NCGlobal.shared.keyFileNameAutoUploadType)
         row.hidden = "$\("maintainOriginalFileName") == 1"
         row.cellConfig["backgroundColor"] = UIColor.secondarySystemGroupedBackground
+        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.brand;
 
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textLabel.textColor"] = UIColor.label
@@ -72,9 +74,15 @@ class NCManageAutoUploadFileName: XLFormViewController {
         form.addFormSection(section)
 
         row = XLFormRowDescriptor(tag: "maskFileName", rowType: XLFormRowDescriptorTypeText, title: (NSLocalizedString("_filename_", comment: "")))
+
         let fileNameMask: String = NCKeychain().getFileNameMask(key: NCGlobal.shared.keyFileNameAutoUploadMask)
         if !fileNameMask.isEmpty {
+            row.cellConfig["textField.text"] = fileNameMask
             row.value = fileNameMask
+        }else{
+            let  placeholderText = CCUtility.createFileName("IMG_0001.JPG", fileDate: dateExample, fileType: PHAssetMediaType.image, keyFileName: nil, keyFileNameType: NCGlobal.shared.keyFileNameAutoUploadType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginalAutoUpload, forcedNewFileName: false)
+            row.cellConfig["textField.text"] = placeholderText
+            row.value = ""
         }
         row.hidden = "$\("maintainOriginalFileName") == 1"
         row.cellConfig["backgroundColor"] = UIColor.secondarySystemGroupedBackground
@@ -82,7 +90,7 @@ class NCManageAutoUploadFileName: XLFormViewController {
         row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textLabel.textColor"] = UIColor.label
 
-        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
+        row.cellConfig["textField.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["textField.textColor"] = UIColor.label
 
@@ -134,7 +142,13 @@ class NCManageAutoUploadFileName: XLFormViewController {
         let maskFileName: XLFormRowDescriptor = self.form.formRow(withTag: "maskFileName")!
         let previewFileName: XLFormRowDescriptor = self.form.formRow(withTag: "previewFileName")!
         previewFileName.value = self.previewFileName(valueRename: maskFileName.value as? String)
-
+        let  placeholderText = CCUtility.createFileName("IMG_0001.JPG", fileDate: dateExample, fileType: PHAssetMediaType.image, keyFileName: nil, keyFileNameType: NCGlobal.shared.keyFileNameAutoUploadType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginalAutoUpload, forcedNewFileName: false)
+        let fileNameMask : String = NCKeychain().getFileNameMask(key: NCGlobal.shared.keyFileNameAutoUploadMask)
+        if fileNameMask.count > 0 {
+            maskFileName.cellConfig["textField.text"] = fileNameMask
+        }else {
+            maskFileName.cellConfig["textField.text"] = placeholderText
+        }
         self.tableView.reloadData()
         self.form.delegate = self
     }
@@ -208,7 +222,6 @@ class NCManageAutoUploadFileName: XLFormViewController {
 
                 returnString = CCUtility.createFileName("IMG_0001.JPG", fileDate: dateExample, fileType: PHAssetMediaType.image, keyFileName: NCGlobal.shared.keyFileNameAutoUploadMask, keyFileNameType: NCGlobal.shared.keyFileNameAutoUploadType, keyFileNameOriginal: NCGlobal.shared.keyFileNameOriginalAutoUpload, forcedNewFileName: false)
             }
-
         } else {
 
             NCKeychain().setFileNameMask(key: NCGlobal.shared.keyFileNameAutoUploadMask, mask: "")
