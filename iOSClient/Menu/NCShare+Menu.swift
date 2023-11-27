@@ -80,7 +80,7 @@ extension NCShare {
                         guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
                         viewNewUserComment.metadata = self.metadata
                         viewNewUserComment.share = tableShare(value: share)
-//                        viewNewUserComment.networking = self.networking
+                        viewNewUserComment.networking = self.networking
                         self.navigationController?.pushViewController(viewNewUserComment, animated: true)
                     }
                 )
@@ -90,7 +90,8 @@ extension NCShare {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_share_unshare_", comment: ""),
-                icon: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.brandElement]),
+                destructive: true,
+                icon: utility.loadImage(named: "trash").imageColor(NCBrandColor.shared.brandElement),
                 sender: sender,
                 action: { _ in
                     Task {
@@ -129,9 +130,12 @@ extension NCShare {
                 }
             ),
             NCMenuAction(
-                title: NSLocalizedString("_share_editing_", comment: ""),
+//                title: NSLocalizedString("_share_editing_", comment: ""),
+                title: isDirectory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
                 icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
                 selected: hasUploadPermission(tableShare: share),
+//                icon: UIImage(),
+//                selected: hasUploadPermission(tableShare: tableShare),
                 on: false,
                 sender: sender,
                 action: { _ in

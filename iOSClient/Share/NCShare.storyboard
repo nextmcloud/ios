@@ -325,6 +325,18 @@
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
+                                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="lRO-Ps-wvd">
+                                                        <rect key="frame" x="16" y="99.333333333333286" width="382" height="384.66666666666674"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="100" id="d7R-0e-rHA"/>
+                                                        </constraints>
+                                                        <color key="textColor" systemColor="labelColor"/>
+                                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="doneAccessory" value="YES"/>
+                                                        </userDefinedRuntimeAttributes>
+                                                    </textView>
                                                 </subviews>
                                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
@@ -350,6 +362,50 @@
                                 <viewLayoutGuide key="contentLayoutGuide" id="fEb-Rc-uJQ"/>
                                 <viewLayoutGuide key="frameLayoutGuide" id="0Tz-a7-cEw"/>
                             </scrollView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZDZ-3w-emE">
+                                <rect key="frame" x="0.0" y="666" width="414" height="70"/>
+                                <subviews>
+                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="1Vt-ak-mIb">
+                                        <rect key="frame" x="16" y="15" width="382" height="40"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4kg-EJ-neZ">
+                                                <rect key="frame" x="0.0" y="0.0" width="183" height="40"/>
+                                                <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="40" id="lG0-1N-kav"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                <state key="normal" title="Cancel"/>
+                                                <connections>
+                                                    <action selector="cancelClicked:" destination="TSs-cr-Hlu" eventType="touchUpInside" id="VVv-br-gyB"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eau-WN-bCs">
+                                                <rect key="frame" x="199" y="0.0" width="183" height="40"/>
+                                                <color key="backgroundColor" red="0.8862745098" green="0.0" blue="0.4549019608" alpha="1" colorSpace="calibratedRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="40" id="6zN-VN-cbK"/>
+                                                </constraints>
+                                                <state key="normal" title="Send email"/>
+                                                <state key="highlighted">
+                                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="sendShareClicked:" destination="TSs-cr-Hlu" eventType="touchUpInside" id="A0K-aA-Id1"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                    </stackView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="centerX" secondItem="1Vt-ak-mIb" secondAttribute="centerX" id="FYG-IP-kga"/>
+                                    <constraint firstAttribute="height" constant="70" id="UAc-LS-BqU"/>
+                                    <constraint firstAttribute="centerY" secondItem="1Vt-ak-mIb" secondAttribute="centerY" id="eUD-TJ-v5y"/>
+                                    <constraint firstItem="1Vt-ak-mIb" firstAttribute="leading" secondItem="ZDZ-3w-emE" secondAttribute="leading" constant="16" id="wzI-ac-wU3"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bo7-K4-14Z"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -397,7 +453,13 @@
                                         </connections>
                                     </containerView>
                                 </subviews>
-                            </stackView>
+                                <constraints>
+                                    <constraint firstItem="wXd-qk-CVR" firstAttribute="top" secondItem="yZH-hY-T47" secondAttribute="top" id="9qf-Gw-dPb"/>
+                                    <constraint firstItem="wXd-qk-CVR" firstAttribute="leading" secondItem="yZH-hY-T47" secondAttribute="leading" id="Aqq-vB-A7D"/>
+                                    <constraint firstAttribute="bottom" secondItem="wXd-qk-CVR" secondAttribute="bottom" id="eg6-EK-sbE"/>
+                                    <constraint firstAttribute="trailing" secondItem="wXd-qk-CVR" secondAttribute="trailing" id="ymT-SY-OhI"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Izp-oB-bSo"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -408,6 +470,7 @@
                             <constraint firstItem="cIW-Tm-wLr" firstAttribute="top" secondItem="Izp-oB-bSo" secondAttribute="top" id="ygJ-CN-OpB"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="LJB-2A-XGu"/>
                     <connections>
                         <outlet property="headerContainerView" destination="5n2-Z9-lp7" id="thC-xV-eWJ"/>
                     </connections>
