@@ -243,7 +243,6 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
             NCActivityIndicator.shared.stop()
 
             if let metadata = metadata, error == .success {
-                var pages: [NCBrandOptions.NCInfoPagingTab] = []
                 let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
                 let shareViewController = shareNavigationController?.topViewController as? NCSharePaging
 
@@ -261,16 +260,8 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
                 (pages, page) = NCApplicationHandle().filterPages(pages: pages, page: page, metadata: metadata)
 
                 shareViewController?.pages = pages
+//                let shareViewController = shareNavigationController?.topViewController as? NCShare
                 shareViewController?.metadata = metadata
-
-                if pages.contains(page) {
-                    shareViewController?.page = page
-                } else if let page = pages.first {
-                    shareViewController?.page = page
-                } else {
-                    return
-                }
-
                 shareNavigationController?.modalPresentationStyle = .formSheet
                 if let shareNavigationController = shareNavigationController {
                     viewController.present(shareNavigationController, animated: true, completion: nil)
