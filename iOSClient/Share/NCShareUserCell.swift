@@ -94,7 +94,7 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         imageItem.image = NCShareCommon.getImageShareType(shareType: tableShare.shareType)
 
         let status = utility.getUserStatus(userIcon: tableShare.userIcon, userStatus: tableShare.userStatus, userMessage: tableShare.userMessage)
-        imageStatus.image = status.statusImage
+        imageStatus.image = status.onlineStatus
         self.status.text = status.statusMessage
         
         if permissions.isAnyPermissionToEdit(tableShare.permissions) {
