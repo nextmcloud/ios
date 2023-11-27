@@ -328,6 +328,15 @@ final class NCGlobal: Sendable {
 
     let notificationCenterEnableSwipeGesture                    = "enableSwipeGesture"
     let notificationCenterDisableSwipeGesture                   = "disableSwipeGesture"
+    
+    let notificationCenterShareViewIn                           = "ShareViewIn"
+    let notificationCenterShareAdvancePermission                = "ShareAdvancePermission"
+    let notificationCenterShareSendEmail                        = "ShareSendEmail"
+    let notificationCenterShareUnshare                          = "ShareUnshare"
+    let notificationCenterStatusReadOnly                        = "statusReadOnly"
+    let notificationCenterStatusEditing                         = "statusEditing"
+    let notificationCenterStatusFileDrop                        = "statusFileDrop"
+
 
     let notificationCenterPlayerIsPlaying                       = "playerIsPlaying"
     let notificationCenterPlayerStoppedPlaying                  = "playerStoppedPlaying"
