@@ -36,8 +36,17 @@ extension NCShare {
                     title: NSLocalizedString("_share_add_sharelink_", comment: ""),
                     icon: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor]),
                     sender: sender,
+//    func toggleShareMenu(for share: tableShare, sendMail: Bool, folder: Bool, sender: Any) {
+//
+//        var actions = [NCMenuAction]()
+//
+//        if !folder {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_open_in_", comment: ""),
+//                    icon: utility.loadImage(named: "viewInFolder").imageColor(NCBrandColor.shared.brandElement),
                     action: { _ in
-                        self.makeNewLinkShare()
+                        NCShareCommon().copyLink(link: share.url, viewController: self, sender: sender)
                     }
                 )
             )
@@ -45,16 +54,20 @@ extension NCShare {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_details_", comment: ""),
-                icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
+                title: NSLocalizedString("_advance_permissions_", comment: ""),
+                icon: utility.loadImage(named: "rename").imageColor(NCBrandColor.shared.brandElement),
                 accessibilityIdentifier: "shareMenu/details",
                 sender: sender,
+//                title: NSLocalizedString("_details_", comment: ""),
+//                icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
+//                accessibilityIdentifier: "shareMenu/details",
+                
                 action: { _ in
                     guard
                         let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
                         let navigationController = self.navigationController, !share.isInvalidated else { return }
                     advancePermission.networking = self.networking
-                    advancePermission.share = tableShare(value: share)
+                    advancePermission.share = share
                     advancePermission.oldTableShare = tableShare(value: share)
                     advancePermission.metadata = self.metadata
 
@@ -66,12 +79,29 @@ extension NCShare {
                 }
             )
         )
-
+        
+        if sendMail {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_send_new_email_", comment: ""),
+                    icon: NCUtility().loadImage(named: "email").imageColor(NCBrandColor.shared.brandElement),
+                    action: { menuAction in
+                        let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+                        guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
+                        viewNewUserComment.metadata = self.metadata
+                        viewNewUserComment.share = tableShare(value: share)
+                        viewNewUserComment.networking = self.networking
+                        self.navigationController?.pushViewController(viewNewUserComment, animated: true)
+                    }
+                )
+            )
+        }
+        
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_share_unshare_", comment: ""),
                 destructive: true,
-                icon: utility.loadImage(named: "person.2.slash"),
+                icon: utility.loadImage(named: "trash").imageColor(NCBrandColor.shared.brandElement),
                 sender: sender,
                 action: { _ in
                     Task {
@@ -110,9 +140,12 @@ extension NCShare {
                 }
             ),
             NCMenuAction(
-                title: NSLocalizedString("_share_editing_", comment: ""),
+//                title: NSLocalizedString("_share_editing_", comment: ""),
+                title: isDirectory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
                 icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
                 selected: hasUploadPermission(tableShare: share),
+//                icon: UIImage(),
+//                selected: hasUploadPermission(tableShare: tableShare),
                 on: false,
                 sender: sender,
                 action: { _ in
@@ -155,7 +188,7 @@ extension NCShare {
                        }
                    ), at: 2)
         }
-
+        
         self.presentMenu(with: actions, sender: sender)
     }
 
