@@ -196,6 +196,20 @@ class NCService: NSObject {
             } else {
                 self.appDelegate.disableSharesView = false
             }
+            
+            // File Sharing
+            if NCGlobal.shared.capabilityFileSharingApiEnabled {
+                let home = self.utilityFileSystem.getHomeServer(urlBase: self.appDelegate.urlBase, userId: self.appDelegate.userId)
+                NextcloudKit.shared.readShares(parameters: NKShareParameter()) { account, shares, data, error in
+                    if error == .success {
+                        NCManageDatabase.shared.deleteTableShare(account: account)
+                        if let shares = shares, !shares.isEmpty {
+                            NCManageDatabase.shared.addShare(account: account, home: home, shares: shares)
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
+                        }
+                    }
+                }
+            }
 
             // Text direct editor detail
             if NCGlobal.shared.capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 {
