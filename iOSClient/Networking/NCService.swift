@@ -193,6 +193,27 @@ class NCService: NSObject {
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming, userInfo: ["account": account])
             }
 
+            // Sharing & Comments
+            if !NCGlobal.shared.capabilityFileSharingApiEnabled && !NCGlobal.shared.capabilityFilesComments && NCGlobal.shared.capabilityActivity.isEmpty {
+                self.appDelegate.disableSharesView = true
+            } else {
+                self.appDelegate.disableSharesView = false
+            }
+            
+            // File Sharing
+            if NCGlobal.shared.capabilityFileSharingApiEnabled {
+                let home = self.utilityFileSystem.getHomeServer(urlBase: self.appDelegate.urlBase, userId: self.appDelegate.userId)
+                NextcloudKit.shared.readShares(parameters: NKShareParameter()) { account, shares, data, error in
+                    if error == .success {
+                        NCManageDatabase.shared.deleteTableShare(account: account)
+                        if let shares = shares, !shares.isEmpty {
+                            NCManageDatabase.shared.addShare(account: account, home: home, shares: shares)
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
+                        }
+                    }
+                }
+            }
+
             // Text direct editor detail
             if capability.capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 {
                 let options = NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)
