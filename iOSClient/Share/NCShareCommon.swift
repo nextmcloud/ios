@@ -32,7 +32,7 @@ enum NCShareCommon {
         let size: CGFloat = 200
 
         let bottomImage = UIImage(named: "circle_fill")!.image(color: colorCircle, size: size / 2)
-        let topImage = NCUtility().loadImage(named: imageName, colors: [NCBrandColor.shared.iconImageColor])
+        let topImage = UIImage(named: imageName)!.image(color: .white, size: size / 2)
         UIGraphicsBeginImageContextWithOptions(CGSize(width: size, height: size), false, UIScreen.main.scale)
         bottomImage.draw(in: CGRect(origin: CGPoint.zero, size: CGSize(width: size, height: size)))
         topImage.draw(in: CGRect(origin: CGPoint(x: size / 4, y: size / 4), size: CGSize(width: size / 2, height: size / 2)))
@@ -75,7 +75,50 @@ enum NCShareCommon {
         case type.talkConversation.rawValue:
             return UIImage(named: "shareTypeRoom")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         default:
-            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         }
+    }
+    
+    func isLinkShare(shareType: Int) -> Bool {
+        return shareType == SHARE_TYPE_LINK
+    }
+    
+    func isExternalUserShare(shareType: Int) -> Bool {
+        return shareType == SHARE_TYPE_EMAIL
+    }
+    
+    func isInternalUser(shareType: Int) -> Bool {
+        return shareType == SHARE_TYPE_USER
+    }
+    
+    func isFileTypeAllowedForEditing(fileExtension: String, shareType: Int) -> Bool {
+        if fileExtension == "md" || fileExtension == "txt" {
+            return true
+        } else {
+            return isInternalUser(shareType: shareType)
+        }
+    }
+    
+    func isEditingEnabled(isDirectory: Bool, fileExtension: String, shareType: Int) -> Bool {
+        if !isDirectory {//file
+            return isFileTypeAllowedForEditing(fileExtension: fileExtension, shareType: shareType)
+        } else {
+            return true
+        }
+    }
+    
+    func isFileDropOptionVisible(isDirectory: Bool, shareType: Int) -> Bool {
+        return (isDirectory && (isLinkShare(shareType: shareType) || isExternalUserShare(shareType: shareType)))
+    }
+    
+    func isCurrentUserIsFileOwner(fileOwnerId: String) -> Bool {
+        if let currentUser = NCManageDatabase.shared.getActiveAccount(), currentUser.userId == fileOwnerId {
+            return true
+        }
+        return false
+    }
+    
+    func canReshare(withPermission permission: String) -> Bool {
+        return permission.contains(NCGlobal.shared.permissionCanShare)
     }
 }
