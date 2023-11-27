@@ -26,10 +26,7 @@ class NMCCommunication: NSObject, XMLParserDelegate {
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: controller)
     }
-    
-    func getDownloadLimit(token: String, completion: @escaping (_ downloadLimit: DownloadLimit?, _ errorDescription: String) -> Void)  {
-        let baseUrl = session.urlBase       // NCBrandOptions.shared.loginBaseUrl
-    
+        
     func getDownloadLimit(token: String, completion: @escaping (_ downloadLimit: DownloadLimit?, _ errorDescription: String) -> Void)  {
         let baseUrl = session.urlBase       // NCBrandOptions.shared.loginBaseUrl
         let endPoint = "/ocs/v2.php/apps/files_downloadlimit/\(token)/limit"

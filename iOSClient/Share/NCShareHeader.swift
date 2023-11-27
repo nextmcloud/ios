@@ -1,5 +1,5 @@
 //
-//  NCShareHeader.swift
+//  NCShareAdvancePermissionHeader.swift
 //  Nextcloud
 //
 //  Created by T-systems on 10/08/21.
@@ -26,10 +26,11 @@ import TagListView
 import SwiftUI
 import NextcloudKit
 
-class NCShareHeader: UIView {
+class NCShareAdvancePermissionHeader: UIView {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var fileName: UILabel!
     @IBOutlet weak var info: UILabel!
+    @IBOutlet weak var favorite: UIButton!
     @IBOutlet weak var fullWidthImageView: UIImageView!
     @IBOutlet weak var fileNameTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var tagListView: TagListView!
@@ -37,23 +38,24 @@ class NCShareHeader: UIView {
     private var heightConstraintWithImage: NSLayoutConstraint?
     private var heightConstraintWithoutImage: NSLayoutConstraint?
 
+    var ocId = ""
+    let utility = NCUtility()
+    let utilityFileSystem = NCUtilityFileSystem()
+    
     func setupUI(with metadata: tableMetadata) {
         let utilityFileSystem = NCUtilityFileSystem()
         if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase) {
             fullWidthImageView.image = image
             fullWidthImageView.contentMode = .scaleAspectFill
-            imageView.image = fullWidthImageView.image
             imageView.isHidden = true
         } else {
             if metadata.directory {
-                imageView.image = metadata.e2eEncrypted ? NCImageCache.shared.getFolderEncrypted(account: metadata.account) : NCImageCache.shared.getFolder(account: metadata.account)
+                imageView.image = UIImage.init(named: "folder")
             } else if !metadata.iconName.isEmpty {
-                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                imageView.image = UIImage.init(named: metadata.iconName)
             } else {
-                imageView.image = NCImageCache.shared.getImageFile()
+                imageView.image = UIImage.init(named: "file")
             }
-
-            fileNameTopConstraint.constant -= 45
         }
 
         fileName.text = metadata.fileNameView

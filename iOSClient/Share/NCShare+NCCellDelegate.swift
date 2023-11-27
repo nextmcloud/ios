@@ -74,5 +74,8 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
     func quickStatus(with tableShare: tableShare?, sender: Any) {
         guard let tableShare, let metadata else { return }
         self.toggleQuickPermissionsMenu(isDirectory: metadata.directory, share: tableShare, sender: sender)
+//        guard let tableShare = tableShare,
+//              let metadata = metadata else { return }
+//        self.toggleUserPermissionMenu(isDirectory: metadata.directory, tableShare: tableShare)
     }
 }

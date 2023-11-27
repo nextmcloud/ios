@@ -103,8 +103,7 @@ class NCShare: UIViewController, NCSharePagingContent {
         tableView.dataSource = self
         tableView.delegate = self
         tableView.allowsSelection = false
-        tableView.backgroundColor = .systemBackground
-        tableView.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 10, right: 0)
+        tableView.backgroundColor = .secondarySystemGroupedBackground
 
         tableView.register(UINib(nibName: "NCShareLinkCell", bundle: nil), forCellReuseIdentifier: "cellLink")
         tableView.register(UINib(nibName: "NCShareUserCell", bundle: nil), forCellReuseIdentifier: "cellUser")
@@ -242,6 +241,54 @@ class NCShare: UIViewController, NCSharePagingContent {
     }
 
     // MARK: - Notification Center
+
+    @objc func openShareProfile(_ sender: UITapGestureRecognizer) {
+        self.showProfileMenu(userId: metadata.ownerId, session: session, sender: sender.view)
+    }
+    
+    @objc func keyboardWillShow(notification: Notification) {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+           if (UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape) {
+                if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+                    if view.frame.origin.y == 0 {
+                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                        self.view.frame.origin.y -= keyboardSize.height
+                    }
+                }
+            } else if UIScreen.main.bounds.height < 850 {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 70
+                }
+            } else {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 40
+                }
+            }
+        }
+        
+        if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
+            if view.frame.origin.y == 0 {
+                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                self.view.frame.origin.y -= 230
+            }
+        }
+        textField?.layer.borderColor = NCBrandColor.shared.brand.cgColor
+    }
+    
+    @objc func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            self.view.frame.origin.y = 0
+        }
+        textField?.layer.borderColor = NCBrandColor.shared.label.cgColor
+    }
+
+    @objc func appWillEnterForeground(notification: Notification) {
+        reloadData()
+    }
+
+    // MARK: -
 
     @objc func openShareProfile(_ sender: UITapGestureRecognizer) {
         self.showProfileMenu(userId: metadata.ownerId, session: session, sender: sender.view)
@@ -416,7 +463,6 @@ class NCShare: UIViewController, NCSharePagingContent {
             present(alertController, animated: true, completion:nil)
         } else if shares.firstShareLink == nil {
             networking?.createShareLink(password: "")
-
         } else {
             networking?.createShareLink(password: "")
         }
@@ -546,7 +592,7 @@ class NCShare: UIViewController, NCSharePagingContent {
     }
 }
 
-// MARK: - NCShareNetworkingDelegate
+    // MARK: - NCShareNetworkingDelegate
 
 extension NCShare: NCShareNetworkingDelegate {
     func readShareCompleted() {
@@ -560,7 +606,10 @@ extension NCShare: NCShareNetworkingDelegate {
     }
 
     func unShareCompleted() {
-        reloadData()
+//        reloadData()
+//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
+        self.reloadData()
     }
 
     func updateShareWithError(idShare: Int) {
@@ -585,9 +634,9 @@ extension NCShare: NCShareNetworkingDelegate {
 
         appearance.backgroundColor = .systemBackground
         appearance.cornerRadius = 10
-        appearance.shadowColor = .black
-        appearance.shadowOpacity = 0.2
-        appearance.shadowRadius = 30
+        appearance.shadowColor = UIColor(white: 0.5, alpha: 1)
+        appearance.shadowOpacity = 0.9
+        appearance.shadowRadius = 25
         appearance.animationduration = 0.25
         appearance.textColor = .darkGray
         appearance.setupMaskedCorners([.layerMaxXMaxYCorner, .layerMinXMaxYCorner])
@@ -654,6 +703,19 @@ extension NCShare: NCShareNetworkingDelegate {
 
     func downloadLimitSet(to limit: Int, by token: String) {
         database.createDownloadLimit(account: metadata.account, count: 0, limit: limit, token: token)
+    }
+    
+    func checkIsCollaboraFile() -> Bool {
+        guard let metadata = metadata else {
+            return false
+        }
+        
+        // EDITORS
+        let editors = utility.isDirectEditing(account: metadata.account, contentType: metadata.contentType)
+        let availableRichDocument = utility.isRichDocument(metadata)
+        
+        // RichDocument: Collabora
+        return (availableRichDocument && editors.count == 0)
     }
 }
 
