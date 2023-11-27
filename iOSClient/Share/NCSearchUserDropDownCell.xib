@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -29,12 +29,12 @@
                     </userDefinedRuntimeAttributes>
                 </imageView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VIB-Xt-ckX">
-                    <rect key="frame" x="50" y="15" width="397" height="20.5"/>
+                    <rect key="frame" x="10" y="15" width="437" height="20.5"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="PlH-LZ-AzK">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="PlH-LZ-AzK">
                     <rect key="frame" x="457" y="15" width="20" height="20"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="20" id="Ej8-sj-gmZ"/>
@@ -58,12 +58,12 @@
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="VIB-Xt-ckX" firstAttribute="centerY" secondItem="wwI-k5-kbU" secondAttribute="centerY" id="1sO-cd-mlA"/>
+                <constraint firstItem="VIB-Xt-ckX" firstAttribute="leading" secondItem="wwI-k5-kbU" secondAttribute="leading" id="AMN-Kx-LZK"/>
                 <constraint firstAttribute="trailing" secondItem="PlH-LZ-AzK" secondAttribute="trailing" constant="10" id="K4R-2t-kFs"/>
                 <constraint firstItem="PlH-LZ-AzK" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="KFn-uE-DTl"/>
                 <constraint firstItem="PlH-LZ-AzK" firstAttribute="leading" secondItem="VIB-Xt-ckX" secondAttribute="trailing" constant="10" id="Lxn-FE-sOF"/>
                 <constraint firstItem="GxZ-7K-Vqz" firstAttribute="leading" secondItem="wwI-k5-kbU" secondAttribute="trailing" constant="-12" id="TcT-5G-EYO"/>
                 <constraint firstAttribute="trailing" secondItem="MbC-vF-eyT" secondAttribute="trailing" constant="20" id="Uiy-Jt-UwV"/>
-                <constraint firstItem="VIB-Xt-ckX" firstAttribute="leading" secondItem="wwI-k5-kbU" secondAttribute="trailing" constant="10" id="aUx-ZS-D4Q"/>
                 <constraint firstItem="MbC-vF-eyT" firstAttribute="leading" secondItem="wwI-k5-kbU" secondAttribute="trailing" constant="10" id="gjC-iK-c9X"/>
                 <constraint firstAttribute="bottom" secondItem="MbC-vF-eyT" secondAttribute="bottom" constant="2" id="kEt-vm-fFo"/>
                 <constraint firstItem="wwI-k5-kbU" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="oNR-Ox-93x"/>
