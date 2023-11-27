@@ -10,6 +10,7 @@ extension DateFormatter {
         let dateFormatter = DateFormatter()
         dateFormatter.formatterBehavior = .behavior10_4
         dateFormatter.dateStyle = .medium
+        dateFormatter.dateFormat = NCShareAdvancePermission.displayDateFormat
         return dateFormatter
     }()
 
@@ -74,4 +75,12 @@ extension DateFormatter {
         return formattedDateString
     }
 
+}
+
+extension Date {
+   static var tomorrow:  Date { return Date().dayAfter }
+   static var today: Date {return Date()}
+   var dayAfter: Date {
+      return Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+   }
 }
