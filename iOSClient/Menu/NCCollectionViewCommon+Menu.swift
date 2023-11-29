@@ -44,8 +44,6 @@ extension NCCollectionViewCommon {
             isOffline = localFile.offline
         }
 
-        let editors = utility.isDirectEditing(account: metadata.account, contentType: metadata.contentType)
-        let isRichDocument = utility.isRichDocument(metadata)
         let applicationHandle = NCApplicationHandle()
 
         var iconHeader: UIImage!
@@ -147,7 +145,7 @@ extension NCCollectionViewCommon {
         //
         // SET FOLDER E2EE
         //
-        if metadata.canSetDirectoryAsE2EE {
+        if metadata.canSetDirectoryAsE2EE && (NCUtilityFileSystem().getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) == appDelegate.activeServerUrl) {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_e2e_set_folder_encrypted_", comment: ""),
@@ -195,11 +193,11 @@ extension NCCollectionViewCommon {
         // FAVORITE
         // FIXME: PROPPATCH doesn't work
         // https://github.com/nextcloud/files_lock/issues/68
-        if !metadata.lock {
+        if !metadata.lock, !metadata.isDirectoryE2EE, !metadata.e2eEncrypted  {
             actions.append(
                 NCMenuAction(
                     title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
-                    icon: utility.loadImage(named: metadata.favorite ? "star.slash" : "star", colors: [NCBrandColor.shared.yellowFavorite]),
+                    icon: utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite]),
                     order: 50,
                     action: { _ in
                         NCNetworking.shared.favoriteMetadata(metadata) { error in
@@ -222,43 +220,24 @@ extension NCCollectionViewCommon {
         }
 
         //
-        // OPEN with external editor
-        //
-        if metadata.canOpenExternalEditor {
-
-            var editor = ""
-            var title = ""
-            var icon: UIImage?
-
-            if editors.contains(NCGlobal.shared.editorOnlyoffice) {
-                editor = NCGlobal.shared.editorOnlyoffice
-                title = NSLocalizedString("_open_in_onlyoffice_", comment: "")
-                icon = utility.loadImage(named: "onlyoffice", colors: [NCBrandColor.shared.iconImageColor])
-            } else if isRichDocument {
-                editor = NCGlobal.shared.editorCollabora
-                title = NSLocalizedString("_open_in_collabora_", comment: "")
-                icon = utility.loadImage(named: "collabora", colors: [NCBrandColor.shared.iconImageColor])
-            }
-
-            if !editor.isEmpty {
-                actions.append(
-                    NCMenuAction(
-                        title: title,
-                        icon: icon!,
-                        order: 70,
-                        action: { _ in
-                            NCViewer().view(viewController: self, metadata: metadata, metadatas: [metadata], imageIcon: imageIcon, editor: editor, isRichDocument: isRichDocument)
-                        }
-                    )
-                )
-            }
-        }
-
-        //
-        // SHARE
+        // OPEN IN
         //
         if metadata.canShare {
             actions.append(.share(selectedMetadatas: [metadata], viewController: self, order: 80))
+        }
+        
+        //
+        // PRINT
+        //
+        if metadata.isPrintable {
+            actions.append(.printAction(metadata: metadata, order: 90))
+        }
+        
+        //
+        // SAVE CAMERA ROLL
+        //
+        if metadata.isSavebleInCameraRoll {
+            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata], order: 100))
         }
 
         //
@@ -342,6 +321,13 @@ extension NCCollectionViewCommon {
         }
 
         //
+        // COPY IN PASTEBOARD
+        //
+        if metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE  {
+            actions.append(.copyAction(selectOcId: [metadata.ocId], order: 140))
+        }
+
+        //
         // MODIFY WITH QUICK LOOK
         //
         if metadata.isModifiableWithQuickLook {
@@ -372,31 +358,10 @@ extension NCCollectionViewCommon {
         }
 
         //
-        // COLOR FOLDER
-        //
-        if self is NCFiles, metadata.directory {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_change_color_", comment: ""),
-                    icon: utility.loadImage(named: "paintpalette", colors: [NCBrandColor.shared.iconImageColor]),
-                    order: 160,
-                    action: { _ in
-                        if let picker = UIStoryboard(name: "NCColorPicker", bundle: nil).instantiateInitialViewController() as? NCColorPicker {
-                            picker.metadata = metadata
-                            let popup = NCPopupViewController(contentController: picker, popupWidth: 200, popupHeight: 320)
-                            popup.backgroundAlpha = 0
-                            self.present(popup, animated: true)
-                        }
-                    }
-                )
-            )
-        }
-
-        //
         // DELETE
         //
         if metadata.isDeletable {
-            actions.append(.deleteAction(selectedMetadatas: [metadata], indexPaths: [indexPath], metadataFolder: metadataFolder, viewController: self, order: 170))
+            actions.append(.deleteAction(selectedMetadatas: [metadata], indexPath: [indexPath], metadataFolder: metadataFolder, viewController: self, order: 170))
         }
 
         applicationHandle.addCollectionViewCommonMenu(metadata: metadata, imageIcon: imageIcon, actions: &actions)
