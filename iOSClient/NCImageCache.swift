@@ -140,9 +140,9 @@ final class NCImageCache: @unchecked Sendable {
         return maxImages
     }
     
-//    func getMediaMetadatas(account: String, predicate: NSPredicate? = nil) -> ThreadSafeArray<tableMetadata>? {
-//        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
-//    }
+    func getMediaMetadatas(account: String, predicate: NSPredicate? = nil) -> ThreadSafeArray<tableMetadata>? {
+        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
+    }
 
     func allowExtensions(ext: String) -> Bool {
         return allowExtensions.contains(ext)
