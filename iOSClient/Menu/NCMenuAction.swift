@@ -78,7 +78,7 @@ extension NCMenuAction {
     static func selectAllAction(action: @escaping () -> Void) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_select_all_", comment: ""),
-            icon: NCUtility().loadImage(named: "checkmark.circle.fill"),
+            icon: NCUtility().loadImage(named: "checkmark.circle.fill", color: NCBrandColor.shared.iconColor),
             action: { _ in action() }
         )
     }
@@ -96,7 +96,7 @@ extension NCMenuAction {
     static func copyAction(selectOcId: [String], order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_copy_file_", comment: ""),
-            icon: NCUtility().loadImage(named: "doc.on.doc"),
+            icon: NCUtility().loadImage(named: "copy", color: NCBrandColor.shared.iconColor),
             order: order,
             action: { _ in
                 NCActionCenter.shared.copyPasteboard(pasteboardOcIds: selectOcId)
@@ -137,7 +137,7 @@ extension NCMenuAction {
 
         return NCMenuAction(
             title: titleDelete,
-            icon: NCUtility().loadImage(named: "trash"),
+            icon: NCUtility().loadImage(named: "trash", color: NCBrandColor.shared.iconColor),
             order: order,
             action: { _ in
                 let alertController = UIAlertController(
@@ -156,9 +156,11 @@ extension NCMenuAction {
                             var error = NKError()
                             var ocId: [String] = []
                             for metadata in selectedMetadatas where error == .success {
+                                NCActivityIndicator.shared.start()
                                 error = await NCNetworking.shared.deleteMetadata(metadata, onlyLocalCache: false)
                                 if error == .success {
                                     ocId.append(metadata.ocId)
+                                    NCActivityIndicator.shared.stop()
                                 }
                             }
                             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteFile, userInfo: ["ocId": ocId, "indexPath": indexPath, "onlyLocalCache": false, "error": error, "hud": hud])
@@ -197,7 +199,7 @@ extension NCMenuAction {
     static func openInAction(selectedMetadatas: [tableMetadata], viewController: UIViewController, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_open_in_", comment: ""),
-            icon: NCUtility().loadImage(named: "square.and.arrow.up"),
+            icon: NCUtility().loadImage(named: "open_file",color: NCBrandColor.shared.iconColor),
             order: order,
             action: { _ in
                 NCActionCenter.shared.openActivityViewController(selectedMetadata: selectedMetadatas)
@@ -209,7 +211,7 @@ extension NCMenuAction {
     /// Save selected files to user's photo library
     static func saveMediaAction(selectedMediaMetadatas: [tableMetadata], order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
         var title: String = NSLocalizedString("_save_selected_files_", comment: "")
-        var icon = NCUtility().loadImage(named: "square.and.arrow.down")
+        var icon = NCUtility().loadImage(named: "save_files",color: NCBrandColor.shared.iconColor)
         if selectedMediaMetadatas.allSatisfy({ NCManageDatabase.shared.getMetadataLivePhoto(metadata: $0) != nil }) {
             title = NSLocalizedString("_livephoto_save_", comment: "")
             icon = NCUtility().loadImage(named: "livephoto")
@@ -244,7 +246,7 @@ extension NCMenuAction {
     static func setAvailableOfflineAction(selectedMetadatas: [tableMetadata], isAnyOffline: Bool, viewController: UIViewController, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: isAnyOffline ? NSLocalizedString("_remove_available_offline_", comment: "") : NSLocalizedString("_set_available_offline_", comment: ""),
-            icon: NCUtility().loadImage(named: "tray.and.arrow.down"),
+            icon: NCUtility().loadImage(named: "offlineMenu", color: NCBrandColor.shared.iconColor),
             order: order,
             action: { _ in
                 if !isAnyOffline, selectedMetadatas.count > 3 {
@@ -270,7 +272,7 @@ extension NCMenuAction {
     static func moveOrCopyAction(selectedMetadatas: [tableMetadata], indexPath: [IndexPath], order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_move_or_copy_selected_files_", comment: ""),
-            icon: NCUtility().loadImage(named: "arrow.up.right.square"),
+            icon: NCUtility().loadImage(named: "move", color: NCBrandColor.shared.iconColor),
             order: order,
             action: { _ in
                 NCActionCenter.shared.openSelectView(items: selectedMetadatas, indexPath: indexPath)
@@ -283,7 +285,7 @@ extension NCMenuAction {
     static func printAction(metadata: tableMetadata, order: Int = 0) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_print_", comment: ""),
-            icon: NCUtility().loadImage(named: "printer"),
+            icon: NCUtility().loadImage(named: "printer", color: NCBrandColor.shared.iconColor),
             order: order,
             action: { _ in
                 if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
