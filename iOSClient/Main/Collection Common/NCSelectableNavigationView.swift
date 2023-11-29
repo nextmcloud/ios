@@ -47,11 +47,6 @@ protocol NCSelectableNavigationView: AnyObject {
     var fileSelect: [String] { get set }
 //    var selectIndexPaths: [IndexPath] { get set }
     var appDelegate: AppDelegate { get }
-    var selectableDataSource: [RealmSwiftObject] { get }
-    var collectionView: UICollectionView! { get set }
-    var isEditMode: Bool { get set }
-    var selectOcId: [String] { get set }
-    var appDelegate: AppDelegate { get }
     var selectIndexPaths: [IndexPath] { get set }
     var titleCurrentFolder: String { get }
     var navigationItem: UINavigationItem { get }
@@ -90,8 +85,6 @@ extension NCSelectableNavigationView {
             self.isEditMode = isOn ?? !self.isEditMode
             self.fileSelect.removeAll()
 //            self.selectIndexPaths.removeAll()
-            self.selectOcId.removeAll()
-            self.selectIndexPaths.removeAll()
             self.setNavigationLeftItems()
             self.setNavigationRightItems(enableMenu: true)
             self.collectionView.reloadData()
@@ -101,8 +94,6 @@ extension NCSelectableNavigationView {
     func collectionViewSelectAll() {
         
         fileSelect = selectableDataSource.compactMap({ $0.primaryKeyValue })
-//        fileSelect = NCCollectionViewDataSource().getMetadataSourceForAllSections().compactMap({ $0.primaryKeyValue })
-//        selectOcId = selectableDataSource.compactMap({ $0.primaryKeyValue })
         collectionView.reloadData()
         setNavigationRightItems(enableMenu: false)
     }
