@@ -69,12 +69,17 @@ extension AppDelegate {
                              sender: sender,
                              action: { _ in
                     let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorText})!
-
-                    Task {
-                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + ".md", account: session.account, serverUrl: serverUrl)
-                        let fileNamePath = NCUtilityFileSystem().getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
-
-                        NCCreateDocument().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: NCGlobal.shared.editorText, creatorId: directEditingCreator.identifier, templateId: NCGlobal.shared.templateDocument, account: session.account)
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorText
+                        viewController.creatorId = directEditingCreator.identifier
+                        viewController.typeTemplate = NCGlobal.shared.editorText
+                        viewController.serverUrl = appDelegate.activeServerUrl
+                        viewController.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
+                        appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
                     }
                 })
             )
@@ -128,8 +133,8 @@ extension AppDelegate {
                         )
         )
 
-        // Folder encrypted
-        if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: session.account) {
+        // Folder encrypted (ONLY ROOT)
+        if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: appDelegate.account) && (NCUtilityFileSystem().getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) == appDelegate.activeServerUrl) {
             actions.append(
                 NCMenuAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
                              icon: NCImageCache.shared.getFolderEncrypted(account: session.account),
