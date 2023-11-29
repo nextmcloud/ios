@@ -1213,17 +1213,41 @@ extension NCManageDatabase {
         } ?? false
     }
 
-    func getMetadataDirectoryAsync(serverUrl: String, account: String) async -> tableMetadata? {
-        guard let url = URL(string: serverUrl) else {
-            return nil
-        }
-        let fileName = url.lastPathComponent
-        var baseUrl = url.deletingLastPathComponent().absoluteString
-        if baseUrl.hasSuffix("/") {
-            baseUrl.removeLast()
-        }
-        guard let decodedBaseUrl = baseUrl.removingPercentEncoding else {
-            return nil
+    func createMetadatasFolder(assets: [PHAsset],
+                               useSubFolder: Bool,
+                               session: NCSession.Session, completion: @escaping ([tableMetadata]) -> Void) {
+        var foldersCreated: Set<String> = []
+        var metadatas: [tableMetadata] = []
+        let serverUrlBase = getAccountAutoUploadDirectory(session: session)
+        let fileNameBase = getAccountAutoUploadFileName(account: session.account)
+        let predicate = NSPredicate(format: "account == %@ AND serverUrl BEGINSWITH %@ AND directory == true", session.account, serverUrlBase)
+
+        func createMetadata(serverUrl: String, fileName: String, metadata: tableMetadata?) {
+            guard !foldersCreated.contains(serverUrl + "/" + fileName) else {
+                return
+            }
+            foldersCreated.insert(serverUrl + "/" + fileName)
+
+            if let metadata {
+                metadata.status = NCGlobal.shared.metadataStatusWaitCreateFolder
+                metadata.sessionSelector = NCGlobal.shared.selectorUploadAutoUpload
+                metadata.sessionDate = Date()
+                metadatas.append(tableMetadata(value: metadata))
+            } else {
+                let metadata = NCManageDatabase.shared.createMetadata(fileName: fileName,
+                                                                      fileNameView: fileName,
+                                                                      ocId: NSUUID().uuidString,
+                                                                      serverUrl: serverUrl,
+                                                                      url: "",
+                                                                      contentType: "httpd/unix-directory",
+                                                                      directory: true,
+                                                                      session: session,
+                                                                      sceneIdentifier: nil)
+                metadata.status = NCGlobal.shared.metadataStatusWaitCreateFolder
+                metadata.sessionSelector = NCGlobal.shared.selectorUploadAutoUpload
+                metadata.sessionDate = Date()
+                metadatas.append(metadata)
+            }
         }
 
         return await core.performRealmReadAsync { realm in
@@ -1233,7 +1257,7 @@ extension NCManageDatabase {
             return object?.detachedCopy()
         }
     }
-
+    
     func getMetadataDirectory(serverUrl: String, account: String) -> tableMetadata? {
         guard let url = URL(string: serverUrl) else {
             return nil
@@ -1253,6 +1277,7 @@ extension NCManageDatabase {
                 .first
             return object?.detachedCopy()
         }
+        return nil
     }
 
     func getTransferAsync(tranfersSuccess: [tableMetadata]) async -> [tableMetadata] {
