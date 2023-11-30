@@ -425,6 +425,55 @@ class NCActionCenter: NSObject, UIDocumentInteractionControllerDelegate, NCSelec
             }
         }
     }
+    
+    // MARK: - Copy & Paste
+
+    func copyPasteboard(pasteboardOcIds: [String], viewController: UIViewController) {
+        var items = [[String: Any]]()
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        let hudView = viewController.view
+        var fractionCompleted: Float = 0
+
+        // getting file data can take some time and block the main queue
+        DispatchQueue.global(qos: .userInitiated).async {
+            var downloadMetadatas: [tableMetadata] = []
+            for ocid in pasteboardOcIds {
+                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocid) else { continue }
+                if let pasteboardItem = metadata.toPasteBoardItem() {
+                    items.append(pasteboardItem)
+                } else {
+                    downloadMetadatas.append(metadata)
+                }
+            }
+
+            // do 5 downloads in parallel to optimize efficiency
+            let processor = ParallelWorker(n: 5, titleKey: "_downloading_", totalTasks: downloadMetadatas.count, hudView: hudView)
+
+            for metadata in downloadMetadatas {
+                processor.execute { completion in
+                    guard let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
+                                                                                                   session: NextcloudKit.shared.nkCommonInstance.sessionIdentifierDownload,
+                                                                                                   selector: "") else { return completion() }
+                    NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: false) {
+                    } requestHandler: { _ in
+                    } progressHandler: { progress in
+                        if Float(progress.fractionCompleted) > fractionCompleted || fractionCompleted == 0 {
+                            processor.hud?.progress = Float(progress.fractionCompleted)
+                            fractionCompleted = Float(progress.fractionCompleted)
+                        }
+                    } completion: { _, _ in
+                        fractionCompleted = 0
+                        completion()
+                    }
+                }
+            }
+            processor.completeWork {
+                items.append(contentsOf: downloadMetadatas.compactMap({ $0.toPasteBoardItem() }))
+                UIPasteboard.general.setItems(items, options: [:])
+            }
+        }
+    }
+
 
     // MARK: - Copy & Paste
 
@@ -620,5 +669,21 @@ class NCActionCenter: NSObject, UIDocumentInteractionControllerDelegate, NCSelec
         if let navigationController = navigationController {
             controller?.present(navigationController, animated: true, completion: nil)
         }
+    }
+}
+
+
+fileprivate extension tableMetadata {
+    func toPasteBoardItem() -> [String: Any]? {
+        // Get Data
+        let fileUrl = URL(fileURLWithPath: NCUtilityFileSystem().getDirectoryProviderStorageOcId(ocId, fileNameView: fileNameView))
+        guard NCUtilityFileSystem().fileProviderStorageExists(self),
+              let data = try? Data(contentsOf: fileUrl) else { return nil }
+
+        // Determine the UTI for the file
+        guard let fileUTI = UTType(filenameExtension: fileExtension)?.identifier else { return nil }
+
+        // Pasteboard item
+        return [fileUTI: data]
     }
 }
