@@ -47,9 +47,10 @@ class NCFiles: NCCollectionViewCommon {
         }
 
         if self.serverUrl.isEmpty {
-            //
-            // Set ServerURL when start (isEmpty)
-            //
+
+            ///
+            /// Set ServerURL when start (isEmpty)
+            ///
             self.serverUrl = utilityFileSystem.getHomeServer(session: session)
             self.titleCurrentFolder = getNavigationTitle()
 
@@ -85,7 +86,8 @@ class NCFiles: NCCollectionViewCommon {
                     }
 
                     self.titleCurrentFolder = self.getNavigationTitle()
-                    self.navigationItem.title = self.titleCurrentFolder
+                ///Magentacloud branding changes hide user account button on left navigation bar
+//                self.setNavigationLeftItems()
 
                     Task { @MainActor in
                         await self.mainNavigationController?.menuPlus?.create(session: session)
@@ -101,6 +103,7 @@ class NCFiles: NCCollectionViewCommon {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        resetPlusButtonAlpha()
         Task {
             await self.reloadDataSource()
         }
@@ -137,6 +140,14 @@ class NCFiles: NCCollectionViewCommon {
             return
         }
 
+        let predicate: NSPredicate = {
+            if NCKeychain().getPersonalFilesOnly(account: self.session.account) {
+                return self.personalFilesOnlyPredicate
+            } else {
+                return self.defaultPredicate
+            }
+        }()
+
         self.metadataFolder = await self.database.getMetadataFolderAsync(session: self.session, serverUrl: self.serverUrl)
         if let tblDirectory = await self.database.getTableDirectoryAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", self.session.account, self.serverUrl)) {
             self.richWorkspaceText = tblDirectory.richWorkspace
@@ -159,7 +170,9 @@ class NCFiles: NCCollectionViewCommon {
         await super.reloadDataSource()
     }
 
-    override func getServerData(forced: Bool = false) async {
+    override func getServerData(refresh: Bool = false) async {
+        await super.getServerData()
+
         defer {
             stopGUIGetServerData()
             startSyncMetadata(metadatas: self.dataSource.getMetadatas())
@@ -190,7 +203,7 @@ class NCFiles: NCCollectionViewCommon {
                                                                                                 session: NCNetworking.shared.sessionDownload,
                                                                                                 selector: NCGlobal.shared.selectorDownloadFile,
                                                                                                 sceneIdentifier: self.controller?.sceneIdentifier) {
-                        await NCNetworking.shared.downloadFile(metadata: metadata)
+                        NCNetworking.shared.download(metadata: metadata)
                     }
                 }
             }
@@ -227,12 +240,9 @@ class NCFiles: NCCollectionViewCommon {
                 self.collectionView.reloadData()
             }
         }
-        guard resultsReadFile.error == .success,
-              let metadata = resultsReadFile.metadata else {
-            return(nil, resultsReadFile.error, reloadRequired)
+        guard resultsReadFile.error == .success, let metadata = resultsReadFile.metadata else {
+            return (nil, resultsReadFile.error, false)
         }
-        let e2eEncrypted = metadata.e2eEncrypted
-        let ocId = metadata.ocId
 
         await self.database.updateDirectoryRichWorkspaceAsync(metadata.richWorkspace, account: account, serverUrl: serverUrl)
         let tableDirectory = await self.database.getTableDirectoryAsync(ocId: metadata.ocId)
@@ -243,14 +253,14 @@ class NCFiles: NCCollectionViewCommon {
         await NCManageDatabase.shared.deleteLivePhotoError()
 
         let shouldSkipUpdate: Bool = (
-            !forced &&
+            !refresh &&
             tableDirectory?.etag == metadata.etag &&
             !metadata.e2eEncrypted &&
             !self.dataSource.isEmpty()
         )
 
         if shouldSkipUpdate {
-            return (nil, NKError(), reloadRequired)
+            return (nil, NKError(), false)
         }
 
         startGUIGetServerData()
@@ -272,7 +282,6 @@ class NCFiles: NCCollectionViewCommon {
         guard resultsReadFolder.error == .success else {
             return(nil, resultsReadFolder.error, reloadRequired)
         }
-        reloadRequired = true
 
         if let metadataFolder {
             self.metadataFolder = metadataFolder.detachedCopy()
@@ -407,9 +416,39 @@ class NCFiles: NCCollectionViewCommon {
         await didSelectMetadata(metadata, withOcIds: false, viewerTransitionSource: nil)
     }
 
+    override func resetPlusButtonAlpha(animated: Bool = true) {
+        accumulatedScrollDown = 0
+        let update = {
+            self.plusButton.alpha = 1.0
+        }
+
+        if animated {
+            UIView.animate(withDuration: 0.3, animations: update)
+        } else {
+            update()
+        }
+    }
+
+    override func isHiddenPlusButton(_ isHidden: Bool) {
+        if isHidden {
+            UIView.animate(withDuration: 0.5, delay: 0.0, options: [], animations: {
+                self.plusButton.transform = CGAffineTransform(translationX: 100, y: 0)
+                self.plusButton.alpha = 0
+            })
+        } else {
+            plusButton.transform = CGAffineTransform(translationX: 100, y: 0)
+            plusButton.alpha = 0
+
+            UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                self.plusButton.transform = .identity
+                self.plusButton.alpha = 1
+            })
+        }
+    }
+
     // MARK: - NCAccountSettingsModelDelegate
 
-    override func accountSettingsDidDismiss(tblAccount: tableAccount?, controller: NCMainTabBarController?) {
+    override func accountSettingsDidDismiss(tableAccount: tableAccount?, controller: NCMainTabBarController?) {
         let currentAccount = session.account
 
         if database.getAllTableAccount().isEmpty {
@@ -431,8 +470,6 @@ class NCFiles: NCCollectionViewCommon {
             navigationItem.title = self.titleCurrentFolder
         }
 
-        Task {
-            await (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
-        }
+        (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
     }
 }
