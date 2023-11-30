@@ -39,7 +39,7 @@ extension NCCollectionViewCommon: SwipeCollectionViewCellDelegate {
             }
         }
         favoriteAction.backgroundColor = NCBrandColor.shared.yellowFavorite
-        favoriteAction.image = .init(systemName: metadata.favorite ? "star.slash.fill" : "star.fill")
+        favoriteAction.image = .init(systemName: "star.fill")
         favoriteAction.transitionDelegate = scaleTransition
         favoriteAction.hidesWhenSelected = true
 
