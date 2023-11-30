@@ -37,8 +37,87 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         self.autoUploadDirectory = self.database.getAccountAutoUploadDirectory(session: self.session)
         // get layout for view
         self.layoutForView = self.database.getLayoutForView(account: self.session.account, key: self.layoutKey, serverUrl: self.serverUrl)
-
+        
         return self.dataSource.numberOfItemsInSection(section)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let metadata = dataSource.cellForItemAt(indexPath: indexPath),
+              let cell = (cell as? NCCellProtocol) else { return }
+        let existsIcon = utilityFileSystem.fileProviderStoragePreviewIconExists(metadata.ocId, etag: metadata.etag)
+
+        func downloadAvatar(fileName: String, user: String, dispalyName: String?) {
+            if let image = NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName) {
+                cell.fileAvatarImageView?.contentMode = .scaleAspectFill
+                cell.fileAvatarImageView?.image = image
+            } else {
+                NCNetworking.shared.downloadAvatar(user: user, dispalyName: dispalyName, fileName: fileName, cell: cell, view: collectionView)
+            }
+        }
+        /// CONTENT MODE
+        cell.filePreviewImageView?.layer.borderWidth = 0
+        if existsIcon {
+            cell.filePreviewImageView?.contentMode = .scaleAspectFill
+        } else {
+            cell.filePreviewImageView?.contentMode = .scaleAspectFit
+        }
+        cell.fileAvatarImageView?.contentMode = .center
+        /// THUMBNAIL
+        if !metadata.directory {
+            if metadata.hasPreviewBorder {
+                cell.filePreviewImageView?.layer.borderWidth = 0.2
+                cell.filePreviewImageView?.layer.borderColor = UIColor.lightGray.cgColor
+            }
+            if metadata.name == NCGlobal.shared.appName {
+                if layoutForView?.layout == NCGlobal.shared.layoutPhotoRatio || layoutForView?.layout == NCGlobal.shared.layoutPhotoSquare {
+                    if let image = NCImageCache.shared.getPreviewImageCache(ocId: metadata.ocId, etag: metadata.etag) {
+                        cell.filePreviewImageView?.image = image
+                    } else if let image = UIImage(contentsOfFile: self.utilityFileSystem.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)) {
+                        cell.filePreviewImageView?.image = image
+                        NCImageCache.shared.addPreviewImageCache(metadata: metadata, image: image)
+                    }
+                } else {
+                    if let image = NCImageCache.shared.getIconImageCache(ocId: metadata.ocId, etag: metadata.etag) {
+                        cell.filePreviewImageView?.image = image
+                    } else if metadata.hasPreview {
+                        cell.filePreviewImageView?.image = utility.getIcon(metadata: metadata)
+                    }
+                }
+                if cell.filePreviewImageView?.image == nil {
+                    if metadata.iconName.isEmpty {
+                        cell.filePreviewImageView?.image = NCImageCache.images.file
+                    } else {
+                        cell.filePreviewImageView?.image = utility.loadImage(named: metadata.iconName, useTypeIconFile: true)
+                    }
+                    if metadata.hasPreview && metadata.status == NCGlobal.shared.metadataStatusNormal && !existsIcon {
+                        for case let operation as NCCollectionViewDownloadThumbnail in NCNetworking.shared.downloadThumbnailQueue.operations where operation.metadata.ocId == metadata.ocId { return }
+                        NCNetworking.shared.downloadThumbnailQueue.addOperation(NCCollectionViewDownloadThumbnail(metadata: metadata, cell: cell, collectionView: collectionView))
+                    }
+                }
+            } else {
+                /// APP NAME - UNIFIED SEARCH
+                switch metadata.iconName {
+                case let str where str.contains("contacts"):
+                    cell.filePreviewImageView?.image = NCImageCache.images.iconContacts
+                case let str where str.contains("conversation"):
+                    cell.filePreviewImageView?.image = NCImageCache.images.iconTalk
+                case let str where str.contains("calendar"):
+                    cell.filePreviewImageView?.image = NCImageCache.images.iconCalendar
+                case let str where str.contains("deck"):
+                    cell.filePreviewImageView?.image = NCImageCache.images.iconDeck
+                case let str where str.contains("mail"):
+                    cell.filePreviewImageView?.image = NCImageCache.images.iconMail
+                case let str where str.contains("talk"):
+                    cell.filePreviewImageView?.image = NCImageCache.images.iconTalk
+                case let str where str.contains("confirm"):
+                    cell.filePreviewImageView?.image = NCImageCache.images.iconConfirm
+                case let str where str.contains("pages"):
+                    cell.filePreviewImageView?.image = NCImageCache.images.iconPages
+                default:
+                    cell.filePreviewImageView?.image = NCImageCache.images.iconFile
+                }
+            }
+        }
     }
 
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -133,9 +212,25 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         var isShare = false
         var isMounted = false
         var a11yValues: [String] = []
+
+        // LAYOUT PHOTO
+        if layoutForView?.layout == NCGlobal.shared.layoutPhotoRatio || layoutForView?.layout == NCGlobal.shared.layoutPhotoSquare {
+            guard let photoCell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as? NCPhotoCell else { return NCPhotoCell() }
+            photoCell.photoCellDelegate = self
+            cell = photoCell
+        } else if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+        // LAYOUT GRID
+            guard let gridCell = collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as? NCGridCell else { return NCGridCell() }
+            gridCell.gridCellDelegate = self
+            cell = gridCell
+        } else {
+        // LAYOUT LIST
+            guard let listCell = collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as? NCListCell else { return NCListCell() }
+            listCell.listCellDelegate = self
+            cell = listCell
+        }
         let metadata = self.dataSource.getMetadata(indexPath: indexPath) ?? tableMetadata()
-        let existsImagePreview = utilityFileSystem.fileProviderStorageImageExists(metadata.ocId, etag: metadata.etag)
-        let ext = global.getSizeExtension(column: self.numberOfColumns)
+        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
 
         defer {
             if !metadata.isSharable() || NCCapabilities.shared.disableSharesView(account: metadata.account) {
@@ -327,14 +422,28 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         }
 
         // Share image
-        if isShare {
-            cell.fileSharedImage?.image = imageCache.getImageShared()
-        } else if !metadata.shareType.isEmpty {
-            metadata.shareType.contains(3) ?
-            (cell.fileSharedImage?.image = imageCache.getImageShareByLink()) :
-            (cell.fileSharedImage?.image = imageCache.getImageShared())
+        if isShare || !metadata.shareType.isEmpty {
+            cell.fileSharedImage?.image = NCImageCache.images.shared
         } else {
-            cell.fileSharedImage?.image = imageCache.getImageCanShare()
+            cell.fileSharedImage?.image = NCImageCache.images.canShare.image(color: NCBrandColor.shared.gray60, size: 50)
+            cell.fileSharedLabel?.text = ""
+        }
+        if appDelegate.account != metadata.account {
+            cell.fileSharedImage?.image = NCImageCache.images.shared
+        }
+        cell.fileSharedLabel?.text = NSLocalizedString("_shared_", comment: "")
+        cell.fileSharedLabel?.textColor = NCBrandColor.shared.customer
+        if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)){
+            cell.fileSharedImage?.image = cell.fileSharedImage?.image?.imageColor(NCBrandColor.shared.customer)
+        } else {
+            cell.fileSharedImage?.image = NCImageCache.images.canShare.image(color: NCBrandColor.shared.gray60, size: 50)
+            cell.fileSharedLabel?.text = ""
+        }
+        
+        if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+            cell.fileSharedImage?.image = NCImageCache.images.sharedWithMe
+            cell.fileSharedLabel?.text = NSLocalizedString("_recieved_", comment: "")
+            cell.fileSharedLabel?.textColor = NCBrandColor.shared.notificationAction
         }
 
         // Button More
@@ -476,12 +585,25 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         }
 
         cell.setIconOutlines()
+
+        // Hide lines on iPhone
+        if !UIDevice.current.orientation.isLandscape && UIDevice.current.model.hasPrefix("iPhone") {
+            cell.cellSeparatorView?.isHidden = true
+            cell.fileSharedLabel?.isHidden = true
+        }else{
+            cell.cellSeparatorView?.isHidden = false
+            cell.fileSharedLabel?.isHidden = false
+        }
+
         return cell
     }
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        if kind == UICollectionView.elementKindSectionHeader || kind == mediaSectionHeader {
-            if self.dataSource.isEmpty() {
+
+        if kind == UICollectionView.elementKindSectionHeader {
+
+            if dataSource.getMetadataSourceForAllSections().isEmpty {
+
                 guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFirstHeaderEmptyData", for: indexPath) as? NCSectionFirstHeaderEmptyData else { return NCSectionFirstHeaderEmptyData() }
                 self.sectionFirstHeaderEmptyData = header
                 header.delegate = self
@@ -529,12 +651,27 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFirstHeader", for: indexPath) as? NCSectionFirstHeader else { return NCSectionFirstHeader() }
                 let (_, heightHeaderRichWorkspace, heightHeaderSection) = getHeaderHeight(section: indexPath.section)
                 self.sectionFirstHeader = header
+                if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+                    header.setImageSwitchList()
+                    header.buttonSwitch.accessibilityLabel = NSLocalizedString("_list_view_", comment: "")
+                } else {
+                    header.setImageSwitchGrid()
+                    header.buttonSwitch.accessibilityLabel = NSLocalizedString("_grid_view_", comment: "")
+                }
                 header.delegate = self
 
                 if !isSearchingMode, headerMenuTransferView, isHeaderMenuTransferViewEnabled() != nil {
                     header.setViewTransfer(isHidden: false)
                 } else {
                     header.setViewTransfer(isHidden: true)
+                }
+                
+                if headerMenuButtonsView {
+                    header.setStatusButtonsView(enable: !dataSource.getMetadataSourceForAllSections().isEmpty)
+                    header.setButtonsView(height: NCGlobal.shared.heightButtonsView)
+                    header.setSortedTitle(layoutForView?.titleButtonHeader ?? "")
+                } else {
+                    header.setButtonsView(height: 0)
                 }
 
                 header.setRichWorkspaceHeight(heightHeaderRichWorkspace)
