@@ -7,15 +7,39 @@ import MarkdownKit
 import NextcloudKit
 
 protocol NCSectionFirstHeaderDelegate: AnyObject {
+    func tapButtonSwitch(_ sender: Any)
+    func tapButtonOrder(_ sender: Any)
+    func tapButtonTransfer(_ sender: Any)
     func tapRichWorkspace(_ sender: Any)
     func tapRecommendations(with metadata: tableMetadata, viewerTransitionSource: NCMediaViewerTransitionSource?)
 }
 
+extension NCSectionFirstHeaderDelegate {
+    func tapButtonSwitch(_ sender: Any) {}
+    func tapButtonOrder(_ sender: Any) {}
+}
+
 class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegate {
+
+    @IBOutlet weak var buttonSwitch: UIButton!
+    @IBOutlet weak var buttonOrder: UIButton!
+    @IBOutlet weak var buttonTransfer: UIButton!
+    @IBOutlet weak var imageButtonTransfer: UIImageView!
+    @IBOutlet weak var labelTransfer: UILabel!
+    @IBOutlet weak var progressTransfer: UIProgressView!
+    @IBOutlet weak var transferSeparatorBottom: UIView!
+    @IBOutlet weak var textViewRichWorkspace: UITextView!
+    @IBOutlet weak var labelSection: UILabel!
+    @IBOutlet weak var viewTransfer: UIView!
     @IBOutlet weak var viewRichWorkspace: UIView!
     @IBOutlet weak var viewRecommendations: UIView!
     @IBOutlet weak var viewSection: UIView!
+    @IBOutlet weak var viewButtonsView: UIView!
+    @IBOutlet weak var viewSeparator: UIView!
 
+    @IBOutlet weak var viewTransferHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var viewButtonsViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var viewSeparatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewRichWorkspaceHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewRecommendationsHeightConstraint: NSLayoutConstraint!
     @IBOutlet private weak var viewRecommendationsLeadingConstraint: NSLayoutConstraint!
@@ -60,6 +84,18 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         richWorkspaceGradient.startPoint = CGPoint(x: 0, y: 0.8)
         richWorkspaceGradient.endPoint = CGPoint(x: 0, y: 0.9)
         viewRichWorkspace.layer.addSublayer(richWorkspaceGradient)
+        backgroundColor = .clear
+        
+        //Button
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet"), for: .normal)//!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
+
+        buttonOrder.setTitle("", for: .normal)
+        buttonOrder.setTitleColor(NCBrandColor.shared.brand, for: .normal)
+
+        // Gradient
+//        gradient.startPoint = CGPoint(x: 0, y: 0.8)
+//        gradient.endPoint = CGPoint(x: 0, y: 0.9)
+//        viewRichWorkspace.layer.addSublayer(gradient)
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(touchUpInsideViewRichWorkspace(_:)))
         tap.delegate = self
@@ -89,6 +125,19 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         //
         labelSection.text = ""
         viewSectionHeightConstraint.constant = 0
+
+        buttonTransfer.backgroundColor = .clear
+        buttonTransfer.setImage(nil, for: .normal)
+        buttonTransfer.layer.cornerRadius = 6
+        buttonTransfer.layer.masksToBounds = true
+        imageButtonTransfer.image = NCUtility().loadImage(named: "stop.circle")
+        imageButtonTransfer.tintColor = .white
+        labelTransfer.text = ""
+        progressTransfer.progress = 0
+        progressTransfer.tintColor = NCBrandColor.shared.brandElement
+        progressTransfer.trackTintColor = NCBrandColor.shared.brandElement.withAlphaComponent(0.2)
+        transferSeparatorBottom.backgroundColor = .separator
+        transferSeparatorBottomHeightConstraint.constant = 0.5
     }
 
     override func layoutSublayers(of layer: CALayer) {
@@ -142,7 +191,7 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         viewRichWorkspaceHeightConstraint.constant = heightHeaderRichWorkspace
         viewRecommendationsHeightConstraint.constant = heightHeaderRecommendations
         viewSectionHeightConstraint.constant = heightHeaderSection
-
+        
         if let richWorkspaceText, richWorkspaceText != self.richWorkspaceText {
             textViewRichWorkspace.attributedText = markdownParser.parse(richWorkspaceText)
             self.richWorkspaceText = richWorkspaceText
@@ -167,11 +216,29 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         } else {
             viewRichWorkspace.isHidden = true
         }
+    }
+    
+    func setRichWorkspaceText(_ text: String?) {
+        guard let text = text else { return }
 
         if recommendationsVisible {
             viewRecommendations.isHidden = false
         } else {
-            viewRecommendations.isHidden = true
+            var image: UIImage?
+            if let ocId,
+               let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
+                image = utility.getIcon(metadata: metadata)?.darken()
+                if image == nil {
+                    image = utility.loadImage(named: metadata.iconName, useTypeIconFile: true)
+                    buttonTransfer.backgroundColor = .lightGray
+                } else {
+                    buttonTransfer.backgroundColor = .clear
+                }
+            }
+            viewTransferHeightConstraint.constant = NCGlobal.shared.heightHeaderTransfer
+            if let progress {
+                progressTransfer.progress = progress
+            }
         }
 
         if heightHeaderSection == 0 {
@@ -222,12 +289,26 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
 
     // MARK: - RichWorkspace
 
-    func setRichWorkspaceColor(style: UIUserInterfaceStyle? = nil) {
-        if let style {
-            richWorkspaceGradient.colors = style == .light ? [UIColor(white: 1, alpha: 0).cgColor, UIColor.white.cgColor] : [UIColor(white: 0, alpha: 0).cgColor, UIColor.black.cgColor]
+    private func setRichWorkspaceColor() {
+        if traitCollection.userInterfaceStyle == .dark {
+            richWorkspaceGradient.colors = [UIColor(white: 0, alpha: 0).cgColor, UIColor.black.cgColor]
         } else {
-            richWorkspaceGradient.colors = traitCollection.userInterfaceStyle == .light ? [UIColor(white: 1, alpha: 0).cgColor, UIColor.white.cgColor] : [UIColor(white: 0, alpha: 0).cgColor, UIColor.black.cgColor]
+            richWorkspaceGradient.colors = [UIColor(white: 1, alpha: 0).cgColor, UIColor.white.cgColor]
         }
+    }
+        
+    // MARK: - Action
+    
+    @IBAction func touchUpInsideSwitch(_ sender: Any) {
+        delegate?.tapButtonSwitch(sender)
+    }
+
+    @IBAction func touchUpInsideOrder(_ sender: Any) {
+        delegate?.tapButtonOrder(sender)
+    }
+
+    @IBAction func touchUpTransfer(_ sender: Any) {
+       delegate?.tapButtonTransfer(sender)
     }
 
     @objc func touchUpInsideViewRichWorkspace(_ sender: Any) {
@@ -421,7 +502,7 @@ extension NCSectionFirstHeader: UICollectionViewDelegate {
             return nil
         }
         let identifier = indexPath as NSCopying
-        let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal().previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase)
+        let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal().previewExt1024)
 
 #if EXTENSION
         return nil
