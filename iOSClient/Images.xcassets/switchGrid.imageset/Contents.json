@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "sortDateLess.png",
+      "filename" : "switchGrid.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "sortDateLess@2x.png",
+      "filename" : "switchGrid@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "sortDateLess@3x.png",
+      "filename" : "switchGrid@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
