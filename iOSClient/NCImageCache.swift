@@ -165,6 +165,7 @@ import NextcloudKit
         static var shared = UIImage()
         static var canShare = UIImage()
         static var shareByLink = UIImage()
+        static var sharedWithMe = UIImage()
 
         static var favorite = UIImage()
         static var comment = UIImage()
@@ -208,7 +209,8 @@ import NextcloudKit
         images.shared = UIImage(named: "share")!.image(color: .systemGray, size: 50)
         images.canShare = UIImage(named: "share")!.image(color: .systemGray, size: 50)
         images.shareByLink = UIImage(named: "sharebylink")!.image(color: .systemGray, size: 50)
-
+        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 50)
+        
         images.favorite = utility.loadImage(named: "star.fill", color: yellowFavorite)
         images.comment = UIImage(named: "comment")!.image(color: .systemGray, size: 50)
         images.livePhoto = utility.loadImage(named: "livephoto", color: .label)
