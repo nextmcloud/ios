@@ -66,6 +66,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     var tabBarSelect: NCCollectionViewCommonSelectTabBar?
     var attributesZoomIn: UIMenuElement.Attributes = []
     var attributesZoomOut: UIMenuElement.Attributes = []
+    let maxImageGrid: CGFloat = 7
+    var headerMenu: NCSectionFirstHeader?
 
     // DECLARE
     var layoutKey = ""
@@ -76,6 +78,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     var emptyImageName: String?
     var emptyImageColors: [UIColor]?
+    var headerMenuButtonsView: Bool = true
+    var emptyImage: UIImage?
     var emptyTitle: String = ""
 
     var emptyDescription: String = ""
@@ -266,8 +270,9 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
         isEditMode = false
 
-        (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
-        (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
+        /// Magentacloud branding changes hide user account button on left navigation bar
+//        setNavigationLeftItems()
+        setNavigationRightItems()
 
         layoutForView = database.getLayoutForView(account: session.account, key: layoutKey, serverUrl: serverUrl)
         if isLayoutList {
@@ -386,6 +391,17 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     @objc func applicationWillResignActive(_ notification: NSNotification) {
         self.refreshControl.endRefreshing()
+    }
+
+    @objc func reloadAvatar(_ notification: NSNotification) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.showTip()
+        }
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let error = userInfo["error"] as? NKError,
+              error.errorCode != global.errorNotModified else { return }
+        /// Magentacloud branding changes hide user account button on left navigation bar
+//        setNavigationLeftItems()
     }
 
     @objc func changeTheming(_ notification: NSNotification) {
@@ -651,6 +667,286 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     // MARK: - Layout
 
+    func setNavigationLeftItems() {
+        guard layoutKey == global.layoutViewFiles,
+              let tableAccount = database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)) else {
+            return }
+        let image = utility.loadUserImage(for: tableAccount.user, displayName: tableAccount.displayName, urlBase: tableAccount.urlBase)
+        let accountButton = AccountSwitcherButton(type: .custom)
+        let accounts = database.getAllAccountOrderAlias()
+        var childrenAccountSubmenu: [UIMenuElement] = []
+
+        accountButton.setImage(image, for: .normal)
+        accountButton.setImage(image, for: .highlighted)
+        accountButton.semanticContentAttribute = .forceLeftToRight
+        accountButton.sizeToFit()
+
+        if !accounts.isEmpty {
+            let accountActions: [UIAction] = accounts.map { account in
+                let image = utility.loadUserImage(for: account.user, displayName: account.displayName, urlBase: account.urlBase)
+                var name: String = ""
+                var url: String = ""
+
+                if account.alias.isEmpty {
+                    name = account.displayName
+                    url = (URL(string: account.urlBase)?.host ?? "")
+                } else {
+                    name = account.alias
+                }
+
+                let action = UIAction(title: name, image: image, state: account.active ? .on : .off) { _ in
+                    if !account.active {
+                        NCAccount().changeAccount(account.account, userProfile: nil, controller: self.controller) { }
+                        self.setEditMode(false)
+                    }
+                }
+
+                action.subtitle = url
+                return action
+            }
+
+            let addAccountAction = UIAction(title: NSLocalizedString("_add_account_", comment: ""), image: utility.loadImage(named: "person.crop.circle.badge.plus", colors: NCBrandColor.shared.iconImageMultiColors)) { _ in
+                self.appDelegate.openLogin(selector: self.global.introLogin)
+            }
+
+            let settingsAccountAction = UIAction(title: NSLocalizedString("_account_settings_", comment: ""), image: utility.loadImage(named: "gear", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                let accountSettingsModel = NCAccountSettingsModel(controller: self.controller, delegate: self)
+                let accountSettingsView = NCAccountSettingsView(model: accountSettingsModel)
+                let accountSettingsController = UIHostingController(rootView: accountSettingsView)
+                self.present(accountSettingsController, animated: true, completion: nil)
+            }
+
+            if !NCBrandOptions.shared.disable_multiaccount {
+                childrenAccountSubmenu.append(addAccountAction)
+            }
+            childrenAccountSubmenu.append(settingsAccountAction)
+
+            let addAccountSubmenu = UIMenu(title: "", options: .displayInline, children: childrenAccountSubmenu)
+            let menu = UIMenu(children: accountActions + [addAccountSubmenu])
+
+            accountButton.menu = menu
+            accountButton.showsMenuAsPrimaryAction = true
+
+            accountButton.onMenuOpened = {
+                self.dismissTip()
+            }
+        }
+
+        navigationItem.leftItemsSupplementBackButton = true
+        navigationItem.setLeftBarButtonItems([UIBarButtonItem(customView: accountButton)], animated: true)
+
+        if titlePreviusFolder != nil {
+            navigationController?.navigationBar.topItem?.title = titlePreviusFolder
+        }
+
+        navigationItem.title = titleCurrentFolder
+    }
+
+    func setNavigationRightItems() {
+        guard layoutKey != global.layoutViewTransfers else { return }
+        let isTabBarHidden = self.tabBarController?.tabBar.isHidden ?? true
+        let isTabBarSelectHidden = tabBarSelect.isHidden()
+
+        func createMenuActions() -> [UIMenuElement] {
+            guard let layoutForView = database.getLayoutForView(account: session.account, key: layoutKey, serverUrl: serverUrl) else { return [] }
+
+            let select = UIAction(title: NSLocalizedString("_select_", comment: ""),
+                                  image: utility.loadImage(named: "checkmark.circle"),
+                                  attributes: (self.dataSource.isEmpty() || NCNetworking.shared.isOffline) ? .disabled : []) { _ in
+                self.setEditMode(true)
+                self.collectionView.reloadData()
+            }
+
+            let list = UIAction(title: NSLocalizedString("_list_", comment: ""), image: utility.loadImage(named: "list.bullet"), state: layoutForView.layout == global.layoutList ? .on : .off) { _ in
+
+                layoutForView.layout = self.global.layoutList
+
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
+                                                            object: nil,
+                                                            userInfo: ["account": self.session.account,
+                                                                       "serverUrl": self.serverUrl,
+                                                                       "layoutForView": layoutForView])
+            }
+
+            let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""), image: utility.loadImage(named: "square.grid.2x2"), state: layoutForView.layout == global.layoutGrid ? .on : .off) { _ in
+
+                layoutForView.layout = self.global.layoutGrid
+
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
+                                                            object: nil,
+                                                            userInfo: ["account": self.session.account,
+                                                                       "serverUrl": self.serverUrl,
+                                                                       "layoutForView": layoutForView])
+            }
+
+            let mediaSquare = UIAction(title: NSLocalizedString("_media_square_", comment: ""), image: utility.loadImage(named: "square.grid.3x3"), state: layoutForView.layout == global.layoutPhotoSquare ? .on : .off) { _ in
+
+                layoutForView.layout = self.global.layoutPhotoSquare
+
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
+                                                            object: nil,
+                                                            userInfo: ["account": self.session.account,
+                                                                       "serverUrl": self.serverUrl,
+                                                                       "layoutForView": layoutForView])
+            }
+
+            let mediaRatio = UIAction(title: NSLocalizedString("_media_ratio_", comment: ""), image: utility.loadImage(named: "rectangle.grid.3x2"), state: layoutForView.layout == self.global.layoutPhotoRatio ? .on : .off) { _ in
+
+                layoutForView.layout = self.global.layoutPhotoRatio
+
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
+                                                            object: nil,
+                                                            userInfo: ["account": self.session.account,
+                                                                       "serverUrl": self.serverUrl,
+                                                                       "layoutForView": layoutForView])
+            }
+
+            let viewStyleSubmenu = UIMenu(title: "", options: .displayInline, children: [list, grid, mediaSquare, mediaRatio])
+
+            let ascending = layoutForView.ascending
+            let ascendingChevronImage = utility.loadImage(named: ascending ? "chevron.up" : "chevron.down")
+            let isName = layoutForView.sort == "fileName"
+            let isDate = layoutForView.sort == "date"
+            let isSize = layoutForView.sort == "size"
+
+            let byName = UIAction(title: NSLocalizedString("_name_", comment: ""), image: isName ? ascendingChevronImage : nil, state: isName ? .on : .off) { _ in
+
+                if isName { // repeated press
+                    layoutForView.ascending = !layoutForView.ascending
+                }
+                layoutForView.sort = "fileName"
+
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
+                                                            object: nil,
+                                                            userInfo: ["account": self.session.account,
+                                                                       "serverUrl": self.serverUrl,
+                                                                       "layoutForView": layoutForView])
+            }
+
+            let byNewest = UIAction(title: NSLocalizedString("_date_", comment: ""), image: isDate ? ascendingChevronImage : nil, state: isDate ? .on : .off) { _ in
+
+                if isDate { // repeated press
+                    layoutForView.ascending = !layoutForView.ascending
+                }
+                layoutForView.sort = "date"
+
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
+                                                            object: nil,
+                                                            userInfo: ["account": self.session.account,
+                                                                       "serverUrl": self.serverUrl,
+                                                                       "layoutForView": layoutForView])
+            }
+
+            let byLargest = UIAction(title: NSLocalizedString("_size_", comment: ""), image: isSize ? ascendingChevronImage : nil, state: isSize ? .on : .off) { _ in
+
+                if isSize { // repeated press
+                    layoutForView.ascending = !layoutForView.ascending
+                }
+                layoutForView.sort = "size"
+
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
+                                                            object: nil,
+                                                            userInfo: ["account": self.session.account,
+                                                                       "serverUrl": self.serverUrl,
+                                                                       "layoutForView": layoutForView])
+            }
+
+            let sortSubmenu = UIMenu(title: NSLocalizedString("_order_by_", comment: ""), options: .displayInline, children: [byName, byNewest, byLargest])
+
+            let foldersOnTop = UIAction(title: NSLocalizedString("_directory_on_top_no_", comment: ""), image: utility.loadImage(named: "folder"), state: layoutForView.directoryOnTop ? .on : .off) { _ in
+
+                layoutForView.directoryOnTop = !layoutForView.directoryOnTop
+
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
+                                                            object: nil,
+                                                            userInfo: ["account": self.session.account,
+                                                                       "serverUrl": self.serverUrl,
+                                                                       "layoutForView": layoutForView])
+            }
+
+            let personalFilesOnly = NCKeychain().getPersonalFilesOnly(account: session.account)
+            let personalFilesOnlyAction = UIAction(title: NSLocalizedString("_personal_files_only_", comment: ""), image: utility.loadImage(named: "folder.badge.person.crop", colors: NCBrandColor.shared.iconImageMultiColors), state: personalFilesOnly ? .on : .off) { _ in
+
+                NCKeychain().setPersonalFilesOnly(account: self.session.account, value: !personalFilesOnly)
+
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": self.serverUrl, "clearDataSource": true])
+                self.setNavigationRightItems()
+            }
+
+            let showDescriptionKeychain = NCKeychain().showDescription
+            let showDescription = UIAction(title: NSLocalizedString("_show_description_", comment: ""), image: utility.loadImage(named: "list.dash.header.rectangle"), attributes: richWorkspaceText == nil ? .disabled : [], state: showDescriptionKeychain && richWorkspaceText != nil ? .on : .off) { _ in
+
+                NCKeychain().showDescription = !showDescriptionKeychain
+
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": self.serverUrl, "clearDataSource": true])
+                self.setNavigationRightItems()
+            }
+            showDescription.subtitle = richWorkspaceText == nil ? NSLocalizedString("_no_description_available_", comment: "") : ""
+
+            if layoutKey == global.layoutViewRecent {
+                return [select]
+            } else {
+                var additionalSubmenu = UIMenu()
+                if layoutKey == global.layoutViewFiles {
+                    additionalSubmenu = UIMenu(title: "", options: .displayInline, children: [foldersOnTop, personalFilesOnlyAction, showDescription])
+                } else {
+                    additionalSubmenu = UIMenu(title: "", options: .displayInline, children: [foldersOnTop, showDescription])
+                }
+                return [select, viewStyleSubmenu, sortSubmenu, additionalSubmenu]
+            }
+        }
+
+        if isEditMode {
+            /// Magentacloud branding changes hide options on bottom tab bar
+//            tabBarSelect.update(selectOcId: selectOcId, metadatas: getSelectedMetadatas(), userId: appDelegate.userId)
+//            tabBarSelect.show()
+            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done) {
+                self.setEditMode(false)
+                self.collectionView.reloadData()
+            }
+            navigationItem.rightBarButtonItems = [select]
+        } else if navigationItem.rightBarButtonItems == nil || (!isEditMode && !tabBarSelect.isHidden()) {
+            /// Magentacloud branding changes hide options on bottom tab bar
+//            tabBarSelect.hide()
+            let menuButton = UIBarButtonItem(image: utility.loadImage(named: "ellipsis.circle"), menu: UIMenu(children: createMenuActions()))
+            menuButton.tintColor = NCBrandColor.shared.iconImageColor
+            if layoutKey == global.layoutViewFiles {
+                let notification = UIBarButtonItem(image: utility.loadImage(named: "bell"), style: .plain) {
+                    if let viewController = UIStoryboard(name: "NCNotification", bundle: nil).instantiateInitialViewController() as? NCNotification {
+                        viewController.session = self.session
+                        self.navigationController?.pushViewController(viewController, animated: true)
+                    }
+                }
+                notification.tintColor = NCBrandColor.shared.iconImageColor
+                navigationItem.rightBarButtonItems = [menuButton, notification]
+            } else {
+                navigationItem.rightBarButtonItems = [menuButton]
+            }
+        } else {
+            navigationItem.rightBarButtonItems?.first?.menu = navigationItem.rightBarButtonItems?.first?.menu?.replacingChildren(createMenuActions())
+        }
+        
+        if isEditMode {
+            let more = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain) { self.presentMenu(with: self.createMenuActions())}
+            navigationItem.rightBarButtonItems = [more]
+        } else {
+            let select = UIBarButtonItem(title: NSLocalizedString("_select_", comment: ""), style: UIBarButtonItem.Style.plain) { self.toggleSelect() }
+            if layoutKey == NCGlobal.shared.layoutViewFiles {
+                let notification = UIBarButtonItem(image: utility.loadImage(named: "bell"), style: .plain) {
+                    if let viewController = UIStoryboard(name: "NCNotification", bundle: nil).instantiateInitialViewController() as? NCNotification {
+                        self.navigationController?.pushViewController(viewController, animated: true)
+                    }
+                }
+                notification.tintColor = NCBrandColor.shared.iconImageColor
+                navigationItem.rightBarButtonItems = [select, notification]
+            } else {
+                navigationItem.rightBarButtonItems = [select]
+            }
+        }
+        guard layoutKey == NCGlobal.shared.layoutViewFiles else { return }
+        navigationItem.title = titleCurrentFolder
+    }
+
     func getNavigationTitle() -> String {
         let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account))
         if let tableAccount,
@@ -751,7 +1047,30 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     func longPressListItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
-    func longPressGridItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+    func tapButtonSwitch(_ sender: Any) {
+        guard !isTransitioning else { return }
+        isTransitioning = true
+
+        guard let layoutForView = NCManageDatabase.shared.getLayoutForView(account: appDelegate.account, key: layoutKey, serverUrl: serverUrl) else { return }
+
+        if layoutForView.layout == NCGlobal.shared.layoutGrid {
+            layoutForView.layout = NCGlobal.shared.layoutList
+        } else {
+            layoutForView.layout = NCGlobal.shared.layoutGrid
+        }
+        self.layoutForView = NCManageDatabase.shared.setLayoutForView(layoutForView: layoutForView)
+        self.collectionView.reloadData()
+        self.collectionView.collectionViewLayout.invalidateLayout()
+        self.collectionView.setCollectionViewLayout(layoutForView.layout == NCGlobal.shared.layoutList ? self.listLayout : self.gridLayout, animated: true) {_ in self.isTransitioning = false }
+    }
+
+    func tapButtonOrder(_ sender: Any) {
+        let sortMenu = NCSortMenu()
+        sortMenu.toggleMenu(viewController: self, account: appDelegate.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
+    }
+
+    func longPressListItem(with objectId: String, indexPath: IndexPath, gestureRecognizer: UILongPressGestureRecognizer) {
+    }
 
     func longPressMoreListItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
@@ -927,27 +1246,30 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     // MARK: - Header size
 
-    func getHeaderHeight(section: Int) -> (heightHeaderRichWorkspace: CGFloat,
-                                           heightHeaderRecommendations: CGFloat,
-                                           heightHeaderSection: CGFloat) {
-        var heightHeaderRichWorkspace: CGFloat = 0
-        var heightHeaderRecommendations: CGFloat = 0
-        var heightHeaderSection: CGFloat = 0
+    func getHeaderHeight(section: Int) -> (heightHeaderCommands: CGFloat, heightHeaderRichWorkspace: CGFloat, heightHeaderSection: CGFloat) {
+        var headerRichWorkspace: CGFloat = 0
 
-        if showDescription,
-           !isSearchingMode,
-           let richWorkspaceText = self.richWorkspaceText,
-           !richWorkspaceText.trimmingCharacters(in: .whitespaces).isEmpty {
-            heightHeaderRichWorkspace = UIScreen.main.bounds.size.height / 6
+        func getHeaderHeight() -> CGFloat {
+            var size: CGFloat = 0
+
+            if isHeaderMenuTransferViewEnabled() != nil {
+                if !isSearchingMode {
+                    size += global.heightHeaderTransfer
+                }
+            }
+            if headerMenuButtonsView {
+                size += NCGlobal.shared.heightButtonsView
+            }
+            return size
         }
 
-        if isRecommendationActived,
-           !isSearchingMode,
-           NCKeychain().showRecommendedFiles,
-           !self.database.getRecommendedFiles(account: self.session.account).isEmpty {
-            heightHeaderRecommendations = self.heightHeaderRecommendations
-            heightHeaderSection = self.heightHeaderSection
-        }
+//        if isRecommendationActived,
+//           !isSearchingMode,
+//           NCKeychain().showRecommendedFiles,
+//           !self.database.getRecommendedFiles(account: self.session.account).isEmpty {
+//            heightHeaderRecommendations = self.heightHeaderRecommendations
+//            heightHeaderSection = self.heightHeaderSection
+//        }
 
         if isSearchingMode || layoutForView?.groupBy != "none" || self.dataSource.numberOfSections() > 1 {
             if section == 0 {
