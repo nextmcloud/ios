@@ -12,6 +12,7 @@ class NCFavorite: NCCollectionViewCommon {
         titleCurrentFolder = NSLocalizedString("_favorites_", comment: "")
         layoutKey = NCGlobal.shared.layoutViewFavorite
         enableSearchBar = false
+        headerMenuButtonsView = true
         headerRichWorkspaceDisable = true
         emptyImageName = "star.fill"
         emptyImageColors = [NCBrandColor.shared.yellowFavorite]
