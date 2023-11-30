@@ -22,15 +22,13 @@
 //
 
 import UIKit
-import SwipeCellKit
 
-class NCListCell: SwipeCollectionViewCell, UIGestureRecognizerDelegate, NCCellProtocol {
+class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProtocol {
 
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!
     @IBOutlet weak var imageFavorite: UIImageView!
-    @IBOutlet weak var imageFavoriteBackground: UIImageView!
     @IBOutlet weak var imageLocal: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var labelInfo: UILabel!
@@ -41,19 +39,16 @@ class NCListCell: SwipeCollectionViewCell, UIGestureRecognizerDelegate, NCCellPr
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var separator: UIView!
-    @IBOutlet weak var tag0: UILabel!
-    @IBOutlet weak var tag1: UILabel!
-
+    @IBOutlet weak var labelShared: UILabel!
     @IBOutlet weak var imageItemLeftConstraint: NSLayoutConstraint!
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var titleTrailingConstraint: NSLayoutConstraint!
-    @IBOutlet weak var subInfoTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var infoTrailingConstraint: NSLayoutConstraint!
 
     private var objectId = ""
     private var user = ""
     var indexPath = IndexPath()
 
-    weak var listCellDelegate: NCListCellDelegate?
+    weak var delegate: NCListCellDelegate?
     var namedButtonMore = ""
 
     var fileAvatarImageView: UIImageView? {
@@ -115,7 +110,11 @@ class NCListCell: SwipeCollectionViewCell, UIGestureRecognizerDelegate, NCCellPr
         get { return separator }
         set { separator = newValue }
     }
-
+    
+    var fileSharedLabel: UILabel? {
+        get { return labelShared }
+        set { labelShared = newValue }
+    }
     override func awakeFromNib() {
         super.awakeFromNib()
 
@@ -149,23 +148,14 @@ class NCListCell: SwipeCollectionViewCell, UIGestureRecognizerDelegate, NCCellPr
 
         labelTitle.text = ""
         labelInfo.text = ""
-        labelSubinfo.text = ""
         labelTitle.textColor = .label
         labelInfo.textColor = .systemGray
         labelSubinfo.textColor = .systemGray
-
-        imageFavoriteBackground.isHidden = true
     }
 
     override func prepareForReuse() {
         super.prepareForReuse()
         imageItem.backgroundColor = nil
-        if fileFavoriteImage?.image != nil {
-            imageFavoriteBackground.isHidden = false
-        } else {
-            imageFavoriteBackground.isHidden = true
-        }
-
         accessibilityHint = nil
         accessibilityLabel = nil
         accessibilityValue = nil
@@ -176,19 +166,19 @@ class NCListCell: SwipeCollectionViewCell, UIGestureRecognizerDelegate, NCCellPr
     }
 
     @IBAction func touchUpInsideShare(_ sender: Any) {
-        listCellDelegate?.tapShareListItem(with: objectId, indexPath: indexPath, sender: sender)
+        delegate?.tapShareListItem(with: objectId, indexPath: indexPath, sender: sender)
     }
 
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        listCellDelegate?.tapMoreListItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, indexPath: indexPath, sender: sender)
+        delegate?.tapMoreListItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, indexPath: indexPath, sender: sender)
     }
 
     @objc func longPressInsideMore(gestureRecognizer: UILongPressGestureRecognizer) {
-        listCellDelegate?.longPressMoreListItem(with: objectId, namedButtonMore: namedButtonMore, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
+        delegate?.longPressMoreListItem(with: objectId, namedButtonMore: namedButtonMore, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
     }
 
     @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
-        listCellDelegate?.longPressListItem(with: objectId, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
+        delegate?.longPressListItem(with: objectId, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
     }
 
     fileprivate func setA11yActions() {
@@ -206,13 +196,11 @@ class NCListCell: SwipeCollectionViewCell, UIGestureRecognizerDelegate, NCCellPr
     }
 
     func titleInfoTrailingFull() {
-        titleTrailingConstraint.constant = 10
-        subInfoTrailingConstraint.constant = 10
+        infoTrailingConstraint.constant = 10
     }
 
     func titleInfoTrailingDefault() {
-        titleTrailingConstraint.constant = 90
-        subInfoTrailingConstraint.constant = 90
+        infoTrailingConstraint.constant = 90
     }
 
     func setButtonMore(named: String, image: UIImage) {
@@ -295,44 +283,6 @@ class NCListCell: SwipeCollectionViewCell, UIGestureRecognizerDelegate, NCCellPr
     func setAccessibility(label: String, value: String) {
         accessibilityLabel = label
         accessibilityValue = value
-    }
-
-    func setTags(tags: [String]) {
-        if tags.isEmpty {
-            tag0.isHidden = true
-            tag1.isHidden = true
-            labelInfo.isHidden = false
-            labelSubinfo.isHidden = false
-        } else {
-            tag0.isHidden = false
-            tag1.isHidden = true
-            labelInfo.isHidden = true
-            labelSubinfo.isHidden = true
-
-            if let tag = tags.first {
-                tag0.text = tag
-                if tags.count > 1 {
-                    tag1.isHidden = false
-                    tag1.text = "+\(tags.count - 1)"
-                }
-            }
-        }
-    }
-
-    func setIconOutlines() {
-        imageFavoriteBackground.isHidden = fileFavoriteImage?.image == nil
-
-        if imageStatus.image != nil {
-            imageStatus.makeCircularBackground(withColor: .systemBackground)
-        } else {
-            imageStatus.backgroundColor = .clear
-        }
-
-        if imageLocal.image != nil {
-            imageLocal.makeCircularBackground(withColor: .systemBackground)
-        } else {
-            imageLocal.backgroundColor = .clear
-        }
     }
 }
 
