@@ -447,6 +447,23 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         }
 
         // Button More
+        if metadata.isInTransfer || metadata.isWaitingTransfer {
+            cell.setButtonMore(named: NCGlobal.shared.buttonMoreStop, image: NCImageCache.images.buttonStop)
+        } else if metadata.lock == true {
+            cell.setButtonMore(named: NCGlobal.shared.buttonMoreLock, image: NCImageCache.images.buttonMoreLock)
+            a11yValues.append(String(format: NSLocalizedString("_locked_by_", comment: ""), metadata.lockOwnerDisplayName))
+        } else {
+            cell.fileSharedImage?.image = NCImageCache.images.canShare.image(color: NCBrandColor.shared.gray60, size: 50)
+            cell.fileSharedLabel?.text = ""
+        }
+        
+        if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+            cell.fileSharedImage?.image = NCImageCache.images.sharedWithMe
+            cell.fileSharedLabel?.text = NSLocalizedString("_recieved_", comment: "")
+            cell.fileSharedLabel?.textColor = NCBrandColor.shared.notificationAction
+        }
+
+        // Button More
         if metadata.lock == true {
             cell.setButtonMore(image: imageCache.getImageButtonMoreLock())
             a11yValues.append(String(format: NSLocalizedString("_locked_by_", comment: ""), metadata.lockOwnerDisplayName))
