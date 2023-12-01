@@ -43,7 +43,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     var serverUrl = ""
     var titleServerUrl = ""
     var arrayImages: [UIImage] = []
-    var fileName = CCUtility.createFileNameDate("scan", extension: "pdf")
+    var fileName = NCUtilityFileSystem().createFileNameDate("scan", ext: "pdf")
     var password: String = ""
     var fileType = "PDF"
     var isPDFWithOCRSwitchOn = false
@@ -57,6 +57,9 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     
     
     var cellBackgoundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+    let utilityFileSystem = NCUtilityFileSystem()
+    let utility = NCUtility()
+    let contentPresenter = NCContentPresenter()
     
     // MARK: - View Life Cycle
     
@@ -64,7 +67,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
         self.init()
 
-        if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate?.urlBase ?? "", userId: appDelegate?.userId ?? "") {
+        if serverUrl == utilityFileSystem.getHomeServer(urlBase: appDelegate?.urlBase ?? "", userId: appDelegate?.userId ?? "") {
             titleServerUrl = "/"
         } else {
             titleServerUrl = (serverUrl as NSString).lastPathComponent
@@ -96,7 +99,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         initializeForm()
         
-        let value = CCUtility.getTextRecognitionStatus()
+        let value = NCKeychain().textRecognitionStatus
         setTextRecognition(newValue: value)
         NotificationCenter.default.addObserver(self, selector: #selector(appTerminateNotify), name: UIApplication.willTerminateNotification, object: nil)
     }
@@ -301,8 +304,8 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
             let fileNameNew = newValue as? String
 
-            if fileNameNew != nil {
-                self.fileName = CCUtility.removeForbiddenCharactersServer(fileNameNew)
+            if let fileNameNew = newValue as? String {
+                self.fileName = utility.removeForbiddenCharacters(fileNameNew)
             } else {
                 self.fileName = ""
             }
@@ -438,7 +441,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         self.updateFormRow(rowFileName)
         self.tableView.reloadData()
         
-        CCUtility.setTextRecognitionStatus(newValue)
+        NCKeychain().textRecognitionStatus = newValue
         
         self.form.delegate = self
     }
@@ -449,7 +452,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         var newFileName: String = ""
 
         if fileName == nil || fileName == "" {
-            name = CCUtility.createFileNameDate("scan", extension: "pdf") ?? "scan.pdf"
+            name = utilityFileSystem.createFileNameDate("scan", ext: "pdf") 
         } else {
             name = fileName!
         }
@@ -473,7 +476,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
             self.serverUrl = serverUrl!
 
-            if serverUrl == NCUtilityFileSystem.shared.getHomeServer(urlBase: appDelegate?.urlBase ?? "", userId: appDelegate?.userId ?? "") {
+            if serverUrl == utilityFileSystem.getHomeServer(urlBase: appDelegate?.urlBase ?? "", userId: appDelegate?.userId ?? "") {
                 self.titleServerUrl = "/"
             } else {
                 self.titleServerUrl = (serverUrl! as NSString).lastPathComponent
@@ -783,7 +786,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
     
     fileprivate func showDeleteAlert() {
         
-        let path = CCUtility.getDirectoryScan()!
+        let path = utilityFileSystem.directoryScan
         
         do {
             let filePaths = try FileManager.default.contentsOfDirectory(atPath: path)
@@ -860,16 +863,11 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                     
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
 //                        self.dismissAndUpload(metadataForUpload, fileType: fileType.uppercased())
-                        guard let fileNameGenerateExport = CCUtility.getDirectoryProviderStorageOcId(metadataForUpload.ocId, fileNameView: metadataForUpload.fileNameView) else {
-                            NCActivityIndicator.shared.stop()
-                            let error = NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_")
-                            NCContentPresenter.shared.showError(error: error)
-                            return
-                        }
+                       let fileNameGenerateExport = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadataForUpload.ocId, fileNameView: metadataForUpload.fileNameView)
                         guard let data = image.jpegData(compressionQuality: CGFloat(0.5)) else {
                             NCActivityIndicator.shared.stop()
                             let error = NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_")
-                            NCContentPresenter.shared.showError(error: error)
+                            self.contentPresenter.showError(error: error)
                             return
                         }
                         
@@ -878,7 +876,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                         } catch {
                             NCActivityIndicator.shared.stop()
                             let error = NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_")
-                            NCContentPresenter.shared.showError(error: error)
+                            self.contentPresenter.showError(error: error)
                             return
                         }
  
@@ -928,13 +926,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
     func dismissAndUpload(_ metadata: tableMetadata, fileType: String?) {
 
-        guard let fileNameGenerateExport = CCUtility.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView) else {
-            NCActivityIndicator.shared.stop()
-
-            let error = NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_")
-            NCContentPresenter.shared.showError(error: error)
-            return
-        }
+        let fileNameGenerateExport = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)
         let fileUrl = URL(fileURLWithPath: fileNameGenerateExport)
 
         // Text Recognition TXT
@@ -972,7 +964,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             } catch {
                 NCActivityIndicator.shared.stop()
                 let error = NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_")
-                NCContentPresenter.shared.showError(error: error)
+                contentPresenter.showError(error: error)
                 return
             }
         }
@@ -986,7 +978,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                             if !char.isASCII {
                                 NCActivityIndicator.shared.stop()
                                 let error = NKError(errorCode: NCGlobal.shared.errorForbidden, errorDescription: "_password_ascii_")
-                                NCContentPresenter.shared.showError(error: error)
+                                contentPresenter.showError(error: error)
                                 return
                             }
                         }
@@ -1065,7 +1057,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 //                let image = changeCompressionImage(self.arrayImages[0])
                 guard let data = image.jpegData(compressionQuality: CGFloat(0.5)) else {
                     NCActivityIndicator.shared.stop()
-                    NCContentPresenter.shared.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
+                    contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     return
                 }
                 
@@ -1073,7 +1065,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                     try data.write(to: fileUrl, options: .atomic)
                 } catch {
                     NCActivityIndicator.shared.stop()
-                    NCContentPresenter.shared.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
+                    contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     return
                 }
             }
@@ -1089,7 +1081,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 //                let image = changeCompressionImage(self.arrayImages[0])
                 guard let data = image.jpegData(compressionQuality: CGFloat(0.5)) else {
                     NCActivityIndicator.shared.stop()
-                    NCContentPresenter.shared.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
+                    contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     return
                 }
                 
@@ -1097,13 +1089,13 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                     try data.write(to: NSURL.fileURL(withPath: fileNameGenerateExport), options: .atomic)
                 } catch {
                     NCActivityIndicator.shared.stop()
-                    NCContentPresenter.shared.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
+                    contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     return
                 }
             }
         }
 
-        metadata.size = NCUtilityFileSystem.shared.getFileSize(filePath: fileNameGenerateExport)
+        metadata.size = utilityFileSystem.getFileSize(filePath: fileNameGenerateExport)
 
         NCActivityIndicator.shared.stop()
 
@@ -1112,9 +1104,9 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         // Request delete all image scanned
         let alertController = UIAlertController(title: "", message: NSLocalizedString("_delete_all_scanned_images_", comment: ""), preferredStyle: .alert)
 
-        let actionYes = UIAlertAction(title: NSLocalizedString("_yes_delete_", comment: ""), style: .default) { (_: UIAlertAction) in
+        let actionYes = UIAlertAction(title: NSLocalizedString("_yes_delete_", comment: ""), style: .default) { [self] (_: UIAlertAction) in
 
-            let path = CCUtility.getDirectoryScan()!
+            let path = utilityFileSystem.directoryScan
 
             do {
                 let filePaths = try FileManager.default.contentsOfDirectory(atPath: path)
