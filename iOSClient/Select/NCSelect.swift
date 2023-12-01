@@ -449,52 +449,52 @@ extension NCSelect: UICollectionViewDataSource {
             if metadata.directory {
 
                 if metadata.e2eEncrypted {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folderEncrypted
+                    cell.imageItem.image = NCImageCache.images.folderEncrypted
                 } else if isShare {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folderSharedWithMe
+                    cell.imageItem.image = NCImageCache.images.folderSharedWithMe
                 } else if !metadata.shareType.isEmpty {
                     metadata.shareType.contains(3) ?
-                    (cell.imageItem.image = NCBrandColor.cacheImages.folderPublic) :
-                    (cell.imageItem.image = NCBrandColor.cacheImages.folderSharedWithMe)
+                    (cell.imageItem.image = NCImageCache.images.folderPublic) :
+                    (cell.imageItem.image = NCImageCache.images.folderSharedWithMe)
                 } else if metadata.mountType == "group" {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folderGroup
+                    cell.imageItem.image = NCImageCache.images.folderGroup
                 } else if isMounted {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folderExternal
+                    cell.imageItem.image = NCImageCache.images.folderExternal
                 } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folderAutomaticUpload
+                    cell.imageItem.image = NCImageCache.images.folderAutomaticUpload
                 } else {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folder
+                    cell.imageItem.image = NCImageCache.images.folder
                 }
                 cell.imageItem.image = cell.imageItem.image?.colorizeFolder(metadata: metadata)
 
-                cell.labelInfo.text = CCUtility.dateDiff(metadata.date as Date)
+                cell.labelInfo.text = utility.dateDiff(metadata.date as Date)
 
             } else {
 
-                cell.labelInfo.text = CCUtility.dateDiff(metadata.date as Date) + " · " + CCUtility.transformedSize(metadata.size)
+                cell.labelInfo.text = utility.dateDiff(metadata.date as Date) + " · " + utilityFileSystem.transformedSize(metadata.size)
 
                 // image local
-                if dataSource.metadatasForSection[indexPath.section].metadataOffLine.contains(metadata.ocId) {
-                    cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
-                } else if CCUtility.fileProviderStorageExists(metadata) {
-                    cell.imageLocal.image = NCBrandColor.cacheImages.local
+                if NCManageDatabase.shared.getTableLocalFile(ocId: metadata.ocId) != nil {
+                    cell.imageLocal.image = NCImageCache.images.offlineFlag
+                } else if utilityFileSystem.fileProviderStorageExists(metadata) {
+                    cell.imageLocal.image = NCImageCache.images.local
                 }
             }
 
             // image Favorite
             if metadata.favorite {
-                cell.imageFavorite.image = NCBrandColor.cacheImages.favorite
+                cell.imageFavorite.image = NCImageCache.images.favorite
             }
 
             // Share image
             if isShare {
-                cell.imageShared.image = NCBrandColor.cacheImages.shared
+                cell.imageShared.image = NCImageCache.images.shared
             } else if !metadata.shareType.isEmpty {
                 metadata.shareType.contains(3) ?
-                (cell.imageShared.image = NCBrandColor.cacheImages.shareByLink) :
-                (cell.imageShared.image = NCBrandColor.cacheImages.shared)
+                (cell.imageShared.image = NCImageCache.images.shareByLink) :
+                (cell.imageShared.image = NCImageCache.images.shared)
             } else {
-                cell.imageShared.image = NCBrandColor.cacheImages.canShare
+                cell.imageShared.image = NCImageCache.images.canShare
             }
 
             cell.imageSelect.isHidden = true
@@ -505,7 +505,7 @@ extension NCSelect: UICollectionViewDataSource {
 
             // Live Photo
             if metadata.livePhoto {
-                cell.imageStatus.image = NCBrandColor.cacheImages.livePhoto
+                cell.imageStatus.image = NCImageCache.images.livePhoto
             }
 
             // Remove last separator
@@ -546,37 +546,37 @@ extension NCSelect: UICollectionViewDataSource {
             if metadata.directory {
 
                 if metadata.e2eEncrypted {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folderEncrypted
+                    cell.imageItem.image = NCImageCache.images.folderEncrypted
                 } else if isShare {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folderSharedWithMe
+                    cell.imageItem.image = NCImageCache.images.folderSharedWithMe
                 } else if !metadata.shareType.isEmpty {
                     metadata.shareType.contains(3) ?
-                    (cell.imageItem.image = NCBrandColor.cacheImages.folderPublic) :
-                    (cell.imageItem.image = NCBrandColor.cacheImages.folderSharedWithMe)
+                    (cell.imageItem.image = NCImageCache.images.folderPublic) :
+                    (cell.imageItem.image = NCImageCache.images.folderSharedWithMe)
                 } else if metadata.mountType == "group" {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folderGroup
+                    cell.imageItem.image = NCImageCache.images.folderGroup
                 } else if isMounted {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folderExternal
+                    cell.imageItem.image = NCImageCache.images.folderExternal
                 } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folderAutomaticUpload
+                    cell.imageItem.image = NCImageCache.images.folderAutomaticUpload
                 } else {
-                    cell.imageItem.image = NCBrandColor.cacheImages.folder
+                    cell.imageItem.image = NCImageCache.images.folder
                 }
                 cell.imageItem.image = cell.imageItem.image?.colorizeFolder(metadata: metadata)
 
             } else {
 
                 // image Local
-                if dataSource.metadatasForSection[indexPath.section].metadataOffLine.contains(metadata.ocId) {
-                    cell.imageLocal.image = NCBrandColor.cacheImages.offlineFlag
-                } else if CCUtility.fileProviderStorageExists(metadata) {
-                    cell.imageLocal.image = NCBrandColor.cacheImages.local
+                if NCManageDatabase.shared.getTableLocalFile(ocId: metadata.ocId) != nil {
+                    cell.imageLocal.image = NCImageCache.images.offlineFlag
+                } else if utilityFileSystem.fileProviderStorageExists(metadata) {
+                    cell.imageLocal.image = NCImageCache.images.local
                 }
             }
 
             // image Favorite
             if metadata.favorite {
-                cell.imageFavorite.image = NCBrandColor.cacheImages.favorite
+                cell.imageFavorite.image = NCImageCache.images.favorite
             }
 
             cell.imageSelect.isHidden = true
@@ -585,7 +585,7 @@ extension NCSelect: UICollectionViewDataSource {
 
             // Live Photo
             if metadata.livePhoto {
-                cell.imageStatus.image = NCBrandColor.cacheImages.livePhoto
+                cell.imageStatus.image = NCImageCache.images.livePhoto
             }
 
             return cell
