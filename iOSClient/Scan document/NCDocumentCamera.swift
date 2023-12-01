@@ -84,7 +84,7 @@ class NCDocumentCamera: NSObject, VNDocumentCameraViewControllerDelegate {
         var itemsDestination: [String] = []
 
         do {
-            let atPath = CCUtility.getDirectoryScan()!
+            let atPath = utilityFileSystem.directoryScan
             let directoryContents = try FileManager.default.contentsOfDirectory(atPath: atPath)
             for fileName in directoryContents {
                 if fileName.first != "." {
@@ -101,7 +101,7 @@ class NCDocumentCamera: NSObject, VNDocumentCameraViewControllerDelegate {
 
             if !itemsDestination.contains(fileName) {
 
-                let fileNamePathAt = CCUtility.getDirectoryScan() + "/" + fileName
+                let fileNamePathAt = utilityFileSystem.directoryScan + "/" + fileName
 
                 guard let data = try? Data(contentsOf: URL(fileURLWithPath: fileNamePathAt)) else { return }
                 guard let image = UIImage(data: data) else { return }
