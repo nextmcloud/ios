@@ -156,7 +156,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
                 imageVisualEffect.effect = UIBlurEffect(style: .extraLight)
                 imageVisualEffect.backgroundColor = .lightGray
             }
-            imageSelect.image = NCBrandColor.cacheImages.checkedYes
+            imageSelect.image = NCImageCache.images.checkedYes
             imageVisualEffect.isHidden = false
         } else {
             imageSelect.isHidden = true
@@ -171,7 +171,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         dateFormatter.timeStyle = .none
         dateFormatter.locale = Locale.current
 
-        labelInfo.text = dateFormatter.string(from: date as Date) + " · " + CCUtility.transformedSize(size)
+        labelInfo.text = dateFormatter.string(from: date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
     }
 
     func setAccessibility(label: String, value: String) {
