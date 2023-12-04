@@ -456,7 +456,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
 
             let value = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: canReshareTheShare(), andIsFolder: metadata.directory)
             share.permissions = value
-            self.oldTableShare?.setPermission(value: value)
+            self.oldTableShare?.permissions = value
 //            self.permissions = "RDNVCK"
             metadata.permissions = "RDNVCK"
             if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
@@ -474,7 +474,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         case "kNMCFilePermissionCellEditing":
              let value = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: canReshareTheShare(), andIsFolder: metadata.directory)
             share.permissions = value
-            self.oldTableShare?.setPermission(value: value)
+            self.oldTableShare?.permissions = value
 //            self.permissions = "RGDNV"
             metadata.permissions = "RGDNV"
             if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
@@ -491,7 +491,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         case "NCFilePermissionCellFileDrop":
             share.permissions = NCGlobal.shared.permissionCreateShare
 
-            self.oldTableShare?.setPermission(value: NCGlobal.shared.permissionCreateShare)
+            self.oldTableShare?.permissions = NCGlobal.shared.permissionCreateShare
 //            self.permissions = "RGDNVCK"
             metadata.permissions = "RGDNVCK"
             if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
@@ -702,8 +702,8 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         }
         
         // EDITORS
-        let editors = NCUtility.shared.isDirectEditing(account: metadata.account, contentType: metadata.contentType)
-        let availableRichDocument = NCUtility.shared.isRichDocument(metadata)
+        let editors = NCUtility().isDirectEditing(account: metadata.account, contentType: metadata.contentType)
+        let availableRichDocument = NCUtility().isRichDocument(metadata)
         
         // RichDocument: Collabora
         return (availableRichDocument && editors.count == 0)
@@ -714,15 +714,15 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
     }
     
     func isLinkShare() -> Bool {
-        return NCShareCommon.shared.isLinkShare(shareType: shareType)
+        return NCShareCommon().isLinkShare(shareType: shareType)
     }
     
     func isExternalUserShare() -> Bool {
-        return NCShareCommon.shared.isExternalUserShare(shareType: shareType)
+        return NCShareCommon().isExternalUserShare(shareType: shareType)
     }
     
     func isInternalUser() -> Bool {
-        return NCShareCommon.shared.isInternalUser(shareType: shareType)
+        return NCShareCommon().isInternalUser(shareType: shareType)
     }
     
     func isCanReshareOptionVisible() -> Bool {
@@ -744,7 +744,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
     func canReshareValueChanged(isOn: Bool) {
         
         guard let oldTableShare = oldTableShare else {
-            self.oldTableShare?.setPermission(value: 0)
+            self.oldTableShare?.permissions = 0
             self.share.permissions = isOn ? self.share.permissions + NCGlobal.shared.permissionShareShare : self.share.permissions
             return
         }
@@ -773,7 +773,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                 }
             }
         }
-        self.oldTableShare?.setPermission(value: permission)
+        self.oldTableShare?.permissions = permission
         self.share.permissions = permission
 
     }
