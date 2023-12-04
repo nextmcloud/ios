@@ -57,7 +57,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_viewimage_show_", comment: ""),
-                    icon: utility.loadImage(named: filterClassTypeImage ? "nocamera" : "file_photo_menu",color: NCBrandColor.shared.iconColor),
+                    icon: utility.loadImage(named: showOnlyImages ? "nocamera" : "file_photo_menu",color: NCBrandColor.shared.iconColor),
                     selected: showOnlyImages,
                     on: true,
                     action: { _ in
@@ -71,7 +71,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_viewvideo_show_", comment: ""),
-                    icon: utility.loadImage(named: filterClassTypeVideo ? "videono" : "videoyes",color: NCBrandColor.shared.iconColor),
+                    icon: utility.loadImage(named: showOnlyVideos ? "videono" : "videoyes",color: NCBrandColor.shared.iconColor),
                     selected: showOnlyVideos,
                     on: true,
                     action: { _ in
