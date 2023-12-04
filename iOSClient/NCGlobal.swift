@@ -171,6 +171,7 @@ class NCGlobal: NSObject {
     let layoutViewShares                            = "LayoutShares"
     let layoutViewShareExtension                    = "LayoutShareExtension"
     let layoutViewGroupfolders                      = "LayoutGroupfolders"
+    let layoutViewMove                              = "LayoutMove"
 
     // Button Type in Cell list/grid
     //
@@ -352,6 +353,7 @@ class NCGlobal: NSObject {
     @objc let notificationCenterApplicationWillResignActive     = "applicationWillResignActive"
     @objc let notificationCenterApplicationWillEnterForeground  = "applicationWillEnterForeground"
 
+    @objc let notificationCenterInitialize                      = "initialize"
     @objc let notificationCenterChangeUser                      = "changeUser"
     @objc let notificationCenterChangeTheming                   = "changeTheming"
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
