@@ -1450,7 +1450,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 let (_, heightHeaderRichWorkspace, heightHeaderSection) = getHeaderHeight(section: indexPath.section)
 
                 self.headerMenu = header
-
+                self.headerMenu?.setViewTransfer(isHidden: true)
                 if layoutForView?.layout == NCGlobal.shared.layoutGrid {
                     header.setImageSwitchList()
                     header.buttonSwitch.accessibilityLabel = NSLocalizedString("_list_view_", comment: "")
