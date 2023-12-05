@@ -157,7 +157,7 @@ class NCEndToEndInitialize: NSObject {
                     } else {
 
                         let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: NSLocalizedString("_e2e_error_incorrect_passphrase_", comment: ""))
-                        NCContentPresenter.shared.messageNotification(NSLocalizedString("_e2e_error_passphrase_title", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
+                        NCContentPresenter().messageNotification(NSLocalizedString("_e2e_error_passphrase_title", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
 
                         return
                     }
