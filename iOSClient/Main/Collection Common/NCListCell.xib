@@ -32,7 +32,7 @@
                         </constraints>
                     </imageView>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="2sp-6s-rn0" userLabel="imageFavorite">
-                        <rect key="frame" x="87" y="-5.6666666666666679" width="15" height="15.333333333333336"/>
+                        <rect key="frame" x="87" y="-5.666666666666667" width="15" height="15.333333333333336"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="15" id="4d5-Wl-o2o"/>
                             <constraint firstAttribute="width" constant="15" id="Acy-ur-WGp"/>
@@ -158,7 +158,6 @@
             </constraints>
             <size key="customSize" width="650" height="58"/>
             <connections>
-                <outlet property="btnMoreRightConstraint" destination="DA1-e5-KvA" id="558-K3-JBl"/>
                 <outlet property="buttonMore" destination="Asa-Q1-AnQ" id="fet-34-rKy"/>
                 <outlet property="buttonShared" destination="pnF-hF-EEM" id="hck-gT-t1K"/>
                 <outlet property="imageFavorite" destination="2sp-6s-rn0" id="SfV-S4-xYh"/>
