@@ -154,7 +154,18 @@ import NextcloudKit
 
         let predicateDefault = NSPredicate(format: showBothPredicateMediaString, account.account, startServerUrl, NKCommon.TypeClassFile.image.rawValue, NKCommon.TypeClassFile.video.rawValue, NKCommon.TypeClassFile.video.rawValue)
 
-        return NCManageDatabase.shared.getMetadatasMedia(predicate: predicate ?? predicateDefault)
+        var newMetadatas = NCManageDatabase.shared.getMetadatasMedia(predicate: predicate ?? predicateDefault)
+        switch NCKeychain().mediaSortDate {
+        case "date":
+            newMetadatas = newMetadatas.sorted(by: {($0.date as Date) > ($1.date as Date)})
+        case "creationDate":
+            newMetadatas = newMetadatas.sorted(by: {($0.creationDate as Date) > ($1.creationDate as Date)})
+        case "uploadDate":
+            newMetadatas = newMetadatas.sorted(by: {($0.uploadDate as Date) > ($1.uploadDate as Date)})
+        default:
+            break
+        }
+        return newMetadatas
     }
 
     // MARK: -
