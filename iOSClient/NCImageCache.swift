@@ -236,13 +236,13 @@ import NextcloudKit
         self.brandElementColor = brandElement
 
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
-        images.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement, size: folderWidth)
-        images.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!.image(color: brandElement, size: folderWidth)
-        images.folderPublic = UIImage(named: "folder_public")!.image(color: brandElement, size: folderWidth)
-        images.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
-        images.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement, size: folderWidth)
-        images.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
-        images.folder = UIImage(named: "folder")!.image(color: brandElement, size: folderWidth)
+        images.folderEncrypted = UIImage(named: "folderEncrypted")!
+        images.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
+        images.folderPublic = UIImage(named: "folder_public")!
+        images.folderGroup = UIImage(named: "folder_group")!
+        images.folderExternal = UIImage(named: "folder_external")!
+        images.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!
+        images.folder = UIImage(named: "folder")!
 
         images.iconContacts = UIImage(named: "icon-contacts")!.image(color: brandElement, size: folderWidth)
         images.iconTalk = UIImage(named: "icon-talk")!.image(color: brandElement, size: folderWidth)
