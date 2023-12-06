@@ -769,7 +769,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         }
         
         
-        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "", isLivePhoto: false)
+        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
         
         metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
         metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
@@ -841,7 +841,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 
                 let image = changeCompressionImage(arrayImages[count])
                 
-                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "", isLivePhoto: false)
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
                 
                 metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
                 metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
