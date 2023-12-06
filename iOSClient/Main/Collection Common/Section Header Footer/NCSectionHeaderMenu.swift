@@ -54,6 +54,12 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
 
         backgroundColor = .clear
 
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet")!.image(color: .systemGray, size: 25), for: .normal)
+
+        buttonOrder.setTitle("", for: .normal)
+        buttonOrder.setTitleColor(NCBrandColor.shared.brand, for: .normal)
+        buttonMore.setImage(UIImage(named: "more")!.image(color: .systemGray, size: 25), for: .normal)
+
         // Gradient
         gradient.startPoint = CGPoint(x: 0, y: 0.8)
         gradient.endPoint = CGPoint(x: 0, y: 0.9)
