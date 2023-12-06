@@ -54,11 +54,11 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
 
         backgroundColor = .clear
 
-        buttonSwitch.setImage(UIImage(systemName: "list.bullet")!.image(color: .systemGray, size: 25), for: .normal)
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet")!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
 
         buttonOrder.setTitle("", for: .normal)
         buttonOrder.setTitleColor(NCBrandColor.shared.brand, for: .normal)
-        buttonMore.setImage(UIImage(named: "more")!.image(color: .systemGray, size: 25), for: .normal)
+        buttonMore.setImage(UIImage(named: "more")!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
 
         // Gradient
         gradient.startPoint = CGPoint(x: 0, y: 0.8)
@@ -104,6 +104,46 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
         super.traitCollectionDidChange(previousTraitCollection)
 
         setInterfaceColor()
+    }
+
+    // MARK: - View
+
+    func setStatusButtonsView(enable: Bool) {
+
+        buttonSwitch.isEnabled = enable
+        buttonOrder.isEnabled = enable
+        buttonMore.isEnabled = enable
+    }
+
+    func buttonMoreIsHidden(_ isHidden: Bool) {
+
+        buttonMore.isHidden = isHidden
+    }
+
+    func setImageSwitchList() {
+
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet")!.image(color: NCBrandColor.shared.iconColor, width: 20, height: 15), for: .normal)
+    }
+
+    func setImageSwitchGrid() {
+
+        buttonSwitch.setImage(UIImage(systemName: "square.grid.2x2")!.image(color: NCBrandColor.shared.iconColor, size: 20), for: .normal)
+    }
+
+    func setButtonsView(height: CGFloat) {
+
+        viewButtonsViewHeightConstraint.constant = height
+        if height == 0 {
+            viewButtonsView.isHidden = true
+        } else {
+            viewButtonsView.isHidden = false
+        }
+    }
+
+    func setSortedTitle(_ title: String) {
+
+        let title = NSLocalizedString(title, comment: "")
+        buttonOrder.setTitle(title, for: .normal)
     }
 
     // MARK: - RichWorkspace
@@ -247,7 +287,7 @@ class NCSectionFooter: UICollectionReusableView, NCSectionFooterDelegate {
         super.awakeFromNib()
 
         self.backgroundColor = UIColor.clear
-        labelSection.textColor = UIColor.systemGray
+        labelSection.textColor = UIColorNCBrandColor.shared.iconColor
         labelSection.text = ""
 
         separator.backgroundColor = .separator
