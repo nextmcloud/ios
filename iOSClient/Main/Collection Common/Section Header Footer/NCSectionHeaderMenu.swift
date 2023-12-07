@@ -287,7 +287,7 @@ class NCSectionFooter: UICollectionReusableView, NCSectionFooterDelegate {
         super.awakeFromNib()
 
         self.backgroundColor = UIColor.clear
-        labelSection.textColor = UIColorNCBrandColor.shared.iconColor
+        labelSection.textColor = NCBrandColor.shared.iconColor
         labelSection.text = ""
 
         separator.backgroundColor = .separator
