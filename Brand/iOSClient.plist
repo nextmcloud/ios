@@ -79,6 +79,8 @@
 		<string>AccountIntent</string>
 		<string>DashboardIntent</string>
 	</array>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>App would like to access IDFA for tracking purpose</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<true/>
 	<key>UIAppFonts</key>
