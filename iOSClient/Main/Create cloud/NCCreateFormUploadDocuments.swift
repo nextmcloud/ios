@@ -72,6 +72,8 @@ import XLForm
 
         let cancelButton: UIBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(cancel))
         let saveButton: UIBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_save_", comment: ""), style: UIBarButtonItem.Style.plain, target: self, action: #selector(save))
+        cancelButton.tintColor = NCBrandColor.shared.brand
+        saveButton.tintColor = NCBrandColor.shared.brand
 
         self.navigationItem.leftBarButtonItem = cancelButton
         self.navigationItem.rightBarButtonItem = saveButton
@@ -79,6 +81,8 @@ import XLForm
 
         // title 
         self.title = titleForm
+        
+        fileName = NCUtilityFileSystem().createFileNameDate("Text", ext: getFileExtension())
 
         initializeForm()
         getTemplate()
@@ -97,18 +101,22 @@ import XLForm
         // Section: Destination Folder
 
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
+        section.footerTitle = "                                                                               "
         form.addFormSection(section)
 
-        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: XLFormRowDescriptorTypeButton, title: fileNameFolder)
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
+        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: "")
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.value = fileNameFolder
-        row.cellConfig["backgroundColor"] = tableView.backgroundColor
-
-        row.cellConfig["imageView.image"] = UIImage(named: "folder")!.image(color: NCBrandColor.shared.brandElement, size: 25)
-
-        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = UIColor.label
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.imageColor(NCBrandColor.shared.customer)
+        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
+        row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
+        if(self.fileNameFolder == "/"){
+            row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
+        }else{
+            row.cellConfig["photoLabel.text"] = self.fileNameFolder
+        }
+        row.cellConfig["textLabel.text"] = ""
 
         section.addFormRow(row)
 
@@ -117,17 +125,16 @@ import XLForm
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
         form.addFormSection(section)
 
-        row = XLFormRowDescriptor(tag: "fileName", rowType: XLFormRowDescriptorTypeText, title: NSLocalizedString("_filename_", comment: ""))
-        row.value = fileName
-        row.cellConfig["backgroundColor"] = tableView.backgroundColor
-
-        row.cellConfig["textField.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textField.textColor"] = UIColor.label
-
-        row.cellConfig["textLabel.textAlignment"] = NSTextAlignment.right.rawValue
-        row.cellConfig["textLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["textLabel.textColor"] = UIColor.label
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = NCCreateDocumentCustomTextField.self
+        
+        row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = NCCreateDocumentCustomTextField.self
+        
+        row.cellConfigAtConfigure["backgroundColor"] =  UIColor.secondarySystemGroupedBackground;
+        row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["fileNameTextField.textColor"] = UIColor.label
+        row.cellConfig["fileNameTextField.placeholder"] = self.fileName
 
         section.addFormRow(row)
 
@@ -137,6 +144,13 @@ import XLForm
     }
 
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        let header = view as? UITableViewHeaderFooterView
+        header?.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
+        header?.textLabel?.textColor = .gray
+        header?.tintColor = tableView.backgroundColor
+    }
+    
+    override func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
         let header = view as? UITableViewHeaderFooterView
         header?.textLabel?.font = UIFont.systemFont(ofSize: 13.0)
         header?.textLabel?.textColor = .gray
@@ -224,10 +238,22 @@ import XLForm
         }
 
         let buttonDestinationFolder: XLFormRowDescriptor = self.form.formRow(withTag: "ButtonDestinationFolder")!
-        buttonDestinationFolder.title = fileNameFolder
+        buttonDestinationFolder.cellConfig["photoLabel.text"] = fileNameFolder
 
         self.tableView.reloadData()
     }
+
+//    override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
+//        super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)
+////        if formRow.tag == "fileName" {
+////            self.form.delegate = nil
+////            if let fileNameNew = formRow.value {
+////                self.fileName = CCUtility.removeForbiddenCharactersServer(fileNameNew as? String)
+////            }
+////            formRow.value = self.fileName
+////            self.form.delegate = self
+////        }
+//    }
 
     @objc func changeDestinationFolder(_ sender: XLFormRowDescriptor) {
 
@@ -252,7 +278,16 @@ import XLForm
         templateIdentifier = selectTemplate.identifier
 
         let rowFileName: XLFormRowDescriptor = self.form.formRow(withTag: "fileName")!
-        guard var fileNameForm: String = rowFileName.value as? String, !fileNameForm.isEmpty else { return }
+        var fileName = rowFileName.value as? String
+        if fileName?.isEmpty ?? false || fileName == nil {
+            fileName = NCUtilityFileSystem().createFileNameDate("Text", ext: getFileExtension())
+        } else if fileName?.trimmingCharacters(in: .whitespaces).isEmpty ?? false {
+            let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_file_name_", comment: ""), preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+            return
+        }
+        guard var fileNameForm: String = fileName, !fileNameForm.isEmpty else { return }
 
         // Trim whitespaces after checks above
         fileNameForm = fileNameForm.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -285,7 +320,7 @@ import XLForm
 
     func dismissCreateFormUploadConflict(metadatas: [tableMetadata]?) {
 
-        if let metadatas {
+        if let metadatas, metadatas.count > 0 {
             let fileName = metadatas[0].fileName
             let fileNamePath = utilityFileSystem.getFileNamePath(fileName, serverUrl: serverUrl, urlBase: appDelegate.urlBase, userId: appDelegate.userId)
             createDocument(fileNamePath: fileNamePath, fileName: fileName)
@@ -505,6 +540,21 @@ import XLForm
             } else {
                 print("[LOG] It has been changed user during networking process, error.")
             }
+        }
+    }
+    
+    func getFileExtension() -> String {
+        switch typeTemplate {
+        case NCGlobal.shared.editorText:
+            return "md"
+        case NCGlobal.shared.templateDocument:
+            return "docx"
+        case NCGlobal.shared.templateSpreadsheet:
+            return "xlsx"
+        case NCGlobal.shared.templatePresentation:
+            return "pptx"
+        default:
+            return ""
         }
     }
 }
