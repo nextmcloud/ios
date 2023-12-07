@@ -44,7 +44,7 @@ extension NCMedia {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_select_", comment: ""),
-                        icon: utility.loadImage(named: "checkmark.circle.fill"),
+                        icon: utility.loadImage(named: "selectFull", color: NCBrandColor.shared.iconColor),
                         action: { _ in
                             self.isEditMode = true
                         }
@@ -56,29 +56,8 @@ extension NCMedia {
 
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_select_media_folder_", comment: ""),
-                    icon: utility.loadImage(named: "folder"),
-                    action: { _ in
-                        if let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as? UINavigationController,
-                           let viewController = navigationController.topViewController as? NCSelect {
-
-                            viewController.delegate = self
-                            viewController.typeOfCommandView = .select
-                            viewController.type = "mediaFolder"
-                            viewController.selectIndexPath = self.selectIndexPath
-
-                            self.present(navigationController, animated: true, completion: nil)
-                        }
-                    }
-                )
-            )
-
-            actions.append(.seperator(order: 0))
-
-            actions.append(
-                NCMenuAction(
                     title: NSLocalizedString("_media_viewimage_show_", comment: ""),
-                    icon: utility.loadImage(named: "photo"),
+                    icon: utility.loadImage(named: showOnlyImages ? "nocamera" : "file_photo_menu",color: NCBrandColor.shared.iconColor),
                     selected: showOnlyImages,
                     on: true,
                     action: { _ in
@@ -92,7 +71,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_viewvideo_show_", comment: ""),
-                    icon: utility.loadImage(named: "video"),
+                    icon: utility.loadImage(named: showOnlyVideos ? "videono" : "videoyes",color: NCBrandColor.shared.iconColor),
                     selected: showOnlyVideos,
                     on: true,
                     action: { _ in
@@ -121,11 +100,18 @@ extension NCMedia {
 
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_play_from_files_", comment: ""),
-                    icon: utility.loadImage(named: "play.circle"),
+                    title: NSLocalizedString("_select_media_folder_", comment: ""),
+                    icon: utility.loadImage(named: "folder"),
                     action: { _ in
-                        if let tabBarController = self.appDelegate.window?.rootViewController as? UITabBarController {
-                            self.documentPickerViewController = NCDocumentPickerViewController(tabBarController: tabBarController, isViewerMedia: true, allowsMultipleSelection: false, viewController: self)
+                        if let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as? UINavigationController,
+                           let viewController = navigationController.topViewController as? NCSelect {
+
+                            viewController.delegate = self
+                            viewController.typeOfCommandView = .select
+                            viewController.type = "mediaFolder"
+                            viewController.selectIndexPath = self.selectIndexPath
+
+                            self.present(navigationController, animated: true, completion: nil)
                         }
                     }
                 )
@@ -133,27 +119,39 @@ extension NCMedia {
 
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_play_from_url_", comment: ""),
-                    icon: utility.loadImage(named: "network"),
+                    title: NSLocalizedString("_media_by_modified_date_", comment: ""),
+                    icon: utility.loadImage(named: "sortFileNameAZ", color: NCBrandColor.shared.iconColor),
+                    selected: NCKeychain().mediaSortDate == "date",
+                    on: true,
                     action: { _ in
+                        NCKeychain().mediaSortDate = "date"
+                        self.reloadDataSource { }
+                    }
+                )
+            )
 
-                        let alert = UIAlertController(title: NSLocalizedString("_valid_video_url_", comment: ""), message: nil, preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: nil))
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_media_by_created_date_", comment: ""),
+                    icon: utility.loadImage(named: "sortFileNameAZ", color: NCBrandColor.shared.iconColor),
+                    selected: NCKeychain().mediaSortDate == "creationDate",
+                    on: true,
+                    action: { _ in
+                        NCKeychain().mediaSortDate = "creationDate"
+                        self.reloadDataSource { }
+                    }
+                )
+            )
 
-                        alert.addTextField(configurationHandler: { textField in
-                            textField.placeholder = "http://myserver.com/movie.mkv"
-                        })
-
-                        alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in
-                            guard let stringUrl = alert.textFields?.first?.text, !stringUrl.isEmpty, let url = URL(string: stringUrl) else { return }
-                            let fileName = url.lastPathComponent
-                            let metadata = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileName, fileNameView: fileName, ocId: NSUUID().uuidString, serverUrl: "", urlBase: self.appDelegate.urlBase, url: stringUrl, contentType: "")
-                            NCManageDatabase.shared.addMetadata(metadata)
-                            NCViewer().view(viewController: self, metadata: metadata, metadatas: [metadata], imageIcon: nil)
-                        }))
-
-                        self.present(alert, animated: true)
-
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_media_by_upload_date_", comment: ""),
+                    icon: utility.loadImage(named: "sortFileNameAZ", color: NCBrandColor.shared.iconColor),
+                    selected: NCKeychain().mediaSortDate == "uploadDate",
+                    on: true,
+                    action: { _ in
+                        NCKeychain().mediaSortDate = "uploadDate"
+                        self.reloadDataSource { }
                     }
                 )
             )
@@ -166,7 +164,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_cancel_", comment: ""),
-                    icon: utility.loadImage(named: "xmark"),
+                    icon: utility.loadImage(named: "xmark", color: NCBrandColor.shared.iconColor),
                     action: { _ in self.tapSelect() }
                 )
             )
