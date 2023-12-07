@@ -25,11 +25,14 @@
 #import "CCUtility.h"
 #import "NSNotificationCenter+MainThread.h"
 #import "NCBridgeSwift.h"
+#import "AdjustHelper.h"
 
 @interface CCAdvanced ()
 {
     AppDelegate *appDelegate;
     XLFormSectionDescriptor *sectionSize;
+    TealiumHelper *tealium;
+    AdjustHelper *adjust;
 }
 @end
 
@@ -285,7 +288,7 @@
     self.title = NSLocalizedString(@"_advanced_", nil);
     appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     self.view.backgroundColor = UIColor.systemGroupedBackgroundColor;
-    
+    adjust = [[AdjustHelper alloc] init];
     self.tableView.backgroundColor = UIColor.systemGroupedBackgroundColor;
     
     [self initializeForm];
@@ -386,8 +389,10 @@
         [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
 
         [[NCImageCache shared] clearMediaCache];
-
         [[NCActivityIndicator shared] stop];
+        tealium = [[TealiumHelper alloc] init];
+        [tealium trackEventWithTitle:@"magentacloud-app.settings.reset" data:nil];
+        [adjust trackEvent:ResetsApp];
         [self calculateSize];
     });
 }
@@ -449,6 +454,9 @@
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:NSLocalizedString(@"_want_exit_", nil) preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alertController addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"_ok_", nil) style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+        tealium = [[TealiumHelper alloc] init];
+        [tealium trackEventWithTitle:@"magentacloud-app.settings.logout" data:nil];
+        [adjust trackEvent:Logout];
         [appDelegate resetApplication];
     }]];
     
