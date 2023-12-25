@@ -40,7 +40,7 @@ class NCFiles: NCCollectionViewCommon {
         enableSearchBar = true
         headerRichWorkspaceDisable = false
         headerMenuTransferView = true
-        emptyImage = UIImage(named: "folder")?.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width)
+        emptyImage = UIImage(named: "folder")
         emptyTitle = "_files_no_files_"
         emptyDescription = "_no_file_pull_down_"
     }
