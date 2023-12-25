@@ -52,7 +52,7 @@ let userAgent: String = {
     @objc public var folderBrandAutoUpload: String = ""                                                             // example "_auto_upload_folder_"   Don't touch me !!
 
     // Auto Upload default folder
-    @objc public var folderDefaultAutoUpload: String = "Photos"
+    @objc public var folderDefaultAutoUpload: String = Locale.current.languageCode == "de" ? "Kamera-Medien" : "Camera-Media"
 
     // Capabilities Group
     @objc public var capabilitiesGroups: String = "group.it.twsweb.Crypto-Cloud"
