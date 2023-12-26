@@ -29,7 +29,16 @@ import NextcloudKit
 
 extension NCTrash {
     var selectActions: [NCMenuAction] {
-        [
+        var actions = [NCMenuAction]()
+        actions.append(.cancelAction {
+            self.tapSelect()
+        })
+        if selectOcId.count != selectableDataSource.count {
+            actions.append(.selectAllAction(action: collectionViewSelectAll))
+        }
+
+        guard !selectOcId.isEmpty else { return actions }
+        actions.append(contentsOf: [
             NCMenuAction(
                 title: NSLocalizedString("_trash_restore_selected_", comment: ""),
                 icon: utility.loadImage(named: "restore").image(color: NCBrandColor.shared.iconColor, size: 50),
@@ -51,7 +60,8 @@ extension NCTrash {
                     self.present(alert, animated: true, completion: nil)
                 }
             )
-        ]
+        ])
+        return actions
     }
 
     func toggleMenuMoreHeader() {
