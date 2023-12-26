@@ -85,7 +85,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_show_all_", comment: ""),
-                    icon: utility.loadImage(named: "photo.on.rectangle.angled"),
+                    icon: utility.loadImage(named: "photo.on.rectangle.angled", color: NCBrandColor.shared.iconColor),
                     selected: !showOnlyImages && !showOnlyVideos,
                     on: true,
                     action: { _ in
@@ -101,7 +101,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_select_media_folder_", comment: ""),
-                    icon: utility.loadImage(named: "folder"),
+                    icon: utility.loadImage(named: "folder", color: NCBrandColor.shared.iconColor),
                     action: { _ in
                         if let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as? UINavigationController,
                            let viewController = navigationController.topViewController as? NCSelect {
