@@ -709,7 +709,6 @@
 "_edit_comment_"                = "Edit comment";
 "_delete_comment_"              = "Delete comment";
 "_share_allow_editing_"         = "Allow editing";
-"_share_editing_"               = "Editing";
 "_share_allow_upload_"          = "Allow upload and editing";
 "_share_secure_file_drop_"      = "Secure file drop (upload only)";
 "_share_password_protect_"      = "Password protect";
