@@ -37,7 +37,9 @@ class PrivacySettingsViewController: XLFormViewController{
     }
 
     //MARK: XLForm
+
     func initializeForm() {
+        
         let form : XLFormDescriptor = XLFormDescriptor() as XLFormDescriptor
         form.rowNavigationOptions = XLFormRowNavigationOptions.stopDisableRow
         
