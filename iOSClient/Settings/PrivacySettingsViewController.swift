@@ -35,7 +35,7 @@ class PrivacySettingsViewController: XLFormViewController{
         tableView.reloadData()
         initializeForm()
     }
-    
+
     //MARK: XLForm
 
     func initializeForm() {
