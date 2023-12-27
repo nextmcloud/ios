@@ -52,11 +52,11 @@ let userAgent: String = {
     @objc public var folderBrandAutoUpload: String = ""                                                             // example "_auto_upload_folder_"   Don't touch me !!
 
     // Auto Upload default folder
-    @objc public var folderDefaultAutoUpload: String = "Photos"
+    @objc public var folderDefaultAutoUpload: String = Locale.current.languageCode == "de" ? "Kamera-Medien" : "Camera-Media"
 
     // Capabilities Group
-    @objc public var capabilitiesGroups:              String = "group.de.magentacloud.next.dev2.client"
-    @objc public var capabilitiesGroupApps:              String = "group.de.magentacloud.next.dev2.client.apps"
+    @objc public var capabilitiesGroups:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
+    @objc public var capabilitiesGroupApps:              String = "group.com.t-systems.pu-ds.magentacloud.qa.apps"
 
     // BRAND ONLY
     @objc public var use_login_web_personalized: Bool = false                                   // Don't touch me !!
@@ -70,8 +70,8 @@ let userAgent: String = {
     @objc public var use_storeLocalAutoUploadAll: Bool = false
     @objc public var use_loginflowv2: Bool = false                                              // Don't touch me !!
 
-    @objc public var disable_intro:       Bool = true
-    @objc public var disable_request_login_url:       Bool = true
+    @objc public var disable_intro:       Bool = false
+    @objc public var disable_request_login_url:       Bool = false
     @objc public var disable_multiaccount:            Bool = true
     @objc public var disable_manage_account:          Bool = false
     @objc public var disable_more_external_site: Bool = false

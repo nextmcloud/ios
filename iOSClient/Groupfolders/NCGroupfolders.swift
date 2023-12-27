@@ -36,7 +36,7 @@ class NCGroupfolders: NCCollectionViewCommon {
         enableSearchBar = false
         headerMenuButtonsView = true
         headerRichWorkspaceDisable = true
-        emptyImage = UIImage(named: "folder_group")?.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width)
+        emptyImage = UIImage(named: "folder_group")
         emptyTitle = "_files_no_files_"
         emptyDescription = "_tutorial_groupfolders_view_"
     }

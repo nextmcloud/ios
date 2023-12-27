@@ -1750,7 +1750,9 @@ class NCCollectionViewDownloadThumbnail: ConcurrentOperation {
                         UIView.transition(with: filePreviewImageView,
                                           duration: 0.75,
                                           options: .transitionCrossDissolve,
-                                          animations: { filePreviewImageView.image = image },
+                                          animations: {
+                            filePreviewImageView.image = image
+                        },
                                           completion: nil)
                     } else {
                         self.collectionView?.reloadData()

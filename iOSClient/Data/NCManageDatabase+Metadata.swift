@@ -296,7 +296,14 @@ extension NCManageDatabase {
         metadata.fileNameView = file.fileName
         metadata.hasPreview = file.hasPreview
         metadata.hidden = file.hidden
-        metadata.iconName = (file.fileName as NSString).pathExtension == "odg" ? "diagram" : file.iconName
+        switch (file.fileName as NSString).pathExtension {
+        case "odg":
+            metadata.iconName = "diagram"
+        case "csv", "xlsm" :
+            metadata.iconName = "file_xls"
+        default:
+            metadata.iconName = file.iconName
+        }
         metadata.mountType = file.mountType
         metadata.name = file.name
         metadata.note = file.note

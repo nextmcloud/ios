@@ -71,21 +71,6 @@ extension NCCollectionViewCommon {
             )
         )
 
-        //
-        // DETAILS
-        //
-        if !appDelegate.disableSharesView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_details_", comment: ""),
-                    icon: utility.loadImage(named: "info"),
-                    order: 10,
-                    action: { _ in
-                        NCActionCenter.shared.openShare(viewController: self, metadata: metadata, page: .activity)
-                    }
-                )
-            )
-        }
 
         if metadata.lock {
             var lockOwnerName = metadata.lockOwnerDisplayName.isEmpty ? metadata.lockOwner : metadata.lockOwnerDisplayName
@@ -196,7 +181,7 @@ extension NCCollectionViewCommon {
         // FAVORITE
         // FIXME: PROPPATCH doesn't work
         // https://github.com/nextcloud/files_lock/issues/68
-        if !metadata.lock {
+        if !metadata.lock, !metadata.isDirectoryE2EE, !metadata.e2eEncrypted  {
             actions.append(
                 NCMenuAction(
                     title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
@@ -277,26 +262,6 @@ extension NCCollectionViewCommon {
         }
 
         //
-        // SAVE AS SCAN
-        //
-        if metadata.isSavebleAsImage {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_save_as_scan_", comment: ""),
-                    icon: utility.loadImage(named: "viewfinder.circle"),
-                    order: 110,
-                    action: { _ in
-                        if self.utilityFileSystem.fileProviderStorageExists(metadata) {
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorSaveAsScan, "error": NKError(), "account": metadata.account])
-                        } else {
-                            NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan) { _, _ in }
-                        }
-                    }
-                )
-            )
-        }
-
-        //
         // RENAME
         //
         if metadata.isRenameable {
@@ -350,27 +315,6 @@ extension NCCollectionViewCommon {
                             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorLoadFileQuickLook, "error": NKError(), "account": metadata.account])
                         } else {
                             NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorLoadFileQuickLook) { _, _ in }
-                        }
-                    }
-                )
-            )
-        }
-
-        //
-        // COLOR FOLDER
-        //
-        if self is NCFiles, metadata.directory {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_change_color_", comment: ""),
-                    icon: utility.loadImage(named: "palette"),
-                    order: 160,
-                    action: { _ in
-                        if let picker = UIStoryboard(name: "NCColorPicker", bundle: nil).instantiateInitialViewController() as? NCColorPicker {
-                            picker.metadata = metadata
-                            let popup = NCPopupViewController(contentController: picker, popupWidth: 200, popupHeight: 320)
-                            popup.backgroundAlpha = 0
-                            self.present(popup, animated: true)
                         }
                     }
                 )

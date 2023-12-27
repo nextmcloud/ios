@@ -228,8 +228,8 @@ import NextcloudKit
         images.offlineFlag = UIImage(named: "offlineFlag")!
         images.local = UIImage(named: "local")!
 
-        images.checkedYes = utility.loadImage(named: "checkmark.circle.fill", color: .systemBlue)
-        images.checkedNo = utility.loadImage(named: "circle", color: .systemGray)
+        images.checkedYes = UIImage(named: "checkedYes")!
+        images.checkedNo = utility.loadImage(named: "circle")
 
         images.buttonMore = UIImage(named: "more")!.image(color: .systemGray, size: 50)
         images.buttonStop = UIImage(named: "stop")!.image(color: .systemGray, size: 50)

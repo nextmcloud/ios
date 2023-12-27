@@ -428,14 +428,6 @@
 {
     NSString *sectionName;
     NSInteger numSections = [tableView numberOfSections] - 1;
-
-    if (section == 1) {
-        NSString *lock = NSLocalizedString(@"_lock_protection_no_screen_footer_", nil);
-        NSString *reset = [NSString stringWithFormat:NSLocalizedString(@"_reset_wrong_passcode_desc_", nil), NCBrandOptions.shared.resetAppPasscodeAttempts];
-        sectionName = [NSString stringWithFormat:@"%@\n%@", lock, reset];
-    } else if (section == 2 && !NCBrandOptions.shared.disable_mobileconfig) {
-        sectionName = NSLocalizedString(@"_calendar_contacts_footer_", nil);
-    }
     return sectionName;
 }
 
