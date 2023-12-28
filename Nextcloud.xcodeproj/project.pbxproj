@@ -15,6 +15,7 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        566EB82A2B3D9CF600FB7CAD /* MoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8292B3D9CF600FB7CAD /* MoreTests.swift */; };
         566EB81E2B3D8C5500FB7CAD /* SettingsTestCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB81D2B3D8C5400FB7CAD /* SettingsTestCases.swift */; };
         566EB8242B3D8CB300FB7CAD /* MagentaCloudVersionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566EB81F2B3D8CB300FB7CAD /* MagentaCloudVersionView.xib */; };
         566EB8252B3D8CB300FB7CAD /* ImprintViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8202B3D8CB300FB7CAD /* ImprintViewController.swift */; };
@@ -1226,6 +1227,7 @@
 		370D26AE248A3D7A00121797 /* NCCellProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCellProtocol.swift; sourceTree = "<group>"; };
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        566EB8292B3D9CF600FB7CAD /* MoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreTests.swift; sourceTree = "<group>"; };
         566EB81D2B3D8C5400FB7CAD /* SettingsTestCases.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTestCases.swift; sourceTree = "<group>"; };
         566EB81F2B3D8CB300FB7CAD /* MagentaCloudVersionView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MagentaCloudVersionView.xib; sourceTree = "<group>"; };
         566EB8202B3D8CB300FB7CAD /* ImprintViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImprintViewController.swift; sourceTree = "<group>"; };
@@ -2113,6 +2115,7 @@
                 566EB8102B3D85DE00FB7CAD /* CollaboraTestCase.swift */,
                 566EB81B2B3D889D00FB7CAD /* E2EETests.swift */,
                 566EB81D2B3D8C5400FB7CAD /* SettingsTestCases.swift */,
+                566EB8292B3D9CF600FB7CAD /* MoreTests.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = NextcloudUnitTests;
@@ -4148,6 +4151,7 @@
 			buildActionMask = 2147483647;
 			files = (
                 566EB7C82B3D6FAB00FB7CAD /* SharingTest.swift in Sources */,
+                566EB82A2B3D9CF600FB7CAD /* MoreTests.swift in Sources */,
 				AF8ED1FC2757821000B8DBC4 /* NextcloudUnitTests.swift in Sources */,
 				F37208792BAB4C09006B5430 /* BaseXCTestCase.swift in Sources */,
 				F372087D2BAB4C0F006B5430 /* TestConstants.swift in Sources */,
