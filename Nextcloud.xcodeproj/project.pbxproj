@@ -15,6 +15,7 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        566EB81C2B3D889D00FB7CAD /* E2EETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB81B2B3D889D00FB7CAD /* E2EETests.swift */; };
         566EB8112B3D85DE00FB7CAD /* CollaboraTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8102B3D85DE00FB7CAD /* CollaboraTestCase.swift */; };
         566EB8172B3D861500FB7CAD /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566EB8132B3D861400FB7CAD /* NCCreateDocumentCustomTextField.xib */; };
         566EB8182B3D861500FB7CAD /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8142B3D861500FB7CAD /* NCCreateDocumentCustomTextField.swift */; };
@@ -968,6 +969,7 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        566EB81B2B3D889D00FB7CAD /* E2EETests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = E2EETests.swift; sourceTree = "<group>"; };
         566EB8102B3D85DE00FB7CAD /* CollaboraTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollaboraTestCase.swift; sourceTree = "<group>"; };
         566EB8132B3D861400FB7CAD /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
         566EB8142B3D861500FB7CAD /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
@@ -1836,6 +1838,7 @@
                 566EB7C72B3D6FAB00FB7CAD /* SharingTest.swift */,
                 566EB80E2B3D833000FB7CAD /* AudioUploadTests.swift */,
                 566EB8102B3D85DE00FB7CAD /* CollaboraTestCase.swift */,
+                566EB81B2B3D889D00FB7CAD /* E2EETests.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = NextcloudUnitTests;
@@ -3719,6 +3722,7 @@
                 566EB8112B3D85DE00FB7CAD /* CollaboraTestCase.swift in Sources */,
                 566EB7C62B3D59B900FB7CAD /* MoveAndCopyTests.swift in Sources */,
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
+                566EB81C2B3D889D00FB7CAD /* E2EETests.swift in Sources */,
                 566EB7E62B3D7AE900FB7CAD /* ScanTests.swift in Sources */,
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
                 566EB80F2B3D833000FB7CAD /* AudioUploadTests.swift in Sources */,
