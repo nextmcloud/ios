@@ -15,6 +15,12 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        566EB81E2B3D8C5500FB7CAD /* SettingsTestCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB81D2B3D8C5400FB7CAD /* SettingsTestCases.swift */; };
+        566EB8242B3D8CB300FB7CAD /* MagentaCloudVersionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566EB81F2B3D8CB300FB7CAD /* MagentaCloudVersionView.xib */; };
+        566EB8252B3D8CB300FB7CAD /* ImprintViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8202B3D8CB300FB7CAD /* ImprintViewController.swift */; };
+        566EB8262B3D8CB300FB7CAD /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8212B3D8CB300FB7CAD /* HelpViewController.swift */; };
+        566EB8272B3D8CB300FB7CAD /* MagentaCloudVersionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8222B3D8CB300FB7CAD /* MagentaCloudVersionView.swift */; };
+        566EB8282B3D8CB300FB7CAD /* OpenSourceSoftwareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8232B3D8CB300FB7CAD /* OpenSourceSoftwareViewController.swift */; };
         566EB81C2B3D889D00FB7CAD /* E2EETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB81B2B3D889D00FB7CAD /* E2EETests.swift */; };
         566EB8112B3D85DE00FB7CAD /* CollaboraTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8102B3D85DE00FB7CAD /* CollaboraTestCase.swift */; };
         566EB8172B3D861500FB7CAD /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566EB8132B3D861400FB7CAD /* NCCreateDocumentCustomTextField.xib */; };
@@ -969,6 +975,12 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        566EB81D2B3D8C5400FB7CAD /* SettingsTestCases.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTestCases.swift; sourceTree = "<group>"; };
+        566EB81F2B3D8CB300FB7CAD /* MagentaCloudVersionView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MagentaCloudVersionView.xib; sourceTree = "<group>"; };
+        566EB8202B3D8CB300FB7CAD /* ImprintViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImprintViewController.swift; sourceTree = "<group>"; };
+        566EB8212B3D8CB300FB7CAD /* HelpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
+        566EB8222B3D8CB300FB7CAD /* MagentaCloudVersionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MagentaCloudVersionView.swift; sourceTree = "<group>"; };
+        566EB8232B3D8CB300FB7CAD /* OpenSourceSoftwareViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenSourceSoftwareViewController.swift; sourceTree = "<group>"; };
         566EB81B2B3D889D00FB7CAD /* E2EETests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = E2EETests.swift; sourceTree = "<group>"; };
         566EB8102B3D85DE00FB7CAD /* CollaboraTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollaboraTestCase.swift; sourceTree = "<group>"; };
         566EB8132B3D861400FB7CAD /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
@@ -1839,6 +1851,7 @@
                 566EB80E2B3D833000FB7CAD /* AudioUploadTests.swift */,
                 566EB8102B3D85DE00FB7CAD /* CollaboraTestCase.swift */,
                 566EB81B2B3D889D00FB7CAD /* E2EETests.swift */,
+                566EB81D2B3D8C5400FB7CAD /* SettingsTestCases.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = NextcloudUnitTests;
@@ -2463,6 +2476,11 @@
 		F7ACE4281BAC0268006C0017 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+                566EB8212B3D8CB300FB7CAD /* HelpViewController.swift */,
+                566EB8202B3D8CB300FB7CAD /* ImprintViewController.swift */,
+                566EB8222B3D8CB300FB7CAD /* MagentaCloudVersionView.swift */,
+                566EB81F2B3D8CB300FB7CAD /* MagentaCloudVersionView.xib */,
+                566EB8232B3D8CB300FB7CAD /* OpenSourceSoftwareViewController.swift */,
 				F7ACE4291BAC0268006C0017 /* Acknowledgements.h */,
 				F7ACE42A1BAC0268006C0017 /* Acknowledgements.m */,
 				F7ACE42B1BAC0268006C0017 /* Acknowledgements.rtf */,
@@ -3596,6 +3614,7 @@
 				F7B398422A6A91D5007538D6 /* NCSectionHeaderMenu.xib in Resources */,
 				F7501C322212E57500FB1415 /* NCMedia.storyboard in Resources */,
 				F74DE14425135B6800917068 /* NCTransfers.storyboard in Resources */,
+                566EB8242B3D8CB300FB7CAD /* MagentaCloudVersionView.xib in Resources */,
 				F77910A525DD517B00CEDB9E /* Settings.bundle in Resources */,
                 566EB8012B3D7B5F00FB7CAD /* TextFileWithOcrSwitchView.xib in Resources */,
 				F7CB68A0254169530050EC94 /* NCSettings.storyboard in Resources */,
@@ -3722,6 +3741,7 @@
                 566EB8112B3D85DE00FB7CAD /* CollaboraTestCase.swift in Sources */,
                 566EB7C62B3D59B900FB7CAD /* MoveAndCopyTests.swift in Sources */,
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
+                566EB81E2B3D8C5500FB7CAD /* SettingsTestCases.swift in Sources */,
                 566EB81C2B3D889D00FB7CAD /* E2EETests.swift in Sources */,
                 566EB7E62B3D7AE900FB7CAD /* ScanTests.swift in Sources */,
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
@@ -4074,6 +4094,7 @@
 				F78C6FDE296D677300C952C3 /* NCContextMenu.swift in Sources */,
 				F7E7AEA72BA32D0000512E52 /* NCCollectionViewUnifiedSearch.swift in Sources */,
 				F769CA172965AB7C00039397 /* NCUploadAssets.swift in Sources */,
+                566EB8252B3D8CB300FB7CAD /* ImprintViewController.swift in Sources */,
 				F73EF7A72B0223900087E6E9 /* NCManageDatabase+Comments.swift in Sources */,
 				F7AE00F8230E81CB007ACF8A /* NCBrowserWeb.swift in Sources */,
 				F702F30825EE5D47008F8E80 /* NCPopupViewController.swift in Sources */,
@@ -4145,11 +4166,13 @@
 				F700510522DF6A89003A3356 /* NCShare.swift in Sources */,
                 566EB8042B3D7B5F00FB7CAD /* ScanDocumentPathView.swift in Sources */,
 				F72D1007210B6882009C96B7 /* NCPushNotificationEncryption.m in Sources */,
+                566EB8272B3D8CB300FB7CAD /* MagentaCloudVersionView.swift in Sources */,
                 566EB80A2B3D7B5F00FB7CAD /* TextFileWithOcrSwitchView.swift in Sources */,
 				F785EE9D246196DF00B3F945 /* NCNetworkingE2EE.swift in Sources */,
 				F76673ED22C901F6007ED366 /* FileProviderDomain.swift in Sources */,
 				F7A321AD1E9E6AD50069AD1B /* CCAdvanced.m in Sources */,
 				F77B0E4F1D118A16002130FE /* CCManageAutoUpload.m in Sources */,
+                566EB8262B3D8CB300FB7CAD /* HelpViewController.swift in Sources */,
 				F75C0C4823D1FAE300163CC8 /* NCRichWorkspaceCommon.swift in Sources */,
 				F78ACD4A21903F850088454D /* NCTrashListCell+NCTrashCellProtocol.swift in Sources */,
 				F757CC8D29E82D0500F31428 /* NCGroupfolders.swift in Sources */,
@@ -4231,6 +4254,7 @@
 				F7B7504B2397D38F004E13EC /* UIImage+Extension.swift in Sources */,
 				F7EFC0CD256BF8DD00461AAD /* NCUserStatus.swift in Sources */,
 				AF3FDCC22796ECC300710F60 /* NCTrash+CollectionView.swift in Sources */,
+                566EB8282B3D8CB300FB7CAD /* OpenSourceSoftwareViewController.swift in Sources */,
 				F70D7C3725FFBF82002B9E34 /* NCCollectionViewCommon.swift in Sources */,
 				F76D364628A4F8BF00214537 /* NCActivityIndicator.swift in Sources */,
 				F7134186259747BA00768D21 /* NCPushNotification.m in Sources */,
