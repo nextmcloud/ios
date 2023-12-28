@@ -15,6 +15,7 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        566EB80F2B3D833000FB7CAD /* AudioUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB80E2B3D833000FB7CAD /* AudioUploadTests.swift */; };
         566EB7E62B3D7AE900FB7CAD /* ScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB7E52B3D7AE900FB7CAD /* ScanTests.swift */; };
         566EB7E82B3D7B3500FB7CAD /* NCCreateFormUploadScanDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB7E72B3D7B3500FB7CAD /* NCCreateFormUploadScanDocument.swift */; };
         566EB7FC2B3D7B5F00FB7CAD /* PNGImageSaveSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB7EA2B3D7B5F00FB7CAD /* PNGImageSaveSwitchView.swift */; };
@@ -962,6 +963,7 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        566EB80E2B3D833000FB7CAD /* AudioUploadTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioUploadTests.swift; sourceTree = "<group>"; };
         566EB7E52B3D7AE900FB7CAD /* ScanTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanTests.swift; sourceTree = "<group>"; };
         566EB7E72B3D7B3500FB7CAD /* NCCreateFormUploadScanDocument.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadScanDocument.swift; sourceTree = "<group>"; };
         566EB7EA2B3D7B5F00FB7CAD /* PNGImageSaveSwitchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PNGImageSaveSwitchView.swift; sourceTree = "<group>"; };
@@ -1811,6 +1813,7 @@
                 566EB7E52B3D7AE900FB7CAD /* ScanTests.swift */,
                 566EB7C52B3D59B900FB7CAD /* MoveAndCopyTests.swift */,
                 566EB7C72B3D6FAB00FB7CAD /* SharingTest.swift */,
+                566EB80E2B3D833000FB7CAD /* AudioUploadTests.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = NextcloudUnitTests;
@@ -3692,6 +3695,7 @@
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
                 566EB7E62B3D7AE900FB7CAD /* ScanTests.swift in Sources */,
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
+                566EB80F2B3D833000FB7CAD /* AudioUploadTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
