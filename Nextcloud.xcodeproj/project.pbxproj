@@ -15,6 +15,16 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        566FCF312B3EB48A00168DEA /* PrivacyPolicyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF302B3EB48A00168DEA /* PrivacyPolicyTest.swift */; };
+        566FCF432B3EB4E800168DEA /* AnalysisDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF3A2B3EB4E700168DEA /* AnalysisDataCollectionSwitch.xib */; };
+        566FCF442B3EB4E800168DEA /* PrivacyPolicyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF3B2B3EB4E700168DEA /* PrivacyPolicyViewController.swift */; };
+        566FCF452B3EB4E800168DEA /* InitialPrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF3C2B3EB4E700168DEA /* InitialPrivacySettingsViewController.swift */; };
+        566FCF462B3EB4E800168DEA /* AnalysisDataCollectionSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF3D2B3EB4E700168DEA /* AnalysisDataCollectionSwitch.swift */; };
+        566FCF472B3EB4E800168DEA /* PrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF3E2B3EB4E800168DEA /* PrivacySettingsViewController.swift */; };
+        566FCF482B3EB4E800168DEA /* RequiredDataCollectionSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF3F2B3EB4E800168DEA /* RequiredDataCollectionSwitch.swift */; };
+        566FCF492B3EB4E800168DEA /* RequiredDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF402B3EB4E800168DEA /* RequiredDataCollectionSwitch.xib */; };
+        566FCF4A2B3EB4E800168DEA /* SaveSettingsCustomButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF412B3EB4E800168DEA /* SaveSettingsCustomButtonCell.swift */; };
+        566FCF4B2B3EB4E800168DEA /* SaveSettingsCustomButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF422B3EB4E800168DEA /* SaveSettingsCustomButtonCell.xib */; };
         566FCF2F2B3EB28D00168DEA /* NCNotificationText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF2E2B3EB28D00168DEA /* NCNotificationText.swift */; };
         566FCF282B3EAD0E00168DEA /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF262B3EAD0E00168DEA /* FolderPathCustomCell.swift */; };
         566FCF292B3EAD0E00168DEA /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF272B3EAD0E00168DEA /* FolderPathCustomCell.xib */; };
@@ -991,6 +1001,16 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        566FCF302B3EB48A00168DEA /* PrivacyPolicyTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyTest.swift; sourceTree = "<group>"; };
+        566FCF3A2B3EB4E700168DEA /* AnalysisDataCollectionSwitch.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AnalysisDataCollectionSwitch.xib; sourceTree = "<group>"; };
+        566FCF3B2B3EB4E700168DEA /* PrivacyPolicyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyViewController.swift; sourceTree = "<group>"; };
+        566FCF3C2B3EB4E700168DEA /* InitialPrivacySettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitialPrivacySettingsViewController.swift; sourceTree = "<group>"; };
+        566FCF3D2B3EB4E700168DEA /* AnalysisDataCollectionSwitch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnalysisDataCollectionSwitch.swift; sourceTree = "<group>"; };
+        566FCF3E2B3EB4E800168DEA /* PrivacySettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacySettingsViewController.swift; sourceTree = "<group>"; };
+        566FCF3F2B3EB4E800168DEA /* RequiredDataCollectionSwitch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequiredDataCollectionSwitch.swift; sourceTree = "<group>"; };
+        566FCF402B3EB4E800168DEA /* RequiredDataCollectionSwitch.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RequiredDataCollectionSwitch.xib; sourceTree = "<group>"; };
+        566FCF412B3EB4E800168DEA /* SaveSettingsCustomButtonCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SaveSettingsCustomButtonCell.swift; sourceTree = "<group>"; };
+        566FCF422B3EB4E800168DEA /* SaveSettingsCustomButtonCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SaveSettingsCustomButtonCell.xib; sourceTree = "<group>"; };
         566FCF2E2B3EB28D00168DEA /* NCNotificationText.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCNotificationText.swift; sourceTree = "<group>"; };
         566FCF262B3EAD0E00168DEA /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
         566FCF272B3EAD0E00168DEA /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
@@ -1882,6 +1902,7 @@
                 566EB8292B3D9CF600FB7CAD /* MoreTests.swift */,
                 566EB82B2B3DA07700FB7CAD /* AssetUploadTest.swift */,
                 566FCF2E2B3EB28D00168DEA /* NCNotificationText.swift */,
+                566FCF302B3EB48A00168DEA /* PrivacyPolicyTest.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = NextcloudUnitTests;
@@ -2517,6 +2538,15 @@
                 566EB8222B3D8CB300FB7CAD /* MagentaCloudVersionView.swift */,
                 566EB81F2B3D8CB300FB7CAD /* MagentaCloudVersionView.xib */,
                 566EB8232B3D8CB300FB7CAD /* OpenSourceSoftwareViewController.swift */,
+                566FCF3D2B3EB4E700168DEA /* AnalysisDataCollectionSwitch.swift */,
+                566FCF3A2B3EB4E700168DEA /* AnalysisDataCollectionSwitch.xib */,
+                566FCF3C2B3EB4E700168DEA /* InitialPrivacySettingsViewController.swift */,
+                566FCF3B2B3EB4E700168DEA /* PrivacyPolicyViewController.swift */,
+                566FCF3E2B3EB4E800168DEA /* PrivacySettingsViewController.swift */,
+                566FCF3F2B3EB4E800168DEA /* RequiredDataCollectionSwitch.swift */,
+                566FCF402B3EB4E800168DEA /* RequiredDataCollectionSwitch.xib */,
+                566FCF412B3EB4E800168DEA /* SaveSettingsCustomButtonCell.swift */,
+                566FCF422B3EB4E800168DEA /* SaveSettingsCustomButtonCell.xib */,
 				F7ACE4291BAC0268006C0017 /* Acknowledgements.h */,
 				F7ACE42A1BAC0268006C0017 /* Acknowledgements.m */,
 				F7ACE42B1BAC0268006C0017 /* Acknowledgements.rtf */,
@@ -3585,6 +3615,7 @@
 				F758B45A212C564000515F55 /* NCScan.storyboard in Resources */,
 				F70D87CF25EE6E58008CBBBD /* NCRenameFile.storyboard in Resources */,
 				F33AAF9A2A60394C006ECCBD /* NCMoreUserCell.xib in Resources */,
+                566FCF432B3EB4E800168DEA /* AnalysisDataCollectionSwitch.xib in Resources */,
 				F765F73225237E3F00391DBE /* NCRecent.storyboard in Resources */,
 				F78F74342163757000C2ADAD /* NCTrash.storyboard in Resources */,
 				F702F30225EE5D2C008F8E80 /* english.txt in Resources */,
@@ -3630,6 +3661,8 @@
 				F7AC934A296193050002BC0F /* Reasons to use Nextcloud.pdf in Resources */,
 				F7A60F87292D215000FCE1F2 /* NCShareAccounts.storyboard in Resources */,
 				F761856A29E98543006EB3B0 /* NCIntro.storyboard in Resources */,
+				F747BA1F22354D2000971601 /* NCCreateFormUploadVoiceNote.storyboard in Resources */,
+                566FCF492B3EB4E800168DEA /* RequiredDataCollectionSwitch.xib in Resources */,
 				F719D9E0288D37A300762E33 /* NCColorPicker.storyboard in Resources */,
 				F7651A8A23A2A3F2001403D2 /* NCCreateFormUploadDocuments.storyboard in Resources */,
 				F7F4F10A27ECDBDB008676F9 /* Inconsolata-ExtraBold.ttf in Resources */,
@@ -3644,6 +3677,7 @@
 				F732D23327CF8AED000B0F1B /* NCPlayerToolBar.xib in Resources */,
 				F73D11FA253C5F4800DF9BEC /* NCViewerNextcloudText.storyboard in Resources */,
 				F7EDE51B262DD0C400414FE6 /* NCSelectCommandViewCopyMove.xib in Resources */,
+                566FCF4B2B3EB4E800168DEA /* SaveSettingsCustomButtonCell.xib in Resources */,
 				F73B422B2476764F00A30FD3 /* NCNotification.storyboard in Resources */,
                 566EB8192B3D861500FB7CAD /* FolderPathCustomCell.xib in Resources */,
 				F7FF2CB12842159500EBB7A1 /* NCSectionHeader.xib in Resources */,
@@ -3786,6 +3820,7 @@
                 566EB7C82B3D6FAB00FB7CAD /* SharingTest.swift in Sources */,
                 566EB82A2B3D9CF600FB7CAD /* MoreTests.swift in Sources */,
                 566FCF2F2B3EB28D00168DEA /* NCNotificationText.swift in Sources */,
+                566FCF312B3EB48A00168DEA /* PrivacyPolicyTest.swift in Sources */,
 				AF8ED1FC2757821000B8DBC4 /* NextcloudUnitTests.swift in Sources */,
                 566EB82C2B3DA07700FB7CAD /* AssetUploadTest.swift in Sources */,
                 566EB8112B3D85DE00FB7CAD /* CollaboraTestCase.swift in Sources */,
@@ -4169,6 +4204,7 @@
 				F76D3CF12428B40E005DFA87 /* NCViewerPDFSearch.swift in Sources */,
 				F7245924289BB50C00474787 /* ThreadSafeDictionary.swift in Sources */,
 				F73F537F1E929C8500F8678D /* NCMore.swift in Sources */,
+                566FCF462B3EB4E800168DEA /* AnalysisDataCollectionSwitch.swift in Sources */,
 				F702F2CF25EE5B5C008F8E80 /* NCGlobal.swift in Sources */,
 				F72CD63A25C19EBF00F46F9A /* NCAutoUpload.swift in Sources */,
 				AF93471D27E2361E002537EE /* NCShareAdvancePermissionFooter.swift in Sources */,
@@ -4194,6 +4230,7 @@
 				F73EF7E72B0226B90087E6E9 /* NCManageDatabase+UserStatus.swift in Sources */,
 				F78A18B623CDD07D00F681F3 /* NCViewerRichWorkspaceWebView.swift in Sources */,
 				AFA2AC8527849604008E1EA7 /* NCActivityCommentView.swift in Sources */,
+                566FCF472B3EB4E800168DEA /* PrivacySettingsViewController.swift in Sources */,
 				AFCE353727E4ED7B00FEA6C2 /* NCShareCells.swift in Sources */,
 				AF36077127BFA4E8001A243D /* ParallelWorker.swift in Sources */,
 				F75A9EE623796C6F0044CFCE /* NCNetworking.swift in Sources */,
@@ -4208,6 +4245,7 @@
 				F7BF9D822934CA21009EE9A6 /* NCManageDatabase+LayoutForView.swift in Sources */,
 				AF7E504E27A2D8FF00B5E4AF /* UIBarButton+Extension.swift in Sources */,
 				F7A846DE2BB01ACB0024816F /* NCTrashCellProtocol.swift in Sources */,
+                566FCF442B3EB4E800168DEA /* PrivacyPolicyViewController.swift in Sources */,
 				F78A10BF29322E8A008499B8 /* NCManageDatabase+Directory.swift in Sources */,
 				F704B5E92430C0B800632F5F /* NCCreateFormUploadConflictCell.swift in Sources */,
 				F7327E3D2B73B92800A462C7 /* NCNetworking+Synchronization.swift in Sources */,
@@ -4233,6 +4271,7 @@
 				F757CC8D29E82D0500F31428 /* NCGroupfolders.swift in Sources */,
 				F760329F252F0F8E0015A421 /* NCTransferCell.swift in Sources */,
 				F3BB46542A3A1E9D00461F6E /* CCCellMore.swift in Sources */,
+                566FCF4A2B3EB4E800168DEA /* SaveSettingsCustomButtonCell.swift in Sources */,
 				AF68326A27BE65A90010BF0B /* NCMenuAction.swift in Sources */,
 				F7682FE023C36B0500983A04 /* NCMainTabBar.swift in Sources */,
 				F7A0D1352591FBC5008F8A13 /* String+Extension.swift in Sources */,
@@ -4254,6 +4293,7 @@
 				F31F69502A2F707E00162F76 /* SwiftUIView+Extensions.swift in Sources */,
 				F7C30E00291BD2610017149B /* NCNetworkingE2EERename.swift in Sources */,
 				F7651A8B23A2A3F2001403D2 /* NCCreateFormUploadDocuments.swift in Sources */,
+                566FCF452B3EB4E800168DEA /* InitialPrivacySettingsViewController.swift in Sources */,
 				F74AF3A4247FB6AE00AC767B /* NCUtilityFileSystem.swift in Sources */,
 				AFCE353327E4ED1900FEA6C2 /* UIToolbar+Extension.swift in Sources */,
 				8491B1CD273BBA82001C8C5B /* UIViewController+Menu.swift in Sources */,
@@ -4378,6 +4418,7 @@
 				F78B87E72B62527100C65ADC /* NCMediaDataSource.swift in Sources */,
 				F7581D1A25EFDA61004DC699 /* NCLoginWeb+Menu.swift in Sources */,
 				F7864ACC2A78FE73004870E0 /* NCManageDatabase+LocalFile.swift in Sources */,
+                566FCF482B3EB4E800168DEA /* RequiredDataCollectionSwitch.swift in Sources */,
 				F7F4F11027ECDC4A008676F9 /* UIDevice+Extension.swift in Sources */,
 				F7327E302B73A86700A462C7 /* NCNetworking+WebDAV.swift in Sources */,
 				F77B0ED11D118A16002130FE /* Acknowledgements.m in Sources */,
