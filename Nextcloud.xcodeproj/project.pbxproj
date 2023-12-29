@@ -15,6 +15,8 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        566FCF522B3EBADE00168DEA /* NCTrashGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF502B3EBADE00168DEA /* NCTrashGridCell.swift */; };
+        566FCF532B3EBADE00168DEA /* NCTrashGridCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF512B3EBADE00168DEA /* NCTrashGridCell.xib */; };
         566FCF4D2B3EB78F00168DEA /* OnboardingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF4C2B3EB78F00168DEA /* OnboardingTestCase.swift */; };
         566FCF4F2B3EB84F00168DEA /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF4E2B3EB84F00168DEA /* AppUtility.swift */; };
         566FCF312B3EB48A00168DEA /* PrivacyPolicyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF302B3EB48A00168DEA /* PrivacyPolicyTest.swift */; };
@@ -994,6 +996,8 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        566FCF502B3EBADE00168DEA /* NCTrashGridCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCTrashGridCell.swift; sourceTree = "<group>"; };
+        566FCF512B3EBADE00168DEA /* NCTrashGridCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCTrashGridCell.xib; sourceTree = "<group>"; };
         566FCF4C2B3EB78F00168DEA /* OnboardingTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingTestCase.swift; sourceTree = "<group>"; };
         566FCF4E2B3EB84F00168DEA /* AppUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppUtility.swift; sourceTree = "<group>"; };
         566FCF302B3EB48A00168DEA /* PrivacyPolicyTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyTest.swift; sourceTree = "<group>"; };
@@ -2378,6 +2382,8 @@
 		F78ACD4721903F850088454D /* Cell */ = {
 			isa = PBXGroup;
 			children = (
+                566FCF502B3EBADE00168DEA /* NCTrashGridCell.swift */,
+                566FCF512B3EBADE00168DEA /* NCTrashGridCell.xib */,
 				F78ACD4821903F850088454D /* NCTrashListCell+NCTrashCellProtocol.swift */,
 				F78ACD4921903F850088454D /* NCTrashListCell.xib */,
 			);
@@ -3584,6 +3590,7 @@
 				F3BB464D2A39ADCC00461F6E /* NCMoreAppSuggestionsCell.xib in Resources */,
                 566EB8172B3D861500FB7CAD /* NCCreateDocumentCustomTextField.xib in Resources */,
 				F7F4F10727ECDBDB008676F9 /* Inconsolata-Black.ttf in Resources */,
+                566FCF532B3EBADE00168DEA /* NCTrashGridCell.xib in Resources */,
 				F761856D29E98543006EB3B0 /* NCIntroCollectionViewCell.xib in Resources */,
 				F78ACD4621903D010088454D /* NCGridCell.xib in Resources */,
 				F7F4F10827ECDBDB008676F9 /* Inconsolata-ExtraLight.ttf in Resources */,
@@ -4378,6 +4385,7 @@
 				F7725A60251F33BB00D125E0 /* NCFiles.swift in Sources */,
 				F3BB46522A39EC4900461F6E /* NCMoreAppSuggestionsCell.swift in Sources */,
 				F704B5E52430AA8000632F5F /* NCCreateFormUploadConflict.swift in Sources */,
+                566FCF522B3EBADE00168DEA /* NCTrashGridCell.swift in Sources */,
 				F765608F23BF813600765969 /* NCContentPresenter.swift in Sources */,
 				F7327E352B73AEDE00A462C7 /* NCNetworking+LivePhoto.swift in Sources */,
 				F76687072B7D067400779E3F /* NCAudioRecorderViewController.swift in Sources */,
