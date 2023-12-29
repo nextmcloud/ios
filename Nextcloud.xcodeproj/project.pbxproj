@@ -15,6 +15,7 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        566FCF2F2B3EB28D00168DEA /* NCNotificationText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF2E2B3EB28D00168DEA /* NCNotificationText.swift */; };
         566FCF282B3EAD0E00168DEA /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF262B3EAD0E00168DEA /* FolderPathCustomCell.swift */; };
         566FCF292B3EAD0E00168DEA /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF272B3EAD0E00168DEA /* FolderPathCustomCell.xib */; };
         566FCF2C2B3EAD4700168DEA /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF2A2B3EAD4700168DEA /* TextTableViewCell.swift */; };
@@ -1270,6 +1271,7 @@
 		370D26AE248A3D7A00121797 /* NCCellProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCellProtocol.swift; sourceTree = "<group>"; };
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        566FCF2E2B3EB28D00168DEA /* NCNotificationText.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCNotificationText.swift; sourceTree = "<group>"; };
         566FCF262B3EAD0E00168DEA /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
         566FCF272B3EAD0E00168DEA /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
         566FCF2A2B3EAD4700168DEA /* TextTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
@@ -2249,6 +2251,7 @@
                 566EB81D2B3D8C5400FB7CAD /* SettingsTestCases.swift */,
                 566EB8292B3D9CF600FB7CAD /* MoreTests.swift */,
                 566EB82B2B3DA07700FB7CAD /* AssetUploadTest.swift */,
+                566FCF2E2B3EB28D00168DEA /* NCNotificationText.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = NextcloudUnitTests;
@@ -4343,6 +4346,7 @@
 				AA52EB472D42AC9E0089C348 /* Placeholder.swift in Sources */,
                 566EB7C82B3D6FAB00FB7CAD /* SharingTest.swift in Sources */,
                 566EB82A2B3D9CF600FB7CAD /* MoreTests.swift in Sources */,
+                566FCF2F2B3EB28D00168DEA /* NCNotificationText.swift in Sources */,
 				AF8ED1FC2757821000B8DBC4 /* NextcloudUnitTests.swift in Sources */,
 				F37208792BAB4C09006B5430 /* BaseXCTestCase.swift in Sources */,
 				F372087D2BAB4C0F006B5430 /* TestConstants.swift in Sources */,
