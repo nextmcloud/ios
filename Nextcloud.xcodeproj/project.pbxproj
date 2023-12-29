@@ -15,6 +15,8 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        566FCF5A2B3ECD3400168DEA /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF572B3ECD3400168DEA /* TealiumHelper.swift */; };
+        566FCF5B2B3ECD3400168DEA /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF582B3ECD3400168DEA /* AdjustHelper.m */; };
         566FCF552B3ECBDE00168DEA /* RenameFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF542B3ECBDE00168DEA /* RenameFileTests.swift */; };
         566FCF522B3EBADE00168DEA /* NCTrashGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF502B3EBADE00168DEA /* NCTrashGridCell.swift */; };
         566FCF532B3EBADE00168DEA /* NCTrashGridCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF512B3EBADE00168DEA /* NCTrashGridCell.xib */; };
@@ -1284,6 +1286,9 @@
 		370D26AE248A3D7A00121797 /* NCCellProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCellProtocol.swift; sourceTree = "<group>"; };
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        566FCF572B3ECD3400168DEA /* TealiumHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
+        566FCF582B3ECD3400168DEA /* AdjustHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
+        566FCF592B3ECD3400168DEA /* AdjustHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
         566FCF542B3ECBDE00168DEA /* RenameFileTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RenameFileTests.swift; sourceTree = "<group>"; };
         566FCF502B3EBADE00168DEA /* NCTrashGridCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCTrashGridCell.swift; sourceTree = "<group>"; };
         566FCF512B3EBADE00168DEA /* NCTrashGridCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCTrashGridCell.xib; sourceTree = "<group>"; };
@@ -2266,6 +2271,16 @@
                 566EB8162B3D861500FB7CAD /* FolderPathCustomCell.swift */,
             );
             path = "NMC Custom Views";
+            sourceTree = "<group>";
+        };
+        566FCF562B3ECD3400168DEA /* Helper */ = {
+            isa = PBXGroup;
+            children = (
+                566FCF572B3ECD3400168DEA /* TealiumHelper.swift */,
+                566FCF582B3ECD3400168DEA /* AdjustHelper.m */,
+                566FCF592B3ECD3400168DEA /* AdjustHelper.h */,
+            );
+            path = Helper;
             sourceTree = "<group>";
         };
 		AF8ED1FA2757821000B8DBC4 /* NextcloudUnitTests */ = {
@@ -3520,6 +3535,7 @@
 			children = (
                 566EB8122B3D861400FB7CAD /* NMC Custom Views */,
                 566FCF4E2B3EB84F00168DEA /* AppUtility.swift */,
+                566FCF562B3ECD3400168DEA /* Helper */,
 				F702F2CC25EE5B4F008F8E80 /* AppDelegate.swift */,
 				F794E13E2BBC0F70003693D7 /* SceneDelegate.swift */,
 				F77DD6A72C5CC093009448FB /* NCSession.swift */,
@@ -4967,6 +4983,7 @@
 				F757CC8D29E82D0500F31428 /* NCGroupfolders.swift in Sources */,
 				F760329F252F0F8E0015A421 /* NCTransferCell.swift in Sources */,
 				F3BB46542A3A1E9D00461F6E /* CCCellMore.swift in Sources */,
+                566FCF5A2B3ECD3400168DEA /* TealiumHelper.swift in Sources */,
                 566FCF4A2B3EB4E800168DEA /* SaveSettingsCustomButtonCell.swift in Sources */,
 				AF68326A27BE65A90010BF0B /* NCMenuAction.swift in Sources */,
 				F7F3E58E2D3BB65600A32B14 /* NCNetworking+Recommendations.swift in Sources */,
@@ -5023,6 +5040,7 @@
 				F7C30DF6291BC0CA0017149B /* NCNetworkingE2EEUpload.swift in Sources */,
 				F7501C332212E57500FB1415 /* NCMedia.swift in Sources */,
 				F7411C552D7B26D700F57358 /* NCNetworking+ServerError.swift in Sources */,
+                566FCF5B2B3ECD3400168DEA /* AdjustHelper.m in Sources */,
 				F72944F22A84246400246839 /* NCEndToEndMetadataV20.swift in Sources */,
 				F70BFC7420E0FA7D00C67599 /* NCUtility.swift in Sources */,
 				F79EDAA526B004980007D134 /* NCPlayer.swift in Sources */,
