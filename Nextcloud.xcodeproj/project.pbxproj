@@ -4054,6 +4054,9 @@
 				F33EE6DF2BF4BDA500CA1A51 /* XCRemoteSwiftPackageReference "swift-nio-ssl" */,
 				F33EE6EE2BF4C0FF00CA1A51 /* XCRemoteSwiftPackageReference "swift-nio" */,
 				F7D4BF4E2CA2ECCB00A5E746 /* XCRemoteSwiftPackageReference "vlckit-spm" */,
+				F327FA412B8CC0B900E5B743 /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
+				566FCF5C2B3ED58900168DEA /* XCRemoteSwiftPackageReference "tealium-swift" */,
+				566FCF5D2B3ED64900168DEA /* XCRemoteSwiftPackageReference "ios_sdk" */,
 			);
 			productRefGroup = F7F67B9F1A24D27800EE80DA;
 			projectDirPath = "";
@@ -6252,6 +6255,22 @@
 				minimumVersion = 2.26.0;
 			};
 		};
+          566FCF5C2B3ED58900168DEA /* XCRemoteSwiftPackageReference "tealium-swift" */ = {
+            isa = XCRemoteSwiftPackageReference;
+            repositoryURL = "https://github.com/Tealium/tealium-swift.git";
+            requirement = {
+                kind = upToNextMajorVersion;
+                minimumVersion = 2.0.0;
+            };
+        };
+        566FCF5D2B3ED64900168DEA /* XCRemoteSwiftPackageReference "ios_sdk" */ = {
+            isa = XCRemoteSwiftPackageReference;
+            repositoryURL = "https://github.com/adjust/ios_sdk";
+            requirement = {
+                kind = upToNextMajorVersion;
+                minimumVersion = 4.29.5;
+            };
+        };
 		F33EE6EE2BF4C0FF00CA1A51 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-nio.git";
