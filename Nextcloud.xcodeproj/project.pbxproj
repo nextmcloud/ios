@@ -15,6 +15,10 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        566FCF282B3EAD0E00168DEA /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF262B3EAD0E00168DEA /* FolderPathCustomCell.swift */; };
+        566FCF292B3EAD0E00168DEA /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF272B3EAD0E00168DEA /* FolderPathCustomCell.xib */; };
+        566FCF2C2B3EAD4700168DEA /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF2A2B3EAD4700168DEA /* TextTableViewCell.swift */; };
+        566FCF2D2B3EAD4700168DEA /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF2B2B3EAD4700168DEA /* TextTableViewCell.xib */; };
         566EB82C2B3DA07700FB7CAD /* AssetUploadTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB82B2B3DA07700FB7CAD /* AssetUploadTest.swift */; };
         566EB82A2B3D9CF600FB7CAD /* MoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8292B3D9CF600FB7CAD /* MoreTests.swift */; };
         566EB81E2B3D8C5500FB7CAD /* SettingsTestCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB81D2B3D8C5400FB7CAD /* SettingsTestCases.swift */; };
@@ -896,7 +900,8 @@
 		F7C9B9212B582F550064EA91 /* NCManageDatabase+SecurityGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C9B91C2B582F550064EA91 /* NCManageDatabase+SecurityGuard.swift */; };
 		F7C9B9222B582F550064EA91 /* NCManageDatabase+SecurityGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C9B91C2B582F550064EA91 /* NCManageDatabase+SecurityGuard.swift */; };
 		F7C9B9232B582F550064EA91 /* NCManageDatabase+SecurityGuard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C9B91C2B582F550064EA91 /* NCManageDatabase+SecurityGuard.swift */; };
-		F7CA212D25F1333300826ABB /* NCAccountRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CA212B25F1333200826ABB /* NCAccountRequest.swift */; };
+		F7CA212D25F1333300826ABB /*
+        ces */ = {isa = PBXBuildFile; fileRef = F7CA212B25F1333200826ABB /* NCAccountRequest.swift */; };
 		F7CA212E25F1333300826ABB /* NCAccountRequest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7CA212C25F1333200826ABB /* NCAccountRequest.storyboard */; };
 		F7CB689A2541676B0050EC94 /* NCMore.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7CB68992541676B0050EC94 /* NCMore.storyboard */; };
 		F7CBC1232BAC8B0000EC1D55 /* NCSectionFirstHeaderEmptyData.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7CBC1212BAC8B0000EC1D55 /* NCSectionFirstHeaderEmptyData.xib */; };
@@ -1205,6 +1210,10 @@
 		370D26AE248A3D7A00121797 /* NCCellProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCellProtocol.swift; sourceTree = "<group>"; };
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        566FCF262B3EAD0E00168DEA /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
+        566FCF272B3EAD0E00168DEA /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
+        566FCF2A2B3EAD4700168DEA /* TextTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
+        566FCF2B2B3EAD4700168DEA /* TextTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
         566EB82B2B3DA07700FB7CAD /* AssetUploadTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetUploadTest.swift; sourceTree = "<group>"; };
         566EB8292B3D9CF600FB7CAD /* MoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreTests.swift; sourceTree = "<group>"; };
         566EB81D2B3D8C5400FB7CAD /* SettingsTestCases.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTestCases.swift; sourceTree = "<group>"; };
@@ -3124,6 +3133,11 @@
 			children = (
 				F7FA7FFD2C0F4F3B0072FC60 /* Upload Assets */,
 				F7A509242C26BD5D00326106 /* NCCreateDocument.swift */,
+                566FCF2A2B3EAD4700168DEA /* TextTableViewCell.swift */,
+                566FCF2B2B3EAD4700168DEA /* TextTableViewCell.xib */,
+                566FCF262B3EAD0E00168DEA /* FolderPathCustomCell.swift */,
+                566FCF272B3EAD0E00168DEA /* FolderPathCustomCell.xib */,
+				F769CA162965AB7C00039397 /* NCUploadAssets.swift */,
 				F704B5E22430AA6F00632F5F /* NCCreateFormUploadConflict.storyboard */,
 				F704B5E42430AA8000632F5F /* NCCreateFormUploadConflict.swift */,
 				F704B5E82430C0B800632F5F /* NCCreateFormUploadConflictCell.swift */,
@@ -3907,6 +3921,7 @@
 				F7CEE6002BA9A5C9003EFD89 /* NCTrashGridCell.xib in Resources */,
 				3704EB2A23D5A58400455C5B /* NCMenu.storyboard in Resources */,
 				AF93471C27E2361E002537EE /* NCShareHeader.xib in Resources */,
+                566FCF292B3EAD0E00168DEA /* FolderPathCustomCell.xib in Resources */,
 				AF93471C27E2361E002537EE /* NCShareAdvancePermissionHeader.xib in Resources */,
 				F7F1E54C2492369A00E42386 /* NCMediaCommandView.xib in Resources */,
                 566EB8072B3D7B5F00FB7CAD /* PdfWithOcrSwitchView.xib in Resources */,
@@ -3953,6 +3968,7 @@
 				F73B422B2476764F00A30FD3 /* NCNotification.storyboard in Resources */,
                 566EB8192B3D861500FB7CAD /* FolderPathCustomCell.xib in Resources */,
 				F7FF2CB12842159500EBB7A1 /* NCSectionHeader.xib in Resources */,
+                566FCF2D2B3EAD4700168DEA /* TextTableViewCell.xib in Resources */,
 				F7D1612023CF19E30039EBBF /* NCViewerRichWorkspace.storyboard in Resources */,
 				F77B0F631D118A16002130FE /* Localizable.strings in Resources */,
                 566EB80D2B3D7B5F00FB7CAD /* PdfWithoutOcrSwitchView.xib in Resources */,
@@ -4607,6 +4623,8 @@
 				F7A51E722C721FC00037BCC0 /* NCTransfersProgress.swift in Sources */,
 				F76882352C0DD1E7001CF441 /* NCWebBrowserView.swift in Sources */,
 				F3A047972BD2668800658E7B /* NCAssistantEmptyView.swift in Sources */,
+                566FCF2C2B3EAD4700168DEA /* TextTableViewCell.swift in Sources */,
+				F78ACD4A21903F850088454D /* NCTrashListCell+NCTrashCellProtocol.swift in Sources */,
 				F757CC8D29E82D0500F31428 /* NCGroupfolders.swift in Sources */,
 				F760329F252F0F8E0015A421 /* NCTransferCell.swift in Sources */,
 				F3BB46542A3A1E9D00461F6E /* CCCellMore.swift in Sources */,
@@ -4635,6 +4653,7 @@
 				F73EF7BF2B02250B0087E6E9 /* NCManageDatabase+GPS.swift in Sources */,
 				F71F6D072B6A6A5E00F1EB15 /* ThreadSafeArray.swift in Sources */,
 				F761856C29E98543006EB3B0 /* NCIntroCollectionViewCell.swift in Sources */,
+                566FCF282B3EAD0E00168DEA /* FolderPathCustomCell.swift in Sources */,
 				F75DD765290ABB25002EB562 /* Intent.intentdefinition in Sources */,
 				F7D4BF012CA1831900A5E746 /* NCCollectionViewCommonPinchGesture.swift in Sources */,
 				F74B6D952A7E239A00F03C5F /* NCManageDatabase+Chunk.swift in Sources */,
