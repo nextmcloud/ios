@@ -15,6 +15,8 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        566FCF4D2B3EB78F00168DEA /* OnboardingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF4C2B3EB78F00168DEA /* OnboardingTestCase.swift */; };
+        566FCF4F2B3EB84F00168DEA /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF4E2B3EB84F00168DEA /* AppUtility.swift */; };
         566FCF312B3EB48A00168DEA /* PrivacyPolicyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF302B3EB48A00168DEA /* PrivacyPolicyTest.swift */; };
         566FCF432B3EB4E800168DEA /* AnalysisDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF3A2B3EB4E700168DEA /* AnalysisDataCollectionSwitch.xib */; };
         566FCF442B3EB4E800168DEA /* PrivacyPolicyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF3B2B3EB4E700168DEA /* PrivacyPolicyViewController.swift */; };
@@ -1001,6 +1003,8 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        566FCF4C2B3EB78F00168DEA /* OnboardingTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingTestCase.swift; sourceTree = "<group>"; };
+        566FCF4E2B3EB84F00168DEA /* AppUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppUtility.swift; sourceTree = "<group>"; };
         566FCF302B3EB48A00168DEA /* PrivacyPolicyTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyTest.swift; sourceTree = "<group>"; };
         566FCF3A2B3EB4E700168DEA /* AnalysisDataCollectionSwitch.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AnalysisDataCollectionSwitch.xib; sourceTree = "<group>"; };
         566FCF3B2B3EB4E700168DEA /* PrivacyPolicyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyViewController.swift; sourceTree = "<group>"; };
@@ -1903,6 +1907,7 @@
                 566EB82B2B3DA07700FB7CAD /* AssetUploadTest.swift */,
                 566FCF2E2B3EB28D00168DEA /* NCNotificationText.swift */,
                 566FCF302B3EB48A00168DEA /* PrivacyPolicyTest.swift */,
+                566FCF4C2B3EB78F00168DEA /* OnboardingTestCase.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = NextcloudUnitTests;
@@ -2858,6 +2863,7 @@
 			isa = PBXGroup;
 			children = (
                 566EB8122B3D861400FB7CAD /* NMC Custom Views */,
+                566FCF4E2B3EB84F00168DEA /* AppUtility.swift */,
 				F702F2CC25EE5B4F008F8E80 /* AppDelegate.swift */,
 				F76B649B2ADFFAED00014640 /* NCImageCache.swift */,
 				F702F2CE25EE5B5C008F8E80 /* NCGlobal.swift */,
@@ -3826,6 +3832,7 @@
                 566EB8112B3D85DE00FB7CAD /* CollaboraTestCase.swift in Sources */,
                 566EB7C62B3D59B900FB7CAD /* MoveAndCopyTests.swift in Sources */,
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
+                566FCF4D2B3EB78F00168DEA /* OnboardingTestCase.swift in Sources */,
                 566EB81E2B3D8C5500FB7CAD /* SettingsTestCases.swift in Sources */,
                 566EB81C2B3D889D00FB7CAD /* E2EETests.swift in Sources */,
                 566EB7E62B3D7AE900FB7CAD /* ScanTests.swift in Sources */,
@@ -4403,6 +4410,7 @@
 				F765608F23BF813600765969 /* NCContentPresenter.swift in Sources */,
 				F7327E352B73AEDE00A462C7 /* NCNetworking+LivePhoto.swift in Sources */,
 				F76687072B7D067400779E3F /* NCAudioRecorderViewController.swift in Sources */,
+                566FCF4F2B3EB84F00168DEA /* AppUtility.swift in Sources */,
 				F343A4BB2A1E734600DDA874 /* Optional+Extension.swift in Sources */,
 				F7D68FCC28CB9051009139F3 /* NCManageDatabase+DashboardWidget.swift in Sources */,
 				F78E2D6529AF02DB0024D4F3 /* Database.swift in Sources */,
