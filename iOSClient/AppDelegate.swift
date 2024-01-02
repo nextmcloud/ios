@@ -54,6 +54,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var documentPickerViewController: NCDocumentPickerViewController?
     var timerErrorNetworking: Timer?
     private var privacyProtectionWindow: UIWindow?
+
+    @objc let adjust = AdjustHelper()
+
     var isAppRefresh: Bool = false
     var isAppProcessing: Bool = false
     
@@ -179,7 +182,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         self.presentPasscode {
             self.enableTouchFaceID()
         }
-
+        adjust.configAdjust()
+        adjust.subsessionStart()
+        TealiumHelper.shared.start()
         return true
     }
 

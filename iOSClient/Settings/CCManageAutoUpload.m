@@ -25,10 +25,13 @@
 #import "CCManageAutoUpload.h"
 #import "CCUtility.h"
 #import "NCBridgeSwift.h"
+#import "AdjustHelper.h"
 
 @interface CCManageAutoUpload () <NCSelectDelegate>
 {
     AppDelegate *appDelegate;
+    AdjustHelper *adjust;
+    TealiumHelper *tealium;
 }
 @end
 
@@ -213,7 +216,9 @@
     self.title = NSLocalizedString(@"_settings_autoupload_", nil);
     appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     self.view.backgroundColor = UIColor.systemGroupedBackgroundColor;
-    
+    adjust = [[AdjustHelper alloc] init];
+    [adjust configAdjust];
+    tealium = [[TealiumHelper alloc] init];
     self.tableView.backgroundColor = UIColor.systemGroupedBackgroundColor;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeUser) name:NCGlobal.shared.notificationCenterChangeUser object:nil];
