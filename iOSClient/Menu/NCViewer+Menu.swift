@@ -37,20 +37,6 @@ extension NCViewer {
         let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
         let isOffline = localFile?.offline == true
 
-        //
-        // DETAIL
-        //
-        if !appDelegate.disableSharesView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_details_", comment: ""),
-                    icon: utility.loadImage(named: "info"),
-                    action: { _ in
-                        NCActionCenter.shared.openShare(viewController: viewController, metadata: metadata, page: .activity)
-                    }
-                )
-            )
-        }
 
         //
         // VIEW IN FOLDER
@@ -148,24 +134,6 @@ extension NCViewer {
             actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata]))
         }
 
-        //
-        // SAVE AS SCAN
-        //
-        if !webView, metadata.isSavebleAsImage {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_save_as_scan_", comment: ""),
-                    icon: utility.loadImage(named: "viewfinder.circle"),
-                    action: { _ in
-                        if self.utilityFileSystem.fileProviderStorageExists(metadata) {
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorSaveAsScan, "error": NKError(), "account": metadata.account])
-                        } else {
-                            NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorSaveAsScan) { _, _ in }
-                        }
-                    }
-                )
-            )
-        }
 
         //
         // RENAME
