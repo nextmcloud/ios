@@ -39,7 +39,7 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_upload_photos_videos_", comment: ""), icon: UIImage(named: "file_photo")!.image(color: UIColor.systemGray, size: 50), action: { _ in
+                title: NSLocalizedString("_upload_photos_videos_", comment: ""), icon: UIImage(named: "file_photo_menu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     NCAskAuthorization().askAuthorizationPhotoLibrary(viewController: viewController) { hasPermission in
                         if hasPermission {NCPhotosPickerViewController(viewController: viewController, maxSelectedAssets: 0, singleSelectedMode: false)
                         }
@@ -50,7 +50,7 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_upload_file_", comment: ""), icon: UIImage(named: "file")!.image(color: UIColor.systemGray, size: 50), action: { _ in
+                title: NSLocalizedString("_upload_file_", comment: ""), icon: UIImage(named: "uploadFile")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     if let tabBarController = self.window?.rootViewController as? UITabBarController {
                         self.documentPickerViewController = NCDocumentPickerViewController(tabBarController: tabBarController, isViewerMedia: false, allowsMultipleSelection: true)
                     }
@@ -61,7 +61,7 @@ extension AppDelegate {
         if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorText}) && !isDirectoryE2EE {
             let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorText})!
             actions.append(
-                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt")!.image(color: UIColor.systemGray, size: 50), action: { _ in
+                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt_menu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
                         return
                     }
@@ -82,7 +82,7 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility().loadImage(named: "doc.text.viewfinder"), action: { _ in
+                title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility().loadImage(named: "scan").image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     if let viewController = appDelegate.window?.rootViewController {
                         NCDocumentCamera.shared.openScannerDocument(viewController: viewController)
                     }
@@ -92,7 +92,7 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_create_voice_memo_", comment: ""), icon: UIImage(named: "microphone")!.image(color: UIColor.systemGray, size: 50), action: { _ in
+                title: NSLocalizedString("_create_voice_memo_", comment: ""), icon: UIImage(named: "microphoneMenu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     NCAskAuthorization().askAuthorizationAudioRecord(viewController: viewController) { hasPermission in
                         if hasPermission {
                             let fileName = NCUtilityFileSystem().createFileNameDate(NSLocalizedString("_voice_memo_filename_", comment: ""), ext: "m4a")
@@ -115,11 +115,11 @@ extension AppDelegate {
             actions.append(.seperator(order: 0))
         }
 
-        let titleCreateFolder = isDirectoryE2EE ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
-        let imageCreateFolder = isDirectoryE2EE ? UIImage(named: "folderEncrypted")! : UIImage(named: "folder")!
+        let titleCreateFolder =  NSLocalizedString("_create_folder_", comment: "")
+        let imageCreateFolder = UIImage(named: "addFolder")!
         actions.append(
             NCMenuAction(title: titleCreateFolder,
-                         icon: imageCreateFolder.image(color: NCBrandColor.shared.brandElement, size: 50), action: { _ in
+                         icon: imageCreateFolder, action: { _ in
                              guard !appDelegate.activeServerUrl.isEmpty else { return }
                              let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate)
                              appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
@@ -131,7 +131,7 @@ extension AppDelegate {
         if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: appDelegate.account) {
             actions.append(
                 NCMenuAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
-                             icon: UIImage(named: "folderEncrypted")!.image(color: NCBrandColor.shared.brandElement, size: 50),
+                             icon: UIImage(named: "encryptedfolder")!,
                              action: { _ in
                                  guard !appDelegate.activeServerUrl.isEmpty else { return }
                                  let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate, markE2ee: true)
@@ -147,7 +147,7 @@ extension AppDelegate {
         if NCGlobal.shared.capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isDirectoryE2EE && NextcloudKit.shared.isNetworkReachable() {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: UIImage(named: "addFolderInfo")!.image(color: UIColor.systemGray, size: 50), action: { _ in
+                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: UIImage(named: "addFolderInfo")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                         let richWorkspaceCommon = NCRichWorkspaceCommon()
                         if let viewController = self.activeViewController {
                             if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView LIKE[c] %@", appDelegate.account, appDelegate.activeServerUrl, NCGlobal.shared.fileNameRichWorkspace.lowercased())) == nil {
