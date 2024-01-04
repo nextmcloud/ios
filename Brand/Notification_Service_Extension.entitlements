@@ -4,11 +4,11 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.it.twsweb.Crypto-Cloud</string>
+		<string>group.com.t-systems.pu-ds.magentacloud.qa</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)it.twsweb.Crypto-Cloud</string>
+		<string>$(AppIdentifierPrefix)in.t-system.Nextcloud</string>
 	</array>
 </dict>
 </plist>
