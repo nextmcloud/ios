@@ -135,7 +135,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_e2e_set_folder_encrypted_", comment: ""),
-                    icon: utility.loadImage(named: "lock"),
+                    icon: utility.loadImage(named: "lock", color: NCBrandColor.shared.iconColor),
                     order: 30,
                     action: { _ in
                         Task {
@@ -156,7 +156,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_e2e_remove_folder_encrypted_", comment: ""),
-                    icon: utility.loadImage(named: "lock"),
+                    icon: utility.loadImage(named: "lock", color: NCBrandColor.shared.iconColor),
                     order: 30,
                     action: { _ in
                         NextcloudKit.shared.markE2EEFolder(fileId: metadata.fileId, delete: true) { _, error in
