@@ -75,9 +75,6 @@ extension NCShareExtension: NCEmptyDataSetDelegate, NCAccountRequestDelegate {
             return
         }
         self.activeAccount = activeAccount
-        
-        // CAPABILITIES
-        NCManageDatabase.shared.setCapabilities(account: account)
 
         // CAPABILITIES
         NCManageDatabase.shared.setCapabilities(account: account)
