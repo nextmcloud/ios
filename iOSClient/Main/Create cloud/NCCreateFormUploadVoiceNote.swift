@@ -180,6 +180,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
             if let fileNameNew = formRow.value as? String {
                 self.fileName = utility.removeForbiddenCharacters(fileNameNew)
+            } else {
+                self.fileName = ""
             }
 
 
@@ -218,9 +220,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
     }
 
     @objc func save() {
-
-        let rowFileName: XLFormRowDescriptor = self.form.formRow(withTag: "fileName")!
-        guard let name = (rowFileName.value as? String)?.trimmingCharacters(in: .whitespaces) else {
+        let name = self.fileName
+        guard name.trimmingCharacters(in: .whitespaces) != "" else {
             let alert = UIAlertController(title: "", message: NSLocalizedString("_prompt_insert_file_name", comment: ""), preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
             self.present(alert, animated: true)
