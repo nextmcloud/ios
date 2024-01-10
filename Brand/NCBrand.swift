@@ -24,8 +24,10 @@
 import UIKit
 
 let userAgent: String = {
-    // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
-    return "MagentaCLOUD iOS"
+    let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+        // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
+        return "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
+//        return "MagentaCLOUD iOS"
 }()
 
 @objc class NCBrandOptions: NSObject {
