@@ -63,7 +63,7 @@ extension NCMedia {
                     action: { _ in
                         self.showOnlyImages = true
                         self.showOnlyVideos = false
-                        self.reloadDataSource { }
+                        self.reloadDataSource()
                     }
                 )
             )
@@ -77,7 +77,7 @@ extension NCMedia {
                     action: { _ in
                         self.showOnlyImages = false
                         self.showOnlyVideos = true
-                        self.reloadDataSource { }
+                        self.reloadDataSource()
                     }
                 )
             )
@@ -91,7 +91,7 @@ extension NCMedia {
                     action: { _ in
                         self.showOnlyImages = false
                         self.showOnlyVideos = false
-                        self.reloadDataSource { }
+                        self.reloadDataSource()
                     }
                 )
             )
@@ -125,7 +125,7 @@ extension NCMedia {
                     on: true,
                     action: { _ in
                         NCKeychain().mediaSortDate = "date"
-                        self.reloadDataSource { }
+                        self.reloadDataSource()
                     }
                 )
             )
@@ -138,7 +138,7 @@ extension NCMedia {
                     on: true,
                     action: { _ in
                         NCKeychain().mediaSortDate = "creationDate"
-                        self.reloadDataSource { }
+                        self.reloadDataSource()
                     }
                 )
             )
@@ -151,7 +151,7 @@ extension NCMedia {
                     on: true,
                     action: { _ in
                         NCKeychain().mediaSortDate = "uploadDate"
-                        self.reloadDataSource { }
+                        self.reloadDataSource()
                     }
                 )
             )
