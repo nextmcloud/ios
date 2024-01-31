@@ -240,7 +240,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func selected(_ status: Bool) {
-        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId), !metadata.isInTransfer else {
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId), !metadata.isInTransfer, !metadata.e2eEncrypted else {
             backgroundView = nil
             separator.isHidden = false
             return
