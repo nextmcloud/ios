@@ -385,12 +385,6 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = sections[indexPath.section].items[indexPath.row]
 
-        // Menu Function
-        if sections[indexPath.section].type == .account {
-            tapImageLogoManageAccount()
-            return
-        }
-
         // Action
         if item.url.contains("segue") && !item.url.contains("//") {
             self.navigationController?.performSegue(withIdentifier: item.url, sender: self)
