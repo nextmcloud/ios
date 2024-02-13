@@ -24,6 +24,11 @@
 import Foundation
 import UIKit
 
+enum VerticalLocation: String {
+    case bottom
+    case top
+}
+
 extension UIView {
 
     // Source
@@ -44,5 +49,22 @@ extension UIView {
         self.addSubview(hiddenView)
         hiddenView.fillSuperview()
         hiddenView.addSubview(view)
+    }
+    
+    func addShadow(location: VerticalLocation, height: CGFloat = 2, color: UIColor = NCBrandColor.shared.customerDarkGrey, opacity: Float = 0.4, radius: CGFloat = 2) {
+        switch location {
+        case .bottom:
+             addShadow(offset: CGSize(width: 0, height: height), color: color, opacity: opacity, radius: radius)
+        case .top:
+            addShadow(offset: CGSize(width: 0, height: -height), color: color, opacity: opacity, radius: radius)
+        }
+    }
+
+    func addShadow(offset: CGSize, color: UIColor = .black, opacity: Float = 0.5, radius: CGFloat = 5.0) {
+        self.layer.masksToBounds = false
+        self.layer.shadowColor = color.cgColor
+        self.layer.shadowOffset = offset
+        self.layer.shadowOpacity = opacity
+        self.layer.shadowRadius = radius
     }
 }

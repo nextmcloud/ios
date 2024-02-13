@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="NCShareEmailFieldCell" id="HdE-7k-Qry" customClass="NCShareEmailFieldCell" customModule="Nextcloud" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="404" height="191"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="HdE-7k-Qry" id="mP2-pg-etb">
+                <rect key="frame" x="0.0" y="0.0" width="404" height="191"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Vra-nB-Ife">
+                        <rect key="frame" x="0.0" y="0.0" width="404" height="191"/>
+                        <subviews>
+                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="noO-4F-B8U">
+                                <rect key="frame" x="11" y="14" width="327" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="1JV-Ny-JhH"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" keyboardType="emailAddress"/>
+                            </textField>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BAS-9K-JgK">
+                                <rect key="frame" x="11" y="61.999999999999993" width="34" height="27.666666666666664"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="16" id="bta-mk-ppd"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="13"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hMF-ep-WaZ">
+                                <rect key="frame" x="11" y="105.66666666666667" width="129" height="40.000000000000014"/>
+                                <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="yV0-48-MQw"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <inset key="contentEdgeInsets" minX="24" minY="0.0" maxX="24" maxY="0.0"/>
+                                <state key="normal" title="Create link"/>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Your shares" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aZM-IC-GaZ">
+                                <rect key="frame" x="14" y="169.66666666666666" width="379" height="20.333333333333343"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="19" id="bdW-yd-cho"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hdL-xj-y4k">
+                                <rect key="frame" x="349" y="14" width="44" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="hdL-xj-y4k" secondAttribute="height" multiplier="1:1" id="EKR-Ec-1HY"/>
+                                </constraints>
+                                <color key="tintColor" systemColor="systemGrayColor"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="contact"/>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="aZM-IC-GaZ" firstAttribute="top" secondItem="hMF-ep-WaZ" secondAttribute="bottom" constant="24" id="9sU-Ft-2aM"/>
+                            <constraint firstItem="hMF-ep-WaZ" firstAttribute="top" secondItem="BAS-9K-JgK" secondAttribute="bottom" constant="16" id="Dta-Ts-FuJ"/>
+                            <constraint firstAttribute="trailing" secondItem="aZM-IC-GaZ" secondAttribute="trailing" constant="11" id="EEg-of-3SX"/>
+                            <constraint firstItem="BAS-9K-JgK" firstAttribute="leading" secondItem="noO-4F-B8U" secondAttribute="leading" id="EJX-My-zDi"/>
+                            <constraint firstItem="hdL-xj-y4k" firstAttribute="centerY" secondItem="noO-4F-B8U" secondAttribute="centerY" id="JEn-ul-tj9"/>
+                            <constraint firstItem="hMF-ep-WaZ" firstAttribute="leading" secondItem="BAS-9K-JgK" secondAttribute="leading" id="N6P-Nt-Owa"/>
+                            <constraint firstItem="aZM-IC-GaZ" firstAttribute="leading" secondItem="hMF-ep-WaZ" secondAttribute="leading" constant="3" id="Oa4-zf-Y6Y"/>
+                            <constraint firstItem="noO-4F-B8U" firstAttribute="top" secondItem="Vra-nB-Ife" secondAttribute="top" constant="14" id="VPi-AO-HA6"/>
+                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="191" id="XPX-Ty-CKG"/>
+                            <constraint firstAttribute="bottom" secondItem="aZM-IC-GaZ" secondAttribute="bottom" constant="1" id="YYD-dX-SxO"/>
+                            <constraint firstItem="hdL-xj-y4k" firstAttribute="height" secondItem="noO-4F-B8U" secondAttribute="height" id="ZMb-Vf-3Jp"/>
+                            <constraint firstItem="BAS-9K-JgK" firstAttribute="top" secondItem="noO-4F-B8U" secondAttribute="bottom" constant="4" id="ayG-yj-oOP"/>
+                            <constraint firstAttribute="trailing" secondItem="hdL-xj-y4k" secondAttribute="trailing" constant="11" id="eoU-9G-dUT"/>
+                            <constraint firstItem="noO-4F-B8U" firstAttribute="leading" secondItem="Vra-nB-Ife" secondAttribute="leading" constant="11" id="gRY-F6-rCr"/>
+                            <constraint firstItem="hdL-xj-y4k" firstAttribute="leading" secondItem="noO-4F-B8U" secondAttribute="trailing" constant="11" id="kN4-qc-uRf"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="Vra-nB-Ife" firstAttribute="leading" secondItem="mP2-pg-etb" secondAttribute="leading" id="Dv6-o4-c81"/>
+                    <constraint firstAttribute="trailing" secondItem="Vra-nB-Ife" secondAttribute="trailing" id="KCX-1J-zhj"/>
+                    <constraint firstItem="Vra-nB-Ife" firstAttribute="top" secondItem="mP2-pg-etb" secondAttribute="top" id="P2I-tS-X5f"/>
+                    <constraint firstAttribute="bottom" secondItem="Vra-nB-Ife" secondAttribute="bottom" id="R0q-Xs-YWV"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="Ptj-ph-cB5"/>
+            <connections>
+                <outlet property="btnContact" destination="hdL-xj-y4k" id="W9s-UW-Q33"/>
+                <outlet property="btnCreateLink" destination="hMF-ep-WaZ" id="roH-Gx-ng2"/>
+                <outlet property="labelShareByMail" destination="BAS-9K-JgK" id="Rr4-bm-4N9"/>
+                <outlet property="labelYourShare" destination="aZM-IC-GaZ" id="FDN-Az-i7t"/>
+                <outlet property="searchField" destination="noO-4F-B8U" id="763-Ln-Bxh"/>
+            </connections>
+            <point key="canvasLocation" x="-20" y="-1"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="contact" width="24" height="24"/>
+        <systemColor name="systemGrayColor">
+            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>
