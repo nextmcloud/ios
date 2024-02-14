@@ -84,7 +84,7 @@ extension NCTrash: UICollectionViewDataSource {
             cell = listCell
         } else {
             // GRID
-            guard let gridCell = collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as? NCGridCell else { return UICollectionViewCell() }
+            guard let gridCell = collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as? NCTrashGridCell else { return UICollectionViewCell() }
             gridCell.setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCImageCache.images.buttonMore)
             gridCell.delegate = self
             cell = gridCell

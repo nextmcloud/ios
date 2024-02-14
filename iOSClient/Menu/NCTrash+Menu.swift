@@ -29,26 +29,19 @@ import NextcloudKit
 
 extension NCTrash {
     var selectActions: [NCMenuAction] {
-        [
-            NCMenuAction(
-                title: NSLocalizedString("_cancel_", comment: ""),
-                icon: utility.loadImage(named: "xmark"),
-                action: { _ in
-                    self.tapSelect()
-                }
-            ),
-            NCMenuAction(
-                title: NSLocalizedString("_select_all_", comment: ""),
-                icon: utility.loadImage(named: "checkmark.circle.fill"),
-                action: { _ in
-                    self.selectOcId = self.datasource.map { $0.fileId }
-                    self.collectionView.reloadData()
-                }
-            ),
-            NCMenuAction.seperator(),
+        var actions = [NCMenuAction]()
+        actions.append(.cancelAction {
+            self.tapSelect()
+        })
+        if selectOcId.count != selectableDataSource.count {
+            actions.append(.selectAllAction(action: collectionViewSelectAll))
+        }
+
+        guard !selectOcId.isEmpty else { return actions }
+        actions.append(contentsOf: [
             NCMenuAction(
                 title: NSLocalizedString("_trash_restore_selected_", comment: ""),
-                icon: utility.loadImage(named: "restore"),
+                icon: utility.loadImage(named: "restore").image(color: NCBrandColor.shared.iconColor, size: 50),
                 action: { _ in
                     self.selectOcId.forEach(self.restoreItem)
                     self.tapSelect()
@@ -56,7 +49,7 @@ extension NCTrash {
             ),
             NCMenuAction(
                 title: NSLocalizedString("_trash_delete_selected_", comment: ""),
-                icon: utility.loadImage(named: "trash"),
+                icon: utility.loadImage(named: "trash").image(color: NCBrandColor.shared.iconColor, size: 50),
                 action: { _ in
                     let alert = UIAlertController(title: NSLocalizedString("_trash_delete_selected_", comment: ""), message: "", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: NSLocalizedString("_delete_", comment: ""), style: .destructive, handler: { _ in
@@ -67,7 +60,8 @@ extension NCTrash {
                     self.present(alert, animated: true, completion: nil)
                 }
             )
-        ]
+        ])
+        return actions
     }
 
     func toggleMenuMoreHeader() {
@@ -77,7 +71,7 @@ extension NCTrash {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_trash_restore_all_", comment: ""),
-                icon: utility.loadImage(named: "restore"),
+                icon: utility.loadImage(named: "restore").image(color: NCBrandColor.shared.iconColor, size: 50),
                 action: { _ in
                     self.datasource.forEach({ self.restoreItem(with: $0.fileId) })
                 }
@@ -87,7 +81,7 @@ extension NCTrash {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_trash_delete_all_", comment: ""),
-                icon: utility.loadImage(named: "trash"),
+                icon: utility.loadImage(named: "trash").image(color: NCBrandColor.shared.iconColor, size: 50),
                 action: { _ in
                     let alert = UIAlertController(title: NSLocalizedString("_trash_delete_all_description_", comment: ""), message: "", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: NSLocalizedString("_trash_delete_all_", comment: ""), style: .destructive, handler: { _ in
@@ -125,7 +119,7 @@ extension NCTrash {
             iconHeader = icon
         } else {
             if tableTrash.directory {
-                iconHeader = UIImage(named: "folder")!.image(color: UIColor.systemGray, size: 50)
+                iconHeader = UIImage(named: "folder")
             } else {
                 iconHeader = UIImage(named: tableTrash.iconName)
             }
@@ -142,7 +136,7 @@ extension NCTrash {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_restore_", comment: ""),
-                icon: UIImage(named: "restore")!.image(color: UIColor.systemGray, size: 50),
+                icon: UIImage(named: "restore")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                 action: { _ in
                     self.restoreItem(with: objectId)
                 }
@@ -152,7 +146,7 @@ extension NCTrash {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_delete_", comment: ""),
-                icon: utility.loadImage(named: "trash"),
+                icon: utility.loadImage(named: "trash").image(color: NCBrandColor.shared.iconColor, size: 50),
                 action: { _ in
                     self.deleteItem(with: objectId)
                 }
