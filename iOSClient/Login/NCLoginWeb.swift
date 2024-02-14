@@ -127,14 +127,22 @@ class NCLoginWeb: UIViewController {
             NCContentPresenter().showError(error: error, priority: .max)
         }
 
-        // TITLE
-        if let host = URL(string: urlBase)?.host {
-            titleView = host
-            if let account = NCManageDatabase.shared.getActiveAccount(), NCKeychain().getPassword(account: account.account).isEmpty {
-                titleView = NSLocalizedString("_user_", comment: "") + " " + account.userId + " " + NSLocalizedString("_in_", comment: "") + " " + host
+        if #available(iOS 13, *) {
+            let keyWindow = UIApplication.shared.connectedScenes
+                .filter({$0.activationState == .foregroundActive})
+                .map({$0 as? UIWindowScene})
+                .compactMap({$0})
+                .first?.windows
+                .filter({$0.isKeyWindow}).first
+            let statusBar = UIView(frame: (keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
+            statusBar.backgroundColor = NCBrandColor.shared.customer
+            keyWindow?.addSubview(statusBar)
+        } else {
+            if let statusBar = UIApplication.shared.value(forKey: "statusBar") as? UIView {
+                statusBar.backgroundColor = NCBrandColor.shared.customer
             }
         }
-        self.title = titleView
+        self.navigationController?.navigationBar.backgroundColor = NCBrandColor.shared.customer
     }
 
     override func viewDidAppear(_ animated: Bool) {
