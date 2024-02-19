@@ -774,7 +774,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
         if isEditMode { return }
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId) else { return }
-
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.filebrowser.sharing", data: ["": ""])
+        appDelegate.adjust.trackEvent(TriggerEvent(Sharing.rawValue))
         NCActionCenter.shared.openShare(viewController: self, metadata: metadata, page: .sharing)
     }
 
