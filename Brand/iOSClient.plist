@@ -18,7 +18,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
@@ -79,6 +79,8 @@
 		<string>AccountIntent</string>
 		<string>DashboardIntent</string>
 	</array>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>App would like to access IDFA for tracking purpose</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<true/>
 	<key>UIAppFonts</key>
