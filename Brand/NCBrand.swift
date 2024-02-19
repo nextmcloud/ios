@@ -35,10 +35,10 @@ let userAgent: String = {
         return instance
     }()
 
-    @objc public var brand: String = "Nextcloud"
-    @objc public var textCopyrightNextcloudiOS: String = "Nextcloud Liquid for iOS %@ © 2023"
-    @objc public var textCopyrightNextcloudServer: String = "Nextcloud Server %@"
-    @objc public var loginBaseUrl: String = "https://cloud.nextcloud.com"
+    @objc public var brand:                           String = "MagentaCLOUD"
+    @objc public var textCopyrightNextcloudiOS:       String = "MagentaCLOUD for iOS %@"
+    @objc public var textCopyrightNextcloudServer:    String = "MagentaCLOUD Server %@"
+    @objc public var loginBaseUrl:                    String = "https://pre1.next.magentacloud.de"
     @objc public var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost: String = "https://nextcloud.com/install"
     @objc public var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
@@ -55,28 +55,28 @@ let userAgent: String = {
     @objc public var folderDefaultAutoUpload: String = "Photos"
 
     // Capabilities Group
-    @objc public var capabilitiesGroups: String = "group.it.twsweb.Crypto-Cloud"
-    @objc public var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
+    @objc public var capabilitiesGroups:              String = "group.de.magentacloud.next.dev2.client"
+    @objc public var capabilitiesGroupApps:              String = "group.de.magentacloud.next.dev2.client.apps"
 
     // BRAND ONLY
     @objc public var use_login_web_personalized: Bool = false                                   // Don't touch me !!
-    @objc public var use_AppConfig: Bool = false                                                // Don't touch me !!
+    @objc public var use_AppConfig: Bool = false
     @objc public var use_GroupApps: Bool = true                                                 // Don't touch me !!
 
     // Options
     @objc public var use_default_auto_upload: Bool = false
-    @objc public var use_themingColor: Bool = true
+    @objc public var use_themingColor:                Bool = false
     @objc public var use_themingLogo: Bool = false
     @objc public var use_storeLocalAutoUploadAll: Bool = false
     @objc public var use_loginflowv2: Bool = false                                              // Don't touch me !!
 
-    @objc public var disable_intro: Bool = false
-    @objc public var disable_request_login_url: Bool = false
-    @objc public var disable_multiaccount: Bool = false
-    @objc public var disable_manage_account: Bool = false
+    @objc public var disable_intro:       Bool = true
+    @objc public var disable_request_login_url:       Bool = true
+    @objc public var disable_multiaccount:            Bool = true
+    @objc public var disable_manage_account:          Bool = false
     @objc public var disable_more_external_site: Bool = false
     @objc public var disable_openin_file: Bool = false                                          // Don't touch me !!
-    @objc public var disable_crash_service: Bool = false
+    @objc public var disable_crash_service:             Bool = true
     @objc public var disable_log: Bool = false
     @objc public var disable_mobileconfig: Bool = false
     @objc public var disable_show_more_nextcloud_apps_in_settings: Bool = false
@@ -144,12 +144,12 @@ class NCBrandColor: NSObject {
     }()
 
     // Color
-    @objc public let customer: UIColor = UIColor(red: 0.0 / 255.0, green: 130.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)         // BLU NC : #0082c9
+    @objc public let customer:              UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)
     @objc public var customerText: UIColor = .white
 
     @objc public var brand: UIColor                                                                                         // don't touch me
     @objc public var brandElement: UIColor                                                                                  // don't touch me
-    @objc public var brandText: UIColor                                                                                     // don't touch me
+    @objc public var brandText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
 
     @objc public let nextcloud: UIColor = UIColor(red: 0.0 / 255.0, green: 130.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)
     @objc public let yellowFavorite: UIColor = UIColor(red: 248.0 / 255.0, green: 205.0 / 255.0, blue: 70.0 / 255.0, alpha: 1.0)
