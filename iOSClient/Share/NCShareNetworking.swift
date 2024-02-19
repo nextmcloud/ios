@@ -71,6 +71,21 @@ class NCShareNetworking: NSObject {
             }
         }
     }
+    
+    func createShareLink(password: String?) {
+        NCActivityIndicator.shared.start(backgroundView: view)
+        let filenamePath = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, urlBase: metadata.urlBase, userId: metadata.userId)
+        NextcloudKit.shared.createShareLink(path: filenamePath) { [self] account, share, data, error in
+            NCActivityIndicator.shared.stop()
+            if error == .success && share != nil {
+                let home = utilityFileSystem.getHomeServer(urlBase: self.metadata.urlBase, userId: self.metadata.userId)
+                NCManageDatabase.shared.addShare(account: self.metadata.account, home:home, shares: [share!])
+            } else if error != .success{
+                NCContentPresenter().showError(error: error)
+            }
+            self.delegate?.shareCompleted()
+        }
+    }
 
     func createShare(option: NCTableShareable) {
         // NOTE: Permissions don't work for creating with file drop!
@@ -83,7 +98,7 @@ class NCShareNetworking: NSObject {
         NCActivityIndicator.shared.start(backgroundView: view)
         let filenamePath = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, urlBase: metadata.urlBase, userId: metadata.userId)
 
-        NextcloudKit.shared.createShare(path: filenamePath, shareType: option.shareType, shareWith: option.shareWith, password: option.password, note: option.note, permissions: option.permissions, attributes: option.attributes) { _, share, _, error in
+        NextcloudKit.shared.createShare(path: filenamePath, shareType: option.shareType, shareWith: option.shareWith, password: option.password, permissions: option.permissions, attributes: option.attributes) { _, share, _, error in
             NCActivityIndicator.shared.stop()
             if error == .success, let share = share {
                 option.idShare = share.idShare
