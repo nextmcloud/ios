@@ -120,6 +120,7 @@ extension NCSelectableNavigationView where Self: UIViewController {
         var isAnyFolder = false
         var isAnyLocked = false
         var canUnlock = true
+        var canOpenIn = false
 
         for ocId in selectOcId {
             guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
@@ -142,9 +143,15 @@ extension NCSelectableNavigationView where Self: UIViewController {
             } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
                 isAnyOffline = localFile.offline
             } // else: file is not offline, continue
-        }
 
-        actions.append(.openInAction(selectedMetadatas: selectedMetadatas, viewController: self, completion: tapSelect))
+            if !metadata.directory {
+                canOpenIn = true
+            }
+        }
+        
+        if canOpenIn {
+            actions.append(.openInAction(selectedMetadatas: selectedMetadatas, viewController: self, completion: tapSelect))
+        }
 
         if !isAnyFolder, canUnlock, !NCGlobal.shared.capabilityFilesLockVersion.isEmpty {
             actions.append(.lockUnlockFiles(shouldLock: !isAnyLocked, metadatas: selectedMetadatas, completion: tapSelect))
