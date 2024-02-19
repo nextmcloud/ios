@@ -33,8 +33,6 @@
         566FCF4A2B3EB4E800168DEA /* SaveSettingsCustomButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF412B3EB4E800168DEA /* SaveSettingsCustomButtonCell.swift */; };
         566FCF4B2B3EB4E800168DEA /* SaveSettingsCustomButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF422B3EB4E800168DEA /* SaveSettingsCustomButtonCell.xib */; };
         566FCF2F2B3EB28D00168DEA /* NCNotificationText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF2E2B3EB28D00168DEA /* NCNotificationText.swift */; };
-        566FCF282B3EAD0E00168DEA /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF262B3EAD0E00168DEA /* FolderPathCustomCell.swift */; };
-        566FCF292B3EAD0E00168DEA /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF272B3EAD0E00168DEA /* FolderPathCustomCell.xib */; };
         566FCF2C2B3EAD4700168DEA /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF2A2B3EAD4700168DEA /* TextTableViewCell.swift */; };
         566FCF2D2B3EAD4700168DEA /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566FCF2B2B3EAD4700168DEA /* TextTableViewCell.xib */; };
         566EB82C2B3DA07700FB7CAD /* AssetUploadTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB82B2B3DA07700FB7CAD /* AssetUploadTest.swift */; };
@@ -1268,8 +1266,6 @@
         566FCF412B3EB4E800168DEA /* SaveSettingsCustomButtonCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SaveSettingsCustomButtonCell.swift; sourceTree = "<group>"; };
         566FCF422B3EB4E800168DEA /* SaveSettingsCustomButtonCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SaveSettingsCustomButtonCell.xib; sourceTree = "<group>"; };
         566FCF2E2B3EB28D00168DEA /* NCNotificationText.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NCNotificationText.swift; sourceTree = "<group>"; };
-        566FCF262B3EAD0E00168DEA /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
-        566FCF272B3EAD0E00168DEA /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
         566FCF2A2B3EAD4700168DEA /* TextTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
         566FCF2B2B3EAD4700168DEA /* TextTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
         566EB82B2B3DA07700FB7CAD /* AssetUploadTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetUploadTest.swift; sourceTree = "<group>"; };
@@ -3268,8 +3264,6 @@
 				F7A509242C26BD5D00326106 /* NCCreateDocument.swift */,
                 566FCF2A2B3EAD4700168DEA /* TextTableViewCell.swift */,
                 566FCF2B2B3EAD4700168DEA /* TextTableViewCell.xib */,
-                566FCF262B3EAD0E00168DEA /* FolderPathCustomCell.swift */,
-                566FCF272B3EAD0E00168DEA /* FolderPathCustomCell.xib */,
 				F769CA162965AB7C00039397 /* NCUploadAssets.swift */,
 				F704B5E22430AA6F00632F5F /* NCCreateFormUploadConflict.storyboard */,
 				F704B5E42430AA8000632F5F /* NCCreateFormUploadConflict.swift */,
@@ -4830,7 +4824,6 @@
 				F73EF7BF2B02250B0087E6E9 /* NCManageDatabase+GPS.swift in Sources */,
 				F71F6D072B6A6A5E00F1EB15 /* ThreadSafeArray.swift in Sources */,
 				F761856C29E98543006EB3B0 /* NCIntroCollectionViewCell.swift in Sources */,
-                566FCF282B3EAD0E00168DEA /* FolderPathCustomCell.swift in Sources */,
 				F75DD765290ABB25002EB562 /* Intent.intentdefinition in Sources */,
 				F7D4BF012CA1831900A5E746 /* NCCollectionViewCommonPinchGesture.swift in Sources */,
 				F74B6D952A7E239A00F03C5F /* NCManageDatabase+Chunk.swift in Sources */,
