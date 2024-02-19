@@ -142,7 +142,19 @@ import RealmSwift
     func getMediaMetadatas(account: String, predicate: NSPredicate? = nil) -> Results<tableMetadata>? {
         guard let account = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", account)) else { return nil }
         let startServerUrl = NCUtilityFileSystem().getHomeServer(urlBase: account.urlBase, userId: account.userId) + account.mediaPath
+
         let predicateBoth = NSPredicate(format: showBothPredicateMediaString, account.account, startServerUrl)
+
+        switch NCKeychain().mediaSortDate {
+        case "date":
+            return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
+        case "creationDate":
+            return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "creationDate")
+        case "uploadDate":
+            return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "uploadDate")
+        default:
+            break
+        }
         return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
     }
 
