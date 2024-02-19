@@ -38,12 +38,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var separator: UIView!
-    @IBOutlet weak var tag0: UILabel!
-    @IBOutlet weak var tag1: UILabel!
-
+    @IBOutlet weak var labelShared: UILabel!
     @IBOutlet weak var imageItemLeftConstraint: NSLayoutConstraint!
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var titleTrailingConstraint: NSLayoutConstraint!
     @IBOutlet weak var infoTrailingConstraint: NSLayoutConstraint!
 
     private var objectId = ""
@@ -108,7 +105,11 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         get { return separator }
         set { separator = newValue }
     }
-
+    
+    var fileSharedLabel: UILabel? {
+        get { return labelShared }
+        set { labelShared = newValue }
+    }
     override func awakeFromNib() {
         super.awakeFromNib()
 
@@ -189,12 +190,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func titleInfoTrailingFull() {
-        titleTrailingConstraint.constant = 10
         infoTrailingConstraint.constant = 10
     }
 
     func titleInfoTrailingDefault() {
-        titleTrailingConstraint.constant = 90
         infoTrailingConstraint.constant = 90
     }
 
@@ -239,7 +238,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func selected(_ status: Bool) {
-        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId), !metadata.isInTransfer else {
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId), !metadata.isInTransfer, !metadata.e2eEncrypted else {
             backgroundView = nil
             separator.isHidden = false
             return
@@ -275,25 +274,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     func setAccessibility(label: String, value: String) {
         accessibilityLabel = label
         accessibilityValue = value
-    }
-
-    func setTags(tags: [String]) {
-        if tags.isEmpty {
-            tag0.isHidden = true
-            tag1.isHidden = true
-            labelInfo.isHidden = false
-        } else {
-            tag0.isHidden = false
-            tag1.isHidden = true
-            labelInfo.isHidden = true
-            if let tag = tags.first {
-                tag0.text = tag
-                if tags.count > 1 {
-                    tag1.isHidden = false
-                    tag1.text = "+\(tags.count - 1)"
-                }
-            }
-        }
     }
 }
 
