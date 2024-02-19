@@ -15,6 +15,7 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        56AB28942B833E2D0089D373 /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28932B833E2D0089D373 /* Adjust */; };
         566FCF5A2B3ECD3400168DEA /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF572B3ECD3400168DEA /* TealiumHelper.swift */; };
         566FCF5B2B3ECD3400168DEA /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF582B3ECD3400168DEA /* AdjustHelper.m */; };
         566FCF552B3ECBDE00168DEA /* RenameFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF542B3ECBDE00168DEA /* RenameFileTests.swift */; };
@@ -1807,6 +1808,7 @@
 				F7F623B52A5EF4D30022D3D4 /* Gzip in Frameworks */,
 				F75EAED826D2552E00F4320E /* MarqueeLabel in Frameworks */,
 				F710FC7A277B7D0000AA9FBF /* Realm in Frameworks */,
+                56AB28942B833E2D0089D373 /* Adjust in Frameworks */,
 				F72DA9B425F53E4E00B87DB1 /* SwiftRichString in Frameworks */,
 				F74E7720277A2EF40013B958 /* XLForm in Frameworks */,
 				F73ADD1C265546890069EA0D /* SwiftEntryKit in Frameworks */,
@@ -3319,6 +3321,8 @@
 				F7F623B42A5EF4D30022D3D4 /* Gzip */,
 				F76B649D2ADFFDEC00014640 /* LRUCache */,
 				F760DE022AE66EA80027D78A /* KeychainAccess */,
+				F327FA422B8CC0B900E5B743 /* SwipeCellKit */,
+                56AB28932B833E2D0089D373 /* Adjust */,
 			);
 			productName = "Crypto Cloud";
 			productReference = F7CE8AFA1DC1F8D8009CAE48 /* Nextcloud.app */;
@@ -5799,6 +5803,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+        56AB28932B833E2D0089D373 /* Adjust */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = 56AB28922B833DEA0089D373 /* XCRemoteSwiftPackageReference "ios_sdk" */;
+            productName = Adjust;
+        };
 		F3131EDC2B038E4A0018DB28 /* XLForm */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F74E771E277A2EF40013B958 /* XCRemoteSwiftPackageReference "XLForm" */;
