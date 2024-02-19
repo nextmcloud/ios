@@ -39,6 +39,15 @@ class NCAutoUpload: NSObject {
     // MARK: -
 
     @objc func initAutoUpload(viewController: UIViewController?, completion: @escaping (_ items: Int) -> Void) {
+        if(NCManageDatabase.shared.getAccountAutoUploadFileName() == "Kamera-Medien" || NCManageDatabase.shared.getAccountAutoUploadFileName() == "Camera-Media"){
+            //set autoupload folder as per locale
+            if(NCManageDatabase.shared.getAccountAutoUploadFileName() != NCBrandOptions.shared.folderDefaultAutoUpload){
+                //set auto upload as per locale
+                print("auto upload folder set here....")
+                NCManageDatabase.shared.setAccountAutoUploadFileName(NCBrandOptions.shared.folderDefaultAutoUpload)
+            }
+        }
+        
         guard let account = NCManageDatabase.shared.getActiveAccount(), account.autoUpload else {
             completion(0)
             return
