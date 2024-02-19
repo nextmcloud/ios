@@ -15,6 +15,7 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        56AB28942B833E2D0089D373 /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28932B833E2D0089D373 /* Adjust */; };
         566FCF5A2B3ECD3400168DEA /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF572B3ECD3400168DEA /* TealiumHelper.swift */; };
         566FCF5B2B3ECD3400168DEA /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF582B3ECD3400168DEA /* AdjustHelper.m */; };
         566FCF552B3ECBDE00168DEA /* RenameFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF542B3ECBDE00168DEA /* RenameFileTests.swift */; };
@@ -2008,6 +2009,8 @@
 				F76DA969277B77EA0082465B /* DropDown in Frameworks */,
 				F7F623B52A5EF4D30022D3D4 /* Gzip in Frameworks */,
 				F75EAED826D2552E00F4320E /* MarqueeLabel in Frameworks */,
+				F710FC7A277B7D0000AA9FBF /* Realm in Frameworks */,
+                56AB28942B833E2D0089D373 /* Adjust in Frameworks */,
 				F72DA9B425F53E4E00B87DB1 /* SwiftRichString in Frameworks */,
 				F78AF1E72BE938C100F3F060 /* MobileVLCKit.xcframework in Frameworks */,
 				F73ADD1C265546890069EA0D /* SwiftEntryKit in Frameworks */,
@@ -3671,6 +3674,8 @@
 				F7160A812BE933390034DCB3 /* RealmSwift */,
 				F33EE6E02BF4BDA500CA1A51 /* NIOSSL */,
 				F33EE6EF2BF4C0FF00CA1A51 /* NIO */,
+				F327FA422B8CC0B900E5B743 /* SwipeCellKit */,
+                56AB28932B833E2D0089D373 /* Adjust */,
 			);
 			productName = "Crypto Cloud";
 			productReference = F7CE8AFA1DC1F8D8009CAE48 /* Nextcloud.app */;
@@ -6192,6 +6197,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+        56AB28932B833E2D0089D373 /* Adjust */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = 56AB28922B833DEA0089D373 /* XCRemoteSwiftPackageReference "ios_sdk" */;
+            productName = Adjust;
+        };
 		F3391B072B4C52C5001C0C4B /* FirebaseDatabase */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F70B86732642CE3B00ED5349 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
