@@ -208,21 +208,6 @@ extension NCViewer {
         }
 
         //
-        // DOWNLOAD LOCALLY
-        //
-        if !webView, metadata.session.isEmpty, !self.utilityFileSystem.fileProviderStorageExists(metadata) {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_download_locally_", comment: ""),
-                    icon: utility.loadImage(named: "icloud.and.arrow.down"),
-                    action: { _ in
-                        NCNetworking.shared.download(metadata: metadata, selector: "") { _, _ in }
-                    }
-                )
-            )
-        }
-
-        //
         // PDF
         //
         if metadata.contentType == "com.adobe.pdf" || metadata.contentType == "application/pdf" {
