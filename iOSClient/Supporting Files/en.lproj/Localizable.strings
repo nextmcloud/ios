@@ -85,7 +85,8 @@
 "_purchase_"                = "Purchase";
 "_account_not_exists_"      = "The account %@ of %@ does not exist";
 "_account_not_available_"   = "The account %@ of %@ does not exist, please add it to be able to read the file %@";
-"_account_not_exists_"      = "The account %@ of %@ does not exist";
+"_the_account_"             = "The account";
+"_does_not_exist_"          = "does not exist";
 "_error_parameter_schema_"  = "Wrong parameters, impossible to continue";
 "_comments_"                = "Comments";
 "_sharing_"                 = "Sharing";
@@ -135,7 +136,6 @@
 
 /* MARK: Files lock */
 
-"_lock_"                            = "Lock";
 "_unlock_"                          = "Unlock";
 "_lock_file_"                       = "Lock file";
 "_unlock_file_"                     = "Unlock file";
@@ -158,7 +158,7 @@
 "_source_code_"             = "Get source code";
 "_account_select_"          = "Select the account";
 "_account_select_to_add_"   = "Select the account to add";
-"_host_insert_"             = "Insert the hostname, for example:";
+"_host_insert_"             = "Insert the host name, for example:";
 "_certificate_not_found_"   = "File %@ in documents directory not found.";
 "_copy_failed_"             = "Copy failed";
 "_certificate_installed_"   = "Certificate installed";
@@ -412,7 +412,6 @@
 "_media_viewimage_show_"        = "Show only images";
 "_media_viewvideo_show_"        = "Show only video";
 "_media_show_all_"              = "Show both";
-"_media_view_options_"          = "View options";
 "_media_by_created_date_"       = "Sort by created date";
 "_media_by_upload_date_"        = "Sort by upload date";
 "_media_by_modified_date_"      = "Sort by modified date";
@@ -499,11 +498,6 @@
 "_share_can_delete_"            = "Delete";
 "_share_can_download_"          = "Allow download and sync";
 "_share_unshare_"               = "Delete share";
-//"_share_can_reshare_"           = "Allow resharing";
-//"_share_can_create_"            = "Allow creating";
-//"_share_can_change_"            = "Allow editing";
-//"_share_can_delete_"            = "Allow deleting";
-//"_share_unshare_"               = "Unshare";
 "_share_internal_link_"         = "Internal link";
 "_share_internal_link_des_"     = "Only works for users with access to this file/folder.";
 "_share_reshare_disabled_"      = "You are not allowed to reshare this file/folder.";
