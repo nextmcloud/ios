@@ -120,6 +120,8 @@ extension NCSelectableNavigationView where Self: UIViewController {
         var isAnyFolder = false
         var isAnyLocked = false
         var canUnlock = true
+        var canOpenIn = false
+        var isDirectoryE2EE = false
 
         for ocId in selectOcId {
             guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
@@ -142,9 +144,20 @@ extension NCSelectableNavigationView where Self: UIViewController {
             } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
                 isAnyOffline = localFile.offline
             } // else: file is not offline, continue
-        }
 
-        actions.append(.openInAction(selectedMetadatas: selectedMetadatas, viewController: self, completion: tapSelect))
+            if !metadata.directory {
+                canOpenIn = true
+            }
+            
+            if metadata.isDirectoryE2EE {
+                isDirectoryE2EE = true
+            }
+
+        }
+        
+        if canOpenIn {
+            actions.append(.openInAction(selectedMetadatas: selectedMetadatas, viewController: self, completion: tapSelect))
+        }
 
         if !isAnyFolder, canUnlock, !NCGlobal.shared.capabilityFilesLockVersion.isEmpty {
             actions.append(.lockUnlockFiles(shouldLock: !isAnyLocked, metadatas: selectedMetadatas, completion: tapSelect))
@@ -158,8 +171,10 @@ extension NCSelectableNavigationView where Self: UIViewController {
             self.tapSelect()
         }))
 
-        actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, indexPath: selectIndexPath, completion: tapSelect))
-        actions.append(.copyAction(selectOcId: selectOcId, completion: tapSelect))
+        if !isDirectoryE2EE {
+            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, indexPath: selectIndexPath, completion: tapSelect))
+            actions.append(.copyAction(selectOcId: selectOcId, completion: tapSelect))
+        }
         actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, indexPath: selectIndexPath, viewController: self, completion: tapSelect))
         return actions
     }
