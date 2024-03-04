@@ -131,7 +131,7 @@ extension NCCollectionViewCommon {
         //
         // SET FOLDER E2EE
         //
-        if metadata.canSetDirectoryAsE2EE {
+        if metadata.isDirectoySettableE2EE && (NCUtilityFileSystem().getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) == appDelegate.activeServerUrl) {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_e2e_set_folder_encrypted_", comment: ""),
@@ -206,40 +206,7 @@ extension NCCollectionViewCommon {
         }
 
         //
-        // OPEN with external editor
-        //
-        if metadata.canOpenExternalEditor {
-
-            var editor = ""
-            var title = ""
-            var icon: UIImage?
-
-            if editors.contains(NCGlobal.shared.editorOnlyoffice) {
-                editor = NCGlobal.shared.editorOnlyoffice
-                title = NSLocalizedString("_open_in_onlyoffice_", comment: "")
-                icon = utility.loadImage(named: "onlyoffice")
-            } else if isRichDocument {
-                editor = NCGlobal.shared.editorCollabora
-                title = NSLocalizedString("_open_in_collabora_", comment: "")
-                icon = utility.loadImage(named: "collabora")
-            }
-
-            if !editor.isEmpty {
-                actions.append(
-                    NCMenuAction(
-                        title: title,
-                        icon: icon!,
-                        order: 70,
-                        action: { _ in
-                            NCViewer().view(viewController: self, metadata: metadata, metadatas: [metadata], imageIcon: imageIcon, editor: editor, isRichDocument: isRichDocument)
-                        }
-                    )
-                )
-            }
-        }
-
-        //
-        // SHARE
+        // OPEN IN
         //
         if metadata.canShare {
             actions.append(.share(selectedMetadatas: [metadata], viewController: self, order: 80))
@@ -292,6 +259,13 @@ extension NCCollectionViewCommon {
         //
         if metadata.isCopyableMovable {
             actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], indexPath: [indexPath], order: 130))
+        }
+
+        //
+        // COPY IN PASTEBOARD
+        //
+        if metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE  {
+            actions.append(.copyAction(selectOcId: [metadata.ocId], order: 140))
         }
 
         //
