@@ -121,6 +121,7 @@ extension NCSelectableNavigationView where Self: UIViewController {
         var isAnyLocked = false
         var canUnlock = true
         var canOpenIn = false
+        var isDirectoryE2EE = false
 
         for ocId in selectOcId {
             guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
@@ -147,6 +148,11 @@ extension NCSelectableNavigationView where Self: UIViewController {
             if !metadata.directory {
                 canOpenIn = true
             }
+            
+            if metadata.isDirectoryE2EE {
+                isDirectoryE2EE = true
+            }
+
         }
         
         if canOpenIn {
@@ -165,8 +171,10 @@ extension NCSelectableNavigationView where Self: UIViewController {
             self.tapSelect()
         }))
 
-        actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, indexPath: selectIndexPath, completion: tapSelect))
-        actions.append(.copyAction(selectOcId: selectOcId, completion: tapSelect))
+        if !isDirectoryE2EE {
+            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, indexPath: selectIndexPath, completion: tapSelect))
+            actions.append(.copyAction(selectOcId: selectOcId, completion: tapSelect))
+        }
         actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, indexPath: selectIndexPath, viewController: self, completion: tapSelect))
         return actions
     }

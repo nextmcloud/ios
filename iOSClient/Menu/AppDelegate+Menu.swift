@@ -127,8 +127,8 @@ extension AppDelegate {
                         )
         )
 
-        // Folder encrypted
-        if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: appDelegate.account) {
+        // Folder encrypted (ONLY ROOT)
+        if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: appDelegate.account) && (NCUtilityFileSystem().getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) == appDelegate.activeServerUrl) {
             actions.append(
                 NCMenuAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
                              icon: UIImage(named: "encryptedfolder")!.image(color: NCBrandColor.shared.iconColor, size: 50),
