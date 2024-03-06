@@ -130,7 +130,12 @@ extension NCSelectableNavigationView where Self: UIViewController {
 
         for ocId in selectOcId {
             guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
-            selectedMetadatas.append(metadata)
+            if metadata.e2eEncrypted {
+                selectOcId.removeAll(where: {$0 == metadata.ocId})
+            } else {
+                selectedMetadatas.append(metadata)
+            }
+            
             if [NKCommon.TypeClassFile.image.rawValue, NKCommon.TypeClassFile.video.rawValue].contains(metadata.classFile) {
                 selectedMediaMetadatas.append(metadata)
             }
