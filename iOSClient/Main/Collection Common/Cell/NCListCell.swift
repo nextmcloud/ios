@@ -42,13 +42,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var labelShared: UILabel!
     @IBOutlet weak var imageItemLeftConstraint: NSLayoutConstraint!
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var infoTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var subInfoTrailingConstraint: NSLayoutConstraint!
 
     private var objectId = ""
     private var user = ""
     var indexPath = IndexPath()
 
-    weak var delegate: NCListCellDelegate?
+    weak var listCellDelegate: NCListCellDelegate?
     var namedButtonMore = ""
 
     var fileAvatarImageView: UIImageView? {
@@ -166,19 +166,19 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     @IBAction func touchUpInsideShare(_ sender: Any) {
-        delegate?.tapShareListItem(with: objectId, indexPath: indexPath, sender: sender)
+        listCellDelegate?.tapShareListItem(with: objectId, indexPath: indexPath, sender: sender)
     }
 
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        delegate?.tapMoreListItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, indexPath: indexPath, sender: sender)
+        listCellDelegate?.tapMoreListItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, indexPath: indexPath, sender: sender)
     }
 
     @objc func longPressInsideMore(gestureRecognizer: UILongPressGestureRecognizer) {
-        delegate?.longPressMoreListItem(with: objectId, namedButtonMore: namedButtonMore, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
+        listCellDelegate?.longPressMoreListItem(with: objectId, namedButtonMore: namedButtonMore, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
     }
 
     @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
-        delegate?.longPressListItem(with: objectId, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
+        listCellDelegate?.longPressListItem(with: objectId, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
     }
 
     fileprivate func setA11yActions() {
@@ -196,11 +196,11 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func titleInfoTrailingFull() {
-        infoTrailingConstraint.constant = 10
+        subInfoTrailingConstraint.constant = 10
     }
 
     func titleInfoTrailingDefault() {
-        infoTrailingConstraint.constant = 90
+        subInfoTrailingConstraint.constant = 90
     }
 
     func setButtonMore(named: String, image: UIImage) {
@@ -276,7 +276,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
-        labelInfo.text = NCUtility().dateDiff(date as Date)
+        labelInfo.text = NCUtility().dateDiff(date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
         labelSubinfo.text = " · " + NCUtilityFileSystem().transformedSize(size)
     }
 

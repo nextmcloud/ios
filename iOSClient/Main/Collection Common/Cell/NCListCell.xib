@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_0" orientation="landscape" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -59,7 +59,13 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" tag="102" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Itl-3m-he3" userLabel="labelInfo">
-                        <rect key="frame" x="107" y="10" width="356" height="15"/>
+                        <rect key="frame" x="107" y="10" width="31" height="15"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" red="0.59999999999999998" green="0.59999999999999998" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" tag="102" contentMode="left" verticalHuggingPriority="251" text="Label" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Azx-4I-oF6" userLabel="labelSubinfo">
+                        <rect key="frame" x="138" y="10" width="282" height="15"/>
                         <fontDescription key="fontDescription" type="system" pointSize="12"/>
                         <color key="textColor" red="0.59999999999999998" green="0.59999999999999998" blue="0.59999999999999998" alpha="1" colorSpace="calibratedRGB"/>
                         <nil key="highlightedColor"/>
@@ -138,8 +144,8 @@
                 <constraint firstItem="ami-bU-Q4v" firstAttribute="top" secondItem="2sp-6s-rn0" secondAttribute="bottom" constant="-10" id="PHS-7a-CVN"/>
                 <constraint firstItem="2sp-6s-rn0" firstAttribute="leading" secondItem="ami-bU-Q4v" secondAttribute="trailing" constant="-10" id="QxH-VY-mTy"/>
                 <constraint firstItem="dUt-pA-wDu" firstAttribute="top" secondItem="ami-bU-Q4v" secondAttribute="bottom" constant="-10" id="SE0-SS-iFi"/>
-                <constraint firstItem="rWt-X2-etJ" firstAttribute="trailing" secondItem="Itl-3m-he3" secondAttribute="trailing" constant="90" id="TxW-ft-p2d"/>
                 <constraint firstItem="ami-bU-Q4v" firstAttribute="centerY" secondItem="rWt-X2-etJ" secondAttribute="centerY" id="X1R-rW-GM0"/>
+                <constraint firstAttribute="trailing" secondItem="Azx-4I-oF6" secondAttribute="trailing" constant="180" id="XST-Eg-irE"/>
                 <constraint firstItem="Asa-Q1-AnQ" firstAttribute="centerY" secondItem="rWt-X2-etJ" secondAttribute="centerY" id="XwW-tp-vCV"/>
                 <constraint firstItem="pRk-si-6on" firstAttribute="centerY" secondItem="Asa-Q1-AnQ" secondAttribute="centerY" id="Yrq-C6-fti"/>
                 <constraint firstItem="rWt-X2-etJ" firstAttribute="bottom" secondItem="DcI-qG-6fw" secondAttribute="bottom" constant="7" id="ZKJ-Yw-ZUN"/>
@@ -147,12 +153,14 @@
                 <constraint firstItem="pRk-si-6on" firstAttribute="centerX" secondItem="Asa-Q1-AnQ" secondAttribute="centerX" id="esU-dO-RAJ"/>
                 <constraint firstItem="rWt-X2-etJ" firstAttribute="bottom" secondItem="Itl-3m-he3" secondAttribute="bottom" constant="14" id="gBL-aJ-BMk"/>
                 <constraint firstItem="vZO-b1-slT" firstAttribute="top" secondItem="ami-bU-Q4v" secondAttribute="bottom" constant="-10" id="iZU-1D-a7W"/>
+                <constraint firstItem="Azx-4I-oF6" firstAttribute="bottom" secondItem="Itl-3m-he3" secondAttribute="bottom" id="iuK-6R-MAZ"/>
                 <constraint firstItem="dUt-pA-wDu" firstAttribute="leading" secondItem="ami-bU-Q4v" secondAttribute="trailing" constant="-10" id="jaL-NY-Yvv"/>
                 <constraint firstItem="rWt-X2-etJ" firstAttribute="trailing" secondItem="DcI-qG-6fw" secondAttribute="trailing" constant="90" id="kEe-UO-Nj2"/>
                 <constraint firstItem="Eu9-x7-wGJ" firstAttribute="centerY" secondItem="rWt-X2-etJ" secondAttribute="centerY" id="lCS-dN-iUu"/>
                 <constraint firstItem="rWt-X2-etJ" firstAttribute="bottom" secondItem="VQe-24-MfZ" secondAttribute="bottom" id="oIi-8V-dOb"/>
                 <constraint firstItem="rWt-X2-etJ" firstAttribute="trailing" secondItem="pnF-hF-EEM" secondAttribute="trailing" constant="45" id="qHS-uY-YUq"/>
                 <constraint firstItem="oto-5K-78P" firstAttribute="leading" secondItem="qNC-Ih-gmj" secondAttribute="trailing" constant="16" id="rnc-4P-sv4"/>
+                <constraint firstItem="Azx-4I-oF6" firstAttribute="leading" secondItem="Itl-3m-he3" secondAttribute="trailing" id="sSl-3u-SeH"/>
                 <constraint firstItem="ami-bU-Q4v" firstAttribute="leading" secondItem="vZO-b1-slT" secondAttribute="trailing" constant="-10" id="sok-qU-6gt"/>
                 <constraint firstItem="DcI-qG-6fw" firstAttribute="leading" secondItem="ami-bU-Q4v" secondAttribute="trailing" constant="10" id="y7C-gv-eeG"/>
             </constraints>
@@ -168,13 +176,14 @@
                 <outlet property="imageSelect" destination="Eu9-x7-wGJ" id="TQc-pR-Y7n"/>
                 <outlet property="imageShared" destination="oto-5K-78P" id="Lu9-sW-cBa"/>
                 <outlet property="imageStatus" destination="vZO-b1-slT" id="NTQ-cC-kj6"/>
-                <outlet property="infoTrailingConstraint" destination="TxW-ft-p2d" id="99x-3H-Oj4"/>
                 <outlet property="labelInfo" destination="Itl-3m-he3" id="EXL-TM-9C9"/>
                 <outlet property="labelShared" destination="qNC-Ih-gmj" id="nyF-NI-FK1"/>
+                <outlet property="labelSubinfo" destination="Azx-4I-oF6" id="3nV-rA-wSm"/>
                 <outlet property="labelTitle" destination="4Jc-Rw-rJO" id="rnV-kT-f3r"/>
                 <outlet property="progressView" destination="DcI-qG-6fw" id="BKm-55-e74"/>
                 <outlet property="separator" destination="VQe-24-MfZ" id="Gji-Qj-Pk8"/>
                 <outlet property="separatorHeightConstraint" destination="UaN-VG-tWh" id="LN4-3Z-lQ0"/>
+                <outlet property="subInfoTrailingConstraint" destination="XST-Eg-irE" id="xlg-dm-SVm"/>
             </connections>
             <point key="canvasLocation" x="97.599999999999994" y="129.53523238380811"/>
         </collectionViewCell>

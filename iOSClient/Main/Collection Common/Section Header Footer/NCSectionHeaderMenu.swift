@@ -26,6 +26,9 @@ import MarkdownKit
 
 class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate {
 
+    @IBOutlet weak var buttonSwitch: UIButton!
+    @IBOutlet weak var buttonOrder: UIButton!
+    @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var buttonTransfer: UIButton!
     @IBOutlet weak var imageButtonTransfer: UIImageView!
     @IBOutlet weak var labelTransfer: UILabel!
@@ -34,10 +37,14 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
     @IBOutlet weak var textViewRichWorkspace: UITextView!
     @IBOutlet weak var labelSection: UILabel!
     @IBOutlet weak var viewTransfer: UIView!
+    @IBOutlet weak var viewButtonsView: UIView!
+    @IBOutlet weak var viewSeparator: UIView!
     @IBOutlet weak var viewRichWorkspace: UIView!
     @IBOutlet weak var viewSection: UIView!
 
     @IBOutlet weak var viewTransferHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var viewButtonsViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var viewSeparatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewRichWorkspaceHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewSectionHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var transferSeparatorBottomHeightConstraint: NSLayoutConstraint!
@@ -61,13 +68,16 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
         buttonMore.setImage(UIImage(named: "more")!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
 
         // Gradient
-        gradient.startPoint = CGPoint(x: 0, y: 0.8)
-        gradient.endPoint = CGPoint(x: 0, y: 0.9)
+        gradient.startPoint = CGPoint(x: 0, y: 0.50)
+        gradient.endPoint = CGPoint(x: 0, y: 1)
         viewRichWorkspace.layer.addSublayer(gradient)
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(touchUpInsideViewRichWorkspace(_:)))
         tap.delegate = self
         viewRichWorkspace?.addGestureRecognizer(tap)
+
+        viewSeparatorHeightConstraint.constant = 0.5
+        viewSeparator.backgroundColor = .separator
 
         markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: 15), color: .label)
         markdownParser.header.font = UIFont.systemFont(ofSize: 25)
@@ -310,9 +320,9 @@ class NCSectionFooter: UICollectionReusableView, NCSectionFooterDelegate {
         }
 
         if files > 1 {
-            filesText = "\(files) " + NSLocalizedString("_files_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
+            filesText = "\(files) " + NSLocalizedString("_files_", comment: "") + " " + utilityFileSystem.transformedSize(size)
         } else if files == 1 {
-            filesText = "1 " + NSLocalizedString("_file_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
+            filesText = "1 " + NSLocalizedString("_file_", comment: "") + " " + utilityFileSystem.transformedSize(size)
         }
 
         if foldersText.isEmpty {
@@ -320,7 +330,7 @@ class NCSectionFooter: UICollectionReusableView, NCSectionFooterDelegate {
         } else if filesText.isEmpty {
             labelSection.text = foldersText
         } else {
-            labelSection.text = foldersText + " • " + filesText
+            labelSection.text = foldersText + ", " + filesText
         }
     }
 
