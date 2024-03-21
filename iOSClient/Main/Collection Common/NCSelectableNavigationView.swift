@@ -56,7 +56,7 @@ protocol NCSelectableNavigationView: AnyObject {
     func reloadDataSource(withQueryDB: Bool)
     func setNavigationLeftItems()
     func setNavigationRightItems(enableMenu: Bool)
-    func createMenuActions() -> [UIMenuElement]
+    func createMenuActions() -> [NCMenuAction]
 
     func toggleSelect(isOn: Bool?)
     func onListSelected()

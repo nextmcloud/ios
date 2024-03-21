@@ -75,6 +75,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     var titlePreviusFolder: String?
     var enableSearchBar: Bool = false
     var headerMenuTransferView = false
+    var headerMenuButtonsView: Bool = true
     var headerRichWorkspaceDisable: Bool = false
     var emptyImage: UIImage?
     var emptyTitle: String = ""
@@ -173,7 +174,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
         // Deselect items when back to previous view controller
         if isEditMode {
-            self.tapSelect()
+            self.toggleSelect()
         }
         
         appDelegate.activeViewController = self
@@ -747,6 +748,18 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     func accountRequestAddAccount() {
         appDelegate.openLogin(viewController: self, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+    }
+    
+    func tapButtonSwitch(_ sender: Any) {
+
+        guard isTransitioning == false else { return }
+        isTransitioning = true
+
+        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+            onListSelected()
+        } else {
+            onGridSelected()
+        }
     }
 
     func tapButtonOrder(_ sender: Any) {

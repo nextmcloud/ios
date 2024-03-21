@@ -26,86 +26,25 @@ import NextcloudKit
 
 extension NCCollectionViewCommon: NCSelectableNavigationView, NCCollectionViewCommonSelectTabBarDelegate {
     func setNavigationRightItems(enableMenu: Bool = false) {
-        if layoutKey == NCGlobal.shared.layoutViewTransfers { return }
-
-        var selectedMetadatas: [tableMetadata] = []
-        var isAnyOffline = false
-        var isAnyDirectory = false
-        var isAllDirectory = true
-        var isAnyLocked = false
-        var canUnlock = true
-        var canSetAsOffline = true
-        let isTabBarHidden = self.tabBarController?.tabBar.isHidden
-
-        for ocId in selectOcId {
-            guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
-            selectedMetadatas.append(metadata)
-
-            if metadata.directory {
-                isAnyDirectory = true
-            } else {
-                isAllDirectory = false
-            }
-
-            if !metadata.canSetAsAvailableOffline {
-                canSetAsOffline = false
-            }
-
-            if metadata.lock {
-                isAnyLocked = true
-                if metadata.lockOwner != appDelegate.userId {
-                    canUnlock = false
-                }
-            }
-
-            guard !isAnyOffline else { continue }
-
-            if metadata.directory,
-               let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, metadata.serverUrl + "/" + metadata.fileName)) {
-                isAnyOffline = directory.offline
-            } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
-                isAnyOffline = localFile.offline
-            } // else: file is not offline, continue
-        }
-
-        guard let tabBarSelect = tabBarSelect as? NCCollectionViewCommonSelectTabBar else { return }
-
-        tabBarSelect.isAnyOffline = isAnyOffline
-        tabBarSelect.canSetAsOffline = canSetAsOffline
-        tabBarSelect.isAnyDirectory = isAnyDirectory
-        tabBarSelect.isAllDirectory = isAllDirectory
-        tabBarSelect.isAnyLocked = isAnyLocked
-        tabBarSelect.canUnlock = canUnlock
-        tabBarSelect.enableLock = !isAnyDirectory && canUnlock && !NCGlobal.shared.capabilityFilesLockVersion.isEmpty
-        tabBarSelect.isSelectedEmpty = selectOcId.isEmpty
-        tabBarSelect.selectedMetadatas = selectedMetadatas
-
         if isEditMode {
-            tabBarSelect.show()
-            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done) { self.toggleSelect() }
-            navigationItem.rightBarButtonItems = [select]
+            let more = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain) { self.presentMenu(with: self.createMenuActions())}
+            navigationItem.rightBarButtonItems = [more]
         } else {
-            tabBarSelect.hide()
-            if navigationItem.rightBarButtonItems == nil || enableMenu {
-                let menuButton = UIBarButtonItem(image: .init(systemName: "ellipsis.circle"), menu: UIMenu(children: createMenuActions()))
-                if layoutKey == NCGlobal.shared.layoutViewFiles {
-                    let notification = UIBarButtonItem(image: .init(systemName: "bell"), style: .plain, action: tapNotification)
-                    navigationItem.rightBarButtonItems = [menuButton, notification]
-                } else {
-                    navigationItem.rightBarButtonItems = [menuButton]
-                }
+            let select = UIBarButtonItem(title: NSLocalizedString("_select_", comment: ""), style: UIBarButtonItem.Style.plain) { self.toggleSelect() }
+            let notification = UIBarButtonItem(image: UIImage(systemName: "bell"), style: .plain, action: tapNotification)
+            if layoutKey == NCGlobal.shared.layoutViewFiles {
+                navigationItem.rightBarButtonItems = [select, notification]
             } else {
-                navigationItem.rightBarButtonItems?.first?.menu = navigationItem.rightBarButtonItems?.first?.menu?.replacingChildren(createMenuActions())
+                navigationItem.rightBarButtonItems = [select]
             }
         }
-        // fix, if the tabbar was hidden before the update, set hidden
-        if let isTabBarHidden, isTabBarHidden {
-            self.tabBarController?.tabBar.isHidden = true
-        }
+        guard layoutKey == NCGlobal.shared.layoutViewFiles else { return }
+        navigationItem.title = titleCurrentFolder
     }
 
     func onListSelected() {
         if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+            headerMenu?.buttonSwitch.accessibilityLabel = NSLocalizedString("_grid_view_", comment: "")
             layoutForView?.layout = NCGlobal.shared.layoutList
             NCManageDatabase.shared.setLayoutForView(account: appDelegate.account, key: layoutKey, serverUrl: serverUrl, layout: layoutForView?.layout)
             self.groupByField = "name"
@@ -121,6 +60,7 @@ extension NCCollectionViewCommon: NCSelectableNavigationView, NCCollectionViewCo
 
     func onGridSelected() {
         if layoutForView?.layout == NCGlobal.shared.layoutList {
+            headerMenu?.buttonSwitch.accessibilityLabel = NSLocalizedString("_list_view_", comment: "")
             layoutForView?.layout = NCGlobal.shared.layoutGrid
             NCManageDatabase.shared.setLayoutForView(account: appDelegate.account, key: layoutKey, serverUrl: serverUrl, layout: layoutForView?.layout)
             if isSearchingMode {
@@ -230,84 +170,87 @@ extension NCCollectionViewCommon: NCSelectableNavigationView, NCCollectionViewCo
         self.toggleSelect()
     }
 
-    func createMenuActions() -> [UIMenuElement] {
-        guard let layoutForView = NCManageDatabase.shared.getLayoutForView(account: appDelegate.account, key: layoutKey, serverUrl: serverUrl) else { return [] }
+    func createMenuActions() -> [NCMenuAction] {
+        var actions = [NCMenuAction]()
 
-        let select = UIAction(title: NSLocalizedString("_select_", comment: ""), image: .init(systemName: "checkmark.circle"), attributes: selectableDataSource.isEmpty ? .disabled : []) { _ in self.toggleSelect() }
-
-        let list = UIAction(title: NSLocalizedString("_list_", comment: ""), image: .init(systemName: "list.bullet"), state: layoutForView.layout == NCGlobal.shared.layoutList ? .on : .off) { _ in
-            self.onListSelected()
-            self.setNavigationRightItems()
+        actions.append(.cancelAction {
+            self.toggleSelect()
+        })
+        if selectOcId.count != selectableDataSource.count {
+            actions.append(.selectAllAction(action: collectionViewSelectAll))
         }
 
-        let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""), image: .init(systemName: "square.grid.2x2"), state: layoutForView.layout == NCGlobal.shared.layoutGrid ? .on : .off) { _ in
-            self.onGridSelected()
-            self.setNavigationRightItems()
-        }
+        guard !selectOcId.isEmpty else { return actions }
 
-        let viewStyleSubmenu = UIMenu(title: "", options: .displayInline, children: [list, grid])
+        actions.append(.seperator(order: 0))
 
-        let ascending = layoutForView.ascending
-        let ascendingChevronImage = UIImage(systemName: ascending ? "chevron.up" : "chevron.down")
-        let isName = layoutForView.sort == "fileName"
-        let isDate = layoutForView.sort == "date"
-        let isSize = layoutForView.sort == "size"
+        var selectedMetadatas: [tableMetadata] = []
+        var selectedMediaMetadatas: [tableMetadata] = []
+        var isAnyOffline = false
+        var isAnyFolder = false
+        var isAnyLocked = false
+        var canUnlock = true
+        var canOpenIn = false
+        var isDirectoryE2EE = false
 
-        let byName = UIAction(title: NSLocalizedString("_name_", comment: ""), image: isName ? ascendingChevronImage : nil, state: isName ? .on : .off) { _ in
-            if isName { // repeated press
-                layoutForView.ascending = !layoutForView.ascending
-            }
-            layoutForView.sort = "fileName"
-            self.saveLayout(layoutForView)
-        }
-
-        let byNewest = UIAction(title: NSLocalizedString("_date_", comment: ""), image: isDate ? ascendingChevronImage : nil, state: isDate ? .on : .off) { _ in
-            if isDate { // repeated press
-                layoutForView.ascending = !layoutForView.ascending
-            }
-            layoutForView.sort = "date"
-            self.saveLayout(layoutForView)
-        }
-
-        let byLargest = UIAction(title: NSLocalizedString("_size_", comment: ""), image: isSize ? ascendingChevronImage : nil, state: isSize ? .on : .off) { _ in
-            if isSize { // repeated press
-                layoutForView.ascending = !layoutForView.ascending
-            }
-            layoutForView.sort = "size"
-            self.saveLayout(layoutForView)
-        }
-
-        let sortSubmenu = UIMenu(title: NSLocalizedString("_order_by_", comment: ""), options: .displayInline, children: [byName, byNewest, byLargest])
-
-        let foldersOnTop = UIAction(title: NSLocalizedString("_directory_on_top_no_", comment: ""), image: UIImage(systemName: "folder"), state: layoutForView.directoryOnTop ? .on : .off) { _ in
-            layoutForView.directoryOnTop = !layoutForView.directoryOnTop
-            self.saveLayout(layoutForView)
-        }
-
-        let personalFilesOnly = NCKeychain().getPersonalFilesOnly(account: appDelegate.account)
-        let personalFilesOnlyAction = UIAction(title: NSLocalizedString("_personal_files_only_", comment: ""), image: UIImage(systemName: "folder.badge.person.crop"), state: personalFilesOnly ? .on : .off) { _ in
-            NCKeychain().setPersonalFilesOnly(account: self.appDelegate.account, value: !personalFilesOnly)
-            self.reloadDataSource()
-        }
-
-        let showDescriptionKeychain = NCKeychain().showDescription
-        let showDescription = UIAction(title: NSLocalizedString("_show_description_", comment: ""), image: UIImage(systemName: "list.dash.header.rectangle"), attributes: richWorkspaceText == nil ? .disabled : [], state: showDescriptionKeychain && richWorkspaceText != nil ? .on : .off) { _ in
-            NCKeychain().showDescription = !showDescriptionKeychain
-            self.collectionView.reloadData()
-            self.setNavigationRightItems()
-        }
-        showDescription.subtitle = richWorkspaceText == nil ? NSLocalizedString("_no_description_available_", comment: "") : ""
-
-        if layoutKey == NCGlobal.shared.layoutViewRecent {
-            return [select]
-        } else {
-            var additionalSubmenu = UIMenu()
-            if layoutKey == NCGlobal.shared.layoutViewFiles {
-                additionalSubmenu = UIMenu(title: "", options: .displayInline, children: [foldersOnTop, personalFilesOnlyAction, showDescription])
+        for ocId in selectOcId {
+            guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
+            if metadata.e2eEncrypted {
+                selectOcId.removeAll(where: {$0 == metadata.ocId})
             } else {
-                additionalSubmenu = UIMenu(title: "", options: .displayInline, children: [foldersOnTop, showDescription])
+                selectedMetadatas.append(metadata)
             }
-            return [select, viewStyleSubmenu, sortSubmenu, additionalSubmenu]
+            
+            if [NKCommon.TypeClassFile.image.rawValue, NKCommon.TypeClassFile.video.rawValue].contains(metadata.classFile) {
+                selectedMediaMetadatas.append(metadata)
+            }
+            if metadata.directory { isAnyFolder = true }
+            if metadata.lock {
+                isAnyLocked = true
+                if metadata.lockOwner != appDelegate.userId {
+                    canUnlock = false
+                }
+            }
+
+            guard !isAnyOffline else { continue }
+            if metadata.directory,
+               let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, metadata.serverUrl + "/" + metadata.fileName)) {
+                isAnyOffline = directory.offline
+            } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
+                isAnyOffline = localFile.offline
+            } // else: file is not offline, continue
+
+            if !metadata.directory {
+                canOpenIn = true
+            }
+            
+            
+            if metadata.isDirectoryE2EE {
+                isDirectoryE2EE = true
+            }
         }
+        
+        if canOpenIn {
+            actions.append(.openInAction(selectedMetadatas: selectedMetadatas, viewController: self, completion: { self.toggleSelect() }))
+        }
+
+        if !isAnyFolder, canUnlock, !NCGlobal.shared.capabilityFilesLockVersion.isEmpty {
+            actions.append(.lockUnlockFiles(shouldLock: !isAnyLocked, metadatas: selectedMetadatas, completion: { self.toggleSelect() }))
+        }
+
+        if !selectedMediaMetadatas.isEmpty {
+            actions.append(.saveMediaAction(selectedMediaMetadatas: selectedMediaMetadatas, completion: { self.toggleSelect() }))
+        }
+        actions.append(.setAvailableOfflineAction(selectedMetadatas: selectedMetadatas, isAnyOffline: isAnyOffline, viewController: self, completion: {
+            self.reloadDataSource()
+            self.toggleSelect()
+        }))
+        
+        if !isDirectoryE2EE {
+            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, indexPath: selectIndexPaths, completion: { self.toggleSelect() }))
+            actions.append(.copyAction(selectOcId: selectOcId, completion: { self.toggleSelect() }))
+        }
+        actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, indexPath: selectIndexPaths, viewController: self, completion: { self.toggleSelect() }))
+        return actions
     }
 }
