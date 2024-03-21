@@ -27,7 +27,7 @@ import Realm
 import UIKit
 import NextcloudKit
 
-class NCTrash: UIViewController, NCTrashListCellDelegate, NCEmptyDataSetDelegate, NCGridCellDelegate {
+class NCTrash: UIViewController, NCTrashListCellDelegate, NCEmptyDataSetDelegate, NCGridCellDelegate, NCSectionHeaderMenuDelegate {
 
     @IBOutlet weak var collectionView: UICollectionView!
 
@@ -67,6 +67,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCEmptyDataSetDelegate
         collectionView.register(UINib(nibName: "NCTrashGridCell", bundle: nil), forCellWithReuseIdentifier: "gridCell")
 
         // Footer
+        collectionView.register(UINib(nibName: "NCSectionHeaderMenu", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionHeaderMenu")
         collectionView.register(UINib(nibName: "NCSectionFooter", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "sectionFooter")
 
         collectionView.alwaysBounceVertical = true
@@ -322,20 +323,20 @@ extension NCTrash: NCSelectableNavigationView, NCTrashSelectTabBarDelegate {
     }
 
     func setNavigationRightItems(enableMenu: Bool = false) {
-        guard let tabBarSelect = tabBarSelect as? NCTrashSelectTabBar else { return }
-
-        tabBarSelect.isSelectedEmpty = selectOcId.isEmpty
         if isEditMode {
-            tabBarSelect.show()
-            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done) { self.toggleSelect() }
-            navigationItem.rightBarButtonItems = [select]
+            let more = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain) { self.presentMenu(with: self.selectActions)}
+            navigationItem.rightBarButtonItems = [more]
         } else {
-            tabBarSelect.hide()
-            let menu = UIMenu(children: createMenuActions())
-            let menuButton = UIBarButtonItem(image: .init(systemName: "ellipsis.circle"), menu: menu)
-            menuButton.isEnabled = true
-            navigationItem.rightBarButtonItems = [menuButton]
+            let select = UIBarButtonItem(title: NSLocalizedString("_select_", comment: ""), style: UIBarButtonItem.Style.plain) { self.toggleSelect() }
+            let notification = UIBarButtonItem(image: UIImage(systemName: "bell"), style: .plain, action: tapNotification)
+            if layoutKey == NCGlobal.shared.layoutViewFiles {
+                navigationItem.rightBarButtonItems = [select, notification]
+            } else {
+                navigationItem.rightBarButtonItems = [select]
+            }
         }
+        guard layoutKey == NCGlobal.shared.layoutViewFiles else { return }
+        navigationItem.title = titleCurrentFolder
     }
 
     func onListSelected() {
@@ -376,7 +377,7 @@ extension NCTrash: NCSelectableNavigationView, NCTrashSelectTabBarDelegate {
         self.toggleSelect()
     }
 
-    func createMenuActions() -> [UIMenuElement] {
+    func createMenuActions() -> [NCMenuAction] {
         guard let layoutForView = NCManageDatabase.shared.getLayoutForView(account: appDelegate.account, key: layoutKey, serverUrl: serverUrl) else { return [] }
 
         let select = UIAction(title: NSLocalizedString("_select_", comment: ""), image: .init(systemName: "checkmark.circle"), attributes: selectableDataSource.isEmpty ? .disabled : []) { _ in self.toggleSelect() }
@@ -393,6 +394,6 @@ extension NCTrash: NCSelectableNavigationView, NCTrashSelectTabBarDelegate {
 
         let viewStyleSubmenu = UIMenu(title: "", options: .displayInline, children: [list, grid])
 
-        return [select, viewStyleSubmenu]
+        return []
     }
 }
