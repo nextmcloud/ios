@@ -31,7 +31,7 @@ extension NCTrash {
     var selectActions: [NCMenuAction] {
         var actions = [NCMenuAction]()
         actions.append(.cancelAction {
-            self.tapSelect()
+            self.toggleSelect()
         })
         if selectOcId.count != selectableDataSource.count {
             actions.append(.selectAllAction(action: collectionViewSelectAll))
