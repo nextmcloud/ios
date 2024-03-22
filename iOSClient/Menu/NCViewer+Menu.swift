@@ -37,21 +37,6 @@ extension NCViewer {
         let isOffline = localFile?.offline == true
 
         //
-        // DETAIL
-        //
-        if !appDelegate.disableSharesView {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_details_", comment: ""),
-                    icon: utility.loadImage(named: "info.circle"),
-                    action: { _ in
-                        NCActionCenter.shared.openShare(viewController: viewController, metadata: metadata, page: .activity)
-                    }
-                )
-            )
-        }
-
-        //
         // VIEW IN FOLDER
         //
         if !webView {
