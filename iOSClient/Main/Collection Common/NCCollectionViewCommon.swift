@@ -75,6 +75,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     var titlePreviusFolder: String?
     var enableSearchBar: Bool = false
     var headerMenuTransferView = false
+    var headerMenuButtonsView: Bool = true
     var headerRichWorkspaceDisable: Bool = false
     var emptyImage: UIImage?
     var emptyTitle: String = ""
@@ -115,7 +116,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             searchController?.searchBar.delegate = self
             searchController?.searchBar.autocapitalizationType = .none
             navigationItem.searchController = searchController
-            navigationItem.hidesSearchBarWhenScrolling = true
+            navigationItem.hidesSearchBarWhenScrolling = false
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_back_", comment: ""), style: .plain, target: nil, action: nil)
         }
 
         // Cell
@@ -170,6 +172,11 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        // Deselect items when back to previous view controller
+        if isEditMode {
+            self.toggleSelect()
+        }
+        
         appDelegate.activeViewController = self
 
         layoutForView = NCManageDatabase.shared.getLayoutForView(account: appDelegate.account, key: layoutKey, serverUrl: serverUrl)
@@ -282,10 +289,6 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         self.collectionView?.collectionViewLayout.invalidateLayout()
         self.collectionView?.reloadData()
         self.tipView?.dismiss()
-
-        coordinator.animate(alongsideTransition: nil) { _ in
-            self.showTip()
-        }
     }
 
     override var canBecomeFirstResponder: Bool {
@@ -315,11 +318,6 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     }
 
     @objc func reloadAvatar(_ notification: NSNotification) {
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.showTip()
-        }
-
         guard let userInfo = notification.userInfo as NSDictionary?,
               let error = userInfo["error"] as? NKError,
               error.errorCode != NCGlobal.shared.errorNotModified else { return }
@@ -600,63 +598,6 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         navigationItem.title = titleCurrentFolder
 
         guard layoutKey == NCGlobal.shared.layoutViewFiles else { return }
-
-        // PROFILE BUTTON
-
-        let activeAccount = NCManageDatabase.shared.getActiveAccount()
-
-        let image = utility.loadUserImage(for: appDelegate.user, displayName: activeAccount?.displayName, userBaseUrl: appDelegate)
-
-        let button = AccountSwitcherButton(type: .custom)
-        button.setImage(image, for: .normal)
-        button.setImage(image, for: .highlighted)
-        button.semanticContentAttribute = .forceLeftToRight
-        button.sizeToFit()
-
-        let accounts = NCManageDatabase.shared.getAllAccountOrderAlias()
-
-        if !accounts.isEmpty, !NCBrandOptions.shared.disable_multiaccount, !NCBrandOptions.shared.disable_manage_account {
-            let accountActions: [UIAction] = accounts.map { account in
-                let image = utility.loadUserImage(for: account.user, displayName: account.displayName, userBaseUrl: account)
-
-                var name: String = ""
-                var url: String = ""
-
-                if account.alias.isEmpty {
-                    name = account.displayName
-                    url = (URL(string: account.urlBase)?.host ?? "")
-                } else {
-                    name = account.alias
-                }
-
-                let action = UIAction(title: name, image: image, state: account.active ? .on : .off) { _ in
-                    if !account.active {
-                        self.appDelegate.changeAccount(account.account, userProfile: nil)
-                    }
-                }
-
-                action.subtitle = url
-
-                return action
-            }
-
-            let addAccountAction = UIAction(title: NSLocalizedString("_add_account_", comment: ""), image: .init(systemName: "person.crop.circle.badge.plus")) { _ in
-                self.appDelegate.openLogin(viewController: self, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
-            }
-
-            let addAccountSubmenu = UIMenu(title: "", options: .displayInline, children: [addAccountAction])
-
-            let menu = UIMenu(children: accountActions + [addAccountSubmenu])
-
-            button.menu = menu
-            button.showsMenuAsPrimaryAction = true
-
-            button.onMenuOpened = {
-                self.dismissTip()
-            }
-        }
-
-        navigationItem.setLeftBarButton(UIBarButtonItem(customView: button), animated: true)
         navigationItem.leftItemsSupplementBackButton = true
 
         if titlePreviusFolder != nil {
@@ -698,7 +639,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 view.emptyTitle.text = NSLocalizedString(emptyTitle, comment: "")
                 view.emptyDescription.text = NSLocalizedString(emptyDescription, comment: "")
             } else {
-                view.emptyImage.image = UIImage(named: "folder")?.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width)
+                view.emptyImage.image = UIImage(named: "folder_nmcloud")
                 view.emptyTitle.text = NSLocalizedString("_files_no_files_", comment: "")
                 view.emptyDescription.text = NSLocalizedString("_no_file_pull_down_", comment: "")
             }
@@ -750,6 +691,18 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     func accountRequestAddAccount() {
         appDelegate.openLogin(viewController: self, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+    }
+    
+    func tapButtonSwitch(_ sender: Any) {
+
+        guard isTransitioning == false else { return }
+        isTransitioning = true
+
+        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+            onListSelected()
+        } else {
+            onGridSelected()
+        }
     }
 
     func tapButtonOrder(_ sender: Any) {
@@ -1201,14 +1154,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 }
             }
         }
-
-        // Avatar
-        if !metadata.ownerId.isEmpty,
-           metadata.ownerId != appDelegate.userId,
-           appDelegate.account == metadata.account {
-            let fileName = metadata.userBaseUrl + "-" + metadata.ownerId + ".png"
-            NCNetworking.shared.downloadAvatar(user: metadata.ownerId, dispalyName: metadata.ownerDisplayName, fileName: fileName, cell: cell, view: collectionView, cellImageView: cell.fileAvatarImageView)
-        }
     }
 
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -1260,7 +1205,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         var isShare = false
         var isMounted = false
         var a11yValues: [String] = []
-
+        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
         if metadataFolder != nil {
             isShare = metadata.permissions.contains(NCGlobal.shared.permissionShared) && !metadataFolder!.permissions.contains(NCGlobal.shared.permissionShared)
             isMounted = metadata.permissions.contains(NCGlobal.shared.permissionMounted) && !metadataFolder!.permissions.contains(NCGlobal.shared.permissionMounted)
@@ -1287,7 +1232,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.fileTitleLabel?.text = metadata.fileName
             cell.fileTitleLabel?.lineBreakMode = .byTruncatingTail
             if metadata.name == NCGlobal.shared.appName {
-                cell.fileInfoLabel?.text = NSLocalizedString("_in_", comment: "") + " " + utilityFileSystem.getPath(path: metadata.path, user: metadata.user)
+                cell.fileInfoLabel?.text = utility.dateDiff(metadata.date as Date) + " · " + utilityFileSystem.transformedSize(metadata.size)
             } else {
                 cell.fileInfoLabel?.text = metadata.subline
             }
@@ -1316,7 +1261,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 cell.filePreviewImageView?.image = NCImageCache.images.folderEncrypted
             } else if isShare {
                 cell.filePreviewImageView?.image = NCImageCache.images.folderSharedWithMe
-            } else if !metadata.shareType.isEmpty {
+            } else if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)) {
                 metadata.shareType.contains(3) ?
                 (cell.filePreviewImageView?.image = NCImageCache.images.folderPublic) :
                 (cell.filePreviewImageView?.image = NCImageCache.images.folderSharedWithMe)
@@ -1363,14 +1308,24 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         if isShare {
             cell.fileSharedImage?.image = NCImageCache.images.shared
         } else if !metadata.shareType.isEmpty {
-            metadata.shareType.contains(3) ?
-            (cell.fileSharedImage?.image = NCImageCache.images.shareByLink) :
             (cell.fileSharedImage?.image = NCImageCache.images.shared)
         } else {
-            cell.fileSharedImage?.image = NCImageCache.images.canShare
+            cell.fileSharedImage?.image = NCImageCache.images.canShare.image(color: NCBrandColor.shared.gray60, size: 50)
+            cell.fileSharedLabel?.text = ""
         }
-        if appDelegate.account != metadata.account {
-            cell.fileSharedImage?.image = NCImageCache.images.shared
+        cell.fileSharedLabel?.text = NSLocalizedString("_shared_", comment: "")
+        cell.fileSharedLabel?.textColor = NCBrandColor.shared.customer
+        if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)){
+            cell.fileSharedImage?.image = cell.fileSharedImage?.image?.imageColor(NCBrandColor.shared.customer)
+        } else {
+            cell.fileSharedImage?.image = NCImageCache.images.canShare.image(color: NCBrandColor.shared.gray60, size: 50)
+            cell.fileSharedLabel?.text = ""
+        }
+        
+        if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+            cell.fileSharedImage?.image = NCImageCache.images.sharedWithMe
+            cell.fileSharedLabel?.text = NSLocalizedString("_recieved_", comment: "")
+            cell.fileSharedLabel?.textColor = NCBrandColor.shared.notificationAction
         }
 
         // Button More
@@ -1425,6 +1380,15 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             }
         }
 
+        // Hide lines on iPhone
+        if !UIDevice.current.orientation.isLandscape && UIDevice.current.model.hasPrefix("iPhone") {
+            cell.cellSeparatorView?.isHidden = true
+            cell.fileSharedLabel?.isHidden = true
+        }else{
+            cell.cellSeparatorView?.isHidden = false
+            cell.fileSharedLabel?.isHidden = false
+        }
+        
         // Separator
         if collectionView.numberOfItems(inSection: indexPath.section) == indexPath.row + 1 || isSearchingMode {
             cell.cellSeparatorView?.isHidden = true
@@ -1447,18 +1411,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
         // Accessibility
         cell.setAccessibility(label: metadata.fileNameView + ", " + (cell.fileInfoLabel?.text ?? "") + (cell.fileSubinfoLabel?.text ?? ""), value: a11yValues.joined(separator: ", "))
-
-        // Color string find in search
-
-        cell.fileTitleLabel?.textColor = .label
-        cell.fileTitleLabel?.font = .systemFont(ofSize: 15)
-
-        if isSearchingMode, let literalSearch = self.literalSearch, let title = cell.fileTitleLabel?.text {
-            let longestWordRange = (title.lowercased() as NSString).range(of: literalSearch)
-            let attributedString = NSMutableAttributedString(string: title, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)])
-            attributedString.setAttributes([NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 15), NSAttributedString.Key.foregroundColor: UIColor.systemBlue], range: longestWordRange)
-            cell.fileTitleLabel?.attributedText = attributedString
-        }
 
         // Add TAGS
         cell.setTags(tags: Array(metadata.tags))
@@ -1485,14 +1437,30 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 let (_, heightHeaderRichWorkspace, heightHeaderSection) = getHeaderHeight(section: indexPath.section)
 
                 self.headerMenu = header
+                self.headerMenu?.setViewTransfer(isHidden: true)
+                if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+                    header.setImageSwitchList()
+                    header.buttonSwitch.accessibilityLabel = NSLocalizedString("_list_view_", comment: "")
+                } else {
+                    header.setImageSwitchGrid()
+                    header.buttonSwitch.accessibilityLabel = NSLocalizedString("_grid_view_", comment: "")
+                }
 
                 header.delegate = self
-
+                
                 if !isSearchingMode, headerMenuTransferView, let ocId = NCNetworking.shared.transferInForegorund?.ocId {
                     let text = String(format: NSLocalizedString("_upload_foreground_msg_", comment: ""), NCBrandOptions.shared.brand)
                     header.setViewTransfer(isHidden: false, ocId: ocId, text: text, progress: NCNetworking.shared.transferInForegorund?.progress)
                 } else {
                     header.setViewTransfer(isHidden: true)
+                }
+
+                if headerMenuButtonsView {
+                    header.setStatusButtonsView(enable: !dataSource.getMetadataSourceForAllSections().isEmpty)
+                    header.setButtonsView(height: NCGlobal.shared.heightButtonsView)
+                    header.setSortedTitle(layoutForView?.titleButtonHeader ?? "")
+                } else {
+                    header.setButtonsView(height: 0)
                 }
 
                 header.setRichWorkspaceHeight(heightHeaderRichWorkspace)
@@ -1533,6 +1501,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
             footer.setTitleLabel("")
             footer.setButtonText(NSLocalizedString("_show_more_results_", comment: ""))
+            footer.buttonSection.setTitleColor(NCBrandColor.shared.customer, for: .normal)
             footer.separatorIsHidden(true)
             footer.buttonIsHidden(true)
             footer.hideActivityIndicatorSection()
@@ -1573,7 +1542,6 @@ extension NCCollectionViewCommon: UICollectionViewDelegateFlowLayout {
     func getHeaderHeight() -> CGFloat {
 
         var size: CGFloat = 0
-
         // transfer in progress
         if headerMenuTransferView,
            let metadata = NCManageDatabase.shared.getMetadataFromOcId(NCNetworking.shared.transferInForegorund?.ocId),
@@ -1583,6 +1551,10 @@ extension NCCollectionViewCommon: UICollectionViewDelegateFlowLayout {
             }
         } else {
             NCNetworking.shared.transferInForegorund = nil
+        }
+        
+        if headerMenuButtonsView {
+            size += NCGlobal.shared.heightButtonsView
         }
 
         return size
