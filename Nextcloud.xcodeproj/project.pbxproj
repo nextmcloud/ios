@@ -4354,6 +4354,7 @@
 				F765F73125237E3F00391DBE /* NCRecent.swift in Sources */,
 				F76B3CCE1EAE01BD00921AC9 /* NCBrand.swift in Sources */,
 				F359D8672A7D03420023F405 /* NCUtility+Exif.swift in Sources */,
+				F7581D2425EFDDDF004DC699 /* NCMedia+Menu.swift in Sources */,
 				F738D4902756740100CD1D38 /* NCLoginNavigationController.swift in Sources */,
 				F77B0E981D118A16002130FE /* CCManageAccount.m in Sources */,
 				F769CA192966EA3C00039397 /* ComponentView.swift in Sources */,
