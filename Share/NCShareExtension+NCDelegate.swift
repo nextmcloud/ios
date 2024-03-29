@@ -34,7 +34,7 @@ extension NCShareExtension: NCEmptyDataSetDelegate, NCAccountRequestDelegate {
             view.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
             view.emptyDescription.text = ""
         } else {
-            view.emptyImage.image = UIImage(named: "folder")?.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width)
+            view.emptyImage.image = UIImage(named: "folder")
             view.emptyTitle.text = NSLocalizedString("_files_no_folders_", comment: "")
             view.emptyDescription.text = ""
         }
