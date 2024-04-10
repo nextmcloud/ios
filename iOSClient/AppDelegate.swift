@@ -54,8 +54,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var documentPickerViewController: NCDocumentPickerViewController?
     var timerErrorNetworking: Timer?
     var isAppRefresh: Bool = false
-    var isAppProcessing: Bool = false
-    
+    var isProcessingTask: Bool = false
     var orientationLock = UIInterfaceOrientationMask.all
 
     var isUiTestingEnabled: Bool {
