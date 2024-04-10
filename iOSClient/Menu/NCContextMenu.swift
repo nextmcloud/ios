@@ -35,7 +35,7 @@ class NCContextMenu: NSObject {
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
 
-    func viewMenu(ocId: String, viewController: UIViewController, image: UIImage?) -> UIMenu {
+    func viewMenu(ocId: String, indexPath: IndexPath, viewController: UIViewController, image: UIImage?) -> UIMenu {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return UIMenu() }
 
         var downloadRequest: DownloadRequest?
@@ -43,16 +43,6 @@ class NCContextMenu: NSObject {
         let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
 
         if metadata.directory { titleDeleteConfirmFile = NSLocalizedString("_delete_folder_", comment: "") }
-        if metadataMOV != nil { titleSave = NSLocalizedString("_livephoto_save_", comment: "") }
-        
-        let serverUrl = metadata.serverUrl + "/" + metadata.fileName
-        var isOffline: Bool = false
-
-        if metadata.directory, let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl)) {
-            isOffline = directory.offline
-        } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
-            isOffline = localFile.offline
-        }
 
         let hud = JGProgressHUD()
         hud.indicatorView = JGProgressHUDRingIndicatorView()
@@ -64,13 +54,25 @@ class NCContextMenu: NSObject {
                 request.cancel()
             }
         }
+        
+        var titleSave: String = NSLocalizedString("_save_selected_files_", comment: "")
+        if metadataMOV != nil { titleSave = NSLocalizedString("_livephoto_save_", comment: "") }
+        let serverUrl = metadata.serverUrl + "/" + metadata.fileName
+        var isOffline: Bool = false
+
+        if metadata.directory, let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, serverUrl)) {
+            isOffline = directory.offline
+        } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
+            isOffline = localFile.offline
+        }
 
         // MENU ITEMS
 
-        let detail = UIAction(title: NSLocalizedString("_details_", comment: "")) { _ in
+        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""),
+                              image: UIImage(systemName: "info.circle")) { _ in
             NCActionCenter.shared.openShare(viewController: viewController, metadata: metadata, page: .activity)
         }
-        
+
         let titleOffline = isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: "")
 
         let offline = UIAction(title: titleOffline, image: UIImage(systemName: "tray.and.arrow.down")) { _ in
@@ -81,7 +83,7 @@ class NCContextMenu: NSObject {
         }
         
         let print = UIAction(title: NSLocalizedString("_print_", comment: ""), image: UIImage(systemName: "printer") ) { _ in
-            NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorPrint) { _, _ in }
+            NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint))
         }
         
         let moveCopy = UIAction(title: NSLocalizedString("_move_or_copy_", comment: ""), image: UIImage(systemName: "arrow.up.right.square")) { action in
@@ -124,12 +126,82 @@ class NCContextMenu: NSObject {
         let favorite = UIAction(title: metadata.favorite ?
                                 NSLocalizedString("_remove_favorites_", comment: "") :
                                 NSLocalizedString("_add_favorites_", comment: ""),
-                                image: utility.loadImage(named: metadata.favorite ? "star.slash" : "star", color: NCBrandColor.shared.yellowFavorite)) { _ in
+                                image: utility.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite)) { _ in
             NCNetworking.shared.favoriteMetadata(metadata) { error in
                 if error != .success {
                     NCContentPresenter().showError(error: error)
                 }
             }
+        }
+
+        let openIn = UIAction(title: NSLocalizedString("_open_in_", comment: ""),
+                              image: UIImage(systemName: "square.and.arrow.up") ) { _ in
+            if self.utilityFileSystem.fileProviderStorageExists(metadata) {
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorOpenIn, "error": NKError(), "account": metadata.account])
+            } else {
+                guard let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
+                                                                                               session: NextcloudKit.shared.nkCommonInstance.sessionIdentifierDownload,
+                                                                                               selector: NCGlobal.shared.selectorOpenIn) else { return }
+                hud.show(in: viewController.view)
+                NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: false) {
+                } requestHandler: { request in
+                    downloadRequest = request
+                } progressHandler: { progress in
+                    hud.progress = Float(progress.fractionCompleted)
+                } completion: { afError, error in
+                    DispatchQueue.main.async {
+                        if error == .success || afError?.isExplicitlyCancelledError ?? false {
+                            hud.dismiss()
+                        } else {
+                            hud.indicatorView = JGProgressHUDErrorIndicatorView()
+                            hud.textLabel.text = error.description
+                            hud.dismiss(afterDelay: NCGlobal.shared.dismissAfterSecond)
+                        }
+                    }
+                }
+            }
+        }
+
+        let viewInFolder = UIAction(title: NSLocalizedString("_view_in_folder_", comment: ""),
+                                    image: UIImage(systemName: "arrow.forward.square")) { _ in
+            NCActionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileNameBlink: metadata.fileName, fileNameOpen: nil)
+        }
+
+        let save = UIAction(title: titleSave,
+                            image: UIImage(systemName: "square.and.arrow.down")) { _ in
+            if let metadataMOV = metadataMOV {
+                NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV))
+            } else {
+                if self.utilityFileSystem.fileProviderStorageExists(metadata) {
+                    NCActionCenter.shared.saveAlbum(metadata: metadata)
+                } else {
+                    guard let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
+                                                                                                   session: NextcloudKit.shared.nkCommonInstance.sessionIdentifierDownload,
+                                                                                                   selector: NCGlobal.shared.selectorSaveAlbum) else { return }
+                    hud.show(in: viewController.view)
+                    NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: false) {
+                    } requestHandler: { request in
+                        downloadRequest = request
+                    } progressHandler: { progress in
+                        hud.progress = Float(progress.fractionCompleted)
+                    } completion: { afError, error in
+                        DispatchQueue.main.async {
+                            if error == .success || afError?.isExplicitlyCancelledError ?? false {
+                                hud.dismiss()
+                            } else {
+                                hud.indicatorView = JGProgressHUDErrorIndicatorView()
+                                hud.textLabel.text = error.description
+                                hud.dismiss(afterDelay: NCGlobal.shared.dismissAfterSecond)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        let copy = UIAction(title: NSLocalizedString("_copy_file_", comment: ""),
+                            image: UIImage(systemName: "doc.on.doc")) { _ in
+            NCActionCenter.shared.copyPasteboard(pasteboardOcIds: [metadata.ocId])
         }
 
         let share = UIAction(title: NSLocalizedString("_share_", comment: ""),
@@ -166,21 +238,12 @@ class NCContextMenu: NSObject {
             }
         }
 
-        let viewInFolder = UIAction(title: NSLocalizedString("_view_in_folder_", comment: ""),
-                                    image: UIImage(systemName: "arrow.forward.square")) { _ in
-            NCActionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileNameBlink: metadata.fileName, fileNameOpen: nil)
-        }
 
         let livePhotoSave = UIAction(title: NSLocalizedString("_livephoto_save_", comment: ""),
                                      image: UIImage(systemName: "livephoto")) { _ in
             if let metadataMOV = metadataMOV {
                 NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV))
             }
-        }
-        
-        let copy = UIAction(title: NSLocalizedString("_copy_file_", comment: ""),
-                            image: UIImage(systemName: "doc.on.doc")) { _ in
-            NCActionCenter.shared.copyPasteboard(pasteboardOcIds: [metadata.ocId])
         }
 
         let modify = UIAction(title: NSLocalizedString("_modify_", comment: ""),
@@ -234,7 +297,7 @@ class NCContextMenu: NSObject {
                     } else {
                         NCContentPresenter().showError(error: error)
                     }
-                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteFile, userInfo: ["ocId": ocId, "onlyLocalCache": false, "error": error])
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteFile, userInfo: ["ocId": ocId, "indexPath": [indexPath], "onlyLocalCache": false, "error": error])
                 }
             })
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel) { _ in })
@@ -251,7 +314,7 @@ class NCContextMenu: NSObject {
                 } else {
                     NCContentPresenter().showError(error: error)
                 }
-                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteFile, userInfo: ["ocId": ocId, "onlyLocalCache": true, "error": error])
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteFile, userInfo: ["ocId": ocId, "indexPath": [indexPath], "onlyLocalCache": true, "error": error])
             }
         }
 
@@ -264,14 +327,14 @@ class NCContextMenu: NSObject {
 
         if metadata.directory {
             let serverUrlHome = utilityFileSystem.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId)
-            let isEncryptionDisabled = metadata.isDirectoryUnsettableE2EE
-            let isEncrytptionEnabled = metadata.serverUrl == serverUrlHome && metadata.isDirectoySettableE2EE
+            let isEncryptionDisabled = metadata.canUnsetDirectoryAsE2EE
+            let isEncrytptionEnabled = metadata.serverUrl == serverUrlHome && metadata.canSetDirectoryAsE2EE
             let submenu = UIMenu(title: "", options: .displayInline, children: isEncrytptionEnabled ? [favorite, offline, rename, moveCopy, encrypt, deleteSubMenu] : [favorite, offline, rename, moveCopy, deleteSubMenu])
             let childrenArray = metadata.e2eEncrypted ? ( isEncryptionDisabled ? [offline, decrypt] : (metadata.serverUrl == serverUrlHome) ? [offline] : [offline, deleteSubMenu]) : [detail,submenu]
             return UIMenu(title: "", children: childrenArray)
 
         } else {
-            
+
             var children: [UIMenuElement] = metadata.e2eEncrypted ? [openIn, copy, deleteSubMenu] : [offline, openIn, deleteSubMenu]
 
             if !metadata.lock {
