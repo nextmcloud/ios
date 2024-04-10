@@ -68,7 +68,7 @@ extension NCViewer {
         // FAVORITE
         // Workaround: PROPPATCH doesn't work
         // https://github.com/nextcloud/files_lock/issues/68
-        if !metadata.lock {
+        if !metadata.lock, !metadata.isDirectoryE2EE{
             actions.append(
                 NCMenuAction(
                     title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
@@ -97,9 +97,9 @@ extension NCViewer {
         if !webView, metadata.canShare {
             actions.append(.share(selectedMetadatas: [metadata], viewController: viewController))
         }
-
+        
         //
-        // SAVE LIVE PHOTO
+        // PRINT
         //
         if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata),
            let hudView = viewController.tabBarController?.view {
@@ -124,13 +124,7 @@ extension NCViewer {
                     icon: utility.loadImage(named: "doc.viewfinder", colors: [NCBrandColor.shared.iconImageColor]),
                     action: { _ in
                         if self.utilityFileSystem.fileProviderStorageExists(metadata) {
-                            NotificationCenter.default.post(
-                                name: Notification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile),
-                                object: nil,
-                                userInfo: ["ocId": metadata.ocId,
-                                           "selector": NCGlobal.shared.selectorSaveAsScan,
-                                           "error": NKError(),
-                                           "account": metadata.account])
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorPrint, "error": NKError(), "account": metadata.account])
                         } else {
                             guard let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
                                                                                                            session: NextcloudKit.shared.nkCommonInstance.sessionIdentifierDownload,
@@ -142,11 +136,19 @@ extension NCViewer {
                 )
             )
         }
+        
+        //
+        // SAVE CAMERA ROLL
+        //
+        if !webView, metadata.isSavebleInCameraRoll {
+            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata]))
+        }
+
 
         //
         // RENAME
         //
-        if !webView, metadata.isRenameable {
+        if !webView, metadata.isRenameable, !metadata.isDirectoryE2EE {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
@@ -185,7 +187,7 @@ extension NCViewer {
         }
         // COPY IN PASTEBOARD
         //
-        if !webView, metadata.isCopyableInPasteboard {
+        if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
             actions.append(.copyAction(selectOcId: [metadata.ocId]))
         }
 
@@ -247,7 +249,7 @@ extension NCViewer {
         // DELETE
         //
         if !webView, metadata.isDeletable {
-            actions.append(.deleteAction(selectedMetadatas: [metadata], indexPaths: [], metadataFolder: nil, viewController: viewController))
+            actions.append(.deleteAction(selectedMetadatas: [metadata], indexPath: [], metadataFolder: nil, viewController: viewController))
         }
 
         viewController.presentMenu(with: actions)
