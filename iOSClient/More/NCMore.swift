@@ -358,7 +358,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                 cell.displayName.textColor = .label
             }
             cell.removeCornerRadius()
-
+            cell.icon.isHidden = true
             return cell
 
         } else if section.type == .moreApps {
