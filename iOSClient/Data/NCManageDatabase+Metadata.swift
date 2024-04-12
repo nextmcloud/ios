@@ -211,7 +211,7 @@ extension tableMetadata {
     }
 
     var canSetAsAvailableOffline: Bool {
-        return session.isEmpty && !isDocumentViewableOnly && !isDirectoryE2EE && !e2eEncrypted
+        return session.isEmpty && !isDocumentViewableOnly
     }
 
     var canShare: Bool {
@@ -287,9 +287,7 @@ extension tableMetadata {
 
     // Return if is sharable
     func isSharable() -> Bool {
-        if !NCGlobal.shared.capabilityFileSharingApiEnabled || (NCGlobal.shared.capabilityE2EEEnabled && isDirectoryE2EE) {
-            return false
-        }
+        guard NCGlobal.shared.capabilityE2EEEnabled, !isDirectoryE2EE, !e2eEncrypted else { return false }
         return true
     }
 }
@@ -1164,4 +1162,23 @@ extension NCManageDatabase {
 
         return nil
     }
+    
+    func getMediaMetadatas(predicate: NSPredicate, sorted: String? = nil, ascending: Bool = false) -> ThreadSafeArray<tableMetadata>? {
+
+        do {
+            let realm = try Realm()
+            if let sorted {
+                let results = realm.objects(tableMetadata.self).filter(predicate).sorted(byKeyPath: sorted, ascending: ascending)
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            } else {
+                let results = realm.objects(tableMetadata.self).filter(predicate)
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            }
+        } catch let error as NSError {
+            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+        }
+
+        return nil
+    }
+
 }
