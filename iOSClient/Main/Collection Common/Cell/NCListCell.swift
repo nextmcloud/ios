@@ -260,6 +260,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     func writeInfoDateSize(date: NSDate, size: Int64) {
         labelInfo.text = NCUtility().getRelativeDateTitle(date as Date)
         labelSubinfo.text = NCUtilityFileSystem().transformedSize(size)
+//        labelSubinfo.text = ""
     }
 
     func setAccessibility(label: String, value: String) {
