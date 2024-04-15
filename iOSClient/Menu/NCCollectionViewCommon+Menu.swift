@@ -46,8 +46,6 @@ extension NCCollectionViewCommon {
             isOffline = localFile.offline
         }
 
-        let editors = utility.isDirectEditing(account: metadata.account, contentType: metadata.contentType)
-        let isRichDocument = utility.isRichDocument(metadata)
         let applicationHandle = NCApplicationHandle()
 
         var iconHeader: UIImage!
@@ -131,7 +129,7 @@ extension NCCollectionViewCommon {
         //
         // SET FOLDER E2EE
         //
-        if metadata.isDirectoySettableE2EE && (NCUtilityFileSystem().getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) == appDelegate.activeServerUrl) {
+        if metadata.canSetDirectoryAsE2EE && (NCUtilityFileSystem().getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) == appDelegate.activeServerUrl) {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_e2e_set_folder_encrypted_", comment: ""),
@@ -183,7 +181,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
-                    icon: utility.loadImage(named: metadata.favorite ? "star.slash.fill" : "star.fill", color: NCBrandColor.shared.yellowFavorite),
+                    icon: utility.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite),
                     order: 50,
                     action: { _ in
                         NCNetworking.shared.favoriteMetadata(metadata) { error in
@@ -211,22 +209,36 @@ extension NCCollectionViewCommon {
         if metadata.canShare {
             actions.append(.share(selectedMetadatas: [metadata], viewController: self, order: 80))
         }
+        
+        //
+        // PRINT
+        //
+        if metadata.isPrintable {
+            actions.append(.printAction(metadata: metadata, order: 90))
+        }
+        
+        //
+        // SAVE CAMERA ROLL
+        //
+        if metadata.isSavebleInCameraRoll {
+            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata], order: 100))
+        }
 
         //
         // SAVE LIVE PHOTO
         //
-        if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_livephoto_save_", comment: ""),
-                    icon: NCUtility().loadImage(named: "livephoto"),
-                    order: 100,
-                    action: { _ in
-                        NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV))
-                    }
-                )
-            )
-        }
+//        if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_livephoto_save_", comment: ""),
+//                    icon: NCUtility().loadImage(named: "livephoto"),
+//                    order: 100,
+//                    action: { _ in
+//                        NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV))
+//                    }
+//                )
+//            )
+//        }
 
         //
         // RENAME
@@ -301,7 +313,7 @@ extension NCCollectionViewCommon {
         // DELETE
         //
         if metadata.isDeletable {
-            actions.append(.deleteAction(selectedMetadatas: [metadata], indexPaths: [indexPath], metadataFolder: metadataFolder, viewController: self, order: 170))
+            actions.append(.deleteAction(selectedMetadatas: [metadata], indexPath: [indexPath], metadataFolder: metadataFolder, viewController: self, order: 170))
         }
 
         applicationHandle.addCollectionViewCommonMenu(metadata: metadata, imageIcon: imageIcon, actions: &actions)

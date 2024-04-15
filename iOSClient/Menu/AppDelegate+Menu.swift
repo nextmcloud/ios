@@ -66,11 +66,14 @@ extension AppDelegate {
                         return
                     }
                     navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
-                    Task {
-                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + ".md", account: appDelegate.account, serverUrl: self.activeServerUrl)
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorText
+                        viewController.creatorId = directEditingCreator.identifier
+                        viewController.typeTemplate = NCGlobal.shared.editorText
+                        viewController.serverUrl = appDelegate.activeServerUrl
+                        viewController.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
 
-                        let fileNamePath = NCUtilityFileSystem().getFileNamePath(String(describing: fileName), serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate.urlBase, userId: appDelegate.userId)
-                        self.createTextDocument(fileNamePath: fileNamePath, fileName: String(describing: fileName), creatorId: directEditingCreator.identifier)
+                        appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
                     }
                 })
             )
