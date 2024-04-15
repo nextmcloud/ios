@@ -200,15 +200,15 @@ import RealmSwift
 
         switch NCKeychain().mediaSortDate {
         case "date":
-            return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
+            return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
         case "creationDate":
-            return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "creationDate")
+            return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "creationDate")
         case "uploadDate":
-            return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "uploadDate")
+            return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "uploadDate")
         default:
             break
         }
-        return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
+        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
     }
 
     // MARK: -
