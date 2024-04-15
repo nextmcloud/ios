@@ -58,6 +58,7 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
 
         labelTitle.text = tableShare.shareWithDisplayname
+        labelTitle.textColor = NCBrandColor.shared.label
         isUserInteractionEnabled = true
         switchCanEdit.isHidden = true
         labelCanEdit.isHidden = true

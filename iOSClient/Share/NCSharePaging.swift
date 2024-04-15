@@ -302,7 +302,10 @@ class NCShareHeaderView: UIView {
         if let ownerId = metadata?.ownerId, !ownerId.isEmpty {
             isCurrentUser = NCShareCommon().isCurrentUserIsFileOwner(fileOwnerId: ownerId)
         }
-        let canReshare = NCShareCommon().canReshare(withPermission: metadata?.permissions ?? "")
+        var canReshare: Bool {
+            guard let metadata = metadata else { return true }
+            return ((metadata.sharePermissionsCollaborationServices & NCGlobal.shared.permissionShareShare) != 0)
+        }
         canShareInfoView.isHidden = isCurrentUser
         labelSharingInfo.isHidden = !isCurrentUser
         

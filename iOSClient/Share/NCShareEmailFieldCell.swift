@@ -18,6 +18,8 @@ class NCShareEmailFieldCell: UITableViewCell {
     @IBOutlet weak var labelYourShare: UILabel!
     @IBOutlet weak var labelShareByMail: UILabel!
     @IBOutlet weak var btnContact: UIButton!
+    @IBOutlet weak var labelNoShare: UILabel!
+    @IBOutlet weak var heightLabelNoShare: NSLayoutConstraint!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -65,6 +67,10 @@ class NCShareEmailFieldCell: UITableViewCell {
         btnContact.layer.borderColor = NCBrandColor.shared.label.cgColor
         btnContact.tintColor = NCBrandColor.shared.label
         btnContact.setImage(NCUtility().loadImage(named: "contact").image(color: NCBrandColor.shared.label, size: 24), for: .normal)
+        labelNoShare.textColor = NCBrandColor.shared.textInfo
+        labelNoShare.numberOfLines = 0
+        labelNoShare.font = UIFont.systemFont(ofSize: 17)
+        labelNoShare.text = NSLocalizedString("no_shares_created", comment: "")
     }
     
     @objc func cancelDatePicker() {
