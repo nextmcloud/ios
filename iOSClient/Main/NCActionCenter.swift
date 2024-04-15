@@ -266,36 +266,9 @@ class NCActionCenter: NSObject, UIDocumentInteractionControllerDelegate, NCSelec
             NCActivityIndicator.shared.stop()
 
             if let metadata = metadata, error == .success {
-
-                var pages: [NCBrandOptions.NCInfoPagingTab] = []
-
                 let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
-                let shareViewController = shareNavigationController?.topViewController as? NCSharePaging
-
-                for value in NCBrandOptions.NCInfoPagingTab.allCases {
-                    pages.append(value)
-                }
-
-                if NCGlobal.shared.capabilityActivity.isEmpty, let idx = pages.firstIndex(of: .activity) {
-                    pages.remove(at: idx)
-                }
-                if !metadata.isSharable(), let idx = pages.firstIndex(of: .sharing) {
-                    pages.remove(at: idx)
-                }
-
-                (pages, page) = NCApplicationHandle().filterPages(pages: pages, page: page, metadata: metadata)
-
-                shareViewController?.pages = pages
+                let shareViewController = shareNavigationController?.topViewController as? NCShare
                 shareViewController?.metadata = metadata
-
-                if pages.contains(page) {
-                    shareViewController?.page = page
-                } else if let page = pages.first {
-                    shareViewController?.page = page
-                } else {
-                    return
-                }
-
                 shareNavigationController?.modalPresentationStyle = .formSheet
                 if let shareNavigationController = shareNavigationController {
                     viewController.present(shareNavigationController, animated: true, completion: nil)
