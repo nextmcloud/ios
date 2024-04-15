@@ -48,7 +48,7 @@ extension NCShareExtension: UICollectionViewDelegate {
                 header.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
                 header.emptyDescription.text = ""
             } else {
-                header.emptyImage.image = UIImage(named: "folder")?.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width)
+                header.emptyImage.image = UIImage(named: "folder")
                 header.emptyTitle.text = NSLocalizedString("_files_no_folders_", comment: "")
                 header.emptyDescription.text = ""
             }
@@ -160,6 +160,7 @@ extension NCShareExtension: UICollectionViewDataSource {
         }
 
         cell.labelInfo.text = utility.dateDiff(metadata.date as Date)
+        cell.labelSubinfo.text = " · " + utilityFileSystem.transformedSize(metadata.size)
 
         let lockServerUrl = utilityFileSystem.stringAppendServerUrl(metadata.serverUrl, addFileName: metadata.fileName)
         let tableDirectory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", activeAccount.account, lockServerUrl))
