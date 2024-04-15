@@ -15,6 +15,7 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        568C76D02BCD0822009EE9C7 /* NCMediaCommandView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 568C76CF2BCD0822009EE9C7 /* NCMediaCommandView.xib */; };
         56AB28972B8351720089D373 /* TealiumAutotracking in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28962B8351720089D373 /* TealiumAutotracking */; };
         56AB28992B8351720089D373 /* TealiumCore in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28982B8351720089D373 /* TealiumCore */; };
         56AB289B2B8351720089D373 /* TealiumLifecycle in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB289A2B8351720089D373 /* TealiumLifecycle */; };
@@ -1255,6 +1256,7 @@
 		370D26AE248A3D7A00121797 /* NCCellProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCellProtocol.swift; sourceTree = "<group>"; };
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        568C76CF2BCD0822009EE9C7 /* NCMediaCommandView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCMediaCommandView.xib; sourceTree = "<group>"; };
         566FCF572B3ECD3400168DEA /* TealiumHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
         566FCF582B3ECD3400168DEA /* AdjustHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
         566FCF592B3ECD3400168DEA /* AdjustHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
@@ -3302,6 +3304,7 @@
 		F7EC9CB921185F2000F1C5CE /* Media */ = {
 			isa = PBXGroup;
 			children = (
+                568C76CF2BCD0822009EE9C7 /* NCMediaCommandView.xib */,
 				F720B5B72507B9A5008C94E5 /* Cell */,
 				F7501C302212E57400FB1415 /* NCMedia.storyboard */,
 				F7501C312212E57400FB1415 /* NCMedia.swift */,
@@ -4060,6 +4063,7 @@
 				F72685E727C78E490019EF5E /* InfoPlist.strings in Resources */,
                 566EB7D52B3D71F800FB7CAD /* NCShareHeaderCustomCell.xib in Resources */,
 				F769453C22E9CFFF000A798A /* NCShareUserCell.xib in Resources */,
+                568C76D02BCD0822009EE9C7 /* NCMediaCommandView.xib in Resources */,
 				F7F4F10927ECDBDB008676F9 /* Inconsolata-Bold.ttf in Resources */,
 				F76D3CF52428D0C1005DFA87 /* NCViewerPDF.storyboard in Resources */,
 				F700222C1EC479840080073F /* Custom.xcassets in Resources */,
@@ -4089,7 +4093,6 @@
 				F75D901F2D2BE12E003E740B /* NCRecommendationsCell.xib in Resources */,
                 566FCF292B3EAD0E00168DEA /* FolderPathCustomCell.xib in Resources */,
 				AF93471C27E2361E002537EE /* NCShareAdvancePermissionHeader.xib in Resources */,
-				F7F1E54C2492369A00E42386 /* NCMediaCommandView.xib in Resources */,
                 566EB8072B3D7B5F00FB7CAD /* PdfWithOcrSwitchView.xib in Resources */,
 				F76032A0252F0F8E0015A421 /* NCTransferCell.xib in Resources */,
 				F7F4F10527ECDBDB008676F9 /* Inconsolata-SemiBold.ttf in Resources */,
