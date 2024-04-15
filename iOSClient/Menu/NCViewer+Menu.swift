@@ -58,7 +58,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_view_in_folder_", comment: ""),
-                    icon: utility.loadImage(named: "questionmark.folder"),
+                    icon: utility.loadImage(named: "arrow.forward.square", color: NCBrandColor.shared.iconColor),
                     action: { _ in
                         NCActionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileNameBlink: metadata.fileName, fileNameOpen: nil)
                     }
@@ -70,7 +70,7 @@ extension NCViewer {
         // FAVORITE
         // Workaround: PROPPATCH doesn't work
         // https://github.com/nextcloud/files_lock/issues/68
-        if !metadata.lock {
+        if !metadata.lock, !metadata.isDirectoryE2EE{
             actions.append(
                 NCMenuAction(
                     title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
@@ -106,8 +106,8 @@ extension NCViewer {
         if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_livephoto_save_", comment: ""),
-                    icon: NCUtility().loadImage(named: "livephoto"),
+                    title: NSLocalizedString("_print_", comment: ""),
+                    icon: utility.loadImage(named: "printer", color: NCBrandColor.shared.iconColor),
                     action: { _ in
                         NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV))
                     }
@@ -146,11 +146,11 @@ extension NCViewer {
         //
         // RENAME
         //
-        if !webView, metadata.isRenameable {
+        if !webView, metadata.isRenameable, !metadata.isDirectoryE2EE {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
-                    icon: utility.loadImage(named: "text.cursor"),
+                    icon: utility.loadImage(named: "rename", color: NCBrandColor.shared.iconColor),
                     action: { _ in
 
                         if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
@@ -174,6 +174,13 @@ extension NCViewer {
         //
         if !webView, metadata.isCopyableMovable {
             actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], indexPath: []))
+        }
+
+        //
+        // COPY IN PASTEBOARD
+        //
+        if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
+            actions.append(.copyAction(selectOcId: [metadata.ocId]))
         }
 
         //
@@ -201,7 +208,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_search_", comment: ""),
-                    icon: UIImage(named: "search")!.image(color: UIColor.systemGray, size: 50),
+                    icon: UIImage(named: "search")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                     action: { _ in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuSearchTextPDF)
                     }
@@ -211,7 +218,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_go_to_page_", comment: ""),
-                    icon: utility.loadImage(named: "repeat"),
+                    icon: utility.loadImage(named: "go-to-page", color: NCBrandColor.shared.iconColor),
                     action: { _ in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuGotToPageInPDF)
                     }
@@ -226,7 +233,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_modify_", comment: ""),
-                    icon: utility.loadImage(named: "pencil.tip.crop.circle"),
+                    icon: utility.loadImage(named: "pencil.tip.crop.circle", color: NCBrandColor.shared.iconColor),
                     action: { _ in
                         if self.utilityFileSystem.fileProviderStorageExists(metadata) {
                             NotificationCenter.default.post(
