@@ -24,11 +24,14 @@
 #import "CCAdvanced.h"
 #import "CCUtility.h"
 #import "NCBridgeSwift.h"
+#import "AdjustHelper.h"
 
 @interface CCAdvanced ()
 {
     AppDelegate *appDelegate;
     XLFormSectionDescriptor *sectionSize;
+    TealiumHelper *tealium;
+    AdjustHelper *adjust;
 }
 @end
 
@@ -278,7 +281,7 @@
     self.title = NSLocalizedString(@"_advanced_", nil);
     appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     self.view.backgroundColor = UIColor.systemGroupedBackgroundColor;
-    
+    adjust = [[AdjustHelper alloc] init];
     self.tableView.backgroundColor = UIColor.systemGroupedBackgroundColor;
     
     [self initializeForm];
@@ -378,6 +381,9 @@
         [[NCImageCache shared] createMediaCacheWithAccount:appDelegate.account withCacheSize:true];
 
         [[NCActivityIndicator shared] stop];
+        tealium = [[TealiumHelper alloc] init];
+        [tealium trackEventWithTitle:@"magentacloud-app.settings.reset" data:nil];
+        [adjust trackEvent:ResetsApp];
         [self calculateSize];
     });
 }
@@ -406,6 +412,17 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
+
+- (void)clearAllCacheRequest:(XLFormRowDescriptor *)sender
+{
+    [self deselectFormRow:sender];
+
+    [[NCActivityIndicator shared] startActivityWithBackgroundView:nil style: UIActivityIndicatorViewStyleLarge blurEffect:true];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void) {
+        [self clearCache:nil];
+    });
+}
+
 - (void)calculateSize
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -429,6 +446,9 @@
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:NSLocalizedString(@"_want_exit_", nil) preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alertController addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"_ok_", nil) style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+        tealium = [[TealiumHelper alloc] init];
+        [tealium trackEventWithTitle:@"magentacloud-app.settings.logout" data:nil];
+        [adjust trackEvent:Logout];
         [appDelegate resetApplication];
     }]];
     
