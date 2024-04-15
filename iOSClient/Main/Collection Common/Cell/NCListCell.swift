@@ -246,7 +246,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func selected(_ status: Bool) {
-        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId), !metadata.isInTransfer, !metadata.e2eEncrypted else {
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(objectId), !metadata.isInTransfer else {
             backgroundView = nil
             separator.isHidden = false
             return
@@ -277,7 +277,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
         labelInfo.text = NCUtility().dateDiff(date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
-        labelSubinfo.text = " · " + NCUtilityFileSystem().transformedSize(size)
+        labelSubinfo.text = ""
     }
 
     func setAccessibility(label: String, value: String) {

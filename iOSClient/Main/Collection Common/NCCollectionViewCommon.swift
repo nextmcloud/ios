@@ -596,15 +596,6 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     func setNavigationLeftItems() {
         navigationItem.title = titleCurrentFolder
-
-        guard layoutKey == NCGlobal.shared.layoutViewFiles else { return }
-        navigationItem.leftItemsSupplementBackButton = true
-
-        if titlePreviusFolder != nil {
-            navigationController?.navigationBar.topItem?.title = titlePreviusFolder
-        }
-
-        navigationItem.title = titleCurrentFolder
     }
 
     func getNavigationTitle() -> String {
