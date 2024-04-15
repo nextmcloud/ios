@@ -303,6 +303,7 @@ extension NCLoginWeb: WKNavigationDelegate {
                     if let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() {
                         viewController.modalPresentationStyle = .fullScreen
                         viewController.view.alpha = 0
+                        NCKeychain().setOriginalFileName(key: NCGlobal.shared.keyFileNameOriginalAutoUpload, value: true)
                         self.appDelegate.window?.rootViewController = viewController
                         self.appDelegate.window?.makeKeyAndVisible()
                         UIView.animate(withDuration: 0.5) {
