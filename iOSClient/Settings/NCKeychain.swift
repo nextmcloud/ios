@@ -302,7 +302,20 @@ import KeychainAccess
             keychain["mediaTypeLayout"] = String(newValue)
         }
     }
-
+    
+    var mediaSortDate: String {
+        get {
+            migrate(key: "mediaSortDate")
+            if let value = try? keychain.get("mediaSortDate") {
+                return value
+            }
+            return "date"
+        }
+        set {
+            keychain["mediaSortDate"] = newValue
+        }
+    }
+    
     var textRecognitionStatus: Bool {
         get {
             migrate(key: "textRecognitionStatus")
