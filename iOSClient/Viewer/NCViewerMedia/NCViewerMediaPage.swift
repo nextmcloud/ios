@@ -389,7 +389,8 @@ class NCViewerMediaPage: UIViewController {
 
     @objc func deleteFile(_ notification: NSNotification) {
 
-        guard let userInfo = notification.userInfo as NSDictionary? else { return }
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let error = userInfo["error"] as? NKError else { return }
 
         if let ocIds = userInfo["ocId"] as? [String],
            let ocId = ocIds.first {
@@ -406,6 +407,9 @@ class NCViewerMediaPage: UIViewController {
             if ocId == currentViewController.metadata.ocId {
                 shiftCurrentPage()
             }
+        }
+        if error != .success {
+            NCContentPresenter().showError(error: error)
         }
     }
 

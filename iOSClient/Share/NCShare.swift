@@ -358,19 +358,8 @@ extension NCShare: UITableViewDataSource {
             shares.share?.insert(shareLink, at: 0)
         }
         
-        self.tableView.setEmptyMessage(NSLocalizedString("", comment: ""), isReshared: (metadata?.ownerId != appDelegate?.userId))
         if shares.share != nil {
             numOfRows = shares.share!.count
-        }
-        if numOfRows == 0 {
-            for messageView in self.tableView.subviews.filter({$0.tag == 999}){
-                messageView.removeFromSuperview()
-            }
-            if canReshare {
-                self.tableView.setEmptyMessage(NSLocalizedString("no_shares_created", comment: ""), isReshared: (metadata?.ownerId != appDelegate?.userId))
-            }
-        } else {
-            self.tableView.restore()
         }
         return canReshare ? (numOfRows + 1) : numOfRows
     }
@@ -382,6 +371,8 @@ extension NCShare: UITableViewDataSource {
             cell.searchField.addTarget(self, action: #selector(searchFieldDidChange(textField:)), for: .editingChanged)
             cell.btnCreateLink.addTarget(self, action: #selector(createLinkClicked(_:)), for: .touchUpInside)
             cell.btnContact.addTarget(self, action: #selector(selectContactClicked(_:)), for: .touchUpInside)
+            cell.labelNoShare.isHidden = (shares.share?.count ?? 0) > 0
+            cell.heightLabelNoShare.constant = (shares.share?.count ?? 0) > 0 ? 0 : 25
             return cell
         }
         
@@ -400,7 +391,8 @@ extension NCShare: UITableViewDataSource {
             } else {
                 cell.labelTitle.text = directory ? NSLocalizedString("_share_link_folder_", comment: "") : NSLocalizedString("_share_link_file_", comment: "")
             }
-            if directory || checkIsCollaboraFile() {
+            let isEditingAllowed = shareCommon.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.fileExtension ?? "", shareType: tableShare.shareType)
+            if isEditingAllowed || directory || checkIsCollaboraFile() {
                 cell.btnQuickStatus.isEnabled = true
                 cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
                 cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
@@ -451,7 +443,7 @@ extension NCShare: UITableViewDataSource {
             headerView.imageView.isHidden = true
         } else {
             if metadata?.directory ?? false {
-                let image = (metadata?.e2eEncrypted ?? false) ? UIImage(named: "folderEncrypted") : UIImage(named: "folder")
+                let image = (metadata?.e2eEncrypted ?? false) ? UIImage(named: "folderEncrypted") : UIImage(named: "folder_nmcloud")
                 headerView.imageView.image = image
             } else if !(metadata?.iconName.isEmpty ?? false) {
                 headerView.imageView.image = metadata!.fileExtension == "odg" ? UIImage(named: "file-diagram") : UIImage.init(named: metadata!.iconName)
@@ -472,10 +464,10 @@ extension NCShare: UITableViewDataSource {
         
     }
     func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-        return 320
+        return metadata?.ownerId != appDelegate?.userId ? canReshare ? 400 : 350 : 320
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return metadata?.ownerId != appDelegate?.userId ? 350 : 320
+        return metadata?.ownerId != appDelegate?.userId ? canReshare ? UITableView.automaticDimension : 350 : 320
     }
 }
 
@@ -516,21 +508,3 @@ extension NCShare: CNContactPickerDelegate {
     }
 }
 
-extension UITableView {
-    func setEmptyMessage(_ message: String, isReshared: Bool) {
-        let messageLabel = UILabel(frame: CGRect(x: 16, y: isReshared ? 545 : 515, width: self.bounds.size.width, height: 20))
-        messageLabel.text = message
-        messageLabel.textColor = NCBrandColor.shared.textInfo
-        messageLabel.numberOfLines = 0
-        messageLabel.textAlignment = .center
-        messageLabel.font = UIFont.systemFont(ofSize: 17)
-        messageLabel.tag = 999
-        messageLabel.sizeToFit()
-        self.addSubview(messageLabel)
-    }
-    
-    func restore() {
-        self.backgroundView = nil
-        self.subviews.forEach({ $0.removeFromSuperview() })
-    }
-}

@@ -93,7 +93,7 @@ extension NCMenuAction {
     static func cancelAction(action: @escaping () -> Void) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_cancel_", comment: ""),
-            icon: NCUtility().loadImage(named: "xmark"),
+            icon: NCUtility().loadImage(named: "xmark", color: NCBrandColor.shared.iconColor),
             action: { _ in action() }
         )
     }
@@ -119,17 +119,17 @@ extension NCMenuAction {
 
         if selectedMetadatas.count > 1 {
             titleDelete = NSLocalizedString("_delete_selected_files_", comment: "")
-            destructive = true
+            destructive = false
         } else if let metadata = selectedMetadatas.first {
             if NCManageDatabase.shared.isMetadataShareOrMounted(metadata: metadata, metadataFolder: metadataFolder) {
                 titleDelete = NSLocalizedString("_leave_share_", comment: "")
                 icon = "person.2.slash"
             } else if metadata.directory {
                 titleDelete = NSLocalizedString("_delete_folder_", comment: "")
-                destructive = true
+                destructive = false
             } else {
                 titleDelete = NSLocalizedString("_delete_file_", comment: "")
-                destructive = true
+                destructive = false
             }
 
             if let metadataFolder = metadataFolder {
@@ -167,9 +167,9 @@ extension NCMenuAction {
                             for metadata in selectedMetadatas where error == .success {
                                 NCActivityIndicator.shared.start()
                                 error = await NCNetworking.shared.deleteMetadata(metadata, onlyLocalCache: false)
+                                NCActivityIndicator.shared.stop()
                                 if error == .success {
                                     ocId.append(metadata.ocId)
-                                    NCActivityIndicator.shared.stop()
                                 }
                             }
                             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteFile, userInfo: ["ocId": ocId, "indexPath": indexPath, "onlyLocalCache": false, "error": error])
@@ -200,6 +200,19 @@ extension NCMenuAction {
                 }
                 alertController.addAction(UIAlertAction(title: NSLocalizedString("_no_delete_", comment: ""), style: .default) { (_: UIAlertAction) in })
                 viewController.present(alertController, animated: true, completion: nil)
+            }
+        )
+    }
+    
+    /// Open "share view" (activity VC) to open files in another app
+    static func openInAction(selectedMetadatas: [tableMetadata], viewController: UIViewController, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
+        NCMenuAction(
+            title: NSLocalizedString("_open_in_", comment: ""),
+            icon: NCUtility().loadImage(named: "open_file",color: NCBrandColor.shared.iconColor),
+            order: order,
+            action: { _ in
+                NCActionCenter.shared.openActivityViewController(selectedMetadata: selectedMetadatas)
+                completion?()
             }
         )
     }
@@ -297,7 +310,7 @@ extension NCMenuAction {
                 if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
                     NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorPrint, "error": NKError(), "account": metadata.account])
                 } else {
-                    NCNetworking.shared.download(metadata: metadata, selector: NCGlobal.shared.selectorPrint) { _, _ in }
+                    NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint))
                 }
             }
         )

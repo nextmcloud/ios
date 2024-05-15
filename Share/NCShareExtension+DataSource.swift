@@ -134,6 +134,7 @@ extension NCShareExtension: UICollectionViewDataSource {
         }
 
         cell.labelInfo.text = utility.dateDiff(metadata.date as Date)
+        cell.labelSubinfo.text = " · " + utilityFileSystem.transformedSize(metadata.size)
 
         let lockServerUrl = utilityFileSystem.stringAppendServerUrl(metadata.serverUrl, addFileName: metadata.fileName)
         let tableDirectory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", activeAccount.account, lockServerUrl))

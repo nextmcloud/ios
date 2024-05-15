@@ -35,7 +35,7 @@ class NCOffline: NCCollectionViewCommon {
         layoutKey = NCGlobal.shared.layoutViewOffline
         enableSearchBar = false
         headerRichWorkspaceDisable = true
-        emptyImage = UIImage(named: "folder")
+        emptyImage = UIImage(named: "folder_nmcloud")
         emptyTitle = "_files_no_files_"
         emptyDescription = "_tutorial_offline_view_"
     }

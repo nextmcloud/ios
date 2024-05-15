@@ -61,6 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var isAppProcessing: Bool = false
     
     var orientationLock = UIInterfaceOrientationMask.all
+    var isProcessingTask: Bool = false
 
     var isUiTestingEnabled: Bool {
         return ProcessInfo.processInfo.arguments.contains("UI_TESTING")

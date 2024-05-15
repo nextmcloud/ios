@@ -711,7 +711,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             
             let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
             
-            metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
+            metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
             metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
             metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
             
@@ -771,7 +771,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         
         let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
         
-        metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
+        metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
         metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
         metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
         
@@ -843,7 +843,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 
                 let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
                 
-                metadataForUpload.session = NCNetworking.shared.sessionIdentifierBackground
+                metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
                 metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
                 metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
                 
@@ -881,7 +881,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                         }
  
                         NCManageDatabase.shared.addMetadata(metadataForUpload)
-                        NCNetworkingProcessUpload.shared.createProcessUploads(metadatas: [metadataForUpload], completion: { _ in })
+                        NCNetworkingProcess.shared.createProcessUploads(metadatas: [metadataForUpload], completion: { _ in })
                     }
                 }
                 
@@ -1099,7 +1099,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
         NCActivityIndicator.shared.stop()
 
-        NCNetworkingProcessUpload.shared.createProcessUploads(metadatas: [metadata], completion: { _ in })
+        NCNetworkingProcess.shared.createProcessUploads(metadatas: [metadata], completion: { _ in })
 
         // Request delete all image scanned
         let alertController = UIAlertController(title: "", message: NSLocalizedString("_delete_all_scanned_images_", comment: ""), preferredStyle: .alert)

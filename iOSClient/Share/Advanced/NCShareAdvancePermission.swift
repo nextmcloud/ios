@@ -29,6 +29,8 @@ import CloudKit
 class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelegate, NCShareDetail {
     func dismissShareAdvanceView(shouldSave: Bool) {
         if shouldSave {
+            self.oldTableShare?.permissions = self.permission ?? (self.oldTableShare?.permissions ?? 0)
+            self.share.permissions = self.permission ?? (self.oldTableShare?.permissions ?? 0)
             if isNewShare {
                 let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
                 guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
@@ -76,6 +78,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
     }()
     static let displayDateFormat = "dd. MMM. yyyy"
     var downloadLimit: DownloadLimit?
+    var permission: Int?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -84,6 +87,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         // disbale pull to dimiss
         isModalInPresentation = true
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+        self.permission = oldTableShare?.permissions
         initializeForm()
         changeTheming()
         getDownloadLimit()
@@ -183,12 +187,12 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_read_only_", comment: "")
         row.height = 44
         
-        if let permission = oldTableShare?.permissions, !CCUtility.isAnyPermission(toEdit: permission), permission !=  NCGlobal.shared.permissionCreateShare {
+        if let permission = self.permission, !CCUtility.isAnyPermission(toEdit: permission), permission !=  NCGlobal.shared.permissionCreateShare {
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
         }
         if isNewShare {
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-            share.permissions = NCGlobal.shared.permissionReadShare
+            self.permission = NCGlobal.shared.permissionReadShare
         }
         section.addFormRow(row)
         
@@ -198,7 +202,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellEditing", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_allow_editing_", comment: "")
         row.height = 44
-        if let permission = oldTableShare?.permissions {
+        if let permission = self.permission {
             if CCUtility.isAnyPermission(toEdit: permission), permission != NCGlobal.shared.permissionCreateShare {
                 row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
             }
@@ -221,7 +225,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
             row = XLFormRowDescriptor(tag: "NCFilePermissionCellFileDrop", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
             row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_file_drop_", comment: "")
-            if oldTableShare?.permissions == NCGlobal.shared.permissionCreateShare {
+            if self.permission == NCGlobal.shared.permissionCreateShare {
                 row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
             }
             row.height = 44
@@ -455,8 +459,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         case "NCFilePermissionCellRead":
 
             let value = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: canReshareTheShare(), andIsFolder: metadata.directory)
-            share.permissions = value
-            self.oldTableShare?.permissions = value
+            self.permission = value
 //            self.permissions = "RDNVCK"
             metadata.permissions = "RDNVCK"
             if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
@@ -473,8 +476,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             break
         case "kNMCFilePermissionCellEditing":
              let value = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: canReshareTheShare(), andIsFolder: metadata.directory)
-            share.permissions = value
-            self.oldTableShare?.permissions = value
+            self.permission = value
 //            self.permissions = "RGDNV"
             metadata.permissions = "RGDNV"
             if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
@@ -489,9 +491,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             self.reloadForm()
             break
         case "NCFilePermissionCellFileDrop":
-            share.permissions = NCGlobal.shared.permissionCreateShare
-
-            self.oldTableShare?.permissions = NCGlobal.shared.permissionCreateShare
+            self.permission = NCGlobal.shared.permissionCreateShare
 //            self.permissions = "RGDNVCK"
             metadata.permissions = "RGDNVCK"
             if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
@@ -511,7 +511,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
     }
 
     func canReshareTheShare() -> Bool {
-        if let permissionValue = oldTableShare?.permissions {
+        if let permissionValue = self.permission {
             let canReshare = CCUtility.isPermission(toCanShare: permissionValue)
             return canReshare
         } else {
@@ -532,7 +532,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             if let canReShareRowIndexPath = form.indexPath(ofFormRow: canReshareRow), indexPath == canReShareRowIndexPath {
                 let cell = cell as? NCFilePermissionEditCell
                 // Can reshare (file)
-                if let permissionValue = oldTableShare?.permissions {
+                if let permissionValue = self.permission {
                     let canReshare = CCUtility.isPermission(toCanShare: permissionValue)
                     cell?.switchControl.isOn = canReshare
                 } else {
@@ -546,9 +546,9 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             if let hideDownloadRowIndexPath = form.indexPath(ofFormRow: hideDownloadRow), indexPath == hideDownloadRowIndexPath {
                 let cell = cell as? NCFilePermissionEditCell
                 cell?.switchControl.isOn = oldTableShare?.hideDownload ?? false
-                cell?.titleLabel.isEnabled = !(share.permissions == NCGlobal.shared.permissionCreateShare)
-                cell?.switchControl.isEnabled = !(share.permissions == NCGlobal.shared.permissionCreateShare)
-                cell?.isUserInteractionEnabled = !(share.permissions == NCGlobal.shared.permissionCreateShare)
+                cell?.titleLabel.isEnabled = !(self.permission == NCGlobal.shared.permissionCreateShare)
+                cell?.switchControl.isEnabled = !(self.permission == NCGlobal.shared.permissionCreateShare)
+                cell?.isUserInteractionEnabled = !(self.permission == NCGlobal.shared.permissionCreateShare)
             }
 
             // set password
@@ -743,39 +743,33 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
     
     func canReshareValueChanged(isOn: Bool) {
         
-        guard let oldTableShare = oldTableShare else {
-            self.oldTableShare?.permissions = 0
-            self.share.permissions = isOn ? self.share.permissions + NCGlobal.shared.permissionShareShare : self.share.permissions
+        guard let oldTableShare = oldTableShare, let permission = self.permission else {
+            self.permission = isOn ? (self.permission ?? 0) + NCGlobal.shared.permissionShareShare : ((self.permission ?? 0) - NCGlobal.shared.permissionShareShare)
             return
         }
 
-        let canEdit = CCUtility.isAnyPermission(toEdit: oldTableShare.permissions)
-        let canCreate = CCUtility.isPermission(toCanCreate: oldTableShare.permissions)
-        let canChange = CCUtility.isPermission(toCanChange: oldTableShare.permissions)
-        let canDelete = CCUtility.isPermission(toCanDelete: oldTableShare.permissions)
-        
-        var permission: Int = 0
-        
+        let canEdit = CCUtility.isAnyPermission(toEdit: permission)
+        let canCreate = CCUtility.isPermission(toCanCreate: permission)
+        let canChange = CCUtility.isPermission(toCanChange: permission)
+        let canDelete = CCUtility.isPermission(toCanDelete: permission)
+
         if metadata.directory {
-            permission = CCUtility.getPermissionsValue(byCanEdit: canEdit, andCanCreate: canCreate, andCanChange: canChange, andCanDelete: canDelete, andCanShare: isOn, andIsFolder: metadata.directory)
+            self.permission = CCUtility.getPermissionsValue(byCanEdit: canEdit, andCanCreate: canCreate, andCanChange: canChange, andCanDelete: canDelete, andCanShare: isOn, andIsFolder: metadata.directory)
         } else {
             if isOn {
                 if canEdit {
-                    permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: isOn, andIsFolder: metadata.directory)
+                    self.permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: isOn, andIsFolder: metadata.directory)
                 } else {
-                    permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: isOn, andIsFolder: metadata.directory)
+                    self.permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: isOn, andIsFolder: metadata.directory)
                 }
             } else {
                 if canEdit {
-                    permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: isOn, andIsFolder: metadata.directory)
+                    self.permission = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: isOn, andIsFolder: metadata.directory)
                 } else {
-                    permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: isOn, andIsFolder: metadata.directory)
+                    self.permission = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: isOn, andIsFolder: metadata.directory)
                 }
             }
         }
-        self.oldTableShare?.permissions = permission
-        self.share.permissions = permission
-
     }
     
     func getDownloadLimit() {

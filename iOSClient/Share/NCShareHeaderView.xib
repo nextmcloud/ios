@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_0" orientation="landscape" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="TDY-ks-6hi" customClass="NCShareHeaderView" customModule="Nextcloud" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="568" height="320"/>
+            <rect key="frame" x="0.0" y="0.0" width="568" height="328"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="CWj-wC-6qD">
@@ -149,7 +149,9 @@
                 <constraint firstItem="Dby-Yw-78V" firstAttribute="centerY" secondItem="8tP-kD-Zys" secondAttribute="centerY" constant="-2" id="lF9-mw-7fO"/>
                 <constraint firstAttribute="trailing" secondItem="uak-Tf-gT0" secondAttribute="trailing" constant="16" id="rR8-aj-wjq"/>
                 <constraint firstItem="NSg-Hz-WD7" firstAttribute="leading" secondItem="8tP-kD-Zys" secondAttribute="leading" id="tfx-gG-hpU"/>
+                <constraint firstAttribute="bottom" secondItem="bL7-OV-YKy" secondAttribute="bottom" id="wn8-se-fbn"/>
             </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="canShareInfoView" destination="bL7-OV-YKy" id="Ysb-c2-2gd"/>
                 <outlet property="constraintTopSharingLabel" destination="B6W-QZ-t5G" id="wig-2x-H9i"/>
@@ -164,11 +166,11 @@
                 <outlet property="sharedByImageView" destination="gIl-2Q-ydC" id="CHg-ph-xKh"/>
                 <outlet property="sharedByLabel" destination="7FE-yQ-NiB" id="7yf-SK-jJt"/>
             </connections>
-            <point key="canvasLocation" x="37.5" y="252.46478873239437"/>
+            <point key="canvasLocation" x="42.25352112676056" y="258.75"/>
         </view>
     </objects>
     <resources>
-        <image name="cloudUpload" width="425" height="425"/>
+        <image name="cloudUpload" width="500" height="500"/>
         <image name="favorite" width="315" height="315"/>
     </resources>
 </document>

@@ -228,7 +228,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
             view.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
             view.emptyDescription.text = ""
         } else {
-            view.emptyImage.image = UIImage(named: "folder")
+            view.emptyImage.image = UIImage(named: "folder_nmcloud")
             if includeImages {
                 view.emptyTitle.text = NSLocalizedString("_files_no_files_", comment: "")
             } else {
@@ -423,7 +423,7 @@ extension NCSelect: UICollectionViewDataSource {
         if layoutForView?.layout == NCGlobal.shared.layoutList {
 
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as! NCListCell
-            cell.delegate = self
+            cell.listCellDelegate = self
 
             cell.fileObjectId = metadata.ocId
             cell.fileUser = metadata.ownerId
@@ -464,6 +464,7 @@ extension NCSelect: UICollectionViewDataSource {
                 cell.imageItem.image = cell.imageItem.image?.colorizeFolder(metadata: metadata)
 
                 cell.labelInfo.text = utility.dateDiff(metadata.date as Date)
+                cell.labelSubinfo.text = " · " + utilityFileSystem.transformedSize(metadata.size)
 
             } else {
 
@@ -522,7 +523,7 @@ extension NCSelect: UICollectionViewDataSource {
         if layoutForView?.layout == NCGlobal.shared.layoutGrid {
 
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as! NCGridCell
-            cell.delegate = self
+            cell.gridCellDelegate = self
 
             cell.fileObjectId = metadata.ocId
             cell.fileUser = metadata.ownerId
@@ -537,7 +538,7 @@ extension NCSelect: UICollectionViewDataSource {
             cell.imageItem.image = nil
             cell.imageItem.backgroundColor = nil
 
-            cell.progressView.progress = 0.0
+//            cell.progressView.progress = 0.0
 
             if metadata.directory {
 
@@ -597,9 +598,14 @@ extension NCSelect: UICollectionViewDataSource {
             let (_, heightHeaderRichWorkspace, _) = getHeaderHeight(section: indexPath.section)
 
             self.headerMenu = header
+            if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+                header.setImageSwitchList()
+                header.setImageSwitchGrid()
+                header.buttonSwitch.accessibilityLabel = NSLocalizedString("_grid_view_", comment: "")
+            }
 
             header.delegate = self
-//            header.setButtonsView(height: 0)
+            header.setButtonsView(height: 0)
             header.setRichWorkspaceHeight(heightHeaderRichWorkspace)
             header.setRichWorkspaceText(richWorkspaceText)
             header.setViewTransfer(isHidden: true)
@@ -655,7 +661,7 @@ extension NCSelect: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
 
         let (heightHeaderCommands, heightHeaderRichWorkspace, heightHeaderSection) = getHeaderHeight(section: section)
-        let heightHeader = heightHeaderCommands + heightHeaderRichWorkspace + heightHeaderSection
+        let heightHeader = typeOfCommandView == .copyMove ? 0 : heightHeaderCommands + heightHeaderRichWorkspace + heightHeaderSection
 
         return CGSize(width: collectionView.frame.width, height: heightHeader)
     }

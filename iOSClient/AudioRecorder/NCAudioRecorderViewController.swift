@@ -52,17 +52,14 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
         view.backgroundColor = .clear
         contentContainerView.backgroundColor = UIColor.lightGray
         voiceRecordHUD.fillColor = NCBrandColor.shared.progressColorGreen60
-
-        Task {
-            self.fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + ".m4a", account: self.appDelegate.account, serverUrl: self.appDelegate.activeServerUrl)
-            recording = NCAudioRecorder(to: self.fileName)
-            recording.delegate = self
-            do {
-                try self.recording.prepare()
-                startStopLabel.text = NSLocalizedString("_voice_memo_start_", comment: "")
-            } catch {
-                print(error)
-            }
+        self.fileName = NCUtilityFileSystem().createFileNameDate(NSLocalizedString("_voice_memo_filename_", comment: ""), ext: "m4a")
+        recording = NCAudioRecorder(to: self.fileName)
+        recording.delegate = self
+        do {
+            try self.recording.prepare()
+            startStopLabel.text = NSLocalizedString("_voice_memo_start_", comment: "")
+        } catch {
+            print(error)
         }
     }
 
@@ -92,8 +89,12 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
         if recording.state == .record {
             recording.stop()
             voiceRecordHUD.update(0.0)
-            dismiss(animated: true) {
-                self.uploadMetadata()
+            dismiss(animated: true) { [self] in
+                guard let navigationController = UIStoryboard(name: "NCCreateFormUploadVoiceNote", bundle: nil).instantiateInitialViewController() as? UINavigationController,
+                      let viewController = navigationController.topViewController as? NCCreateFormUploadVoiceNote else { return }
+                navigationController.modalPresentationStyle = .formSheet
+                viewController.setup(serverUrl: self.appDelegate.activeServerUrl, fileNamePath: NSTemporaryDirectory() + self.fileName, fileName: self.fileName)
+                self.appDelegate.window?.rootViewController?.present(navigationController, animated: true)
             }
         } else {
             do {

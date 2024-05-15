@@ -40,7 +40,7 @@ class NCFiles: NCCollectionViewCommon {
         enableSearchBar = true
         headerRichWorkspaceDisable = false
         headerMenuTransferView = true
-        emptyImage = UIImage(named: "folder")
+        emptyImage = UIImage(named: "folder_nmcloud")
         emptyTitle = "_files_no_files_"
         emptyDescription = "_no_file_pull_down_"
     }

@@ -5,3 +5,4 @@ NSPhotoLibraryUsageDescription = "Photo library access is required to upload you
 NSPhotoLibraryAddUsageDescription = "Photo library access is required to upload your photos and videos to your cloud.";
 NSMicrophoneUsageDescription = "Microphone access is required to create voice notes.";
 NSLocationWhenInUseUsageDescription = "The app will show your location on a map.";
+NSUserTrackingUsageDescription = "Telekom uses the Apple Advertising ID to optimize and further develop the functionality of the app based on user needs, to correct any errors and to show you targeted advertising in the app and on third-party sites. You can revoke your consent at any time in the operating system.";

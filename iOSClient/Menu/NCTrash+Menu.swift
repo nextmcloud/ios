@@ -119,7 +119,7 @@ extension NCTrash {
             iconHeader = icon
         } else {
             if tableTrash.directory {
-                iconHeader = UIImage(named: "folder")
+                iconHeader = UIImage(named: "folder_nmcloud")
             } else {
                 iconHeader = UIImage(named: tableTrash.iconName)
             }

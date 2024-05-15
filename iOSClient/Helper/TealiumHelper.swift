@@ -18,7 +18,7 @@ class TealiumHelper: NSObject {
     static let shared = TealiumHelper()
     let config = TealiumConfig(account: "telekom",
                                profile: "magentacloud-app",
-                               environment: "dev")
+                               environment: "prod")
     var tealium: Tealium?
 
     @objc override init() {

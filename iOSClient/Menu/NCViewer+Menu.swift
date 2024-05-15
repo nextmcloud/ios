@@ -59,7 +59,7 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
-                    icon: utility.loadImage(named: metadata.favorite ? "star.slash.fill" : "star.fill", color: NCBrandColor.shared.yellowFavorite),
+                    icon: utility.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite),
                     action: { _ in
                         NCNetworking.shared.favoriteMetadata(metadata) { error in
                             if error != .success {
@@ -84,49 +84,33 @@ extension NCViewer {
         if !webView, metadata.canShare {
             actions.append(.share(selectedMetadatas: [metadata], viewController: viewController))
         }
-
+        
         //
-        // SAVE LIVE PHOTO
+        // PRINT
         //
-        if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
+        if !webView, metadata.isPrintable {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_print_", comment: ""),
                     icon: utility.loadImage(named: "printer", color: NCBrandColor.shared.iconColor),
                     action: { _ in
-                        NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV))
-                    }
-                )
-            )
-        }
-
-        //
-        // SAVE AS SCAN
-        //
-        if !webView, metadata.isSavebleAsImage {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_save_as_scan_", comment: ""),
-                    icon: utility.loadImage(named: "doc.viewfinder"),
-                    action: { _ in
                         if self.utilityFileSystem.fileProviderStorageExists(metadata) {
-                            NotificationCenter.default.post(
-                                name: Notification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile),
-                                object: nil,
-                                userInfo: ["ocId": metadata.ocId,
-                                           "selector": NCGlobal.shared.selectorSaveAsScan,
-                                           "error": NKError(),
-                                           "account": metadata.account])
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorPrint, "error": NKError(), "account": metadata.account])
                         } else {
-                            guard let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
-                                                                                                           session: NextcloudKit.shared.nkCommonInstance.sessionIdentifierDownload,
-                                                                                                           selector: NCGlobal.shared.selectorSaveAsScan) else { return }
-                            NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
+                            NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint))
                         }
                     }
                 )
             )
         }
+        
+        //
+        // SAVE CAMERA ROLL
+        //
+        if !webView, metadata.isSavebleInCameraRoll {
+            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata]))
+        }
+
 
         //
         // RENAME
@@ -165,29 +149,6 @@ extension NCViewer {
         // COPY IN PASTEBOARD
         //
         if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
-            actions.append(.copyAction(selectOcId: [metadata.ocId]))
-        }
-
-        //
-        // DOWNLOAD FULL RESOLUTION
-        //
-        if !webView, metadata.session.isEmpty, !self.utilityFileSystem.fileProviderStorageExists(metadata) {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_try_download_full_resolution_", comment: ""),
-                    icon: utility.loadImage(named: "photo"),
-                    action: { _ in
-                        guard let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
-                                                                                                       session: NextcloudKit.shared.nkCommonInstance.sessionIdentifierDownload,
-                                                                                                       selector: "") else { return }
-                        NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
-                    }
-                )
-            )
-        }
-        // COPY IN PASTEBOARD
-        //
-        if !webView, metadata.isCopyableInPasteboard {
             actions.append(.copyAction(selectOcId: [metadata.ocId]))
         }
 
@@ -248,7 +209,7 @@ extension NCViewer {
         // DELETE
         //
         if !webView, metadata.isDeletable {
-            actions.append(.deleteAction(selectedMetadatas: [metadata], indexPaths: [], metadataFolder: nil, viewController: viewController))
+            actions.append(.deleteAction(selectedMetadatas: [metadata], indexPath: [], metadataFolder: nil, viewController: viewController))
         }
 
         viewController.presentMenu(with: actions)

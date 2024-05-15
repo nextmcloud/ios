@@ -197,18 +197,7 @@ import RealmSwift
         guard let tableAccount = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", account)) else { return nil }
         let startServerUrl = NCUtilityFileSystem().getHomeServer(urlBase: tableAccount.urlBase, userId: tableAccount.userId) + tableAccount.mediaPath
         let predicateBoth = NSPredicate(format: showBothPredicateMediaString, account, startServerUrl)
-
-        switch NCKeychain().mediaSortDate {
-        case "date":
-            return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
-        case "creationDate":
-            return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "creationDate")
-        case "uploadDate":
-            return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "uploadDate")
-        default:
-            break
-        }
-        return NCManageDatabase.shared.getResultsMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
+        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
     }
 
     // MARK: -
@@ -291,12 +280,12 @@ import RealmSwift
 
         let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
         images.folderEncrypted = UIImage(named: "folderEncrypted")!
-        images.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
-        images.folderPublic = UIImage(named: "folder_public")!
+        images.folderSharedWithMe = UIImage(named: "folder-share")!
+        images.folderPublic = UIImage(named: "folder-share")!
         images.folderGroup = UIImage(named: "folder_group")!
         images.folderExternal = UIImage(named: "folder_external")!
-        images.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!
-        images.folder = UIImage(named: "folder")!
+        images.folderAutomaticUpload = UIImage(named: "folder-photo")!
+        images.folder = UIImage(named: "folder_nmcloud")!
 
         images.iconContacts = UIImage(named: "icon-contacts")!.image(color: brandElement, size: folderWidth)
         images.iconTalk = UIImage(named: "icon-talk")!.image(color: brandElement, size: folderWidth)

@@ -36,6 +36,7 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
     @IBOutlet weak var menuButton: UIButton!
     @IBOutlet weak var gradientView: UIView!
 
+    var mediaCommandView: NCMediaCommandView?
     var activeAccount = tableAccount()
     var emptyDataSet: NCEmptyDataSet?
     var documentPickerViewController: NCDocumentPickerViewController?
@@ -50,6 +51,7 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
     var isTop: Bool = true
     var isEditMode = false
     var selectOcId: [String] = []
+    internal var selectIndexPath: [IndexPath] = []
     var attributesZoomIn: UIMenuElement.Attributes = []
     var attributesZoomOut: UIMenuElement.Attributes = []
     let gradient: CAGradientLayer = CAGradientLayer()
@@ -91,21 +93,24 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         playImage = utility.loadImage(named: "play.fill", color: .white)
 
         titleDate.text = ""
+        titleDate.isHidden = true
+        menuButton.isHidden = true
+        setupMediaCommandView()
 
-        selectOrCancelButton.backgroundColor = .clear
-        selectOrCancelButton.layer.cornerRadius = 15
-        selectOrCancelButton.layer.masksToBounds = true
-        selectOrCancelButton.setTitle( NSLocalizedString("_select_", comment: ""), for: .normal)
-        selectOrCancelButton.addBlur(style: .systemThinMaterial)
+//        selectOrCancelButton.backgroundColor = .clear
+//        selectOrCancelButton.layer.cornerRadius = 15
+//        selectOrCancelButton.layer.masksToBounds = true
+//        selectOrCancelButton.setTitle( NSLocalizedString("_select_", comment: ""), for: .normal)
+//        selectOrCancelButton.addBlur(style: .systemThinMaterial)
 
-        menuButton.backgroundColor = .clear
-        menuButton.layer.cornerRadius = 15
-        menuButton.layer.masksToBounds = true
-        menuButton.showsMenuAsPrimaryAction = true
-        menuButton.configuration = UIButton.Configuration.plain()
-        menuButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
-        menuButton.changesSelectionAsPrimaryAction = false
-        menuButton.addBlur(style: .systemThinMaterial)
+//        menuButton.backgroundColor = .clear
+//        menuButton.layer.cornerRadius = 15
+//        menuButton.layer.masksToBounds = true
+//        menuButton.showsMenuAsPrimaryAction = true
+//        menuButton.configuration = UIButton.Configuration.plain()
+//        menuButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+//        menuButton.changesSelectionAsPrimaryAction = false
+//        menuButton.addBlur(style: .systemThinMaterial)
 
         gradient.startPoint = CGPoint(x: 0, y: 0.1)
         gradient.endPoint = CGPoint(x: 0, y: 1)
@@ -277,6 +282,109 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
             videoImage = image
         }
     }
+    
+    // MARK: - Command
+    
+    func setupMediaCommandView() {
+        mediaCommandView?.title.text = ""
+        
+        mediaCommandView = Bundle.main.loadNibNamed("NCMediaCommandView", owner: self, options: nil)?.first as? NCMediaCommandView
+        self.view.addSubview(mediaCommandView!)
+        mediaCommandView?.mediaView = self
+        updateZoomButton()
+        mediaCommandView?.collapseControlButtonView(true)
+        mediaCommandView?.translatesAutoresizingMaskIntoConstraints = false
+        mediaCommandView?.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
+        mediaCommandView?.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+        mediaCommandView?.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+        mediaCommandView?.heightAnchor.constraint(equalToConstant: 150).isActive = true
+        self.updateMediaControlVisibility()
+    }
+    
+    @objc func zoomOutGrid() {
+        UIView.animate(withDuration: 0.0, animations: {
+            NCKeychain().mediaColumnCount += 1
+            if CGFloat(NCKeychain().mediaColumnCount) >= self.maxImageGrid - 1 {
+                self.attributesZoomIn = []
+                self.attributesZoomOut = .disabled
+                self.mediaCommandView?.zoomOutButton.isEnabled = false
+            } else if NCKeychain().mediaColumnCount <= 1 {
+                self.attributesZoomIn = .disabled
+                self.attributesZoomOut = []
+                self.mediaCommandView?.zoomInButton.isEnabled = false
+            } else {
+                self.mediaCommandView?.zoomOutButton.isEnabled = true
+                self.mediaCommandView?.zoomInButton.isEnabled = true
+                self.attributesZoomIn = []
+                self.attributesZoomOut = []
+            }
+//            self.updateZoomButton()
+            self.collectionViewReloadData()
+        })
+    }
+
+    @objc func zoomInGrid() {
+        UIView.animate(withDuration: 0.0, animations: {
+            NCKeychain().mediaColumnCount -= 1
+            if CGFloat(NCKeychain().mediaColumnCount) >= self.maxImageGrid - 1 {
+                self.attributesZoomIn = []
+                self.attributesZoomOut = .disabled
+                self.mediaCommandView?.zoomOutButton.isEnabled = false
+            } else if NCKeychain().mediaColumnCount <= 1 {
+                self.attributesZoomIn = .disabled
+                self.attributesZoomOut = []
+                self.mediaCommandView?.zoomInButton.isEnabled = false
+            } else {
+                self.mediaCommandView?.zoomOutButton.isEnabled = true
+                self.mediaCommandView?.zoomInButton.isEnabled = true
+                self.attributesZoomIn = []
+                self.attributesZoomOut = []
+            }
+//            self.updateZoomButton()
+            self.collectionViewReloadData()
+        })
+    }
+    
+    func updateMediaControlVisibility() {
+
+        if let metadatas = self.metadatas, metadatas.isEmpty {
+            if !self.showOnlyImages && !self.showOnlyVideos {
+                self.mediaCommandView?.toggleEmptyView(isEmpty: true)
+                self.mediaCommandView?.isHidden = false
+            } else {
+                self.mediaCommandView?.toggleEmptyView(isEmpty: true)
+                self.mediaCommandView?.isHidden = false
+            }
+        } else {
+            self.mediaCommandView?.toggleEmptyView(isEmpty: false)
+            self.mediaCommandView?.isHidden = false
+        }
+    }
+    
+    func updateZoomButton() {
+        var columnCount = NCKeychain().mediaColumnCount
+        if UIDevice.current.userInterfaceIdiom == .phone,
+           (UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight) {
+            columnCount += 2
+        }
+        if CGFloat(columnCount) >= maxImageGrid - 1 {
+            self.attributesZoomIn = []
+            self.attributesZoomOut = .disabled
+            mediaCommandView?.zoomOutButton.isEnabled = false
+        } else if columnCount <= 1 {
+            self.attributesZoomIn = .disabled
+            self.attributesZoomOut = []
+            mediaCommandView?.zoomInButton.isEnabled = false
+        } else {
+            self.attributesZoomIn = []
+            self.attributesZoomOut = []
+        }
+    }
+    
+    @objc func openMenuButtonMore(_ sender: Any) {
+
+        toggleMenu()
+    }
 }
 
 // MARK: - Collection View
@@ -295,9 +403,11 @@ extension NCMedia: UICollectionViewDelegate {
             if isEditMode {
                 if let index = selectOcId.firstIndex(of: metadata.ocId) {
                     selectOcId.remove(at: index)
+                    selectIndexPath.removeAll(where: { $0 == indexPath })
                     mediaCell?.selected(false)
                 } else {
                     selectOcId.append(metadata.ocId)
+                    selectIndexPath.append(indexPath)
                     mediaCell?.selected(true)
 
                 }
@@ -345,17 +455,17 @@ extension NCMedia: UICollectionViewDataSource {
         var numberOfItemsInSection = 0
         if let metadatas { numberOfItemsInSection = metadatas.count }
         if numberOfItemsInSection == 0 {
-            selectOrCancelButton.isHidden = true
-            menuButton.isHidden = false
+//            selectOrCancelButton.isHidden = true
+//            menuButton.isHidden = false
             gradientView.isHidden = true
             activityIndicatorTrailing.constant = 50
         } else if isEditMode {
-            selectOrCancelButton.isHidden = false
-            menuButton.isHidden = true
+//            selectOrCancelButton.isHidden = false
+//            menuButton.isHidden = true
             activityIndicatorTrailing.constant = 150
         } else {
-            selectOrCancelButton.isHidden = false
-            menuButton.isHidden = false
+//            selectOrCancelButton.isHidden = false
+//            menuButton.isHidden = false
             activityIndicatorTrailing.constant = 150
         }
 
@@ -506,5 +616,102 @@ extension NCMedia: NCSelectDelegate {
         activeAccount = NCManageDatabase.shared.getActiveAccount() ?? tableAccount()
         reloadDataSource()
         startTimer()
+    }
+}
+
+// MARK: - Media Command View
+
+class NCMediaCommandView: UIView {
+
+    @IBOutlet weak var moreView: UIVisualEffectView!
+    @IBOutlet weak var gridSwitchButton: UIButton!
+    @IBOutlet weak var separatorView: UIView!
+    @IBOutlet weak var buttonControlWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var zoomInButton: UIButton!
+    @IBOutlet weak var zoomOutButton: UIButton!
+    @IBOutlet weak var moreButton: UIButton!
+    @IBOutlet weak var controlButtonView: UIVisualEffectView!
+    @IBOutlet weak var title: UILabel!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+
+    var mediaView: NCMedia?
+    private let gradient: CAGradientLayer = CAGradientLayer()
+
+    override func awakeFromNib() {
+        moreView.layer.cornerRadius = 20
+        moreView.layer.masksToBounds = true
+        controlButtonView.layer.cornerRadius = 20
+        controlButtonView.layer.masksToBounds = true
+        controlButtonView.effect = UIBlurEffect(style: .dark)
+        gradient.frame = bounds
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 0, y: 1)
+        gradient.colors = [UIColor.black.withAlphaComponent(UIAccessibility.isReduceTransparencyEnabled ? 0.8 : 0.4).cgColor, UIColor.clear.cgColor]
+        layer.insertSublayer(gradient, at: 0)
+        moreButton.setImage(UIImage(named: "more")!.image(color: .white, size: 25), for: .normal)
+        title.text = ""
+    }
+
+    func toggleEmptyView(isEmpty: Bool) {
+        if isEmpty {
+            UIView.animate(withDuration: 0.3) {
+                self.moreView.effect = UIBlurEffect(style: .dark)
+                self.gradient.isHidden = true
+                self.controlButtonView.isHidden = true
+            }
+        } else {
+            UIView.animate(withDuration: 0.3) {
+                self.moreView.effect = UIBlurEffect(style: .dark)
+                self.gradient.isHidden = false
+                self.controlButtonView.isHidden = false
+            }
+        }
+    }
+
+    @IBAction func moreButtonPressed(_ sender: UIButton) {
+        mediaView?.openMenuButtonMore(sender)
+    }
+
+    @IBAction func zoomInPressed(_ sender: UIButton) {
+        mediaView?.zoomInGrid()
+    }
+
+    @IBAction func zoomOutPressed(_ sender: UIButton) {
+        mediaView?.zoomOutGrid()
+    }
+
+    @IBAction func gridSwitchButtonPressed(_ sender: Any) {
+        self.collapseControlButtonView(false)
+    }
+
+    func collapseControlButtonView(_ collapse: Bool) {
+        if collapse {
+            self.buttonControlWidthConstraint.constant = 40
+            UIView.animate(withDuration: 0.25) {
+                self.zoomOutButton.isHidden = true
+                self.zoomInButton.isHidden = true
+                self.separatorView.isHidden = true
+                self.gridSwitchButton.isHidden = false
+                self.layoutIfNeeded()
+            }
+        } else {
+            self.buttonControlWidthConstraint.constant = 80
+            UIView.animate(withDuration: 0.25) {
+                self.zoomOutButton.isHidden = false
+                self.zoomInButton.isHidden = false
+                self.separatorView.isHidden = false
+                self.gridSwitchButton.isHidden = true
+                self.layoutIfNeeded()
+            }
+        }
+    }
+
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        return moreView.frame.contains(point) || controlButtonView.frame.contains(point)
+    }
+
+    override func layoutSublayers(of layer: CALayer) {
+        super.layoutSublayers(of: layer)
+        gradient.frame = bounds
     }
 }
