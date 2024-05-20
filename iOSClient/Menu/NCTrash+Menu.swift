@@ -48,7 +48,7 @@ extension NCTrash {
             iconHeader = icon
         } else {
             if tableTrash.directory {
-                iconHeader = UIImage(named: "folder")!.image(color: UIColor.systemGray, size: 50)
+                iconHeader = UIImage(named: "folder")
             } else {
                 iconHeader = UIImage(named: tableTrash.iconName)
             }
