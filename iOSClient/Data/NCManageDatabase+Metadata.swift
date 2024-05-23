@@ -211,7 +211,7 @@ extension tableMetadata {
     }
 
     var canSetAsAvailableOffline: Bool {
-        return session.isEmpty && !isDocumentViewableOnly && !isDirectoryE2EE && !e2eEncrypted
+        return session.isEmpty && !isDocumentViewableOnly
     }
 
     var canShare: Bool {
@@ -287,9 +287,7 @@ extension tableMetadata {
 
     // Return if is sharable
     func isSharable() -> Bool {
-        if !NCGlobal.shared.capabilityFileSharingApiEnabled || (NCGlobal.shared.capabilityE2EEEnabled && isDirectoryE2EE) {
-            return false
-        }
+        guard NCGlobal.shared.capabilityE2EEEnabled, !isDirectoryE2EE, !e2eEncrypted else { return false }
         return true
     }
 }
@@ -321,7 +319,14 @@ extension NCManageDatabase {
         metadata.fileNameView = file.fileName
         metadata.hasPreview = file.hasPreview
         metadata.hidden = file.hidden
-        metadata.iconName = file.iconName
+        switch (file.fileName as NSString).pathExtension {
+        case "odg":
+            metadata.iconName = "diagram"
+        case "csv", "xlsm" :
+            metadata.iconName = "file_xls"
+        default:
+            metadata.iconName = file.iconName
+        }
         metadata.mountType = file.mountType
         metadata.name = file.name
         metadata.note = file.note
