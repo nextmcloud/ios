@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="1Rq-JU-ATi" userLabel="PNGImageSwitchView" customClass="PNGImageSaveSwitchView" customModule="Nextcloud" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="397" height="93"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="akx-DG-Z3u">
+                    <rect key="frame" x="332" y="31" width="51" height="31"/>
+                </switch>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hmz-yd-vqC">
+                    <rect key="frame" x="20" y="36.5" width="310" height="20.5"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Gft-gs-OVQ" userLabel="bottomline">
+                    <rect key="frame" x="0.0" y="92" width="397" height="1"/>
+                    <color key="backgroundColor" systemColor="systemGray5Color"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="PfL-cM-az5"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="ACW-cu-1nN"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="akx-DG-Z3u" firstAttribute="leading" secondItem="hmz-yd-vqC" secondAttribute="trailing" constant="2" id="ATK-6F-vgQ"/>
+                <constraint firstAttribute="trailing" secondItem="Gft-gs-OVQ" secondAttribute="trailing" id="Jsb-oq-fXt"/>
+                <constraint firstItem="ACW-cu-1nN" firstAttribute="trailing" secondItem="akx-DG-Z3u" secondAttribute="trailing" constant="16" id="L9f-yH-Dox"/>
+                <constraint firstItem="Gft-gs-OVQ" firstAttribute="leading" secondItem="1Rq-JU-ATi" secondAttribute="leading" id="ORT-NA-ip9"/>
+                <constraint firstItem="hmz-yd-vqC" firstAttribute="leading" secondItem="ACW-cu-1nN" secondAttribute="leading" constant="20" id="ZCO-xX-YCi"/>
+                <constraint firstItem="ACW-cu-1nN" firstAttribute="bottom" secondItem="Gft-gs-OVQ" secondAttribute="bottom" id="aRb-zC-ckf"/>
+                <constraint firstItem="akx-DG-Z3u" firstAttribute="centerY" secondItem="1Rq-JU-ATi" secondAttribute="centerY" id="idv-4e-cER"/>
+                <constraint firstItem="hmz-yd-vqC" firstAttribute="centerY" secondItem="1Rq-JU-ATi" secondAttribute="centerY" id="maV-zI-2w7"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="cellLabel" destination="hmz-yd-vqC" id="Vhn-Ja-txt"/>
+                <outlet property="switchControl" destination="akx-DG-Z3u" id="suL-aI-uj4"/>
+            </connections>
+            <point key="canvasLocation" x="125.36231884057972" y="189.17410714285714"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray5Color">
+            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>
