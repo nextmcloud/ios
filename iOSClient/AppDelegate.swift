@@ -53,6 +53,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var disableSharesView: Bool = false
     var documentPickerViewController: NCDocumentPickerViewController?
     var timerErrorNetworking: Timer?
+    private var privacyProtectionWindow: UIWindow?
+
+    @objc let adjust = AdjustHelper()
+
     var isAppRefresh: Bool = false
     var isProcessingTask: Bool = false
     var orientationLock = UIInterfaceOrientationMask.all
@@ -174,7 +178,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 NCPasscode.shared.enableTouchFaceID()
             }
         }
-
+        adjust.configAdjust()
+        adjust.subsessionStart()
+        TealiumHelper.shared.start()
         return true
     }
 
