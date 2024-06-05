@@ -94,6 +94,21 @@ extension NCViewer {
                     title: NSLocalizedString("_print_", comment: ""),
                     icon: utility.loadImage(named: "printer", color: NCBrandColor.shared.iconColor),
                     action: { _ in
+                        NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV))
+                    }
+                )
+            )
+        }
+
+        //
+        // SAVE AS SCAN
+        //
+        if !webView, metadata.isSavebleAsImage {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_save_as_scan_", comment: ""),
+                    icon: utility.loadImage(named: "doc.viewfinder"),
+                    action: { _ in
                         if self.utilityFileSystem.fileProviderStorageExists(metadata) {
                             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorPrint, "error": NKError(), "account": metadata.account])
                         } else {
@@ -147,6 +162,13 @@ extension NCViewer {
 
         //
         // COPY IN PASTEBOARD
+        //
+        if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
+            actions.append(.copyAction(selectOcId: [metadata.ocId]))
+        }
+
+        //
+        // DOWNLOAD FULL RESOLUTION
         //
         if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
             actions.append(.copyAction(selectOcId: [metadata.ocId]))
