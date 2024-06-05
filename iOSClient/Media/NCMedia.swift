@@ -25,7 +25,7 @@ import UIKit
 import NextcloudKit
 import RealmSwift
 
-class NCMedia: UIViewController {
+class NCMedia: UIViewController, NCEmptyDataSetDelegate {
 
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var titleDate: UILabel!
@@ -36,10 +36,11 @@ class NCMedia: UIViewController {
     @IBOutlet weak var menuButton: UIButton!
     @IBOutlet weak var gradientView: UIView!
 
-    let layout = NCMediaLayout()
+    var mediaCommandView: NCMediaCommandView?
     var activeAccount = tableAccount()
+    var emptyDataSet: NCEmptyDataSet?
     var documentPickerViewController: NCDocumentPickerViewController?
-    var tabBarSelect: NCMediaSelectTabBar!
+    var tabBarSelect: NCMediaSelectTabBar?
     let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
@@ -50,6 +51,7 @@ class NCMedia: UIViewController {
     var isTop: Bool = true
     var isEditMode = false
     var selectOcId: [String] = []
+    internal var selectIndexPath: [IndexPath] = []
     var attributesZoomIn: UIMenuElement.Attributes = []
     var attributesZoomOut: UIMenuElement.Attributes = []
     let gradient: CAGradientLayer = CAGradientLayer()
@@ -72,16 +74,18 @@ class NCMedia: UIViewController {
 
         view.backgroundColor = .systemBackground
 
-        collectionView.register(UINib(nibName: "NCSectionHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: collectionViewMediaElementKindSectionHeader, withReuseIdentifier: "sectionHeaderEmptyData")
         collectionView.register(UINib(nibName: "NCGridMediaCell", bundle: nil), forCellWithReuseIdentifier: "gridCell")
         collectionView.alwaysBounceVertical = true
         collectionView.contentInset = UIEdgeInsets(top: insetsTop, left: 0, bottom: 50, right: 0)
         collectionView.backgroundColor = .systemBackground
         collectionView.prefetchDataSource = self
 
+        let layout = NCMediaLayout()
         layout.sectionInset = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: 2)
         layout.mediaViewController = self
         collectionView.collectionViewLayout = layout
+
+        emptyDataSet = NCEmptyDataSet(view: collectionView, offset: 0, delegate: self)
 
         tabBarSelect = NCMediaSelectTabBar(tabBarController: self.tabBarController, delegate: self)
 
@@ -89,21 +93,9 @@ class NCMedia: UIViewController {
         playImage = utility.loadImage(named: "play.fill", color: .white)
 
         titleDate.text = ""
-
-        selectOrCancelButton.backgroundColor = .clear
-        selectOrCancelButton.layer.cornerRadius = 15
-        selectOrCancelButton.layer.masksToBounds = true
-        selectOrCancelButton.setTitle( NSLocalizedString("_select_", comment: ""), for: .normal)
-        selectOrCancelButton.addBlur(style: .systemThinMaterial)
-
-        menuButton.backgroundColor = .clear
-        menuButton.layer.cornerRadius = 15
-        menuButton.layer.masksToBounds = true
-        menuButton.showsMenuAsPrimaryAction = true
-        menuButton.configuration = UIButton.Configuration.plain()
-        menuButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
-        menuButton.changesSelectionAsPrimaryAction = false
-        menuButton.addBlur(style: .systemThinMaterial)
+        titleDate.isHidden = true
+        menuButton.isHidden = true
+        setupMediaCommandView()
 
         gradient.startPoint = CGPoint(x: 0, y: 0.1)
         gradient.endPoint = CGPoint(x: 0, y: 1)
@@ -142,18 +134,17 @@ class NCMedia: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        navigationController?.setMediaAppreance()
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-
         appDelegate.activeViewController = self
+        navigationController?.setMediaAppreance()
 
         NotificationCenter.default.addObserver(self, selector: #selector(deleteFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDeleteFile), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(enterForeground(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationWillEnterForeground), object: nil)
 
         startTimer()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         createMenu()
 
         if imageCache.createMediaCacheInProgress {
@@ -169,8 +160,8 @@ class NCMedia: UIViewController {
         }
     }
 
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
 
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDeleteFile), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationWillEnterForeground), object: nil)
@@ -197,7 +188,7 @@ class NCMedia: UIViewController {
         super.viewWillLayoutSubviews()
 
         if let frame = tabBarController?.tabBar.frame {
-            tabBarSelect.hostingController.view.frame = frame
+            tabBarSelect?.hostingController.view.frame = frame
         }
         gradient.frame = gradientView.bounds
     }
@@ -225,6 +216,17 @@ class NCMedia: UIViewController {
 
     @objc func enterForeground(_ notification: NSNotification) {
         startTimer()
+    }
+    // MARK: - Empty
+
+    func emptyDataSetView(_ view: NCEmptyView) {
+        view.emptyImage.image = UIImage(named: "media")?.image(color: .gray, size: UIScreen.main.bounds.width)
+        if loadingTask != nil || imageCache.createMediaCacheInProgress {
+            view.emptyTitle.text = NSLocalizedString("_search_in_progress_", comment: "")
+        } else {
+            view.emptyTitle.text = NSLocalizedString("_tutorial_photo_view_", comment: "")
+        }
+        view.emptyDescription.text = ""
     }
 
     // MARK: - Image
@@ -265,6 +267,107 @@ class NCMedia: UIViewController {
             videoImage = image
         }
     }
+    
+    // MARK: - Command
+    
+    func setupMediaCommandView() {
+        mediaCommandView?.title.text = ""
+        
+        mediaCommandView = Bundle.main.loadNibNamed("NCMediaCommandView", owner: self, options: nil)?.first as? NCMediaCommandView
+        self.view.addSubview(mediaCommandView!)
+        mediaCommandView?.mediaView = self
+        updateZoomButton()
+        mediaCommandView?.collapseControlButtonView(true)
+        mediaCommandView?.translatesAutoresizingMaskIntoConstraints = false
+        mediaCommandView?.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
+        mediaCommandView?.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+        mediaCommandView?.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0).isActive = true
+        mediaCommandView?.heightAnchor.constraint(equalToConstant: 150).isActive = true
+        self.updateMediaControlVisibility()
+    }
+    
+    @objc func zoomOutGrid() {
+        UIView.animate(withDuration: 0.0, animations: {
+            NCKeychain().mediaColumnCount += 1
+            if CGFloat(NCKeychain().mediaColumnCount) >= self.maxImageGrid - 1 {
+                self.attributesZoomIn = []
+                self.attributesZoomOut = .disabled
+                self.mediaCommandView?.zoomOutButton.isEnabled = false
+            } else if NCKeychain().mediaColumnCount <= 1 {
+                self.attributesZoomIn = .disabled
+                self.attributesZoomOut = []
+                self.mediaCommandView?.zoomInButton.isEnabled = false
+            } else {
+                self.mediaCommandView?.zoomOutButton.isEnabled = true
+                self.mediaCommandView?.zoomInButton.isEnabled = true
+                self.attributesZoomIn = []
+                self.attributesZoomOut = []
+            }
+            self.collectionViewReloadData()
+        })
+    }
+
+    @objc func zoomInGrid() {
+        UIView.animate(withDuration: 0.0, animations: {
+            NCKeychain().mediaColumnCount -= 1
+            if CGFloat(NCKeychain().mediaColumnCount) >= self.maxImageGrid - 1 {
+                self.attributesZoomIn = []
+                self.attributesZoomOut = .disabled
+                self.mediaCommandView?.zoomOutButton.isEnabled = false
+            } else if NCKeychain().mediaColumnCount <= 1 {
+                self.attributesZoomIn = .disabled
+                self.attributesZoomOut = []
+                self.mediaCommandView?.zoomInButton.isEnabled = false
+            } else {
+                self.mediaCommandView?.zoomOutButton.isEnabled = true
+                self.mediaCommandView?.zoomInButton.isEnabled = true
+                self.attributesZoomIn = []
+                self.attributesZoomOut = []
+            }
+            self.collectionViewReloadData()
+        })
+    }
+    
+    func updateMediaControlVisibility() {
+
+        if let metadatas = self.metadatas, metadatas.isEmpty {
+            if !self.showOnlyImages && !self.showOnlyVideos {
+                self.mediaCommandView?.toggleEmptyView(isEmpty: true)
+                self.mediaCommandView?.isHidden = false
+            } else {
+                self.mediaCommandView?.toggleEmptyView(isEmpty: true)
+                self.mediaCommandView?.isHidden = false
+            }
+        } else {
+            self.mediaCommandView?.toggleEmptyView(isEmpty: false)
+            self.mediaCommandView?.isHidden = false
+        }
+    }
+    
+    func updateZoomButton() {
+        var columnCount = NCKeychain().mediaColumnCount
+        if UIDevice.current.userInterfaceIdiom == .phone,
+           (UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight) {
+            columnCount += 2
+        }
+        if CGFloat(columnCount) >= maxImageGrid - 1 {
+            self.attributesZoomIn = []
+            self.attributesZoomOut = .disabled
+            mediaCommandView?.zoomOutButton.isEnabled = false
+        } else if columnCount <= 1 {
+            self.attributesZoomIn = .disabled
+            self.attributesZoomOut = []
+            mediaCommandView?.zoomInButton.isEnabled = false
+        } else {
+            self.attributesZoomIn = []
+            self.attributesZoomOut = []
+        }
+    }
+    
+    @objc func openMenuButtonMore(_ sender: Any) {
+
+        toggleMenu()
+    }
 }
 
 // MARK: - Collection View
@@ -275,7 +378,7 @@ extension NCMedia: UICollectionViewDelegate {
         if let metadata = self.metadatas?[indexPath.row] {
             if let visibleCells = self.collectionView?.indexPathsForVisibleItems.compactMap({ self.collectionView?.cellForItem(at: $0) }) {
                 for case let cell as NCGridMediaCell in visibleCells {
-                    if cell.ocId == metadata.ocId {
+                    if cell.fileObjectId == metadata.ocId {
                         mediaCell = cell
                     }
                 }
@@ -283,13 +386,15 @@ extension NCMedia: UICollectionViewDelegate {
             if isEditMode {
                 if let index = selectOcId.firstIndex(of: metadata.ocId) {
                     selectOcId.remove(at: index)
+                    selectIndexPath.removeAll(where: { $0 == indexPath })
                     mediaCell?.selected(false)
                 } else {
                     selectOcId.append(metadata.ocId)
+                    selectIndexPath.append(indexPath)
                     mediaCell?.selected(true)
 
                 }
-                tabBarSelect.selectCount = selectOcId.count
+                tabBarSelect?.selectCount = selectOcId.count
             } else {
                 // ACTIVE SERVERURL
                 appDelegate.activeServerUrl = metadata.serverUrl
@@ -309,7 +414,7 @@ extension NCMedia: UICollectionViewDelegate {
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
             return NCViewerProviderContextMenu(metadata: metadata, image: image)
         }, actionProvider: { _ in
-            return NCContextMenu().viewMenu(ocId: metadata.ocId, viewController: self, image: image)
+            return NCContextMenu().viewMenu(ocId: metadata.ocId, indexPath: indexPath, viewController: self, image: image)
         })
     }
 
@@ -329,40 +434,21 @@ extension NCMedia: UICollectionViewDataSourcePrefetching {
 }
 
 extension NCMedia: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        if kind == "collectionViewMediaElementKindSectionHeader" {
-            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionHeaderEmptyData", for: indexPath) as? NCSectionHeaderEmptyData else { return NCSectionHeaderEmptyData() }
-            header.emptyImage.image = UIImage(named: "media")?.image(color: .gray, size: UIScreen.main.bounds.width)
-            if loadingTask != nil || imageCache.createMediaCacheInProgress {
-                header.emptyTitle.text = NSLocalizedString("_search_in_progress_", comment: "")
-            } else {
-                header.emptyTitle.text = NSLocalizedString("_tutorial_photo_view_", comment: "")
-            }
-            header.emptyDescription.text = ""
-            return header
-        }
-        return UICollectionReusableView()
-    }
-
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         var numberOfItemsInSection = 0
         if let metadatas { numberOfItemsInSection = metadatas.count }
         if numberOfItemsInSection == 0 {
-            selectOrCancelButton.isHidden = true
-            menuButton.isHidden = false
             gradientView.isHidden = true
             activityIndicatorTrailing.constant = 50
         } else if isEditMode {
-            selectOrCancelButton.isHidden = false
-            menuButton.isHidden = true
             activityIndicatorTrailing.constant = 150
         } else {
-            selectOrCancelButton.isHidden = false
-            menuButton.isHidden = false
             activityIndicatorTrailing.constant = 150
         }
 
+        emptyDataSet?.numberOfItemsInSection(numberOfItemsInSection, section: section)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { self.setTitleDate() }
+
         return numberOfItemsInSection
     }
 
@@ -383,15 +469,12 @@ extension NCMedia: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as? NCGridMediaCell,
               let metadatas = self.metadatas,
-              let metadata = metadatas[indexPath.row]
-        else {
-            return NCGridMediaCell()
-        }
+              let metadata = metadatas[indexPath.row] else { return UICollectionViewCell() }
 
-        cell.date = metadata.date as Date
-        cell.ocId = metadata.ocId
+        cell.fileDate = metadata.date as Date
+        cell.fileObjectId = metadata.ocId
         cell.indexPath = indexPath
-        cell.user = metadata.ownerId
+        cell.fileUser = metadata.ownerId
         cell.imageStatus.image = nil
         cell.imageItem.contentMode = .scaleAspectFill
 
@@ -432,35 +515,19 @@ extension NCMedia: UICollectionViewDataSource {
 
 // MARK: -
 
+extension NCMedia: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: 0)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: 0)
+    }
+}
+
+// MARK: -
+
 extension NCMedia: NCMediaLayoutDelegate {
-    func collectionView(_ collectionView: UICollectionView, layout: UICollectionViewLayout, heightForHeaderInSection section: Int) -> Float {
-        var height: Double = 0
-        if metadatas?.count ?? 0 == 0 {
-            height = NCGlobal.shared.getHeightHeaderEmptyData(view: view, portraitOffset: 0, landscapeOffset: -20)
-        }
-        return Float(height)
-    }
-
-    func collectionView(_ collectionView: UICollectionView, layout: UICollectionViewLayout, heightForFooterInSection section: Int) -> Float {
-        return .zero
-    }
-
-    func collectionView(_ collectionView: UICollectionView, layout: UICollectionViewLayout, insetForSection section: Int) -> UIEdgeInsets {
-        return .zero
-    }
-
-    func collectionView(_ collectionView: UICollectionView, layout: UICollectionViewLayout, insetForHeaderInSection section: Int) -> UIEdgeInsets {
-        return .zero
-    }
-
-    func collectionView(_ collectionView: UICollectionView, layout: UICollectionViewLayout, insetForFooterInSection section: Int) -> UIEdgeInsets {
-        return .zero
-    }
-
-    func collectionView(_ collectionView: UICollectionView, layout: UICollectionViewLayout, minimumInteritemSpacingForSection section: Int) -> Float {
-        return .zero
-    }
-
     func collectionView(_ collectionView: UICollectionView, layout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath, columnCount: Int, mediaLayout: String) -> CGSize {
         let size = CGSize(width: collectionView.frame.width / CGFloat(columnCount), height: collectionView.frame.width / CGFloat(columnCount))
         if mediaLayout == NCGlobal.shared.mediaLayoutRatio {
@@ -518,7 +585,7 @@ extension NCMedia: UIScrollViewDelegate {
 // MARK: -
 
 extension NCMedia: NCSelectDelegate {
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], indexPath: [IndexPath], overwrite: Bool, copy: Bool, move: Bool) {
         guard let serverUrl = serverUrl else { return }
         let home = utilityFileSystem.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId)
         let mediaPath = serverUrl.replacingOccurrences(of: home, with: "")
@@ -526,5 +593,102 @@ extension NCMedia: NCSelectDelegate {
         activeAccount = NCManageDatabase.shared.getActiveAccount() ?? tableAccount()
         reloadDataSource()
         startTimer()
+    }
+}
+
+// MARK: - Media Command View
+
+class NCMediaCommandView: UIView {
+
+    @IBOutlet weak var moreView: UIVisualEffectView!
+    @IBOutlet weak var gridSwitchButton: UIButton!
+    @IBOutlet weak var separatorView: UIView!
+    @IBOutlet weak var buttonControlWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var zoomInButton: UIButton!
+    @IBOutlet weak var zoomOutButton: UIButton!
+    @IBOutlet weak var moreButton: UIButton!
+    @IBOutlet weak var controlButtonView: UIVisualEffectView!
+    @IBOutlet weak var title: UILabel!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+
+    var mediaView: NCMedia?
+    private let gradient: CAGradientLayer = CAGradientLayer()
+
+    override func awakeFromNib() {
+        moreView.layer.cornerRadius = 20
+        moreView.layer.masksToBounds = true
+        controlButtonView.layer.cornerRadius = 20
+        controlButtonView.layer.masksToBounds = true
+        controlButtonView.effect = UIBlurEffect(style: .dark)
+        gradient.frame = bounds
+        gradient.startPoint = CGPoint(x: 0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 0, y: 1)
+        gradient.colors = [UIColor.black.withAlphaComponent(UIAccessibility.isReduceTransparencyEnabled ? 0.8 : 0.4).cgColor, UIColor.clear.cgColor]
+        layer.insertSublayer(gradient, at: 0)
+        moreButton.setImage(UIImage(named: "more")!.image(color: .white, size: 25), for: .normal)
+        title.text = ""
+    }
+
+    func toggleEmptyView(isEmpty: Bool) {
+        if isEmpty {
+            UIView.animate(withDuration: 0.3) {
+                self.moreView.effect = UIBlurEffect(style: .dark)
+                self.gradient.isHidden = true
+                self.controlButtonView.isHidden = true
+            }
+        } else {
+            UIView.animate(withDuration: 0.3) {
+                self.moreView.effect = UIBlurEffect(style: .dark)
+                self.gradient.isHidden = false
+                self.controlButtonView.isHidden = false
+            }
+        }
+    }
+
+    @IBAction func moreButtonPressed(_ sender: UIButton) {
+        mediaView?.openMenuButtonMore(sender)
+    }
+
+    @IBAction func zoomInPressed(_ sender: UIButton) {
+        mediaView?.zoomInGrid()
+    }
+
+    @IBAction func zoomOutPressed(_ sender: UIButton) {
+        mediaView?.zoomOutGrid()
+    }
+
+    @IBAction func gridSwitchButtonPressed(_ sender: Any) {
+        self.collapseControlButtonView(false)
+    }
+
+    func collapseControlButtonView(_ collapse: Bool) {
+        if collapse {
+            self.buttonControlWidthConstraint.constant = 40
+            UIView.animate(withDuration: 0.25) {
+                self.zoomOutButton.isHidden = true
+                self.zoomInButton.isHidden = true
+                self.separatorView.isHidden = true
+                self.gridSwitchButton.isHidden = false
+                self.layoutIfNeeded()
+            }
+        } else {
+            self.buttonControlWidthConstraint.constant = 80
+            UIView.animate(withDuration: 0.25) {
+                self.zoomOutButton.isHidden = false
+                self.zoomInButton.isHidden = false
+                self.separatorView.isHidden = false
+                self.gridSwitchButton.isHidden = true
+                self.layoutIfNeeded()
+            }
+        }
+    }
+
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        return moreView.frame.contains(point) || controlButtonView.frame.contains(point)
+    }
+
+    override func layoutSublayers(of layer: CALayer) {
+        super.layoutSublayers(of: layer)
+        gradient.frame = bounds
     }
 }

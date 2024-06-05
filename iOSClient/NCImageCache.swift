@@ -197,7 +197,18 @@ import RealmSwift
         guard let tableAccount = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", account)) else { return nil }
         let startServerUrl = NCUtilityFileSystem().getHomeServer(urlBase: tableAccount.urlBase, userId: tableAccount.userId) + tableAccount.mediaPath
         let predicateBoth = NSPredicate(format: showBothPredicateMediaString, account, startServerUrl)
-        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth)
+
+        switch NCKeychain().mediaSortDate {
+        case "date":
+            return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
+        case "creationDate":
+            return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "creationDate")
+        case "uploadDate":
+            return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "uploadDate")
+        default:
+            break
+        }
+        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
     }
 
     // MARK: -
