@@ -2,46 +2,73 @@
 //  NCTrashGridCell.swift
 //  Nextcloud
 //
-//  Created by Marino Faggiana on 19/03/2024.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//  Created by A200073704 on 27/06/23.
+//  Copyright © 2023 Marino Faggiana. All rights reserved.
 //
 
 import UIKit
 
-protocol NCTrashGridCellDelegate: AnyObject {
-    func tapMoreGridItem(with objectId: String, namedButtonMore: String, image: UIImage?, indexPath: IndexPath, sender: Any)
-}
-
 class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
 
+    
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageSelect: UIImageView!
+    @IBOutlet weak var imageStatus: UIImageView!
+    @IBOutlet weak var imageFavorite: UIImageView!
+    @IBOutlet weak var imageLocal: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var labelInfo: UILabel!
-    @IBOutlet weak var labelSubinfo: UILabel!
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
+    @IBOutlet weak var progressView: UIProgressView!
 
-    weak var delegate: NCTrashGridCellDelegate?
-    var objectId = ""
+    internal var objectId = ""
     var indexPath = IndexPath()
-    var user = ""
+    private var user = ""
+
+    weak var delegate: NCGridCellDelegate?
     var namedButtonMore = ""
+
+    var fileObjectId: String? {
+        get { return objectId }
+        set { objectId = newValue ?? "" }
+    }
+    var filePreviewImageView: UIImageView? {
+        get { return imageItem }
+        set { imageItem = newValue }
+    }
+    var fileUser: String? {
+        get { return user }
+        set { user = newValue ?? "" }
+    }
+    var fileTitleLabel: UILabel? {
+        get { return labelTitle }
+        set { labelTitle = newValue }
+    }
+    var fileInfoLabel: UILabel? {
+        get { return labelInfo }
+        set { labelInfo = newValue }
+    }
+    var fileProgressView: UIProgressView? {
+        get { return progressView }
+        set { progressView = newValue }
+    }
+    var fileSelectImage: UIImageView? {
+        get { return imageSelect }
+        set { imageSelect = newValue }
+    }
+    var fileStatusImage: UIImageView? {
+        get { return imageStatus }
+        set { imageStatus = newValue }
+    }
+    var fileLocalImage: UIImageView? {
+        get { return imageLocal }
+        set { imageLocal = newValue }
+    }
+    var fileFavoriteImage: UIImageView? {
+        get { return imageFavorite }
+        set { imageFavorite = newValue }
+    }
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -59,9 +86,14 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         imageVisualEffect.clipsToBounds = true
         imageVisualEffect.alpha = 0.5
 
+        progressView.tintColor = NCBrandColor.shared.brandElement
+        progressView.transform = CGAffineTransform(scaleX: 1.0, y: 0.5)
+        progressView.trackTintColor = .clear
+
         labelTitle.text = ""
         labelInfo.text = ""
-        labelSubinfo.text = ""
+        labelTitle.textColor = .label
+        labelInfo.textColor = .systemGray
     }
 
     override func prepareForReuse() {
@@ -80,9 +112,10 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         delegate?.tapMoreGridItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, indexPath: indexPath, sender: sender)
     }
 
+
     fileprivate func setA11yActions() {
         let moreName = namedButtonMore == NCGlobal.shared.buttonMoreStop ? "_cancel_" : "_more_"
-
+        
         self.accessibilityCustomActions = [
             UIAccessibilityCustomAction(
                 name: NSLocalizedString(moreName, comment: ""),
@@ -90,7 +123,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
                 selector: #selector(touchUpInsideMore))
         ]
     }
-
+    
     func setButtonMore(named: String, image: UIImage) {
         namedButtonMore = named
         buttonMore.setImage(image, for: .normal)
@@ -126,7 +159,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
             imageSelect.image = NCImageCache.images.checkedYes
             imageVisualEffect.isHidden = false
         } else {
-            imageSelect.isHidden = true
+            imageSelect.image = NCImageCache.images.checkedNo
             imageVisualEffect.isHidden = true
         }
     }
@@ -138,68 +171,11 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         dateFormatter.timeStyle = .none
         dateFormatter.locale = Locale.current
 
-        labelInfo.text = dateFormatter.string(from: date as Date)
-        labelSubinfo.text = NCUtilityFileSystem().transformedSize(size)
+        labelInfo.text = dateFormatter.string(from: date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
     }
 
     func setAccessibility(label: String, value: String) {
         accessibilityLabel = label
         accessibilityValue = value
-    }
-}
-
-// MARK: - Grid Layout
-
-class NCTrashGridLayout: UICollectionViewFlowLayout {
-
-    var heightLabelPlusButton: CGFloat = 60
-    var marginLeftRight: CGFloat = 10
-    var itemForLine: CGFloat = 3
-    var itemWidthDefault: CGFloat = 140
-
-    // MARK: - View Life Cycle
-
-    override init() {
-        super.init()
-
-        sectionHeadersPinToVisibleBounds = false
-
-        minimumInteritemSpacing = 1
-        minimumLineSpacing = marginLeftRight
-
-        self.scrollDirection = .vertical
-        self.sectionInset = UIEdgeInsets(top: 10, left: marginLeftRight, bottom: 0, right: marginLeftRight)
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override var itemSize: CGSize {
-        get {
-            if let collectionView = collectionView {
-
-                if collectionView.frame.width < 400 {
-                    itemForLine = 3
-                } else {
-                    itemForLine = collectionView.frame.width / itemWidthDefault
-                }
-
-                let itemWidth: CGFloat = (collectionView.frame.width - marginLeftRight * 2 - marginLeftRight * (itemForLine - 1)) / itemForLine
-                let itemHeight: CGFloat = itemWidth + heightLabelPlusButton
-
-                return CGSize(width: itemWidth, height: itemHeight)
-            }
-
-            // Default fallback
-            return CGSize(width: itemWidthDefault, height: itemWidthDefault)
-        }
-        set {
-            super.itemSize = newValue
-        }
-    }
-
-    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
-        return proposedContentOffset
     }
 }
