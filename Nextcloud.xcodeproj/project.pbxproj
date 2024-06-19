@@ -15,6 +15,7 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+		5676A3282C22BFF900A890E5 /* AppDelegate+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5676A3272C22BFF900A890E5 /* AppDelegate+Swizzle.swift */; };
 		56B1F1172C1C26A900E4282E /* SwizzleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B1F1162C1C26A900E4282E /* SwizzleHandler.swift */; };
 		56B1F1192C1C3AA800E4282E /* SceneDelegate+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B1F1182C1C3AA800E4282E /* SceneDelegate+Swizzle.swift */; };
 		56CB2DAA2C16E744009E88AF /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB2DA92C16E744009E88AF /* AnalyticsHelper.swift */; };
@@ -1068,6 +1069,7 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+		5676A3272C22BFF900A890E5 /* AppDelegate+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Swizzle.swift"; sourceTree = "<group>"; };
 		56B1F1162C1C26A900E4282E /* SwizzleHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwizzleHandler.swift; sourceTree = "<group>"; };
 		56B1F1182C1C3AA800E4282E /* SceneDelegate+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SceneDelegate+Swizzle.swift"; sourceTree = "<group>"; };
 		56CB2DA92C16E744009E88AF /* AnalyticsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsHelper.swift; sourceTree = "<group>"; };
@@ -1901,6 +1903,7 @@
 			children = (
 				56B1F1162C1C26A900E4282E /* SwizzleHandler.swift */,
 				56B1F1182C1C3AA800E4282E /* SceneDelegate+Swizzle.swift */,
+				5676A3272C22BFF900A890E5 /* AppDelegate+Swizzle.swift */,
 			);
 			path = Swizzle;
 			sourceTree = "<group>";
@@ -4376,6 +4379,7 @@
 				F717402E24F699A5000C87D5 /* NCFavorite.swift in Sources */,
 				AF2D7C7E2742559100ADF566 /* NCShareUserCell.swift in Sources */,
 				F74DE14325135B6800917068 /* NCTransfers.swift in Sources */,
+				5676A3282C22BFF900A890E5 /* AppDelegate+Swizzle.swift in Sources */,
 				AF4BF614275629E20081CEEF /* NCManageDatabase+Account.swift in Sources */,
 				F711A4DC2AF92CAE00095DD8 /* NCUtility+Date.swift in Sources */,
 				AF4BF61E27562B3F0081CEEF /* NCManageDatabase+Activity.swift in Sources */,
