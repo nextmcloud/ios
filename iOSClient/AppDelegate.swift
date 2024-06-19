@@ -118,7 +118,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
             NCKeychain().removeAll()
             if let bundleID = Bundle.main.bundleIdentifier {
+                let oldVersion = UserDefaults.standard.value(forKey: NCSettingsBundleHelper.SettingsBundleKeys.BuildVersionKey) as? String
                 UserDefaults.standard.removePersistentDomain(forName: bundleID)
+                UserDefaults.standard.setValue(oldVersion, forKey: NCSettingsBundleHelper.SettingsBundleKeys.BuildVersionKey)
             }
         }
 
@@ -147,6 +149,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             self.handleProcessingTask(task)
         }
 
+        //Swizzle Methods
+        SwizzleHandler().setup()
         return true
     }
 

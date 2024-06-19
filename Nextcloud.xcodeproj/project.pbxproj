@@ -15,6 +15,12 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+		56B1F1172C1C26A900E4282E /* SwizzleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B1F1162C1C26A900E4282E /* SwizzleHandler.swift */; };
+		56B1F1192C1C3AA800E4282E /* SceneDelegate+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B1F1182C1C3AA800E4282E /* SceneDelegate+Swizzle.swift */; };
+		56CB2DAA2C16E744009E88AF /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB2DA92C16E744009E88AF /* AnalyticsHelper.swift */; };
+		56CB2DAC2C16F408009E88AF /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB2DAB2C16F408009E88AF /* AnalyticsService.swift */; };
+		56CB2DAE2C16F45B009E88AF /* MoEngageAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB2DAD2C16F45B009E88AF /* MoEngageAnalytics.swift */; };
+		56CB2DB02C16F6F4009E88AF /* MoEngage-iOS-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 56CB2DAF2C16F6F4009E88AF /* MoEngage-iOS-SDK */; };
 		8491B1CD273BBA82001C8C5B /* UIViewController+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8491B1CC273BBA82001C8C5B /* UIViewController+Menu.swift */; };
 		AF1A9B6427D0CA1E00F17A9E /* UIAlertController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1A9B6327D0CA1E00F17A9E /* UIAlertController+Extension.swift */; };
 		AF1A9B6527D0CC0500F17A9E /* UIAlertController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1A9B6327D0CA1E00F17A9E /* UIAlertController+Extension.swift */; };
@@ -1062,6 +1068,11 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+		56B1F1162C1C26A900E4282E /* SwizzleHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwizzleHandler.swift; sourceTree = "<group>"; };
+		56B1F1182C1C3AA800E4282E /* SceneDelegate+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SceneDelegate+Swizzle.swift"; sourceTree = "<group>"; };
+		56CB2DA92C16E744009E88AF /* AnalyticsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsHelper.swift; sourceTree = "<group>"; };
+		56CB2DAB2C16F408009E88AF /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		56CB2DAD2C16F45B009E88AF /* MoEngageAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoEngageAnalytics.swift; sourceTree = "<group>"; };
 		8491B1CC273BBA82001C8C5B /* UIViewController+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Menu.swift"; sourceTree = "<group>"; };
 		AF1A9B6327D0CA1E00F17A9E /* UIAlertController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extension.swift"; sourceTree = "<group>"; };
 		AF22B20B277C6F4D00DAB0CC /* NCShareCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareCell.swift; sourceTree = "<group>"; };
@@ -1828,6 +1839,7 @@
 				F72AD70D28C24B93006CB92D /* NextcloudKit in Frameworks */,
 				F70B86752642CE3B00ED5349 /* FirebaseCrashlytics in Frameworks */,
 				F7A1050E29E587AF00FFD92B /* TagListView in Frameworks */,
+				56CB2DB02C16F6F4009E88AF /* MoEngage-iOS-SDK in Frameworks */,
 				F76DA969277B77EA0082465B /* DropDown in Frameworks */,
 				F7F623B52A5EF4D30022D3D4 /* Gzip in Frameworks */,
 				F75EAED826D2552E00F4320E /* MarqueeLabel in Frameworks */,
@@ -1882,6 +1894,33 @@
 				F7A560412AE1593700BE8FD6 /* NCOperationSaveLivePhoto.swift */,
 			);
 			path = Menu;
+			sourceTree = "<group>";
+		};
+		56B1F1152C1C258500E4282E /* Swizzle */ = {
+			isa = PBXGroup;
+			children = (
+				56B1F1162C1C26A900E4282E /* SwizzleHandler.swift */,
+				56B1F1182C1C3AA800E4282E /* SceneDelegate+Swizzle.swift */,
+			);
+			path = Swizzle;
+			sourceTree = "<group>";
+		};
+		56CB2DA72C16E719009E88AF /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				56CB2DA82C16E723009E88AF /* MoEngage */,
+				56CB2DA92C16E744009E88AF /* AnalyticsHelper.swift */,
+				56CB2DAB2C16F408009E88AF /* AnalyticsService.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		56CB2DA82C16E723009E88AF /* MoEngage */ = {
+			isa = PBXGroup;
+			children = (
+				56CB2DAD2C16F45B009E88AF /* MoEngageAnalytics.swift */,
+			);
+			path = MoEngage;
 			sourceTree = "<group>";
 		};
 		AF8ED1FA2757821000B8DBC4 /* NextcloudUnitTests */ = {
@@ -2829,6 +2868,8 @@
 		F7F67BAA1A24D27800EE80DA /* iOSClient */ = {
 			isa = PBXGroup;
 			children = (
+				56B1F1152C1C258500E4282E /* Swizzle */,
+				56CB2DA72C16E719009E88AF /* Analytics */,
 				F702F2CC25EE5B4F008F8E80 /* AppDelegate.swift */,
 				F794E13E2BBC0F70003693D7 /* SceneDelegate.swift */,
 				F76B649B2ADFFAED00014640 /* NCImageCache.swift */,
@@ -3295,6 +3336,7 @@
 				F3A0479D2BD268B500658E7B /* PopupView */,
 				F7160A7F2BE933390034DCB3 /* Realm */,
 				F7160A812BE933390034DCB3 /* RealmSwift */,
+				56CB2DAF2C16F6F4009E88AF /* MoEngage-iOS-SDK */,
 			);
 			productName = "Crypto Cloud";
 			productReference = F7CE8AFA1DC1F8D8009CAE48 /* Nextcloud.app */;
@@ -3467,6 +3509,7 @@
 				F76B649A2ADFFAD200014640 /* XCRemoteSwiftPackageReference "LRUCache" */,
 				F760DE012AE66E860027D78A /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				F3A0479C2BD268B500658E7B /* XCRemoteSwiftPackageReference "PopupView" */,
+				56CB2DA62C16E4C5009E88AF /* XCRemoteSwiftPackageReference "MoEngage-iOS-SDK" */,
 			);
 			productRefGroup = F7F67B9F1A24D27800EE80DA;
 			projectDirPath = "";
@@ -4102,6 +4145,7 @@
 				F73EF7A72B0223900087E6E9 /* NCManageDatabase+Comments.swift in Sources */,
 				F7AE00F8230E81CB007ACF8A /* NCBrowserWeb.swift in Sources */,
 				F702F30825EE5D47008F8E80 /* NCPopupViewController.swift in Sources */,
+				56B1F1192C1C3AA800E4282E /* SceneDelegate+Swizzle.swift in Sources */,
 				F733598125C1C188002ABA72 /* NCAskAuthorization.swift in Sources */,
 				370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */,
 				F77B0DF51D118A16002130FE /* CCUtility.m in Sources */,
@@ -4144,6 +4188,7 @@
 				F7A60F86292D215000FCE1F2 /* NCShareAccounts.swift in Sources */,
 				F72408332B8A27C900F128E2 /* NCMedia+Command.swift in Sources */,
 				F77910AB25DD53C700CEDB9E /* NCSettingsBundleHelper.swift in Sources */,
+				56CB2DAC2C16F408009E88AF /* AnalyticsService.swift in Sources */,
 				F755CB402B8CB13C00CE27E9 /* NCMediaLayout.swift in Sources */,
 				F73EF7B72B0224AB0087E6E9 /* NCManageDatabase+ExternalSites.swift in Sources */,
 				AF4BF61927562A4B0081CEEF /* NCManageDatabase+Metadata.swift in Sources */,
@@ -4202,6 +4247,7 @@
 				F7651A8B23A2A3F2001403D2 /* NCCreateFormUploadDocuments.swift in Sources */,
 				F74AF3A4247FB6AE00AC767B /* NCUtilityFileSystem.swift in Sources */,
 				AFCE353327E4ED1900FEA6C2 /* UIToolbar+Extension.swift in Sources */,
+				56CB2DAE2C16F45B009E88AF /* MoEngageAnalytics.swift in Sources */,
 				8491B1CD273BBA82001C8C5B /* UIViewController+Menu.swift in Sources */,
 				F73EF7BF2B02250B0087E6E9 /* NCManageDatabase+GPS.swift in Sources */,
 				F71F6D072B6A6A5E00F1EB15 /* ThreadSafeArray.swift in Sources */,
@@ -4253,6 +4299,7 @@
 				F755BD9B20594AC7008C5FBB /* NCService.swift in Sources */,
 				F7E8A391295DC5E0006CB2D0 /* View+Extension.swift in Sources */,
 				F79B869B265E19D40085C0E0 /* NSMutableAttributedString+Extension.swift in Sources */,
+				56B1F1172C1C26A900E4282E /* SwizzleHandler.swift in Sources */,
 				F7B7504B2397D38F004E13EC /* UIImage+Extension.swift in Sources */,
 				F7EFC0CD256BF8DD00461AAD /* NCUserStatus.swift in Sources */,
 				AF3FDCC22796ECC300710F60 /* NCTrash+CollectionView.swift in Sources */,
@@ -4288,6 +4335,7 @@
 				F7BC288026663F85004D46C5 /* NCViewCertificateDetails.swift in Sources */,
 				F78B87E92B62550800C65ADC /* NCMediaDownloadThumbnaill.swift in Sources */,
 				F73EF7AF2B0224350087E6E9 /* NCManageDatabase+DirectEditing.swift in Sources */,
+				56CB2DAA2C16E744009E88AF /* AnalyticsHelper.swift in Sources */,
 				D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */,
 				F745B253222D88AE00346520 /* NCLoginQRCode.swift in Sources */,
 				F769454822E9F20D000A798A /* NCShareNetworking.swift in Sources */,
@@ -5118,6 +5166,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = NKUJUXUJ3B;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
@@ -5140,6 +5189,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = NKUJUXUJ3B;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
@@ -5472,6 +5522,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		56CB2DA62C16E4C5009E88AF /* XCRemoteSwiftPackageReference "MoEngage-iOS-SDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/moengage/MoEngage-iOS-SDK.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.17.4;
+			};
+		};
 		F3A0479C2BD268B500658E7B /* XCRemoteSwiftPackageReference "PopupView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/exyte/PopupView.git";
@@ -5675,6 +5733,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		56CB2DAF2C16F6F4009E88AF /* MoEngage-iOS-SDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56CB2DA62C16E4C5009E88AF /* XCRemoteSwiftPackageReference "MoEngage-iOS-SDK" */;
+			productName = "MoEngage-iOS-SDK";
+		};
 		F3391B012B4C40FB001C0C4B /* XLForm */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F74E771E277A2EF40013B958 /* XCRemoteSwiftPackageReference "XLForm" */;
