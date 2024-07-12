@@ -25,6 +25,12 @@ extension SwizzleDelegate {
 
 class SwizzleHandler {
     func setup() {
-        SceneDelegate.setup()
+        DispatchQueue.main.async {
+            SceneDelegate.setup()
+            NCFavorite.setup()
+            NCOffline.setup()
+            NCShares.setup()
+            NCNotification.setup()
+        }
     }
 }

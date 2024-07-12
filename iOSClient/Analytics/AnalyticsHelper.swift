@@ -8,18 +8,18 @@
 
 import Foundation
 
-class AnalyticsHelper: AnalyticsService {
+class AnalyticsHelper: NSObject, AnalyticsService {
     
-    static let shared = AnalyticsHelper()
+    @objc static let shared = AnalyticsHelper()
 
     private var analyticsServices: [AnalyticsService]
 
-    private init() {
+    private override init() {
         // Initialize the analytics services
         let moEngageAnalytics = MoEngageAnalytics()
         moEngageAnalytics.trackAppId()
         analyticsServices = [moEngageAnalytics]
-        
+        super.init()
     }
 
     func trackEvent(eventName: AnalyticEvents, properties: [String: Any]? = nil) {
@@ -40,7 +40,7 @@ class AnalyticsHelper: AnalyticsService {
         }
     }
     
-    func trackAutoUpload(isEnable: Bool) {
+    @objc func trackAutoUpload(isEnable: Bool) {
         DispatchQueue.global(qos: .background).async {
             self.analyticsServices.forEach { $0.trackAutoUpload(isEnable: isEnable) }
         }
@@ -51,4 +51,35 @@ class AnalyticsHelper: AnalyticsService {
             self.analyticsServices.forEach { $0.trackAppVersion() }
         }
     }
+
+    func trackLogout() {
+        DispatchQueue.global(qos: .background).async {
+            self.analyticsServices.forEach { $0.trackLogout() }
+        }
+    }
+
+    func trackCreateFile(metadata: tableMetadata) {
+        DispatchQueue.global(qos: .background).async {
+            self.analyticsServices.forEach { $0.trackCreateFile(metadata: metadata) }
+        }
+    }
+
+    func trackEventWithMetadata(eventName: AnalyticEvents, metadata: tableMetadata) {
+        DispatchQueue.global(qos: .background).async {
+            self.analyticsServices.forEach { $0.trackEventWithMetadata(eventName: eventName, metadata: metadata) }
+        }
+    }
+    
+    func trackCreateVoiceMemo(metadata: tableMetadata) {
+        DispatchQueue.global(qos: .background).async {
+            self.analyticsServices.forEach { $0.trackCreateVoiceMemo(metadata: metadata) }
+        }
+    }
+
+    func trackCreateFolder(isEncrypted: Bool, creationDate: Date) {
+        DispatchQueue.global(qos: .background).async {
+            self.analyticsServices.forEach { $0.trackCreateFolder(isEncrypted: isEncrypted, creationDate: creationDate) }
+        }
+    }
+
 }

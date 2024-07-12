@@ -349,6 +349,9 @@ extension NCNetworking {
                             self.uploadLivePhoto(metadata: metadata, userInfo: userInfo)
                         }
                     } else {
+#if !EXTENSION
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__UPLOAD_FILE ,metadata: metadata)
+#endif
                         NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadedFile,
                                                                     object: nil,
                                                                     userInfo: userInfo,

@@ -255,7 +255,7 @@ extension AppDelegate {
                 )
             }
         }
-
+        AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
         controller.presentMenu(with: actions)
     }
 }

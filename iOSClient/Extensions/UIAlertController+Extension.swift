@@ -48,6 +48,10 @@ extension UIAlertController {
                         let error = await NCNetworkingE2EEMarkFolder().markFolderE2ee(account: session.account, fileName: fileNameFolder, serverUrl: serverUrl, userId: session.userId)
                         if error != .success {
                             NCContentPresenter().showError(error: error)
+                        } else {
+#if !EXTENSION
+                            AnalyticsHelper.shared.trackCreateFolder(isEncrypted: true, creationDate: Date())
+#endif
                         }
                     } else {
                         NCContentPresenter().showError(error: createFolderResults.error)
@@ -76,6 +80,7 @@ extension UIAlertController {
                 metadataForCreateFolder.sessionDate = Date()
                 NCManageDatabase.shared.addMetadata(metadataForCreateFolder)
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCreateFolder, userInfo: ["ocId": metadataForCreateFolder.ocId, "serverUrl": metadataForCreateFolder.serverUrl, "account": metadataForCreateFolder.account, "withPush": true, "sceneIdentifier": sceneIdentifier as Any])
+                AnalyticsHelper.shared.trackCreateFolder(isEncrypted: false, creationDate: Date())
             }
         })
 

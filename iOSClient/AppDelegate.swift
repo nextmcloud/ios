@@ -410,6 +410,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NCKeychain().removeAll()
         NCNetworking.shared.removeAllKeyUserDefaultsData(account: nil)
 
+        AnalyticsHelper.shared.trackLogout()
         exit(0)
     }
 
