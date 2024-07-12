@@ -585,6 +585,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         utilityFileSystem.removeTemporaryDirectory()
 
         NCKeychain().removeAll()
+        
+        AnalyticsHelper.shared.trackLogout()
         exit(0)
     }
 

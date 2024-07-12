@@ -306,6 +306,7 @@ extension NCLoginWeb: WKNavigationDelegate {
                     self.dismiss(animated: true)
                 } else {
                     if let mainTabBarController = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as? NCMainTabBarController {
+                        AnalyticsHelper.shared.trackUserData()
                         mainTabBarController.modalPresentationStyle = .fullScreen
                         mainTabBarController.view.alpha = 0
                         window?.rootViewController = mainTabBarController

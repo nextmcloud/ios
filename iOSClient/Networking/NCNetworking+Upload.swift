@@ -370,6 +370,9 @@ extension NCNetworking {
                 if metadata.isLivePhoto, NCGlobal.shared.isLivePhotoServerAvailable {
                     self.uploadLivePhoto(metadata: metadata, userInfo: userInfo)
                 } else {
+#if !EXTENSION
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__UPLOAD_FILE ,metadata: metadata)
+#endif
                     NotificationCenter.default.post(name: Notification.Name(rawValue: NCGlobal.shared.notificationCenterUploadedFile),
                                                     object: nil,
                                                     userInfo: userInfo)

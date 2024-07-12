@@ -14,6 +14,11 @@ protocol AnalyticsService {
     func trackUsedStorageData(quotaUsed: Int64)
     func trackAutoUpload(isEnable: Bool)
     func trackAppVersion()
+    func trackLogout()
+    func trackCreateFile(metadata: tableMetadata)
+    func trackCreateVoiceMemo(metadata: tableMetadata)
+    func trackCreateFolder(isEncrypted: Bool, creationDate: Date)
+    func trackEventWithMetadata(eventName: AnalyticEvents, metadata: tableMetadata)
 }
 
 
@@ -26,10 +31,10 @@ enum AnalyticEvents: String {
     case EVENT__UPLOAD_FILE = "upload_file" // when user uploads any file (not applicable for folder) from other apps
     case EVENT__CREATE_FILE = "create_file" // when user creates any file in app
     case EVENT__CREATE_FOLDER = "create_folder"
+    case EVENT__CREATE_VOICE_MEMO = "create_voice_memo"
     case EVENT__ADD_FAVORITE = "add_favorite"
     case EVENT__SHARE_FILE = "share_file" // when user share any file using link
     case EVENT__OFFLINE_AVAILABLE = "offline_available"
-    case EVENT__PIN_TO_HOME_SCREEN = "pin_to_homescreen"
     case EVENT__ONLINE_OFFICE_USED = "online_office_used" // when user opens any office files
     
     // screen view events when user open specific screen
@@ -63,4 +68,29 @@ enum AnalyticPropertyAttributes: String {
     case PROPERTIES__FILE_SIZE = "file_size" // in MB
     case PROPERTIES__CREATION_DATE = "creation_date" // yyyy-MM-dd
     case PROPERTIES__UPLOAD_DATE = "upload_date" // // yyyy-MM-dd
+}
+
+enum FolderType: String {
+    // properties attributes key
+    case FOLDER_ENCRYPTED = "encrypted"
+    case FOLDER_NORMAL = "not encrypted"
+}
+
+
+enum Size {
+    static let KILOBYTE = 1024
+    static let MEGABYTE = KILOBYTE * 1024
+    static let GIGABYTE = MEGABYTE * 1024
+}
+
+enum FileType: String {
+    case FOTO = "foto"
+    case AUDIO = "audio"
+    case VIDEO = "video"
+    case PDF = "pdf"
+    case TEXT = "text"
+    case DOCX = "docx"
+    case XLSX = "xlsx"
+    case PPT = "ppt"
+    case OTHER = "other"
 }

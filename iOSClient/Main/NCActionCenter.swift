@@ -166,6 +166,7 @@ class NCActionCenter: NSObject, UIDocumentInteractionControllerDelegate, NCSelec
         } else if metadata.directory {
             NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, offline: true, account: metadata.account)
             NCNetworking.shared.synchronization(account: metadata.account, serverUrl: serverUrl, add: true)
+            AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__OFFLINE_AVAILABLE, metadata: metadata)
         } else {
             var metadatasSynchronizationOffline: [tableMetadata] = []
             metadatasSynchronizationOffline.append(metadata)
@@ -176,6 +177,7 @@ class NCActionCenter: NSObject, UIDocumentInteractionControllerDelegate, NCSelec
             NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: metadatasSynchronizationOffline,
                                                                       session: NCNetworking.shared.sessionDownloadBackground,
                                                                       selector: NCGlobal.shared.selectorSynchronizationOffline)
+            AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__OFFLINE_AVAILABLE, metadata: metadata)
         }
     }
 

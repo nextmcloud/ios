@@ -67,7 +67,9 @@ extension MoEngageAnalytics: AnalyticsService {
     
     // Method to track the auto-upload setting
     func trackAutoUpload(isEnable: Bool) {
-        MoEngageSDKAnalytics.sharedInstance.setUserAttribute(isEnable, withAttributeName: AnalyticEvents.USER_PROPERTIES_AUTO_UPLOAD.rawValue)
+        if isEnable {
+            MoEngageSDKAnalytics.sharedInstance.setUserAttribute(isEnable, withAttributeName: AnalyticEvents.USER_PROPERTIES_AUTO_UPLOAD.rawValue)
+        }
     }
     
     // Method to track the app version
@@ -79,6 +81,7 @@ extension MoEngageAnalytics: AnalyticsService {
         if let oldVersion = UserDefaults.standard.value(forKey: NCSettingsBundleHelper.SettingsBundleKeys.BuildVersionKey) as? String {
             if version != oldVersion {
                 MoEngageSDKAnalytics.sharedInstance.appStatus(.update)
+                trackUserData()
             }
         } else {
             MoEngageSDKAnalytics.sharedInstance.appStatus(.install)
@@ -86,4 +89,88 @@ extension MoEngageAnalytics: AnalyticsService {
         
         MoEngageSDKAnalytics.sharedInstance.setUserAttribute(version, withAttributeName: AnalyticEvents.USER_PROPERTIES_APP_VERSION.rawValue)
     }
+    
+    //Method to track user logout
+    func trackLogout() {
+        MoEngageSDKAnalytics.sharedInstance.resetUser()
+    }
+    
+    //Method to track create file
+    func trackCreateFile(metadata: tableMetadata) {
+        let properties = MoEngageProperties()
+        properties.addAttribute(getFileType(contentType: metadata.contentType), withName: AnalyticPropertyAttributes.PROPERTIES__FILE_TYPE.rawValue)
+        properties.addAttribute(String(getFileSizeInMB(bytes: Int(metadata.size))), withName: AnalyticPropertyAttributes.PROPERTIES__FILE_SIZE.rawValue)
+        properties.addAttribute(getDate(date: metadata.creationDate as Date), withName: AnalyticPropertyAttributes.PROPERTIES__CREATION_DATE.rawValue)
+        MoEngageSDKAnalytics.sharedInstance.trackEvent(AnalyticEvents.EVENT__CREATE_FILE.rawValue, withProperties: properties)
+    }
+    
+    //Method to track upload file
+    func trackEventWithMetadata(eventName: AnalyticEvents, metadata: tableMetadata) {
+        let properties = MoEngageProperties()
+        properties.addAttribute(getFileType(contentType: metadata.contentType), withName: AnalyticPropertyAttributes.PROPERTIES__FILE_TYPE.rawValue)
+        properties.addAttribute(String(getFileSizeInMB(bytes: Int(metadata.size))), withName: AnalyticPropertyAttributes.PROPERTIES__FILE_SIZE.rawValue)
+        properties.addAttribute(getDate(date: metadata.creationDate as Date), withName: AnalyticPropertyAttributes.PROPERTIES__CREATION_DATE.rawValue)
+        properties.addAttribute(getDate(date: metadata.uploadDate as Date), withName: AnalyticPropertyAttributes.PROPERTIES__UPLOAD_DATE.rawValue)
+        MoEngageSDKAnalytics.sharedInstance.trackEvent(eventName.rawValue, withProperties: properties)
+    }
+    
+    //Method to track create folder
+    func trackCreateFolder(isEncrypted: Bool, creationDate: Date) {
+        let properties = MoEngageProperties()
+        properties.addAttribute(isEncrypted ? FolderType.FOLDER_ENCRYPTED.rawValue : FolderType.FOLDER_NORMAL.rawValue , withName: AnalyticPropertyAttributes.PROPERTIES__FILE_TYPE.rawValue)
+        properties.addAttribute(getDate(date: creationDate), withName: AnalyticPropertyAttributes.PROPERTIES__CREATION_DATE.rawValue)
+        MoEngageSDKAnalytics.sharedInstance.trackEvent(AnalyticEvents.EVENT__CREATE_FOLDER.rawValue, withProperties: properties)
+    }
+    
+    //Method to track create voice memo
+    func trackCreateVoiceMemo(metadata: tableMetadata) {
+        let properties = MoEngageProperties()
+        properties.addAttribute(FileType.AUDIO.rawValue, withName: AnalyticPropertyAttributes.PROPERTIES__FILE_TYPE.rawValue)
+        properties.addAttribute(String(getFileSizeInMB(bytes: Int(metadata.size))), withName: AnalyticPropertyAttributes.PROPERTIES__FILE_SIZE.rawValue)
+        properties.addAttribute(getDate(date: metadata.creationDate as Date), withName: AnalyticPropertyAttributes.PROPERTIES__CREATION_DATE.rawValue)
+        MoEngageSDKAnalytics.sharedInstance.trackEvent(AnalyticEvents.EVENT__CREATE_VOICE_MEMO.rawValue, withProperties: properties)
+    }
+    
+    
 }
+
+// Functions
+extension MoEngageAnalytics {
+    private func getFileType(contentType: String) -> String? {
+        switch contentType {
+        case "image/png":
+            return FileType.FOTO.rawValue
+        case "audio/x-m4a":
+            return FileType.AUDIO.rawValue
+        case "video/mp4":
+            return FileType.VIDEO.rawValue
+        case "application/pdf":
+            return FileType.PDF.rawValue
+        case "text/x-markdown","text/plain":
+            return FileType.TEXT.rawValue
+        case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            return FileType.DOCX.rawValue
+        case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","text/csv":
+            return FileType.XLSX.rawValue
+        case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+            return FileType.PPT.rawValue
+        default:
+            return FileType.OTHER.rawValue
+        }
+    }
+    
+    private func getDate(date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        return dateFormatter.string(from: date)
+    }
+    
+    private func getFileSizeInMB(bytes: Int) -> Int {
+        return Int(bytes / Size.MEGABYTE)
+    }
+
+}
+
+//    SCAN("scan"),
+
+

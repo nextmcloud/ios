@@ -250,7 +250,7 @@
             // remove
             [[NCManageDatabase shared] clearMetadatasUploadWithAccount:appDelegate.account];
         }
-        
+        [[AnalyticsHelper shared] trackAutoUploadWithIsEnable: [[rowDescriptor.value valueData] boolValue]];
         [self reloadForm];
     }
 

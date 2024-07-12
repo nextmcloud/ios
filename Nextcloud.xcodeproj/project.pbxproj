@@ -15,7 +15,10 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
-		5676A3282C22BFF900A890E5 /* AppDelegate+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5676A3272C22BFF900A890E5 /* AppDelegate+Swizzle.swift */; };
+		56042C852C32B6FF00EC9ADC /* NCFavorite+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56042C842C32B6FF00EC9ADC /* NCFavorite+Swizzle.swift */; };
+		56042C892C32C2BF00EC9ADC /* NCOffline+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56042C882C32C2BF00EC9ADC /* NCOffline+Swizzle.swift */; };
+		565006AF2C33D2A500A99FCB /* NCShares+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565006AE2C33D2A500A99FCB /* NCShares+Swizzle.swift */; };
+		565006B32C33D5F600A99FCB /* NCNotification+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565006B22C33D5F600A99FCB /* NCNotification+Swizzle.swift */; };
 		56B1F1172C1C26A900E4282E /* SwizzleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B1F1162C1C26A900E4282E /* SwizzleHandler.swift */; };
 		56B1F1192C1C3AA800E4282E /* SceneDelegate+Swizzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B1F1182C1C3AA800E4282E /* SceneDelegate+Swizzle.swift */; };
 		56CB2DAA2C16E744009E88AF /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB2DA92C16E744009E88AF /* AnalyticsHelper.swift */; };
@@ -1069,7 +1072,10 @@
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		371B5A3223D0BD5500FAFAE9 /* FloatingPanel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FloatingPanel.framework; path = Carthage/Build/iOS/FloatingPanel.framework; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
-		5676A3272C22BFF900A890E5 /* AppDelegate+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Swizzle.swift"; sourceTree = "<group>"; };
+		56042C842C32B6FF00EC9ADC /* NCFavorite+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCFavorite+Swizzle.swift"; sourceTree = "<group>"; };
+		56042C882C32C2BF00EC9ADC /* NCOffline+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCOffline+Swizzle.swift"; sourceTree = "<group>"; };
+		565006AE2C33D2A500A99FCB /* NCShares+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShares+Swizzle.swift"; sourceTree = "<group>"; };
+		565006B22C33D5F600A99FCB /* NCNotification+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCNotification+Swizzle.swift"; sourceTree = "<group>"; };
 		56B1F1162C1C26A900E4282E /* SwizzleHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwizzleHandler.swift; sourceTree = "<group>"; };
 		56B1F1182C1C3AA800E4282E /* SceneDelegate+Swizzle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SceneDelegate+Swizzle.swift"; sourceTree = "<group>"; };
 		56CB2DA92C16E744009E88AF /* AnalyticsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsHelper.swift; sourceTree = "<group>"; };
@@ -1903,7 +1909,10 @@
 			children = (
 				56B1F1162C1C26A900E4282E /* SwizzleHandler.swift */,
 				56B1F1182C1C3AA800E4282E /* SceneDelegate+Swizzle.swift */,
-				5676A3272C22BFF900A890E5 /* AppDelegate+Swizzle.swift */,
+				56042C842C32B6FF00EC9ADC /* NCFavorite+Swizzle.swift */,
+				56042C882C32C2BF00EC9ADC /* NCOffline+Swizzle.swift */,
+				565006AE2C33D2A500A99FCB /* NCShares+Swizzle.swift */,
+				565006B22C33D5F600A99FCB /* NCNotification+Swizzle.swift */,
 			);
 			path = Swizzle;
 			sourceTree = "<group>";
@@ -4163,6 +4172,7 @@
 				AF935067276B84E700BD078F /* NCMenu+FloatingPanel.swift in Sources */,
 				F321DA8A2B71205A00DDA0E6 /* NCTrashSelectTabBar.swift in Sources */,
 				F702F2CD25EE5B4F008F8E80 /* AppDelegate.swift in Sources */,
+				56042C852C32B6FF00EC9ADC /* NCFavorite+Swizzle.swift in Sources */,
 				F769454022E9F077000A798A /* NCSharePaging.swift in Sources */,
 				F7802B322BD5584F00D74270 /* NCMedia+DragDrop.swift in Sources */,
 				F7EE66AD2A20B226009AE765 /* UILabel+Extension.swift in Sources */,
@@ -4304,6 +4314,7 @@
 				F79B869B265E19D40085C0E0 /* NSMutableAttributedString+Extension.swift in Sources */,
 				56B1F1172C1C26A900E4282E /* SwizzleHandler.swift in Sources */,
 				F7B7504B2397D38F004E13EC /* UIImage+Extension.swift in Sources */,
+				565006AF2C33D2A500A99FCB /* NCShares+Swizzle.swift in Sources */,
 				F7EFC0CD256BF8DD00461AAD /* NCUserStatus.swift in Sources */,
 				AF3FDCC22796ECC300710F60 /* NCTrash+CollectionView.swift in Sources */,
 				F70D7C3725FFBF82002B9E34 /* NCCollectionViewCommon.swift in Sources */,
@@ -4321,6 +4332,7 @@
 				F77BC3ED293E528A005F2B08 /* NCConfigServer.swift in Sources */,
 				F7A560422AE1593700BE8FD6 /* NCOperationSaveLivePhoto.swift in Sources */,
 				F7E402312BA891EB007E5609 /* NCTrash+SelectTabBarDelegate.swift in Sources */,
+				56042C892C32C2BF00EC9ADC /* NCOffline+Swizzle.swift in Sources */,
 				F70753EB2542A99800972D44 /* NCViewerMediaPage.swift in Sources */,
 				F7817CF829801A3500FFBC65 /* Data+Extension.swift in Sources */,
 				F749B651297B0F2400087535 /* NCManageDatabase+Avatar.swift in Sources */,
@@ -4353,6 +4365,7 @@
 				F76687072B7D067400779E3F /* NCAudioRecorderViewController.swift in Sources */,
 				F343A4BB2A1E734600DDA874 /* Optional+Extension.swift in Sources */,
 				F7D68FCC28CB9051009139F3 /* NCManageDatabase+DashboardWidget.swift in Sources */,
+				565006B32C33D5F600A99FCB /* NCNotification+Swizzle.swift in Sources */,
 				F78E2D6529AF02DB0024D4F3 /* Database.swift in Sources */,
 				F70CEF5623E9C7E50007035B /* UIColor+Extension.swift in Sources */,
 				F75CA1472962F13700B01130 /* HUDView.swift in Sources */,
@@ -4379,7 +4392,6 @@
 				F717402E24F699A5000C87D5 /* NCFavorite.swift in Sources */,
 				AF2D7C7E2742559100ADF566 /* NCShareUserCell.swift in Sources */,
 				F74DE14325135B6800917068 /* NCTransfers.swift in Sources */,
-				5676A3282C22BFF900A890E5 /* AppDelegate+Swizzle.swift in Sources */,
 				AF4BF614275629E20081CEEF /* NCManageDatabase+Account.swift in Sources */,
 				F711A4DC2AF92CAE00095DD8 /* NCUtility+Date.swift in Sources */,
 				AF4BF61E27562B3F0081CEEF /* NCManageDatabase+Activity.swift in Sources */,

@@ -628,6 +628,11 @@ extension NCNetworking {
             if error == .success && metadata.account == account {
                 metadata.favorite = favorite
                 NCManageDatabase.shared.addMetadata(metadata)
+#if !EXTENSION
+                if favorite {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__ADD_FAVORITE ,metadata: metadata)
+                }
+#endif
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterFavoriteFile, userInfo: ["ocId": ocId, "serverUrl": metadata.serverUrl])
             }
             completion(error)

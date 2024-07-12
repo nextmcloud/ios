@@ -285,7 +285,7 @@ extension AppDelegate {
                 )
             }
         }
-
+        AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
         mainTabBarController.presentMenu(with: actions)
     }
 
@@ -309,7 +309,7 @@ extension AppDelegate {
             }
 
             let metadata = NCManageDatabase.shared.createMetadata(account: self.account, user: self.user, userId: self.userId, fileName: fileName, fileNameView: fileName, ocId: UUID, serverUrl: serverUrl, urlBase: self.urlBase, url: url, contentType: results.mimeType)
-
+            AnalyticsHelper.shared.trackCreateFile(metadata: metadata)
             NCViewer().view(viewController: viewController, metadata: metadata, metadatas: [metadata], imageIcon: nil)
         }
     }
