@@ -27,7 +27,7 @@ let userAgent: String = {
     let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
 //    return "MagentaCLOUD iOS"
-    return "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
+    return "Mozilla/5.0 (iOS) Magenta-iOS/\(appVersion)"
 }()
 
 @objc class NCBrandOptions: NSObject {
@@ -57,11 +57,11 @@ let userAgent: String = {
     @objc public var folderDefaultAutoUpload: String = Locale.current.languageCode == "de" ? "Kamera-Medien" : "Camera-Media"
 
     // Capabilities Group
-    @objc public var capabilitiesGroups:              String = "group.de.telekom.Mediencenter"
-    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
+    @objc public var capabilitiesGroups:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
+    @objc public var capabilitiesGroupApps:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
 
     // BRAND ONLY
-    @objc public var use_login_web_personalized: Bool = true                                   // Don't touch me !!
+    @objc public var use_login_web_personalized: Bool = false                                   // Don't touch me !!
     @objc public var use_AppConfig: Bool = false
     @objc public var use_GroupApps: Bool = true                                                 // Don't touch me !!
 
