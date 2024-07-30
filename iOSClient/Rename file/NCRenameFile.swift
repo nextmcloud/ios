@@ -36,6 +36,7 @@ public extension NCRenameFileDelegate {
 class NCRenameFile: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var separatorHeightContraint: NSLayoutConstraint!
     @IBOutlet weak var previewFile: UIImageView!
     @IBOutlet weak var fileNameNoExtension: UITextField!
     @IBOutlet weak var point: UILabel!
@@ -43,9 +44,10 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var fileNameNoExtensionTrailingContraint: NSLayoutConstraint!
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var renameButton: UIButton!
+    @IBOutlet weak var seperator: UIView!
 
     let width: CGFloat = 300
-    let height: CGFloat = 310
+    let height: CGFloat = 350
 
     var metadata: tableMetadata?
     var indexPath: IndexPath = IndexPath()
@@ -66,7 +68,9 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             } else {
                 titleLabel.text = NSLocalizedString("_rename_file_", comment: "")
             }
-
+            separatorHeightContraint.constant = 0.3
+            seperator.backgroundColor = NCBrandColor.shared.seperatorRename
+            fileNameNoExtension.backgroundColor = .secondarySystemGroupedBackground
             fileNameNoExtension.text = (metadata.fileNameView as NSString).deletingPathExtension
             fileNameNoExtension.delegate = self
             fileNameNoExtension.becomeFirstResponder()
@@ -123,9 +127,17 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
         }
 
         cancelButton.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
-        cancelButton.setTitleColor(NCBrandColor.shared.brandElement, for: .normal)
+        cancelButton.setTitleColor(NCBrandColor.shared.iconColor, for: .normal)
+        cancelButton.layer.cornerRadius = 5
+        cancelButton.layer.masksToBounds = true
+        cancelButton.layer.borderWidth = 0.3
+        cancelButton.layer.borderColor = NCBrandColor.shared.iconColor.cgColor
+        
         renameButton.setTitle(NSLocalizedString("_rename_", comment: ""), for: .normal)
-        renameButton.setTitleColor(NCBrandColor.shared.brandElement, for: .normal)
+        renameButton.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
+        renameButton.layer.cornerRadius = 5
+        renameButton.layer.masksToBounds = true
+        renameButton.layer.backgroundColor = NCBrandColor.shared.brand.cgColor
     }
 
     override func viewDidAppear(_ animated: Bool) {
