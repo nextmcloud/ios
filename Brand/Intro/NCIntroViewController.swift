@@ -203,7 +203,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
             navigationController?.pushViewController(loginViewPage, animated: true)
         } else {
             if NextcloudKit.shared.isNetworkReachable() {
-                appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+                appDelegate.openLogin(selector: NCGlobal.shared.introLogin, openLoginWeb: false)
             } else {
                 showNoInternetAlert()
             }
@@ -217,7 +217,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func signup(_ sender: Any) {
-        appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introSignup, openLoginWeb: false)
+        appDelegate.openLogin(selector: NCGlobal.shared.introSignup, openLoginWeb: false)
     }
 
     @IBAction func host(_ sender: Any) {
