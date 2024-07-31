@@ -232,7 +232,6 @@ class NCImageCache: NSObject {
         static var sharedWithMe = UIImage()
 
         static var favorite = UIImage()
-        static var comment = UIImage()
         static var livePhoto = UIImage()
         static var offlineFlag = UIImage()
         static var local = UIImage()
@@ -272,14 +271,13 @@ class NCImageCache: NSObject {
         images.shareByLink = UIImage(named: "sharebylink")!.image(color: .systemGray, size: 50)
         images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 50)
         
-        images.favorite = utility.loadImage(named: "star.fill", color: yellowFavorite)
-        images.comment = UIImage(named: "comment")!.image(color: .systemGray, size: 50)
-        images.livePhoto = utility.loadImage(named: "livephoto", color: .label)
+        images.favorite = utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
+        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
         images.offlineFlag = UIImage(named: "offlineFlag")!
-        images.local = UIImage(named: "local")!
+        images.local = utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen])
 
         images.checkedYes = UIImage(named: "checkedYes")!
-        images.checkedNo = utility.loadImage(named: "circle")
+        images.checkedNo = UIImage(named: "local")!
 
         images.buttonMore = utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor])
         images.buttonStop = utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor])
