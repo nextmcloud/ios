@@ -140,6 +140,7 @@ extension NCLoginProvider: WKNavigationDelegate {
                 let server: String = server.replacingOccurrences(of: "/server:", with: "")
                 let username: String = user.replacingOccurrences(of: "user:", with: "").replacingOccurrences(of: "+", with: " ")
                 let password: String = password.replacingOccurrences(of: "password:", with: "")
+
                 createAccount(server: server, username: username, password: password)
             }
         }
@@ -183,7 +184,7 @@ extension NCLoginProvider: WKNavigationDelegate {
                 NCManageDatabase.shared.deleteAccount(account)
                 NCManageDatabase.shared.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
 
-                self.appDelegate.changeAccount(account, userProfile: userProfile) { }
+                self.appDelegate.changeAccount(account, userProfile: userProfile)
 
                 let window = UIApplication.shared.firstWindow
                 if window?.rootViewController is NCMainTabBarController {
