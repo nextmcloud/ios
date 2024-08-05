@@ -159,6 +159,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell = listCell
         }
         guard let metadata = dataSource.cellForItemAt(indexPath: indexPath) else { return cell }
+        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
 
         defer {
             if NCGlobal.shared.disableSharesView || !metadata.isSharable() {
@@ -271,6 +272,20 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         if appDelegate.account != metadata.account {
             cell.fileSharedImage?.image = NCImageCache.images.shared
         }
+        cell.fileSharedLabel?.text = NSLocalizedString("_shared_", comment: "")
+        cell.fileSharedLabel?.textColor = NCBrandColor.shared.customer
+        if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)){
+            cell.fileSharedImage?.image = cell.fileSharedImage?.image?.imageColor(NCBrandColor.shared.customer)
+        } else {
+            cell.fileSharedImage?.image = NCImageCache.images.canShare.image(color: NCBrandColor.shared.gray60, size: 50)
+            cell.fileSharedLabel?.text = ""
+        }
+        
+        if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+            cell.fileSharedImage?.image = NCImageCache.images.sharedWithMe
+            cell.fileSharedLabel?.text = NSLocalizedString("_recieved_", comment: "")
+            cell.fileSharedLabel?.textColor = NCBrandColor.shared.notificationAction
+        }
 
         // Button More
         if metadata.isInTransfer || metadata.isWaitingTransfer {
@@ -375,6 +390,16 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         }
 
         cell.setIconOutlines()
+
+        // Hide lines on iPhone
+        if !UIDevice.current.orientation.isLandscape && UIDevice.current.model.hasPrefix("iPhone") {
+            cell.cellSeparatorView?.isHidden = true
+            cell.fileSharedLabel?.isHidden = true
+        }else{
+            cell.cellSeparatorView?.isHidden = false
+            cell.fileSharedLabel?.isHidden = false
+        }
+
         return cell
     }
 

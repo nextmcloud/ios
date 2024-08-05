@@ -73,8 +73,8 @@ class NCOffline: NCCollectionViewCommon {
         self.dataSource = NCDataSource(metadatas: metadatas, account: self.appDelegate.account, layoutForView: layoutForView, providers: self.providers, searchResults: self.searchResults)
     }
 
-    override func reloadDataSourceNetwork() {
-        super.reloadDataSourceNetwork()
+    override func reloadDataSourceNetwork(withQueryDB: Bool = false) {
+        super.reloadDataSourceNetwork(withQueryDB: withQueryDB)
         reloadDataSource()
     }
 }
