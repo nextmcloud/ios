@@ -722,7 +722,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
         let form : XLFormDescriptor
         var section : XLFormSectionDescriptor
         var row : XLFormRowDescriptor
-        
+        let permissions = NCPermissions()
         form = XLFormDescriptor(title: "Other Cells")
         
         //Sharing
@@ -746,12 +746,12 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_read_only_", comment: "")
         row.height = 44
         
-        if let permission = self.permission, !CCUtility.isAnyPermission(toEdit: permission), permission !=  NCGlobal.shared.permissionCreateShare {
+        if let permission = self.permission, !permissions.isAnyPermissionToEdit(permission), permission !=  permissions.permissionCreateShare {
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
         }
         if isNewShare {
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
-            self.permission = NCGlobal.shared.permissionReadShare
+            self.permission = permissions.permissionReadShare
         }
         section.addFormRow(row)
         
@@ -762,7 +762,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_allow_editing_", comment: "")
         row.height = 44
         if let permission = self.permission {
-            if CCUtility.isAnyPermission(toEdit: permission), permission != NCGlobal.shared.permissionCreateShare {
+            if permissions.isAnyPermissionToEdit(permission), permission != permissions.permissionCreateShare {
                 row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
             }
         }
@@ -784,7 +784,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
             XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
             row = XLFormRowDescriptor(tag: "NCFilePermissionCellFileDrop", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
             row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_file_drop_", comment: "")
-            if self.permission == NCGlobal.shared.permissionCreateShare {
+            if self.permission == permissions.permissionCreateShare {
                 row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
             }
             row.height = 44
@@ -1013,11 +1013,11 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
     
     override func didSelectFormRow(_ formRow: XLFormRowDescriptor!) {
         guard let metadata = self.metadata else { return }
-
+        let permissions = NCPermissions()
         switch formRow.tag {
         case "NCFilePermissionCellRead":
 
-            let value = CCUtility.getPermissionsValue(byCanEdit: false, andCanCreate: false, andCanChange: false, andCanDelete: false, andCanShare: canReshareTheShare(), andIsFolder: metadata.directory)
+            let value = permissions.getPermission(canEdit: false, canCreate: false, canChange: false, canDelete: false, canShare: canReshareTheShare(), isDirectory: metadata.directory)
             self.permission = value
 //            self.permissions = "RDNVCK"
             metadata.permissions = "RDNVCK"
@@ -1034,7 +1034,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
             self.reloadForm()
             break
         case "kNMCFilePermissionCellEditing":
-             let value = CCUtility.getPermissionsValue(byCanEdit: true, andCanCreate: true, andCanChange: true, andCanDelete: true, andCanShare: canReshareTheShare(), andIsFolder: metadata.directory)
+            let value = permissions.getPermission(canEdit: true, canCreate: true, canChange: true, canDelete: true, canShare: canReshareTheShare(), isDirectory: metadata.directory)
             self.permission = value
 //            self.permissions = "RGDNV"
             metadata.permissions = "RGDNV"
@@ -1050,7 +1050,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
             self.reloadForm()
             break
         case "NCFilePermissionCellFileDrop":
-            self.permission = NCGlobal.shared.permissionCreateShare
+            self.permission = permissions.permissionCreateShare
 //            self.permissions = "RGDNVCK"
             metadata.permissions = "RGDNVCK"
             if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
@@ -1080,7 +1080,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFooterDeleg
             
     func canReshareTheShare() -> Bool {
         if let permissionValue = self.permission {
-            let canReshare = CCUtility.isPermission(toCanShare: permissionValue)
+            let canReshare = NCPermissions().isPermissionToCanShare(permissionValue)
             return canReshare
         } else {
             return false

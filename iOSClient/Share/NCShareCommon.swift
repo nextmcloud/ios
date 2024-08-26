@@ -22,19 +22,9 @@
 
 import UIKit
 import DropDown
+import NextcloudKit
 
 enum NCShareCommon {
-    static let shareTypeUser = 0
-    static let shareTypeGroup = 1
-    static let shareTypeLink = 3
-    static let shareTypeEmail = 4
-    static let shareTypeContact = 5
-    static let shareTypeFederated = 6
-    static let shareTypeTeam = 7
-    static let shareTypeGuest = 8
-    static let shareTypeFederatedGroup = 9
-    static let shareTypeRoom = 10
-
     static let itemTypeFile = "file"
     static let itemTypeFolder = "folder"
 
@@ -68,49 +58,40 @@ enum NCShareCommon {
         }
     }
 
-    static func getImageShareType(shareType: Int, isDropDown:Bool = false) -> UIImage? {
+    static func getImageShareType(shareType: Int) -> UIImage? {
+        typealias type = NKShare.ShareType
 
         switch shareType {
-        case NCShareCommon.shareTypeUser:
-            return UIImage(named: "shareTypeEmail")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case NCShareCommon.shareTypeGroup:
+        case type.group.rawValue:
             return UIImage(named: "shareTypeGroup")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case NCShareCommon.shareTypeLink:
+        case type.publicLink.rawValue:
             return UIImage(named: "shareTypeLink")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case NCShareCommon.shareTypeEmail:
-            return UIImage(named: isDropDown ? "email" : "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case NCShareCommon.shareTypeContact:
-            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case NCShareCommon.shareTypeFederated:
-//            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-            return UIImage(named: isDropDown ? "shareTypeUser" : "shareTypeEmail")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case NCShareCommon.shareTypeTeam:
-//            return UIImage(named: "shareTypeTeam")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-            return UIImage(named: "shareTypeCircles")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case NCShareCommon.shareTypeGuest:
-            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case NCShareCommon.shareTypeFederatedGroup:
+        case type.email.rawValue:
+            return UIImage(named: "shareTypeEmail")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+        case type.team.rawValue:
+            return UIImage(named: "shareTypeTeam")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+        case type.federatedGroup.rawValue:
             return UIImage(named: "shareTypeGroup")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case NCShareCommon.shareTypeRoom:
+        case type.talkConversation.rawValue:
             return UIImage(named: "shareTypeRoom")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         default:
             return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         }
     }
     
-    static func isLinkShare(shareType: Int) -> Bool {
-        return shareType == NCShareCommon.shareTypeLink
+    func isLinkShare(shareType: Int) -> Bool {
+        return shareType == SHARE_TYPE_LINK
     }
     
-    static func isExternalUserShare(shareType: Int) -> Bool {
-        return shareType == NCShareCommon.shareTypeEmail
+    func isExternalUserShare(shareType: Int) -> Bool {
+        return shareType == SHARE_TYPE_EMAIL
     }
     
-    static func isInternalUser(shareType: Int) -> Bool {
-        return shareType == NCShareCommon.shareTypeUser
+    func isInternalUser(shareType: Int) -> Bool {
+        return shareType == SHARE_TYPE_USER
     }
     
-    static func isFileTypeAllowedForEditing(fileExtension: String, shareType: Int) -> Bool {
+    func isFileTypeAllowedForEditing(fileExtension: String, shareType: Int) -> Bool {
         if fileExtension == "md" || fileExtension == "txt" {
             return true
         } else {
@@ -118,7 +99,7 @@ enum NCShareCommon {
         }
     }
     
-    static func isEditingEnabled(isDirectory: Bool, fileExtension: String, shareType: Int) -> Bool {
+    func isEditingEnabled(isDirectory: Bool, fileExtension: String, shareType: Int) -> Bool {
         if !isDirectory {//file
             return isFileTypeAllowedForEditing(fileExtension: fileExtension, shareType: shareType)
         } else {
@@ -126,18 +107,18 @@ enum NCShareCommon {
         }
     }
     
-    static func isFileDropOptionVisible(isDirectory: Bool, shareType: Int) -> Bool {
+    func isFileDropOptionVisible(isDirectory: Bool, shareType: Int) -> Bool {
         return (isDirectory && (isLinkShare(shareType: shareType) || isExternalUserShare(shareType: shareType)))
     }
     
-    static func isCurrentUserIsFileOwner(fileOwnerId: String) -> Bool {
-        if let currentUser = NCManageDatabase.shared.getActiveTableAccount(), currentUser.userId == fileOwnerId {
+    func isCurrentUserIsFileOwner(fileOwnerId: String) -> Bool {
+        if let currentUser = NCManageDatabase.shared.getActiveAccount(), currentUser.userId == fileOwnerId {
             return true
         }
         return false
     }
     
-    static func canReshare(withPermission permission: String) -> Bool {
+    func canReshare(withPermission permission: String) -> Bool {
         return permission.contains(NCPermissions().permissionCanShare)
     }
 }
