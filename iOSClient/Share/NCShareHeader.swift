@@ -56,9 +56,9 @@ class NCShareAdvancePermissionHeader: UIView {
         fileName.text = metadata.fileNameView
         fileName.textColor = NCBrandColor.shared.fileFolderName
         if metadata.favorite {
-            favorite.setImage(utility.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
+            favorite.setImage(utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 24), for: .normal)
         } else {
-            favorite.setImage(utility.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
+            favorite.setImage(utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.textInfo], size: 24), for: .normal)
         }
         info.textColor = NCBrandColor.shared.optionItem
         info.text = utilityFileSystem.transformedSize(metadata.size) + ", " + utility.dateDiff(metadata.date as Date)
@@ -70,9 +70,9 @@ class NCShareAdvancePermissionHeader: UIView {
             if error == .success {
                 guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
                 if metadata.favorite {
-                    self.favorite.setImage(self.utility.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
+                    self.favorite.setImage(self.utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 24), for: .normal)
                 } else {
-                    self.favorite.setImage(self.utility.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
+                    self.favorite.setImage(self.utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.textInfo], size: 24), for: .normal)
                 }
             } else {
                 NCContentPresenter().showError(error: error)

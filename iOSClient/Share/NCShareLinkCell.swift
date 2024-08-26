@@ -47,25 +47,26 @@ class NCShareLinkCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-
+        buttonMenu.contentMode = .scaleAspectFill
         imageItem.image = UIImage(named: "sharebylink")?.image(color: NCBrandColor.shared.label, size: 30)
         buttonCopy.setImage(UIImage.init(named: "shareCopy")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
-        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
+        buttonMenu.setImage(NCImageCache.images.buttonMore.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
     }
 
     func setupCellUI() {
+        let permissions = NCPermissions()
         guard let tableShare = tableShare else {
             return
         }
         contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         labelTitle.textColor = NCBrandColor.shared.label
         
-        if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
+        if tableShare.permissions == permissions.permissionCreateShare {
             labelQuickStatus.text = NSLocalizedString("_share_file_drop_", comment: "")
         } else {
             // Read Only
-            if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
+            if permissions.isAnyPermissionToEdit(tableShare.permissions) {
                 labelQuickStatus.text = NSLocalizedString("_share_editing_", comment: "")
             } else {
                 labelQuickStatus.text = NSLocalizedString("_share_read_only_", comment: "")

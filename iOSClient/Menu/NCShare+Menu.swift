@@ -110,7 +110,7 @@ extension NCShare {
             NCMenuAction(
                 title: NSLocalizedString("_share_read_only_", comment: ""),
                 icon: UIImage(),
-                selected: tableShare.permissions == (NCGlobal.shared.permissionReadShare + NCGlobal.shared.permissionShareShare) || tableShare.permissions == NCGlobal.shared.permissionReadShare,
+                selected: tableShare.permissions == (permissions.permissionReadShare + permissions.permissionShareShare) || tableShare.permissions == permissions.permissionReadShare,
                 on: false,
                 action: { _ in
                     let canShare = permissions.isPermissionToCanShare(tableShare.permissions)
@@ -139,12 +139,11 @@ extension NCShare {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_share_file_drop_", comment: ""),
-                    icon: tableShare.permissions == NCGlobal.shared.permissionCreateShare ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) ?? UIImage() : UIImage(),
+                    icon: tableShare.permissions == permissions.permissionCreateShare ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) ?? UIImage() : UIImage(),
                     selected: false,
                     on: false,
                     action: { menuAction in
-                        let permissions = NCGlobal.shared.permissionCreateShare
-                        self.updateSharePermissions(share: tableShare, permissions: permissions)
+                        self.updateSharePermissions(share: tableShare, permissions: permissions.permissionCreateShare)
                     }
                 )
             )

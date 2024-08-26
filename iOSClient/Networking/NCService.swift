@@ -181,13 +181,6 @@ class NCService: NSObject {
                 NCBrandColor.shared.settingThemingColor(account: account)
                 NCImageCache.shared.createImagesBrandCache()
             }
-
-            // Sharing & Comments
-            if !NCGlobal.shared.capabilityFileSharingApiEnabled && !NCGlobal.shared.capabilityFilesComments && NCGlobal.shared.capabilityActivity.isEmpty {
-                self.appDelegate.disableSharesView = true
-            } else {
-                self.appDelegate.disableSharesView = false
-            }
             
             // File Sharing
             if NCGlobal.shared.capabilityFileSharingApiEnabled {

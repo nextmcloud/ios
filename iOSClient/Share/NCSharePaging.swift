@@ -106,7 +106,7 @@ class NCSharePaging: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if appDelegate?.disableSharesView == true {
+        if NCGlobal.shared.disableSharesView {
             self.dismiss(animated: false, completion: nil)
         }
 
@@ -304,7 +304,7 @@ class NCShareHeaderView: UIView {
         }
         var canReshare: Bool {
             guard let metadata = metadata else { return true }
-            return ((metadata.sharePermissionsCollaborationServices & NCGlobal.shared.permissionShareShare) != 0)
+            return ((metadata.sharePermissionsCollaborationServices & NCPermissions().permissionShareShare) != 0)
         }
         canShareInfoView.isHidden = isCurrentUser
         labelSharingInfo.isHidden = !isCurrentUser
@@ -325,9 +325,9 @@ class NCShareHeaderView: UIView {
             if error == .success {
                 guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
                 if metadata.favorite {
-                    self.favorite.setImage(self.utility.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
+                    self.favorite.setImage(self.utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 24), for: .normal)
                 } else {
-                    self.favorite.setImage(self.utility.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
+                    self.favorite.setImage(self.utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.textInfo], size: 24), for: .normal)
                 }
             } else {
                 NCContentPresenter().showError(error: error)
