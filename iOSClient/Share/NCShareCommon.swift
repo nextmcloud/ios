@@ -143,6 +143,6 @@ class NCShareCommon: NSObject {
     }
     
     func canReshare(withPermission permission: String) -> Bool {
-        return permission.contains(NCGlobal.shared.permissionCanShare)
+        return permission.contains(NCPermissions().permissionCanShare)
     }
 }
