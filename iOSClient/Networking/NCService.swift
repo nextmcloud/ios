@@ -182,13 +182,6 @@ class NCService: NSObject {
             if NCBrandColor.shared.settingThemingColor(account: account) {
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming, userInfo: ["account": account])
             }
-
-            // Sharing & Comments
-            if !NCGlobal.shared.capabilityFileSharingApiEnabled && !NCGlobal.shared.capabilityFilesComments && NCGlobal.shared.capabilityActivity.isEmpty {
-                self.appDelegate.disableSharesView = true
-            } else {
-                self.appDelegate.disableSharesView = false
-            }
             
             // File Sharing
             if NCGlobal.shared.capabilityFileSharingApiEnabled {

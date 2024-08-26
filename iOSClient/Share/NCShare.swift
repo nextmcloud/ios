@@ -342,8 +342,8 @@ extension NCShare: NCShareNetworkingDelegate {
         }
         
         // EDITORS
-        let editors = utility.isDirectEditing(account: metadata.account, contentType: metadata.contentType)
-        let availableRichDocument = utility.isRichDocument(metadata)
+        let editors = utility.editorsDirectEditing(account: metadata.account, contentType: metadata.contentType)
+        let availableRichDocument = utility.isTypeFileRichDocument(metadata)
         
         // RichDocument: Collabora
         return (availableRichDocument && editors.count == 0)
@@ -473,9 +473,9 @@ extension NCShare: UITableViewDataSource {
         headerView.fileName.text = metadata?.fileNameView
         headerView.fileName.textColor = NCBrandColor.shared.label
         if metadata!.favorite {
-            headerView.favorite.setImage(utility.loadImage(named: "star.fill", color: NCBrandColor.shared.yellowFavorite, size: 24), for: .normal)
+            headerView.favorite.setImage(utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 24), for: .normal)
         } else {
-            headerView.favorite.setImage(utility.loadImage(named: "star.fill", color: NCBrandColor.shared.textInfo, size: 24), for: .normal)
+            headerView.favorite.setImage(utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.textInfo], size: 24), for: .normal)
         }
         headerView.info.text = utilityFileSystem.transformedSize(metadata!.size) + ", " + utility.dateDiff(metadata!.date as Date)
         return headerView
