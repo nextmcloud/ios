@@ -71,7 +71,7 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         labelTitle.lineBreakMode = .byTruncatingMiddle
         labelTitle.textColor = NCBrandColor.shared.textColor
         contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-
+        let permissions = NCPermissions()
         labelTitle.text = tableShare.shareWithDisplayname
         labelTitle.textColor = NCBrandColor.shared.label
         isUserInteractionEnabled = true
@@ -82,10 +82,10 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         imageItem.image = NCShareCommon().getImageShareType(shareType: tableShare.shareType)
 
         let status = utility.getUserStatus(userIcon: tableShare.userIcon, userStatus: tableShare.userStatus, userMessage: tableShare.userMessage)
-        imageStatus.image = status.onlineStatus
+        imageStatus.image = status.statusImage
         self.status.text = status.statusMessage
         
-        if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
+        if permissions.isAnyPermissionToEdit(tableShare.permissions) {
             switchCanEdit.setOn(true, animated: false)
         } else {
             switchCanEdit.setOn(false, animated: false)
@@ -142,11 +142,11 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         default:
             return ""
         }
-        if tableShare.permissions == NCGlobal.shared.permissionCreateShare {
+        if tableShare.permissions == permissions.permissionCreateShare {
             labelQuickStatus.text = NSLocalizedString("_share_file_drop_", comment: "")
         } else {
             // Read Only
-            if CCUtility.isAnyPermission(toEdit: tableShare.permissions) {
+            if permissions.isAnyPermissionToEdit(tableShare.permissions) {
                 labelQuickStatus.text = NSLocalizedString("_share_editing_", comment: "")
             } else {
                 labelQuickStatus.text = NSLocalizedString("_share_read_only_", comment: "")
@@ -159,6 +159,8 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAvatarImage(_:)))
         imageItem?.addGestureRecognizer(tapGesture)
         buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
+        buttonMenu.contentMode = .scaleAspectFill
+//        buttonMenu.setImage(NCImageCache.images.buttonMore.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
         imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
         switchCanEdit.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
@@ -213,7 +215,7 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
         let utility = NCUtility()
         imageShareeType.image = NCShareCommon().getImageShareType(shareType: sharee.shareType, isDropDown: true)
         let status = utility.getUserStatus(userIcon: sharee.userIcon, userStatus: sharee.userStatus, userMessage: sharee.userMessage)
-        imageStatus.image = status.onlineStatus
+        imageStatus.image = status.statusImage
         self.status.text = status.statusMessage
         if self.status.text?.count ?? 0 > 0 {
             centerTitle.constant = -5
