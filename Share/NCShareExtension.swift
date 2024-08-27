@@ -108,7 +108,7 @@ class NCShareExtension: UIViewController {
         uploadView.layer.cornerRadius = 10
 
         uploadLabel.text = NSLocalizedString("_upload_", comment: "")
-        uploadLabel.textColor = .systemBlue
+        uploadLabel.textColor = NCBrandColor.shared.customer
         let uploadGesture = UITapGestureRecognizer(target: self, action: #selector(actionUpload))
         uploadView.addGestureRecognizer(uploadGesture)
 
@@ -124,14 +124,6 @@ class NCShareExtension: UIViewController {
         } else {
             NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start Share session with level \(levelLog) " + versionNextcloudiOS)
         }
-
-        // Colors
-        if let activeAccount = NCManageDatabase.shared.getActiveAccount() {
-            NCBrandColor.shared.settingThemingColor(account: activeAccount.account)
-        }
-        NCBrandColor.shared.createUserColors()
-        NCImageCache.shared.createImagesCache()
-        NCImageCache.shared.createImagesBrandCache()
 
         hud.indicatorView = JGProgressHUDRingIndicatorView()
         if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
@@ -200,14 +192,15 @@ class NCShareExtension: UIViewController {
 
         navigationItem.title = navigationTitle
         cancelButton.title = NSLocalizedString("_cancel_", comment: "")
+        cancelButton.tintColor = NCBrandColor.shared.customer
 
         // BACK BUTTON
         let backButton = UIButton(type: .custom)
-        backButton.setImage(UIImage(named: "back"), for: .normal)
-        backButton.tintColor = .systemBlue
+        backButton.setImage(UIImage(named: "back")?.imageColor(NCBrandColor.shared.customer), for: .normal)
+        backButton.tintColor = NCBrandColor.shared.customer
         backButton.semanticContentAttribute = .forceLeftToRight
         backButton.setTitle(" " + NSLocalizedString("_back_", comment: ""), for: .normal)
-        backButton.setTitleColor(.systemBlue, for: .normal)
+        backButton.setTitleColor(NCBrandColor.shared.customer, for: .normal)
         backButton.action(for: .touchUpInside) { _ in
             if !self.uploadStarted {
                 while self.serverUrl.last != "/" { self.serverUrl.removeLast() }
@@ -222,38 +215,12 @@ class NCShareExtension: UIViewController {
                 self.setNavigationBar(navigationTitle: navigationTitle)
             }
         }
-
-        let image = utility.loadUserImage(for: activeAccount.user, displayName: activeAccount.displayName, userBaseUrl: activeAccount)
-        let profileButton = UIButton(type: .custom)
-        profileButton.setImage(image, for: .normal)
-
-        if serverUrl == utilityFileSystem.getHomeServer(urlBase: activeAccount.urlBase, userId: activeAccount.userId) {
-
-            var title = "  "
-            if let userAlias = activeAccount?.alias, !userAlias.isEmpty {
-                title += userAlias
-            } else {
-                title += activeAccount?.displayName ?? ""
-            }
-
-            profileButton.setTitle(title, for: .normal)
-            profileButton.setTitleColor(.systemBlue, for: .normal)
-        }
-
-        profileButton.semanticContentAttribute = .forceLeftToRight
-        profileButton.sizeToFit()
-        profileButton.action(for: .touchUpInside) { _ in
-            if !self.uploadStarted {
-                self.showAccountPicker()
-            }
-        }
-        var navItems = [UIBarButtonItem(customView: profileButton)]
+        
         if serverUrl != utilityFileSystem.getHomeServer(urlBase: activeAccount.urlBase, userId: activeAccount.userId) {
-            let space = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
-            space.width = 20
-            navItems.append(contentsOf: [UIBarButtonItem(customView: backButton), space])
+            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+        } else {
+            navigationItem.leftBarButtonItem = nil
         }
-        navigationItem.setLeftBarButtonItems(navItems, animated: true)
     }
 
     func setCommandView() {
