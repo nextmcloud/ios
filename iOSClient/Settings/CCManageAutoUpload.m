@@ -25,10 +25,13 @@
 #import "CCManageAutoUpload.h"
 #import "CCUtility.h"
 #import "NCBridgeSwift.h"
+#import "AdjustHelper.h"
 
 @interface CCManageAutoUpload () <NCSelectDelegate>
 {
     AppDelegate *appDelegate;
+    AdjustHelper *adjust;
+    TealiumHelper *tealium;
 }
 @end
 
@@ -66,6 +69,7 @@
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
     row.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
     [row.cellConfig setObject:[[UIImage imageNamed:@"foldersOnTop"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
+    [row.cellConfig setObject:[[UIImage imageNamed:@"foldersOnTop"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
@@ -214,6 +218,9 @@
     appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     self.view.backgroundColor = UIColor.systemGroupedBackgroundColor;
     
+    adjust = [[AdjustHelper alloc] init];
+    [adjust configAdjust];
+    tealium = [[TealiumHelper alloc] init];
     self.tableView.backgroundColor = UIColor.systemGroupedBackgroundColor;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeUser) name:NCGlobal.shared.notificationCenterChangeUser object:nil];
@@ -353,6 +360,7 @@
     XLFormRowDescriptor *rowAutoUploadVideo = [self.form formRowWithTag:@"autoUploadVideo"];
     XLFormRowDescriptor *rowAutoUploadWWAnVideo = [self.form formRowWithTag:@"autoUploadWWAnVideo"];
     XLFormRowDescriptor *rowRemovePhotoCameraRoll = [self.form formRowWithTag:@"removePhotoCameraRoll"];
+
     XLFormRowDescriptor *rowAutoUploadFull = [self.form formRowWithTag:@"autoUploadFull"];
     
     XLFormRowDescriptor *rowAutoUploadCreateSubfolder = [self.form formRowWithTag:@"autoUploadCreateSubfolder"];
@@ -398,6 +406,7 @@
     rowAutoUploadVideo.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
     rowAutoUploadWWAnVideo.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
     rowRemovePhotoCameraRoll.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
+
     rowAutoUploadFull.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
     
     rowAutoUploadCreateSubfolder.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
@@ -445,6 +454,14 @@
             else sectionName = @"";
             break;
         case 7:
+            if (activeAccount.autoUpload) sectionName =  NSLocalizedString(@"_autoupload_fullphotos_footer_", nil);
+            else sectionName = @"";
+            break;
+        case 5:
+            if (activeAccount.autoUpload) sectionName =  NSLocalizedString(@"_autoupload_create_subfolder_footer_", nil);
+            else sectionName = @"";
+            break;
+        case 6:
             if (activeAccount.autoUpload) sectionName =  NSLocalizedString(@"_autoupload_filenamemask_footer_", nil);
             else sectionName = @"";
             break;
