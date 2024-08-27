@@ -25,12 +25,21 @@ import UIKit
 import MarkdownKit
 
 protocol NCSectionFirstHeaderDelegate: AnyObject {
+    func tapButtonSwitch(_ sender: Any)
+    func tapButtonOrder(_ sender: Any)
     func tapButtonTransfer(_ sender: Any)
     func tapRichWorkspace(_ sender: Any)
 }
 
+extension NCSectionFirstHeaderDelegate {
+    func tapButtonSwitch(_ sender: Any) {}
+    func tapButtonOrder(_ sender: Any) {}
+}
+
 class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegate {
 
+    @IBOutlet weak var buttonSwitch: UIButton!
+    @IBOutlet weak var buttonOrder: UIButton!
     @IBOutlet weak var buttonTransfer: UIButton!
     @IBOutlet weak var imageButtonTransfer: UIImageView!
     @IBOutlet weak var labelTransfer: UILabel!
@@ -41,8 +50,12 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
     @IBOutlet weak var viewTransfer: UIView!
     @IBOutlet weak var viewRichWorkspace: UIView!
     @IBOutlet weak var viewSection: UIView!
+    @IBOutlet weak var viewButtonsView: UIView!
+    @IBOutlet weak var viewSeparator: UIView!
 
     @IBOutlet weak var viewTransferHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var viewButtonsViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var viewSeparatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewRichWorkspaceHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewSectionHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var transferSeparatorBottomHeightConstraint: NSLayoutConstraint!
@@ -58,6 +71,12 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         super.awakeFromNib()
 
         backgroundColor = .clear
+        
+        //Button
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet"), for: .normal)//!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
+
+        buttonOrder.setTitle("", for: .normal)
+        buttonOrder.setTitleColor(NCBrandColor.shared.brand, for: .normal)
 
         // Gradient
         gradient.startPoint = CGPoint(x: 0, y: 0.8)
@@ -103,6 +122,40 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         super.traitCollectionDidChange(previousTraitCollection)
 
         setInterfaceColor()
+    }
+
+    // MARK: - View
+
+    func setStatusButtonsView(enable: Bool) {
+
+        buttonSwitch.isEnabled = enable
+        buttonOrder.isEnabled = enable
+    }
+
+    func setImageSwitchList() {
+
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet"), for: .normal)//!.image(color: NCBrandColor.shared.iconColor, width: 20, height: 15), for: .normal)
+    }
+
+    func setImageSwitchGrid() {
+
+        buttonSwitch.setImage(UIImage(systemName: "square.grid.2x2")!.image(color: NCBrandColor.shared.iconImageColor, size: 20), for: .normal)
+    }
+
+    func setButtonsView(height: CGFloat) {
+
+        viewButtonsViewHeightConstraint.constant = height
+        if height == 0 {
+            viewButtonsView.isHidden = true
+        } else {
+            viewButtonsView.isHidden = false
+        }
+    }
+
+    func setSortedTitle(_ title: String) {
+
+        let title = NSLocalizedString(title, comment: "")
+        buttonOrder.setTitle(title, for: .normal)
     }
 
     // MARK: - RichWorkspace
@@ -174,6 +227,14 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
     }
 
     // MARK: - Action
+    
+    @IBAction func touchUpInsideSwitch(_ sender: Any) {
+        delegate?.tapButtonSwitch(sender)
+    }
+
+    @IBAction func touchUpInsideOrder(_ sender: Any) {
+        delegate?.tapButtonOrder(sender)
+    }
 
     @IBAction func touchUpTransfer(_ sender: Any) {
        delegate?.tapButtonTransfer(sender)

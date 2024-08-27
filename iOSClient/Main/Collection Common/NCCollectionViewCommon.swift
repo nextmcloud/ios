@@ -66,6 +66,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     var attributesZoomIn: UIMenuElement.Attributes = []
     var attributesZoomOut: UIMenuElement.Attributes = []
     let maxImageGrid: CGFloat = 7
+    var headerMenu: NCSectionFirstHeader?
 
     // DECLARE
     var layoutKey = ""
@@ -74,6 +75,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     var enableSearchBar: Bool = false
     var headerMenuTransferView = false
     var headerRichWorkspaceDisable: Bool = false
+    var headerMenuButtonsView: Bool = true
     var emptyImage: UIImage?
     var emptyTitle: String = ""
     var emptyDescription: String = ""
@@ -166,7 +168,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         navigationItem.title = titleCurrentFolder
 
         isEditMode = false
-        setNavigationLeftItems()
+        /// Magentacloud branding changes hide user account button on left navigation bar
+//        setNavigationLeftItems()
         setNavigationRightItems()
 
         layoutForView = NCManageDatabase.shared.getLayoutForView(account: appDelegate.account, key: layoutKey, serverUrl: serverUrl)
@@ -315,8 +318,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         guard let userInfo = notification.userInfo as NSDictionary?,
               let error = userInfo["error"] as? NKError,
               error.errorCode != NCGlobal.shared.errorNotModified else { return }
-
-        setNavigationLeftItems()
+        /// Magentacloud branding changes hide user account button on left navigation bar
+//        setNavigationLeftItems()
     }
 
     @objc func changeTheming() {
@@ -843,14 +846,16 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         }
 
         if isEditMode {
-            tabBarSelect.update(selectOcId: selectOcId, metadatas: getSelectedMetadatas(), userId: appDelegate.userId)
-            tabBarSelect.show()
+            /// Magentacloud branding changes hide options on bottom tab bar
+//            tabBarSelect.update(selectOcId: selectOcId, metadatas: getSelectedMetadatas(), userId: appDelegate.userId)
+//            tabBarSelect.show()
             let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done) {
                 self.setEditMode(false)
             }
             navigationItem.rightBarButtonItems = [select]
         } else if navigationItem.rightBarButtonItems == nil || (!isEditMode && !tabBarSelect.isHidden()) {
-            tabBarSelect.hide()
+            /// Magentacloud branding changes hide options on bottom tab bar
+//            tabBarSelect.hide()
             let menuButton = UIBarButtonItem(image: utility.loadImage(named: "ellipsis.circle"), menu: UIMenu(children: createMenuActions()))
             menuButton.tintColor = NCBrandColor.shared.iconImageColor
             if layoutKey == NCGlobal.shared.layoutViewFiles {
@@ -867,10 +872,26 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         } else {
             navigationItem.rightBarButtonItems?.first?.menu = navigationItem.rightBarButtonItems?.first?.menu?.replacingChildren(createMenuActions())
         }
-        // fix, if the tabbar was hidden before the update, set it in hidden
-        if isTabBarHidden, isTabBarSelectHidden {
-            self.tabBarController?.tabBar.isHidden = true
+        
+        if isEditMode {
+            let more = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain) { self.presentMenu(with: self.createMenuActions())}
+            navigationItem.rightBarButtonItems = [more]
+        } else {
+            let select = UIBarButtonItem(title: NSLocalizedString("_select_", comment: ""), style: UIBarButtonItem.Style.plain) { self.toggleSelect() }
+            if layoutKey == NCGlobal.shared.layoutViewFiles {
+                let notification = UIBarButtonItem(image: utility.loadImage(named: "bell"), style: .plain) {
+                    if let viewController = UIStoryboard(name: "NCNotification", bundle: nil).instantiateInitialViewController() as? NCNotification {
+                        self.navigationController?.pushViewController(viewController, animated: true)
+                    }
+                }
+                notification.tintColor = NCBrandColor.shared.iconImageColor
+                navigationItem.rightBarButtonItems = [select, notification]
+            } else {
+                navigationItem.rightBarButtonItems = [select]
+            }
         }
+        guard layoutKey == NCGlobal.shared.layoutViewFiles else { return }
+        navigationItem.title = titleCurrentFolder
     }
 
     func getNavigationTitle() -> String {
@@ -1077,6 +1098,28 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         }
     }
 
+    func tapButtonSwitch(_ sender: Any) {
+        guard !isTransitioning else { return }
+        isTransitioning = true
+
+        guard let layoutForView = NCManageDatabase.shared.getLayoutForView(account: appDelegate.account, key: layoutKey, serverUrl: serverUrl) else { return }
+
+        if layoutForView.layout == NCGlobal.shared.layoutGrid {
+            layoutForView.layout = NCGlobal.shared.layoutList
+        } else {
+            layoutForView.layout = NCGlobal.shared.layoutGrid
+        }
+        self.layoutForView = NCManageDatabase.shared.setLayoutForView(layoutForView: layoutForView)
+        self.collectionView.reloadData()
+        self.collectionView.collectionViewLayout.invalidateLayout()
+        self.collectionView.setCollectionViewLayout(layoutForView.layout == NCGlobal.shared.layoutList ? self.listLayout : self.gridLayout, animated: true) {_ in self.isTransitioning = false }
+    }
+
+    func tapButtonOrder(_ sender: Any) {
+        let sortMenu = NCSortMenu()
+        sortMenu.toggleMenu(viewController: self, account: appDelegate.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
+    }
+
     func longPressListItem(with objectId: String, indexPath: IndexPath, gestureRecognizer: UILongPressGestureRecognizer) {
     }
 
@@ -1274,6 +1317,9 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 }
             } else {
                 NCNetworking.shared.transferInForegorund = nil
+            }
+            if headerMenuButtonsView {
+                size += NCGlobal.shared.heightButtonsView
             }
             return size
         }
