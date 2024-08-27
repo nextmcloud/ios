@@ -47,9 +47,25 @@ let userAgent: String = {
     var sourceCode: String = "https://github.com/nextcloud/ios"
     var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
     var appStoreUrl: String = "https://apps.apple.com/in/app/nextcloud/id1125420102"
+    @objc public var brand: String = "Nextcloud"
+    @objc public var textCopyrightNextcloudiOS: String = "Nextcloud Hydrogen for iOS %@ © 2024"
+    @objc public var textCopyrightNextcloudServer: String = "Nextcloud Server %@"
+    @objc public var loginBaseUrl: String = "https://cloud.nextcloud.com"
+    @objc public var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
+    @objc public var linkLoginHost: String = "https://nextcloud.com/install"
+    @objc public var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
+    @objc public var webLoginAutenticationProtocol: String = "nc://"                                                // example "abc://"
+    @objc public var privacy: String = "https://nextcloud.com/privacy"
+    @objc public var sourceCode: String = "https://github.com/nextcloud/ios"
+    @objc public var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
+    @objc public var appStoreUrl: String = "https://apps.apple.com/de/app/magentacloud-cloud-speicher/id312838242"
+
+    // Personalized
+    @objc public var webCloseViewProtocolPersonalized: String = ""                                                  // example "abc://change/plan"      Don't touch me !!
+    @objc public var folderBrandAutoUpload: String = ""                                                             // example "_auto_upload_folder_"   Don't touch me !!
 
     // Auto Upload default folder
-    var folderDefaultAutoUpload: String = "Photos"
+    @objc public var folderDefaultAutoUpload: String = Locale.current.languageCode == "de" ? "Kamera-Medien" : "Camera-Media"
 
     // Capabilities Group
     var capabilitiesGroup:              String = "group.de.magentacloud.next.dev2.client"
@@ -296,4 +312,62 @@ class NCBrandColor: NSObject {
 
         return palette1 + palette2 + palette3
     }
+    
+    @objc public var iconColor: UIColor{
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
+            }else {
+                return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+            }
+        } else {
+            return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+        }
+    }
+    
+    @objc public var notificationAction: UIColor {
+        return UIColor(red: 0/255.0, green: 153/255.0, blue: 255/255.0, alpha: 1.0)
+    }
+
+    @objc public var secondarySystemGroupedBackground: UIColor = UIColor.secondarySystemGroupedBackground
+    @objc public var label: UIColor = UIColor.label
+    @objc public var backgroundForm: UIColor = UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
+    @objc public let graySoft: UIColor = UIColor(red: 162.0/255.0, green: 162.0/255.0, blue: 162.0/255.0, alpha: 0.5)
+    @objc public let systemGray4: UIColor = UIColor.systemGray4
+    @objc public let systemBackground: UIColor = UIColor.systemBackground
+    @objc public let textInfo: UIColor = UIColor(red: 153.0/255.0, green: 153.0/255.0, blue: 153.0/255.0, alpha: 1.0)
+    @objc public let systemGray: UIColor = UIColor.systemGray
+    @objc public let customerDarkGrey: UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+    @objc public var fileFolderName: UIColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+    @objc public let optionItem: UIColor = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
+    @objc public var singleTitleColorButton: UIColor = UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
+    @objc public var shareCellTitleColor: UIColor = UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+    @objc public var gray60: UIColor {
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return  UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
+        } else {
+            return  UIColor(red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+        }
+    }
+    @objc public var systemGray2: UIColor = UIColor.systemGray2
+    @objc public var shareByEmailTextColor: UIColor = UIColor(displayP3Red: 13.0/255.0, green: 57.0/255.0, blue: 223.0/255.0, alpha: 1.0)
+    @objc public var memoryConsuptionBackground: UIColor {
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return  UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
+        } else {
+            return  UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
+        }
+    }
+    @objc public var nmcGray0: UIColor{
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return  UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+        }else {
+            return  UIColor(red: 19.0/255.0, green: 19.0/255.0, blue: 19.0/255.0, alpha: 1.0)
+        }
+    }
+    @objc public var commonViewInfoText: UIColor =  UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+    @objc public let progressColorGreen60: UIColor = UIColor(red: 115.0/255.0, green: 195.0/255.0, blue: 84.0/255.0, alpha: 1.0)
+    @objc public var seperatorRename: UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
+    @objc public let gray: UIColor = UIColor(red: 104.0/255.0, green: 104.0/255.0, blue: 104.0/255.0, alpha: 1.0)
+    @objc public var nmcIconSharedWithMe: UIColor = UIColor(displayP3Red: 0.0/255.0, green: 153.0/255.0, blue: 255.0/255.0, alpha: 1.0)
 }
