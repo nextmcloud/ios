@@ -15,6 +15,10 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+		5623B6BF2C2C94FB001E05E0 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 56A959FB2C29812C002E272C /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5623B6C02C2C94FF001E05E0 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 56A959B22C2970E5002E272C /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5623B6C22C2C9502001E05E0 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 56A959B62C2970F2002E272C /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		5623B6C42C2C9505001E05E0 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 56A959BA2C2970FF002E272C /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		56497BCB2BB2A58800CCED20 /* NCMediaCommandView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 56497BCA2BB2A58800CCED20 /* NCMediaCommandView.xib */; };
 		56497BCD2BB2B34000CCED20 /* NCMedia+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56497BCC2BB2B34000CCED20 /* NCMedia+Menu.swift */; };
 		56497BD02BB2D2A100CCED20 /* NCCreateFormUploadVoiceNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56497BCE2BB2D2A100CCED20 /* NCCreateFormUploadVoiceNote.swift */; };
@@ -90,6 +94,60 @@
 		566FCF5B2B3ECD3400168DEA /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF582B3ECD3400168DEA /* AdjustHelper.m */; };
 		56A6405A2BAD82A100E418BF /* TealiumLifecycle in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB289A2B8351720089D373 /* TealiumLifecycle */; };
 		56A6405B2BAD82A100E418BF /* TealiumTagManagement in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28A02B8351730089D373 /* TealiumTagManagement */; };
+		56A9597B2C2964B8002E272C /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 56A9597A2C2964B8002E272C /* SVGKitSwift */; };
+		56A959802C2966AC002E272C /* QRCodeReader in Frameworks */ = {isa = PBXBuildFile; productRef = 56A9597F2C2966AC002E272C /* QRCodeReader */; };
+		56A959832C2966F4002E272C /* SwiftRichString in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959822C2966F4002E272C /* SwiftRichString */; };
+		56A959862C29678A002E272C /* FloatingPanel in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959852C29678A002E272C /* FloatingPanel */; };
+		56A959892C2967EB002E272C /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959882C2967EB002E272C /* MarkdownKit */; };
+		56A9598B2C296803002E272C /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = 56A9598A2C296803002E272C /* MarkdownKit */; };
+		56A9598E2C2968AD002E272C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 56A9598D2C2968AD002E272C /* FirebaseCrashlytics */; };
+		56A959912C296942002E272C /* SwiftEntryKit in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959902C296942002E272C /* SwiftEntryKit */; };
+		56A959932C296951002E272C /* SwiftEntryKit in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959922C296951002E272C /* SwiftEntryKit */; };
+		56A959952C29695F002E272C /* SwiftEntryKit in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959942C29695F002E272C /* SwiftEntryKit */; };
+		56A959982C296C3E002E272C /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959972C296C3E002E272C /* MarqueeLabel */; };
+		56A9599D2C296E45002E272C /* XLForm in Frameworks */ = {isa = PBXBuildFile; productRef = 56A9599C2C296E45002E272C /* XLForm */; };
+		56A959A32C296EE4002E272C /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959A22C296EE4002E272C /* Queuer */; };
+		56A959A52C296EF2002E272C /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959A42C296EF2002E272C /* Queuer */; };
+		56A959A72C296EFF002E272C /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959A62C296EFF002E272C /* Queuer */; };
+		56A959AA2C296FAA002E272C /* DropDown in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959A92C296FAA002E272C /* DropDown */; };
+		56A959B32C2970E5002E272C /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959B22C2970E5002E272C /* RealmSwift */; };
+		56A959B72C2970F2002E272C /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959B62C2970F2002E272C /* RealmSwift */; };
+		56A959BB2C2970FF002E272C /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959BA2C2970FF002E272C /* RealmSwift */; };
+		56A959BF2C2971D2002E272C /* XLForm in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959BE2C2971D2002E272C /* XLForm */; };
+		56A959C12C297322002E272C /* XLForm in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959C02C297322002E272C /* XLForm */; };
+		56A959C42C2973BD002E272C /* Parchment in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959C32C2973BD002E272C /* Parchment */; };
+		56A959C82C297481002E272C /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959C72C297481002E272C /* JGProgressHUD */; };
+		56A959CA2C297489002E272C /* EasyTipView in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959C92C297489002E272C /* EasyTipView */; };
+		56A959CC2C2974A5002E272C /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959CB2C2974A5002E272C /* JGProgressHUD */; };
+		56A959CE2C2974BC002E272C /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959CD2C2974BC002E272C /* JGProgressHUD */; };
+		56A959DA2C297640002E272C /* TLPhotoPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959D92C297640002E272C /* TLPhotoPicker */; };
+		56A959DD2C2976D5002E272C /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959DC2C2976D5002E272C /* OpenSSL */; };
+		56A959DF2C2976EA002E272C /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959DE2C2976EA002E272C /* OpenSSL */; };
+		56A959E22C297CBE002E272C /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959E12C297CBE002E272C /* Swifter */; };
+		56A959E52C297D0C002E272C /* Mantis in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959E42C297D0C002E272C /* Mantis */; };
+		56A959E82C297D50002E272C /* TagListView in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959E72C297D50002E272C /* TagListView */; };
+		56A959F12C298093002E272C /* Gzip in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959F02C298093002E272C /* Gzip */; };
+		56A959F32C2980C1002E272C /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959F22C2980C1002E272C /* KeychainAccess */; };
+		56A959F52C2980C9002E272C /* LRUCache in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959F42C2980C9002E272C /* LRUCache */; };
+		56A959F72C2980FB002E272C /* PreviewSnapshots in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959F62C2980FB002E272C /* PreviewSnapshots */; };
+		56A959FC2C29812C002E272C /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959FB2C29812C002E272C /* RealmSwift */; };
+		56A95A002C298162002E272C /* SwipeCellKit in Frameworks */ = {isa = PBXBuildFile; productRef = 56A959FF2C298162002E272C /* SwipeCellKit */; };
+		56A95A042C2981F5002E272C /* Gzip in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A032C2981F5002E272C /* Gzip */; };
+		56A95A062C2982A2002E272C /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A052C2982A2002E272C /* KeychainAccess */; };
+		56A95A082C2982AE002E272C /* LRUCache in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A072C2982AE002E272C /* LRUCache */; };
+		56A95A0A2C2982C0002E272C /* SwipeCellKit in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A092C2982C0002E272C /* SwipeCellKit */; };
+		56A95A0C2C2982C8002E272C /* TagListView in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A0B2C2982C8002E272C /* TagListView */; };
+		56A95A0E2C2982E1002E272C /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A0D2C2982E1002E272C /* KeychainAccess */; };
+		56A95A102C2982F8002E272C /* PreviewSnapshots in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A0F2C2982F8002E272C /* PreviewSnapshots */; };
+		56A95A122C298308002E272C /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A112C298308002E272C /* KeychainAccess */; };
+		56A95A162C29833A002E272C /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A152C29833A002E272C /* SnapshotTesting */; };
+		56A95A182C29834A002E272C /* PreviewSnapshotsTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A172C29834A002E272C /* PreviewSnapshotsTesting */; };
+		56A95A1A2C298356002E272C /* SnapshotTestingHEIC in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A192C298356002E272C /* SnapshotTestingHEIC */; };
+		56A95A202C2986EA002E272C /* NextcloudKit in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A1F2C2986EA002E272C /* NextcloudKit */; };
+		56A95A222C2986FD002E272C /* NextcloudKit in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A212C2986FD002E272C /* NextcloudKit */; };
+		56A95A242C298710002E272C /* NextcloudKit in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A232C298710002E272C /* NextcloudKit */; };
+		56A95A262C29871F002E272C /* NextcloudKit in Frameworks */ = {isa = PBXBuildFile; productRef = 56A95A252C29871F002E272C /* NextcloudKit */; };
+		56AA29CB2C2C420A00026C2C /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 56AA29CA2C2C420A00026C2C /* SVGKitSwift */; };
 		56AB28942B833E2D0089D373 /* Adjust in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28932B833E2D0089D373 /* Adjust */; };
 		56AB28972B8351720089D373 /* TealiumAutotracking in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28962B8351720089D373 /* TealiumAutotracking */; };
 		56AB28992B8351720089D373 /* TealiumCore in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28982B8351720089D373 /* TealiumCore */; };
@@ -155,19 +213,11 @@
 		F30A962F2A27ADF900D7BCFE /* EnvVars.stencil in Resources */ = {isa = PBXBuildFile; fileRef = F30A962E2A27ADF900D7BCFE /* EnvVars.stencil */; };
 		F30A96312A27AEBF00D7BCFE /* EnvVars.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = F30A96302A27AEBF00D7BCFE /* EnvVars.generated.swift */; };
 		F30A96322A27AEDD00D7BCFE /* EnvVars.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = F30A96302A27AEBF00D7BCFE /* EnvVars.generated.swift */; };
-		F3131EDD2B038E4A0018DB28 /* XLForm in Frameworks */ = {isa = PBXBuildFile; productRef = F3131EDC2B038E4A0018DB28 /* XLForm */; };
-		F3131EDF2B038F2A0018DB28 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = F3131EDE2B038F2A0018DB28 /* SnapshotTesting */; };
-		F3131EE12B038F560018DB28 /* SnapshotTestingHEIC in Frameworks */ = {isa = PBXBuildFile; productRef = F3131EE02B038F560018DB28 /* SnapshotTestingHEIC */; };
-		F3131EE32B038F9B0018DB28 /* PreviewSnapshotsTesting in Frameworks */ = {isa = PBXBuildFile; productRef = F3131EE22B038F9B0018DB28 /* PreviewSnapshotsTesting */; };
-		F314F1112A30C11200BC7FAB /* PreviewSnapshots in Frameworks */ = {isa = PBXBuildFile; productRef = F314F1102A30C11200BC7FAB /* PreviewSnapshots */; };
 		F314F1142A30E2DE00BC7FAB /* View+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E8A390295DC5E0006CB2D0 /* View+Extension.swift */; };
 		F31F69452A2F6D4600162F76 /* NextcloudSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31F69442A2F6D4600162F76 /* NextcloudSnapshotTests.swift */; };
 		F31F69502A2F707E00162F76 /* SwiftUIView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F31F694F2A2F707E00162F76 /* SwiftUIView+Extensions.swift */; };
 		F31F69612A2F907800162F76 /* __Snapshots__ in Resources */ = {isa = PBXBuildFile; fileRef = F31F69602A2F907800162F76 /* __Snapshots__ */; };
-		F31F69642A2F929600162F76 /* PreviewSnapshots in Frameworks */ = {isa = PBXBuildFile; productRef = F31F69632A2F929600162F76 /* PreviewSnapshots */; };
 		F321DA8A2B71205A00DDA0E6 /* NCTrashSelectTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F321DA892B71205A00DDA0E6 /* NCTrashSelectTabBar.swift */; };
-		F327FA432B8CC0B900E5B743 /* SwipeCellKit in Frameworks */ = {isa = PBXBuildFile; productRef = F327FA422B8CC0B900E5B743 /* SwipeCellKit */; };
-		F327FA452B8CC36900E5B743 /* SwipeCellKit in Frameworks */ = {isa = PBXBuildFile; productRef = F327FA442B8CC36900E5B743 /* SwipeCellKit */; };
 		F32ED5062A2F254400EABA81 /* EnvVars.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = F30A96302A27AEBF00D7BCFE /* EnvVars.generated.swift */; };
 		F33AAF9A2A60394C006ECCBD /* NCMoreUserCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F33AAF992A60394C006ECCBD /* NCMoreUserCell.xib */; };
 		F343A4B32A1E01FF00DDA874 /* PHAsset+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F343A4B22A1E01FF00DDA874 /* PHAsset+Extension.swift */; };
@@ -195,7 +245,6 @@
 		F3BB464F2A39EBE500461F6E /* NCMoreUserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3BB464E2A39EBE500461F6E /* NCMoreUserCell.swift */; };
 		F3BB46522A39EC4900461F6E /* NCMoreAppSuggestionsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3BB46512A39EC4900461F6E /* NCMoreAppSuggestionsCell.swift */; };
 		F3BB46542A3A1E9D00461F6E /* CCCellMore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3BB46532A3A1E9D00461F6E /* CCCellMore.swift */; };
-		F3C6D0972B0F9BA40078DD25 /* XLForm in Frameworks */ = {isa = PBXBuildFile; productRef = F3C6D0962B0F9BA40078DD25 /* XLForm */; };
 		F700222C1EC479840080073F /* Custom.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F700222B1EC479840080073F /* Custom.xcassets */; };
 		F700222D1EC479840080073F /* Custom.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F700222B1EC479840080073F /* Custom.xcassets */; };
 		F700510122DF63AC003A3356 /* NCShare.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F700510022DF63AC003A3356 /* NCShare.storyboard */; };
@@ -221,9 +270,7 @@
 		F70753F12542A9A200972D44 /* NCViewerMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70753F02542A9A200972D44 /* NCViewerMedia.swift */; };
 		F70753F72542A9C000972D44 /* NCViewerMediaPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F70753F62542A9C000972D44 /* NCViewerMediaPage.storyboard */; };
 		F707C26521A2DC5200F6181E /* NCStoreReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = F707C26421A2DC5200F6181E /* NCStoreReview.swift */; };
-		F70821D829E59E6D001CA2D7 /* TagListView in Frameworks */ = {isa = PBXBuildFile; productRef = F70821D729E59E6D001CA2D7 /* TagListView */; };
 		F70968A424212C4E00ED60E5 /* NCLivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70968A324212C4E00ED60E5 /* NCLivePhoto.swift */; };
-		F70B86752642CE3B00ED5349 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = F70B86742642CE3B00ED5349 /* FirebaseCrashlytics */; };
 		F70BFC7420E0FA7D00C67599 /* NCUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70BFC7320E0FA7C00C67599 /* NCUtility.swift */; };
 		F70BFC7520E0FA7D00C67599 /* NCUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70BFC7320E0FA7C00C67599 /* NCUtility.swift */; };
 		F70CAE3A1F8CF31A008125FD /* NCEndToEndEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F70CAE391F8CF31A008125FD /* NCEndToEndEncryption.m */; };
@@ -234,18 +281,12 @@
 		F70D8D8124A4A9BF000A5756 /* NCNetworkingProcess.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70D8D8024A4A9BF000A5756 /* NCNetworkingProcess.swift */; };
 		F710D1F52405770F00A6033D /* NCViewerPDF.swift in Sources */ = {isa = PBXBuildFile; fileRef = F710D1F42405770F00A6033D /* NCViewerPDF.swift */; };
 		F710D2022405826100A6033D /* NCViewer+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = F710D2012405826100A6033D /* NCViewer+Menu.swift */; };
-		F710FC7A277B7D0000AA9FBF /* Realm in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC79277B7D0000AA9FBF /* Realm */; };
-		F710FC7C277B7D0000AA9FBF /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC7B277B7D0000AA9FBF /* RealmSwift */; };
-		F710FC80277B7D2700AA9FBF /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC7F277B7D2700AA9FBF /* RealmSwift */; };
-		F710FC84277B7D3500AA9FBF /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC83277B7D3500AA9FBF /* RealmSwift */; };
-		F710FC88277B7D3F00AA9FBF /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F710FC87277B7D3F00AA9FBF /* RealmSwift */; };
 		F711A4DC2AF92CAE00095DD8 /* NCUtility+Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F711A4DB2AF92CAD00095DD8 /* NCUtility+Date.swift */; };
 		F711A4DF2AF92CAE00095DD8 /* NCUtility+Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F711A4DB2AF92CAD00095DD8 /* NCUtility+Date.swift */; };
 		F711A4E02AF92CAE00095DD8 /* NCUtility+Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F711A4DB2AF92CAD00095DD8 /* NCUtility+Date.swift */; };
 		F711A4E22AF92CAE00095DD8 /* NCUtility+Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F711A4DB2AF92CAD00095DD8 /* NCUtility+Date.swift */; };
 		F711A4E52AF9310500095DD8 /* NCUtility+Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF93474B27E34120002537EE /* NCUtility+Image.swift */; };
 		F711A4EB2AF9327D00095DD8 /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = F713FEFF2472764100214AF6 /* UIImage+animatedGIF.m */; };
-		F711A4EF2AF932B900095DD8 /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F711A4EE2AF932B900095DD8 /* SVGKitSwift */; };
 		F7134186259747BA00768D21 /* NCPushNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = F7134185259747BA00768D21 /* NCPushNotification.m */; };
 		F713FF002472764100214AF6 /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = F713FEFF2472764100214AF6 /* UIImage+animatedGIF.m */; };
 		F7145610296433C80038D028 /* NCDocumentCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = F714560F296433C80038D028 /* NCDocumentCamera.swift */; };
@@ -288,16 +329,9 @@
 		F72944F32A84246400246839 /* NCEndToEndMetadataV20.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72944F12A84246400246839 /* NCEndToEndMetadataV20.swift */; };
 		F72944F52A8424F800246839 /* NCEndToEndMetadataV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72944F42A8424F800246839 /* NCEndToEndMetadataV1.swift */; };
 		F72944F62A8424F800246839 /* NCEndToEndMetadataV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72944F42A8424F800246839 /* NCEndToEndMetadataV1.swift */; };
-		F72AD70D28C24B93006CB92D /* NextcloudKit in Frameworks */ = {isa = PBXBuildFile; productRef = F72AD70C28C24B93006CB92D /* NextcloudKit */; };
-		F72AD70F28C24BA1006CB92D /* NextcloudKit in Frameworks */ = {isa = PBXBuildFile; productRef = F72AD70E28C24BA1006CB92D /* NextcloudKit */; };
-		F72AD71128C24BBB006CB92D /* NextcloudKit in Frameworks */ = {isa = PBXBuildFile; productRef = F72AD71028C24BBB006CB92D /* NextcloudKit */; };
-		F72AD71328C24BCC006CB92D /* NextcloudKit in Frameworks */ = {isa = PBXBuildFile; productRef = F72AD71228C24BCC006CB92D /* NextcloudKit */; };
-		F72CD01227A7E92400E59476 /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = F72CD01127A7E92400E59476 /* JGProgressHUD */; };
 		F72CD63A25C19EBF00F46F9A /* NCAutoUpload.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72CD63925C19EBF00F46F9A /* NCAutoUpload.swift */; };
 		F72D1007210B6882009C96B7 /* NCPushNotificationEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F72D1005210B6882009C96B7 /* NCPushNotificationEncryption.m */; };
 		F72D404923D2082500A97FD0 /* NCViewerNextcloudText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72D404823D2082500A97FD0 /* NCViewerNextcloudText.swift */; };
-		F72D7EB7263B1207000B3DFC /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = F72D7EB6263B1207000B3DFC /* MarkdownKit */; };
-		F72DA9B425F53E4E00B87DB1 /* SwiftRichString in Frameworks */ = {isa = PBXBuildFile; productRef = F72DA9B325F53E4E00B87DB1 /* SwiftRichString */; };
 		F72FD3B5297ED49A00075D28 /* NCManageDatabase+E2EE.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72FD3B4297ED49A00075D28 /* NCManageDatabase+E2EE.swift */; };
 		F72FD3B8297ED49A00075D28 /* NCManageDatabase+E2EE.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72FD3B4297ED49A00075D28 /* NCManageDatabase+E2EE.swift */; };
 		F72FD3B9297ED49A00075D28 /* NCManageDatabase+E2EE.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72FD3B4297ED49A00075D28 /* NCManageDatabase+E2EE.swift */; };
@@ -321,7 +355,6 @@
 		F7327E402B73B92800A462C7 /* NCNetworking+Synchronization.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7327E3C2B73B92800A462C7 /* NCNetworking+Synchronization.swift */; };
 		F732D23327CF8AED000B0F1B /* NCPlayerToolBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = F732D23227CF8AED000B0F1B /* NCPlayerToolBar.xib */; };
 		F733598125C1C188002ABA72 /* NCAskAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = F733598025C1C188002ABA72 /* NCAskAuthorization.swift */; };
-		F734B06628E75C0100E180D5 /* TLPhotoPicker in Frameworks */ = {isa = PBXBuildFile; productRef = F734B06528E75C0100E180D5 /* TLPhotoPicker */; };
 		F7362A1F220C853A005101B5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7362A1E220C853A005101B5 /* LaunchScreen.storyboard */; };
 		F737DA992B7B864E0063BAFC /* TOPasscodeViewController.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F70B86822642CF5500ED5349 /* TOPasscodeViewController.xcframework */; };
 		F737DA9D2B7B893C0063BAFC /* NCPasscode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F737DA9C2B7B893C0063BAFC /* NCPasscode.swift */; };
@@ -330,10 +363,7 @@
 		F7381EE1218218C9000B1560 /* NCOffline.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7381EDA218218C9000B1560 /* NCOffline.swift */; };
 		F7381EE5218218C9000B1560 /* NCOffline.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7381EDE218218C9000B1560 /* NCOffline.storyboard */; };
 		F738D4902756740100CD1D38 /* NCLoginNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F738D48F2756740100CD1D38 /* NCLoginNavigationController.swift */; };
-		F73ADD1C265546890069EA0D /* SwiftEntryKit in Frameworks */ = {isa = PBXBuildFile; productRef = F73ADD1B265546890069EA0D /* SwiftEntryKit */; };
-		F73ADD2126554F8E0069EA0D /* SwiftEntryKit in Frameworks */ = {isa = PBXBuildFile; productRef = F73ADD2026554F8E0069EA0D /* SwiftEntryKit */; };
 		F73ADD2226554FD10069EA0D /* NCContentPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F765608E23BF813500765969 /* NCContentPresenter.swift */; };
-		F73ADD2426554FE20069EA0D /* SwiftEntryKit in Frameworks */ = {isa = PBXBuildFile; productRef = F73ADD2326554FE20069EA0D /* SwiftEntryKit */; };
 		F73B422B2476764F00A30FD3 /* NCNotification.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F73B42292476764F00A30FD3 /* NCNotification.storyboard */; };
 		F73B422C2476764F00A30FD3 /* NCNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73B422A2476764F00A30FD3 /* NCNotification.swift */; };
 		F73CB3B222E072A000AD728E /* NCShareHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F73CB3B122E072A000AD728E /* NCShareHeaderView.xib */; };
@@ -403,14 +433,10 @@
 		F74C0436253F1CDC009762AB /* NCShares.swift in Sources */ = {isa = PBXBuildFile; fileRef = F74C0434253F1CDC009762AB /* NCShares.swift */; };
 		F74C0437253F1CDC009762AB /* NCShares.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F74C0435253F1CDC009762AB /* NCShares.storyboard */; };
 		F74C86382AEFBE64009A1D4A /* NCImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B649B2ADFFAED00014640 /* NCImageCache.swift */; };
-		F74C863D2AEFBFD9009A1D4A /* LRUCache in Frameworks */ = {isa = PBXBuildFile; productRef = F74C863C2AEFBFD9009A1D4A /* LRUCache */; };
 		F74DE14325135B6800917068 /* NCTransfers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F74DE14125135B6800917068 /* NCTransfers.swift */; };
 		F74DE14425135B6800917068 /* NCTransfers.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F74DE14225135B6800917068 /* NCTransfers.storyboard */; };
-		F74E7720277A2EF40013B958 /* XLForm in Frameworks */ = {isa = PBXBuildFile; productRef = F74E771F277A2EF40013B958 /* XLForm */; };
 		F7501C322212E57500FB1415 /* NCMedia.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7501C302212E57400FB1415 /* NCMedia.storyboard */; };
 		F7501C332212E57500FB1415 /* NCMedia.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7501C312212E57400FB1415 /* NCMedia.swift */; };
-		F75379202AE2AD9400C0250E /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = F753791F2AE2AD9400C0250E /* JGProgressHUD */; };
-		F753BA93281FD8020015BFB6 /* EasyTipView in Frameworks */ = {isa = PBXBuildFile; productRef = F753BA92281FD8020015BFB6 /* EasyTipView */; };
 		F755BD9B20594AC7008C5FBB /* NCService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F755BD9A20594AC7008C5FBB /* NCService.swift */; };
 		F755CB402B8CB13C00CE27E9 /* NCMediaLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F755CB3F2B8CB13C00CE27E9 /* NCMediaLayout.swift */; };
 		F757CC8229E7F88B00F31428 /* NCManageDatabase+Groupfolders.swift in Sources */ = {isa = PBXBuildFile; fileRef = F757CC8129E7F88B00F31428 /* NCManageDatabase+Groupfolders.swift */; };
@@ -420,7 +446,6 @@
 		F757CC8C29E82D0500F31428 /* NCGroupfolders.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F757CC8A29E82D0500F31428 /* NCGroupfolders.storyboard */; };
 		F757CC8D29E82D0500F31428 /* NCGroupfolders.swift in Sources */ = {isa = PBXBuildFile; fileRef = F757CC8B29E82D0500F31428 /* NCGroupfolders.swift */; };
 		F7581D1A25EFDA61004DC699 /* NCLoginWeb+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7581D1925EFDA60004DC699 /* NCLoginWeb+Menu.swift */; };
-		F758A01227A7F03E0069468B /* JGProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = F758A01127A7F03E0069468B /* JGProgressHUD */; };
 		F758B45A212C564000515F55 /* NCScan.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F758B457212C564000515F55 /* NCScan.storyboard */; };
 		F758B45E212C569D00515F55 /* NCScanCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F758B45D212C569C00515F55 /* NCScanCell.swift */; };
 		F758B460212C56A400515F55 /* NCScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = F758B45F212C56A400515F55 /* NCScan.swift */; };
@@ -433,13 +458,8 @@
 		F75CA1482962F13700B01130 /* HUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F75CA1462962F13700B01130 /* HUDView.swift */; };
 		F75D19E325EFE09000D74598 /* NCTrash+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = F75D19E225EFE09000D74598 /* NCTrash+Menu.swift */; };
 		F75DD765290ABB25002EB562 /* Intent.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = F75DD769290ABB25002EB562 /* Intent.intentdefinition */; };
-		F75EAED826D2552E00F4320E /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = F75EAED726D2552E00F4320E /* MarqueeLabel */; };
 		F760329F252F0F8E0015A421 /* NCTransferCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F760329D252F0F8E0015A421 /* NCTransferCell.swift */; };
 		F76032A0252F0F8E0015A421 /* NCTransferCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F760329E252F0F8E0015A421 /* NCTransferCell.xib */; };
-		F760DE032AE66EA80027D78A /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = F760DE022AE66EA80027D78A /* KeychainAccess */; };
-		F760DE092AE66ED00027D78A /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = F760DE082AE66ED00027D78A /* KeychainAccess */; };
-		F760DE0B2AE66ED80027D78A /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = F760DE0A2AE66ED80027D78A /* KeychainAccess */; };
-		F760DE0F2AE66EE60027D78A /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = F760DE0E2AE66EE60027D78A /* KeychainAccess */; };
 		F760DE172AE66F350027D78A /* NCKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F760DE162AE66F350027D78A /* NCKeychain.swift */; };
 		F761856A29E98543006EB3B0 /* NCIntro.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F761856629E98543006EB3B0 /* NCIntro.storyboard */; };
 		F761856B29E98543006EB3B0 /* NCIntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F761856729E98543006EB3B0 /* NCIntroViewController.swift */; };
@@ -470,7 +490,6 @@
 		F76B3CCE1EAE01BD00921AC9 /* NCBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B3CCD1EAE01BD00921AC9 /* NCBrand.swift */; };
 		F76B3CCF1EAE01BD00921AC9 /* NCBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B3CCD1EAE01BD00921AC9 /* NCBrand.swift */; };
 		F76B649C2ADFFAED00014640 /* NCImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76B649B2ADFFAED00014640 /* NCImageCache.swift */; };
-		F76B649E2ADFFDEC00014640 /* LRUCache in Frameworks */ = {isa = PBXBuildFile; productRef = F76B649D2ADFFDEC00014640 /* LRUCache */; };
 		F76C26A62850D3A500E42BDF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F7F67BB81A24D27800EE80DA /* Images.xcassets */; };
 		F76D364628A4F8BF00214537 /* NCActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76D364528A4F8BF00214537 /* NCActivityIndicator.swift */; };
 		F76D364728A4F8BF00214537 /* NCActivityIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76D364528A4F8BF00214537 /* NCActivityIndicator.swift */; };
@@ -481,12 +500,9 @@
 		F76D3CF52428D0C1005DFA87 /* NCViewerPDF.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F76D3CF42428D0C0005DFA87 /* NCViewerPDF.storyboard */; };
 		F76DA95B277B75A90082465B /* TOPasscodeViewController.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F70B86822642CF5500ED5349 /* TOPasscodeViewController.xcframework */; };
 		F76DA95C277B75A90082465B /* TOPasscodeViewController.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F70B86822642CF5500ED5349 /* TOPasscodeViewController.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		F76DA963277B760E0082465B /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = F76DA962277B760E0082465B /* Queuer */; };
-		F76DA969277B77EA0082465B /* DropDown in Frameworks */ = {isa = PBXBuildFile; productRef = F76DA968277B77EA0082465B /* DropDown */; };
 		F7707687263A853700A1BA94 /* NCContentPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F765608E23BF813500765969 /* NCContentPresenter.swift */; };
 		F7707689263A896A00A1BA94 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7B7504A2397D38E004E13EC /* UIImage+Extension.swift */; };
 		F770768A263A8A2500A1BA94 /* NCUtilityFileSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F74AF3A3247FB6AE00AC767B /* NCUtilityFileSystem.swift */; };
-		F770768E263A8C3400A1BA94 /* FloatingPanel in Frameworks */ = {isa = PBXBuildFile; productRef = F770768D263A8C3400A1BA94 /* FloatingPanel */; };
 		F771E3D320E2392D00AFB62D /* FileProviderExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F771E3D220E2392D00AFB62D /* FileProviderExtension.swift */; };
 		F771E3D520E2392D00AFB62D /* FileProviderItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F771E3D420E2392D00AFB62D /* FileProviderItem.swift */; };
 		F771E3D720E2392D00AFB62D /* FileProviderEnumerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F771E3D620E2392D00AFB62D /* FileProviderEnumerator.swift */; };
@@ -496,7 +512,6 @@
 		F771E3F820E239B500AFB62D /* FileProviderExtension+Thumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = F771E3F520E239B400AFB62D /* FileProviderExtension+Thumbnail.swift */; };
 		F7725A60251F33BB00D125E0 /* NCFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7725A5E251F33BB00D125E0 /* NCFiles.swift */; };
 		F7725A61251F33BB00D125E0 /* NCFiles.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7725A5F251F33BB00D125E0 /* NCFiles.storyboard */; };
-		F77333882927A72100466E35 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = F77333872927A72100466E35 /* OpenSSL */; };
 		F774264A22EB4D0000B23912 /* NCSearchUserDropDownCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F774264822EB4D0000B23912 /* NCSearchUserDropDownCell.xib */; };
 		F77444F522281649000D5EB0 /* NCGridMediaCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77444F322281649000D5EB0 /* NCGridMediaCell.swift */; };
 		F77444F622281649000D5EB0 /* NCGridMediaCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F77444F422281649000D5EB0 /* NCGridMediaCell.xib */; };
@@ -517,11 +532,9 @@
 		F77BB746289984CA0090FC19 /* UIViewController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77BB745289984CA0090FC19 /* UIViewController+Extension.swift */; };
 		F77BB748289985270090FC19 /* UITabBarController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77BB747289985270090FC19 /* UITabBarController+Extension.swift */; };
 		F77BB74A2899857B0090FC19 /* UINavigationController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77BB7492899857B0090FC19 /* UINavigationController+Extension.swift */; };
-		F77BC3EB293E5268005F2B08 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = F77BC3EA293E5268005F2B08 /* Swifter */; };
 		F77BC3ED293E528A005F2B08 /* NCConfigServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77BC3EC293E528A005F2B08 /* NCConfigServer.swift */; };
 		F77C97392953131000FDDD09 /* NCCameraRoll.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77C97382953131000FDDD09 /* NCCameraRoll.swift */; };
 		F77C973A2953143A00FDDD09 /* NCCameraRoll.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77C97382953131000FDDD09 /* NCCameraRoll.swift */; };
-		F77CB6A92AA08053000C3CA4 /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = F77CB6A82AA08053000C3CA4 /* OpenSSL */; };
 		F7817CF829801A3500FFBC65 /* Data+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7817CF729801A3500FFBC65 /* Data+Extension.swift */; };
 		F7817CFB29801A3500FFBC65 /* Data+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7817CF729801A3500FFBC65 /* Data+Extension.swift */; };
 		F7817CFC29801A3500FFBC65 /* Data+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7817CF729801A3500FFBC65 /* Data+Extension.swift */; };
@@ -542,8 +555,6 @@
 		F7864AD02A78FE73004870E0 /* NCManageDatabase+LocalFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7864ACB2A78FE73004870E0 /* NCManageDatabase+LocalFile.swift */; };
 		F7864AD22A78FE73004870E0 /* NCManageDatabase+LocalFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7864ACB2A78FE73004870E0 /* NCManageDatabase+LocalFile.swift */; };
 		F787704F22E7019900F287A9 /* NCShareLinkCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F787704E22E7019900F287A9 /* NCShareLinkCell.xib */; };
-		F787AC09298BCB4A0001BB00 /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F787AC08298BCB4A0001BB00 /* SVGKitSwift */; };
-		F788ECC7263AAAFA00ADC67F /* MarkdownKit in Frameworks */ = {isa = PBXBuildFile; productRef = F788ECC6263AAAFA00ADC67F /* MarkdownKit */; };
 		F78A10BF29322E8A008499B8 /* NCManageDatabase+Directory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78A10BE29322E8A008499B8 /* NCManageDatabase+Directory.swift */; };
 		F78A10C229322E8A008499B8 /* NCManageDatabase+Directory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78A10BE29322E8A008499B8 /* NCManageDatabase+Directory.swift */; };
 		F78A10C329322E8A008499B8 /* NCManageDatabase+Directory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78A10BE29322E8A008499B8 /* NCManageDatabase+Directory.swift */; };
@@ -589,13 +600,10 @@
 		F7A0D1352591FBC5008F8A13 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		F7A0D1362591FBC5008F8A13 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		F7A0D1372591FBC5008F8A13 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
-		F7A1050E29E587AF00FFD92B /* TagListView in Frameworks */ = {isa = PBXBuildFile; productRef = F7A1050D29E587AF00FFD92B /* TagListView */; };
 		F7A321AD1E9E6AD50069AD1B /* CCAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = F7A321AC1E9E6AD50069AD1B /* CCAdvanced.m */; };
 		F7A48413297022E000BD1B49 /* ViewerQuickLook.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A48412297022E000BD1B49 /* ViewerQuickLook.swift */; };
 		F7A48415297028FC00BD1B49 /* Nextcloud Hub.png in Resources */ = {isa = PBXBuildFile; fileRef = F7A48414297028FC00BD1B49 /* Nextcloud Hub.png */; };
 		F7A560422AE1593700BE8FD6 /* NCOperationSaveLivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A560412AE1593700BE8FD6 /* NCOperationSaveLivePhoto.swift */; };
-		F7A560442AE15D2900BE8FD6 /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = F7A560432AE15D2900BE8FD6 /* Queuer */; };
-		F7A560482AE15D5000BE8FD6 /* Queuer in Frameworks */ = {isa = PBXBuildFile; productRef = F7A560472AE15D5000BE8FD6 /* Queuer */; };
 		F7A60F86292D215000FCE1F2 /* NCShareAccounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A60F84292D215000FCE1F2 /* NCShareAccounts.swift */; };
 		F7A60F87292D215000FCE1F2 /* NCShareAccounts.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7A60F85292D215000FCE1F2 /* NCShareAccounts.storyboard */; };
 		F7A76DC8256A71CD00119AB3 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7B7504A2397D38E004E13EC /* UIImage+Extension.swift */; };
@@ -617,7 +625,6 @@
 		F7B8B83025681C3400967775 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F7B8B82F25681C3400967775 /* GoogleService-Info.plist */; };
 		F7BAADCB1ED5A87C00B7EAD4 /* NCManageDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB51ED5A87C00B7EAD4 /* NCManageDatabase.swift */; };
 		F7BAADCC1ED5A87C00B7EAD4 /* NCManageDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BAADB51ED5A87C00B7EAD4 /* NCManageDatabase.swift */; };
-		F7BB7E4727A18C56009B9F29 /* Parchment in Frameworks */ = {isa = PBXBuildFile; productRef = F7BB7E4627A18C56009B9F29 /* Parchment */; };
 		F7BC287E26663F6C004D46C5 /* NCViewCertificateDetails.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7BC287D26663F6C004D46C5 /* NCViewCertificateDetails.storyboard */; };
 		F7BC288026663F85004D46C5 /* NCViewCertificateDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BC287F26663F85004D46C5 /* NCViewCertificateDetails.swift */; };
 		F7BD71E62636EAFC00643C34 /* NCNetworkingE2EE.swift in Sources */ = {isa = PBXBuildFile; fileRef = F785EE9C246196DF00B3F945 /* NCNetworkingE2EE.swift */; };
@@ -647,7 +654,6 @@
 		F7CB68A0254169530050EC94 /* NCSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7CB689F254169530050EC94 /* NCSettings.storyboard */; };
 		F7CBC31C24F78E79004D3812 /* NCSortMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CBC31B24F78E79004D3812 /* NCSortMenu.swift */; };
 		F7D1612023CF19E30039EBBF /* NCViewerRichWorkspace.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7D1611F23CF19E30039EBBF /* NCViewerRichWorkspace.storyboard */; };
-		F7D56B1A2972405500FA46C4 /* Mantis in Frameworks */ = {isa = PBXBuildFile; productRef = F7D56B192972405500FA46C4 /* Mantis */; };
 		F7D57C8626317BDA00DE301D /* NCAccountRequest.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7CA212C25F1333200826ABB /* NCAccountRequest.storyboard */; };
 		F7D57C8B26317BDE00DE301D /* NCAccountRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7CA212B25F1333200826ABB /* NCAccountRequest.swift */; };
 		F7D68FCC28CB9051009139F3 /* NCManageDatabase+DashboardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7D68FCB28CB9051009139F3 /* NCManageDatabase+DashboardWidget.swift */; };
@@ -665,7 +671,6 @@
 		F7E98C1727E0D0FC001F9F19 /* NCManageDatabase+Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E98C1527E0D0FC001F9F19 /* NCManageDatabase+Video.swift */; };
 		F7E98C1827E0D0FC001F9F19 /* NCManageDatabase+Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E98C1527E0D0FC001F9F19 /* NCManageDatabase+Video.swift */; };
 		F7E98C1927E0D0FC001F9F19 /* NCManageDatabase+Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E98C1527E0D0FC001F9F19 /* NCManageDatabase+Video.swift */; };
-		F7ED547C25EEA65400956C55 /* QRCodeReader in Frameworks */ = {isa = PBXBuildFile; productRef = F7ED547B25EEA65400956C55 /* QRCodeReader */; };
 		F7EDE4CC262D7B6F00414FE6 /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7239870253D86B600257F49 /* NCEmptyDataSet.swift */; };
 		F7EDE4D1262D7B8400414FE6 /* NCDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C1EEA425053A9C00866ACC /* NCDataSource.swift */; };
 		F7EDE4D6262D7B9600414FE6 /* NCListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78ACD4121903CE00088454D /* NCListCell.swift */; };
@@ -688,8 +693,6 @@
 		F7F4F10C27ECDBDB008676F9 /* Inconsolata-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F7F4F10427ECDBDB008676F9 /* Inconsolata-Regular.ttf */; };
 		F7F4F11027ECDC4A008676F9 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7F4F10F27ECDC4A008676F9 /* UIDevice+Extension.swift */; };
 		F7F4F11227ECDC52008676F9 /* UIFont+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7F4F11127ECDC52008676F9 /* UIFont+Extension.swift */; };
-		F7F623B52A5EF4D30022D3D4 /* Gzip in Frameworks */ = {isa = PBXBuildFile; productRef = F7F623B42A5EF4D30022D3D4 /* Gzip */; };
-		F7F623B72A5EFA0C0022D3D4 /* Gzip in Frameworks */ = {isa = PBXBuildFile; productRef = F7F623B62A5EFA0C0022D3D4 /* Gzip */; };
 		F7F878AE1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7F878AD1FB9E3B900599E4F /* NCEndToEndMetadata.swift */; };
 		F7F878AF1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7F878AD1FB9E3B900599E4F /* NCEndToEndMetadata.swift */; };
 		F7F9D1BB25397CE000D9BFF5 /* NCViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7F9D1BA25397CE000D9BFF5 /* NCViewer.swift */; };
@@ -751,12 +754,46 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		5623B6C12C2C94FF001E05E0 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5623B6C02C2C94FF001E05E0 /* RealmSwift in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5623B6C32C2C9502001E05E0 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5623B6C22C2C9502001E05E0 /* RealmSwift in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5623B6C52C2C9505001E05E0 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				5623B6C42C2C9505001E05E0 /* RealmSwift in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F76DA934277B75710082465B /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				5623B6BF2C2C94FB001E05E0 /* RealmSwift in Embed Frameworks */,
 				F7792DE629EEE02D005930CE /* MobileVLCKit.xcframework in Embed Frameworks */,
 				F76DA95C277B75A90082465B /* TOPasscodeViewController.xcframework in Embed Frameworks */,
 			);
@@ -1381,10 +1418,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F72AD71128C24BBB006CB92D /* NextcloudKit in Frameworks */,
-				F314F1112A30C11200BC7FAB /* PreviewSnapshots in Frameworks */,
-				F710FC88277B7D3F00AA9FBF /* RealmSwift in Frameworks */,
-				F760DE0F2AE66EE60027D78A /* KeychainAccess in Frameworks */,
+				56A95A122C298308002E272C /* KeychainAccess in Frameworks */,
+				56A95A102C2982F8002E272C /* PreviewSnapshots in Frameworks */,
+				56A95A262C29871F002E272C /* NextcloudKit in Frameworks */,
+				56A959BB2C2970FF002E272C /* RealmSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1392,7 +1429,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F3C6D0972B0F9BA40078DD25 /* XLForm in Frameworks */,
+				56A9599D2C296E45002E272C /* XLForm in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1400,7 +1437,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F3131EDD2B038E4A0018DB28 /* XLForm in Frameworks */,
+				56A959BF2C2971D2002E272C /* XLForm in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1415,9 +1452,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F3131EE12B038F560018DB28 /* SnapshotTestingHEIC in Frameworks */,
-				F3131EE32B038F9B0018DB28 /* PreviewSnapshotsTesting in Frameworks */,
-				F3131EDF2B038F2A0018DB28 /* SnapshotTesting in Frameworks */,
+				56A95A1A2C298356002E272C /* SnapshotTestingHEIC in Frameworks */,
+				56A95A182C29834A002E272C /* PreviewSnapshotsTesting in Frameworks */,
+				56A95A162C29833A002E272C /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1425,20 +1462,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F711A4EF2AF932B900095DD8 /* SVGKitSwift in Frameworks */,
-				F710FC80277B7D2700AA9FBF /* RealmSwift in Frameworks */,
-				F74C863D2AEFBFD9009A1D4A /* LRUCache in Frameworks */,
-				F72AD70F28C24BA1006CB92D /* NextcloudKit in Frameworks */,
+				56A959B32C2970E5002E272C /* RealmSwift in Frameworks */,
+				56A959CC2C2974A5002E272C /* JGProgressHUD in Frameworks */,
+				56A95A082C2982AE002E272C /* LRUCache in Frameworks */,
+				56A959DF2C2976EA002E272C /* OpenSSL in Frameworks */,
+				56AA29CB2C2C420A00026C2C /* SVGKitSwift in Frameworks */,
+				56A95A062C2982A2002E272C /* KeychainAccess in Frameworks */,
+				56A959A52C296EF2002E272C /* Queuer in Frameworks */,
+				56A95A222C2986FD002E272C /* NextcloudKit in Frameworks */,
+				56A959932C296951002E272C /* SwiftEntryKit in Frameworks */,
+				56A95A042C2981F5002E272C /* Gzip in Frameworks */,
+				56A9598B2C296803002E272C /* MarkdownKit in Frameworks */,
 				F737DA992B7B864E0063BAFC /* TOPasscodeViewController.xcframework in Frameworks */,
-				F72CD01227A7E92400E59476 /* JGProgressHUD in Frameworks */,
-				F327FA452B8CC36900E5B743 /* SwipeCellKit in Frameworks */,
-				F77CB6A92AA08053000C3CA4 /* OpenSSL in Frameworks */,
-				F760DE092AE66ED00027D78A /* KeychainAccess in Frameworks */,
-				F73ADD2126554F8E0069EA0D /* SwiftEntryKit in Frameworks */,
-				F7A560482AE15D5000BE8FD6 /* Queuer in Frameworks */,
-				F70821D829E59E6D001CA2D7 /* TagListView in Frameworks */,
-				F7F623B72A5EFA0C0022D3D4 /* Gzip in Frameworks */,
-				F72D7EB7263B1207000B3DFC /* MarkdownKit in Frameworks */,
+				56A95A0C2C2982C8002E272C /* TagListView in Frameworks */,
+				56A95A0A2C2982C0002E272C /* SwipeCellKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1446,12 +1483,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F7A560442AE15D2900BE8FD6 /* Queuer in Frameworks */,
-				F760DE0B2AE66ED80027D78A /* KeychainAccess in Frameworks */,
-				F73ADD2426554FE20069EA0D /* SwiftEntryKit in Frameworks */,
-				F710FC84277B7D3500AA9FBF /* RealmSwift in Frameworks */,
-				F75379202AE2AD9400C0250E /* JGProgressHUD in Frameworks */,
-				F72AD71328C24BCC006CB92D /* NextcloudKit in Frameworks */,
+				56A95A242C298710002E272C /* NextcloudKit in Frameworks */,
+				56A959CE2C2974BC002E272C /* JGProgressHUD in Frameworks */,
+				56A959B72C2970F2002E272C /* RealmSwift in Frameworks */,
+				56A95A0E2C2982E1002E272C /* KeychainAccess in Frameworks */,
+				56A959952C29695F002E272C /* SwiftEntryKit in Frameworks */,
+				56A959A72C296EFF002E272C /* Queuer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1459,43 +1496,42 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56A959F12C298093002E272C /* Gzip in Frameworks */,
+				56A959982C296C3E002E272C /* MarqueeLabel in Frameworks */,
+				56A959F52C2980C9002E272C /* LRUCache in Frameworks */,
+				56A9597B2C2964B8002E272C /* SVGKitSwift in Frameworks */,
 				56A6405B2BAD82A100E418BF /* TealiumTagManagement in Frameworks */,
 				56A6405A2BAD82A100E418BF /* TealiumLifecycle in Frameworks */,
-				F7D56B1A2972405500FA46C4 /* Mantis in Frameworks */,
-				F7ED547C25EEA65400956C55 /* QRCodeReader in Frameworks */,
-				F788ECC7263AAAFA00ADC67F /* MarkdownKit in Frameworks */,
+				56A959FC2C29812C002E272C /* RealmSwift in Frameworks */,
+				56A959C12C297322002E272C /* XLForm in Frameworks */,
+				56A959F32C2980C1002E272C /* KeychainAccess in Frameworks */,
 				56AB28992B8351720089D373 /* TealiumCore in Frameworks */,
+				56A959DA2C297640002E272C /* TLPhotoPicker in Frameworks */,
+				56A95A202C2986EA002E272C /* NextcloudKit in Frameworks */,
 				56AB28972B8351720089D373 /* TealiumAutotracking in Frameworks */,
 				56AB28A32B8351740089D373 /* TealiumVisitorService in Frameworks */,
+				56A959E22C297CBE002E272C /* Swifter in Frameworks */,
+				56A959892C2967EB002E272C /* MarkdownKit in Frameworks */,
+				56A959F72C2980FB002E272C /* PreviewSnapshots in Frameworks */,
+				56A959862C29678A002E272C /* FloatingPanel in Frameworks */,
 				56AB289F2B8351730089D373 /* TealiumRemoteCommands in Frameworks */,
+				56A959DD2C2976D5002E272C /* OpenSSL in Frameworks */,
 				56AB289D2B8351730089D373 /* TealiumLocation in Frameworks */,
-				F77BC3EB293E5268005F2B08 /* Swifter in Frameworks */,
-				F7BB7E4727A18C56009B9F29 /* Parchment in Frameworks */,
-				F734B06628E75C0100E180D5 /* TLPhotoPicker in Frameworks */,
-				F787AC09298BCB4A0001BB00 /* SVGKitSwift in Frameworks */,
-				F760DE032AE66EA80027D78A /* KeychainAccess in Frameworks */,
-				F770768E263A8C3400A1BA94 /* FloatingPanel in Frameworks */,
-				F710FC7C277B7D0000AA9FBF /* RealmSwift in Frameworks */,
-				F758A01227A7F03E0069468B /* JGProgressHUD in Frameworks */,
-				F77333882927A72100466E35 /* OpenSSL in Frameworks */,
+				56A959E52C297D0C002E272C /* Mantis in Frameworks */,
+				56A959C82C297481002E272C /* JGProgressHUD in Frameworks */,
 				F7792DE529EEE02D005930CE /* MobileVLCKit.xcframework in Frameworks */,
-				F753BA93281FD8020015BFB6 /* EasyTipView in Frameworks */,
+				56A959832C2966F4002E272C /* SwiftRichString in Frameworks */,
 				F76DA95B277B75A90082465B /* TOPasscodeViewController.xcframework in Frameworks */,
-				F76DA963277B760E0082465B /* Queuer in Frameworks */,
-				F72AD70D28C24B93006CB92D /* NextcloudKit in Frameworks */,
-				F70B86752642CE3B00ED5349 /* FirebaseCrashlytics in Frameworks */,
-				F7A1050E29E587AF00FFD92B /* TagListView in Frameworks */,
-				F76DA969277B77EA0082465B /* DropDown in Frameworks */,
-				F327FA432B8CC0B900E5B743 /* SwipeCellKit in Frameworks */,
-				F7F623B52A5EF4D30022D3D4 /* Gzip in Frameworks */,
-				F75EAED826D2552E00F4320E /* MarqueeLabel in Frameworks */,
-				F710FC7A277B7D0000AA9FBF /* Realm in Frameworks */,
+				56A9598E2C2968AD002E272C /* FirebaseCrashlytics in Frameworks */,
+				56A95A002C298162002E272C /* SwipeCellKit in Frameworks */,
+				56A959A32C296EE4002E272C /* Queuer in Frameworks */,
+				56A959912C296942002E272C /* SwiftEntryKit in Frameworks */,
+				56A959E82C297D50002E272C /* TagListView in Frameworks */,
 				56AB28942B833E2D0089D373 /* Adjust in Frameworks */,
-				F72DA9B425F53E4E00B87DB1 /* SwiftRichString in Frameworks */,
-				F74E7720277A2EF40013B958 /* XLForm in Frameworks */,
-				F73ADD1C265546890069EA0D /* SwiftEntryKit in Frameworks */,
-				F31F69642A2F929600162F76 /* PreviewSnapshots in Frameworks */,
-				F76B649E2ADFFDEC00014640 /* LRUCache in Frameworks */,
+				56A959C42C2973BD002E272C /* Parchment in Frameworks */,
+				56A959802C2966AC002E272C /* QRCodeReader in Frameworks */,
+				56A959AA2C296FAA002E272C /* DropDown in Frameworks */,
+				56A959CA2C297489002E272C /* EasyTipView in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2732,6 +2768,7 @@
 				2C33C47B23E2C475005F963B /* Sources */,
 				2C33C47C23E2C475005F963B /* Frameworks */,
 				2C33C47D23E2C475005F963B /* Resources */,
+				5623B6C52C2C9505001E05E0 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2739,10 +2776,10 @@
 			);
 			name = "Notification Service Extension";
 			packageProductDependencies = (
-				F710FC87277B7D3F00AA9FBF /* RealmSwift */,
-				F72AD71028C24BBB006CB92D /* NextcloudKit */,
-				F314F1102A30C11200BC7FAB /* PreviewSnapshots */,
-				F760DE0E2AE66EE60027D78A /* KeychainAccess */,
+				56A959BA2C2970FF002E272C /* RealmSwift */,
+				56A95A0F2C2982F8002E272C /* PreviewSnapshots */,
+				56A95A112C298308002E272C /* KeychainAccess */,
+				56A95A252C29871F002E272C /* NextcloudKit */,
 			);
 			productName = "Notification Service Extension";
 			productReference = 2C33C47F23E2C475005F963B /* Notification Service Extension.appex */;
@@ -2763,7 +2800,7 @@
 			);
 			name = NextcloudUnitTests;
 			packageProductDependencies = (
-				F3C6D0962B0F9BA40078DD25 /* XLForm */,
+				56A9599C2C296E45002E272C /* XLForm */,
 			);
 			productName = NextcloudTests;
 			productReference = AF8ED1F92757821000B8DBC4 /* NextcloudUnitTests.xctest */;
@@ -2784,7 +2821,7 @@
 			);
 			name = NextcloudUITests;
 			packageProductDependencies = (
-				F3131EDC2B038E4A0018DB28 /* XLForm */,
+				56A959BE2C2971D2002E272C /* XLForm */,
 			);
 			productName = NextcloudUITests;
 			productReference = C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */;
@@ -2825,9 +2862,9 @@
 			);
 			name = NextcloudSnapshotTests;
 			packageProductDependencies = (
-				F3131EDE2B038F2A0018DB28 /* SnapshotTesting */,
-				F3131EE02B038F560018DB28 /* SnapshotTestingHEIC */,
-				F3131EE22B038F9B0018DB28 /* PreviewSnapshotsTesting */,
+				56A95A152C29833A002E272C /* SnapshotTesting */,
+				56A95A172C29834A002E272C /* PreviewSnapshotsTesting */,
+				56A95A192C298356002E272C /* SnapshotTestingHEIC */,
 			);
 			productName = NextcloudSnapshotTests;
 			productReference = F31F69422A2F6D4500162F76 /* NextcloudSnapshotTests.xctest */;
@@ -2840,6 +2877,7 @@
 				F71459B51D12E3B700CAFEEC /* Sources */,
 				F7145A141D12E3B700CAFEEC /* Frameworks */,
 				F7145A181D12E3B700CAFEEC /* Resources */,
+				5623B6C12C2C94FF001E05E0 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2847,19 +2885,19 @@
 			);
 			name = Share;
 			packageProductDependencies = (
-				F72D7EB6263B1207000B3DFC /* MarkdownKit */,
-				F73ADD2026554F8E0069EA0D /* SwiftEntryKit */,
-				F710FC7F277B7D2700AA9FBF /* RealmSwift */,
-				F72CD01127A7E92400E59476 /* JGProgressHUD */,
-				F72AD70E28C24BA1006CB92D /* NextcloudKit */,
-				F70821D729E59E6D001CA2D7 /* TagListView */,
-				F7F623B62A5EFA0C0022D3D4 /* Gzip */,
-				F77CB6A82AA08053000C3CA4 /* OpenSSL */,
-				F7A560472AE15D5000BE8FD6 /* Queuer */,
-				F760DE082AE66ED00027D78A /* KeychainAccess */,
-				F74C863C2AEFBFD9009A1D4A /* LRUCache */,
-				F711A4EE2AF932B900095DD8 /* SVGKitSwift */,
-				F327FA442B8CC36900E5B743 /* SwipeCellKit */,
+				56A9598A2C296803002E272C /* MarkdownKit */,
+				56A959922C296951002E272C /* SwiftEntryKit */,
+				56A959A42C296EF2002E272C /* Queuer */,
+				56A959B22C2970E5002E272C /* RealmSwift */,
+				56A959CB2C2974A5002E272C /* JGProgressHUD */,
+				56A959DE2C2976EA002E272C /* OpenSSL */,
+				56A95A032C2981F5002E272C /* Gzip */,
+				56A95A052C2982A2002E272C /* KeychainAccess */,
+				56A95A072C2982AE002E272C /* LRUCache */,
+				56A95A092C2982C0002E272C /* SwipeCellKit */,
+				56A95A0B2C2982C8002E272C /* TagListView */,
+				56A95A212C2986FD002E272C /* NextcloudKit */,
+				56AA29CA2C2C420A00026C2C /* SVGKitSwift */,
 			);
 			productName = "Share Ext";
 			productReference = F7CE8AFB1DC1F8D8009CAE48 /* Share.appex */;
@@ -2872,6 +2910,7 @@
 				F771E3CC20E2392D00AFB62D /* Sources */,
 				F771E3CD20E2392D00AFB62D /* Frameworks */,
 				F771E3CE20E2392D00AFB62D /* Resources */,
+				5623B6C32C2C9502001E05E0 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2879,12 +2918,12 @@
 			);
 			name = "File Provider Extension";
 			packageProductDependencies = (
-				F73ADD2326554FE20069EA0D /* SwiftEntryKit */,
-				F710FC83277B7D3500AA9FBF /* RealmSwift */,
-				F72AD71228C24BCC006CB92D /* NextcloudKit */,
-				F7A560432AE15D2900BE8FD6 /* Queuer */,
-				F753791F2AE2AD9400C0250E /* JGProgressHUD */,
-				F760DE0A2AE66ED80027D78A /* KeychainAccess */,
+				56A959942C29695F002E272C /* SwiftEntryKit */,
+				56A959A62C296EFF002E272C /* Queuer */,
+				56A959B62C2970F2002E272C /* RealmSwift */,
+				56A959CD2C2974BC002E272C /* JGProgressHUD */,
+				56A95A0D2C2982E1002E272C /* KeychainAccess */,
+				56A95A232C298710002E272C /* NextcloudKit */,
 			);
 			productName = "File Provider Extension";
 			productReference = F771E3D020E2392D00AFB62D /* File Provider Extension.appex */;
@@ -2911,33 +2950,6 @@
 			);
 			name = Nextcloud;
 			packageProductDependencies = (
-				F7ED547B25EEA65400956C55 /* QRCodeReader */,
-				F72DA9B325F53E4E00B87DB1 /* SwiftRichString */,
-				F770768D263A8C3400A1BA94 /* FloatingPanel */,
-				F788ECC6263AAAFA00ADC67F /* MarkdownKit */,
-				F70B86742642CE3B00ED5349 /* FirebaseCrashlytics */,
-				F73ADD1B265546890069EA0D /* SwiftEntryKit */,
-				F75EAED726D2552E00F4320E /* MarqueeLabel */,
-				F74E771F277A2EF40013B958 /* XLForm */,
-				F76DA962277B760E0082465B /* Queuer */,
-				F76DA968277B77EA0082465B /* DropDown */,
-				F710FC79277B7D0000AA9FBF /* Realm */,
-				F710FC7B277B7D0000AA9FBF /* RealmSwift */,
-				F7BB7E4627A18C56009B9F29 /* Parchment */,
-				F758A01127A7F03E0069468B /* JGProgressHUD */,
-				F753BA92281FD8020015BFB6 /* EasyTipView */,
-				F72AD70C28C24B93006CB92D /* NextcloudKit */,
-				F734B06528E75C0100E180D5 /* TLPhotoPicker */,
-				F77333872927A72100466E35 /* OpenSSL */,
-				F77BC3EA293E5268005F2B08 /* Swifter */,
-				F7D56B192972405500FA46C4 /* Mantis */,
-				F787AC08298BCB4A0001BB00 /* SVGKitSwift */,
-				F7A1050D29E587AF00FFD92B /* TagListView */,
-				F31F69632A2F929600162F76 /* PreviewSnapshots */,
-				F7F623B42A5EF4D30022D3D4 /* Gzip */,
-				F76B649D2ADFFDEC00014640 /* LRUCache */,
-				F760DE022AE66EA80027D78A /* KeychainAccess */,
-				F327FA422B8CC0B900E5B743 /* SwipeCellKit */,
 				56AB28932B833E2D0089D373 /* Adjust */,
 				56AB28962B8351720089D373 /* TealiumAutotracking */,
 				56AB28982B8351720089D373 /* TealiumCore */,
@@ -2946,6 +2958,32 @@
 				56AB289E2B8351730089D373 /* TealiumRemoteCommands */,
 				56AB28A02B8351730089D373 /* TealiumTagManagement */,
 				56AB28A22B8351740089D373 /* TealiumVisitorService */,
+				56A9597A2C2964B8002E272C /* SVGKitSwift */,
+				56A9597F2C2966AC002E272C /* QRCodeReader */,
+				56A959822C2966F4002E272C /* SwiftRichString */,
+				56A959852C29678A002E272C /* FloatingPanel */,
+				56A959882C2967EB002E272C /* MarkdownKit */,
+				56A9598D2C2968AD002E272C /* FirebaseCrashlytics */,
+				56A959902C296942002E272C /* SwiftEntryKit */,
+				56A959972C296C3E002E272C /* MarqueeLabel */,
+				56A959A22C296EE4002E272C /* Queuer */,
+				56A959A92C296FAA002E272C /* DropDown */,
+				56A959C02C297322002E272C /* XLForm */,
+				56A959C32C2973BD002E272C /* Parchment */,
+				56A959C72C297481002E272C /* JGProgressHUD */,
+				56A959C92C297489002E272C /* EasyTipView */,
+				56A959D92C297640002E272C /* TLPhotoPicker */,
+				56A959DC2C2976D5002E272C /* OpenSSL */,
+				56A959E12C297CBE002E272C /* Swifter */,
+				56A959E42C297D0C002E272C /* Mantis */,
+				56A959E72C297D50002E272C /* TagListView */,
+				56A959F02C298093002E272C /* Gzip */,
+				56A959F22C2980C1002E272C /* KeychainAccess */,
+				56A959F42C2980C9002E272C /* LRUCache */,
+				56A959F62C2980FB002E272C /* PreviewSnapshots */,
+				56A959FB2C29812C002E272C /* RealmSwift */,
+				56A959FF2C298162002E272C /* SwipeCellKit */,
+				56A95A1F2C2986EA002E272C /* NextcloudKit */,
 			);
 			productName = "Crypto Cloud";
 			productReference = F7CE8AFA1DC1F8D8009CAE48 /* Nextcloud.app */;
@@ -3061,36 +3099,36 @@
 			);
 			mainGroup = F7F67B9F1A24D27800EE80DA;
 			packageReferences = (
-				F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */,
-				F7ED547A25EEA65400956C55 /* XCRemoteSwiftPackageReference "QRCodeReader" */,
-				F72DA9B225F53E4E00B87DB1 /* XCRemoteSwiftPackageReference "SwiftRichString" */,
-				F770768C263A8C3400A1BA94 /* XCRemoteSwiftPackageReference "FloatingPanel" */,
-				F788ECC5263AAAF900ADC67F /* XCRemoteSwiftPackageReference "MarkdownKit" */,
-				F70B86732642CE3B00ED5349 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				F73ADD1A265546880069EA0D /* XCRemoteSwiftPackageReference "SwiftEntryKit" */,
-				F75EAED626D2552E00F4320E /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
-				F74E771E277A2EF40013B958 /* XCRemoteSwiftPackageReference "XLForm" */,
-				F76DA961277B760E0082465B /* XCRemoteSwiftPackageReference "Queuer" */,
-				F76DA967277B77E90082465B /* XCRemoteSwiftPackageReference "DropDown" */,
-				F710FC78277B7CFF00AA9FBF /* XCRemoteSwiftPackageReference "realm-swift" */,
-				F7BB7E4527A18C56009B9F29 /* XCRemoteSwiftPackageReference "Parchment" */,
-				F72CD01027A7E92400E59476 /* XCRemoteSwiftPackageReference "JGProgressHUD" */,
-				F753BA91281FD8010015BFB6 /* XCRemoteSwiftPackageReference "EasyTipView" */,
-				F783034028B511D200B84583 /* XCRemoteSwiftPackageReference "NextcloudKit" */,
-				F734B06428E75C0100E180D5 /* XCRemoteSwiftPackageReference "TLPhotoPicker" */,
-				F77333862927A72100466E35 /* XCRemoteSwiftPackageReference "OpenSSL" */,
-				F77BC3E9293E5268005F2B08 /* XCRemoteSwiftPackageReference "swifter" */,
-				F7D56B182972405400FA46C4 /* XCRemoteSwiftPackageReference "Mantis" */,
-				F7A1050C29E587AF00FFD92B /* XCRemoteSwiftPackageReference "TagListView" */,
-				F31F694B2A2F6EFA00162F76 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
-				F31F69622A2F929600162F76 /* XCRemoteSwiftPackageReference "swiftui-preview-snapshots" */,
-				F31F69672A2F92F000162F76 /* XCRemoteSwiftPackageReference "SnapshotTestingHEIC" */,
-				F7F623B32A5EF4D30022D3D4 /* XCRemoteSwiftPackageReference "GzipSwift" */,
-				F76B649A2ADFFAD200014640 /* XCRemoteSwiftPackageReference "LRUCache" */,
-				F760DE012AE66E860027D78A /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				F327FA412B8CC0B900E5B743 /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
 				566FCF5C2B3ED58900168DEA /* XCRemoteSwiftPackageReference "tealium-swift" */,
 				566FCF5D2B3ED64900168DEA /* XCRemoteSwiftPackageReference "ios_sdk" */,
+				56A959772C296448002E272C /* XCRemoteSwiftPackageReference "SVGKit" */,
+				56A9597E2C29666E002E272C /* XCRemoteSwiftPackageReference "QRCodeReader" */,
+				56A959812C2966D3002E272C /* XCRemoteSwiftPackageReference "SwiftRichString" */,
+				56A959842C296769002E272C /* XCRemoteSwiftPackageReference "FloatingPanel" */,
+				56A959872C2967D4002E272C /* XCRemoteSwiftPackageReference "MarkdownKit" */,
+				56A9598C2C296883002E272C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				56A9598F2C2968ED002E272C /* XCRemoteSwiftPackageReference "SwiftEntryKit" */,
+				56A959962C296C24002E272C /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
+				56A959992C296D53002E272C /* XCRemoteSwiftPackageReference "XLForm" */,
+				56A959A12C296EC4002E272C /* XCRemoteSwiftPackageReference "Queuer" */,
+				56A959A82C296F69002E272C /* XCRemoteSwiftPackageReference "DropDown" */,
+				56A959AB2C297079002E272C /* XCRemoteSwiftPackageReference "realm-swift" */,
+				56A959C22C29739B002E272C /* XCRemoteSwiftPackageReference "Parchment" */,
+				56A959C52C297418002E272C /* XCRemoteSwiftPackageReference "JGProgressHUD" */,
+				56A959C62C297466002E272C /* XCRemoteSwiftPackageReference "EasyTipView" */,
+				56A959D82C297626002E272C /* XCRemoteSwiftPackageReference "TLPhotoPicker" */,
+				56A959DB2C2976B2002E272C /* XCRemoteSwiftPackageReference "OpenSSL" */,
+				56A959E02C297746002E272C /* XCRemoteSwiftPackageReference "swifter" */,
+				56A959E32C297CFE002E272C /* XCRemoteSwiftPackageReference "Mantis" */,
+				56A959E62C297D40002E272C /* XCRemoteSwiftPackageReference "TagListView" */,
+				56A959E92C297DD6002E272C /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+				56A959EA2C297E24002E272C /* XCRemoteSwiftPackageReference "swiftui-preview-snapshots" */,
+				56A959EB2C297E4F002E272C /* XCRemoteSwiftPackageReference "SnapshotTestingHEIC" */,
+				56A959EC2C297EF1002E272C /* XCRemoteSwiftPackageReference "LRUCache" */,
+				56A959ED2C297F69002E272C /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				56A959EE2C297F8D002E272C /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
+				56A959EF2C297FC5002E272C /* XCRemoteSwiftPackageReference "GzipSwift" */,
+				56A95A1E2C2986D0002E272C /* XCRemoteSwiftPackageReference "NextcloudKit" */,
 			);
 			productRefGroup = F7F67B9F1A24D27800EE80DA;
 			projectDirPath = "";
@@ -3306,7 +3344,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nexport PATH\n\nif which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if test -d \"/opt/homebrew/bin/\"; then\n  PATH=\"/opt/homebrew/bin/:${PATH}\"\nfi\n\nexport PATH\n\n\n";
 		};
 		F30A961C2A2766D900D7BCFE /* Generate env vars */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -4025,7 +4063,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.notificationextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development NotificationExt 010";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development NotificationExt 015";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
 			};
@@ -4049,7 +4087,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.notificationextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development NotificationExt 010";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development NotificationExt 015";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_NOTIFICATION_SERVICE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Notification Service Extension/Notification_Service_Extension-Bridging-Header.h";
 			};
@@ -4350,7 +4388,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.documentproviderextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development DocProvExt 010";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development DocProvExt 015";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Share/Share-Bridging-Header.h";
 			};
@@ -4374,7 +4412,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.documentproviderextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development DocProvExt 010";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development DocProvExt 015";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_SHARE";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Share/Share-Bridging-Header.h";
 			};
@@ -4398,7 +4436,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.FileProviderExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development FileProvExt 010";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development FileProvExt 015";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/File Provider Extension/FileProviderExtension-Bridging-Header.h";
 			};
@@ -4422,7 +4460,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.FileProviderExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development FileProvExt 010";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development FileProvExt 015";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) EXTENSION EXTENSION_FILE_PROVIDER_EXTENSION";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/File Provider Extension/FileProviderExtension-Bridging-Header.h";
 			};
@@ -4434,18 +4472,19 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
-				MARKETING_VERSION = 8.2.1;
+				MARKETING_VERSION = 8.2.2;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development App 010";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development App 015";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/iOSClient/Nextcloud-Bridging-Header.h";
 			};
 			name = Debug;
@@ -4456,18 +4495,19 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
-				MARKETING_VERSION = 8.2.1;
+				MARKETING_VERSION = 8.2.2;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development App 010";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development App 015";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/iOSClient/Nextcloud-Bridging-Header.h";
 			};
 			name = Release;
@@ -4703,103 +4743,7 @@
 				minimumVersion = 4.29.5;
 			};
 		};
-		F31F694B2A2F6EFA00162F76 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing.git";
-			requirement = {
-				kind = exactVersion;
-				version = 1.11.0;
-			};
-		};
-		F31F69622A2F929600162F76 /* XCRemoteSwiftPackageReference "swiftui-preview-snapshots" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/doordash-oss/swiftui-preview-snapshots";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-		F31F69672A2F92F000162F76 /* XCRemoteSwiftPackageReference "SnapshotTestingHEIC" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/alexey1312/SnapshotTestingHEIC";
-			requirement = {
-				kind = exactVersion;
-				version = 1.4.0;
-			};
-		};
-		F327FA412B8CC0B900E5B743 /* XCRemoteSwiftPackageReference "SwipeCellKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwipeCellKit/SwipeCellKit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.7.1;
-			};
-		};
-		F70B86732642CE3B00ED5349 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 8.9.0;
-			};
-		};
-		F710FC78277B7CFF00AA9FBF /* XCRemoteSwiftPackageReference "realm-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/realm/realm-swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 10.0.0;
-			};
-		};
-		F72CD01027A7E92400E59476 /* XCRemoteSwiftPackageReference "JGProgressHUD" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/JonasGessner/JGProgressHUD.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
-		F72DA9B225F53E4E00B87DB1 /* XCRemoteSwiftPackageReference "SwiftRichString" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/malcommac/SwiftRichString";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.7.2;
-			};
-		};
-		F734B06428E75C0100E180D5 /* XCRemoteSwiftPackageReference "TLPhotoPicker" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/marinofaggiana/TLPhotoPicker";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		F73ADD1A265546880069EA0D /* XCRemoteSwiftPackageReference "SwiftEntryKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/huri000/SwiftEntryKit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.7;
-			};
-		};
-		F74E771E277A2EF40013B958 /* XCRemoteSwiftPackageReference "XLForm" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/xmartlabs/XLForm";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
-			};
-		};
-		F753BA91281FD8010015BFB6 /* XCRemoteSwiftPackageReference "EasyTipView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/marinofaggiana/EasyTipView";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
-		F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */ = {
+		56A959772C296448002E272C /* XCRemoteSwiftPackageReference "SVGKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SVGKit/SVGKit.git";
 			requirement = {
@@ -4807,111 +4751,7 @@
 				minimumVersion = 3.0.0;
 			};
 		};
-		F75EAED626D2552E00F4320E /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/cbpowell/MarqueeLabel";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.3.0;
-			};
-		};
-		F760DE012AE66E860027D78A /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
-			};
-		};
-		F76B649A2ADFFAD200014640 /* XCRemoteSwiftPackageReference "LRUCache" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/nicklockwood/LRUCache";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.4;
-			};
-		};
-		F76DA961277B760E0082465B /* XCRemoteSwiftPackageReference "Queuer" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/FabrizioBrancati/Queuer";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
-		F76DA967277B77E90082465B /* XCRemoteSwiftPackageReference "DropDown" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AssistoLab/DropDown";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		F770768C263A8C3400A1BA94 /* XCRemoteSwiftPackageReference "FloatingPanel" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/scenee/FloatingPanel";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
-		F77333862927A72100466E35 /* XCRemoteSwiftPackageReference "OpenSSL" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/krzyzanowskim/OpenSSL";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-		F77BC3E9293E5268005F2B08 /* XCRemoteSwiftPackageReference "swifter" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/httpswift/swifter.git";
-			requirement = {
-				branch = stable;
-				kind = branch;
-			};
-		};
-		F783034028B511D200B84583 /* XCRemoteSwiftPackageReference "NextcloudKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/nextcloud/NextcloudKit";
-			requirement = {
-				kind = exactVersion;
-				version = 2.9.8;
-			};
-		};
-		F788ECC5263AAAF900ADC67F /* XCRemoteSwiftPackageReference "MarkdownKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/bmoliveira/MarkdownKit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.7.1;
-			};
-		};
-		F7A1050C29E587AF00FFD92B /* XCRemoteSwiftPackageReference "TagListView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ElaWorkshop/TagListView";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-		F7BB7E4527A18C56009B9F29 /* XCRemoteSwiftPackageReference "Parchment" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/rechsteiner/Parchment";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-		F7D56B182972405400FA46C4 /* XCRemoteSwiftPackageReference "Mantis" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/marinofaggiana/Mantis";
-			requirement = {
-				kind = exactVersion;
-				version = 1.0.0;
-			};
-		};
-		F7ED547A25EEA65400956C55 /* XCRemoteSwiftPackageReference "QRCodeReader" */ = {
+		56A9597E2C29666E002E272C /* XCRemoteSwiftPackageReference "QRCodeReader" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/yannickl/QRCodeReader.swift";
 			requirement = {
@@ -4919,17 +4759,487 @@
 				minimumVersion = 10.1.1;
 			};
 		};
-		F7F623B32A5EF4D30022D3D4 /* XCRemoteSwiftPackageReference "GzipSwift" */ = {
+		56A959812C2966D3002E272C /* XCRemoteSwiftPackageReference "SwiftRichString" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/malcommac/SwiftRichString";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.7.2;
+			};
+		};
+		56A959842C296769002E272C /* XCRemoteSwiftPackageReference "FloatingPanel" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scenee/FloatingPanel";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+		56A959872C2967D4002E272C /* XCRemoteSwiftPackageReference "MarkdownKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bmoliveira/MarkdownKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.7.1;
+			};
+		};
+		56A9598C2C296883002E272C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.28.0;
+			};
+		};
+		56A9598F2C2968ED002E272C /* XCRemoteSwiftPackageReference "SwiftEntryKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/huri000/SwiftEntryKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+		56A959962C296C24002E272C /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/cbpowell/MarqueeLabel";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.0;
+			};
+		};
+		56A959992C296D53002E272C /* XCRemoteSwiftPackageReference "XLForm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/xmartlabs/XLForm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.3.0;
+			};
+		};
+		56A959A12C296EC4002E272C /* XCRemoteSwiftPackageReference "Queuer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/FabrizioBrancati/Queuer";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.1;
+			};
+		};
+		56A959A82C296F69002E272C /* XCRemoteSwiftPackageReference "DropDown" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AssistoLab/DropDown";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		56A959AB2C297079002E272C /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.0.0;
+			};
+		};
+		56A959C22C29739B002E272C /* XCRemoteSwiftPackageReference "Parchment" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rechsteiner/Parchment";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		56A959C52C297418002E272C /* XCRemoteSwiftPackageReference "JGProgressHUD" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JonasGessner/JGProgressHUD.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
+		56A959C62C297466002E272C /* XCRemoteSwiftPackageReference "EasyTipView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marinofaggiana/EasyTipView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+		56A959D82C297626002E272C /* XCRemoteSwiftPackageReference "TLPhotoPicker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marinofaggiana/TLPhotoPicker";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		56A959DB2C2976B2002E272C /* XCRemoteSwiftPackageReference "OpenSSL" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzyzanowskim/OpenSSL";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		56A959E02C297746002E272C /* XCRemoteSwiftPackageReference "swifter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/httpswift/swifter.git";
+			requirement = {
+				branch = stable;
+				kind = branch;
+			};
+		};
+		56A959E32C297CFE002E272C /* XCRemoteSwiftPackageReference "Mantis" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marinofaggiana/Mantis";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.0;
+			};
+		};
+		56A959E62C297D40002E272C /* XCRemoteSwiftPackageReference "TagListView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ElaWorkshop/TagListView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		56A959E92C297DD6002E272C /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.11.0;
+			};
+		};
+		56A959EA2C297E24002E272C /* XCRemoteSwiftPackageReference "swiftui-preview-snapshots" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/doordash-oss/swiftui-preview-snapshots";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		56A959EB2C297E4F002E272C /* XCRemoteSwiftPackageReference "SnapshotTestingHEIC" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alexey1312/SnapshotTestingHEIC";
+			requirement = {
+				kind = exactVersion;
+				version = 1.4.0;
+			};
+		};
+		56A959EC2C297EF1002E272C /* XCRemoteSwiftPackageReference "LRUCache" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nicklockwood/LRUCache";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.4;
+			};
+		};
+		56A959ED2C297F69002E272C /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+		56A959EE2C297F8D002E272C /* XCRemoteSwiftPackageReference "SwipeCellKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwipeCellKit/SwipeCellKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.1;
+			};
+		};
+		56A959EF2C297FC5002E272C /* XCRemoteSwiftPackageReference "GzipSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/1024jp/GzipSwift";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.0.0;
+				kind = exactVersion;
+				version = 6.0.1;
+			};
+		};
+		56A95A1E2C2986D0002E272C /* XCRemoteSwiftPackageReference "NextcloudKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nextmcloud/NextcloudKit.git";
+			requirement = {
+				branch = "nmc/2882-file_preview_2.9.8";
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		56A9597A2C2964B8002E272C /* SVGKitSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959772C296448002E272C /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKitSwift;
+		};
+		56A9597F2C2966AC002E272C /* QRCodeReader */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A9597E2C29666E002E272C /* XCRemoteSwiftPackageReference "QRCodeReader" */;
+			productName = QRCodeReader;
+		};
+		56A959822C2966F4002E272C /* SwiftRichString */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959812C2966D3002E272C /* XCRemoteSwiftPackageReference "SwiftRichString" */;
+			productName = SwiftRichString;
+		};
+		56A959852C29678A002E272C /* FloatingPanel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959842C296769002E272C /* XCRemoteSwiftPackageReference "FloatingPanel" */;
+			productName = FloatingPanel;
+		};
+		56A959882C2967EB002E272C /* MarkdownKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959872C2967D4002E272C /* XCRemoteSwiftPackageReference "MarkdownKit" */;
+			productName = MarkdownKit;
+		};
+		56A9598A2C296803002E272C /* MarkdownKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959872C2967D4002E272C /* XCRemoteSwiftPackageReference "MarkdownKit" */;
+			productName = MarkdownKit;
+		};
+		56A9598D2C2968AD002E272C /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A9598C2C296883002E272C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		56A959902C296942002E272C /* SwiftEntryKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A9598F2C2968ED002E272C /* XCRemoteSwiftPackageReference "SwiftEntryKit" */;
+			productName = SwiftEntryKit;
+		};
+		56A959922C296951002E272C /* SwiftEntryKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A9598F2C2968ED002E272C /* XCRemoteSwiftPackageReference "SwiftEntryKit" */;
+			productName = SwiftEntryKit;
+		};
+		56A959942C29695F002E272C /* SwiftEntryKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A9598F2C2968ED002E272C /* XCRemoteSwiftPackageReference "SwiftEntryKit" */;
+			productName = SwiftEntryKit;
+		};
+		56A959972C296C3E002E272C /* MarqueeLabel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959962C296C24002E272C /* XCRemoteSwiftPackageReference "MarqueeLabel" */;
+			productName = MarqueeLabel;
+		};
+		56A9599C2C296E45002E272C /* XLForm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959992C296D53002E272C /* XCRemoteSwiftPackageReference "XLForm" */;
+			productName = XLForm;
+		};
+		56A959A22C296EE4002E272C /* Queuer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959A12C296EC4002E272C /* XCRemoteSwiftPackageReference "Queuer" */;
+			productName = Queuer;
+		};
+		56A959A42C296EF2002E272C /* Queuer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959A12C296EC4002E272C /* XCRemoteSwiftPackageReference "Queuer" */;
+			productName = Queuer;
+		};
+		56A959A62C296EFF002E272C /* Queuer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959A12C296EC4002E272C /* XCRemoteSwiftPackageReference "Queuer" */;
+			productName = Queuer;
+		};
+		56A959A92C296FAA002E272C /* DropDown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959A82C296F69002E272C /* XCRemoteSwiftPackageReference "DropDown" */;
+			productName = DropDown;
+		};
+		56A959B22C2970E5002E272C /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959AB2C297079002E272C /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
+		56A959B62C2970F2002E272C /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959AB2C297079002E272C /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
+		56A959BA2C2970FF002E272C /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959AB2C297079002E272C /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
+		56A959BE2C2971D2002E272C /* XLForm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959992C296D53002E272C /* XCRemoteSwiftPackageReference "XLForm" */;
+			productName = XLForm;
+		};
+		56A959C02C297322002E272C /* XLForm */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959992C296D53002E272C /* XCRemoteSwiftPackageReference "XLForm" */;
+			productName = XLForm;
+		};
+		56A959C32C2973BD002E272C /* Parchment */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959C22C29739B002E272C /* XCRemoteSwiftPackageReference "Parchment" */;
+			productName = Parchment;
+		};
+		56A959C72C297481002E272C /* JGProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959C52C297418002E272C /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
+			productName = JGProgressHUD;
+		};
+		56A959C92C297489002E272C /* EasyTipView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959C62C297466002E272C /* XCRemoteSwiftPackageReference "EasyTipView" */;
+			productName = EasyTipView;
+		};
+		56A959CB2C2974A5002E272C /* JGProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959C52C297418002E272C /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
+			productName = JGProgressHUD;
+		};
+		56A959CD2C2974BC002E272C /* JGProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959C52C297418002E272C /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
+			productName = JGProgressHUD;
+		};
+		56A959D92C297640002E272C /* TLPhotoPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959D82C297626002E272C /* XCRemoteSwiftPackageReference "TLPhotoPicker" */;
+			productName = TLPhotoPicker;
+		};
+		56A959DC2C2976D5002E272C /* OpenSSL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959DB2C2976B2002E272C /* XCRemoteSwiftPackageReference "OpenSSL" */;
+			productName = OpenSSL;
+		};
+		56A959DE2C2976EA002E272C /* OpenSSL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959DB2C2976B2002E272C /* XCRemoteSwiftPackageReference "OpenSSL" */;
+			productName = OpenSSL;
+		};
+		56A959E12C297CBE002E272C /* Swifter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959E02C297746002E272C /* XCRemoteSwiftPackageReference "swifter" */;
+			productName = Swifter;
+		};
+		56A959E42C297D0C002E272C /* Mantis */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959E32C297CFE002E272C /* XCRemoteSwiftPackageReference "Mantis" */;
+			productName = Mantis;
+		};
+		56A959E72C297D50002E272C /* TagListView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959E62C297D40002E272C /* XCRemoteSwiftPackageReference "TagListView" */;
+			productName = TagListView;
+		};
+		56A959F02C298093002E272C /* Gzip */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959EF2C297FC5002E272C /* XCRemoteSwiftPackageReference "GzipSwift" */;
+			productName = Gzip;
+		};
+		56A959F22C2980C1002E272C /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959ED2C297F69002E272C /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		56A959F42C2980C9002E272C /* LRUCache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959EC2C297EF1002E272C /* XCRemoteSwiftPackageReference "LRUCache" */;
+			productName = LRUCache;
+		};
+		56A959F62C2980FB002E272C /* PreviewSnapshots */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959EA2C297E24002E272C /* XCRemoteSwiftPackageReference "swiftui-preview-snapshots" */;
+			productName = PreviewSnapshots;
+		};
+		56A959FB2C29812C002E272C /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959AB2C297079002E272C /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
+		56A959FF2C298162002E272C /* SwipeCellKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959EE2C297F8D002E272C /* XCRemoteSwiftPackageReference "SwipeCellKit" */;
+			productName = SwipeCellKit;
+		};
+		56A95A032C2981F5002E272C /* Gzip */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959EF2C297FC5002E272C /* XCRemoteSwiftPackageReference "GzipSwift" */;
+			productName = Gzip;
+		};
+		56A95A052C2982A2002E272C /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959ED2C297F69002E272C /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		56A95A072C2982AE002E272C /* LRUCache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959EC2C297EF1002E272C /* XCRemoteSwiftPackageReference "LRUCache" */;
+			productName = LRUCache;
+		};
+		56A95A092C2982C0002E272C /* SwipeCellKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959EE2C297F8D002E272C /* XCRemoteSwiftPackageReference "SwipeCellKit" */;
+			productName = SwipeCellKit;
+		};
+		56A95A0B2C2982C8002E272C /* TagListView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959E62C297D40002E272C /* XCRemoteSwiftPackageReference "TagListView" */;
+			productName = TagListView;
+		};
+		56A95A0D2C2982E1002E272C /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959ED2C297F69002E272C /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		56A95A0F2C2982F8002E272C /* PreviewSnapshots */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959EA2C297E24002E272C /* XCRemoteSwiftPackageReference "swiftui-preview-snapshots" */;
+			productName = PreviewSnapshots;
+		};
+		56A95A112C298308002E272C /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959ED2C297F69002E272C /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		56A95A152C29833A002E272C /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959E92C297DD6002E272C /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		56A95A172C29834A002E272C /* PreviewSnapshotsTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959EA2C297E24002E272C /* XCRemoteSwiftPackageReference "swiftui-preview-snapshots" */;
+			productName = PreviewSnapshotsTesting;
+		};
+		56A95A192C298356002E272C /* SnapshotTestingHEIC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959EB2C297E4F002E272C /* XCRemoteSwiftPackageReference "SnapshotTestingHEIC" */;
+			productName = SnapshotTestingHEIC;
+		};
+		56A95A1F2C2986EA002E272C /* NextcloudKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A95A1E2C2986D0002E272C /* XCRemoteSwiftPackageReference "NextcloudKit" */;
+			productName = NextcloudKit;
+		};
+		56A95A212C2986FD002E272C /* NextcloudKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A95A1E2C2986D0002E272C /* XCRemoteSwiftPackageReference "NextcloudKit" */;
+			productName = NextcloudKit;
+		};
+		56A95A232C298710002E272C /* NextcloudKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A95A1E2C2986D0002E272C /* XCRemoteSwiftPackageReference "NextcloudKit" */;
+			productName = NextcloudKit;
+		};
+		56A95A252C29871F002E272C /* NextcloudKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A95A1E2C2986D0002E272C /* XCRemoteSwiftPackageReference "NextcloudKit" */;
+			productName = NextcloudKit;
+		};
+		56AA29CA2C2C420A00026C2C /* SVGKitSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 56A959772C296448002E272C /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKitSwift;
+		};
 		56AB28932B833E2D0089D373 /* Adjust */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Adjust;
@@ -4961,281 +5271,6 @@
 		56AB28A22B8351740089D373 /* TealiumVisitorService */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = TealiumVisitorService;
-		};
-		F3131EDC2B038E4A0018DB28 /* XLForm */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F74E771E277A2EF40013B958 /* XCRemoteSwiftPackageReference "XLForm" */;
-			productName = XLForm;
-		};
-		F3131EDE2B038F2A0018DB28 /* SnapshotTesting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F31F694B2A2F6EFA00162F76 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
-			productName = SnapshotTesting;
-		};
-		F3131EE02B038F560018DB28 /* SnapshotTestingHEIC */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F31F69672A2F92F000162F76 /* XCRemoteSwiftPackageReference "SnapshotTestingHEIC" */;
-			productName = SnapshotTestingHEIC;
-		};
-		F3131EE22B038F9B0018DB28 /* PreviewSnapshotsTesting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F31F69622A2F929600162F76 /* XCRemoteSwiftPackageReference "swiftui-preview-snapshots" */;
-			productName = PreviewSnapshotsTesting;
-		};
-		F314F1102A30C11200BC7FAB /* PreviewSnapshots */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F31F69622A2F929600162F76 /* XCRemoteSwiftPackageReference "swiftui-preview-snapshots" */;
-			productName = PreviewSnapshots;
-		};
-		F31F69632A2F929600162F76 /* PreviewSnapshots */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F31F69622A2F929600162F76 /* XCRemoteSwiftPackageReference "swiftui-preview-snapshots" */;
-			productName = PreviewSnapshots;
-		};
-		F327FA422B8CC0B900E5B743 /* SwipeCellKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F327FA412B8CC0B900E5B743 /* XCRemoteSwiftPackageReference "SwipeCellKit" */;
-			productName = SwipeCellKit;
-		};
-		F327FA442B8CC36900E5B743 /* SwipeCellKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F327FA412B8CC0B900E5B743 /* XCRemoteSwiftPackageReference "SwipeCellKit" */;
-			productName = SwipeCellKit;
-		};
-		F3C6D0962B0F9BA40078DD25 /* XLForm */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F74E771E277A2EF40013B958 /* XCRemoteSwiftPackageReference "XLForm" */;
-			productName = XLForm;
-		};
-		F70821D729E59E6D001CA2D7 /* TagListView */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F7A1050C29E587AF00FFD92B /* XCRemoteSwiftPackageReference "TagListView" */;
-			productName = TagListView;
-		};
-		F70B86742642CE3B00ED5349 /* FirebaseCrashlytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F70B86732642CE3B00ED5349 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCrashlytics;
-		};
-		F710FC79277B7D0000AA9FBF /* Realm */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F710FC78277B7CFF00AA9FBF /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = Realm;
-		};
-		F710FC7B277B7D0000AA9FBF /* RealmSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F710FC78277B7CFF00AA9FBF /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = RealmSwift;
-		};
-		F710FC7F277B7D2700AA9FBF /* RealmSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F710FC78277B7CFF00AA9FBF /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = RealmSwift;
-		};
-		F710FC83277B7D3500AA9FBF /* RealmSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F710FC78277B7CFF00AA9FBF /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = RealmSwift;
-		};
-		F710FC87277B7D3F00AA9FBF /* RealmSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F710FC78277B7CFF00AA9FBF /* XCRemoteSwiftPackageReference "realm-swift" */;
-			productName = RealmSwift;
-		};
-		F711A4EE2AF932B900095DD8 /* SVGKitSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */;
-			productName = SVGKitSwift;
-		};
-		F72AD70C28C24B93006CB92D /* NextcloudKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F783034028B511D200B84583 /* XCRemoteSwiftPackageReference "NextcloudKit" */;
-			productName = NextcloudKit;
-		};
-		F72AD70E28C24BA1006CB92D /* NextcloudKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F783034028B511D200B84583 /* XCRemoteSwiftPackageReference "NextcloudKit" */;
-			productName = NextcloudKit;
-		};
-		F72AD71028C24BBB006CB92D /* NextcloudKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F783034028B511D200B84583 /* XCRemoteSwiftPackageReference "NextcloudKit" */;
-			productName = NextcloudKit;
-		};
-		F72AD71228C24BCC006CB92D /* NextcloudKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F783034028B511D200B84583 /* XCRemoteSwiftPackageReference "NextcloudKit" */;
-			productName = NextcloudKit;
-		};
-		F72CD01127A7E92400E59476 /* JGProgressHUD */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F72CD01027A7E92400E59476 /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
-			productName = JGProgressHUD;
-		};
-		F72D7EB6263B1207000B3DFC /* MarkdownKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F788ECC5263AAAF900ADC67F /* XCRemoteSwiftPackageReference "MarkdownKit" */;
-			productName = MarkdownKit;
-		};
-		F72DA9B325F53E4E00B87DB1 /* SwiftRichString */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F72DA9B225F53E4E00B87DB1 /* XCRemoteSwiftPackageReference "SwiftRichString" */;
-			productName = SwiftRichString;
-		};
-		F734B06528E75C0100E180D5 /* TLPhotoPicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F734B06428E75C0100E180D5 /* XCRemoteSwiftPackageReference "TLPhotoPicker" */;
-			productName = TLPhotoPicker;
-		};
-		F73ADD1B265546890069EA0D /* SwiftEntryKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F73ADD1A265546880069EA0D /* XCRemoteSwiftPackageReference "SwiftEntryKit" */;
-			productName = SwiftEntryKit;
-		};
-		F73ADD2026554F8E0069EA0D /* SwiftEntryKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F73ADD1A265546880069EA0D /* XCRemoteSwiftPackageReference "SwiftEntryKit" */;
-			productName = SwiftEntryKit;
-		};
-		F73ADD2326554FE20069EA0D /* SwiftEntryKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F73ADD1A265546880069EA0D /* XCRemoteSwiftPackageReference "SwiftEntryKit" */;
-			productName = SwiftEntryKit;
-		};
-		F74C863C2AEFBFD9009A1D4A /* LRUCache */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F76B649A2ADFFAD200014640 /* XCRemoteSwiftPackageReference "LRUCache" */;
-			productName = LRUCache;
-		};
-		F74E771F277A2EF40013B958 /* XLForm */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F74E771E277A2EF40013B958 /* XCRemoteSwiftPackageReference "XLForm" */;
-			productName = XLForm;
-		};
-		F753791F2AE2AD9400C0250E /* JGProgressHUD */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F72CD01027A7E92400E59476 /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
-			productName = JGProgressHUD;
-		};
-		F753BA92281FD8020015BFB6 /* EasyTipView */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F753BA91281FD8010015BFB6 /* XCRemoteSwiftPackageReference "EasyTipView" */;
-			productName = EasyTipView;
-		};
-		F758A01127A7F03E0069468B /* JGProgressHUD */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F72CD01027A7E92400E59476 /* XCRemoteSwiftPackageReference "JGProgressHUD" */;
-			productName = JGProgressHUD;
-		};
-		F75EAED726D2552E00F4320E /* MarqueeLabel */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F75EAED626D2552E00F4320E /* XCRemoteSwiftPackageReference "MarqueeLabel" */;
-			productName = MarqueeLabel;
-		};
-		F760DE022AE66EA80027D78A /* KeychainAccess */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F760DE012AE66E860027D78A /* XCRemoteSwiftPackageReference "KeychainAccess" */;
-			productName = KeychainAccess;
-		};
-		F760DE082AE66ED00027D78A /* KeychainAccess */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F760DE012AE66E860027D78A /* XCRemoteSwiftPackageReference "KeychainAccess" */;
-			productName = KeychainAccess;
-		};
-		F760DE0A2AE66ED80027D78A /* KeychainAccess */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F760DE012AE66E860027D78A /* XCRemoteSwiftPackageReference "KeychainAccess" */;
-			productName = KeychainAccess;
-		};
-		F760DE0E2AE66EE60027D78A /* KeychainAccess */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F760DE012AE66E860027D78A /* XCRemoteSwiftPackageReference "KeychainAccess" */;
-			productName = KeychainAccess;
-		};
-		F76B649D2ADFFDEC00014640 /* LRUCache */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F76B649A2ADFFAD200014640 /* XCRemoteSwiftPackageReference "LRUCache" */;
-			productName = LRUCache;
-		};
-		F76DA962277B760E0082465B /* Queuer */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F76DA961277B760E0082465B /* XCRemoteSwiftPackageReference "Queuer" */;
-			productName = Queuer;
-		};
-		F76DA968277B77EA0082465B /* DropDown */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F76DA967277B77E90082465B /* XCRemoteSwiftPackageReference "DropDown" */;
-			productName = DropDown;
-		};
-		F770768D263A8C3400A1BA94 /* FloatingPanel */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F770768C263A8C3400A1BA94 /* XCRemoteSwiftPackageReference "FloatingPanel" */;
-			productName = FloatingPanel;
-		};
-		F77333872927A72100466E35 /* OpenSSL */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F77333862927A72100466E35 /* XCRemoteSwiftPackageReference "OpenSSL" */;
-			productName = OpenSSL;
-		};
-		F77BC3EA293E5268005F2B08 /* Swifter */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F77BC3E9293E5268005F2B08 /* XCRemoteSwiftPackageReference "swifter" */;
-			productName = Swifter;
-		};
-		F77CB6A82AA08053000C3CA4 /* OpenSSL */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F77333862927A72100466E35 /* XCRemoteSwiftPackageReference "OpenSSL" */;
-			productName = OpenSSL;
-		};
-		F787AC08298BCB4A0001BB00 /* SVGKitSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F75E57A725BF0D61002B72C2 /* XCRemoteSwiftPackageReference "SVGKit" */;
-			productName = SVGKitSwift;
-		};
-		F788ECC6263AAAFA00ADC67F /* MarkdownKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F788ECC5263AAAF900ADC67F /* XCRemoteSwiftPackageReference "MarkdownKit" */;
-			productName = MarkdownKit;
-		};
-		F7A1050D29E587AF00FFD92B /* TagListView */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F7A1050C29E587AF00FFD92B /* XCRemoteSwiftPackageReference "TagListView" */;
-			productName = TagListView;
-		};
-		F7A560432AE15D2900BE8FD6 /* Queuer */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F76DA961277B760E0082465B /* XCRemoteSwiftPackageReference "Queuer" */;
-			productName = Queuer;
-		};
-		F7A560472AE15D5000BE8FD6 /* Queuer */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F76DA961277B760E0082465B /* XCRemoteSwiftPackageReference "Queuer" */;
-			productName = Queuer;
-		};
-		F7BB7E4627A18C56009B9F29 /* Parchment */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F7BB7E4527A18C56009B9F29 /* XCRemoteSwiftPackageReference "Parchment" */;
-			productName = Parchment;
-		};
-		F7D56B192972405500FA46C4 /* Mantis */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F7D56B182972405400FA46C4 /* XCRemoteSwiftPackageReference "Mantis" */;
-			productName = Mantis;
-		};
-		F7ED547B25EEA65400956C55 /* QRCodeReader */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F7ED547A25EEA65400956C55 /* XCRemoteSwiftPackageReference "QRCodeReader" */;
-			productName = QRCodeReader;
-		};
-		F7F623B42A5EF4D30022D3D4 /* Gzip */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F7F623B32A5EF4D30022D3D4 /* XCRemoteSwiftPackageReference "GzipSwift" */;
-			productName = Gzip;
-		};
-		F7F623B62A5EFA0C0022D3D4 /* Gzip */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F7F623B32A5EF4D30022D3D4 /* XCRemoteSwiftPackageReference "GzipSwift" */;
-			productName = Gzip;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

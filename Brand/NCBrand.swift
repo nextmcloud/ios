@@ -27,7 +27,7 @@ let userAgent: String = {
     let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
     // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
 //    return "MagentaCLOUD iOS"
-    return "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
+    return "Mozilla/5.0 (iOS) Magenta-iOS/\(appVersion)"
 }()
 
 @objc class NCBrandOptions: NSObject {
