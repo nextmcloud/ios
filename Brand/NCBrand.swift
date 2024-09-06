@@ -60,7 +60,8 @@ let userAgent: String = {
 
     // Options
     @objc public var use_themingColor: Bool = true
-
+    @objc public var use_loginflowv2: Bool = false
+    
     var disable_intro: Bool = false
     var disable_request_login_url: Bool = false
     var disable_multiaccount: Bool = false

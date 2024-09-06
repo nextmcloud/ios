@@ -42,7 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     var tipView: EasyTipView?
     var backgroundSessionCompletionHandler: (() -> Void)?
-    var activeLogin: NCLogin?
+    var activeLogin: NCLoginWeb?
     var activeLoginWeb: NCLoginProvider?
     var timerErrorNetworking: Timer?
     var timerErrorNetworkingDisabled: Bool = false
@@ -347,8 +347,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     // MARK: - Login
 
-    func openLogin(selector: Int, openLoginWeb: Bool, windowForRootViewController: UIWindow? = nil) {
-        func showLoginViewController(_ viewController: UIViewController?) {
+    func openLogin(viewController: UIViewController? = nil, selector: Int, openLoginWeb: Bool, windowForRootViewController: UIWindow? = nil) {
+        func showLoginViewController(_ viewController: UIViewController?, contextViewController: UIViewController? = nil) {
             guard let viewController else { return }
             let navigationController = NCLoginNavigationController(rootViewController: viewController)
 
@@ -358,7 +358,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             navigationController.navigationBar.barTintColor = NCBrandColor.shared.customer
             navigationController.navigationBar.isTranslucent = false
 
-            if let window = windowForRootViewController {
+            if contextViewController is UINavigationController {
+                if let contextViewController = contextViewController {
+                    (contextViewController as? UINavigationController)?.pushViewController(viewController, animated: true)
+                }
+            } else if let window = windowForRootViewController {
                 window.rootViewController = navigationController
                 window.makeKeyAndVisible()
             } else {
@@ -379,7 +383,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Nextcloud standard login
         if selector == NCGlobal.shared.introSignup {
             if activeLogin?.view.window == nil {
-                activeLogin = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin
+                activeLogin = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb
                 if selector == NCGlobal.shared.introSignup {
                     activeLogin?.urlBase = NCBrandOptions.shared.linkloginPreferredProviders
                     let web = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider
@@ -392,9 +396,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
         } else {
             if activeLogin?.view.window == nil {
-                activeLogin = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin
+                activeLogin = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb
                 activeLogin?.urlBase = NCBrandOptions.shared.disable_request_login_url ? NCBrandOptions.shared.loginBaseUrl : ""
-                showLoginViewController(activeLogin)
+                showLoginViewController(activeLogin, contextViewController: viewController)
             }
         }
     }

@@ -319,9 +319,30 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
                 NextcloudKit.shared.getLoginFlowV2(serverUrl: url) { token, endpoint, login, _, error in
                     self.loginButton.isEnabled = true
                     // Login Flow V2
-                    if error == .success, let token, let endpoint, let login {
-                        let vc = UIHostingController(rootView: NCLoginPoll(loginFlowV2Token: token, loginFlowV2Endpoint: endpoint, loginFlowV2Login: login))
-                        self.present(vc, animated: true)
+                    if error == .success && NCBrandOptions.shared.use_loginflowv2, let token, let endpoint, let login {
+                        if let loginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb {
+                            loginWeb.urlBase = url
+                            loginWeb.user = user
+                            loginWeb.loginFlowV2Available = true
+                            loginWeb.loginFlowV2Token = token
+                            loginWeb.loginFlowV2Endpoint = endpoint
+                            loginWeb.loginFlowV2Login = login
+                            self.navigationController?.pushViewController(loginWeb, animated: true)
+                        }
+
+                    // Login Flow
+                    } else if serverInfo.versionMajor >= NCGlobal.shared.nextcloudVersion12 {
+
+                            if let loginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb {
+
+                                loginWeb.urlBase = url
+                                loginWeb.user = user
+
+                                self.navigationController?.pushViewController(loginWeb, animated: true)
+                            }
+
+                        // NO Login flow available
+
                     } else if serverInfo.versionMajor < NCGlobal.shared.nextcloudVersion12 { // No login flow available
                         let alertController = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: NSLocalizedString("_webflow_not_available_", comment: ""), preferredStyle: .alert)
                         alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))

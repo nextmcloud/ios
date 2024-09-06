@@ -179,7 +179,12 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func login(_ sender: Any) {
-        appDelegate.openLogin(selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+        if NCBrandOptions.shared.use_AppConfig == true {
+            let loginViewPage = UIStoryboard(name: "NCLogin", bundle: Bundle.main).instantiateViewController(identifier: "NCLogin")
+            navigationController?.pushViewController(loginViewPage, animated: true)
+        } else {
+            appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+        }
     }
 
     @IBAction func signup(_ sender: Any) {
