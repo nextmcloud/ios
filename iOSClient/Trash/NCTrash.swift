@@ -194,6 +194,20 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         }
     }
 
+    func tapButtonSwitch(_ sender: Any) {
+        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
+            onListSelected()
+        } else {
+            onGridSelected()
+        }
+    }
+    
+    func tapButtonOrder(_ sender: Any) {
+
+        let sortMenu = NCSortMenu()
+        sortMenu.toggleMenu(viewController: self, account: appDelegate.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
+    }
+
     func longPressGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
     func longPressMoreGridItem(with objectId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
