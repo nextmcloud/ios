@@ -194,6 +194,21 @@ extension NCMenuAction {
             }
         )
     }
+    
+    /// Copy files to pasteboard
+    static func copyAction(selectOcId: [String], viewController: UIViewController, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
+        NCMenuAction(
+            title: NSLocalizedString("_copy_file_", comment: ""),
+            icon: NCUtility().loadImage(named: "copy", colors: [NCBrandColor.shared.iconImageColor]),
+            order: order,
+            action: { _ in
+                NCActionCenter.shared.copyPasteboard(pasteboardOcIds: selectOcId, viewController: viewController)
+                completion?()
+            }
+        )
+    }
+
+    
     /// Open view that lets the user move or copy the files within Nextcloud
     static func moveOrCopyAction(selectedMetadatas: [tableMetadata], viewController: UIViewController, indexPath: [IndexPath], order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
