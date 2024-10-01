@@ -229,9 +229,9 @@ class NCImageCache: NSObject {
         static var shared = UIImage()
         static var canShare = UIImage()
         static var shareByLink = UIImage()
+        static var sharedWithMe = UIImage()
 
         static var favorite = UIImage()
-        static var comment = UIImage()
         static var livePhoto = UIImage()
         static var offlineFlag = UIImage()
         static var local = UIImage()
@@ -266,17 +266,18 @@ class NCImageCache: NSObject {
 
         images.file = utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor2])
 
-        images.shared = utility.loadImage(named: "person.fill.badge.plus", colors: NCBrandColor.shared.iconImageMultiColors)
-        images.canShare = utility.loadImage(named: "person.fill.badge.plus", colors: NCBrandColor.shared.iconImageMultiColors)
-        images.shareByLink = utility.loadImage(named: "link", colors: [NCBrandColor.shared.iconImageColor])
-
+        images.shared = UIImage(named: "share")!.image(color: .systemGray, size: 50)
+        images.canShare = UIImage(named: "share")!.image(color: .systemGray, size: 50)
+        images.shareByLink = UIImage(named: "sharebylink")!.image(color: .systemGray, size: 50)
+        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 50)
+        
         images.favorite = utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
-        images.livePhoto = utility.loadImage(named: "livephoto", colors: [NCBrandColor.shared.iconImageColor])
-        images.offlineFlag = utility.loadImage(named: "arrow.down.circle.fill", colors: [.systemGreen])
+        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
+        images.offlineFlag = UIImage(named: "offlineFlag")!
         images.local = utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen])
 
-        images.checkedYes = utility.loadImage(named: "checkmark.circle.fill", colors: [NCBrandColor.shared.brandElement])
-        images.checkedNo = utility.loadImage(named: "circle", colors: [NCBrandColor.shared.brandElement])
+        images.checkedYes = UIImage(named: "checkedYes")!
+        images.checkedNo = UIImage(named: "local")!
 
         images.buttonMore = utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor])
         images.buttonStop = utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor])
@@ -291,14 +292,13 @@ class NCImageCache: NSObject {
         self.brandElementColor = brandElement
         let utility = NCUtility()
 
-        images.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement)
-        images.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!.image(color: brandElement)
-        images.folderPublic = UIImage(named: "folder_public")!.image(color: brandElement)
-        images.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement)
-        images.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement)
-        images.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement)
-        images.folder = UIImage(named: "folder")!.image(color: brandElement)
-
+        images.folderEncrypted = UIImage(named: "folderEncrypted")!
+        images.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
+        images.folderPublic = UIImage(named: "folder_public")!
+        images.folderGroup = UIImage(named: "folder_group")!
+        images.folderExternal = UIImage(named: "folder_external")!
+        images.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!
+        images.folder = UIImage(named: "folder")!
         images.iconContacts = utility.loadImage(named: "person.crop.rectangle.stack", colors: [NCBrandColor.shared.iconImageColor])
         images.iconTalk = UIImage(named: "talk-template")!.image(color: brandElement)
         images.iconCalendar = utility.loadImage(named: "calendar", colors: [NCBrandColor.shared.iconImageColor])
