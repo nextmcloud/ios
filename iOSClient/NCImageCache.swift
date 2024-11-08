@@ -26,8 +26,8 @@ import LRUCache
 import NextcloudKit
 import RealmSwift
 
-class NCImageCache: NSObject {
-    public static let shared: NCImageCache = {
+@objc class NCImageCache: NSObject {
+    @objc public static let shared: NCImageCache = {
         let instance = NCImageCache()
         return instance
     }()
@@ -77,7 +77,7 @@ class NCImageCache: NSObject {
     ///
     /// MEDIA CACHE
     ///
-    func createMediaCache(account: String, withCacheSize: Bool) {
+    @objc func createMediaCache(account: String, withCacheSize: Bool) {
         if createMediaCacheInProgress {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] ThumbnailLRUCache image process already in progress")
             return
@@ -237,12 +237,15 @@ class NCImageCache: NSObject {
         static var local = UIImage()
 
         static var folderEncrypted = UIImage()
+        static var encryptedFolder = UIImage()
         static var folderSharedWithMe = UIImage()
         static var folderPublic = UIImage()
         static var folderGroup = UIImage()
         static var folderExternal = UIImage()
         static var folderAutomaticUpload = UIImage()
         static var folder = UIImage()
+        static var addFolder = UIImage()
+        static var addFolderInfo = UIImage()
 
         static var checkedYes = UIImage()
         static var checkedNo = UIImage()
@@ -292,12 +295,15 @@ class NCImageCache: NSObject {
         let utility = NCUtility()
 
         images.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement)
+        images.encryptedFolder = UIImage(named: "encryptedfolder")!.imageColor(NCBrandColor.shared.iconImageColor)
         images.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!.image(color: brandElement)
         images.folderPublic = UIImage(named: "folder_public")!.image(color: brandElement)
         images.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement)
         images.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement)
         images.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement)
         images.folder = UIImage(named: "folder")!.image(color: brandElement)
+        images.addFolder = UIImage(named: "addFolder")!
+        images.addFolderInfo = UIImage(named: "addFolderInfo")!.imageColor(NCBrandColor.shared.iconImageColor)
 
         images.iconContacts = utility.loadImage(named: "person.crop.rectangle.stack", colors: [NCBrandColor.shared.iconImageColor])
         images.iconTalk = UIImage(named: "talk-template")!.image(color: brandElement)

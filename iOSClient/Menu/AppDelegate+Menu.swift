@@ -102,7 +102,7 @@ extension AppDelegate {
         }
 
         let titleCreateFolder = isDirectoryE2EE ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
-        let imageCreateFolder = isDirectoryE2EE ? NCImageCache.images.folderEncrypted : NCImageCache.images.folder
+        let imageCreateFolder = isDirectoryE2EE ? NCImageCache.images.encryptedFolder : NCImageCache.images.addFolder
         actions.append(
             NCMenuAction(title: titleCreateFolder,
                          icon: imageCreateFolder, action: { _ in
@@ -116,7 +116,7 @@ extension AppDelegate {
         if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: appDelegate.account) {
             actions.append(
                 NCMenuAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
-                             icon: NCImageCache.images.folderEncrypted,
+                             icon: NCImageCache.images.encryptedFolder,
                              action: { _ in
                                  let alertController = UIAlertController.createFolder(serverUrl: serverUrl, userBaseUrl: appDelegate, markE2ee: true, sceneIdentifier: controller.sceneIdentifier)
                                  controller.present(alertController, animated: true, completion: nil)
@@ -131,7 +131,7 @@ extension AppDelegate {
         if NCGlobal.shared.capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isDirectoryE2EE && NextcloudKit.shared.isNetworkReachable() {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: NCUtility().loadImage(named: "list.dash.header.rectangle", colors: [NCBrandColor.shared.iconImageColor]), action: { _ in
+                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: NCImageCache.images.addFolderInfo, action: { _ in
                         let richWorkspaceCommon = NCRichWorkspaceCommon()
                         if let viewController = controller.currentViewController() {
                             if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView LIKE[c] %@", appDelegate.account, serverUrl, NCGlobal.shared.fileNameRichWorkspace.lowercased())) == nil {

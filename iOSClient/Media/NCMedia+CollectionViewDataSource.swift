@@ -29,7 +29,7 @@ extension NCMedia: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == mediaSectionHeader {
             guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFirstHeaderEmptyData", for: indexPath) as? NCSectionFirstHeaderEmptyData else { return NCSectionFirstHeaderEmptyData() }
-            header.emptyImage.image = utility.loadImage(named: "photo", colors: [NCBrandColor.shared.brandElement])
+            header.emptyImage.image = UIImage(named: "media")?.image(color: .gray, size: UIScreen.main.bounds.width)
             if loadingTask != nil || imageCache.createMediaCacheInProgress {
                 header.emptyTitle.text = NSLocalizedString("_search_in_progress_", comment: "")
             } else {
