@@ -27,8 +27,8 @@ import LRUCache
 import NextcloudKit
 import RealmSwift
 
-class NCImageCache: NSObject {
-    static let shared = NCImageCache()
+@objc class NCImageCache: NSObject {
+    @objc static let shared = NCImageCache()
 
     private let utility = NCUtility()
     private let global = NCGlobal.shared
@@ -230,8 +230,20 @@ class NCImageCache: NSObject {
         return UIImage(named: "folder")!.image(color: NCBrandColor.shared.getElement(account: account))
     }
 
+    func getAddFolder() -> UIImage {
+        return UIImage(named: "addFolder")!
+    }
+
+    func getAddFolderInfo() -> UIImage {
+        return UIImage(named: "addFolderInfo")!.imageColor(NCBrandColor.shared.iconImageColor)
+    }
+
     func getFolderEncrypted(account: String) -> UIImage {
         return UIImage(named: "folderEncrypted")!.image(color: NCBrandColor.shared.getElement(account: account))
+    }
+    
+    func getEncryptedFolder() -> UIImage {
+        return UIImage(named: "encryptedfolder")!.imageColor(NCBrandColor.shared.iconImageColor)
     }
 
     func getFolderSharedWithMe(account: String) -> UIImage {
