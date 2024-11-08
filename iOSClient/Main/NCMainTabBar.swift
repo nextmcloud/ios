@@ -133,7 +133,7 @@ class NCMainTabBar: UITabBar {
         }
 
         // +
-        let imagePlus = UIImage(systemName: "plus", withConfiguration: UIImage.SymbolConfiguration(scale: .large))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [.white]))
+        let imagePlus = UIImage(named: "tabBarPlus")?.image(color: .white, size: 100)
         if let item = items?[2] {
             item.title = ""
             item.image = nil
@@ -143,15 +143,14 @@ class NCMainTabBar: UITabBar {
         // Media
         if let item = items?[3] {
             item.title = NSLocalizedString("_media_", comment: "")
-            item.image = UIImage(systemName: "photo")
+            item.image = UIImage(named: "media")?.image(color: color, size: 25)
             item.selectedImage = item.image
         }
 
         // More
         if let item = items?[4] {
             item.title = NSLocalizedString("_more_", comment: "")
-            item.image = UIImage(systemName: "line.3.horizontal")
-            item.image = UIImage(systemName: "ellipsis")
+            item.image = UIImage(named: "tabBarMore")?.image(color: color, size: 25)
             item.selectedImage = item.image
         }
 

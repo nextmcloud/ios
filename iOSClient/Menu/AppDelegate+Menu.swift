@@ -101,7 +101,7 @@ extension AppDelegate {
         }
 
         let titleCreateFolder = isDirectoryE2EE ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
-        let imageCreateFolder = isDirectoryE2EE ? NCImageCache.shared.getFolderEncrypted(account: session.account) : NCImageCache.shared.getFolder(account: session.account)
+        let imageCreateFolder = isDirectoryE2EE ? NCImageCache.shared.getEncryptedFolder() : NCImageCache.shared.getAddFolder()
         actions.append(
             NCMenuAction(title: titleCreateFolder,
                          icon: imageCreateFolder, action: { _ in
@@ -115,7 +115,7 @@ extension AppDelegate {
         if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: session.account) {
             actions.append(
                 NCMenuAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
-                             icon: NCImageCache.shared.getFolderEncrypted(account: session.account),
+                             icon: NCImageCache.shared.getEncryptedFolder(),
                              action: { _ in
                                  let alertController = UIAlertController.createFolder(serverUrl: serverUrl, session: session, markE2ee: true, sceneIdentifier: controller.sceneIdentifier)
                                  controller.present(alertController, animated: true, completion: nil)
@@ -130,7 +130,7 @@ extension AppDelegate {
         if NCCapabilities.shared.getCapabilities(account: session.account).capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isDirectoryE2EE && NextcloudKit.shared.isNetworkReachable() {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: NCUtility().loadImage(named: "list.dash.header.rectangle", colors: [NCBrandColor.shared.iconImageColor]), action: { _ in
+                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: NCImageCache.shared.getAddFolderInfo(), action: { _ in
                         let richWorkspaceCommon = NCRichWorkspaceCommon()
                         if let viewController = controller.currentViewController() {
                             if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView LIKE[c] %@",
