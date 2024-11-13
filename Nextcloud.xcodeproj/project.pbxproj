@@ -34,6 +34,10 @@
 		370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 370D26AE248A3D7A00121797 /* NCCellProtocol.swift */; };
 		371B5A2E23D0B04500FAFAE9 /* NCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */; };
 		3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */; };
+        56A32E6A2CE4B69B0020EFF5 /* MoEngage-iOS-SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 56A32E692CE4B69B0020EFF5 /* MoEngage-iOS-SDK */; };
+        56A32E792CE4B75C0020EFF5 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A32E6D2CE4B75C0020EFF5 /* AnalyticsHelper.swift */; };
+        56A32E7A2CE4B75C0020EFF5 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A32E6E2CE4B75C0020EFF5 /* AnalyticsService.swift */; };
+        56A32E7B2CE4B75C0020EFF5 /* MoEngageAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A32E6B2CE4B75C0020EFF5 /* MoEngageAnalytics.swift */; };
         568C76D02BCD0822009EE9C7 /* NCMediaCommandView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 568C76CF2BCD0822009EE9C7 /* NCMediaCommandView.xib */; };
         56AB28972B8351720089D373 /* TealiumAutotracking in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28962B8351720089D373 /* TealiumAutotracking */; };
         56AB28992B8351720089D373 /* TealiumCore in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28982B8351720089D373 /* TealiumCore */; };
@@ -1421,6 +1425,9 @@
 		370D26AE248A3D7A00121797 /* NCCellProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCellProtocol.swift; sourceTree = "<group>"; };
 		371B5A2D23D0B04500FAFAE9 /* NCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMenu.swift; sourceTree = "<group>"; };
 		3781B9AF23DB2B7E006B4B1D /* AppDelegate+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+Menu.swift"; sourceTree = "<group>"; };
+        56A32E6B2CE4B75C0020EFF5 /* MoEngageAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoEngageAnalytics.swift; sourceTree = "<group>"; };
+        56A32E6D2CE4B75C0020EFF5 /* AnalyticsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsHelper.swift; sourceTree = "<group>"; };
+        56A32E6E2CE4B75C0020EFF5 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
         568C76CF2BCD0822009EE9C7 /* NCMediaCommandView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCMediaCommandView.xib; sourceTree = "<group>"; };
         566FCF572B3ECD3400168DEA /* TealiumHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
         566FCF582B3ECD3400168DEA /* AdjustHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
@@ -2432,6 +2439,7 @@
 				F3374AF42D78B01B002A38F9 /* DequeModule in Frameworks */,
 				F7160A822BE933390034DCB3 /* RealmSwift in Frameworks */,
 				F3374AF22D78B01B002A38F9 /* Collections in Frameworks */,
+                56A32E6A2CE4B69B0020EFF5 /* MoEngage-iOS-SDK in Frameworks */,
 				F72AD70D28C24B93006CB92D /* NextcloudKit in Frameworks */,
 				F70B86752642CE3B00ED5349 /* FirebaseCrashlytics in Frameworks */,
 				F7A1050E29E587AF00FFD92B /* TagListView in Frameworks */,
@@ -2561,6 +2569,36 @@
                 566FCF592B3ECD3400168DEA /* AdjustHelper.h */,
             );
             path = Helper;
+            sourceTree = "<group>";
+        };
+        AA3C85EC2D36BC8400F74F12 /* Responses */ = {
+            isa = PBXGroup;
+            children = (
+                AAA7BC2D2D3E39EC008F1A22 /* CapabilitiesResponse.swift */,
+                AA3C85F12D394B3600F74F12 /* DownloadLimitResponse.swift */,
+                AAA7BC2F2D3E3B83008F1A22 /* CapabilityResponse.swift */,
+                AA3C85ED2D36BCCB00F74F12 /* SharesResponse.swift */,
+                AA3C85EA2D36BBF400F74F12 /* OCSResponse.swift */,
+            );
+            path = Responses;
+            sourceTree = "<group>";
+        };
+        56A32E6C2CE4B75C0020EFF5 /* MoEngage */ = {
+            isa = PBXGroup;
+            children = (
+                56A32E6B2CE4B75C0020EFF5 /* MoEngageAnalytics.swift */,
+            );
+            path = MoEngage;
+            sourceTree = "<group>";
+        };
+        56A32E6F2CE4B75C0020EFF5 /* Analytics */ = {
+            isa = PBXGroup;
+            children = (
+                56A32E6C2CE4B75C0020EFF5 /* MoEngage */,
+                56A32E6D2CE4B75C0020EFF5 /* AnalyticsHelper.swift */,
+                56A32E6E2CE4B75C0020EFF5 /* AnalyticsService.swift */,
+            );
+            path = Analytics;
             sourceTree = "<group>";
         };
 		AA52EB442D42AC500089C348 /* NextcloudUnitTests */ = {
@@ -4158,6 +4196,7 @@
                 566EB8122B3D861400FB7CAD /* NMC Custom Views */,
                 566FCF4E2B3EB84F00168DEA /* AppUtility.swift */,
                 566FCF562B3ECD3400168DEA /* Helper */,
+                56A32E6F2CE4B75C0020EFF5 /* Analytics */,
 				F702F2CC25EE5B4F008F8E80 /* AppDelegate.swift */,
 				F7CAFE1A2F16AA8600DB35A5 /* main.swift */,
 				F794E13E2BBC0F70003693D7 /* SceneDelegate.swift */,
@@ -4533,6 +4572,7 @@
 				F70557B62ED44E2700135623 /* LucidBanner */,
 				F7A27B2C3053007C00EF02C7 /* NextcloudKitUI */,
 				F76BED73306CE862002E1442 /* GRDB */,
+                56A32E692CE4B69B0020EFF5 /* MoEngage-iOS-SDK */,
 				F327FA422B8CC0B900E5B743 /* SwipeCellKit */,
                 56AB28932B833E2D0089D373 /* Adjust */,
                 56AB28962B8351720089D373 /* TealiumAutotracking */,
@@ -4768,6 +4808,7 @@
 				F3374AEE2D78B01B002A38F9 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				F70557B52ED44E2700135623 /* XCRemoteSwiftPackageReference "LucidBanner" */,
 				F76BED72306CE862002E1442 /* XCRemoteSwiftPackageReference "GRDB" */,
+                56A32E682CE4B66A0020EFF5 /* XCRemoteSwiftPackageReference "MoEngage-iOS-SDK" */,
 				F327FA412B8CC0B900E5B743 /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
 				566FCF5C2B3ED58900168DEA /* XCRemoteSwiftPackageReference "tealium-swift" */,
 				566FCF5D2B3ED64900168DEA /* XCRemoteSwiftPackageReference "ios_sdk" */,
@@ -5528,6 +5569,10 @@
                 566EB8032B3D7B5F00FB7CAD /* PasswordInputField.swift in Sources */,
 				F733598125C1C188002ABA72 /* NCAskAuthorization.swift in Sources */,
 				370D26AF248A3D7A00121797 /* NCCellMain.swift in Sources */,
+                56A32E792CE4B75C0020EFF5 /* AnalyticsHelper.swift in Sources */,
+                56A32E7A2CE4B75C0020EFF5 /* AnalyticsService.swift in Sources */,
+                56A32E7B2CE4B75C0020EFF5 /* MoEngageAnalytics.swift in Sources */,
+				370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */,
 				F32FADA92D1176E3007035E2 /* UIButton+Extension.swift in Sources */,
 				F7DF7B3F2F1A2EF900514020 /* WarningBannerView.swift in Sources */,
 				F768822C2C0DD1E7001CF441 /* NCPreferences.swift in Sources */,
@@ -7501,6 +7546,14 @@
 				minimumVersion = 1.1.4;
 			};
 		};
+        56A32E682CE4B66A0020EFF5 /* XCRemoteSwiftPackageReference "MoEngage-iOS-SDK" */ = {
+            isa = XCRemoteSwiftPackageReference;
+            repositoryURL = "https://github.com/moengage/MoEngage-iOS-SDK.git";
+            requirement = {
+                kind = upToNextMajorVersion;
+                minimumVersion = 9.18.1;
+            };
+        };
 		F33EE6DF2BF4BDA500CA1A51 /* XCRemoteSwiftPackageReference "swift-nio-ssl" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-nio-ssl";
@@ -7713,6 +7766,11 @@
 			package = F3374AEE2D78B01B002A38F9 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = HeapModule;
 		};
+        56A32E692CE4B69B0020EFF5 /* MoEngage-iOS-SDK */ = {
+            isa = XCSwiftPackageProductDependency;
+            package = 56A32E682CE4B66A0020EFF5 /* XCRemoteSwiftPackageReference "MoEngage-iOS-SDK" */;
+            productName = "MoEngage-iOS-SDK";
+        };
         56AB28962B8351720089D373 /* TealiumAutotracking */ = {
             isa = XCSwiftPackageProductDependency;
             package = 56AB28952B8350F20089D373 /* XCRemoteSwiftPackageReference "tealium-swift" */;
