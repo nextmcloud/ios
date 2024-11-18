@@ -209,6 +209,7 @@ class NCViewerMediaDetailView: UIView {
         }
 
         if metadata.isImage && !utilityFileSystem.fileProviderStorageExists(metadata) && metadata.session.isEmpty {
+            downloadImageButton.tintColor = NCBrandColor.shared.brand
             downloadImageButton.setTitle(NSLocalizedString("_try_download_full_resolution_", comment: ""), for: .normal)
             downloadImageLabel.text = NSLocalizedString("_full_resolution_image_info_", comment: "")
             downloadImageButtonContainer.isHidden = false
