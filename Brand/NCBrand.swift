@@ -35,54 +35,57 @@ let userAgent: String = {
         return instance
     }()
 
-    @objc public var brand: String = "Nextcloud"
-    @objc public var textCopyrightNextcloudiOS: String = "Nextcloud Liquid for iOS %@ © 2023"
-    @objc public var textCopyrightNextcloudServer: String = "Nextcloud Server %@"
-    @objc public var loginBaseUrl: String = "https://cloud.nextcloud.com"
-    @objc public var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
-    @objc public var linkLoginHost: String = "https://nextcloud.com/install"
-    @objc public var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
-    @objc public var webLoginAutenticationProtocol: String = "nc://"                                                // example "abc://"
-    @objc public var privacy: String = "https://nextcloud.com/privacy"
-    @objc public var sourceCode: String = "https://github.com/nextcloud/ios"
-    @objc public var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
-
-    // Personalized
-    @objc public var webCloseViewProtocolPersonalized: String = ""                                                  // example "abc://change/plan"      Don't touch me !!
-    @objc public var folderBrandAutoUpload: String = ""                                                             // example "_auto_upload_folder_"   Don't touch me !!
+    var brand: String = "Nextcloud"
+    var textCopyrightNextcloudiOS: String = "Nextcloud Hydrogen for iOS %@ © 2024"
+    var textCopyrightNextcloudServer: String = "Nextcloud Server %@"
+    var loginBaseUrl: String = "https://cloud.nextcloud.com"
+    @objc var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
+    var linkLoginHost: String = "https://nextcloud.com/install"
+    var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
+    var webLoginAutenticationProtocol: String = "nc://"                                                // example "abc://"
+    var privacy: String = "https://nextcloud.com/privacy"
+    var sourceCode: String = "https://github.com/nextcloud/ios"
+    var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
+    var appStoreUrl: String = "https://apps.apple.com/in/app/nextcloud/id1125420102"
 
     // Auto Upload default folder
-    @objc public var folderDefaultAutoUpload: String = "Photos"
+    var folderDefaultAutoUpload: String = "Photos"
 
     // Capabilities Group
-    @objc public var capabilitiesGroups: String = "group.it.twsweb.Crypto-Cloud"
-    @objc public var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
+    var capabilitiesGroup: String = "group.it.twsweb.Crypto-Cloud"
+    var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
 
     // BRAND ONLY
-    @objc public var use_login_web_personalized: Bool = false                                   // Don't touch me !!
     @objc public var use_AppConfig: Bool = false                                                // Don't touch me !!
-    @objc public var use_GroupApps: Bool = true                                                 // Don't touch me !!
 
-    // Options
-    @objc public var use_default_auto_upload: Bool = false
+    // Use server theming color
     @objc public var use_themingColor: Bool = true
-    @objc public var use_themingLogo: Bool = false
-    @objc public var use_storeLocalAutoUploadAll: Bool = false
-    @objc public var use_loginflowv2: Bool = false                                              // Don't touch me !!
 
-    @objc public var disable_intro: Bool = false
-    @objc public var disable_request_login_url: Bool = false
-    @objc public var disable_multiaccount: Bool = false
-    @objc public var disable_manage_account: Bool = false
-    @objc public var disable_more_external_site: Bool = false
-    @objc public var disable_openin_file: Bool = false                                          // Don't touch me !!
-    @objc public var disable_crash_service: Bool = false
-    @objc public var disable_log: Bool = false
-    @objc public var disable_mobileconfig: Bool = false
-    @objc public var disable_show_more_nextcloud_apps_in_settings: Bool = false
+    var disable_intro: Bool = false
+    var disable_request_login_url: Bool = false
+    var disable_multiaccount: Bool = false
+    var disable_more_external_site: Bool = false
+    var disable_openin_file: Bool = false                                          // Don't touch me !!
+    var disable_crash_service: Bool = false
+    var disable_log: Bool = false
+    var disable_mobileconfig: Bool = false
+    var disable_show_more_nextcloud_apps_in_settings: Bool = false
+    var doNotAskPasscodeAtStartup: Bool = false
+    var disable_source_code_in_settings: Bool = false
+
+    // (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
+    var enforce_servers: [(name: String, url: String)] = []
 
     // Internal option behaviour
-    @objc public var cleanUpDay: Int = 0                                                        // Set default "Delete, in the cache, all files older than" possible days value are: 0, 1, 7, 30, 90, 180, 365
+    var cleanUpDay: Int = 0                                                        // Set default "Delete, in the cache, all files older than" possible days value are: 0, 1, 7, 30, 90, 180, 365
+
+    // Max download/upload concurrent
+    let maxConcurrentOperationDownload: Int = 5
+    let maxConcurrentOperationUpload: Int = 5
+
+    // Number of failed attempts after reset app
+    let resetAppPasscodeAttempts: Int = 10
+    let passcodeSecondsFail: Int = 60
 
     // Info Paging
     enum NCInfoPagingTab: Int, CaseIterable {
@@ -90,11 +93,6 @@ let userAgent: String = {
     }
 
     override init() {
-
-        if folderBrandAutoUpload != "" {
-            folderDefaultAutoUpload = folderBrandAutoUpload
-        }
-
         // wrapper AppConfig
         if let configurationManaged = UserDefaults.standard.dictionary(forKey: "com.apple.configuration.managed"), use_AppConfig {
 
@@ -113,9 +111,6 @@ let userAgent: String = {
             if let str = configurationManaged[NCGlobal.shared.configuration_disable_log] as? String {
                 disable_log = (str as NSString).boolValue
             }
-            if let str = configurationManaged[NCGlobal.shared.configuration_disable_manage_account] as? String {
-                disable_manage_account = (str as NSString).boolValue
-            }
             if let str = configurationManaged[NCGlobal.shared.configuration_disable_more_external_site] as? String {
                 disable_more_external_site = (str as NSString).boolValue
             }
@@ -131,235 +126,55 @@ let userAgent: String = {
 }
 
 class NCBrandColor: NSObject {
-    @objc static let shared: NCBrandColor = {
+    static let shared: NCBrandColor = {
         let instance = NCBrandColor()
         return instance
     }()
 
-    struct cacheImages {
-        static var file = UIImage()
+    /// This is rewrited from customet theme, default is Nextcloud color
+    ///
+    let customer: UIColor = UIColor(red: 0.0 / 255.0, green: 130.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)         // BLU NC : #0082c9
+    var customerText: UIColor = .white
 
-        static var shared = UIImage()
-        static var canShare = UIImage()
-        static var shareByLink = UIImage()
+    // INTERNAL DEFINE COLORS
+    private var themingColor = ThreadSafeDictionary<String, UIColor>()
+    private var themingColorElement = ThreadSafeDictionary<String, UIColor>()
+    private var themingColorText = ThreadSafeDictionary<String, UIColor>()
 
-        static var favorite = UIImage()
-        static var comment = UIImage()
-        static var livePhoto = UIImage()
-        static var offlineFlag = UIImage()
-        static var local = UIImage()
+    var userColors: [CGColor] = []
+    let nextcloud: UIColor = UIColor(red: 0.0 / 255.0, green: 130.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)
+    let yellowFavorite: UIColor = UIColor(red: 248.0 / 255.0, green: 205.0 / 255.0, blue: 70.0 / 255.0, alpha: 1.0)
+    let iconImageColor: UIColor = .label
+    let iconImageColor2: UIColor = .secondaryLabel
+    let iconImageMultiColors: [UIColor] = [.secondaryLabel, .label]
+    let textColor: UIColor = .label
+    let textColor2: UIColor = .secondaryLabel
 
-        static var folderEncrypted = UIImage()
-        static var folderSharedWithMe = UIImage()
-        static var folderPublic = UIImage()
-        static var folderGroup = UIImage()
-        static var folderExternal = UIImage()
-        static var folderAutomaticUpload = UIImage()
-        static var folder = UIImage()
-
-        static var checkedYes = UIImage()
-        static var checkedNo = UIImage()
-
-        static var buttonMore = UIImage()
-        static var buttonStop = UIImage()
-        static var buttonMoreLock = UIImage()
-        static var buttonRestore = UIImage()
-        static var buttonTrash = UIImage()
-
-        static var iconContacts = UIImage()
-        static var iconTalk = UIImage()
-        static var iconCalendar = UIImage()
-        static var iconDeck = UIImage()
-        static var iconMail = UIImage()
-        static var iconConfirm = UIImage()
-        static var iconPages = UIImage()
-    }
-
-    // Color
-    @objc public let customer: UIColor = UIColor(red: 0.0 / 255.0, green: 130.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)         // BLU NC : #0082c9
-    @objc public var customerText: UIColor = .white
-
-    @objc public var brand: UIColor                                                                                         // don't touch me
-    @objc public var brandElement: UIColor                                                                                  // don't touch me
-    @objc public var brandText: UIColor                                                                                     // don't touch me
-
-    @objc public let nextcloud: UIColor = UIColor(red: 0.0 / 255.0, green: 130.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)
-    @objc public let yellowFavorite: UIColor = UIColor(red: 248.0 / 255.0, green: 205.0 / 255.0, blue: 70.0 / 255.0, alpha: 1.0)
-
-    public var userColors: [CGColor] = []
-    public var themingColor: String = ""
-    public var themingColorElement: String = ""
-    public var themingColorText: String = ""
-
-    @objc public var systemMint: UIColor {
+    var systemMint: UIColor {
         get {
             return UIColor(red: 0.0 / 255.0, green: 199.0 / 255.0, blue: 190.0 / 255.0, alpha: 1.0)
         }
     }
-    
-    @objc public var iconColor: UIColor{
-        if #available(iOS 13.0, *) {
-            if UITraitCollection.current.userInterfaceStyle == .dark {
-                return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
-            }else {
-                return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
-            }
-        } else {
-            return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+
+    var documentIconColor: UIColor {
+        get {
+            return UIColor(hex: "#49abe9")!
         }
     }
 
-    override init() {
-        brand = customer
-        brandElement = customer
-        brandText = customerText
-    }
-
-    func createUserColors() {
-        userColors = generateColors()
-    }
-
-    func createImagesThemingColor() {
-
-        cacheImages.file = UIImage(named: "file")!
-
-        cacheImages.shared = UIImage(named: "share")!.image(color: .systemGray, size: 50)
-        cacheImages.canShare = UIImage(named: "share")!.image(color: .systemGray, size: 50)
-        cacheImages.shareByLink = UIImage(named: "sharebylink")!.image(color: .systemGray, size: 50)
-
-        cacheImages.favorite = NCUtility.shared.loadImage(named: "star.fill", color: yellowFavorite)
-        cacheImages.comment = UIImage(named: "comment")!.image(color: .systemGray, size: 50)
-        cacheImages.livePhoto = NCUtility.shared.loadImage(named: "livephoto", color: .label)
-        cacheImages.offlineFlag = UIImage(named: "offlineFlag")!
-        cacheImages.local = UIImage(named: "local")!
-
-        let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
-        cacheImages.folderEncrypted = UIImage(named: "folderEncrypted")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderPublic = UIImage(named: "folder_public")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderGroup = UIImage(named: "folder_group")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderExternal = UIImage(named: "folder_external")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!.image(color: brandElement, size: folderWidth)
-        cacheImages.folder = UIImage(named: "folder")!.image(color: brandElement, size: folderWidth)
-
-        cacheImages.checkedYes = NCUtility.shared.loadImage(named: "checkmark.circle.fill", color: .systemBlue)
-        cacheImages.checkedNo = NCUtility.shared.loadImage(named: "circle", color: .systemGray)
-
-        cacheImages.buttonMore = UIImage(named: "more")!.image(color: .systemGray, size: 50)
-        cacheImages.buttonStop = UIImage(named: "stop")!.image(color: .systemGray, size: 50)
-        cacheImages.buttonMoreLock = UIImage(named: "moreLock")!.image(color: .systemGray, size: 50)
-        cacheImages.buttonRestore = UIImage(named: "restore")!.image(color: .systemGray, size: 50)
-        cacheImages.buttonTrash = UIImage(named: "trash")!.image(color: .systemGray, size: 50)
-
-        cacheImages.iconContacts = UIImage(named: "icon-contacts")!.image(color: brandElement, size: folderWidth)
-        cacheImages.iconTalk = UIImage(named: "icon-talk")!.image(color: brandElement, size: folderWidth)
-        cacheImages.iconCalendar = UIImage(named: "icon-calendar")!.image(color: brandElement, size: folderWidth)
-        cacheImages.iconDeck = UIImage(named: "icon-deck")!.image(color: brandElement, size: folderWidth)
-        cacheImages.iconMail = UIImage(named: "icon-mail")!.image(color: brandElement, size: folderWidth)
-        cacheImages.iconConfirm = UIImage(named: "icon-confirm")!.image(color: brandElement, size: folderWidth)
-        cacheImages.iconPages = UIImage(named: "icon-pages")!.image(color: brandElement, size: folderWidth)
-    }
-
-    func settingThemingColor(account: String) {
-
-        let darker: CGFloat = 30    // %
-        let lighter: CGFloat = 30   // %
-
-        if NCBrandOptions.shared.use_themingColor {
-
-            self.themingColor = NCGlobal.shared.capabilityThemingColor
-            self.themingColorElement = NCGlobal.shared.capabilityThemingColorElement
-            self.themingColorText = NCGlobal.shared.capabilityThemingColorText
-
-            // COLOR
-            if themingColor.first == "#" {
-                if let color = UIColor(hex: themingColor) {
-                    brand = color
-                } else {
-                    brand = customer
-                }
-            } else {
-                brand = customer
-            }
-
-            // COLOR TEXT
-            if themingColorText.first == "#" {
-                if let color = UIColor(hex: themingColorText) {
-                    brandText = color
-                } else {
-                    brandText = customerText
-                }
-            } else {
-                brandText = customerText
-            }
-
-            // COLOR ELEMENT
-            if themingColorElement.first == "#" {
-                if let color = UIColor(hex: themingColorElement) {
-                    brandElement = color
-                } else {
-                    brandElement = brand
-                }
-            } else {
-                brandElement = brand
-            }
-
-            if brandElement.isTooLight() {
-                if let color = brandElement.darker(by: darker) {
-                    brandElement = color
-                }
-            } else if brandElement.isTooDark() {
-                if let color = brandElement.lighter(by: lighter) {
-                    brandElement = color
-                }
-            }
-
-        } else {
-
-            if self.customer.isTooLight() {
-                if let color = customer.darker(by: darker) {
-                    brandElement = color
-                }
-            } else if customer.isTooDark() {
-                if let color = customer.lighter(by: lighter) {
-                    brandElement = color
-                }
-            } else {
-                brandElement = customer
-            }
-
-            brand = customer
-            brandText = customerText
+    var spreadsheetIconColor: UIColor {
+        get {
+            return UIColor(hex: "#9abd4e")!
         }
-
-        createImagesThemingColor()
-#if !EXTENSION
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming)
-#endif
     }
 
-    private func stepCalc(steps: Int, color1: CGColor, color2: CGColor) -> [CGFloat] {
-        var step = [CGFloat](repeating: 0, count: 3)
-        step[0] = (color2.components![0] - color1.components![0]) / CGFloat(steps)
-        step[1] = (color2.components![1] - color1.components![1]) / CGFloat(steps)
-        step[2] = (color2.components![2] - color1.components![2]) / CGFloat(steps)
-        return step
-    }
-
-    private func mixPalette(steps: Int, color1: CGColor, color2: CGColor) -> [CGColor] {
-        var palette = [color1]
-        let step = stepCalc(steps: steps, color1: color1, color2: color2)
-
-        let c1Components = color1.components!
-        for i in 1 ..< steps {
-            let r = c1Components[0] + step[0] * CGFloat(i)
-            let g = c1Components[1] + step[1] * CGFloat(i)
-            let b = c1Components[2] + step[2] * CGFloat(i)
-
-            palette.append(UIColor(red: r, green: g, blue: b, alpha: 1).cgColor)
+    var presentationIconColor: UIColor {
+        get {
+            return UIColor(hex: "#f0965f")!
         }
-        return palette
     }
+
+    override init() { }
 
     /**
      Generate colors from the official nextcloud color.
@@ -367,60 +182,154 @@ class NCBrandColor: NSObject {
      if `step` = 6,
      3 colors \* 6 will result in 18 generated colors
      */
-    func generateColors(steps: Int = 6) -> [CGColor] {
-        let red = UIColor(red: 182 / 255, green: 70 / 255, blue: 157 / 255, alpha: 1).cgColor
-        let yellow = UIColor(red: 221 / 255, green: 203 / 255, blue: 85 / 255, alpha: 1).cgColor
-        let blue = UIColor(red: 0 / 255, green: 130 / 255, blue: 201 / 255, alpha: 1).cgColor
+    func createUserColors() {
+        func generateColors(steps: Int = 6) -> [CGColor] {
+            func stepCalc(steps: Int, color1: CGColor, color2: CGColor) -> [CGFloat] {
+                var step = [CGFloat](repeating: 0, count: 3)
 
-        let palette1 = mixPalette(steps: steps, color1: red, color2: yellow)
-        let palette2 = mixPalette(steps: steps, color1: yellow, color2: blue)
-        let palette3 = mixPalette(steps: steps, color1: blue, color2: red)
-        return palette1 + palette2 + palette3
+                step[0] = (color2.components![0] - color1.components![0]) / CGFloat(steps)
+                step[1] = (color2.components![1] - color1.components![1]) / CGFloat(steps)
+                step[2] = (color2.components![2] - color1.components![2]) / CGFloat(steps)
+                return step
+            }
+
+            func mixPalette(steps: Int, color1: CGColor, color2: CGColor) -> [CGColor] {
+                var palette = [color1]
+                let step = stepCalc(steps: steps, color1: color1, color2: color2)
+                let c1Components = color1.components!
+
+                for i in 1 ..< steps {
+                    let r = c1Components[0] + step[0] * CGFloat(i)
+                    let g = c1Components[1] + step[1] * CGFloat(i)
+                    let b = c1Components[2] + step[2] * CGFloat(i)
+
+                    palette.append(UIColor(red: r, green: g, blue: b, alpha: 1).cgColor)
+                }
+                return palette
+            }
+
+            let red = UIColor(red: 182 / 255, green: 70 / 255, blue: 157 / 255, alpha: 1).cgColor
+            let yellow = UIColor(red: 221 / 255, green: 203 / 255, blue: 85 / 255, alpha: 1).cgColor
+            let blue = UIColor(red: 0 / 255, green: 130 / 255, blue: 201 / 255, alpha: 1).cgColor
+
+            let palette1 = mixPalette(steps: steps, color1: red, color2: yellow)
+            let palette2 = mixPalette(steps: steps, color1: yellow, color2: blue)
+            let palette3 = mixPalette(steps: steps, color1: blue, color2: red)
+
+            return palette1 + palette2 + palette3
+        }
+
+        userColors = generateColors()
     }
-    
-    @objc public var notificationAction: UIColor {
-        return UIColor(red: 0/255.0, green: 153/255.0, blue: 255/255.0, alpha: 1.0)
-    }
-    
-    @objc public var secondarySystemGroupedBackground: UIColor = UIColor.secondarySystemGroupedBackground
-    @objc public var label: UIColor = UIColor.label
-    @objc public var backgroundForm: UIColor = UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
-    @objc public let graySoft: UIColor = UIColor(red: 162.0/255.0, green: 162.0/255.0, blue: 162.0/255.0, alpha: 0.5)
-    @objc public let systemGray4: UIColor = UIColor.systemGray4
-    @objc public let systemBackground: UIColor = UIColor.systemBackground
-    @objc public let textInfo: UIColor = UIColor(red: 153.0/255.0, green: 153.0/255.0, blue: 153.0/255.0, alpha: 1.0)
-    @objc public let systemGray: UIColor = UIColor.systemGray
-    @objc public let customerDarkGrey: UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
-    @objc public var fileFolderName: UIColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
-    @objc public let optionItem: UIColor = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
-    @objc public var singleTitleColorButton: UIColor = UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
-    @objc public var shareCellTitleColor: UIColor = UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
-    @objc public var gray60: UIColor {
-        if UITraitCollection.current.userInterfaceStyle == .dark {
-            return  UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
+
+    @discardableResult
+    func settingThemingColor(account: String) -> Bool {
+        let darker: CGFloat = 30    // %
+        let lighter: CGFloat = 30   // %
+        var colorThemingColor: UIColor?
+        var colorThemingColorElement: UIColor?
+        var colorThemingColorText: UIColor?
+
+        if NCBrandOptions.shared.use_themingColor {
+            let themingColor = NCCapabilities.shared.getCapabilities(account: account).capabilityThemingColor
+            let themingColorElement = NCCapabilities.shared.getCapabilities(account: account).capabilityThemingColorElement
+            let themingColorText = NCCapabilities.shared.getCapabilities(account: account).capabilityThemingColorText
+
+            // THEMING COLOR
+            if themingColor.first == "#" {
+                if let color = UIColor(hex: themingColor) {
+                    colorThemingColor = color
+                } else {
+                    colorThemingColor = customer
+                }
+            } else {
+                colorThemingColor = customer
+            }
+
+            // THEMING COLOR ELEMENT (control isTooLight / isTooDark)
+            if themingColorElement.first == "#" {
+                if let color = UIColor(hex: themingColorElement) {
+                    if color.isTooLight() {
+                        if let color = color.darker(by: darker) {
+                            colorThemingColorElement = color
+                        }
+                    } else if color.isTooDark() {
+                        if let color = color.lighter(by: lighter) {
+                            colorThemingColorElement = color
+                        }
+                    } else {
+                        colorThemingColorElement = color
+                    }
+                } else {
+                    colorThemingColorElement = customer
+                }
+            } else {
+                colorThemingColorElement = customer
+            }
+
+            // THEMING COLOR TEXT
+            if themingColorText.first == "#" {
+                if let color = UIColor(hex: themingColorText) {
+                    colorThemingColorText = color
+                } else {
+                    colorThemingColorText = .white
+                }
+            } else {
+                colorThemingColorText = .white
+            }
+
         } else {
-            return  UIColor(red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+
+            // THEMING COLOR
+            colorThemingColor = customer
+
+            // THEMING COLOR ELEMENT (control isTooLight / isTooDark)
+            if self.customer.isTooLight() {
+                if let color = customer.darker(by: darker) {
+                    colorThemingColorElement = color
+                }
+            } else if customer.isTooDark() {
+                if let color = customer.lighter(by: lighter) {
+                    colorThemingColorElement = color
+                }
+            } else {
+                colorThemingColorElement = customer
+            }
+
+            // THEMING COLOR TEXT
+            colorThemingColorText = customerText
         }
-    }
-    @objc public var systemGray2: UIColor = UIColor.systemGray2
-    @objc public var shareByEmailTextColor: UIColor = UIColor(displayP3Red: 13.0/255.0, green: 57.0/255.0, blue: 223.0/255.0, alpha: 1.0)
-    @objc public var memoryConsuptionBackground: UIColor {
-        if UITraitCollection.current.userInterfaceStyle == .dark {
-            return  UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
-        } else {
-            return  UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
+
+        if self.themingColor[account] != colorThemingColor || self.themingColorElement[account] != colorThemingColorElement || self.themingColorText[account] != colorThemingColorText {
+
+            self.themingColor[account] = colorThemingColor
+            self.themingColorElement[account] = colorThemingColorElement
+            self.themingColorText[account] = colorThemingColorText
+
+            return true
         }
+
+        return false
     }
-    @objc public var nmcGray0: UIColor{
-        if UITraitCollection.current.userInterfaceStyle == .dark {
-            return  UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
-        }else {
-            return  UIColor(red: 19.0/255.0, green: 19.0/255.0, blue: 19.0/255.0, alpha: 1.0)
+
+    public func getTheming(account: String?) -> UIColor {
+        if let account, let color = self.themingColor[account] {
+            return color
         }
+        return customer
     }
-    @objc public var commonViewInfoText: UIColor =  UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
-    @objc public let progressColorGreen60: UIColor = UIColor(red: 115.0/255.0, green: 195.0/255.0, blue: 84.0/255.0, alpha: 1.0)
-    @objc public var seperatorRename: UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
-    @objc public let gray: UIColor = UIColor(red: 104.0/255.0, green: 104.0/255.0, blue: 104.0/255.0, alpha: 1.0)
-    @objc public var nmcIconSharedWithMe: UIColor = UIColor(displayP3Red: 0.0/255.0, green: 153.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+
+    public func getElement(account: String?) -> UIColor {
+        if let account, let color = self.themingColorElement[account] {
+            return color
+        }
+        return customer
+    }
+
+    public func getText(account: String?) -> UIColor {
+        if let account, let color = self.themingColorText[account] {
+            return color
+        }
+        return .white
+    }
 }
