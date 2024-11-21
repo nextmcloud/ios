@@ -25,12 +25,23 @@ import UIKit
 import MarkdownKit
 
 protocol NCSectionFirstHeaderDelegate: AnyObject {
+    func tapButtonSwitch(_ sender: Any)
+    func tapButtonOrder(_ sender: Any)
+    func tapButtonTransfer(_ sender: Any)
     func tapRichWorkspace(_ sender: Any)
 }
 
+extension NCSectionFirstHeaderDelegate {
+    func tapButtonSwitch(_ sender: Any) {}
+    func tapButtonOrder(_ sender: Any) {}
+}
+
 class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegate {
+
+    @IBOutlet weak var buttonSwitch: UIButton!
+    @IBOutlet weak var buttonOrder: UIButton!
     @IBOutlet weak var buttonTransfer: UIButton!
-    @IBOutlet weak var imageTransfer: UIImageView!
+    @IBOutlet weak var imageButtonTransfer: UIImageView!
     @IBOutlet weak var labelTransfer: UILabel!
     @IBOutlet weak var progressTransfer: UIProgressView!
     @IBOutlet weak var transferSeparatorBottom: UIView!
@@ -39,8 +50,12 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
     @IBOutlet weak var viewTransfer: UIView!
     @IBOutlet weak var viewRichWorkspace: UIView!
     @IBOutlet weak var viewSection: UIView!
+    @IBOutlet weak var viewButtonsView: UIView!
+    @IBOutlet weak var viewSeparator: UIView!
 
     @IBOutlet weak var viewTransferHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var viewButtonsViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var viewSeparatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewRichWorkspaceHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewSectionHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var transferSeparatorBottomHeightConstraint: NSLayoutConstraint!
@@ -56,6 +71,12 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         super.awakeFromNib()
 
         backgroundColor = .clear
+        
+        //Button
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet"), for: .normal)//!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
+
+        buttonOrder.setTitle("", for: .normal)
+        buttonOrder.setTitleColor(NCBrandColor.shared.brand, for: .normal)
 
         // Gradient
         gradient.startPoint = CGPoint(x: 0, y: 0.8)
@@ -76,13 +97,16 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         labelSection.text = ""
         viewSectionHeightConstraint.constant = 0
 
-        imageTransfer.tintColor = NCBrandColor.shared.iconImageColor
-        imageTransfer.image = NCUtility().loadImage(named: "icloud.and.arrow.up")
-
+        buttonTransfer.backgroundColor = .clear
+        buttonTransfer.setImage(nil, for: .normal)
+        buttonTransfer.layer.cornerRadius = 6
+        buttonTransfer.layer.masksToBounds = true
+        imageButtonTransfer.image = NCUtility().loadImage(named: "stop.circle")
+        imageButtonTransfer.tintColor = .white
+        labelTransfer.text = ""
         progressTransfer.progress = 0
-        progressTransfer.tintColor = NCBrandColor.shared.iconImageColor
-        progressTransfer.trackTintColor = NCBrandColor.shared.customer.withAlphaComponent(0.2)
-
+        progressTransfer.tintColor = NCBrandColor.shared.brandElement
+        progressTransfer.trackTintColor = NCBrandColor.shared.brandElement.withAlphaComponent(0.2)
         transferSeparatorBottom.backgroundColor = .separator
         transferSeparatorBottomHeightConstraint.constant = 0.5
     }
@@ -98,6 +122,40 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         super.traitCollectionDidChange(previousTraitCollection)
 
         setInterfaceColor()
+    }
+
+    // MARK: - View
+
+    func setStatusButtonsView(enable: Bool) {
+
+        buttonSwitch.isEnabled = enable
+        buttonOrder.isEnabled = enable
+    }
+
+    func setImageSwitchList() {
+
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet"), for: .normal)//!.image(color: NCBrandColor.shared.iconColor, width: 20, height: 15), for: .normal)
+    }
+
+    func setImageSwitchGrid() {
+
+        buttonSwitch.setImage(UIImage(systemName: "square.grid.2x2")!.image(color: NCBrandColor.shared.iconImageColor, size: 20), for: .normal)
+    }
+
+    func setButtonsView(height: CGFloat) {
+
+        viewButtonsViewHeightConstraint.constant = height
+        if height == 0 {
+            viewButtonsView.isHidden = true
+        } else {
+            viewButtonsView.isHidden = false
+        }
+    }
+
+    func setSortedTitle(_ title: String) {
+
+        let title = NSLocalizedString(title, comment: "")
+        buttonOrder.setTitle(title, for: .normal)
     }
 
     // MARK: - RichWorkspace
@@ -130,28 +188,29 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
 
     // MARK: - Transfer
 
-    func setViewTransfer(isHidden: Bool, progress: Float? = nil) {
+    func setViewTransfer(isHidden: Bool, ocId: String? = nil, text: String? = nil, progress: Float? = nil) {
+        labelTransfer.text = text
         viewTransfer.isHidden = isHidden
+        progressTransfer.progress = 0
 
         if isHidden {
             viewTransferHeightConstraint.constant = 0
-            progressTransfer.progress = 0
         } else {
-            viewTransferHeightConstraint.constant = NCGlobal.shared.heightHeaderTransfer
-            if NCTransferProgress.shared.haveUploadInForeground() {
-                labelTransfer.text = String(format: NSLocalizedString("_upload_foreground_msg_", comment: ""), NCBrandOptions.shared.brand)
-                if let progress {
-                    progressTransfer.progress = progress
-                } else if let progress = NCTransferProgress.shared.getLastTransferProgressInForeground() {
-                    progressTransfer.progress = progress
+            var image: UIImage?
+            if let ocId,
+               let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
+                image = utility.getIcon(metadata: metadata)?.darken()
+                if image == nil {
+                    image = utility.loadImage(named: metadata.iconName, useTypeIconFile: true)
+                    buttonTransfer.backgroundColor = .lightGray
                 } else {
-                    progressTransfer.progress = 0.0
+                    buttonTransfer.backgroundColor = .clear
                 }
-            } else {
-                labelTransfer.text = NSLocalizedString("_upload_background_msg_", comment: "")
-                progressTransfer.progress = 0.0
             }
-
+            viewTransferHeightConstraint.constant = NCGlobal.shared.heightHeaderTransfer
+            if let progress {
+                progressTransfer.progress = progress
+            }
         }
     }
 
@@ -168,6 +227,18 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
     }
 
     // MARK: - Action
+    
+    @IBAction func touchUpInsideSwitch(_ sender: Any) {
+        delegate?.tapButtonSwitch(sender)
+    }
+
+    @IBAction func touchUpInsideOrder(_ sender: Any) {
+        delegate?.tapButtonOrder(sender)
+    }
+
+    @IBAction func touchUpTransfer(_ sender: Any) {
+       delegate?.tapButtonTransfer(sender)
+    }
 
     @objc func touchUpInsideViewRichWorkspace(_ sender: Any) {
         delegate?.tapRichWorkspace(sender)
