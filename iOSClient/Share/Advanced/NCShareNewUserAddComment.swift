@@ -23,7 +23,6 @@
 
 import UIKit
 import NextcloudKit
-import SVGKit
 
 class NCShareNewUserAddComment: UIViewController, NCShareDetail {
 

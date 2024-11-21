@@ -158,6 +158,7 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
     }
 
     func setupCell(sharee: NKSharee, baseUrl: NCUserBaseUrl) {
+    func setupCell(sharee: NKSharee, session: NCSession.Session) {
         let utility = NCUtility()
         imageShareeType.image = NCShareCommon().getImageShareType(shareType: sharee.shareType, isDropDown: true)
         let status = utility.getUserStatus(userIcon: sharee.userIcon, userStatus: sharee.userStatus, userMessage: sharee.userMessage)

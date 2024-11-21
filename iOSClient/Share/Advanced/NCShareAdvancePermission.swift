@@ -135,7 +135,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
     
     func setupFooterView() {
         guard let footerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionFooter", owner: self, options: nil)?.first as? NCShareAdvancePermissionFooter) else { return }
-        footerView.setupUI(delegate: self)
+        footerView.setupUI(delegate: self, account: metadata.account)
 
         // tableFooterView can't use auto layout directly
         footerView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 100)

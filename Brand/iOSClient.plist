@@ -9,6 +9,8 @@
 	</array>
 	<key>CFBundleAllowMixedLocalizations</key>
 	<true/>
+	<key>LSMinimumSystemVersion</key>
+	<string>12.3</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -42,6 +44,7 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>25246</string>
+	<string>26881</string>
 	<key>ITSAppUsesNonExemptEncryption</key><false/>
 	
 	<key>LSApplicationQueriesSchemes</key>

@@ -38,16 +38,21 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
 
     weak var appDelegate = UIApplication.shared.delegate as? AppDelegate
 
-    public var metadata: tableMetadata?
+    public var metadata: tableMetadata!
     public var sharingEnabled = true
     public var height: CGFloat = 0
     let shareCommon = NCShareCommon()
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
+    let database = NCManageDatabase.shared
 
     var canReshare: Bool {
         guard let metadata = metadata else { return true }
         return ((metadata.sharePermissionsCollaborationServices & NCPermissions().permissionShareShare) != 0)
+    }
+
+    var session: NCSession.Session {
+        NCSession.shared.getSession(account: metadata.account)
     }
 
     var shares: (firstShareLink: tableShare?, share: [tableShare]?) = (nil, nil)
@@ -79,7 +84,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
         
         reloadData()
 
-        networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self)
+        networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session)
         if sharingEnabled {
             let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing
             networking?.readShare(showLoadingIndicator: isVisible)
@@ -100,11 +105,10 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     func makeNewLinkShare() {
         guard
             let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
-            let navigationController = self.navigationController,
-            let metadata = self.metadata else { return }
+            let navigationController = self.navigationController else { return }
         self.checkEnforcedPassword(shareType: shareCommon.SHARE_TYPE_LINK) { password in
             advancePermission.networking = self.networking
-            advancePermission.share = NCTableShareOptions.shareLink(metadata: metadata, password: password)
+            advancePermission.share = NCTableShareOptions.shareLink(metadata: self.metadata, password: password)
             advancePermission.metadata = self.metadata
             navigationController.pushViewController(advancePermission, animated: true)
         }
@@ -113,8 +117,83 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     // MARK: - Notification Center
 
     @objc func openShareProfile() {
-        guard let metadata = metadata else { return }
-        self.showProfileMenu(userId: metadata.ownerId)
+        self.showProfileMenu(userId: metadata.ownerId, session: session)
+    }
+    
+    @objc func keyboardWillShow(notification: Notification) {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+           if (UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape) {
+                if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+                    if view.frame.origin.y == 0 {
+                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                        self.view.frame.origin.y -= keyboardSize.height
+                    }
+                }
+            } else if UIScreen.main.bounds.height < 850 {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 70
+                }
+            } else {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 40
+                }
+            }
+        }
+        
+        if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
+            if view.frame.origin.y == 0 {
+                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                self.view.frame.origin.y -= 230
+            }
+        }
+        textField?.layer.borderColor = NCBrandColor.shared.brand.cgColor
+    }
+    
+    @objc func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            self.view.frame.origin.y = 0
+        }
+        textField?.layer.borderColor = NCBrandColor.shared.label.cgColor
+    }
+    
+    @objc func keyboardWillShow(notification: Notification) {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+           if (UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape) {
+                if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+                    if view.frame.origin.y == 0 {
+                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                        self.view.frame.origin.y -= keyboardSize.height
+                    }
+                }
+            } else if UIScreen.main.bounds.height < 850 {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 70
+                }
+            } else {
+                if view.frame.origin.y == 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    self.view.frame.origin.y -= 40
+                }
+            }
+        }
+        
+        if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
+            if view.frame.origin.y == 0 {
+                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                self.view.frame.origin.y -= 230
+            }
+        }
+        textField?.layer.borderColor = NCBrandColor.shared.brand.cgColor
+    }
+    
+    @objc func keyboardWillHide(notification: Notification) {
+        if view.frame.origin.y != 0 {
+            self.view.frame.origin.y = 0
+        }
+        textField?.layer.borderColor = NCBrandColor.shared.label.cgColor
     }
     
     @objc func keyboardWillShow(notification: Notification) {
@@ -161,9 +240,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     // MARK: -
 
     @objc func reloadData() {
-        if let metadata = metadata {
-            shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
-        }
+        shares = self.database.getTableShares(metadata: metadata)
         tableView.reloadData()
     }
 
@@ -257,8 +334,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     }
 
     func getSharees(sharees: [NKSharee]?) {
-
-        guard let sharees = sharees, let appDelegate = appDelegate else { return }
+        guard let sharees else { return }
 
         dropDown = DropDown()
         let appearance = DropDown.appearance()
@@ -296,6 +372,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
             guard let cell = cell as? NCSearchUserDropDownCell else { return }
             let sharee = sharees[index]
             cell.setupCell(sharee: sharee, baseUrl: appDelegate)
+            cell.setupCell(sharee: sharee, session: self.session)
         }
 
         dropDown.selectionAction = { index, _ in
@@ -304,13 +381,12 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
             let sharee = sharees[index]
             guard
                 let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
-                let navigationController = self.navigationController,
-                let metadata = self.metadata else { return }
+                let navigationController = self.navigationController else { return }
             self.checkEnforcedPassword(shareType: sharee.shareType) { password in
-                let shareOptions = NCTableShareOptions(sharee: sharee, metadata: metadata, password: password)
+                let shareOptions = NCTableShareOptions(sharee: sharee, metadata: self.metadata, password: password)
                 advancePermission.share = shareOptions
                 advancePermission.networking = self.networking
-                advancePermission.metadata = metadata
+                advancePermission.metadata = self.metadata
                 navigationController.pushViewController(advancePermission, animated: true)
             }
         }

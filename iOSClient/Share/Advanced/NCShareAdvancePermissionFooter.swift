@@ -33,7 +33,7 @@ class NCShareAdvancePermissionFooter: UIView {
     @IBOutlet weak var buttonNext: UIButton!
     weak var delegate: NCShareAdvanceFotterDelegate?
 
-    func setupUI(delegate: NCShareAdvanceFotterDelegate?) {
+    func setupUI(delegate: NCShareAdvanceFotterDelegate?, account: String) {
         self.delegate = delegate
         buttonCancel.addTarget(self, action: #selector(cancelClicked), for: .touchUpInside)
         buttonNext.addTarget(self, action: #selector(nextClicked), for: .touchUpInside)

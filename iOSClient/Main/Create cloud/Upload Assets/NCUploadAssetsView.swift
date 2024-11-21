@@ -7,13 +7,16 @@
 //
 
 import SwiftUI
+import NextcloudKit
 
 struct NCUploadAssetsView: View {
     @ObservedObject var model: NCUploadAssetsModel
+
     @State private var showSelect = false
     @State private var showUploadConflict = false
     @State private var showQuickLook = false
-    @State private var shorRenameAlert = false
+    @State private var showRenameAlert = false
+    @State private var renameError = ""
     @State private var renameFileName: String = ""
     @State private var renameIndex: Int = 0
     @State private var index: Int = 0
@@ -21,12 +24,11 @@ struct NCUploadAssetsView: View {
     var metadata: tableMetadata?
     let gridItems: [GridItem] = [GridItem()]
     let fileNamePath = NSTemporaryDirectory() + "Photo.jpg"
+    let utilityFileSystem = NCUtilityFileSystem()
 
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
-        let utilityFileSystem = NCUtilityFileSystem()
-
         NavigationView {
             ZStack(alignment: .top) {
                 List {
@@ -39,7 +41,7 @@ struct NCUploadAssetsView: View {
                                         Button(action: {
                                             renameFileName = model.previewStore[index].fileName
                                             renameIndex = index
-                                            shorRenameAlert = true
+                                            showRenameAlert = true
                                         }) {
                                             Label(NSLocalizedString("_rename_", comment: ""), systemImage: "pencil")
                                         }
@@ -84,41 +86,57 @@ struct NCUploadAssetsView: View {
                                         }
                                     } label: {
                                         ImageAsset(model: model, index: index)
-                                            .alert(NSLocalizedString("_rename_file_", comment: ""), isPresented: $shorRenameAlert) {
-                                                TextField(NSLocalizedString("_enter_filename_", comment: ""), text: $renameFileName)
+                                            .alert(NSLocalizedString("_rename_", comment: ""), isPresented: $showRenameAlert) {
+                                                TextField("", text: $renameFileName)
                                                     .autocapitalization(.none)
                                                     .autocorrectionDisabled()
+
                                                 Button(NSLocalizedString("_rename_", comment: ""), action: {
-                                                    model.previewStore[renameIndex].fileName = renameFileName.trimmingCharacters(in: .whitespacesAndNewlines)
+                                                    if !renameError.isEmpty {
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                            showRenameAlert = true
+                                                        }
+                                                    } else {
+                                                        model.previewStore[renameIndex].fileName = renameFileName.trimmingCharacters(in: .whitespacesAndNewlines)
+                                                    }
                                                 })
+
                                                 Button(NSLocalizedString("_cancel_", comment: ""), role: .cancel, action: {})
+                                            } message: {
+                                                Text(renameError)
                                             }
+                                    }
+                                    .onChange(of: renameFileName) { newValue in
+                                        if let error = FileNameValidator.shared.checkFileName(newValue, account: model.controller?.account) {
+                                            renameError = error.errorDescription
+                                        } else {
+                                            renameError = ""
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    // .redacted(reason: uploadAssets.previewStore.isEmpty ? .placeholder : [])
 
                     Section {
                         Toggle(isOn: $model.useAutoUploadFolder, label: {
                             Text(NSLocalizedString("_use_folder_auto_upload_", comment: ""))
                                 .font(.system(size: 15))
                         })
-                        .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.brandElement)))
+                        .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.getElement(account: metadata?.account))))
 
                         if model.useAutoUploadFolder {
-                            Toggle(isOn: $model.useAutoUploadFolder, label: {
+                            Toggle(isOn: $model.useAutoUploadSubFolder, label: {
                                 Text(NSLocalizedString("_autoupload_create_subfolder_", comment: ""))
                                     .font(.system(size: 15))
                             })
-                            .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.brandElement)))
+                            .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.getElement(account: metadata?.account))))
                         }
 
                         if !model.useAutoUploadFolder {
                             HStack {
                                 Label {
-                                    if utilityFileSystem.getHomeServer(urlBase: model.userBaseUrl.urlBase, userId: model.userBaseUrl.userId) == model.serverUrl {
+                                    if utilityFileSystem.getHomeServer(session: model.session) == model.serverUrl {
                                         Text("/")
                                             .font(.system(size: 15))
                                             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -132,7 +150,7 @@ struct NCUploadAssetsView: View {
                                         .renderingMode(.template)
                                         .resizable()
                                         .scaledToFit()
-                                        .foregroundColor(Color(NCBrandColor.shared.brandElement))
+                                        .foregroundColor(Color(NCBrandColor.shared.getElement(account: metadata?.account)))
                                 }
                             }
                             .contentShape(Rectangle())
@@ -142,44 +160,46 @@ struct NCUploadAssetsView: View {
                         }
                     }
 
-                    Button(NSLocalizedString("_save_", comment: "")) {
-                        if model.useAutoUploadFolder, model.useAutoUploadSubFolder {
-                            model.showHUD = true
-                        }
-                        model.uploadInProgress.toggle()
-                        model.save { metadatasNOConflict, metadatasUploadInConflict in
-                            if metadatasUploadInConflict.isEmpty {
-                                model.dismissCreateFormUploadConflict(metadatas: metadatasNOConflict)
-                            } else {
-                                model.metadatasNOConflict = metadatasNOConflict
-                                model.metadatasUploadInConflict = metadatasUploadInConflict
-                                showUploadConflict = true
+                    Section {
+                        Button(NSLocalizedString("_save_", comment: "")) {
+                            if model.useAutoUploadFolder, model.useAutoUploadSubFolder {
+                                model.showHUD = true
+                            }
+                            model.uploadInProgress.toggle()
+                            model.save { metadatasNOConflict, metadatasUploadInConflict in
+                                if metadatasUploadInConflict.isEmpty {
+                                    model.dismissCreateFormUploadConflict(metadatas: metadatasNOConflict)
+                                } else {
+                                    model.metadatasNOConflict = metadatasNOConflict
+                                    model.metadatasUploadInConflict = metadatasUploadInConflict
+                                    showUploadConflict = true
+                                }
                             }
                         }
+                        .frame(maxWidth: .infinity)
+                        .buttonStyle(ButtonRounded(disabled: model.uploadInProgress, account: model.session.account))
+                        .listRowBackground(Color(UIColor.systemGroupedBackground))
+                        .disabled(model.uploadInProgress)
+                        .hiddenConditionally(isHidden: model.hiddenSave)
                     }
-                    .frame(maxWidth: .infinity)
-                    .buttonStyle(ButtonRounded(disabled: model.uploadInProgress))
-                    .listRowBackground(Color(UIColor.systemGroupedBackground))
-                    .disabled(model.uploadInProgress)
-                    .hiddenConditionally(isHidden: model.hiddenSave)
                 }
-                .navigationTitle(NSLocalizedString("_upload_photos_videos_", comment: ""))
-                .navigationBarTitleDisplayMode(.inline)
-                .navigationBarItems(trailing: Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Image(systemName: "xmark")
-                        .font(Font.system(.body).weight(.light))
-                        .foregroundStyle(Color(NCBrandColor.shared.iconImageColor))
-                })
-                HUDView(showHUD: $model.showHUD, textLabel: NSLocalizedString("_wait_", comment: ""), image: "doc.badge.arrow.up")
-                    .offset(y: model.showHUD ? 5 : -200)
-                    .animation(.easeOut, value: model.showHUD)
             }
+            .navigationTitle(NSLocalizedString("_upload_photos_videos_", comment: ""))
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing: Button(action: {
+                model.dismissView = true
+            }) {
+                Image(systemName: "xmark")
+                    .font(Font.system(.body).weight(.light))
+                    .foregroundStyle(Color(NCBrandColor.shared.iconImageColor))
+            })
+            NCHUDView(showHUD: $model.showHUD, textLabel: NSLocalizedString("_wait_", comment: ""), image: "doc.badge.arrow.up", color: NCBrandColor.shared.getElement(account: model.session.account))
+                .offset(y: model.showHUD ? 5 : -200)
+                .animation(.easeOut, value: model.showHUD)
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .sheet(isPresented: $showSelect) {
-            SelectView(serverUrl: $model.serverUrl)
+            SelectView(serverUrl: $model.serverUrl, session: model.session)
         }
         .sheet(isPresented: $showUploadConflict) {
             UploadConflictView(delegate: model, serverUrl: model.serverUrl, metadatasUploadInConflict: model.metadatasUploadInConflict, metadatasNOConflict: model.metadatasNOConflict)
@@ -192,9 +212,6 @@ struct NCUploadAssetsView: View {
             if newValue {
                 presentationMode.wrappedValue.dismiss()
             }
-        }
-        .onTapGesture {
-            SceneManager.shared.getWindow(controller: model.controller)?.endEditing(true)
         }
         .onDisappear {
             model.dismissView = true
@@ -238,5 +255,5 @@ struct NCUploadAssetsView: View {
 }
 
 #Preview {
-    NCUploadAssetsView(model: NCUploadAssetsModel(assets: [], serverUrl: "/", userBaseUrl: (UIApplication.shared.delegate as? AppDelegate)!, controller: nil))
+    NCUploadAssetsView(model: NCUploadAssetsModel(assets: [], serverUrl: "/", controller: nil))
 }

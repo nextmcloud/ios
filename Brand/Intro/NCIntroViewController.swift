@@ -27,7 +27,6 @@ import UIKit
 import NextcloudKit
 
 class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-
     @IBOutlet weak var buttonLogin: UIButton!
     @IBOutlet weak var buttonSignUp: UIButton!
     @IBOutlet weak var buttonHost: UIButton!
@@ -199,11 +198,13 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
 
     @IBAction func login(_ sender: Any) {
         if NCBrandOptions.shared.use_AppConfig == true {
+        if NCBrandOptions.shared.use_AppConfig {
             let loginViewPage = UIStoryboard(name: "NCLogin", bundle: Bundle.main).instantiateViewController(identifier: "NCLogin")
             navigationController?.pushViewController(loginViewPage, animated: true)
         } else {
             if NextcloudKit.shared.isNetworkReachable() {
                 appDelegate.openLogin(selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+                appDelegate.openLogin(selector: NCGlobal.shared.introLogin)
             } else {
                 showNoInternetAlert()
             }
@@ -217,7 +218,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func signup(_ sender: Any) {
-        appDelegate.openLogin(selector: NCGlobal.shared.introSignup, openLoginWeb: false)
+        appDelegate.openLogin(selector: NCGlobal.shared.introSignup)
     }
 
     @IBAction func host(_ sender: Any) {

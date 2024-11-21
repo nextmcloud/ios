@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol NCTrashGridCellDelegate: AnyObject {
+    func tapMoreGridItem(with objectId: String, image: UIImage?, sender: Any)
+}
+
 class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
 
     
@@ -27,6 +31,13 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
     private var user = ""
 
     weak var delegate: NCGridCellDelegate?
+
+    internal var objectId = ""
+    var indexPath = IndexPath()
+    var account = ""
+    var user = ""
+
+    weak var delegate: NCTrashGridCellDelegate?
     var namedButtonMore = ""
 
     var fileObjectId: String? {
@@ -108,7 +119,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
     }
 
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        delegate?.tapMoreGridItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, indexPath: indexPath, sender: sender)
+        delegate?.tapMoreGridItem(with: objectId, image: imageItem.image, sender: sender)
     }
 
 
@@ -117,7 +128,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         
         self.accessibilityCustomActions = [
             UIAccessibilityCustomAction(
-                name: NSLocalizedString(moreName, comment: ""),
+                name: NSLocalizedString("_more_", comment: ""),
                 target: self,
                 selector: #selector(touchUpInsideMore))
         ]
@@ -133,7 +144,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         buttonMore.isHidden = status
     }
 
-    func selected(_ status: Bool, isEditMode: Bool) {
+    func selected(_ status: Bool, isEditMode: Bool, account: String) {
         if isEditMode {
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
@@ -142,11 +153,12 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
             setA11yActions()
         }
         if status {
-            imageSelect.image = NCImageCache.images.checkedYes
+            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
             imageSelect.isHidden = false
             imageVisualEffect.isHidden = false
         } else {
             imageSelect.image = NCImageCache.images.checkedNo
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
             imageVisualEffect.isHidden = true
         }
     }

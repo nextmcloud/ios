@@ -27,6 +27,7 @@
 import UIKit
 import AVFoundation
 import QuartzCore
+import NextcloudKit
 
 class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
 
@@ -39,6 +40,15 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var startStopLabel: UILabel!
     @IBOutlet weak var voiceRecordHUD: VoiceRecordHUD!
+
+    var recording: NCAudioRecorder!
+    var startDate: Date = Date()
+    var fileName: String = ""
+    var controller: NCMainTabBarController!
+    var session: NCSession.Session {
+        NCSession.shared.getSession(controller: controller)
+    }
+    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
 
     // MARK: - View Life Cycle
 
@@ -99,6 +109,15 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
     func uploadMetadata() {
         let fileNamePath = NSTemporaryDirectory() + self.fileName
         let metadata = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileName, fileNameView: fileName, ocId: UUID().uuidString, serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate.urlBase, url: "", contentType: "")
+        let metadata = NCManageDatabase.shared.createMetadata(fileName: fileName,
+                                                              fileNameView: fileName,
+                                                              ocId: UUID().uuidString,
+                                                              serverUrl: controller.currentServerUrl(),
+                                                              url: "",
+                                                              contentType: "",
+                                                              session: self.session,
+                                                              sceneIdentifier: self.controller?.sceneIdentifier)
+
         metadata.session = NCNetworking.shared.sessionUploadBackground
         metadata.sessionSelector = NCGlobal.shared.selectorUploadFile
         metadata.status = NCGlobal.shared.metadataStatusWaitUpload

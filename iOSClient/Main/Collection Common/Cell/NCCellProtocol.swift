@@ -25,14 +25,14 @@ import UIKit
 
 protocol NCCellProtocol {
     var fileAvatarImageView: UIImageView? { get }
-    var fileObjectId: String? { get set }
+    var fileAccount: String? { get set }
+    var fileOcId: String? { get set }
+    var fileOcIdTransfer: String? { get set }
     var filePreviewImageView: UIImageView? { get set }
-    var filePreviewImageBottom: NSLayoutConstraint? { get set }
     var fileUser: String? { get set }
     var fileTitleLabel: UILabel? { get set }
     var fileInfoLabel: UILabel? { get set }
     var fileSubinfoLabel: UILabel? { get set }
-    var fileProgressView: UIProgressView? { get set }
     var fileStatusImage: UIImageView? { get set }
     var fileLocalImage: UIImageView? { get set }
     var fileFavoriteImage: UIImageView? { get set }
@@ -45,7 +45,14 @@ protocol NCCellProtocol {
     func titleInfoTrailingDefault()
     func titleInfoTrailingFull()
     func writeInfoDateSize(date: NSDate, size: Int64)
-    func setButtonMore(named: String, image: UIImage)
+    func setButtonMore(image: UIImage)
+    func hideImageItem(_ status: Bool)
+    func hideImageFavorite(_ status: Bool)
+    func hideImageStatus(_ status: Bool)
+    func hideImageLocal(_ status: Bool)
+    func hideLabelTitle(_ status: Bool)
+    func hideLabelInfo(_ status: Bool)
+    func hideLabelSubinfo(_ status: Bool)
     func hideButtonShare(_ status: Bool)
     func hideButtonMore(_ status: Bool)
     func selected(_ status: Bool, isEditMode: Bool)
@@ -55,19 +62,22 @@ protocol NCCellProtocol {
 }
 
 extension NCCellProtocol {
-
     var fileAvatarImageView: UIImageView? {
         return nil
     }
-    var fileObjectId: String? {
+    var fileAccount: String? {
+        get { return nil }
+        set {}
+    }
+    var fileOcId: String? {
+        get { return nil }
+        set {}
+    }
+    var fileOcIdTransfer: String? {
         get { return nil }
         set {}
     }
     var filePreviewImageView: UIImageView? {
-        get { return nil }
-        set {}
-    }
-    var filePreviewImageBottom: NSLayoutConstraint? {
         get { return nil }
         set {}
     }
@@ -82,10 +92,6 @@ extension NCCellProtocol {
     var fileSubinfoLabel: UILabel? {
         get { return nil }
         set { }
-    }
-    var fileProgressView: UIProgressView? {
-        get { return nil }
-        set {}
     }
     var fileStatusImage: UIImageView? {
         get { return nil }
@@ -119,7 +125,14 @@ extension NCCellProtocol {
     func titleInfoTrailingDefault() {}
     func titleInfoTrailingFull() {}
     func writeInfoDateSize(date: NSDate, size: Int64) {}
-    func setButtonMore(named: String, image: UIImage) {}
+    func setButtonMore(image: UIImage) {}
+    func hideImageItem(_ status: Bool) {}
+    func hideImageFavorite(_ status: Bool) {}
+    func hideImageStatus(_ status: Bool) {}
+    func hideImageLocal(_ status: Bool) {}
+    func hideLabelTitle(_ status: Bool) {}
+    func hideLabelInfo(_ status: Bool) {}
+    func hideLabelSubinfo(_ status: Bool) {}
     func hideButtonShare(_ status: Bool) {}
     func hideButtonMore(_ status: Bool) {}
     func selected(_ status: Bool, isEditMode: Bool) {}
