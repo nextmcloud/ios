@@ -128,7 +128,8 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         if editMode {
             navigationItem.leftBarButtonItems = nil
         } else {
-            setNavigationLeftItems()
+            ///Magentacloud branding changes hide user account button on left navigation bar
+//            setNavigationLeftItems()
         }
         setNavigationRightItems()
 
@@ -137,4 +138,127 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         searchController(enabled: !editMode)
         self.collectionView.reloadData()
     }
+    
+    /// If explicit `isOn` is not set, it will invert `isEditMode`
+    func toggleSelect(isOn: Bool? = nil) {
+        DispatchQueue.main.async {
+            self.isEditMode = isOn ?? !self.isEditMode
+            self.selectOcId.removeAll()
+            self.setNavigationLeftItems()
+            self.setNavigationRightItems()
+            self.collectionView.reloadData()
+        }
+    }
+
+    func createMenuActions() -> [NCMenuAction] {
+        var actions = [NCMenuAction]()
+
+        actions.append(.cancelAction {
+            self.toggleSelect()
+        })
+        if selectOcId.count != dataSource.getMetadataSourceForAllSections().count {
+            actions.append(.selectAllAction(action: selectAll))
+        }
+
+        guard !selectOcId.isEmpty else { return actions }
+
+        actions.append(.seperator(order: 0))
+
+        var selectedMetadatas: [tableMetadata] = []
+        var selectedMediaMetadatas: [tableMetadata] = []
+        var isAnyOffline = false
+        var isAnyFolder = false
+        var isAnyLocked = false
+        var canUnlock = true
+        var canOpenIn = false
+        var isDirectoryE2EE = false
+
+        for ocId in selectOcId {
+            guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
+            if metadata.e2eEncrypted {
+                selectOcId.removeAll(where: {$0 == metadata.ocId})
+            } else {
+                selectedMetadatas.append(metadata)
+            }
+
+            if [NKCommon.TypeClassFile.image.rawValue, NKCommon.TypeClassFile.video.rawValue].contains(metadata.classFile) {
+                selectedMediaMetadatas.append(metadata)
+            }
+            if metadata.directory { isAnyFolder = true }
+            if metadata.lock {
+                isAnyLocked = true
+                if metadata.lockOwner != appDelegate.userId {
+                    canUnlock = false
+                }
+            }
+
+            guard !isAnyOffline else { continue }
+            if metadata.directory,
+               let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, metadata.serverUrl + "/" + metadata.fileName)) {
+                isAnyOffline = directory.offline
+            } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
+                isAnyOffline = localFile.offline
+            } // else: file is not offline, continue
+
+            if !metadata.directory {
+                canOpenIn = true
+            }
+
+            if metadata.isDirectoryE2EE {
+                isDirectoryE2EE = true
+            }
+        }
+        
+        if canOpenIn {
+            actions.append(.share(selectedMetadatas: selectedMetadatas, viewController: self, completion: { self.toggleSelect() }))
+        }
+
+        if !isAnyFolder, canUnlock, !NCGlobal.shared.capabilityFilesLockVersion.isEmpty {
+            actions.append(.lockUnlockFiles(shouldLock: !isAnyLocked, metadatas: selectedMetadatas, completion: { self.toggleSelect() }))
+        }
+
+        if !selectedMediaMetadatas.isEmpty {
+            var title: String = NSLocalizedString("_save_selected_files_", comment: "")
+            var icon = NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconImageColor])
+            if selectedMediaMetadatas.allSatisfy({ NCManageDatabase.shared.getMetadataLivePhoto(metadata: $0) != nil }) {
+                title = NSLocalizedString("_livephoto_save_", comment: "")
+                icon = NCUtility().loadImage(named: "livephoto")
+            }
+
+            actions.append(NCMenuAction(
+                title: title,
+                icon: icon,
+                order: 0,
+                action: { _ in
+                    for metadata in selectedMediaMetadatas {
+                        if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
+                            NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV, hudView: self.view))
+                        } else {
+                            if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
+                                NCActionCenter.shared.saveAlbum(metadata: metadata, controller: self.tabBarController as? NCMainTabBarController)
+                            } else {
+                                if NCNetworking.shared.downloadQueue.operations.filter({ ($0 as? NCOperationDownload)?.metadata.ocId == metadata.ocId }).isEmpty {
+                                    NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum))
+                                }
+                            }
+                        }
+                    }
+                    self.toggleSelect()
+                }
+            )
+            )
+        }
+        actions.append(.setAvailableOfflineAction(selectedMetadatas: selectedMetadatas, isAnyOffline: isAnyOffline, viewController: self, completion: {
+            self.reloadDataSource()
+            self.toggleSelect()
+        }))
+        
+        if !isDirectoryE2EE {
+            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, viewController: self, indexPath: [], completion: { self.toggleSelect() }))
+            actions.append(.copyAction(selectOcId: selectOcId, viewController: self, completion: { self.toggleSelect() }))
+        }
+        actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, indexPaths: [], viewController: self, completion: { self.toggleSelect() }))
+        return actions
+    }
+
 }

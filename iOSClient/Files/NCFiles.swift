@@ -76,7 +76,8 @@ class NCFiles: NCCollectionViewCommon {
                 }
 
                 self.titleCurrentFolder = self.getNavigationTitle()
-                self.setNavigationLeftItems()
+                ///Magentacloud branding changes hide user account button on left navigation bar
+//                self.setNavigationLeftItems()
 
                 self.dataSource.removeAll()
                 self.reloadDataSource()
