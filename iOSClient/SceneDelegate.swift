@@ -68,7 +68,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         } else {
             NCKeychain().removeAll()
             if let bundleID = Bundle.main.bundleIdentifier {
+                let lastUpdateCheckDate = UserDefaults.standard.object(forKey: AppUpdaterKey.lastUpdateCheckDate)
                 UserDefaults.standard.removePersistentDomain(forName: bundleID)
+                if lastUpdateCheckDate != nil {
+                    UserDefaults.standard.setValue(lastUpdateCheckDate, forKey: AppUpdaterKey.lastUpdateCheckDate)
+                }
             }
             if NCBrandOptions.shared.disable_intro {
                 appDelegate.openLogin(selector: NCGlobal.shared.introLogin, window: window)
@@ -109,7 +113,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 requestedAccount(controller: controller)
             }
         }
-
+        AppUpdater().checkForUpdate()
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
     }
 
