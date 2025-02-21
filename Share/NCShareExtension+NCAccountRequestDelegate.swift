@@ -81,6 +81,9 @@ extension NCShareExtension: NCAccountRequestDelegate {
                                           password: NCKeychain().getPassword(account: tableAccount.account),
                                           userAgent: userAgent,
                                           nextcloudVersion: capabilities.capabilityServerVersionMajor,
+                                          httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
+                                          httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
+                                          httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
                                           groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
 
         // SESSION
@@ -106,6 +109,7 @@ extension NCShareExtension: NCCreateFormUploadConflictDelegate {
         }
 
         self.uploadMetadata.append(contentsOf: metadatas)
+        uploadStarted = true
         self.upload()
     }
 }

@@ -33,6 +33,10 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     var dataSourceTask: URLSessionTask?
     var session: NCSession.Session!
 
+    var controller: NCMainTabBarController? {
+        self.tabBarController as? NCMainTabBarController
+    }
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -77,6 +81,18 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        if self.notifications.count > 0 {
+            controller?.availableNotifications = true
+        } else {
+            controller?.availableNotifications = false
+        }
 
         // Cancel Queue & Retrieves Properties
         dataSourceTask?.cancel()
@@ -345,10 +361,6 @@ class NCNotificationCell: UITableViewCell, NCCellProtocol {
     var fileUser: String? {
         get { return user }
         set { user = newValue ?? "" }
-    }
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
     }
 
     @IBAction func touchUpInsideRemove(_ sender: Any) {

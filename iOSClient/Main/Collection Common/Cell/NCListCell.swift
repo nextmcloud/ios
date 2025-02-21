@@ -31,6 +31,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var imageLocal: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var labelInfo: UILabel!
+    @IBOutlet weak var labelInfoSeparator: UILabel!
     @IBOutlet weak var labelSubinfo: UILabel!
     @IBOutlet weak var imageShared: UIImageView!
     @IBOutlet weak var buttonShared: UIButton!
@@ -250,6 +251,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         labelInfo.text = NCUtility().dateDiff(date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
         labelInfo.text = NCUtility().dateDiff(date as Date)
         labelSubinfo.text = ""
+        labelSubinfo.text = ""
+        labelInfo.text = NCUtility().dateDiff(date as Date)
+        labelSubinfo.text = NCUtilityFileSystem().transformedSize(size)
+//        labelSubinfo.text = ""
     }
 
     func setAccessibility(label: String, value: String) {

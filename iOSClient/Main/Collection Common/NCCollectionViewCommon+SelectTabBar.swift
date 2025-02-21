@@ -32,7 +32,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         } else {
             fileSelect = self.dataSource.getMetadatas().compactMap({ $0.ocId })
         }
-        tabBarSelect.update(fileSelect: fileSelect, metadatas: getSelectedMetadatas(), userId: session.userId)
+        tabBarSelect?.update(fileSelect: fileSelect, metadatas: getSelectedMetadatas(), userId: session.userId)
         self.collectionView.reloadData()
     }
 
@@ -129,9 +129,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
             navigationItem.leftBarButtonItems = nil
         } else {
             ///Magentacloud branding changes hide user account button on left navigation bar
+           ///Magentacloud branding changes hide user account button on left navigation bar
 //            setNavigationLeftItems()
         }
-        setNavigationRightItems()
+        (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
 
         navigationController?.interactivePopGestureRecognizer?.isEnabled = !editMode
         navigationItem.hidesBackButton = editMode

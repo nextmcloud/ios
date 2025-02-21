@@ -134,6 +134,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         ]
     }
     
+
     func setButtonMore(named: String, image: UIImage) {
         namedButtonMore = named
         buttonMore.setImage(image, for: .normal)

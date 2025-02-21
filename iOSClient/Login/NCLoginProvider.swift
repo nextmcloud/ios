@@ -177,6 +177,18 @@ extension NCLoginProvider: WKNavigationDelegate {
         NextcloudKit.shared.setup(account: account, user: user, userId: user, password: password, urlBase: urlBase)
         NextcloudKit.shared.getUserProfile(account: account) { _, userProfile, _, error in
             if error == .success, let userProfile {
+                NextcloudKit.shared.appendSession(account: account,
+                                                  urlBase: urlBase,
+                                                  user: user,
+                                                  userId: user,
+                                                  password: password,
+                                                  userAgent: userAgent,
+                                                  nextcloudVersion: NCCapabilities.shared.getCapabilities(account: account).capabilityServerVersionMajor,
+                                                  httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
+                                                  httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
+                                                  httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
+                                                  groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
+                NCSession.shared.appendSession(account: account, urlBase: urlBase, user: user, userId: userProfile.userId)
                 NCManageDatabase.shared.deleteAccount(account)
                 NCManageDatabase.shared.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
                 self.appDelegate.changeAccount(account, userProfile: userProfile) { }

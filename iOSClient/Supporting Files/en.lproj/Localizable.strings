@@ -229,6 +229,8 @@
 "_wait_file_encryption_"  = "Please wait, encrypting file…";
 "_passcode_counter_fail_" = "Too many failed attempts, please wait before reattempting";
 "_seconds_"               = "seconds";
+"_change_lock_passcode_"  = "Change passcode";
+"_lock_cannot_disable_mdm_" = "Disabling the passcode lock is not permitted by your configuration profile.";
 
 /* Background of the file listing view */
 "_use_as_background_"       = "Use it as a background";
@@ -586,6 +588,7 @@
 "_directory_on_top_yes_"        = "✓ Folders on top";
 "_directory_on_top_no_"         = "Folders on top";
 "_show_description_"            = "Show description";
+"_show_recommended_files_"      = "Show recommended files";
 "_no_description_available_"    = "No description available for this folder";
 "_folder_automatic_upload_"     = "Folder for \"Auto upload\"";
 "_search_no_record_found_"      = "No result";
@@ -824,6 +827,9 @@
 "_file_creation_"                   = "File creation";
 "_delete_all_scanned_images_"       = "Delete all scanned images";
 "_text_recognition_"                = "Text recognition";
+"_all_files_"                       = "All files";
+"_personal_files_"                  = "Personal Files";
+
 
 /* The title on the navigation bar of the Scanning screen. */
 "wescan.scanning.title"             = "Scanning";
@@ -927,6 +933,7 @@
 "Enter Passcode"            = "Enter Passcode";
 "Enter a new passcode"      = "Enter a new passcode";
 "Confirm new passcode"      = "Confirm new passcode";
+"_too_many_failed_passcode_attempts_error_" = "Too many failed passcode attempts. Please try again.";
 "Passcodes didn't match. Try again." = "Passcodes didn't match. Try again.";
 "Delete"                    = "Delete";
 "Cancel"                    = "Cancel";
@@ -968,6 +975,7 @@
 "_resolution_"              = "Resolution";
 "_try_download_full_resolution_"            = "Download full resolution image";
 "_full_resolution_image_info_"            = "This may reveal more information about the photo.";
+"_download_audio_"          = "Download the audio locally";
 "_copied_path_"             = "Copied path";
 "_copy_path_"               = "Copy path";
 "_certificates_"            = "Certificates";
@@ -1044,6 +1052,7 @@
 "_download_image_"          = "Download image";
 "_download_video_"          = "Download video";
 "_reset_wrong_passcode_"    = "Reset application";
+"_reset_wrong_passcode_option_" = "Reset application after failed attempts";
 "_reset_wrong_passcode_desc_" = "Use \"Reset application\" to remove all accounts and local data after %d failed code entry attempts.";
 "_deviceOwnerAuthentication_" = "The biometric sensor has been temporarily disabled due to multiple failed attempts. Enter the device passcode to re-enable the sensor.";
 "_virus_detect_"            = "Virus detected. Upload cannot be completed!";
@@ -1104,6 +1113,12 @@
 "_account_unauthorized_"    = "Warning, %@, you are not authorized, your account has been deleted, if you have changed your password, re-authenticate.";
 "_folder_offline_desc_"     = "Even without an internet connection, you can organize your folders, create files. Once you're back online, your pending actions will automatically sync.";
 "_offline_not_allowed_"     = "This operation is not allowed in offline mode";
+"_Upload_native_format_yes_"= "Upload in native format: yes";
+"_Upload_native_format_no_" = "Upload in native format: no";
+"_terms_of_service_"        = "Terms of service";
+"_terms_accept_"            = "I acknowledge that I have read and agree to the above terms of service";
+"_terms_accepted_"          = "Terms accepted";
+"_recommended_files_"       = "Recommended Files";
 
 // Tip
 "_tip_pdf_thumbnails_"      = "Swipe left from the right edge of the screen to show the thumbnails.";

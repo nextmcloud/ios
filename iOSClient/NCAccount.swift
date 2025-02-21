@@ -44,6 +44,9 @@ class NCAccount: NSObject {
                                           password: password,
                                           userAgent: userAgent,
                                           nextcloudVersion: NCCapabilities.shared.getCapabilities(account: account).capabilityServerVersionMajor,
+                                          httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
+                                          httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
+                                          httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
                                           groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
 
         NextcloudKit.shared.getUserProfile(account: account) { account, userProfile, _, error in
@@ -99,7 +102,7 @@ class NCAccount: NSObject {
         completion()
     }
 
-    func deleteAccount(_ account: String, wipe: Bool = true) {
+    func deleteAccount(_ account: String, wipe: Bool = true, completion: () -> Void = {}) {
         UIApplication.shared.allSceneSessionDestructionExceptFirst()
 
         /// Unsubscribing Push Notification
@@ -129,6 +132,8 @@ class NCAccount: NSObject {
         NCKeychain().clearAllKeysPushNotification(account: account)
         /// Remove User Default Data
         NCNetworking.shared.removeAllKeyUserDefaultsData(account: account)
+
+        completion()
     }
 
     func deleteAllAccounts() {

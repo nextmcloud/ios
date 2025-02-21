@@ -43,6 +43,10 @@ let userAgent: String = {
     var linkLoginHost: String = "https://nextcloud.com/install"
     var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
     var webLoginAutenticationProtocol: String = "nc://"                                                // example "abc://"
+    var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
+    var linkLoginHost: String = "https://nextcloud.com/install"
+    var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
+    var webLoginAutenticationProtocol: String = "nc://"                                        // example "abc://"
     var privacy: String = "https://static.magentacloud.de/privacy/datenschutzhinweise_app.htm"
     var sourceCode: String = "https://github.com/nextcloud/ios"
     var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
@@ -83,22 +87,26 @@ let userAgent: String = {
     var disable_multiaccount:            Bool = true
     var disable_more_external_site: Bool = false
     var disable_openin_file: Bool = false                                          // Don't touch me !!
+    var disable_openin_file: Bool = false                                                       // Don't touch me !!
     var disable_crash_service:             Bool = true
     var disable_log: Bool = false
     var disable_mobileconfig: Bool = false
     var disable_show_more_nextcloud_apps_in_settings:         Bool = true
     var doNotAskPasscodeAtStartup: Bool = false
     var disable_source_code_in_settings: Bool = false
+    var enforce_passcode_lock = false
+    var use_in_app_browser_for_login = false
 
     // (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
     var enforce_servers: [(name: String, url: String)] = []
 
     // Internal option behaviour
-    var cleanUpDay: Int = 0                                                        // Set default "Delete, in the cache, all files older than" possible days value are: 0, 1, 7, 30, 90, 180, 365
+    var cleanUpDay: Int = 0                                                                     // Set default "Delete all cached files older than" possible days value are: 0, 1, 7, 30, 90, 180, 365
 
-    // Max download/upload concurrent
-    let maxConcurrentOperationDownload: Int = 5
-    let maxConcurrentOperationUpload: Int = 5
+    // Max request/download/upload concurrent
+    let httpMaximumConnectionsPerHost: Int = 6
+    let httpMaximumConnectionsPerHostInDownload: Int = 6
+    let httpMaximumConnectionsPerHostInUpload: Int = 6
 
     // Number of failed attempts after reset app
     let resetAppPasscodeAttempts: Int = 10
@@ -112,7 +120,6 @@ let userAgent: String = {
     override init() {
         // wrapper AppConfig
         if let configurationManaged = UserDefaults.standard.dictionary(forKey: "com.apple.configuration.managed"), use_AppConfig {
-
             if let str = configurationManaged[NCGlobal.shared.configuration_brand] as? String {
                 brand = str
             }
@@ -133,6 +140,9 @@ let userAgent: String = {
             }
             if let str = configurationManaged[NCGlobal.shared.configuration_disable_openin_file] as? String {
                 disable_openin_file = (str as NSString).boolValue
+            }
+            if let str = configurationManaged[NCGlobal.shared.configuration_enforce_passcode_lock] as? String {
+                enforce_passcode_lock = (str as NSString).boolValue
             }
         }
     }

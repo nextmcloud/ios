@@ -187,13 +187,56 @@ extension NCViewer {
         }
 
         //
-        // DOWNLOAD FULL RESOLUTION
+        // RENAME
         //
-        if !webView, metadata.session.isEmpty, !self.utilityFileSystem.fileProviderStorageExists(metadata) {
+        if !webView, metadata.isRenameable, !metadata.isDirectoryE2EE {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_try_download_full_resolution_", comment: ""),
-                    icon: utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor]),
+                    title: NSLocalizedString("_rename_", comment: ""),
+                    icon: utility.loadImage(named: "text.cursor", colors: [NCBrandColor.shared.iconImageColor]),
+                    action: { _ in
+
+                        if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
+
+                            vcRename.metadata = metadata
+                            vcRename.disableChangeExt = true
+                            vcRename.imagePreview = imageIcon
+                            vcRename.indexPath = indexPath
+
+                            let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
+
+                            viewController.present(popup, animated: true)
+                        }
+                    }
+                )
+            )
+        }
+
+        //
+        // COPY - MOVE
+        //
+        if !webView, metadata.isCopyableMovable {
+            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], viewController: viewController, indexPath: []))
+        }
+
+        //
+        // DOWNLOAD - LOCAL
+        //
+        if !webView, metadata.session.isEmpty, !self.utilityFileSystem.fileProviderStorageExists(metadata) {
+            var title = ""
+            if metadata.isImage {
+                title = NSLocalizedString("_try_download_full_resolution_", comment: "")
+            } else if metadata.isVideo {
+                title = NSLocalizedString("_download_video_", comment: "")
+            } else if metadata.isAudio {
+                title = NSLocalizedString("_download_audio_", comment: "")
+            } else {
+                title = NSLocalizedString("_download_file_", comment: "")
+            }
+            actions.append(
+                NCMenuAction(
+                    title: title,
+                    icon: utility.loadImage(named: "iphone.circle", colors: [NCBrandColor.shared.iconImageColor]),
                     action: { _ in
                         guard let metadata = self.database.setMetadatasSessionInWaitDownload(metadatas: [metadata],
                                                                                              session: NCNetworking.shared.sessionDownload,

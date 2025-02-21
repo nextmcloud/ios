@@ -27,6 +27,7 @@ import RealmSwift
 
 class NCService: NSObject {
     let utilityFileSystem = NCUtilityFileSystem()
+    let utility = NCUtility()
     let database = NCManageDatabase.shared
 
     // MARK: -
@@ -41,7 +42,7 @@ class NCService: NSObject {
 
             let result = await requestServerStatus(account: account, controller: controller)
             if result {
-                requestServerCapabilities(account: account)
+                requestServerCapabilities(account: account, controller: controller)
                 getAvatar(account: account)
                 NCNetworkingE2EE().unlockAll(account: account)
                 sendClientDiagnosticsRemoteOperation(account: account)
@@ -149,27 +150,43 @@ class NCService: NSObject {
                                            avatarSizeRounded: NCGlobal.shared.avatarSizeRounded,
                                            etag: etag,
                                            account: account,
-                                           options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { _, _, _, etag, _, error in
-            if let etag = etag, error == .success {
-                self.database.addAvatar(fileName: fileName, etag: etag)
+                                           options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { _, _, _, newEtag, _, error in
+            if let newEtag,
+               etag != newEtag,
+               error == .success {
+                self.database.addAvatar(fileName: fileName, etag: newEtag)
+
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadAvatar, userInfo: ["error": error])
             } else if error.errorCode == NCGlobal.shared.errorNotModified {
                 self.database.setAvatarLoaded(fileName: fileName)
             }
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadAvatar, userInfo: ["error": error])
         }
     }
 
-    private func requestServerCapabilities(account: String) {
+    private func requestServerCapabilities(account: String, controller: NCMainTabBarController?) {
         NextcloudKit.shared.getCapabilities(account: account, options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { account, presponseData, error in
-            guard error == .success, let data = presponseData?.data else { return }
+            guard error == .success, let data = presponseData?.data else {
+                return
+            }
 
             data.printJson()
 
-            if NCNetworking.shared.isResponseDataChanged(account: account, responseData: presponseData) {
-                self.database.addCapabilitiesJSon(data, account: account)
+            self.database.addCapabilitiesJSon(data, account: account)
+
+            guard let capability = self.database.setCapabilities(account: account, data: data) else {
+                return
             }
 
-            guard let capability = self.database.setCapabilities(account: account, data: data) else { return }
+            // Recommendations
+            if NCCapabilities.shared.getCapabilities(account: account).capabilityRecommendations {
+                Task.detached {
+                    let session = NCSession.shared.getSession(account: account)
+                    await NCNetworking.shared.createRecommendations(session: session)
+                }
+            } else {
+                self.database.deleteAllRecommendedFiles(account: account)
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadHeader, userInfo: ["account": account])
+            }
 
             // Theming
             if NCBrandColor.shared.settingThemingColor(account: account) {
@@ -247,6 +264,17 @@ class NCService: NSObject {
                 NextcloudKit.shared.getUserStatus(account: account, options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { account, clearAt, icon, message, messageId, messageIsPredefined, status, statusIsUserDefined, _, _, error in
                     if error == .success {
                         self.database.setAccountUserStatus(userStatusClearAt: clearAt, userStatusIcon: icon, userStatusMessage: message, userStatusMessageId: messageId, userStatusMessageIsPredefined: messageIsPredefined, userStatusStatus: status, userStatusStatusIsUserDefined: statusIsUserDefined, account: account)
+                    }
+                }
+            }
+
+            // Notifications
+            controller?.availableNotifications = false
+            if capability.capabilityNotification.count > 0 {
+                NextcloudKit.shared.getNotifications(account: account) { _ in
+                } completion: { _, notifications, _, error in
+                    if error == .success, let notifications = notifications, notifications.count > 0 {
+                        controller?.availableNotifications = true
                     }
                 }
             }

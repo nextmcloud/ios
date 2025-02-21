@@ -93,6 +93,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         super.viewWillAppear(animated)
         appDelegate.activeViewController = self
         navigationController?.setGroupAppearance()
+//        appDelegate.activeViewController = self
+//        navigationController?.setGroupAppearance()
         loadItems()
         changeTheming()
         tableView.reloadData()
@@ -275,6 +277,19 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                 }
             }
         }
+            }
+
+            switch tableAccount.quotaTotal {
+            case -1:
+                quota = "0"
+            case -2:
+                quota = NSLocalizedString("_quota_space_unknown_", comment: "")
+            case -3:
+                quota = NSLocalizedString("_quota_space_unlimited_", comment: "")
+            default:
+                quota = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
+            }
+
             let quotaUsed: String = utilityFileSystem.transformedSize(tableAccount.quotaUsed)
             let quota2: String = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
             let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"

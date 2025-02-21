@@ -139,6 +139,9 @@ func getDashboardDataEntry(configuration: DashboardIntent?, isPreview: Bool, dis
                                       password: password,
                                       userAgent: userAgent,
                                       nextcloudVersion: capabilities.capabilityServerVersionMajor,
+                                      httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
+                                      httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
+                                      httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
                                       groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
 
     // LOG
@@ -225,7 +228,7 @@ func getDashboardDataEntry(configuration: DashboardIntent?, isPreview: Bool, dis
                                     if FileManager().fileExists(atPath: fileNamePath), let image = UIImage(contentsOfFile: fileNamePath) {
                                         icon = image
                                     } else {
-                                        let (_, data, error) = await NCNetworking.shared.downloadPreview(url: url, account: activeTableAccount.account)
+                                        let (_, _, error) = await NCNetworking.shared.downloadPreview(url: url, account: activeTableAccount.account)
                                         if error == .success,
                                            let data = responseData?.data,
                                            let image = convertDataToImage(data: data, size: NCGlobal.shared.size256, fileNameToWrite: fileName) {

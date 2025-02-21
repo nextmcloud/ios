@@ -36,8 +36,8 @@ class NCMedia: UIViewController {
     @IBOutlet weak var menuButton: UIButton!
     @IBOutlet weak var gradientView: UIView!
 
-    let lockQueue = DispatchQueue(label: "com.nextcloud.mediasearch.lockqueue")
-    var hasRunSearchMedia: Bool = false
+    let semaphoreSearchMedia = DispatchSemaphore(value: 1)
+    let semaphoreNotificationCenter = DispatchSemaphore(value: 1)
 
     let layout = NCMediaLayout()
     var layoutType = NCGlobal.shared.mediaLayoutRatio
@@ -53,7 +53,9 @@ class NCMedia: UIViewController {
     var isTop: Bool = true
     var isEditMode = false
     var fileSelect: [String] = []
-    var filesExists: [String] = []
+    var filesExists: ThreadSafeArray<String> = ThreadSafeArray()
+    var ocIdDoNotExists: ThreadSafeArray<String> = ThreadSafeArray()
+    var searchMediaInProgress: Bool = false
     var attributesZoomIn: UIMenuElement.Attributes = []
     var attributesZoomOut: UIMenuElement.Attributes = []
     let gradient: CAGradientLayer = CAGradientLayer()
@@ -115,6 +117,7 @@ class NCMedia: UIViewController {
         collectionView.dragInteractionEnabled = true
         collectionView.dragDelegate = self
         collectionView.dropDelegate = self
+        collectionView.accessibilityIdentifier = "NCMedia"
 
         layout.sectionInset = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: 2)
         collectionView.collectionViewLayout = layout
@@ -253,14 +256,30 @@ class NCMedia: UIViewController {
 
     @objc func deleteFile(_ notification: NSNotification) {
         guard let userInfo = notification.userInfo as NSDictionary?,
-              let error = userInfo["error"] as? NKError else { return }
+              let error = userInfo["error"] as? NKError
+        else {
+            return
+        }
 
-        if error.errorCode == self.global.errorResourceNotFound, let ocId = userInfo["ocId"] as? String {
+        // This is only a fail safe "dead lock", I don't think the timeout will ever be called but at least nothing gets stuck, if after 5 sec. (which is a long time in this routine), the semaphore is still locked
+        //
+        if self.semaphoreNotificationCenter.wait(timeout: .now() + 5) == .timedOut {
+            self.semaphoreNotificationCenter.signal()
+        }
+
+        if error.errorCode == self.global.errorResourceNotFound,
+           let ocIds = userInfo["ocId"] as? [String],
+           let ocId = ocIds.first {
             self.database.deleteMetadataOcId(ocId)
-            self.loadDataSource()
+            self.loadDataSource {
+                self.semaphoreNotificationCenter.signal()
+            }
         } else if error != .success {
-            NCContentPresenter().showError(error: error)
-            self.loadDataSource()
+            self.loadDataSource {
+                self.semaphoreNotificationCenter.signal()
+            }
+        } else {
+            semaphoreNotificationCenter.signal()
         }
     }
 
@@ -271,26 +290,23 @@ class NCMedia: UIViewController {
     @objc func fileExists(_ notification: NSNotification) {
         guard let userInfo = notification.userInfo as NSDictionary?,
               let ocId = userInfo["ocId"] as? String,
-              let fileExists = userInfo["fileExists"] as? Bool else { return }
-        var indexPaths: [IndexPath] = []
+              let fileExists = userInfo["fileExists"] as? Bool
+        else {
+            return
+        }
 
         filesExists.append(ocId)
-
         if !fileExists {
-            if let index = dataSource.metadatas.firstIndex(where: {$0.ocId == ocId}),
-               let cell = collectionView.cellForItem(at: IndexPath(row: index, section: 0)) as? NCMediaCell,
-               dataSource.metadatas[index].ocId == cell.ocId {
-                indexPaths.append(IndexPath(row: index, section: 0))
-            }
+            ocIdDoNotExists.append(ocId)
+        }
 
-            dataSource.removeMetadata([ocId])
-            database.deleteMetadataOcId(ocId)
-
-            if !indexPaths.isEmpty {
-                collectionView.deleteItems(at: indexPaths)
-            } else {
-                collectionViewReloadData()
-            }
+        if NCNetworking.shared.fileExistsQueue.operationCount == 0,
+           !ocIdDoNotExists.isEmpty,
+           let ocIdDoNotExists = self.ocIdDoNotExists.getArray() {
+            dataSource.removeMetadata(ocIdDoNotExists)
+            database.deleteMetadataOcIds(ocIdDoNotExists)
+            self.ocIdDoNotExists.removeAll()
+            collectionViewReloadData()
         }
     }
 
