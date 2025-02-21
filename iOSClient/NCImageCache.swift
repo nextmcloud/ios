@@ -118,6 +118,19 @@ import RealmSwift
         NotificationCenter.default.removeObserver(self, name: LRUCacheMemoryWarningNotification, object: nil)
     }
 
+    func calculateMaxImages(percentage: Double, imageSizeKB: Double) -> Int {
+        let totalRamBytes = Double(ProcessInfo.processInfo.physicalMemory)
+        let cacheSizeBytes = totalRamBytes * (percentage / 100.0)
+        let imageSizeBytes = imageSizeKB * 1024
+        let maxImages = Int(cacheSizeBytes / imageSizeBytes)
+
+        return maxImages
+    }
+    
+    func getMediaMetadatas(account: String, predicate: NSPredicate? = nil) -> ThreadSafeArray<tableMetadata>? {
+        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
+    }
+
     func allowExtensions(ext: String) -> Bool {
         return allowExtensions.contains(ext)
     }
