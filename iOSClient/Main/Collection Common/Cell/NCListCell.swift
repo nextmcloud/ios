@@ -204,7 +204,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         if isEditMode {
             imageItemLeftConstraint.constant = 45
             imageSelect.isHidden = false
-            imageShared.isHidden = true
             imageMore.isHidden = true
             buttonShared.isHidden = true
             buttonMore.isHidden = true
@@ -212,7 +211,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         } else {
             imageItemLeftConstraint.constant = 10
             imageSelect.isHidden = true
-            imageShared.isHidden = false
             imageMore.isHidden = false
             buttonShared.isHidden = false
             buttonMore.isHidden = false
@@ -239,6 +237,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     func writeInfoDateSize(date: NSDate, size: Int64) {
         labelInfo.text = NCUtility().dateDiff(date as Date)
         labelSubinfo.text = NCUtilityFileSystem().transformedSize(size)
+//        labelSubinfo.text = ""
     }
 
     func setAccessibility(label: String, value: String) {
