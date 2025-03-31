@@ -153,6 +153,7 @@ class NCGlobal: NSObject {
     //
     let buttonMoreMore                              = "more"
     let buttonMoreLock                              = "moreLock"
+    let buttonMoreStop                              = "stop"
 
     // Text -  OnlyOffice - Collabora - QuickLook
     //
