@@ -38,6 +38,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var activeLogin: NCLogin?
     var activeLoginWeb: NCLoginProvider?
     var taskAutoUploadDate: Date = Date()
+    @objc let adjust = AdjustHelper()
     var isUiTestingEnabled: Bool {
         return ProcessInfo.processInfo.arguments.contains("UI_TESTING")
     }
@@ -113,6 +114,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         _ = NCActionCenter.shared
         _ = NCNetworkingProcess.shared
 
+        if account.isEmpty {
+            if NCBrandOptions.shared.disable_intro {
+                openLogin(viewController: nil, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+            } else {
+                if let viewController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() {
+                    let navigationController = NCLoginNavigationController(rootViewController: viewController)
+                    window?.rootViewController = navigationController
+                    window?.makeKeyAndVisible()
+                }
+            }
+        } else {
+            NCPasscode.shared.presentPasscode(delegate: self) {
+                NCPasscode.shared.enableTouchFaceID()
+            }
+        }
+        adjust.configAdjust()
+        adjust.subsessionStart()
+        TealiumHelper.shared.start()
         return true
     }
 
