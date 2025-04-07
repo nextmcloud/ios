@@ -264,7 +264,8 @@
 "_want_leave_share_"            = "You will leave the following shares: ";
 "_delete_account_"              = "Remove account";
 "_delete_active_account_"       = "Remove active account";
-//"_want_delete_"                 = "Do you really want to delete?";
+"_want_delete_"                 = "Do you really want to delete?";
+"_want_leave_share_"            = "You will leave the following shares: ";
 "_no_delete_"                   = "No, do not delete";
 "_yes_delete_"                  = "Yes, delete";
 "_information_"                 = "Information";
@@ -298,6 +299,8 @@
 "_autoupload_subfolder_granularity_"    = "Subfolder Granularity";
 "_filenamemask_"                        = "Change filename mask";
 "_filenamemask_footer_"                 = "By default, when a file is uploaded, it automatically gets the following format: yy-mm-dd hh-mm-ss plus a 4-digit counter. If you do not like this format, you can change it here except for the final 4-digit counter, which cannot be omitted.";
+"_autoupload_filenamemask_"         = "Change filename mask";
+"_autoupload_filenamemask_footer_"  = "Change the automatic filename mask";
 "_autoupload_current_folder_"           = "Currently selected folder";
 "_show_hidden_files_"           = "Show hidden files";
 "_format_compatibility_"        = "Most Compatible";
@@ -314,6 +317,7 @@
 "_diagnostics_footer_"          = "Changing log level requires a restart of the app to take effect";
 "_view_log_"                    = "View log file";
 "_clear_log_"                   = "Clear log file";
+"_level_log_"                   = "Set Log level (disabled, standard, maximum)";
 "_set_log_level_"               = "Set Log level";
 "_log_file_clear_alert_"        = "Log file cleared \n successfully!";
 "_connect_server_anyway_"       = "Do you want to connect to the server anyway?";
@@ -341,6 +345,7 @@
 "_access_background_app_refresh_denied_"    = "\"Background App Refresh\" is denied. Please enable it in \"Settings\" otherwise, new photos or videos will not be detected when the application is in the background";
 "_new_photos_starting_"                     = "Only photos or videos starting %@ will be uploaded.";
 "_tutorial_photo_view_"                     = "No photos or videos uploaded yet";
+"_create_full_upload_"                      = "Creating archive … May take a long time. During this process, keep the application active during the transfer as well.";
 "_error_createsubfolders_upload_"           = "Error creating subfolders";
 "_remove_photo_CameraRoll_"                 = "Remove from camera roll";
 "_remove_photo_CameraRoll_desc_"            = "\"Remove from camera roll\" after uploads, a confirmation message will be displayed to delete the uploaded photos or videos from the camera roll. The deleted photos or videos will still be available in the iOS Photos Trash for 30 days.";
@@ -383,6 +388,7 @@
 "_files_no_files_"              = "No files in here";
 "_files_no_folders_"            = "No folders in here";
 "_request_in_progress_"         = "Request to server in progress …";
+"_personal_files_only_"         = "Personal files only";
 
 "audio"                         = "AUDIO";
 "directory"                     = "FOLDERS";
@@ -580,6 +586,9 @@
 "_trash_view_"                      = "Deleted files";
 "_trash_no_trash_"                  = "No files deleted";
 "_trash_no_trash_description_"      = "You can restore deleted files from here";
+"_trash_restore_selected_"          = "Restore selected files";
+"_trash_delete_selected_"           = "Delete selected files";
+"_recover_"                         = "Recover";
 "_confirm_delete_selected_"         = "Are you sure you want to delete the selected items?";
 "_manage_file_offline_"             = "Manage offline files";
 "_set_available_offline_"           = "Set as available offline";
@@ -655,6 +664,8 @@
 "_show_more_results_"       = "Show more results";
 "_waiting_for_"             = "Waiting for:";
 "_reachable_wifi_"          = "network reachable via Wi-Fi or cable";
+"_ITMS-90076_"              = "Due to a change in the Nextcloud application identifier, the settings and password for accessing your cloud are reset, so please re-enter your account data and check your Settings. We are sorry about that.";
+"_password_not_present_"    = "Please re-insert your credentials.";
 "_copy_passphrase_"         = "Copy passphrase";
 "_ok_copy_passphrase_"      = "OK and copy passphrase";
 "_select_color_"            = "Select the color";
