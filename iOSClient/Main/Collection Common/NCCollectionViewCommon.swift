@@ -98,6 +98,16 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
     var emptyImage: UIImage?
 
+    let maxImageGrid: CGFloat = 7
+    var headerMenu: NCSectionHeaderMenu?
+    var headerMenuTransferView = false
+    var headerMenuButtonsView: Bool = true
+    var headerRichWorkspaceDisable: Bool = false
+    
+    var groupByField = "name"
+
+    var emptyImage: UIImage?
+
     internal var emptyDescription: String = ""
     internal var emptyDataPortaitOffset: CGFloat = 0
     internal var emptyDataLandscapeOffset: CGFloat = -20
@@ -431,7 +441,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         dismissTip()
-
         pushed = false
         toggleSelect(isOn: false)
         // Cancel Queue & Retrieves Properties
@@ -476,13 +485,13 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         removeImageCache(metadatas: self.dataSource.getMetadatas())
     }
     
-    func isApplicationUpdated() -> Bool{
+    func isApplicationUpdated() -> Bool {
         let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String ?? ""
         let currentVersion = UserDefaults.standard.string(forKey: "CurrentAppVersion")
         return currentVersion != appVersion
     }
 
-    func redirectToPrivacyViewController(){
+    func redirectToPrivacyViewController() {
         let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
         let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as! UINavigationController
         newViewController.modalPresentationStyle = .fullScreen
@@ -1099,6 +1108,66 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         }
     }
 
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        self.networking.cancelUnifiedSearchFiles()
+
+        self.isSearchingMode = false
+        self.literalSearch = ""
+        self.providers?.removeAll()
+        self.dataSource.removeAll()
+        Task {
+            await self.reloadDataSource()
+        }
+        //
+        mainNavigationController?.hiddenPlusButton(false)
+    }
+
+    // MARK: - TAP EVENT
+
+    func tapMoreListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any) {
+        tapMoreGridItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, image: image, sender: sender)
+    }
+
+    func tapMorePhotoItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any) {
+        tapMoreGridItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, image: image, sender: sender)
+    }
+
+    func tapShareListItem(with ocId: String, ocIdTransfer: String, sender: Any) {
+        if isEditMode { return }
+        guard let metadata = self.database.getMetadataFromOcId(ocId) else { return }
+
+        NCCreate().createShare(viewController: self, metadata: metadata, page: .sharing)
+//        NCDownloadAction.shared.openShare(viewController: self, metadata: metadata, page: .sharing)
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.filebrowser.sharing", data: ["": ""])
+        appDelegate.adjust.trackEvent(TriggerEvent(Sharing.rawValue))
+    }
+
+    func tapMoreGridItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any) {
+        if isEditMode { return }
+        guard let metadata = self.database.getMetadataFromOcId(ocId) else { return }
+//        toggleMenu(metadata: metadata, image: image)
+        if namedButtonMore == NCGlobal.shared.buttonMoreMore || namedButtonMore == NCGlobal.shared.buttonMoreLock {
+            toggleMenu(metadata: metadata, image: image)
+        } else if namedButtonMore == NCGlobal.shared.buttonMoreStop {
+            Task {
+                await cancelSession(metadata: metadata)
+            }
+        }
+    }
+
+    func tapRichWorkspace(_ sender: Any) {
+        if let navigationController = UIStoryboard(name: "NCViewerRichWorkspace", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+            if let viewerRichWorkspace = navigationController.topViewController as? NCViewerRichWorkspace {
+                viewerRichWorkspace.richWorkspaceText = richWorkspaceText ?? ""
+                viewerRichWorkspace.serverUrl = serverUrl
+                viewerRichWorkspace.delegate = self
+
+                navigationController.modalPresentationStyle = .fullScreen
+                self.present(navigationController, animated: true, completion: nil)
+            }
+        }
+    }
+
     @MainActor
     func setSearchBarLoading(_ loading: Bool) {
         guard let textField = searchController?.searchBar.searchTextField else {
@@ -1141,6 +1210,46 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     }
 
     // MARK: - TAP EVENT
+
+    func tapRecommendations(with metadata: tableMetadata) {
+        didSelectMetadata(metadata, withOcIds: false)
+    }
+
+    func tapButtonSwitch(_ sender: Any) {
+        guard !isTransitioning else { return }
+        isTransitioning = true
+
+        guard let layoutForView = NCManageDatabase.shared.getLayoutForView(account: session.account, key: layoutKey, serverUrl: serverUrl) else { return }
+
+        if layoutForView.layout == NCGlobal.shared.layoutGrid {
+            layoutForView.layout = NCGlobal.shared.layoutList
+        } else {
+            layoutForView.layout = NCGlobal.shared.layoutGrid
+        }
+        self.layoutForView = NCManageDatabase.shared.setLayoutForView(layoutForView: layoutForView)
+        self.collectionView.reloadData()
+        self.collectionView.collectionViewLayout.invalidateLayout()
+        self.collectionView.setCollectionViewLayout(layoutForView.layout == NCGlobal.shared.layoutList ? self.listLayout : self.gridLayout, animated: true) {_ in self.isTransitioning = false }
+    }
+
+    func tapButtonOrder(_ sender: Any) {
+        
+//        if let titleButtonHeader = NCKeychain().getTitleButtonHeader(account: session.account), !titleButtonHeader.isEmpty {
+//            layoutForView?.titleButtonHeader = titleButtonHeader
+//        }
+//        NCManageDatabase.shared.setLayoutForView(layoutForView: layoutForView!)
+        
+        let sortMenu = NCSortMenu()
+        sortMenu.toggleMenu(viewController: self, account: session.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
+    }
+
+    func longPressPhotoItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+    
+    func longPressListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+    
+    func tapShareListItem(with objectId: String, indexPath: IndexPath, sender: Any) { }
+
+    func longPressMoreGridItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
     func tapRecommendations(with metadata: tableMetadata) {
         didSelectMetadata(metadata, withOcIds: false)
@@ -1374,8 +1483,6 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         let hasCompactWidth = traitCollection.horizontalSizeClass == .compact
 
         if self.dataSource.isEmpty() {
-//            height = utility.getHeightHeaderEmptyData(view: view, portraitOffset: emptyDataPortaitOffset, landscapeOffset: emptyDataLandscapeOffset)
-//        } else if isEditMode || (isLandscape && isIphone && hasCompactWidth) {
             height = utility.getHeightHeaderEmptyData(view: view, portraitOffset: emptyDataPortaitOffset, landscapeOffset: emptyDataLandscapeOffset, isHeaderMenuTransferViewEnabled: isHeaderMenuTransferViewEnabled() != nil)
         } else if isEditMode || (isLandscape && isIphone) {
             return CGSize.zero
