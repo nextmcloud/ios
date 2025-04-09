@@ -115,11 +115,24 @@ class NCLoginProvider: NSObject, ASWebAuthenticationPresentationContextProviding
 //                statusBar.backgroundColor = NCBrandColor.shared.customer
 //            }
 //        }
-//        loadWebPage(url: url)
-//        self.title = titleView
-//        self.navigationController?.navigationBar.backgroundColor = NCBrandColor.shared.customer
-//    
-//        appDelegate.timerErrorNetworkingDisabled = true
+
+//
+//        nkLog(debug: "Cancelling existing polling task because view did disappear...")
+//        pollingTask?.cancel()
+//        pollingTask = nil
+//        appDelegate.timerErrorNetworkingDisabled = false
+    }
+
+    // MARK: - Navigation
+
+    private func loadWebPage(url: URL) {
+        let language = NSLocale.preferredLanguages[0] as String
+        var request = URLRequest(url: url)
+
+        request.addValue("true", forHTTPHeaderField: "OCS-APIRequest")
+        request.addValue(language, forHTTPHeaderField: "Accept-Language")
+
+        webView.load(request)
     }
 
     ///

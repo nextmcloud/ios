@@ -98,6 +98,9 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
             baseUrlTextField.alpha = 0.5
             urlBase = NCBrandOptions.shared.loginBaseUrl
         }
+        
+        // qrcode
+        qrCode.setImage(UIImage(named: "qrcode")?.image(color: textColor, size: 100), for: .normal)
 
         // certificate
         certificate.setImage(UIImage(named: "certificate")?.image(color: textColor, size: 100), for: .normal)
