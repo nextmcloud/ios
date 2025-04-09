@@ -92,6 +92,19 @@ class NCLoginProvider: UIViewController {
         appDelegate.timerErrorNetworkingDisabled = true
     }
 
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(animated)
+//        // Stop timer error network
+////        appDelegate.timerErrorNetworkingDisabled = true
+//        if let account = NCManageDatabase.shared.getActiveTableAccount(), NCKeychain().getPassword(account: account.account).isEmpty {
+//
+//            let message = "\n" + NSLocalizedString("_password_not_present_", comment: "")
+//            let alertController = UIAlertController(title: titleView, message: message, preferredStyle: .alert)
+//            alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
+//            present(alertController, animated: true)
+//        }
+//    }
+
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         nkLog(debug: "Login provider view did disappear.")
@@ -105,7 +118,7 @@ class NCLoginProvider: UIViewController {
 //        nkLog(debug: "Cancelling existing polling task because view did disappear...")
 //        pollingTask?.cancel()
 //        pollingTask = nil
-        appDelegate.timerErrorNetworkingDisabled = false
+//        appDelegate.timerErrorNetworkingDisabled = false
     }
 
     // MARK: - Navigation
