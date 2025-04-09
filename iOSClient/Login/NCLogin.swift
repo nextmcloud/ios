@@ -99,6 +99,9 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
             baseUrlTextField.isUserInteractionEnabled = false
             baseUrlTextField.alpha = 0.5
         }
+        
+        // qrcode
+        qrCode.setImage(UIImage(named: "qrcode")?.image(color: textColor, size: 100), for: .normal)
 
         // certificate
         certificate.setImage(UIImage(named: "certificate")?.image(color: textColor, size: 100), for: .normal)
