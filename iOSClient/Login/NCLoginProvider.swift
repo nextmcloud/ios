@@ -76,13 +76,20 @@ class NCLoginProvider: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // Stop timer error network
-        appDelegate.timerErrorNetworkingDisabled = true
+//        appDelegate.timerErrorNetworkingDisabled = true
+        if let account = NCManageDatabase.shared.getActiveTableAccount(), NCKeychain().getPassword(account: account.account).isEmpty {
+
+            let message = "\n" + NSLocalizedString("_password_not_present_", comment: "")
+            let alertController = UIAlertController(title: titleView, message: message, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
+            present(alertController, animated: true)
+        }
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         NCActivityIndicator.shared.stop()
-        appDelegate.timerErrorNetworkingDisabled = false
+//        appDelegate.timerErrorNetworkingDisabled = false
     }
 
     func loadWebPage(webView: WKWebView, url: URL) {
@@ -257,7 +264,7 @@ extension NCLoginProvider: WKNavigationDelegate {
         let account: String = "\(username) \(urlBase)"
         let user = username
 
-        NextcloudKit.shared.setup(account: account, user: user, userId: user, password: password, urlBase: urlBase)
+//        NextcloudKit.shared.setup(account: account, user: user, userId: user, password: password, urlBase: urlBase)
         NextcloudKit.shared.getUserProfile(account: account) { _, userProfile, _, error in
             if error == .success, let userProfile {
                 NextcloudKit.shared.appendSession(account: account,
@@ -272,9 +279,9 @@ extension NCLoginProvider: WKNavigationDelegate {
                                                   httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
                                                   groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
                 NCSession.shared.appendSession(account: account, urlBase: urlBase, user: user, userId: userProfile.userId)
-                NCManageDatabase.shared.deleteAccount(account)
+                NCAccount().deleteAccount(account)
                 NCManageDatabase.shared.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
-                self.appDelegate.changeAccount(account, userProfile: userProfile) { }
+                NCAccount().changeAccount(account, userProfile: userProfile, controller: nil) { }
                 let window = UIApplication.shared.firstWindow
                 if window?.rootViewController is NCMainTabBarController {
                     self.dismiss(animated: true)
