@@ -217,7 +217,8 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
             navigationController?.pushViewController(loginViewPage, animated: true)
         } else {
             if NextcloudKit.shared.isNetworkReachable() {
-                appDelegate.openLogin(selector: NCGlobal.shared.introLogin)
+//                appDelegate.openLogin(selector: NCGlobal.shared.introLogin)
+                appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
             } else {
                 showNoInternetAlert()
             }
