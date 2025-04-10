@@ -24,11 +24,14 @@
 #import "CCAdvanced.h"
 #import "CCUtility.h"
 #import "NCBridgeSwift.h"
+#import "AdjustHelper.h"
 
 @interface CCAdvanced ()
 {
     AppDelegate *appDelegate;
     XLFormSectionDescriptor *sectionSize;
+    TealiumHelper *tealium;
+    AdjustHelper *adjust;
 }
 @end
 
@@ -77,6 +80,14 @@
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
+
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"removePhotoCameraRoll" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_remove_photo_CameraRoll_", nil)];
+    row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+    if ([[[NCKeychain alloc] init] removePhotoCameraRoll]) row.value = @"1";
+    else row.value = @0;
+    [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+    [section addFormRow:row];
     
     // Section : Files App --------------------------------------------------------------
     
@@ -121,7 +132,7 @@
     section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_diagnostics_", nil)];
     [form addFormSection:section];
         
-    if ([[NSFileManager defaultManager] fileExistsAtPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] && NCBrandOptions.shared.disable_log == false) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:@""] && NCBrandOptions.shared.disable_log == false) {
         
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"log" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_view_log_", nil)];
         row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
@@ -132,7 +143,7 @@
         row.action.formBlock = ^(XLFormRowDescriptor * sender) {
                     
             [self deselectFormRow:sender];
-            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] isEditingEnabled:false metadata:nil];
+            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:@""] fileNameSource:@"" isEditingEnabled:false metadata:nil];
             [self presentViewController:viewerQuickLook animated:YES completion:nil];
         };
         [section addFormRow:row];
@@ -146,17 +157,10 @@
         row.action.formBlock = ^(XLFormRowDescriptor * sender) {
                     
             [self deselectFormRow:sender];
-
-            [[[NextcloudKit shared] nkCommonInstance] clearFileLog];
             
             NSInteger logLevel = [[NCKeychain alloc] init].logLevel;
             BOOL isSimulatorOrTestFlight = [[[NCUtility alloc] init] isSimulatorOrTestFlight];
             NSString *versionNextcloudiOS = [NSString stringWithFormat:[NCBrandOptions shared].textCopyrightNextcloudiOS, [[[NCUtility alloc] init] getVersionAppWithBuild:true]];
-            if (isSimulatorOrTestFlight) {
-                [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@ (Simulator / TestFlight)", (unsigned long)logLevel, versionNextcloudiOS]];
-            } else {
-                [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@", (unsigned long)logLevel, versionNextcloudiOS]];
-            }
         };
         [section addFormRow:row];
         
@@ -227,6 +231,7 @@
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+    row.cellConfigForSelector[@"tintColor"] = NCBrandColor.shared.customer;
     row.selectorTitle = NSLocalizedString(@"_delete_old_files_", nil);
     row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:NSLocalizedString(@"_never_", nil)],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(365) displayText:NSLocalizedString(@"_1_year_", nil)],
@@ -277,6 +282,7 @@
     appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     self.view.backgroundColor = UIColor.systemGroupedBackgroundColor;
     
+    adjust = [[AdjustHelper alloc] init];
     self.tableView.backgroundColor = UIColor.systemGroupedBackgroundColor;
     
     [self initializeForm];
@@ -338,7 +344,6 @@
         
         NSInteger levelLog = [[rowDescriptor.value valueData] intValue];
         [[NCKeychain alloc] init].logLevel = levelLog;
-        [[[NextcloudKit shared] nkCommonInstance] setLevelLog:levelLog];
     }
 
     if ([rowDescriptor.tag isEqualToString:@"deleteoldfiles"]) {
@@ -371,11 +376,14 @@
 
         [ufs createDirectoryStandard];
 
-        [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
+        [[NCAutoUpload shared] alignPhotoLibraryWithController:self account:appDelegate.account];
 
         [[NCImageCache shared] createMediaCacheWithAccount:appDelegate.account withCacheSize:true];
 
         [[NCActivityIndicator shared] stop];
+        tealium = [[TealiumHelper alloc] init];
+        [tealium trackEventWithTitle:@"magentacloud-app.settings.reset" data:nil];
+        [adjust trackEvent:ResetsApp];
         [self calculateSize];
     });
 }
@@ -404,6 +412,17 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
+
+- (void)clearAllCacheRequest:(XLFormRowDescriptor *)sender
+{
+    [self deselectFormRow:sender];
+
+    [[NCActivityIndicator shared] startActivityWithBackgroundView:nil style: UIActivityIndicatorViewStyleLarge blurEffect:true];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void) {
+        [self clearCache:nil];
+    });
+}
+
 - (void)calculateSize
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -427,6 +446,9 @@
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:NSLocalizedString(@"_want_exit_", nil) preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alertController addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"_ok_", nil) style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+        tealium = [[TealiumHelper alloc] init];
+        [tealium trackEventWithTitle:@"magentacloud-app.settings.logout" data:nil];
+        [adjust trackEvent:Logout];
         [appDelegate resetApplication];
     }]];
     
