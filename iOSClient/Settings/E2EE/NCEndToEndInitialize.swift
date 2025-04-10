@@ -149,8 +149,8 @@ class NCEndToEndInitialize: NSObject {
                        let privateKey = String(data: keyData, encoding: .utf8) {
                         NCPreferences().setEndToEndPrivateKey(account: account, privateKey: privateKey)
                     } else {
-                        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to decrypt Private Key")
-                        NCContentPresenter().messageNotification("E2E decrypt privateKey", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
+                        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: NSLocalizedString("_e2e_error_incorrect_passphrase_", comment: ""))
+                        NCContentPresenter().messageNotification(NSLocalizedString("_e2e_error_passphrase_title", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
 
                         return
                     }
@@ -186,7 +186,9 @@ class NCEndToEndInitialize: NSObject {
                     }
                 })
 
-                let cancel = UIAlertAction(title: "Cancel", style: .cancel)
+                let cancel = UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel) { _ -> Void in
+                }
+
                 alertController.addAction(ok)
                 alertController.addAction(cancel)
                 alertController.addTextField { textField in
