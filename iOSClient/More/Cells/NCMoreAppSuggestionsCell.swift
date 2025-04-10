@@ -50,12 +50,12 @@ class NCMoreAppSuggestionsCell: BaseNCMoreCell {
         moreAppsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(moreAppsTapped(_:))))
     }
 
-    override func setupCell(account: String, controller: NCMainTabBarController?) {
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
-
-        assistantView.isHidden = !capabilities.assistantEnabled
-        self.controller = controller
-    }
+//    override func setupCell(account: String, controller: NCMainTabBarController?) {
+//        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+//
+//        assistantView.isHidden = !capabilities.assistantEnabled
+//        self.controller = controller
+//    }
 
     @objc func assistantTapped(_ sender: Any?) {
         if let viewController = self.window?.rootViewController {
