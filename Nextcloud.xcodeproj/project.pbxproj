@@ -118,6 +118,8 @@
 		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
 		B529E4072E8D1C3E006D9131 /* NCUploadAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B529E4062E8D1C3E006D9131 /* NCUploadAssets.swift */; };
 		B529E4082E8D1C3E006D9131 /* NCUploadAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B529E4062E8D1C3E006D9131 /* NCUploadAssets.swift */; };
+		B568C2AD2DA7A9000072FCB4 /* AssetUploadTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2AC2DA7A9000072FCB4 /* AssetUploadTest.swift */; };
+		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
 		F0A1B2C430B5000100D4E5F6 /* NCMediaViewerFloatingTitleViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A1B2C330B5000100D4E5F6 /* NCMediaViewerFloatingTitleViewTests.swift */; };
@@ -2377,6 +2379,7 @@
 				CA1700013000000000000002 /* NCUploadedAssetsCleanupTests.swift */,
 				AA52EB452D42AC5A0089C348 /* Placeholder.swift */,
 				B568C2AC2DA7A9000072FCB4 /* AssetUploadTest.swift */,
+				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
