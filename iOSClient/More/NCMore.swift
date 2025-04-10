@@ -24,6 +24,7 @@
 import UIKit
 import NextcloudKit
 import SafariServices
+import SwiftUI
 
 class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
@@ -43,6 +44,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     private let utilityFileSystem = NCUtilityFileSystem()
     private let utility = NCUtility()
     private let database = NCManageDatabase.shared
+    private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+    private var tabAccount: tableAccount?
 
     private struct Section {
         var items: [NKExternalSite]
@@ -88,8 +91,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        appDelegate.activeViewController = self
-//        navigationController?.setGroupAppearance()
+        appDelegate.activeViewController = self
+        navigationController?.setGroupAppearance()
         loadItems()
         changeTheming()
         tableView.reloadData()
@@ -219,13 +222,16 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         // Display Name user & Quota
 
-
-        if tableAccount.quotaRelative > 0 {
+        if let activeAccount = NCManageDatabase.shared.getActiveTableAccount() {
+            
+            self.tabAccount = activeAccount
+            
+            if tableAccount.quotaRelative > 0 {
                 progressQuota.progress = Float(tableAccount.quotaRelative) / 100
             } else {
                 progressQuota.progress = 0
             }
-
+            
             switch tableAccount.quotaTotal {
             case -1:
                 quota = "0"
@@ -236,15 +242,34 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             default:
                 quota = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
             }
-
+            
             let quotaUsed: String = utilityFileSystem.transformedSize(tableAccount.quotaUsed)
             let quota2: String = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
             let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
-
+            
             labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
             
             quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
             quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
+        }
+        
+        // ITEM : External
+        if NCBrandOptions.shared.disable_more_external_site == false {
+            if let externalSites = NCManageDatabase.shared.getAllExternalSites(account: session.account) {
+                for externalSite in externalSites {
+                    if !externalSite.name.isEmpty, !externalSite.url.isEmpty, let urlEncoded = externalSite.url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+                        item = NKExternalSite()
+                        item.name = externalSite.name
+                        item.url = urlEncoded
+                        item.icon = "network"
+                        if externalSite.type == "settings" {
+                            item.icon = "gear"
+                        }
+                        externalSiteMenu.append(item)
+                    }
+                }
+            }
+        }
 
         loadSections()
     }
@@ -348,13 +373,11 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         } else if section.type == .moreApps {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: NCMoreAppSuggestionsCell.reuseIdentifier, for: indexPath) as? NCMoreAppSuggestionsCell else { return UITableViewCell() }
-            cell.setupCell(account: session.account, controller: controller)
+            cell.controller = self.controller
             return cell
         } else {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: CCCellMore.reuseIdentifier, for: indexPath) as? CCCellMore else { return UITableViewCell() }
-
-            cell.setupCell(account: session.account, controller: controller)
-
+            
             let item = sections[indexPath.section].items[indexPath.row]
 
             cell.imageIcon?.image = utility.loadImage(named: item.icon).image(color: NCBrandColor.shared.iconColor, size: 25)
@@ -395,22 +418,9 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             let alertController = UIAlertController(title: "", message: NSLocalizedString("_want_delete_", comment: ""), preferredStyle: .alert)
 
             let actionYes = UIAlertAction(title: NSLocalizedString("_yes_delete_", comment: ""), style: .default) { (_: UIAlertAction) in
-                if NCBrandOptions.shared.disable_intro {
-                    if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
-                        viewController.controller = self.controller
-                        let navigationController = UINavigationController(rootViewController: viewController)
-                        navigationController.modalPresentationStyle = .fullScreen
-                        self.present(navigationController, animated: true)
-                    }
-                } else {
-                    if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
-                        if let viewController = navigationController.topViewController as? NCIntroViewController {
-                            viewController.controller = self.controller
-                        }
-                        navigationController.modalPresentationStyle = .fullScreen
-                        self.present(navigationController, animated: true)
-                    }
-                }
+                let manageAccount = CCManageAccount()
+                manageAccount.delete(self.session.account)
+                self.appDelegate.openLogin(viewController: self, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
             }
 
             let actionNo = UIAlertAction(title: NSLocalizedString("_no_delete_", comment: ""), style: .default) { (_: UIAlertAction) in
