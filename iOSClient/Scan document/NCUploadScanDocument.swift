@@ -287,7 +287,7 @@ class NCUploadScanDocument: ObservableObject {
 // MARK: - Delegate
 
 extension NCUploadScanDocument: NCSelectDelegate {
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
         if let serverUrl = serverUrl {
             self.serverUrl = serverUrl
         }
