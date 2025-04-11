@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import XLForm
 
 class PNGImageSaveSwitchView: XLFormBaseCell{
     @IBOutlet weak var cellLabel: UILabel!
