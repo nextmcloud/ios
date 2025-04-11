@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import XLForm
 
 class TextFileWithOcrSwitchView: XLFormBaseCell{
     @IBOutlet weak var switchControl: UISwitch!
