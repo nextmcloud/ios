@@ -170,7 +170,6 @@ extension AppDelegate {
                             viewController.titleForm = NSLocalizedString("_create_new_document_", comment: "")
 
                             controller.present(navigationController, animated: true, completion: nil)
-
                         }
                     }
                 )
