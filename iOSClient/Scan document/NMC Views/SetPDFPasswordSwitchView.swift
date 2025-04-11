@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import XLForm
 
 class SetPDFPasswordSwitchView: XLFormBaseCell{
     @IBOutlet weak var cellLabel: UILabel!
