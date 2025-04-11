@@ -93,6 +93,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     }
 
     func initCell() {
+        
+        imageItem.layer.cornerRadius = 6
+        imageItem.layer.masksToBounds = true
+        
         accessibilityHint = nil
         accessibilityLabel = nil
         accessibilityValue = nil
@@ -202,7 +206,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         let locationInButton = touch.location(in: buttonMore)
         let result = buttonMore.bounds.contains(locationInButton)
-
         return result
     }
 
@@ -240,27 +243,47 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             moreContainer.isHidden = false
             backgroundView = nil
         }
+    }
+    
+    func selected(_ status: Bool, isEditMode: Bool) {
+        // NMC-1190 - iOS - Files - Deleting files while files are still uploading won't delete properly : to fix this issue remove check for !metadata.isInTransfer in below line
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.isInTransfer, !metadata.e2eEncrypted else {
+//        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
+            backgroundView = nil
+            separator.isHidden = false
+            imageSelect.isHidden = true
+
+            return
+        }
+
         if status {
+            var blurEffect: UIVisualEffect?
             var blurEffectView: UIView?
-            blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
-            blurEffectView?.backgroundColor = .lightGray
+            if traitCollection.userInterfaceStyle == .dark {
+                blurEffect = UIBlurEffect(style: .dark)
+                blurEffectView = UIVisualEffectView(effect: blurEffect)
+                blurEffectView?.backgroundColor = .black
+            } else {
+                blurEffect = UIBlurEffect(style: .extraLight)
+                blurEffectView = UIVisualEffectView(effect: blurEffect)
+                blurEffectView?.backgroundColor = .lightGray
+            }
             blurEffectView?.frame = self.bounds
             blurEffectView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
             backgroundView = blurEffectView
+            imageSelect.image = NCImageCache.images.checkedYes
             separator.isHidden = true
         } else {
             imageSelect.image = NCImageCache.shared.getImageCheckedNo(color: color)
             backgroundView = nil
             separator.isHidden = false
         }
-
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
-        labelInfo.text = NCUtility().getRelativeDateTitle(date as Date)
-        labelSubinfo.text = NCUtilityFileSystem().transformedSize(size)
-//        labelSubinfo.text = ""
+        labelInfo.text = NCUtility().dateDiff(date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
+        labelSubinfo.text = ""
     }
 
     func setAccessibility(label: String, value: String) {
@@ -370,6 +393,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             imageStatus.layer.cornerRadius = imageStatus.bounds.width / 2
         }
     }
+}
+
+protocol NCListCellDelegate: AnyObject {
+    func tapShareListItem(with ocId: String, ocIdTransfer: String, sender: Any)
+    func tapMoreListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any)
+    func longPressMoreListItem(with ocId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
+    func longPressListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
 }
 
 // MARK: - List Layout
