@@ -139,8 +139,35 @@ extension tableMetadata {
         (fileNameView as NSString).deletingPathExtension
     }
 
+    var isRenameable: Bool {
+        if !NCMetadataPermissions.canRename(self) {
+            return false
+        }
+        if lock {
+            return false
+        }
+        if !isDirectoryE2EE && e2eEncrypted {
+            return false
+        }
+        return true
+    }
+
+    var isPrintable: Bool {
+        if isDocumentViewableOnly {
+            return false
+        }
+        if ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/") || classFile == NKCommon.TypeClassFile.image.rawValue {
+            return true
+        }
+        return false
+    }
+    
     var isSavebleInCameraRoll: Bool {
         return (classFile == NKTypeClassFile.image.rawValue && contentType != "image/svg+xml") || classFile == NKTypeClassFile.video.rawValue
+    }
+    
+    var isDocumentViewableOnly: Bool {
+        sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKCommon.TypeClassFile.document.rawValue
     }
 
     var isAudioOrVideo: Bool {
@@ -168,7 +195,7 @@ extension tableMetadata {
     }
 
     var isCopyableInPasteboard: Bool {
-        !directory
+        !isDocumentViewableOnly && !directory
     }
 
 #if !EXTENSION_FILE_PROVIDER_EXTENSION
@@ -177,11 +204,11 @@ extension tableMetadata {
     }
 
     var isCopyableMovable: Bool {
-        !isDirectoryE2EE && !e2eEncrypted
+        !isDocumentViewableOnly && !isDirectoryE2EE && !e2eEncrypted
     }
 
     var isModifiableWithQuickLook: Bool {
-        if directory || isDirectoryE2EE {
+        if directory || isDocumentViewableOnly || isDirectoryE2EE {
             return false
         }
         return isPDF || isImage
@@ -212,18 +239,70 @@ extension tableMetadata {
     }
 
     var canSetAsAvailableOffline: Bool {
-        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
+//        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
+        return session.isEmpty && !isDocumentViewableOnly
     }
 
-    // Return if is sharable
-    func isSharable() -> Bool {
-        guard let capabilities = NCNetworking.shared.capabilities[account] else {
+    var canShare: Bool {
+        return session.isEmpty && !isDocumentViewableOnly && !directory && !NCBrandOptions.shared.disable_openin_file
+    }
+
+    var canUnsetDirectoryAsE2EE: Bool {
+        return !isDirectoryE2EE && directory && size == 0 && e2eEncrypted && NCPreferences().isEndToEndEnabled(account: account)
+    }
+
+    var canOpenExternalEditor: Bool {
+        if isDocumentViewableOnly {
             return false
         }
-        if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE) {
-            return false
-        }
-        return true
+        let utility = NCUtility()
+        let editors = utility.editorsDirectEditing(account: account, contentType: contentType)
+        let isRichDocument = utility.isTypeFileRichDocument(self)
+        return classFile == NKCommon.TypeClassFile.document.rawValue && editors.contains(NCGlobal.shared.editorText) && ((editors.contains(NCGlobal.shared.editorOnlyoffice) || isRichDocument))
+    }
+
+    var isWaitingTransfer: Bool {
+        status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusWaitUpload || status == NCGlobal.shared.metadataStatusUploadError
+    }
+
+    var isInTransfer: Bool {
+        status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusUploading
+    }
+
+    var isTransferInForeground: Bool {
+        (status > 0 && (chunk > 0 || e2eEncrypted))
+    }
+    
+    var isDownloadUpload: Bool {
+        status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusUploading
+    }
+    
+    var isDownload: Bool {
+        status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusDownloading
+    }
+
+    var isUpload: Bool {
+        status == NCGlobal.shared.metadataStatusWaitUpload || status == NCGlobal.shared.metadataStatusUploading
+    }
+
+    var isDirectory: Bool {
+        directory
+    }
+
+    @objc var isDirectoryE2EE: Bool {
+        return NCUtilityFileSystem().isDirectoryE2EE(serverUrl: serverUrl, urlBase: urlBase, userId: userId, account: account)
+    }
+
+    var isLivePhoto: Bool {
+        !livePhotoFile.isEmpty
+    }
+
+    var isNotFlaggedAsLivePhotoByServer: Bool {
+        !isFlaggedAsLivePhotoByServer
+    }
+
+    var imageSize: CGSize {
+        CGSize(width: width, height: height)
     }
 
     var hasPreviewBorder: Bool {
@@ -331,6 +410,17 @@ extension tableMetadata {
     /// Returns false if the user is lokced out of the file. I.e. The file is locked but by somone else
     func canUnlock(as user: String) -> Bool {
         return !lock || (lockOwner == user && lockOwnerType == 0)
+    }
+
+    // Return if is sharable
+    func isSharable() -> Bool {
+        guard let capabilities = NCNetworking.shared.capabilities[account] else {
+            return false
+        }
+        if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE) {
+            return false
+        }
+        return !e2eEncrypted
     }
 
     /// Returns a detached (unmanaged) deep copy of the current `tableMetadata` object.
@@ -1103,6 +1193,37 @@ extension NCManageDatabase {
                 .filter(predicate)
                 .map { $0.detachedCopy() }
         } ?? []
+    }
+
+    func getTableMetadatasDirectoryFavoriteIdentifierRankAsync(account: String) async -> [String: NSNumber] {
+        let result = await performRealmReadAsync { realm in
+            var listIdentifierRank: [String: NSNumber] = [:]
+            var counter = Int64(10)
+
+            let results = realm.objects(tableMetadata.self)
+                .filter("account == %@ AND directory == true AND favorite == true", account)
+                .sorted(byKeyPath: "fileNameView", ascending: true)
+
+            results.forEach { item in
+                counter += 1
+                listIdentifierRank[item.ocId] = NSNumber(value: counter)
+            }
+            
+            return listIdentifierRank
+        }
+        return result ?? [:]
+    }
+
+    @objc func clearMetadatasUpload(account: String) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let results = realm.objects(tableMetadata.self).filter("account == %@ AND (status == %d OR status == %d)", account, NCGlobal.shared.metadataStatusWaitUpload, NCGlobal.shared.metadataStatusUploadError)
+                realm.delete(results)
+            }
+        } catch let error {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        }
     }
 
     func getAssetLocalIdentifiersUploadedAsync() async -> [String]? {

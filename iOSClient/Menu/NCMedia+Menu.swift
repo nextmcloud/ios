@@ -28,9 +28,17 @@ import NextcloudKit
 extension NCMedia {
     func tapSelect() {
         self.isEditMode = false
-        self.selectOcId.removeAll()
-        self.selectIndexPath.removeAll()
+        self.fileSelect.removeAll()
         self.collectionView?.reloadData()
+    }
+
+    func selectAll() {
+        if !fileSelect.isEmpty, self.dataSource.metadatas.count == fileSelect.count {
+            fileSelect = []
+        } else {
+            fileSelect = self.dataSource.metadatas.compactMap({ $0.ocId })
+        }
+        self.collectionView.reloadData()
     }
 
     func toggleMenu() {
@@ -44,7 +52,7 @@ extension NCMedia {
                 actions.append(
                     NCMenuAction(
                         title: NSLocalizedString("_select_", comment: ""),
-                        icon: utility.loadImage(named: "selectFull", color: NCBrandColor.shared.iconColor),
+                        icon: utility.loadImage(named: "selectFull", colors: [NCBrandColor.shared.iconColor]),
                         action: { _ in
                             self.isEditMode = true
                         }
@@ -57,13 +65,13 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_viewimage_show_", comment: ""),
-                    icon: utility.loadImage(named: showOnlyImages ? "nocamera" : "file_photo_menu",color: NCBrandColor.shared.iconColor),
+                    icon: utility.loadImage(named: showOnlyImages ? "nocamera" : "file_photo_menu", colors: [NCBrandColor.shared.iconColor]),
                     selected: showOnlyImages,
                     on: true,
                     action: { _ in
                         self.showOnlyImages = true
                         self.showOnlyVideos = false
-                        self.reloadDataSource()
+                        self.loadDataSource()
                     }
                 )
             )
@@ -71,13 +79,13 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_viewvideo_show_", comment: ""),
-                    icon: utility.loadImage(named: showOnlyVideos ? "videono" : "videoyes",color: NCBrandColor.shared.iconColor),
+                    icon: utility.loadImage(named: showOnlyVideos ? "videono" : "videoyes", colors: [NCBrandColor.shared.iconColor]),
                     selected: showOnlyVideos,
                     on: true,
                     action: { _ in
                         self.showOnlyImages = false
                         self.showOnlyVideos = true
-                        self.reloadDataSource()
+                        self.loadDataSource()
                     }
                 )
             )
@@ -85,13 +93,13 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_show_all_", comment: ""),
-                    icon: utility.loadImage(named: "photo.on.rectangle.angled", color: NCBrandColor.shared.iconColor),
+                    icon: utility.loadImage(named: "photo.on.rectangle.angled", colors: [NCBrandColor.shared.iconColor]),
                     selected: !showOnlyImages && !showOnlyVideos,
                     on: true,
                     action: { _ in
                         self.showOnlyImages = false
                         self.showOnlyVideos = false
-                        self.reloadDataSource()
+                        self.loadDataSource()
                     }
                 )
             )
@@ -101,7 +109,7 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_select_media_folder_", comment: ""),
-                    icon: utility.loadImage(named: "folder", color: NCBrandColor.shared.iconColor),
+                    icon: utility.loadImage(named: "folder", colors: [NCBrandColor.shared.iconColor]),
                     action: { _ in
                         if let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as? UINavigationController,
                            let viewController = navigationController.topViewController as? NCSelect {
@@ -109,7 +117,6 @@ extension NCMedia {
                             viewController.delegate = self
                             viewController.typeOfCommandView = .select
                             viewController.type = "mediaFolder"
-                            viewController.selectIndexPath = self.selectIndexPath
 
                             self.present(navigationController, animated: true, completion: nil)
                         }
@@ -120,12 +127,12 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_modified_date_", comment: ""),
-                    icon: utility.loadImage(named: "sortFileNameAZ", color: NCBrandColor.shared.iconColor),
+                    icon: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
                     selected: NCKeychain().mediaSortDate == "date",
                     on: true,
                     action: { _ in
                         NCKeychain().mediaSortDate = "date"
-                        self.reloadDataSource()
+                        self.loadDataSource()
                     }
                 )
             )
@@ -133,12 +140,12 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_created_date_", comment: ""),
-                    icon: utility.loadImage(named: "sortFileNameAZ", color: NCBrandColor.shared.iconColor),
+                    icon: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
                     selected: NCKeychain().mediaSortDate == "creationDate",
                     on: true,
                     action: { _ in
                         NCKeychain().mediaSortDate = "creationDate"
-                        self.reloadDataSource()
+                        self.loadDataSource()
                     }
                 )
             )
@@ -146,12 +153,12 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_media_by_upload_date_", comment: ""),
-                    icon: utility.loadImage(named: "sortFileNameAZ", color: NCBrandColor.shared.iconColor),
+                    icon: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
                     selected: NCKeychain().mediaSortDate == "uploadDate",
                     on: true,
                     action: { _ in
                         NCKeychain().mediaSortDate = "uploadDate"
-                        self.reloadDataSource()
+                        self.loadDataSource()
                     }
                 )
             )
@@ -164,39 +171,45 @@ extension NCMedia {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_cancel_", comment: ""),
-                    icon: utility.loadImage(named: "xmark", color: NCBrandColor.shared.iconColor),
+                    icon: utility.loadImage(named: "xmark", colors: [NCBrandColor.shared.iconColor]),
                     action: { _ in self.tapSelect() }
                 )
             )
 
-            guard !selectOcId.isEmpty else { return }
-            let selectedMetadatas = selectOcId.compactMap(NCManageDatabase.shared.getMetadataFromOcId)
+            if fileSelect.count != dataSource.metadatas.count {
+                actions.append(.selectAllAction(action: selectAll))
+            }
+            guard !fileSelect.isEmpty else { return }
+            
+            actions.append(.seperator(order: 0))
+
+            let selectedMetadatas = fileSelect.compactMap(NCManageDatabase.shared.getMetadataFromOcId)
 
             //
             // OPEN IN
             //
-            actions.append(.openInAction(selectedMetadatas: selectedMetadatas, viewController: self, completion: tapSelect))
+            actions.append(.openInAction(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: tapSelect))
 
             //
             // SAVE TO PHOTO GALLERY
             //
-            actions.append(.saveMediaAction(selectedMediaMetadatas: selectedMetadatas, completion: tapSelect))
+            actions.append(.saveMediaAction(selectedMediaMetadatas: selectedMetadatas, controller: self.controller, completion: tapSelect))
 
             //
             // COPY - MOVE
             //
-            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, indexPath: selectIndexPath, completion: tapSelect))
+            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: tapSelect))
 
             //
             // COPY
             //
-            actions.append(.copyAction(selectOcId: selectOcId, completion: tapSelect))
+            actions.append(.copyAction(fileSelect: fileSelect, controller: self.controller, completion: tapSelect))
 
             //
             // DELETE
             // can't delete from cache because is needed for NCMedia view, and if locked can't delete from server either.
-            if !selectedMetadatas.contains(where: { $0.lock && $0.lockOwner != appDelegate.userId }) {
-                actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, indexPath: selectIndexPath, metadataFolder: nil, viewController: self, completion: tapSelect))
+            if !selectedMetadatas.contains(where: { $0.lock && $0.lockOwner != session.userId }) {
+                actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: tapSelect))
             }
         }
     }
