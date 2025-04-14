@@ -177,6 +177,10 @@ extension tableMetadata {
     var isSavebleInCameraRoll: Bool {
         return (classFile == NKTypeClassFile.image.rawValue && contentType != "image/svg+xml") || classFile == NKTypeClassFile.video.rawValue
     }
+    
+    var isDocumentViewableOnly: Bool {
+        sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKCommon.TypeClassFile.document.rawValue
+    }
 
     var isDocumentViewableOnly: Bool {
         sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKTypeClassFile.document.rawValue
@@ -207,7 +211,7 @@ extension tableMetadata {
     }
 
     var isCopyableInPasteboard: Bool {
-        !directory
+        !isDocumentViewableOnly && !directory
     }
 
 #if !EXTENSION_FILE_PROVIDER_EXTENSION
@@ -216,11 +220,11 @@ extension tableMetadata {
     }
 
     var isCopyableMovable: Bool {
-        !isDirectoryE2EE && !e2eEncrypted
+        !isDocumentViewableOnly && !isDirectoryE2EE && !e2eEncrypted
     }
 
     var isModifiableWithQuickLook: Bool {
-        if directory || isDirectoryE2EE {
+        if directory || isDocumentViewableOnly || isDirectoryE2EE {
             return false
         }
         return isPDF || isImage
@@ -251,7 +255,8 @@ extension tableMetadata {
     }
 
     var canSetAsAvailableOffline: Bool {
-        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
+//        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
+        return session.isEmpty && !isDocumentViewableOnly
     }
 
     var canShare: Bool {
@@ -266,6 +271,32 @@ extension tableMetadata {
         return !isDirectoryE2EE && directory && size == 0 && e2eEncrypted && NCPreferences().isEndToEndEnabled(account: account)
     }
 
+    var canOpenExternalEditor: Bool {
+        if isDocumentViewableOnly {
+            return false
+        }
+        let utility = NCUtility()
+        let editors = utility.editorsDirectEditing(account: account, contentType: contentType)
+        let isRichDocument = utility.isTypeFileRichDocument(self)
+        return classFile == NKCommon.TypeClassFile.document.rawValue && editors.contains(NCGlobal.shared.editorText) && ((editors.contains(NCGlobal.shared.editorOnlyoffice) || isRichDocument))
+    }
+
+    var isWaitingTransfer: Bool {
+        status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusWaitUpload || status == NCGlobal.shared.metadataStatusUploadError
+    }
+
+    var isInTransfer: Bool {
+        status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusUploading
+    }
+
+    var isTransferInForeground: Bool {
+        (status > 0 && (chunk > 0 || e2eEncrypted))
+    }
+    
+    var isDownloadUpload: Bool {
+        status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusUploading
+    }
+    
     var isDownload: Bool {
         status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusDownloading
     }
@@ -1303,10 +1334,21 @@ extension NCManageDatabase {
                 counter += 1
                 listIdentifierRank[item.ocId] = NSNumber(value: counter)
             }
-
             return listIdentifierRank
         }
         return result ?? [:]
+    }
+
+    @objc func clearMetadatasUpload(account: String) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let results = realm.objects(tableMetadata.self).filter("account == %@ AND (status == %d OR status == %d)", account, NCGlobal.shared.metadataStatusWaitUpload, NCGlobal.shared.metadataStatusUploadError)
+                realm.delete(results)
+            }
+        } catch let error {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        }
     }
 
     func getAssetLocalIdentifiersUploadedAsync() async -> [String]? {
