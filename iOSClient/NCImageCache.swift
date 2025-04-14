@@ -25,7 +25,16 @@ final class NCImageCache: @unchecked Sendable {
         "\(ocId)-\(etag)-\(ext)"
     }
 
-    private init() {
+    public var isLoadingCache: Bool = false
+    public var controller: UITabBarController?
+
+    var createMediaCacheInProgress: Bool = false
+    let showAllPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload')"
+    let showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
+    let showOnlyPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND classFile == %@ AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
+
+    init() {
+
         cache.countLimit = maximumCachedImages
 
         NotificationCenter.default.addObserver(
@@ -34,6 +43,11 @@ final class NCImageCache: @unchecked Sendable {
             queue: nil
         ) { [weak self] _ in
             self?.removeAll()
+        }
+
+        observerToken = NotificationCenter.default.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: nil) { _ in
+            self.cache.removeAll()
+            self.cache = LRUCache<String, UIImage>(countLimit: self.countLimit)
         }
 
         NotificationCenter.default.addObserver(
@@ -63,6 +77,9 @@ final class NCImageCache: @unchecked Sendable {
     }
     
     func getMediaMetadatas(account: String, predicate: NSPredicate? = nil) -> ThreadSafeArray<tableMetadata>? {
+        guard let tableAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", account)) else { return nil }
+        let startServerUrl = NCUtilityFileSystem().getHomeServer(urlBase: tableAccount.urlBase, userId: tableAccount.userId) + tableAccount.mediaPath
+        let predicateBoth = NSPredicate(format: showBothPredicateMediaString, account, startServerUrl)
         return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
     }
 
