@@ -11,14 +11,16 @@ import Foundation
 extension NCTrash: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let resultTableTrash = datasource?[indexPath.item] else { return }
+        let resultTableTrash = datasource[indexPath.item]
+
         guard !isEditMode else {
-            if let index = selectOcId.firstIndex(of: resultTableTrash.fileId) {
-                selectOcId.remove(at: index)
+            if let index = fileSelect.firstIndex(of: resultTableTrash.fileId) {
+                fileSelect.remove(at: index)
             } else {
-                selectOcId.append(resultTableTrash.fileId)
+                fileSelect.append(resultTableTrash.fileId)
             }
             collectionView.reloadItems(at: [indexPath])
+            tabBarSelect.update(selectOcId: fileSelect)
             setNavigationRightItems()
             return
         }
@@ -37,8 +39,10 @@ extension NCTrash: UICollectionViewDelegate {
 extension NCTrash: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        let numberOfItems = datasource.count
+        emptyDataSet?.numberOfItemsInSection(numberOfItems, section: section)
         setNavigationRightItems()
-        return datasource?.count ?? 0
+        return numberOfItems
     }
 
     func collectionView(_ collectionView: UICollectionView,
@@ -159,7 +163,7 @@ extension NCTrash: UICollectionViewDataSource {
         if resultTableTrash.iconName.isEmpty {
             image = NCImageCache.shared.getImageFile()
         } else {
-            image = NCUtility().loadImage(named: resultTableTrash.iconName, useTypeIconFile: true, account: resultTableTrash.account)
+            image = UIImage(named: resultTableTrash.iconName)
         }
 
         if let imageIcon = utility.getImage(ocId: resultTableTrash.fileId,
@@ -304,8 +308,13 @@ extension NCTrash: UICollectionViewDataSource {
 extension NCTrash: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        if datasource.isEmpty {
+            let height = utility.getHeightHeaderEmptyData(view: view, portraitOffset: 0, landscapeOffset: -20)
+            return CGSize(width: collectionView.frame.width, height: height)
+        }
         return CGSize(width: collectionView.frame.width, height: NCGlobal.shared.heightButtonsView)
     }
+
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 85)
     }
