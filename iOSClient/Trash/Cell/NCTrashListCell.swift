@@ -137,8 +137,11 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
         }
         if status {
             var blurEffectView: UIView?
-            blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
-            blurEffectView?.backgroundColor = .lightGray
+            var blurEffect: UIVisualEffect?
+            let traitCollectionUserInterfaceStyleDark = traitCollection.userInterfaceStyle == .dark
+            blurEffect = UIBlurEffect(style: traitCollectionUserInterfaceStyleDark ? .dark : .extraLight)
+            blurEffectView = UIVisualEffectView(effect: blurEffect)
+            blurEffectView?.backgroundColor = traitCollectionUserInterfaceStyleDark ? .black : .lightGray
             blurEffectView?.frame = self.bounds
             blurEffectView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
