@@ -177,6 +177,10 @@ extension tableMetadata {
     var isSavebleInCameraRoll: Bool {
         return (classFile == NKTypeClassFile.image.rawValue && contentType != "image/svg+xml") || classFile == NKTypeClassFile.video.rawValue
     }
+    
+    var isDocumentViewableOnly: Bool {
+        sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKCommon.TypeClassFile.document.rawValue
+    }
 
     var isDocumentViewableOnly: Bool {
         sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKTypeClassFile.document.rawValue
@@ -207,7 +211,7 @@ extension tableMetadata {
     }
 
     var isCopyableInPasteboard: Bool {
-        !directory
+        !isDocumentViewableOnly && !directory
     }
 
 #if !EXTENSION_FILE_PROVIDER_EXTENSION
@@ -216,11 +220,11 @@ extension tableMetadata {
     }
 
     var isCopyableMovable: Bool {
-        !isDirectoryE2EE && !e2eEncrypted
+        !isDocumentViewableOnly && !isDirectoryE2EE && !e2eEncrypted
     }
 
     var isModifiableWithQuickLook: Bool {
-        if directory || isDirectoryE2EE {
+        if directory || isDocumentViewableOnly || isDirectoryE2EE {
             return false
         }
         return isPDF || isImage
@@ -251,7 +255,8 @@ extension tableMetadata {
     }
 
     var canSetAsAvailableOffline: Bool {
-        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
+//        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
+        return session.isEmpty && !isDocumentViewableOnly
     }
 
     func isSharable() -> Bool {
@@ -1317,10 +1322,21 @@ extension NCManageDatabase {
                 counter += 1
                 listIdentifierRank[item.ocId] = NSNumber(value: counter)
             }
-
             return listIdentifierRank
         }
         return result ?? [:]
+    }
+
+    @objc func clearMetadatasUpload(account: String) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let results = realm.objects(tableMetadata.self).filter("account == %@ AND (status == %d OR status == %d)", account, NCGlobal.shared.metadataStatusWaitUpload, NCGlobal.shared.metadataStatusUploadError)
+                realm.delete(results)
+            }
+        } catch let error {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        }
     }
 
     func getAssetLocalIdentifiersUploadedAsync() async -> [String]? {
