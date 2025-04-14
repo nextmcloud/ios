@@ -74,7 +74,7 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
 
         ]
 
-        imageRestore.image = utility.loadImage(named: "restore", color: NCBrandColor.shared.iconColor)
+        imageRestore.image = utility.loadImage(named: "restore", colors: [NCBrandColor.shared.iconColor])
 
         imageMore.image = UIImage(systemName: "trash")
         imageMore.tintColor = NCBrandColor.shared.iconColor
@@ -113,8 +113,11 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
         }
         if status {
             var blurEffectView: UIView?
-            blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
-            blurEffectView?.backgroundColor = .lightGray
+            var blurEffect: UIVisualEffect?
+            let traitCollectionUserInterfaceStyleDark = traitCollection.userInterfaceStyle == .dark
+            blurEffect = UIBlurEffect(style: traitCollectionUserInterfaceStyleDark ? .dark : .extraLight)
+            blurEffectView = UIVisualEffectView(effect: blurEffect)
+            blurEffectView?.backgroundColor = traitCollectionUserInterfaceStyleDark ? .black : .lightGray
             blurEffectView?.frame = self.bounds
             blurEffectView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             imageSelect.image = NCImageCache.shared.getImageCheckedYes()
