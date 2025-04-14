@@ -79,7 +79,7 @@ import KeychainAccess
         }
     }
 
-    var resetAppCounterFail: Bool {
+    @objc var resetAppCounterFail: Bool {
         get {
             if let value = try? keychain.get("resetAppCounterFail"), let result = Bool(value) {
                 return result
@@ -115,7 +115,7 @@ import KeychainAccess
         }
     }
 
-    var requestPasscodeAtStart: Bool {
+    @objc var requestPasscodeAtStart: Bool {
         get {
             let keychainOLD = Keychain(service: "Crypto Cloud")
             if let value = keychainOLD["notPasscodeAtStart"], !value.isEmpty {
@@ -138,7 +138,7 @@ import KeychainAccess
         }
     }
 
-    var touchFaceID: Bool {
+    @objc var touchFaceID: Bool {
         get {
             migrate(key: "enableTouchFaceID")
             if let value = try? keychain.get("enableTouchFaceID"), let result = Bool(value) {
@@ -155,7 +155,7 @@ import KeychainAccess
         return passcode != nil && requestPasscodeAtStart
     }
 
-    var incrementalNumber: String {
+    @objc var incrementalNumber: String {
         migrate(key: "incrementalnumber")
         var incrementalString = String(format: "%04ld", 0)
         if let value = try? keychain.get("incrementalnumber"), var result = Int(value) {
@@ -166,7 +166,20 @@ import KeychainAccess
         return incrementalString
     }
 
-    var formatCompatibility: Bool {
+    @objc var showHiddenFiles: Bool {
+        get {
+            migrate(key: "showHiddenFiles")
+            if let value = try? keychain.get("showHiddenFiles"), let result = Bool(value) {
+                return result
+            }
+            return false
+        }
+        set {
+            keychain["showHiddenFiles"] = String(newValue)
+        }
+    }
+
+    @objc var formatCompatibility: Bool {
         get {
             migrate(key: "formatCompatibility")
             if let value = try? keychain.get("formatCompatibility"), let result = Bool(value) {
@@ -179,7 +192,7 @@ import KeychainAccess
         }
     }
 
-    var disableFilesApp: Bool {
+    @objc var disableFilesApp: Bool {
         get {
             migrate(key: "disablefilesapp")
             if let value = try? keychain.get("disablefilesapp"), let result = Bool(value) {
@@ -192,7 +205,7 @@ import KeychainAccess
         }
     }
 
-    var livePhoto: Bool {
+    @objc var livePhoto: Bool {
         get {
             migrate(key: "livePhoto")
             if let value = try? keychain.get("livePhoto"), let result = Bool(value) {
@@ -205,7 +218,7 @@ import KeychainAccess
         }
     }
 
-    var disableCrashservice: Bool {
+    @objc var disableCrashservice: Bool {
         get {
             migrate(key: "crashservice")
             if let value = try? keychain.get("crashservice"), let result = Bool(value) {
@@ -218,7 +231,7 @@ import KeychainAccess
         }
     }
 
-    var logLevel: Int {
+    @objc var logLevel: Int {
         get {
             migrate(key: "logLevel")
             if let value = try? keychain.get("logLevel"), let result = Int(value) {
@@ -231,7 +244,7 @@ import KeychainAccess
         }
     }
 
-    var accountRequest: Bool {
+    @objc var accountRequest: Bool {
         get {
             migrate(key: "accountRequest")
             if let value = try? keychain.get("accountRequest"), let result = Bool(value) {
@@ -244,7 +257,7 @@ import KeychainAccess
         }
     }
 
-    var removePhotoCameraRoll: Bool {
+    @objc var removePhotoCameraRoll: Bool {
         get {
             migrate(key: "removePhotoCameraRoll")
             if let value = try? keychain.get("removePhotoCameraRoll"), let result = Bool(value) {
@@ -257,7 +270,7 @@ import KeychainAccess
         }
     }
 
-    var privacyScreenEnabled: Bool {
+    @objc var privacyScreenEnabled: Bool {
         get {
             migrate(key: "privacyScreen")
             if let value = try? keychain.get("privacyScreen"), let result = Bool(value) {
@@ -270,7 +283,7 @@ import KeychainAccess
         }
     }
 
-    var cleanUpDay: Int {
+    @objc var cleanUpDay: Int {
         get {
             migrate(key: "cleanUpDay")
             if let value = try? keychain.get("cleanUpDay"), let result = Int(value) {
@@ -521,6 +534,54 @@ import KeychainAccess
         }
     }
 
+    func setTitleButtonHeader(account: String, value: String?) {
+        let key = "titleButtonHeader" + account
+        keychain[key] = value
+    }
+
+    func getTitleButtonHeader(account: String) -> String? {
+        let key = "titleButtonHeader" + account
+        return (try? keychain.get(key)) ?? ""
+    }
+    
+    @objc func getOriginalFileName(key: String) -> Bool {
+        migrate(key: key)
+        if let value = try? keychain.get(key), let result = Bool(value) {
+            return result
+        }
+        return false
+    }
+
+    @objc func setOriginalFileName(key: String, value: Bool) {
+        keychain[key] = String(value)
+    }
+
+    @objc func getFileNameMask(key: String) -> String {
+        migrate(key: key)
+        if let value = try? keychain.get(key) {
+            return value
+        } else {
+            return ""
+        }
+    }
+
+    @objc func setFileNameMask(key: String, mask: String?) {
+        keychain[key] = mask
+    }
+
+    @objc func getFileNameType(key: String) -> Bool {
+        migrate(key: key)
+        if let value = try? keychain.get(key), let result = Bool(value) {
+            return result
+        } else {
+            return false
+        }
+    }
+
+    @objc func setFileNameType(key: String, prefix: Bool) {
+        keychain[key] = String(prefix)
+    }
+    
     // MARK: - E2EE
 
     func getEndToEndCertificate(account: String) -> String? {
@@ -586,7 +647,7 @@ import KeychainAccess
 
     // MARK: - PUSHNOTIFICATION
 
-    func getPushNotificationPublicKey(account: String) -> Data? {
+    @objc func getPushNotificationPublicKey(account: String) -> Data? {
         let key = "PNPublicKey" + account
         return try? keychain.getData(key)
     }
@@ -596,7 +657,7 @@ import KeychainAccess
         keychain[data: key] = data
     }
 
-    func getPushNotificationPrivateKey(account: String) -> Data? {
+    @objc func getPushNotificationPrivateKey(account: String) -> Data? {
         let key = "PNPrivateKey" + account
         return try? keychain.getData(key)
     }
@@ -606,47 +667,47 @@ import KeychainAccess
         keychain[data: key] = data
     }
 
-    func getPushNotificationSubscribingPublicKey(account: String) -> String? {
+    @objc func getPushNotificationSubscribingPublicKey(account: String) -> String? {
         let key = "PNSubscribingPublicKey" + account
         return try? keychain.get(key)
     }
 
-    func setPushNotificationSubscribingPublicKey(account: String, publicKey: String?) {
+    @objc func setPushNotificationSubscribingPublicKey(account: String, publicKey: String?) {
         let key = "PNSubscribingPublicKey" + account
         keychain[key] = publicKey
     }
 
-    func getPushNotificationToken(account: String) -> String? {
+    @objc func getPushNotificationToken(account: String) -> String? {
         let key = "PNToken" + account
         return try? keychain.get(key)
     }
 
-    func setPushNotificationToken(account: String, token: String?) {
+    @objc func setPushNotificationToken(account: String, token: String?) {
         let key = "PNToken" + account
         keychain[key] = token
     }
 
-    func getPushNotificationDeviceIdentifier(account: String) -> String? {
+    @objc func getPushNotificationDeviceIdentifier(account: String) -> String? {
         let key = "PNDeviceIdentifier" + account
         return try? keychain.get(key)
     }
 
-    func setPushNotificationDeviceIdentifier(account: String, deviceIdentifier: String?) {
+    @objc func setPushNotificationDeviceIdentifier(account: String, deviceIdentifier: String?) {
         let key = "PNDeviceIdentifier" + account
         keychain[key] = deviceIdentifier
     }
 
-    func getPushNotificationDeviceIdentifierSignature(account: String) -> String? {
+    @objc func getPushNotificationDeviceIdentifierSignature(account: String) -> String? {
         let key = "PNDeviceIdentifierSignature" + account
         return try? keychain.get(key)
     }
 
-    func setPushNotificationDeviceIdentifierSignature(account: String, deviceIdentifierSignature: String?) {
+    @objc func setPushNotificationDeviceIdentifierSignature(account: String, deviceIdentifierSignature: String?) {
         let key = "PNDeviceIdentifierSignature" + account
         keychain[key] = deviceIdentifierSignature
     }
 
-    func clearAllKeysPushNotification(account: String) {
+    @objc func clearAllKeysPushNotification(account: String) {
         setPushNotificationPublicKey(account: account, data: nil)
         setPushNotificationSubscribingPublicKey(account: account, publicKey: nil)
         setPushNotificationPrivateKey(account: account, data: nil)
@@ -697,7 +758,7 @@ import KeychainAccess
         }
     }
 
-    func removeAll() {
+    @objc func removeAll() {
         try? keychain.removeAll()
     }
 }
