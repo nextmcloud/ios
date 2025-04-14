@@ -46,6 +46,9 @@
                                 <constraint firstAttribute="width" constant="25" id="hbz-kO-mWZ"/>
                             </constraints>
                             <state key="normal" image="moreBig"/>
+                            <connections>
+                                <action selector="touchUpInsideMore:" destination="Wid-tD-XjP" eventType="touchUpInside" id="RwI-3w-X6G"/>
+                            </connections>
                         </button>
                     </subviews>
                     <constraints>
@@ -177,6 +180,7 @@
                 <constraint firstItem="zLo-D8-zdQ" firstAttribute="trailing" secondItem="tF1-rS-oFJ" secondAttribute="trailing" id="yKI-uK-T9p"/>
             </constraints>
             <connections>
+                <outlet property="buttonMore" destination="aeS-eW-3Ic" id="Lju-Yg-J1v"/>
                 <outlet property="buttonOrder" destination="Kue-Oz-eYM" id="YWi-ge-x2G"/>
                 <outlet property="buttonSwitch" destination="L8c-mm-cDM" id="mqW-mz-zsR"/>
                 <outlet property="buttonTransfer" destination="1oT-4B-K24" id="aFL-Oq-q5s"/>
