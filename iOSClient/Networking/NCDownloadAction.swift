@@ -67,24 +67,25 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
 
         switch metadata.sessionSelector {
         case NCGlobal.shared.selectorLoadFileQuickLook:
-
-            let fileNamePath = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)
-            let fileNameTemp = NSTemporaryDirectory() + metadata.fileNameView
-            let viewerQuickLook = NCViewerQuickLook(with: URL(fileURLWithPath: fileNameTemp), isEditingEnabled: true, metadata: metadata)
-            if let image = UIImage(contentsOfFile: fileNamePath) {
-                if let data = image.jpegData(compressionQuality: 1) {
-                    do {
-                        try data.write(to: URL(fileURLWithPath: fileNameTemp))
-                    } catch {
-                        return
+            DispatchQueue.main.async {
+                let fileNamePath = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)
+                let fileNameTemp = NSTemporaryDirectory() + metadata.fileNameView
+                let viewerQuickLook = NCViewerQuickLook(with: URL(fileURLWithPath: fileNameTemp), isEditingEnabled: true, metadata: metadata)
+                if let image = UIImage(contentsOfFile: fileNamePath) {
+                    if let data = image.jpegData(compressionQuality: 1) {
+                        do {
+                            try data.write(to: URL(fileURLWithPath: fileNameTemp))
+                        } catch {
+                            return
+                        }
                     }
+                    let navigationController = UINavigationController(rootViewController: viewerQuickLook)
+                    navigationController.modalPresentationStyle = .fullScreen
+                    controller.present(navigationController, animated: true)
+                } else {
+                    self.utilityFileSystem.copyFile(atPath: fileNamePath, toPath: fileNameTemp)
+                    controller.present(viewerQuickLook, animated: true)
                 }
-                let navigationController = UINavigationController(rootViewController: viewerQuickLook)
-                navigationController.modalPresentationStyle = .fullScreen
-                controller.present(navigationController, animated: true)
-            } else {
-                self.utilityFileSystem.copyFile(atPath: fileNamePath, toPath: fileNameTemp)
-                controller.present(viewerQuickLook, animated: true)
             }
 
         case NCGlobal.shared.selectorLoadFileView:
@@ -101,6 +102,17 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
                 if let viewController = controller.currentViewController() {
                     let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024)
                     NCViewer().view(viewController: viewController, metadata: metadata, image: image)
+//            DispatchQueue.main.async {
+//                guard UIApplication.shared.applicationState == .active else { return }
+//                if metadata.contentType.contains("opendocument") && !self.utility.isTypeFileRichDocument(metadata) {
+//                    self.openDocumentController(metadata: metadata, controller: controller)
+//                } else if metadata.classFile == NKCommon.TypeClassFile.compress.rawValue || metadata.classFile == NKCommon.TypeClassFile.unknow.rawValue {
+//                    self.openDocumentController(metadata: metadata, controller: controller)
+//                } else {
+//                    if let viewController = controller.currentViewController() {
+//                        let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024)
+//                        NCViewer().view(viewController: viewController, metadata: metadata, image: image, metadatas: [metadata])
+//                    }
                 }
             }
 
@@ -112,14 +124,30 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
 
             self.openActivityViewController(selectedMetadata: [metadata], controller: controller, sender: nil)
 
+            DispatchQueue.main.async {
+                if UIApplication.shared.applicationState == .active {
+                    self.openDocumentController(metadata: metadata, controller: controller)
+                }
+            }
+
+        case NCGlobal.shared.selectorPrint:
+            // waiting close menu
+            // https://github.com/nextcloud/ios/issues/2278
+//            DispatchQueue.main.async {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.printDocument(metadata: metadata)
+            }
+            
         case NCGlobal.shared.selectorSaveAlbum:
-
-            self.saveAlbum(metadata: metadata, controller: controller)
-
+            DispatchQueue.main.async {
+                self.saveAlbum(metadata: metadata, controller: controller)
+            }
+            
         case NCGlobal.shared.selectorSaveAsScan:
-
-            self.saveAsScan(metadata: metadata, controller: controller)
-
+            DispatchQueue.main.async {
+                self.saveAsScan(metadata: metadata, controller: controller)
+            }
+            
         case NCGlobal.shared.selectorOpenDetail:
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterOpenMediaDetail, userInfo: ["ocId": metadata.ocId])
 
@@ -160,7 +188,10 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
             database.addLocalFile(metadata: metadata, offline: true, sync: false)
             database.setMetadatasSessionInWaitDownload(metadatas: metadatasSynchronizationOffline,
                                                        session: NCNetworking.shared.sessionDownloadBackground,
-                                                       selector: NCGlobal.shared.selectorSynchronizationOffline)
+//                                                       selector: NCGlobal.shared.selectorSynchronizationOffline)
+                                                       selector: NCGlobal.shared.selectorSynchronizationOffline,
+                                                       sync: false)
+            AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__OFFLINE_AVAILABLE, metadata: metadata)
         }
     }
 
@@ -168,14 +199,17 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
 
     func viewerFile(account: String, fileId: String, viewController: UIViewController) {
         var downloadRequest: DownloadRequest?
-        let hud = NCHud(viewController.tabBarController?.view)
-
-        if let metadata = database.getMetadataFromFileId(fileId) {
+        var hud = NCHud()
+        DispatchQueue.main.async {
+            hud = NCHud(viewController.tabBarController?.view)
+        }
+        if let metadata = database.getResultMetadataFromFileId(fileId) {
+            let metadata = tableMetadata(value: metadata)
             do {
                 let attr = try FileManager.default.attributesOfItem(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
                 let fileSize = attr[FileAttributeKey.size] as? UInt64 ?? 0
                 if fileSize > 0 {
-                    NCViewer().view(viewController: viewController, metadata: metadata)
+                    NCViewer().view(viewController: viewController, metadata: metadata, metadatas: [metadata])
                     return
                 }
             } catch {
@@ -203,7 +237,7 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
                 let fileNameLocalPath = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)
 
                 if metadata.isAudioOrVideo {
-                    NCViewer().view(viewController: viewController, metadata: metadata)
+                    NCViewer().view(viewController: viewController, metadata: metadata, metadatas: [metadata])
                 } else {
                     hud.show()
                     NextcloudKit.shared.download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, account: account, requestHandler: { request in
@@ -224,7 +258,7 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
                                                          etag: etag)
                         if account == accountDownload, error == .success {
                             self.database.addLocalFile(metadata: metadata)
-                            NCViewer().view(viewController: viewController, metadata: metadata)
+                            NCViewer().view(viewController: viewController, metadata: metadata, metadatas: [metadata])
                         }
                     }
                 }
@@ -241,7 +275,7 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
         let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
         var page = page
 
-        NCActivityIndicator.shared.start(backgroundView: viewController.view)
+        DispatchQueue.main.async { NCActivityIndicator.shared.start(backgroundView: viewController.view) }
         NCNetworking.shared.readFile(serverUrlFileName: serverUrlFileName, account: metadata.account, queue: .main) { account, metadata, error in
             NCActivityIndicator.shared.stop()
 
@@ -400,12 +434,50 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
         }
     }
     
+    // MARK: - Print
+
+    func printDocument(metadata: tableMetadata) {
+
+        let fileNameURL = URL(fileURLWithPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
+        let printController = UIPrintInteractionController.shared
+        let printInfo = UIPrintInfo(dictionary: nil)
+
+        printInfo.jobName = fileNameURL.lastPathComponent
+        printInfo.outputType = metadata.isImage ? .photo : .general
+        printController.printInfo = printInfo
+        printController.showsNumberOfCopies = true
+
+        guard !UIPrintInteractionController.canPrint(fileNameURL) else {
+            printController.printingItem = fileNameURL
+            printController.present(animated: true)
+            return
+        }
+
+        // can't print without data
+        guard let data = try? Data(contentsOf: fileNameURL) else { return }
+
+        if let svg = SVGKImage(data: data) {
+            printController.printingItem = svg.uiImage
+            printController.present(animated: true)
+            return
+        }
+
+        guard let text = String(data: data, encoding: .utf8) else { return }
+        let formatter = UISimpleTextPrintFormatter(text: text)
+        formatter.perPageContentInsets.top = 72
+        formatter.perPageContentInsets.bottom = 72
+        formatter.perPageContentInsets.left = 72
+        formatter.perPageContentInsets.right = 72
+        printController.printFormatter = formatter
+        printController.present(animated: true)
+    }
+    
     // MARK: - Copy & Paste
 
-    func copyPasteboard(pasteboardOcIds: [String], viewController: UIViewController) {
+    func copyPasteboard(pasteboardOcIds: [String], controller: NCMainTabBarController?) {
         var items = [[String: Any]]()
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        let hudView = viewController.view
+        let hudView = controller
         var fractionCompleted: Float = 0
 
         // getting file data can take some time and block the main queue
@@ -421,18 +493,18 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
             }
 
             // do 5 downloads in parallel to optimize efficiency
-            let processor = ParallelWorker(n: 5, titleKey: "_downloading_", totalTasks: downloadMetadatas.count, hudView: hudView)
+            let processor = ParallelWorker(n: 5, titleKey: "_downloading_", totalTasks: downloadMetadatas.count, controller: hudView)
 
             for metadata in downloadMetadatas {
                 processor.execute { completion in
                     guard let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
-                                                                                                   session: NextcloudKit.shared.nkCommonInstance.sessionIdentifierDownload,
+                                                                                                   session: NextcloudKit.shared.nkCommonInstance.identifierSessionDownload,
                                                                                                    selector: "") else { return completion() }
                     NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: false) {
                     } requestHandler: { _ in
                     } progressHandler: { progress in
                         if Float(progress.fractionCompleted) > fractionCompleted || fractionCompleted == 0 {
-                            processor.hud?.progress = Float(progress.fractionCompleted)
+                            processor.hud.progress(progress.fractionCompleted)
                             fractionCompleted = Float(progress.fractionCompleted)
                         }
                     } completion: { _, _ in
@@ -552,7 +624,7 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
 
     // MARK: - NCSelect + Delegate
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
         if let serverUrl, !items.isEmpty {
             if copy {
                 for case let metadata as tableMetadata in items {
