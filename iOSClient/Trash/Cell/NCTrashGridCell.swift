@@ -173,7 +173,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         
         self.accessibilityCustomActions = [
             UIAccessibilityCustomAction(
-                name: NSLocalizedString("_more_", comment: ""),
+                name: NSLocalizedString(moreName, comment: ""),
                 target: self,
                 selector: #selector(touchUpInsideMore(_:)))
         ]
@@ -187,10 +187,13 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
 
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
         if isEditMode {
+            imageSelect.isHidden = false
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
         } else {
+            imageSelect.isHidden = true
             buttonMore.isHidden = false
+            imageVisualEffect.isHidden = true
             setA11yActions()
         }
 
