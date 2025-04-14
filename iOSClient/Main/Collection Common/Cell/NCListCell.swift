@@ -44,9 +44,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var subInfoTrailingConstraint: NSLayoutConstraint!
 
-    private var objectId = ""
+    private var ocId = ""
+    private var ocIdTransfer = ""
     private var user = ""
-    var indexPath = IndexPath()
 
     weak var listCellDelegate: NCListCellDelegate?
     var namedButtonMore = ""
@@ -54,9 +54,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     var fileAvatarImageView: UIImageView? {
         return imageShared
     }
-    var fileObjectId: String? {
-        get { return objectId }
-        set { objectId = newValue ?? "" }
+    var fileOcId: String? {
+        get { return ocId }
+        set { ocId = newValue ?? "" }
     }
     var filePreviewImageView: UIImageView? {
         get { return imageItem }
@@ -118,7 +118,11 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
     override func awakeFromNib() {
         super.awakeFromNib()
+        initCell()
+    }
 
+    func initCell() {
+        
         imageItem.layer.cornerRadius = 6
         imageItem.layer.masksToBounds = true
 
@@ -128,9 +132,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         accessibilityValue = nil
         isAccessibilityElement = true
 
-        progressView.tintColor = NCBrandColor.shared.brandElement
+        progressView.tintColor = NCBrandColor.shared.brand
         progressView.transform = CGAffineTransform(scaleX: 1.0, y: 0.5)
         progressView.trackTintColor = .clear
+        imageSelect.isHidden = true
 
         let longPressedGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gestureRecognizer:)))
         longPressedGesture.minimumPressDuration = 0.5
@@ -140,20 +145,21 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
         separator.backgroundColor = .separator
         separatorHeightConstraint.constant = 0.5
+        titleInfoTrailingDefault()
 
         labelTitle.text = ""
         labelInfo.text = ""
         labelTitle.textColor = .label
         labelInfo.textColor = .systemGray
         labelSubinfo.textColor = .systemGray
+        setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCImageCache.images.buttonMore)
+        imageMore.isHidden = false
+        buttonMore.isHidden = false
     }
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        imageItem.backgroundColor = nil
-        accessibilityHint = nil
-        accessibilityLabel = nil
-        accessibilityValue = nil
+        initCell()
     }
 
     override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
@@ -161,15 +167,19 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     @IBAction func touchUpInsideShare(_ sender: Any) {
-        listCellDelegate?.tapShareListItem(with: objectId, indexPath: indexPath, sender: sender)
+        listCellDelegate?.tapShareListItem(with: ocId, ocIdTransfer: ocIdTransfer, sender: sender)
     }
 
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        listCellDelegate?.tapMoreListItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, indexPath: indexPath, sender: sender)
+        listCellDelegate?.tapMoreListItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
     }
 
     @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
-        listCellDelegate?.longPressListItem(with: objectId, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
+        listCellDelegate?.longPressListItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, gestureRecognizer: gestureRecognizer)
+    }
+    
+    @objc func longPressInsideMore(gestureRecognizer: UILongPressGestureRecognizer) {
+        listCellDelegate?.longPressMoreListItem(with: ocId, namedButtonMore: namedButtonMore, gestureRecognizer: gestureRecognizer)
     }
 
     fileprivate func setA11yActions() {
@@ -215,11 +225,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         separator.isHidden = status
     }
 
-    func selected(_ status: Bool, isEditMode: Bool) {
-        if isEditMode {
+    func selectMode(_ status: Bool) {
+        if status {
             imageItemLeftConstraint.constant = 45
             imageSelect.isHidden = false
-            imageShared.isHidden = true
             imageMore.isHidden = true
             buttonShared.isHidden = true
             buttonMore.isHidden = true
@@ -227,28 +236,46 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         } else {
             imageItemLeftConstraint.constant = 10
             imageSelect.isHidden = true
-            imageShared.isHidden = false
             imageMore.isHidden = false
             buttonShared.isHidden = false
             buttonMore.isHidden = false
             backgroundView = nil
             setA11yActions()
         }
+    }
+    
+    func selected(_ status: Bool, isEditMode: Bool) {
+        // NMC-1190 - iOS - Files - Deleting files while files are still uploading won't delete properly : to fix this issue remove check for !metadata.isInTransfer in below line
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.isInTransfer, !metadata.e2eEncrypted else {
+            backgroundView = nil
+            separator.isHidden = false
+            imageSelect.isHidden = true
+
+            return
+        }
+
         if status {
+            var blurEffect: UIVisualEffect?
             var blurEffectView: UIView?
-            blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
-            blurEffectView?.backgroundColor = .lightGray
+            if traitCollection.userInterfaceStyle == .dark {
+                blurEffect = UIBlurEffect(style: .dark)
+                blurEffectView = UIVisualEffectView(effect: blurEffect)
+                blurEffectView?.backgroundColor = .black
+            } else {
+                blurEffect = UIBlurEffect(style: .extraLight)
+                blurEffectView = UIVisualEffectView(effect: blurEffect)
+                blurEffectView?.backgroundColor = .lightGray
+            }
             blurEffectView?.frame = self.bounds
             blurEffectView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            imageSelect.image = NCImageCache.images.checkedYes
             backgroundView = blurEffectView
+            imageSelect.image = NCImageCache.images.checkedYes
             separator.isHidden = true
         } else {
             imageSelect.image = NCImageCache.images.checkedNo
             backgroundView = nil
             separator.isHidden = false
         }
-
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
@@ -263,9 +290,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 }
 
 protocol NCListCellDelegate: AnyObject {
-    func tapShareListItem(with objectId: String, indexPath: IndexPath, sender: Any)
-    func tapMoreListItem(with objectId: String, namedButtonMore: String, image: UIImage?, indexPath: IndexPath, sender: Any)
-    func longPressListItem(with objectId: String, indexPath: IndexPath, gestureRecognizer: UILongPressGestureRecognizer)
+    func tapShareListItem(with ocId: String, ocIdTransfer: String, sender: Any)
+    func tapMoreListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any)
+    func longPressMoreListItem(with ocId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
+    func longPressListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
 }
 
 // MARK: - List Layout
