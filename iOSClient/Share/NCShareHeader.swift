@@ -41,11 +41,11 @@ class NCShareAdvancePermissionHeader: UIView {
             imageView.isHidden = true
         } else {
             if metadata.directory {
-                imageView.image = UIImage.init(named: "folder")
+                imageView.image = metadata.e2eEncrypted ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
             } else if !metadata.iconName.isEmpty {
-                imageView.image = UIImage.init(named: metadata.iconName)
+                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
             } else {
-                imageView.image = UIImage.init(named: "file")
+                imageView.image = NCImageCache.shared.getImageFile()
             }
         }
         favorite.setNeedsUpdateConstraints()
