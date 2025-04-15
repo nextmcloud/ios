@@ -19,7 +19,6 @@ protocol AnalyticsService {
     func trackCreateVoiceMemo(size: Int64, date: Date)
     func trackCreateFolder(isEncrypted: Bool, creationDate: Date)
     func trackEventWithMetadata(eventName: AnalyticEvents, metadata: tableMetadata)
-//    func displayInAppNotification()
 }
 
 // swiftlint:disable identifier_name

@@ -24,7 +24,6 @@
 import UIKit
 import Photos
 import NextcloudKit
-import XLForm
 
 class NCManageAutoUploadFileName: XLFormViewController {
 
@@ -130,10 +129,6 @@ class NCManageAutoUploadFileName: XLFormViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        // Re-evaluate in-app messages after viewDidAppear
-        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
-
         appDelegate.activeViewController = self
     }
 
@@ -175,7 +170,6 @@ class NCManageAutoUploadFileName: XLFormViewController {
 
             if let fileName = fileName {
                 formRow.value = NCUtility().removeForbiddenCharacters(fileName)
-                formRow.value = FileAutoRenamer.rename(fileName, account: appDelegate.account)
             }
 
             self.form.delegate = self

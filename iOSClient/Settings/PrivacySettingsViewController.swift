@@ -9,7 +9,6 @@
 import Foundation
 import AppTrackingTransparency
 import AdSupport
-import XLForm
 
 class PrivacySettingsViewController: XLFormViewController{
     

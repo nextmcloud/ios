@@ -7,7 +7,6 @@
 //
 
 import Foundation
-
 import XLForm
 
 class JPGImageSaveSwitchView: XLFormBaseCell{

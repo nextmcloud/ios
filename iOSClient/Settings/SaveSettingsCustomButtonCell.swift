@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import XLForm
 
 
 class SaveSettingsCustomButtonCell: XLFormButtonCell {
