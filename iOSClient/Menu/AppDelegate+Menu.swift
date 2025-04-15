@@ -28,20 +28,20 @@ import FloatingPanel
 import NextcloudKit
 
 extension AppDelegate {
-
-    func toggleMenu(viewController: UIViewController) {
-
+    func toggleMenu(controller: NCMainTabBarController) {
         var actions: [NCMenuAction] = []
-        let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-        let directEditingCreators = NCManageDatabase.shared.getDirectEditingCreators(account: appDelegate.account)
-        let isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(serverUrl: appDelegate.activeServerUrl, userBase: appDelegate)
-        let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, appDelegate.activeServerUrl))
+        let session = NCSession.shared.getSession(controller: controller)
+        let directEditingCreators = NCManageDatabase.shared.getDirectEditingCreators(account: session.account)
+        let serverUrl = controller.currentServerUrl()
+        let isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(serverUrl: serverUrl, account: session.account)
+        let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl))
+        let utility = NCUtility()
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_upload_photos_videos_", comment: ""), icon: UIImage(named: "file_photo")!.image(color: UIColor.systemGray, size: 50), action: { _ in
-                    NCAskAuthorization().askAuthorizationPhotoLibrary(viewController: viewController) { hasPermission in
-                        if hasPermission {NCPhotosPickerViewController(viewController: viewController, maxSelectedAssets: 0, singleSelectedMode: false)
+                title: NSLocalizedString("_upload_photos_videos_", comment: ""), icon: utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor]), action: { _ in
+                    NCAskAuthorization().askAuthorizationPhotoLibrary(controller: controller) { hasPermission in
+                        if hasPermission {NCPhotosPickerViewController(controller: controller, maxSelectedAssets: 0, singleSelectedMode: false)
                         }
                     }
                 }
@@ -50,31 +50,22 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_upload_file_", comment: ""), icon: UIImage(named: "file")!.image(color: UIColor.systemGray, size: 50), action: { _ in
-                    if let tabBarController = self.window?.rootViewController as? UITabBarController {
-                        self.documentPickerViewController = NCDocumentPickerViewController(tabBarController: tabBarController, isViewerMedia: false, allowsMultipleSelection: true)
-                    }
+                title: NSLocalizedString("_upload_file_", comment: ""), icon: utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor]), action: { _ in
+                    controller.documentPickerViewController = NCDocumentPickerViewController(controller: controller, isViewerMedia: false, allowsMultipleSelection: true)
                 }
             )
         )
 
         if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorText}) && !isDirectoryE2EE {
-            let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorText})!
             actions.append(
-                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt")!.image(color: UIColor.systemGray, size: 50), action: { _ in
-                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
-                        return
-                    }
-                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: utility.loadImage(named: "doc.text", colors: [NCBrandColor.shared.iconImageColor]), action: { _ in
+                    let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorText})!
 
-                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
-                        viewController.editorId = NCGlobal.shared.editorText
-                        viewController.creatorId = directEditingCreator.identifier
-                        viewController.typeTemplate = NCGlobal.shared.templateDocument
-                        viewController.serverUrl = appDelegate.activeServerUrl
-                        viewController.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
+                    Task {
+                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + ".md", account: session.account, serverUrl: serverUrl)
+                        let fileNamePath = NCUtilityFileSystem().getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                        appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+                        NCCreateDocument().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: NCGlobal.shared.editorText, creatorId: directEditingCreator.identifier, templateId: NCGlobal.shared.templateDocument, account: session.account)
                     }
                 })
             )
@@ -82,28 +73,22 @@ extension AppDelegate {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility().loadImage(named: "doc.text.viewfinder"), action: { _ in
-                    if let viewController = appDelegate.window?.rootViewController {
-                        NCDocumentCamera.shared.openScannerDocument(viewController: viewController)
-                    }
+                title: NSLocalizedString("_scans_document_", comment: ""), icon: utility.loadImage(named: "doc.text.viewfinder", colors: [NCBrandColor.shared.iconImageColor]), action: { _ in
+                    NCDocumentCamera.shared.openScannerDocument(viewController: controller)
                 }
             )
         )
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_create_voice_memo_", comment: ""), icon: UIImage(named: "microphone")!.image(color: UIColor.systemGray, size: 50), action: { _ in
-                    NCAskAuthorization().askAuthorizationAudioRecord(viewController: viewController) { hasPermission in
+                title: NSLocalizedString("_create_voice_memo_", comment: ""), icon: utility.loadImage(named: "mic", colors: [NCBrandColor.shared.iconImageColor]), action: { _ in
+                    NCAskAuthorization().askAuthorizationAudioRecord(viewController: controller) { hasPermission in
                         if hasPermission {
-                            let fileName = NCUtilityFileSystem().createFileNameDate(NSLocalizedString("_voice_memo_filename_", comment: ""), ext: "m4a")
                             if let viewController = UIStoryboard(name: "NCAudioRecorderViewController", bundle: nil).instantiateInitialViewController() as? NCAudioRecorderViewController {
-
-                                viewController.delegate = self
-                                viewController.createRecorder(fileName: fileName)
+                                viewController.controller = controller
                                 viewController.modalTransitionStyle = .crossDissolve
                                 viewController.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
-
-                                appDelegate.window?.rootViewController?.present(viewController, animated: true, completion: nil)
+                                controller.present(viewController, animated: true, completion: nil)
                             }
                         }
                     }
@@ -111,49 +96,50 @@ extension AppDelegate {
             )
         )
 
-        if NCKeychain().isEndToEndEnabled(account: appDelegate.account) {
+        if NCKeychain().isEndToEndEnabled(account: session.account) {
             actions.append(.seperator(order: 0))
         }
 
         let titleCreateFolder = isDirectoryE2EE ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
-        let imageCreateFolder = isDirectoryE2EE ? UIImage(named: "folderEncrypted")! : UIImage(named: "folder")!
+        let imageCreateFolder = isDirectoryE2EE ? NCImageCache.shared.getFolderEncrypted(account: session.account) : NCImageCache.shared.getFolder(account: session.account)
         actions.append(
             NCMenuAction(title: titleCreateFolder,
-                         icon: imageCreateFolder.image(color: NCBrandColor.shared.brandElement, size: 50), action: { _ in
-                             guard !appDelegate.activeServerUrl.isEmpty else { return }
-                             let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate)
-                             appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
+                         icon: imageCreateFolder, action: { _ in
+                             let alertController = UIAlertController.createFolder(serverUrl: serverUrl, session: session, sceneIdentifier: controller.sceneIdentifier)
+                             controller.present(alertController, animated: true, completion: nil)
                          }
                         )
         )
 
         // Folder encrypted
-        if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: appDelegate.account) {
+        if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: session.account) {
             actions.append(
                 NCMenuAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
-                             icon: UIImage(named: "folderEncrypted")!.image(color: NCBrandColor.shared.brandElement, size: 50),
+                             icon: NCImageCache.shared.getFolderEncrypted(account: session.account),
                              action: { _ in
-                                 guard !appDelegate.activeServerUrl.isEmpty else { return }
-                                 let alertController = UIAlertController.createFolder(serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate, markE2ee: true)
-                                 appDelegate.window?.rootViewController?.present(alertController, animated: true, completion: nil)
+                                 let alertController = UIAlertController.createFolder(serverUrl: serverUrl, session: session, markE2ee: true, sceneIdentifier: controller.sceneIdentifier)
+                                 controller.present(alertController, animated: true, completion: nil)
                              })
             )
         }
 
-        if NCKeychain().isEndToEndEnabled(account: appDelegate.account) {
+        if NCKeychain().isEndToEndEnabled(account: session.account) {
             actions.append(.seperator(order: 0))
         }
 
-        if NCGlobal.shared.capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isDirectoryE2EE && NextcloudKit.shared.isNetworkReachable() {
+        if NCCapabilities.shared.getCapabilities(account: session.account).capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isDirectoryE2EE && NextcloudKit.shared.isNetworkReachable() {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: UIImage(named: "addFolderInfo")!.image(color: UIColor.systemGray, size: 50), action: { _ in
+                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: NCUtility().loadImage(named: "list.dash.header.rectangle", colors: [NCBrandColor.shared.iconImageColor]), action: { _ in
                         let richWorkspaceCommon = NCRichWorkspaceCommon()
-                        if let viewController = self.activeViewController {
-                            if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView LIKE[c] %@", appDelegate.account, appDelegate.activeServerUrl, NCGlobal.shared.fileNameRichWorkspace.lowercased())) == nil {
-                                richWorkspaceCommon.createViewerNextcloudText(serverUrl: appDelegate.activeServerUrl, viewController: viewController)
+                        if let viewController = controller.currentViewController() {
+                            if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView LIKE[c] %@",
+                                                                                session.account,
+                                                                                serverUrl,
+                                                                                NCGlobal.shared.fileNameRichWorkspace.lowercased())) == nil {
+                                richWorkspaceCommon.createViewerNextcloudText(serverUrl: serverUrl, viewController: viewController, session: session)
                             } else {
-                                richWorkspaceCommon.openViewerNextcloudText(serverUrl: appDelegate.activeServerUrl, viewController: viewController)
+                                richWorkspaceCommon.openViewerNextcloudText(serverUrl: serverUrl, viewController: viewController, session: session)
                             }
                         }
                     }
@@ -165,20 +151,15 @@ extension AppDelegate {
             let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeDocx})!
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_create_new_document_", comment: ""), icon: UIImage(named: "create_file_document")!, action: { _ in
-                        guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
-                            return
-                        }
-                        navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                    title: NSLocalizedString("_create_new_document_", comment: ""), icon: utility.loadImage(named: "doc.text", colors: [NCBrandColor.shared.documentIconColor]), action: { _ in
+                        let createDocument = NCCreateDocument()
 
-                        if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
-                            viewController.editorId = NCGlobal.shared.editorOnlyoffice
-                            viewController.creatorId = directEditingCreator.identifier
-                            viewController.typeTemplate = NCGlobal.shared.templateDocument
-                            viewController.serverUrl = appDelegate.activeServerUrl
-                            viewController.titleForm = NSLocalizedString("_create_new_document_", comment: "")
+                        Task {
+                            let templates = await createDocument.getTemplate(editorId: NCGlobal.shared.editorOnlyoffice, templateId: NCGlobal.shared.templateDocument, account: session.account)
+                            let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                            let fileNamePath = NCUtilityFileSystem().getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                            appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+                            createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: NCGlobal.shared.editorOnlyoffice, creatorId: directEditingCreator.identifier, templateId: templates.selectedTemplate.identifier, account: session.account)
                         }
                     }
                 )
@@ -189,20 +170,15 @@ extension AppDelegate {
             let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeXlsx})!
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_create_new_spreadsheet_", comment: ""), icon: UIImage(named: "create_file_xls")!, action: { _ in
-                        guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
-                            return
-                        }
-                        navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                    title: NSLocalizedString("_create_new_spreadsheet_", comment: ""), icon: utility.loadImage(named: "tablecells", colors: [NCBrandColor.shared.spreadsheetIconColor]), action: { _ in
+                        let createDocument = NCCreateDocument()
 
-                        if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
-                            viewController.editorId = NCGlobal.shared.editorOnlyoffice
-                            viewController.creatorId = directEditingCreator.identifier
-                            viewController.typeTemplate = NCGlobal.shared.templateSpreadsheet
-                            viewController.serverUrl = appDelegate.activeServerUrl
-                            viewController.titleForm = NSLocalizedString("_create_new_spreadsheet_", comment: "")
+                        Task {
+                            let templates = await createDocument.getTemplate(editorId: NCGlobal.shared.editorOnlyoffice, templateId: NCGlobal.shared.templateSpreadsheet, account: session.account)
+                            let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                            let fileNamePath = NCUtilityFileSystem().getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                            appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+                            createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: NCGlobal.shared.editorOnlyoffice, creatorId: directEditingCreator.identifier, templateId: templates.selectedTemplate.identifier, account: session.account)
                         }
                     }
                 )
@@ -213,43 +189,34 @@ extension AppDelegate {
             let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficePptx})!
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_create_new_presentation_", comment: ""), icon: UIImage(named: "create_file_ppt")!, action: { _ in
-                        guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
-                            return
-                        }
-                        navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                    title: NSLocalizedString("_create_new_presentation_", comment: ""), icon: utility.loadImage(named: "play.rectangle", colors: [NCBrandColor.shared.presentationIconColor]), action: { _ in
+                        let createDocument = NCCreateDocument()
 
-                        if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
-                            viewController.editorId = NCGlobal.shared.editorOnlyoffice
-                            viewController.creatorId = directEditingCreator.identifier
-                            viewController.typeTemplate = NCGlobal.shared.templatePresentation
-                            viewController.serverUrl = appDelegate.activeServerUrl
-                            viewController.titleForm = NSLocalizedString("_create_new_presentation_", comment: "")
+                        Task {
+                            let templates = await createDocument.getTemplate(editorId: NCGlobal.shared.editorOnlyoffice, templateId: NCGlobal.shared.templatePresentation, account: session.account)
+                            let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                            let fileNamePath = NCUtilityFileSystem().getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                            appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+                            createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: NCGlobal.shared.editorOnlyoffice, creatorId: directEditingCreator.identifier, templateId: templates.selectedTemplate.identifier, account: session.account)
                         }
                     }
                 )
             )
         }
 
-        if NCGlobal.shared.capabilityRichdocumentsEnabled {
+        if NCCapabilities.shared.getCapabilities(account: session.account).capabilityRichDocumentsEnabled {
             if NextcloudKit.shared.isNetworkReachable() && !isDirectoryE2EE {
                 actions.append(
                     NCMenuAction(
-                        title: NSLocalizedString("_create_new_document_", comment: ""), icon: UIImage(named: "create_file_document")!, action: { _ in
-                            guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
-                                return
-                            }
-                            navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                        title: NSLocalizedString("_create_new_document_", comment: ""), icon: utility.loadImage(named: "doc.richtext", colors: [NCBrandColor.shared.documentIconColor]), action: { _ in
+                            let createDocument = NCCreateDocument()
 
-                            if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
-                                viewController.editorId = NCGlobal.shared.editorCollabora
-                                viewController.typeTemplate = NCGlobal.shared.templateDocument
-                                viewController.serverUrl = appDelegate.activeServerUrl
-                                viewController.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
+                            Task {
+                                let templates = await createDocument.getTemplate(editorId: NCGlobal.shared.editorCollabora, templateId: NCGlobal.shared.templateDocument, account: session.account)
+                                let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                                let fileNamePath = NCUtilityFileSystem().getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                                appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+                                createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: NCGlobal.shared.editorCollabora, templateId: templates.selectedTemplate.identifier, account: session.account)
                             }
                         }
                     )
@@ -257,19 +224,15 @@ extension AppDelegate {
 
                 actions.append(
                     NCMenuAction(
-                        title: NSLocalizedString("_create_new_spreadsheet_", comment: ""), icon: UIImage(named: "create_file_xls")!, action: { _ in
-                            guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
-                                return
-                            }
-                            navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                        title: NSLocalizedString("_create_new_spreadsheet_", comment: ""), icon: utility.loadImage(named: "tablecells", colors: [NCBrandColor.shared.spreadsheetIconColor]), action: { _ in
+                            let createDocument = NCCreateDocument()
 
-                            if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
-                                viewController.editorId = NCGlobal.shared.editorCollabora
-                                viewController.typeTemplate = NCGlobal.shared.templateSpreadsheet
-                                viewController.serverUrl = appDelegate.activeServerUrl
-                                viewController.titleForm = NSLocalizedString("_create_new_spreadsheet_", comment: "")
+                            Task {
+                                let templates = await createDocument.getTemplate(editorId: NCGlobal.shared.editorCollabora, templateId: NCGlobal.shared.templateSpreadsheet, account: session.account)
+                                let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                                let fileNamePath = NCUtilityFileSystem().getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                                appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+                                createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: NCGlobal.shared.editorCollabora, templateId: templates.selectedTemplate.identifier, account: session.account)
                             }
                         }
                     )
@@ -277,19 +240,15 @@ extension AppDelegate {
 
                 actions.append(
                     NCMenuAction(
-                        title: NSLocalizedString("_create_new_presentation_", comment: ""), icon: UIImage(named: "create_file_ppt")!, action: { _ in
-                            guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
-                                return
-                            }
-                            navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                        title: NSLocalizedString("_create_new_presentation_", comment: ""), icon: utility.loadImage(named: "play.rectangle", colors: [NCBrandColor.shared.presentationIconColor]), action: { _ in
+                            let createDocument = NCCreateDocument()
 
-                            if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
-                                viewController.editorId = NCGlobal.shared.editorCollabora
-                                viewController.typeTemplate = NCGlobal.shared.templatePresentation
-                                viewController.serverUrl = appDelegate.activeServerUrl
-                                viewController.titleForm = NSLocalizedString("_create_new_presentation_", comment: "")
+                            Task {
+                                let templates = await createDocument.getTemplate(editorId: NCGlobal.shared.editorCollabora, templateId: NCGlobal.shared.templatePresentation, account: session.account)
+                                let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                                let fileNamePath = NCUtilityFileSystem().getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                                appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+                                createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: NCGlobal.shared.editorCollabora, templateId: templates.selectedTemplate.identifier, account: session.account)
                             }
                         }
                     )
@@ -297,6 +256,6 @@ extension AppDelegate {
             }
         }
 
-        viewController.presentMenu(with: actions)
+        controller.presentMenu(with: actions)
     }
 }

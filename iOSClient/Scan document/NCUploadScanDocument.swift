@@ -28,65 +28,51 @@ import VisionKit
 import Photos
 import PDFKit
 
-class NCHostingUploadScanDocumentView: NSObject {
-
-    @objc func makeShipDetailsUI(images: [UIImage], userBaseUrl: NCUserBaseUrl, serverUrl: String) -> UIViewController {
-
-        let uploadScanDocument = NCUploadScanDocument(images: images, userBaseUrl: userBaseUrl, serverUrl: serverUrl)
-        let details = UploadScanDocumentView(uploadScanDocument: uploadScanDocument)
-        let vc = UIHostingController(rootView: details)
-        vc.title = NSLocalizedString("_save_", comment: "")
-        return vc
-    }
-}
-
-// MARK: - Class
-
 class NCUploadScanDocument: ObservableObject {
-
-    internal var userBaseUrl: NCUserBaseUrl
-
     internal var metadata = tableMetadata()
     internal var images: [UIImage]
-
     internal var password: String = ""
     internal var isTextRecognition: Bool = false
     internal var quality: Double = 0
     internal var removeAllFiles: Bool = false
-    let utilityFileSystem = NCUtilityFileSystem()
+    internal let utilityFileSystem = NCUtilityFileSystem()
+    internal let database = NCManageDatabase.shared
 
     @Published var serverUrl: String
     @Published var showHUD: Bool = false
+    @Published var controller: NCMainTabBarController?
 
-    init(images: [UIImage], userBaseUrl: NCUserBaseUrl, serverUrl: String) {
+    var session: NCSession.Session {
+        NCSession.shared.getSession(controller: controller)
+    }
+
+    init(images: [UIImage], serverUrl: String, controller: NCMainTabBarController?) {
         self.images = images
-        self.userBaseUrl = userBaseUrl
         self.serverUrl = serverUrl
+        self.controller = controller
     }
 
     func save(fileName: String, password: String = "", isTextRecognition: Bool = false, removeAllFiles: Bool, quality: Double, completion: @escaping (_ openConflictViewController: Bool, _ error: Bool) -> Void) {
-
         self.password = password
         self.isTextRecognition = isTextRecognition
         self.quality = quality
         self.removeAllFiles = removeAllFiles
 
-        metadata = NCManageDatabase.shared.createMetadata(account: userBaseUrl.account,
-                                                          user: userBaseUrl.user,
-                                                          userId: userBaseUrl.userId,
-                                                          fileName: fileName,
-                                                          fileNameView: fileName,
-                                                          ocId: UUID().uuidString,
-                                                          serverUrl: serverUrl,
-                                                          urlBase: userBaseUrl.urlBase,
-                                                          url: "",
-                                                          contentType: "")
+        metadata = self.database.createMetadata(fileName: fileName,
+                                                fileNameView: fileName,
+                                                ocId: UUID().uuidString,
+                                                serverUrl: serverUrl,
+                                                url: "",
+                                                contentType: "",
+                                                session: session,
+                                                sceneIdentifier: controller?.sceneIdentifier)
 
-        metadata.session = NCNetworking.shared.sessionIdentifierBackground
+        metadata.session = NCNetworking.shared.sessionUploadBackground
         metadata.sessionSelector = NCGlobal.shared.selectorUploadFile
         metadata.status = NCGlobal.shared.metadataStatusWaitUpload
+        metadata.sessionDate = Date()
 
-        if NCManageDatabase.shared.getMetadataConflict(account: userBaseUrl.account, serverUrl: serverUrl, fileNameView: fileName) != nil {
+        if self.database.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileName, nativeFormat: metadata.nativeFormat) != nil {
             completion(true, false)
         } else {
             createPDF(metadata: metadata) { error in
@@ -98,8 +84,7 @@ class NCUploadScanDocument: ObservableObject {
     }
 
     func createPDF(metadata: tableMetadata, completion: @escaping (_ error: Bool) -> Void) {
-
-        DispatchQueue.global().async {
+        DispatchQueue.global(qos: .userInteractive).async {
             let fileNamePath = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)
             let pdfData = NSMutableData()
 
@@ -126,7 +111,7 @@ class NCUploadScanDocument: ObservableObject {
             do {
                 try pdfData.write(to: URL(fileURLWithPath: fileNamePath), options: .atomic)
                 metadata.size = self.utilityFileSystem.getFileSize(filePath: fileNamePath)
-                NCNetworkingProcessUpload.shared.createProcessUploads(metadatas: [metadata], completion: { _ in })
+                NCNetworkingProcess.shared.createProcessUploads(metadatas: [metadata])
                 if self.removeAllFiles {
                     let path = self.utilityFileSystem.directoryScan
                     let filePaths = try FileManager.default.contentsOfDirectory(atPath: path)
@@ -143,36 +128,26 @@ class NCUploadScanDocument: ObservableObject {
     }
 
     func createPDFPreview(quality: Double, isTextRecognition: Bool, completion: @escaping (_ data: Data) -> Void) {
-
-        DispatchQueue.global().async {
+        DispatchQueue.global(qos: .userInteractive).async {
             if let image = self.images.first {
-
                 let pdfData = NSMutableData()
-
                 UIGraphicsBeginPDFContextToData(pdfData, CGRect.zero, nil)
-
                 self.drawImage(image: image, quality: quality, isTextRecognition: isTextRecognition, fontColor: UIColor.red)
-
                 UIGraphicsEndPDFContext()
-
                 DispatchQueue.main.async { completion(pdfData as Data) }
-
             } else {
-
                 let url = Bundle.main.url(forResource: "Reasons to use Nextcloud", withExtension: "pdf")!
                 let data = try? Data(contentsOf: url)
-
                 DispatchQueue.main.async { completion(data!) }
             }
         }
     }
 
     func fileName(_ fileName: String) -> String {
-
         let fileName = fileName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !fileName.isEmpty, fileName != ".", fileName.lowercased() != ".pdf" else { return "" }
-
         let ext = (fileName as NSString).pathExtension.uppercased()
+
         if ext.isEmpty {
             return fileName + ".pdf"
         } else {
@@ -181,7 +156,6 @@ class NCUploadScanDocument: ObservableObject {
     }
 
     private func changeCompressionImage(_ image: UIImage, quality: Double) -> UIImage {
-
         var compressionQuality: CGFloat = 0.0
         let baseHeight: Float = 595.2    // A4
         let baseWidth: Float = 841.8     // A4
@@ -234,11 +208,9 @@ class NCUploadScanDocument: ObservableObject {
     }
 
     private func bestFittingFont(for text: String, in bounds: CGRect, fontDescriptor: UIFontDescriptor, fontColor: UIColor) -> [NSAttributedString.Key: Any] {
-
         let constrainingDimension = min(bounds.width, bounds.height)
         let properBounds = CGRect(origin: .zero, size: bounds.size)
         var attributes: [NSAttributedString.Key: Any] = [:]
-
         let infiniteBounds = CGSize(width: CGFloat.infinity, height: CGFloat.infinity)
         var bestFontSize: CGFloat = constrainingDimension
 
@@ -272,7 +244,6 @@ class NCUploadScanDocument: ObservableObject {
     }
 
     private func drawImage(image: UIImage, quality: Double, isTextRecognition: Bool, fontColor: UIColor) {
-
         let image = changeCompressionImage(image, quality: quality)
         let bounds = CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height)
 
@@ -316,9 +287,7 @@ class NCUploadScanDocument: ObservableObject {
 // MARK: - Delegate
 
 extension NCUploadScanDocument: NCSelectDelegate {
-
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], indexPath: [IndexPath], overwrite: Bool, copy: Bool, move: Bool) {
-
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
         if let serverUrl = serverUrl {
             self.serverUrl = serverUrl
         }
@@ -326,9 +295,7 @@ extension NCUploadScanDocument: NCSelectDelegate {
 }
 
 extension NCUploadScanDocument: NCCreateFormUploadConflictDelegate {
-
     func dismissCreateFormUploadConflict(metadatas: [tableMetadata]?) {
-
         if let metadata = metadatas?.first {
             self.showHUD.toggle()
             createPDF(metadata: metadata) { error in
@@ -344,8 +311,8 @@ extension NCUploadScanDocument: NCCreateFormUploadConflictDelegate {
 // MARK: - View
 
 struct UploadScanDocumentView: View {
-
     @State var fileName = NCUtilityFileSystem().createFileNameDate("scan", ext: "")
+    @State var footer = ""
     @State var password: String = ""
     @State var isSecuredPassword: Bool = true
     @State var isTextRecognition: Bool = NCKeychain().textRecognitionStatus
@@ -354,17 +321,16 @@ struct UploadScanDocumentView: View {
     @State var isPresentedSelect = false
     @State var isPresentedUploadConflict = false
 
+    @ObservedObject var model: NCUploadScanDocument
+
     var metadatasConflict: [tableMetadata] = []
 
-    @ObservedObject var uploadScanDocument: NCUploadScanDocument
-
-    init(uploadScanDocument: NCUploadScanDocument) {
-        self.uploadScanDocument = uploadScanDocument
+    init(model: NCUploadScanDocument) {
+        self.model = model
     }
 
     func getTextServerUrl(_ serverUrl: String) -> String {
-
-        if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", uploadScanDocument.userBaseUrl.account, serverUrl)), let metadata = NCManageDatabase.shared.getMetadataFromOcId(directory.ocId) {
+        if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", model.session.account, serverUrl)), let metadata = NCManageDatabase.shared.getMetadataFromOcId(directory.ocId) {
             return (metadata.fileNameView)
         } else {
             return (serverUrl as NSString).lastPathComponent
@@ -372,18 +338,17 @@ struct UploadScanDocumentView: View {
     }
 
     var body: some View {
-
         GeometryReader { geo in
             ZStack(alignment: .top) {
                 List {
-                    Section(header: Text(NSLocalizedString("_file_creation_", comment: ""))) {
+                    Section(header: Text(NSLocalizedString("_file_creation_", comment: "")), footer: Text(footer)) {
                         HStack {
                             Label {
-                                if NCUtilityFileSystem().getHomeServer(urlBase: uploadScanDocument.userBaseUrl.urlBase, userId: uploadScanDocument.userBaseUrl.userId) == uploadScanDocument.serverUrl {
+                                if NCUtilityFileSystem().getHomeServer(session: model.session) == model.serverUrl {
                                     Text("/")
                                         .frame(maxWidth: .infinity, alignment: .trailing)
                                 } else {
-                                    Text(self.getTextServerUrl(uploadScanDocument.serverUrl))
+                                    Text(self.getTextServerUrl(model.serverUrl))
                                         .frame(maxWidth: .infinity, alignment: .trailing)
                                 }
                             } icon: {
@@ -391,7 +356,7 @@ struct UploadScanDocumentView: View {
                                     .renderingMode(.template)
                                     .resizable()
                                     .scaledToFit()
-                                    .foregroundColor(Color(NCBrandColor.shared.brand))
+                                    .foregroundColor(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                             }
                         }
                         .contentShape(Rectangle())
@@ -405,14 +370,18 @@ struct UploadScanDocumentView: View {
                                 }
                             }
                         }
-
                         HStack {
                             Text(NSLocalizedString("_filename_", comment: ""))
                             TextField(NSLocalizedString("_enter_filename_", comment: ""), text: $fileName)
-                                .modifier(TextFieldClearButton(text: $fileName))
                                 .multilineTextAlignment(.trailing)
+                                .onChange(of: fileName) { _ in
+                                    if let fileNameError = FileNameValidator.checkFileName(fileName, account: self.model.controller?.account) {
+                                        footer = fileNameError.errorDescription
+                                    } else {
+                                        footer = ""
+                                    }
+                                }
                         }
-
                         HStack {
                             Group {
                                 Text(NSLocalizedString("_password_", comment: ""))
@@ -432,10 +401,9 @@ struct UploadScanDocumentView: View {
                             }
                             .buttonStyle(BorderlessButtonStyle())
                         }
-
                         HStack {
                             Toggle(NSLocalizedString("_text_recognition_", comment: ""), isOn: $isTextRecognition)
-                                .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.brand)))
+                                .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.getElement(account: model.session.account))))
                                 .onChange(of: isTextRecognition) { newValue in
                                     NCKeychain().textRecognitionStatus = newValue
                                 }
@@ -445,63 +413,61 @@ struct UploadScanDocumentView: View {
                         view.listRowSeparator(.hidden)
                     }
 
-                    VStack(spacing: 20) {
-
-                        Toggle(NSLocalizedString("_delete_all_scanned_images_", comment: ""), isOn: $removeAllFiles)
-                            .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.brand)))
-                            .onChange(of: removeAllFiles) { newValue in
-                                NCKeychain().deleteAllScanImages = newValue
-                            }
-
-                        Button(NSLocalizedString("_save_", comment: "")) {
-                            let fileName = uploadScanDocument.fileName(fileName)
-                            if !fileName.isEmpty {
-                                uploadScanDocument.showHUD.toggle()
-                                uploadScanDocument.save(fileName: fileName, password: password, isTextRecognition: isTextRecognition, removeAllFiles: removeAllFiles, quality: quality) { openConflictViewController, error in
-                                    uploadScanDocument.showHUD.toggle()
-                                    if error {
-                                        print("error")
-                                    } else if openConflictViewController {
-                                        isPresentedUploadConflict = true
-                                    } else {
-                                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDismissScanDocument)
+                    Section {
+                        VStack(spacing: 20) {
+                            Toggle(NSLocalizedString("_delete_all_scanned_images_", comment: ""), isOn: $removeAllFiles)
+                                .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.getElement(account: model.session.account))))
+                                .onChange(of: removeAllFiles) { newValue in
+                                    NCKeychain().deleteAllScanImages = newValue
+                                }
+                            Button(NSLocalizedString("_save_", comment: "")) {
+                                let fileName = model.fileName(fileName)
+                                if !fileName.isEmpty {
+                                    model.showHUD.toggle()
+                                    model.save(fileName: fileName, password: password, isTextRecognition: isTextRecognition, removeAllFiles: removeAllFiles, quality: quality) { openConflictViewController, error in
+                                        model.showHUD.toggle()
+                                        if error {
+                                            print("error")
+                                        } else if openConflictViewController {
+                                            isPresentedUploadConflict = true
+                                        } else {
+                                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDismissScanDocument)
+                                        }
                                     }
                                 }
                             }
+                            .buttonStyle(ButtonRounded(disabled: fileName.isEmpty || !footer.isEmpty, account: model.session.account))
+                            .disabled(fileName.isEmpty || !footer.isEmpty)
                         }
-                        .buttonStyle(ButtonRounded(disabled: fileName.isEmpty))
                     }
 
                     Section(header: Text(NSLocalizedString("_quality_image_title_", comment: ""))) {
-
                         VStack {
                             Slider(value: $quality, in: 0...4, step: 1, onEditingChanged: { touch in
                                 if !touch {
                                     NCKeychain().qualityScanDocument = quality
                                 }
                             })
-                            .accentColor(Color(NCBrandColor.shared.brand))
+                            .accentColor(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                         }
-                        PDFKitRepresentedView(quality: $quality, isTextRecognition: $isTextRecognition, uploadScanDocument: uploadScanDocument)
+                        PDFKitRepresentedView(quality: $quality, isTextRecognition: $isTextRecognition, uploadScanDocument: model)
                             .frame(maxWidth: .infinity, minHeight: geo.size.height / 2)
                     }
                     .complexModifier { view in
                         view.listRowSeparator(.hidden)
                     }
                 }
-                HUDView(showHUD: $uploadScanDocument.showHUD, textLabel: NSLocalizedString("_wait_", comment: ""), image: "doc.badge.arrow.up")
-                    .offset(y: uploadScanDocument.showHUD ? 5 : -200)
-                    .animation(.easeOut, value: UUID())
+                NCHUDView(showHUD: $model.showHUD, textLabel: NSLocalizedString("_wait_", comment: ""), image: "doc.badge.arrow.up", color: NCBrandColor.shared.getElement(account: model.session.account))
+                    .offset(y: model.showHUD ? 5 : -200)
+                    .animation(.easeOut, value: model.showHUD)
             }
         }
         .background(Color(UIColor.systemGroupedBackground))
         .sheet(isPresented: $isPresentedSelect) {
-            NCSelectViewControllerRepresentable(delegate: uploadScanDocument)
+            NCSelectViewControllerRepresentable(delegate: model, session: model.session)
         }
         .sheet(isPresented: $isPresentedUploadConflict) {
-            UploadConflictView(delegate: uploadScanDocument, serverUrl: uploadScanDocument.serverUrl, metadatasUploadInConflict: [uploadScanDocument.metadata], metadatasNOConflict: [])
-        }.onTapGesture {
-            UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.filter { $0.isKeyWindow }.first?.endEditing(true)
+            UploadConflictView(delegate: model, serverUrl: model.serverUrl, metadatasUploadInConflict: [model.metadata], metadatasNOConflict: [])
         }
     }
 }
@@ -509,7 +475,6 @@ struct UploadScanDocumentView: View {
 // MARK: - UIViewControllerRepresentable
 
 struct PDFKitRepresentedView: UIViewRepresentable {
-
     typealias UIView = PDFView
     @Binding var quality: Double
     @Binding var isTextRecognition: Bool
@@ -539,9 +504,7 @@ struct PDFKitRepresentedView: UIViewRepresentable {
 
 struct UploadScanDocumentView_Previews: PreviewProvider {
     static var previews: some View {
-        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
-            let uploadScanDocument = NCUploadScanDocument(images: [], userBaseUrl: appDelegate, serverUrl: "ABCD")
-            UploadScanDocumentView(uploadScanDocument: uploadScanDocument)
-        }
+        let model = NCUploadScanDocument(images: [], serverUrl: "ABCD", controller: nil)
+        UploadScanDocumentView(model: model)
     }
 }

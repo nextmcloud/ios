@@ -22,11 +22,11 @@
 //
 
 import Foundation
+import UIKit
 import RealmSwift
 import NextcloudKit
 
 class tableLocalFile: Object {
-
     @objc dynamic var account = ""
     @objc dynamic var etag = ""
     @objc dynamic var exifDate: NSDate?
@@ -43,19 +43,16 @@ class tableLocalFile: Object {
         return "ocId"
     }
 }
-extension NCManageDatabase {
 
+extension NCManageDatabase {
     // MARK: -
     // MARK: Table LocalFile - return RESULT
-
     func getTableLocalFile(ocId: String) -> tableLocalFile? {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             return realm.objects(tableLocalFile.self).filter("ocId == %@", ocId).first
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
         return nil
     }
@@ -63,8 +60,7 @@ extension NCManageDatabase {
     // MARK: -
     // MARK: Table LocalFile
 
-    func addLocalFile(metadata: tableMetadata) {
-
+    func addLocalFile(metadata: tableMetadata, offline: Bool? = nil) {
         do {
             let realm = try Realm()
             try realm.write {
@@ -76,15 +72,17 @@ extension NCManageDatabase {
                 addObject.exifLongitude = "-1"
                 addObject.ocId = metadata.ocId
                 addObject.fileName = metadata.fileName
+                if let offline {
+                    addObject.offline = offline
+                }
                 realm.add(addObject, update: .all)
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func addLocalFile(account: String, etag: String, ocId: String, fileName: String) {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -99,43 +97,39 @@ extension NCManageDatabase {
                 realm.add(addObject, update: .all)
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
-    func deleteLocalFile(predicate: NSPredicate) {
+    func deleteLocalFileOcId(_ ocId: String?) {
+        guard let ocId else { return }
 
         do {
             let realm = try Realm()
             try realm.write {
-                let results = realm.objects(tableLocalFile.self).filter(predicate)
+                let results = realm.objects(tableLocalFile.self).filter("ocId == %@", ocId)
                 realm.delete(results)
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
-    func setLocalFile(ocId: String, fileName: String?, etag: String?) {
-
+    func setLocalFile(ocId: String, fileName: String?) {
         do {
             let realm = try Realm()
             try realm.write {
                 let result = realm.objects(tableLocalFile.self).filter("ocId == %@", ocId).first
-                if let fileName = fileName {
+                if let fileName {
                     result?.fileName = fileName
-                }
-                if let etag = etag {
-                    result?.etag = etag
                 }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     @objc func setLocalFile(ocId: String, exifDate: NSDate?, exifLatitude: String, exifLongitude: String, exifLensModel: String?) {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -149,93 +143,76 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
-    func setLocalFile(ocId: String, offline: Bool) {
-
+    func setOffLocalFile(ocId: String) {
         do {
             let realm = try Realm()
             try realm.write {
                 let result = realm.objects(tableLocalFile.self).filter("ocId == %@", ocId).first
-                result?.offline = offline
+                result?.offline = false
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func getTableLocalFile(account: String) -> [tableLocalFile] {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             let results = realm.objects(tableLocalFile.self).filter("account == %@", account)
             return Array(results.map { tableLocalFile.init(value: $0) })
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
-
         return []
     }
 
     func getTableLocalFile(predicate: NSPredicate) -> tableLocalFile? {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             guard let result = realm.objects(tableLocalFile.self).filter(predicate).first else { return nil }
             return tableLocalFile.init(value: result)
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
-
         return nil
     }
 
     func getResultsTableLocalFile(predicate: NSPredicate) -> Results<tableLocalFile>? {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             return realm.objects(tableLocalFile.self).filter(predicate)
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
-
         return nil
     }
 
     func getTableLocalFiles(predicate: NSPredicate, sorted: String, ascending: Bool) -> [tableLocalFile] {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             let results = realm.objects(tableLocalFile.self).filter(predicate).sorted(byKeyPath: sorted, ascending: ascending)
             return Array(results.map { tableLocalFile.init(value: $0) })
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
-
         return []
     }
 
     func getResultsTableLocalFile(predicate: NSPredicate, sorted: String, ascending: Bool) -> Results<tableLocalFile>? {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             return realm.objects(tableLocalFile.self).filter(predicate).sorted(byKeyPath: sorted, ascending: ascending)
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
-
         return nil
     }
 
     func setLastOpeningDate(metadata: tableMetadata) {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -254,7 +231,7 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 }

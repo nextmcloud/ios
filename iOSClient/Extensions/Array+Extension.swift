@@ -23,6 +23,7 @@
 //
 
 import Foundation
+import UIKit
 
 // https://stackoverflow.com/questions/33861036/unique-objects-inside-a-array-swift/45023247#45023247
 extension Array {
@@ -36,5 +37,11 @@ extension Array {
         }
 
         return arrayOrdered
+    }
+}
+
+extension Array where Element == URLQueryItem {
+    subscript(name: String) -> URLQueryItem? {
+        first(where: { $0.name == name })
     }
 }

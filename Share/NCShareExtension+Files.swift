@@ -22,64 +22,49 @@
 //
 
 import Foundation
+import UIKit
 import UniformTypeIdentifiers
+import NextcloudKit
 
 extension NCShareExtension {
-
     @objc func reloadDatasource(withLoadFolder: Bool) {
+        let layoutForView = NCManageDatabase.shared.getLayoutForView(account: session.account, key: keyLayout, serverUrl: serverUrl) ?? NCDBLayoutForView()
+        let predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND directory == true", session.account, serverUrl)
+        let metadatas = self.database.getResultsMetadatasPredicate(predicate, layoutForView: layoutForView)
 
-        var groupByField = "name"
-
-        layoutForView = NCManageDatabase.shared.setLayoutForView(account: activeAccount.account, key: keyLayout, serverUrl: serverUrl)
-
-        // set GroupField for Grid
-        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
-            groupByField = "classFile"
-        }
-
-        let metadatas = NCManageDatabase.shared.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND directory == true", activeAccount.account, serverUrl))
-        self.dataSource = NCDataSource(
-            metadatas: metadatas,
-            account: activeAccount.account,
-            sort: layoutForView?.sort,
-            ascending: layoutForView?.ascending,
-            directoryOnTop: layoutForView?.directoryOnTop,
-            favoriteOnTop: true,
-            groupByField: groupByField)
+        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas)
 
         if withLoadFolder {
             loadFolder()
         } else {
             self.refreshControl.endRefreshing()
         }
-
         collectionView.reloadData()
     }
 
     @objc func didCreateFolder(_ notification: NSNotification) {
-
         guard let userInfo = notification.userInfo as NSDictionary?,
               let ocId = userInfo["ocId"] as? String,
-              let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+              let metadata = self.database.getMetadataFromOcId(ocId)
         else { return }
 
         self.serverUrl += "/" + metadata.fileName
         self.reloadDatasource(withLoadFolder: true)
-        self.setNavigationBar(navigationTitle: metadata.fileName)
+        self.setNavigationBar(navigationTitle: metadata.fileNameView)
     }
 
     func loadFolder() {
-
-        networkInProgress = true
-        collectionView.reloadData()
-
-        NCNetworking.shared.readFolder(serverUrl: serverUrl, account: activeAccount.account) { _, metadataFolder, _, _, _, error in
-
+        NCNetworking.shared.readFolder(serverUrl: serverUrl,
+                                       account: session.account,
+                                       checkResponseDataChanged: false,
+                                       queue: .main) { task in
+            self.dataSourceTask = task
+            self.collectionView.reloadData()
+        } completion: { _, metadataFolder, _, _, error in
             DispatchQueue.main.async {
                 if error != .success {
                     self.showAlert(description: error.errorDescription)
                 }
-                self.networkInProgress = false
                 self.metadataFolder = metadataFolder
                 self.reloadDatasource(withLoadFolder: false)
             }
@@ -219,6 +204,6 @@ class NCFilesExtensionHandler {
 extension NSItemProvider {
     var typeIdentifier: String {
         if hasItemConformingToTypeIdentifier("public.url") { return "public.url" } else
-        if hasItemConformingToTypeIdentifier(kUTTypeItem as String) { return kUTTypeItem as String } else { return "" }
+        if hasItemConformingToTypeIdentifier(UTType.item.identifier as String) { return UTType.item.identifier as String } else { return "" }
     }
 }

@@ -22,6 +22,7 @@
 //
 
 import Foundation
+import UIKit
 import RealmSwift
 import NextcloudKit
 
@@ -47,9 +48,7 @@ class tableComments: Object, DateCompareable {
 }
 
 extension NCManageDatabase {
-
     func addComments(_ comments: [NKComments], account: String, objectId: String) {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -73,21 +72,18 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func getComments(account: String, objectId: String) -> [tableComments] {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             let results = realm.objects(tableComments.self).filter("account == %@ AND objectId == %@", account, objectId).sorted(byKeyPath: "creationDateTime", ascending: false)
             return Array(results.map(tableComments.init))
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
-
         return []
     }
 }

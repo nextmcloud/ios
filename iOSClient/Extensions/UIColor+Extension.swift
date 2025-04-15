@@ -25,6 +25,11 @@ import Foundation
 import UIKit
 
 extension UIColor {
+    var inverted: UIColor {
+        var r: CGFloat = 0.0, g: CGFloat = 0.0, b: CGFloat = 0.0, a: CGFloat = 0.0
+        self.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return UIColor(red: (1 - r), green: (1 - g), blue: (1 - b), alpha: a) // Assuming you want the same alpha value.
+    }
 
     var hexString: String {
 
@@ -112,7 +117,7 @@ extension UIColor {
 
         guard let components = cgColor.components, components.count > 2 else {return false}
         let brightness = ((components[0] * 299) + (components[1] * 587) + (components[2] * 114)) / 1000
-        return (brightness > 0.95)
+        return (brightness > 0.90)
     }
 
     @objc func isTooDark() -> Bool {
@@ -123,7 +128,7 @@ extension UIColor {
 
         guard let components = cgColor.components, components.count > 2 else {return false}
         let brightness = ((components[0] * 299) + (components[1] * 587) + (components[2] * 114)) / 1000
-        return (brightness < 0.05)
+        return (brightness < 0.10)
     }
 
     func isLight(threshold: Float = 0.7) -> Bool {

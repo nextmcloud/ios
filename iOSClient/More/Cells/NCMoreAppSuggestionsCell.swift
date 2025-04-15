@@ -22,14 +22,18 @@
 //
 
 import Foundation
+import UIKit
 import SafariServices
+import SwiftUI
 
 class NCMoreAppSuggestionsCell: BaseNCMoreCell {
+    @IBOutlet weak var assistantView: UIStackView!
     @IBOutlet weak var talkView: UIStackView!
     @IBOutlet weak var notesView: UIStackView!
     @IBOutlet weak var moreAppsView: UIStackView!
 
     static let reuseIdentifier = "NCMoreAppSuggestionsCell"
+    var controller: NCMainTabBarController?
 
     static func fromNib() -> UINib {
         return UINib(nibName: "NCMoreAppSuggestionsCell", bundle: nil)
@@ -39,9 +43,24 @@ class NCMoreAppSuggestionsCell: BaseNCMoreCell {
         super.awakeFromNib()
         backgroundColor = .clear
 
+        assistantView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(assistantTapped)))
         talkView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(talkTapped)))
         notesView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(notesTapped)))
         moreAppsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(moreAppsTapped)))
+    }
+
+    override func setupCell(account: String, controller: NCMainTabBarController?) {
+        assistantView.isHidden = !NCCapabilities.shared.getCapabilities(account: account).capabilityAssistantEnabled
+        self.controller = controller
+    }
+
+    @objc func assistantTapped() {
+        if let viewController = self.window?.rootViewController {
+            let assistant = NCAssistant()
+                .environmentObject(NCAssistantModel(controller: self.controller))
+            let hostingController = UIHostingController(rootView: assistant)
+            viewController.present(hostingController, animated: true, completion: nil)
+        }
     }
 
     @objc func talkTapped() {

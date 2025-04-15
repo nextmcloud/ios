@@ -23,60 +23,46 @@
 
 import UIKit
 import Queuer
-import JGProgressHUD
+import NextcloudKit
 
-class NCOperationSaveLivePhoto: ConcurrentOperation {
-
+class NCOperationSaveLivePhoto: ConcurrentOperation, @unchecked Sendable {
     var metadata: tableMetadata
     var metadataMOV: tableMetadata
-    let hud = JGProgressHUD()
-    let appDelegate = UIApplication.shared.delegate as? AppDelegate
+    let hud: NCHud?
     let utilityFileSystem = NCUtilityFileSystem()
 
-    init(metadata: tableMetadata, metadataMOV: tableMetadata) {
+    init(metadata: tableMetadata, metadataMOV: tableMetadata, hudView: UIView) {
         self.metadata = tableMetadata.init(value: metadata)
         self.metadataMOV = tableMetadata.init(value: metadataMOV)
+        self.hud = NCHud(hudView)
+        hud?.initHudRing(text: NSLocalizedString("_download_image_", comment: ""), detailText: self.metadata.fileName)
     }
 
     override func start() {
-        guard !isCancelled else { return self.finish() }
+        guard !isCancelled,
+            let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
+                                                                                     session: NCNetworking.shared.sessionDownload,
+                                                                                     selector: ""),
+            let metadataLive = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadataMOV],
+                                                                                         session: NCNetworking.shared.sessionDownload,
+                                                                                         selector: "") else { return self.finish() }
 
-        DispatchQueue.main.async {
-            self.hud.indicatorView = JGProgressHUDRingIndicatorView()
-            if let indicatorView = self.hud.indicatorView as? JGProgressHUDRingIndicatorView {
-                indicatorView.ringWidth = 1.5
-            }
-            self.hud.textLabel.text = NSLocalizedString("_download_image_", comment: "")
-            self.hud.detailTextLabel.text = self.metadata.fileName
-            self.hud.show(in: (self.appDelegate?.window?.rootViewController?.view)!)
-        }
-
-        NCNetworking.shared.download(metadata: metadata, selector: "", notificationCenterProgressTask: false, checkfileProviderStorageExists: true) { _ in
+        NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: false) {
+        } requestHandler: { _ in
         } progressHandler: { progress in
-            self.hud.progress = Float(progress.fractionCompleted)
+            self.hud?.progress(progress.fractionCompleted)
         } completion: { _, error in
             guard error == .success else {
-                DispatchQueue.main.async {
-                    self.hud.indicatorView = JGProgressHUDErrorIndicatorView()
-                    self.hud.textLabel.text = NSLocalizedString("_livephoto_save_error_", comment: "")
-                    self.hud.dismiss()
-                }
+                self.hud?.error(text: NSLocalizedString("_livephoto_save_error_", comment: ""))
                 return self.finish()
             }
-            NCNetworking.shared.download(metadata: self.metadataMOV, selector: "", notificationCenterProgressTask: false, checkfileProviderStorageExists: true) { _ in
-                DispatchQueue.main.async {
-                    self.hud.textLabel.text = NSLocalizedString("_download_video_", comment: "")
-                    self.hud.detailTextLabel.text = self.metadataMOV.fileName
-                }
+            NCNetworking.shared.download(metadata: metadataLive, withNotificationProgressTask: false) {
+                self.hud?.setText(text: NSLocalizedString("_download_video_", comment: ""), detailText: self.metadataMOV.fileName)
             } progressHandler: { progress in
-                self.hud.progress = Float(progress.fractionCompleted)
+                self.hud?.progress(progress.fractionCompleted)
             } completion: { _, error in
                 guard error == .success else {
-                    DispatchQueue.main.async {
-                        self.hud.indicatorView = JGProgressHUDErrorIndicatorView()
-                        self.hud.textLabel.text = NSLocalizedString("_livephoto_save_error_", comment: "")
-                        self.hud.dismiss()
-                    }
+                    self.hud?.error(text: NSLocalizedString("_livephoto_save_error_", comment: ""))
                     return self.finish()
                 }
                 self.saveLivePhotoToDisk(metadata: self.metadata, metadataMov: self.metadataMOV)
@@ -85,38 +71,26 @@ class NCOperationSaveLivePhoto: ConcurrentOperation {
     }
 
     func saveLivePhotoToDisk(metadata: tableMetadata, metadataMov: tableMetadata) {
-
         let fileNameImage = URL(fileURLWithPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
         let fileNameMov = URL(fileURLWithPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadataMov.ocId, fileNameView: metadataMov.fileNameView))
 
-        DispatchQueue.main.async {
-            self.hud.textLabel.text = NSLocalizedString("_livephoto_save_", comment: "")
-            self.hud.detailTextLabel.text = ""
-        }
+        self.hud?.progress(0)
+        self.hud?.setText(text: NSLocalizedString("_livephoto_save_", comment: ""))
 
         NCLivePhoto.generate(from: fileNameImage, videoURL: fileNameMov, progress: { progress in
-            self.hud.progress = Float(progress)
+            self.hud?.progress(progress)
         }, completion: { _, resources in
             if let resources {
                 NCLivePhoto.saveToLibrary(resources) { result in
-                    DispatchQueue.main.async {
-                        if !result {
-                            self.hud.indicatorView = JGProgressHUDErrorIndicatorView()
-                            self.hud.textLabel.text = NSLocalizedString("_livephoto_save_error_", comment: "")
-                        } else {
-                            self.hud.indicatorView = JGProgressHUDSuccessIndicatorView()
-                            self.hud.textLabel.text = NSLocalizedString("_success_", comment: "")
-                        }
-                        self.hud.dismiss()
+                    if !result {
+                        self.hud?.error(text: NSLocalizedString("_livephoto_save_error_", comment: ""))
+                    } else {
+                        self.hud?.success()
                     }
                     return self.finish()
                 }
             } else {
-                DispatchQueue.main.async {
-                    self.hud.indicatorView = JGProgressHUDErrorIndicatorView()
-                    self.hud.textLabel.text = NSLocalizedString("_livephoto_save_error_", comment: "")
-                    self.hud.dismiss()
-                }
+                self.hud?.error(text: NSLocalizedString("_livephoto_save_error_", comment: ""))
                 return self.finish()
             }
         })

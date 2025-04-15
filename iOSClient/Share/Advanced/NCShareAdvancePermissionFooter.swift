@@ -33,7 +33,7 @@ class NCShareAdvancePermissionFooter: UIView {
     @IBOutlet weak var buttonNext: UIButton!
     weak var delegate: NCShareAdvanceFotterDelegate?
 
-    func setupUI(delegate: NCShareAdvanceFotterDelegate?) {
+    func setupUI(delegate: NCShareAdvanceFotterDelegate?, account: String) {
         self.delegate = delegate
         backgroundColor = .clear
 
@@ -41,17 +41,17 @@ class NCShareAdvancePermissionFooter: UIView {
         buttonCancel.layer.cornerRadius = 25
         buttonCancel.layer.masksToBounds = true
         buttonCancel.layer.borderWidth = 1
-        buttonCancel.layer.borderColor = UIColor.systemGray.cgColor
+        buttonCancel.layer.borderColor = NCBrandColor.shared.textColor2.cgColor
         buttonCancel.backgroundColor = .secondarySystemBackground
         buttonCancel.addTarget(self, action: #selector(cancelClicked), for: .touchUpInside)
-        buttonCancel.setTitleColor(.systemGray, for: .normal)
+        buttonCancel.setTitleColor(NCBrandColor.shared.textColor2, for: .normal)
 
         buttonNext.setTitle(NSLocalizedString(delegate?.isNewShare == true ? "_share_" : "_save_", comment: ""), for: .normal)
         buttonNext.layer.cornerRadius = 25
         buttonNext.layer.masksToBounds = true
-        buttonNext.backgroundColor = NCBrandColor.shared.brand
+        buttonNext.backgroundColor = NCBrandColor.shared.getElement(account: account)
         buttonNext.addTarget(self, action: #selector(nextClicked), for: .touchUpInside)
-        buttonNext.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
+        buttonNext.setTitleColor(.white, for: .normal)
     }
 
     @objc func cancelClicked() {

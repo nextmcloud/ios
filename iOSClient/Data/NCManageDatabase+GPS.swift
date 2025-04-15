@@ -22,6 +22,7 @@
 //
 
 import Foundation
+import UIKit
 import RealmSwift
 import NextcloudKit
 
@@ -33,12 +34,9 @@ class tableGPSV2: Object {
 }
 
 extension NCManageDatabase {
-
-    @objc func addGeocoderLocation(_ location: String, latitude: Double, longitude: Double) {
-
+    func addGeocoderLocation(_ location: String, latitude: Double, longitude: Double) {
         do {
             let realm = try Realm()
-            realm.refresh()
             guard realm.objects(tableGPS.self).filter("latitude == %@ AND longitude == %@", latitude, longitude).first == nil else { return }
             try realm.write {
                 let addObject = tableGPS()
@@ -48,20 +46,18 @@ extension NCManageDatabase {
                 realm.add(addObject)
             }
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
-    @objc func getLocationFromLatAndLong(latitude: Double, longitude: Double) -> String? {
+    func getLocationFromLatAndLong(latitude: Double, longitude: Double) -> String? {
         do {
             let realm = try Realm()
-            realm.refresh()
             let result = realm.objects(tableGPS.self).filter("latitude == %@ AND longitude == %@", latitude, longitude).first
             return result?.location
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access to database: \(error)")
         }
-
         return nil
     }
 }

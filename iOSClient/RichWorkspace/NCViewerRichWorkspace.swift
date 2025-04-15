@@ -29,7 +29,6 @@ import MarkdownKit
 
     @IBOutlet weak var textView: UITextView!
 
-    private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     private let richWorkspaceCommon = NCRichWorkspaceCommon()
     private var markdownParser = MarkdownParser()
     private var textViewColor: UIColor?
@@ -38,47 +37,49 @@ import MarkdownKit
     var serverUrl: String = ""
     var delegate: NCCollectionViewCommon?
 
+    var session: NCSession.Session {
+        NCSession.shared.getSession(controller: self.delegate?.tabBarController)
+    }
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = .systemBackground
+        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
         presentationController?.delegate = self
 
         let closeItem = UIBarButtonItem(title: NSLocalizedString("_back_", comment: ""), style: .plain, target: self, action: #selector(closeItemTapped(_:)))
         self.navigationItem.leftBarButtonItem = closeItem
 
-        let editItem = UIBarButtonItem(image: UIImage(named: "actionSheetModify"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(editItemAction(_:)))
+        let editItem = UIBarButtonItem(image: NCUtility().loadImage(named: "square.and.pencil"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(editItemAction(_:)))
         self.navigationItem.rightBarButtonItem = editItem
 
-        markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: 15), color: .label)
+        markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: 15), color: NCBrandColor.shared.textColor)
         markdownParser.header.font = UIFont.systemFont(ofSize: 25)
         textView.attributedText = markdownParser.parse(richWorkspaceText)
-        textViewColor = .label
+        textViewColor = NCBrandColor.shared.textColor
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
 
-        NCNetworking.shared.readFile(serverUrlFileName: serverUrl) { account, metadata, error in
-
-            if error == .success && account == self.appDelegate.account {
-                guard let metadata = metadata else { return }
-                NCManageDatabase.shared.setDirectory(serverUrl: self.serverUrl, richWorkspace: metadata.richWorkspace, account: account)
-                if self.richWorkspaceText != metadata.richWorkspace && metadata.richWorkspace != nil {
+        NCNetworking.shared.readFile(serverUrlFileName: self.serverUrl, account: session.account, queue: .main) { _ in
+        } completion: { account, metadata, error in
+            if error == .success, let metadata {
+                NCManageDatabase.shared.updateDirectoryRichWorkspace(metadata.richWorkspace, account: account, serverUrl: self.serverUrl)
+                if self.richWorkspaceText != metadata.richWorkspace, metadata.richWorkspace != nil {
                     self.delegate?.richWorkspaceText = self.richWorkspaceText
                     self.richWorkspaceText = metadata.richWorkspace!
-                    DispatchQueue.main.async {
-                        self.textView.attributedText = self.markdownParser.parse(metadata.richWorkspace!)
-                    }
+                    self.textView.attributedText = self.markdownParser.parse(metadata.richWorkspace!)
                 }
             }
         }
     }
 
     public func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
-        self.viewWillAppear(true)
+        self.viewDidAppear(true)
     }
 
     @objc func closeItemTapped(_ sender: UIBarButtonItem) {
@@ -86,7 +87,6 @@ import MarkdownKit
     }
 
     @IBAction func editItemAction(_ sender: Any) {
-
-        richWorkspaceCommon.openViewerNextcloudText(serverUrl: serverUrl, viewController: self)
+        richWorkspaceCommon.openViewerNextcloudText(serverUrl: serverUrl, viewController: self, session: session)
     }
 }

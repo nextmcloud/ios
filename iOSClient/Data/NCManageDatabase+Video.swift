@@ -22,12 +22,12 @@
 //
 
 import Foundation
+import UIKit
 import RealmSwift
 import NextcloudKit
 
 typealias tableVideo = tableVideoV4
 class tableVideoV4: Object {
-
     @Persisted var account = ""
     @Persisted(primaryKey: true) var ocId = ""
     @Persisted var position: Float?
@@ -45,9 +45,7 @@ class tableVideoV4: Object {
 }
 
 extension NCManageDatabase {
-
     func addVideo(metadata: tableMetadata, position: Float? = nil, width: Int? = nil, height: Int? = nil, length: Int? = nil, currentAudioTrackIndex: Int? = nil, currentVideoSubTitleIndex: Int? = nil) {
-
         if metadata.isLivePhoto { return }
 
         do {
@@ -99,12 +97,11 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func addVideoCodec(metadata: tableMetadata, codecNameVideo: String?, codecNameAudio: String?, codecAudioChannelLayout: String?, codecAudioLanguage: String?, codecMaxCompatibility: Bool, codecQuality: String?) {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -130,36 +127,33 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func getVideo(metadata: tableMetadata?) -> tableVideo? {
-
         guard let metadata = metadata else { return nil }
 
         do {
             let realm = try Realm()
-            realm.refresh()
             guard let result = realm.objects(tableVideo.self).filter("account == %@ AND ocId == %@", metadata.account, metadata.ocId).first else { return nil }
             return tableVideo.init(value: result)
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
-
         return nil
     }
 
     func deleteVideo(metadata: tableMetadata) {
-
         do {
             let realm = try Realm()
             try realm.write {
-                let result = realm.objects(tableVideo.self).filter("account == %@ AND ocId == %@", metadata.account, metadata.ocId)
-                realm.delete(result)
+                if let result = realm.objects(tableVideo.self).filter("account == %@ AND ocId == %@", metadata.account, metadata.ocId).first {
+                    realm.delete(result)
+                }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 }

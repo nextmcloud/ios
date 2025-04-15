@@ -21,9 +21,8 @@
 
 import UIKit
 import NextcloudKit
-import SVGKit
 
-class NCShareNewUserAddComment: UIViewController, NCShareDetail {
+class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting {
 
     @IBOutlet weak var headerContainerView: UIView!
     @IBOutlet weak var sharingLabel: UILabel!
@@ -32,7 +31,7 @@ class NCShareNewUserAddComment: UIViewController, NCShareDetail {
     let contentInsets: CGFloat = 16
     var onDismiss: (() -> Void)?
 
-    public var share: NCTableShareable!
+    public var share: Shareable!
     public var metadata: tableMetadata!
 
     override func viewDidLoad() {
@@ -58,7 +57,7 @@ class NCShareNewUserAddComment: UIViewController, NCShareDetail {
 
         noteTextField.inputAccessoryView = toolbar.wrappedSafeAreaContainer
 
-        guard let headerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?.first as? NCShareAdvancePermissionHeader) else { return }
+        guard let headerView = (Bundle.main.loadNibNamed("NCShareHeader", owner: self, options: nil)?.first as? NCShareHeader) else { return }
         headerContainerView.addSubview(headerView)
         headerView.frame = headerContainerView.frame
         headerView.translatesAutoresizingMaskIntoConstraints = false

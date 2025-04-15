@@ -26,52 +26,86 @@ import NextcloudKit
 import SVGKit
 import CloudKit
 
-class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDelegate, NCShareDetail {
+class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDelegate, NCShareNavigationTitleSetting {
     func dismissShareAdvanceView(shouldSave: Bool) {
         guard shouldSave else {
             guard oldTableShare?.hasChanges(comparedTo: share) != false else {
                 navigationController?.popViewController(animated: true)
                 return
             }
+
             let alert = UIAlertController(
                 title: NSLocalizedString("_cancel_request_", comment: ""),
                 message: NSLocalizedString("_discard_changes_info_", comment: ""),
                 preferredStyle: .alert)
+
             alert.addAction(UIAlertAction(
                 title: NSLocalizedString("_discard_changes_", comment: ""),
                 style: .destructive,
                 handler: { _ in self.navigationController?.popViewController(animated: true) }))
+
             alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_editing_", comment: ""), style: .default))
             self.present(alert, animated: true)
+
             return
         }
+
         Task {
+            // TODO: Apply share token to download limit object
+
             if isNewShare {
                 let serverUrl = metadata.serverUrl + "/" + metadata.fileName
+
                 if share.shareType != NCShareCommon().SHARE_TYPE_LINK, metadata.e2eEncrypted,
-                   NCGlobal.shared.capabilityE2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+                   NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityE2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+
                     if NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: serverUrl) {
                         let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
                         return NCContentPresenter().showInfo(error: error)
                     }
-                    let error = await NCNetworkingE2EE().uploadMetadata(account: metadata.account, serverUrl: serverUrl, userId: metadata.userId, addUserId: share.shareWith, removeUserId: nil)
+
+                    let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: serverUrl, addUserId: share.shareWith, removeUserId: nil, account: metadata.account)
+
                     if error != .success {
-                        NCContentPresenter().showError(error: error)
-                        return
+                        return NCContentPresenter().showError(error: error)
                     }
                 }
-                networking?.createShare(option: share)
+
+                networking?.createShare(share, downloadLimit: self.downloadLimit)
             } else {
-                networking?.updateShare(option: share)
+                networking?.updateShare(share, downloadLimit: self.downloadLimit)
             }
         }
+
         navigationController?.popViewController(animated: true)
     }
 
+    let database = NCManageDatabase.shared
+
     var oldTableShare: tableShare?
-    var share: NCTableShareable!
-    var isNewShare: Bool { share is NCTableShareOptions }
+
+    ///
+    /// View model for the share link user interface.
+    ///
+    var share: (any Shareable)!
+
+    ///
+    /// Determining whether the currently represented share is new based on its concrete type.
+    ///
+    var isNewShare: Bool { share is TransientShare }
+
+    ///
+    /// The subject to share.
+    ///
     var metadata: tableMetadata!
+
+    ///
+    /// The possible download limit associated with this share.
+    ///
+    /// This can only be created after the share has been actually created due to its requirement of the share token provided by the server.
+    ///
+    var downloadLimit: DownloadLimitViewModel = .unlimited
+
     var shareConfig: NCShareConfig!
     var networking: NCShareNetworking?
 
@@ -79,11 +113,26 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
         super.viewDidLoad()
         self.shareConfig = NCShareConfig(parentMetadata: metadata, share: share)
 
+        // Only persisted shares have tokens which are provided by the server.
+        // A download limit requires a token to exist.
+        // Hence it can only be looked up if the share is already persisted at this point.
+        if isNewShare == false {
+            if let persistedShare = share as? tableShare {
+                do {
+                    if let limit = try database.getDownloadLimit(byAccount: metadata.account, shareToken: persistedShare.token) {
+                        self.downloadLimit = .limited(limit: limit.limit, count: limit.count)
+                    }
+                } catch {
+                    NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] There was an error while fetching the download limit for share with token \(persistedShare.token)!")
+                }
+            }
+        }
+
         tableView.estimatedRowHeight = tableView.rowHeight
         tableView.rowHeight = UITableView.automaticDimension
         self.setNavigationTitle()
         self.navigationItem.hidesBackButton = true
-        // disbale pull to dimiss
+        // disable pull to dimiss
         isModalInPresentation = true
     }
 
@@ -96,7 +145,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
 
     func setupFooterView() {
         guard let footerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionFooter", owner: self, options: nil)?.first as? NCShareAdvancePermissionFooter) else { return }
-        footerView.setupUI(delegate: self)
+        footerView.setupUI(delegate: self, account: metadata.account)
 
         // tableFooterView can't use auto layout directly
         let container = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 120))
@@ -109,7 +158,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
     }
 
     func setupHeaderView() {
-        guard let headerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?.first as? NCShareAdvancePermissionHeader) else { return }
+        guard let headerView = (Bundle.main.loadNibNamed("NCShareHeader", owner: self, options: nil)?.first as? NCShareHeader) else { return }
         headerView.setupUI(with: metadata)
 
         let container = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 220))
@@ -136,7 +185,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             // check reshare permission, if restricted add note
-            let maxPermission = metadata.directory ? NCGlobal.shared.permissionMaxFolderShare : NCGlobal.shared.permissionMaxFileShare
+            let maxPermission = metadata.directory ? NCPermissions().permissionMaxFolderShare : NCPermissions().permissionMaxFileShare
             return shareConfig.resharePermission != maxPermission ? shareConfig.permissions.count + 1 : shareConfig.permissions.count
         } else if section == 1 {
             return shareConfig.advanced.count
@@ -166,6 +215,15 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
         }
 
         switch cellConfig {
+        case .limitDownload:
+            let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+            guard let viewController = storyboard.instantiateViewController(withIdentifier: "NCShareDownloadLimit") as? NCShareDownloadLimitViewController else { return }
+            viewController.downloadLimit = self.downloadLimit
+            viewController.metadata = self.metadata
+            viewController.share = self.share
+            viewController.shareDownloadLimitTableViewControllerDelegate = self
+            viewController.onDismiss = tableView.reloadData
+            self.navigationController?.pushViewController(viewController, animated: true)
         case .hideDownload:
             share.hideDownload.toggle()
             tableView.reloadData()
@@ -202,5 +260,13 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
             }
             self.present(alertController, animated: true)
         }
+    }
+}
+
+// MARK: - NCShareDownloadLimitTableViewControllerDelegate
+
+extension NCShareAdvancePermission: NCShareDownloadLimitTableViewControllerDelegate {
+    func didSetDownloadLimit(_ downloadLimit: DownloadLimitViewModel) {
+        self.downloadLimit = downloadLimit
     }
 }

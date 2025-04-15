@@ -22,6 +22,7 @@
 //
 
 import Foundation
+import UIKit
 
 extension UINavigationController {
 
@@ -30,16 +31,12 @@ extension UINavigationController {
         return self.visibleViewController!.topMostViewController()
     }
 
-    func setFileAppreance() {
-
-        navigationBar.tintColor = .systemBlue
-
+    func setNavigationBarAppearance() {
         let standardAppearance = UINavigationBarAppearance()
-        standardAppearance.configureWithDefaultBackground()
 
-        standardAppearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
-        standardAppearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
-        standardAppearance.backgroundColor = .systemGray6
+        standardAppearance.configureWithDefaultBackground()
+        standardAppearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.textColor]
+        standardAppearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.textColor]
         navigationBar.standardAppearance = standardAppearance
 
         let scrollEdgeAppearance = UINavigationBarAppearance()
@@ -48,18 +45,17 @@ extension UINavigationController {
         scrollEdgeAppearance.backgroundColor = .systemBackground
         scrollEdgeAppearance.shadowColor = .clear
         scrollEdgeAppearance.shadowImage = UIImage()
+
         navigationBar.scrollEdgeAppearance = scrollEdgeAppearance
+        navigationBar.tintColor = NCBrandColor.shared.iconImageColor
     }
 
     func setGroupAppearance() {
-
-        navigationBar.tintColor = .systemBlue
-
         let standardAppearance = UINavigationBarAppearance()
-        standardAppearance.configureWithDefaultBackground()
 
-        standardAppearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
-        standardAppearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.label]
+        standardAppearance.configureWithDefaultBackground()
+        standardAppearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.textColor]
+        standardAppearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.textColor]
         standardAppearance.backgroundColor = .systemGray6
         navigationBar.standardAppearance = standardAppearance
 
@@ -69,7 +65,9 @@ extension UINavigationController {
         scrollEdgeAppearance.backgroundColor = .systemGroupedBackground
         scrollEdgeAppearance.shadowColor = .clear
         scrollEdgeAppearance.shadowImage = UIImage()
+
         navigationBar.scrollEdgeAppearance = scrollEdgeAppearance
+        navigationBar.tintColor = NCBrandColor.shared.iconImageColor
     }
 
     func setMediaAppreance() {

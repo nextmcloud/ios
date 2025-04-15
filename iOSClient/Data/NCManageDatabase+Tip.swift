@@ -22,18 +22,16 @@
 //
 
 import Foundation
+import UIKit
 import RealmSwift
 import NextcloudKit
 
 class tableTip: Object {
-
     @Persisted(primaryKey: true) var tipName = ""
 }
 
 extension NCManageDatabase {
-
     func tipExists(_ tipName: String) -> Bool {
-
         do {
             let realm = try Realm()
             guard (realm.objects(tableTip.self).where {
@@ -42,14 +40,12 @@ extension NCManageDatabase {
                 return true
             }
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access to database: \(error)")
         }
-
         return false
     }
 
     func addTip(_ tipName: String) {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -58,7 +54,7 @@ extension NCManageDatabase {
                 realm.add(addObject, update: .all)
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 }

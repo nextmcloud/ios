@@ -22,11 +22,11 @@
 //
 
 import Foundation
+import UIKit
 import RealmSwift
 import NextcloudKit
 
 class tableTag: Object {
-
     @objc dynamic var account = ""
     @objc dynamic var ocId = ""
     @objc dynamic var tagIOS: Data?
@@ -37,9 +37,7 @@ class tableTag: Object {
 }
 
 extension NCManageDatabase {
-
     func addTag(_ ocId: String, tagIOS: Data?, account: String) {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -50,12 +48,11 @@ extension NCManageDatabase {
                 realm.add(addObject, update: .all)
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func deleteTag(_ ocId: String) {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -63,35 +60,29 @@ extension NCManageDatabase {
                 realm.delete(results)
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func getTags(predicate: NSPredicate) -> [tableTag] {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             let results = realm.objects(tableTag.self).filter(predicate)
             return Array(results.map { tableTag.init(value: $0) })
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access to database: \(error)")
         }
-
         return []
     }
 
     func getTag(predicate: NSPredicate) -> tableTag? {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             guard let result = realm.objects(tableTag.self).filter(predicate).first else { return nil }
             return tableTag.init(value: result)
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not acess to database: \(error)")
         }
-
         return nil
     }
 }

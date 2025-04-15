@@ -28,12 +28,9 @@ class IntentHandler: INExtension, DashboardIntentHandling, AccountIntentHandling
 
     // MARK: - Account
 
-    // Account
-
     func provideAccountsOptionsCollection(for intent: AccountIntent, with completion: @escaping (INObjectCollection<Accounts>?, Error?) -> Void) {
-
         var accounts: [Accounts] = []
-        let results = NCManageDatabase.shared.getAllAccount()
+        let results = NCManageDatabase.shared.getAllTableAccount()
 
         accounts.append(Accounts(identifier: "active", display: "Active account"))
 
@@ -52,8 +49,7 @@ class IntentHandler: INExtension, DashboardIntentHandling, AccountIntentHandling
     }
 
     func defaultAccounts(for intent: AccountIntent) -> Accounts? {
-
-        if NCManageDatabase.shared.getActiveAccount() == nil {
+        if NCManageDatabase.shared.getActiveTableAccount() == nil {
             return nil
         } else {
             return Accounts(identifier: "active", display: "Active account")
@@ -63,24 +59,22 @@ class IntentHandler: INExtension, DashboardIntentHandling, AccountIntentHandling
     // MARK: - Dashboard
 
     // Application
-
     func provideApplicationsOptionsCollection(for intent: DashboardIntent, with completion: @escaping (INObjectCollection<Applications>?, Error?) -> Void) {
-
         var applications: [Applications] = []
-        var account: tableAccount?
+        var activeTableAccount: tableAccount?
 
         let accountIdentifier: String = intent.accounts?.identifier ?? "active"
         if accountIdentifier == "active" {
-            account = NCManageDatabase.shared.getActiveAccount()
+            activeTableAccount = NCManageDatabase.shared.getActiveTableAccount()
         } else {
-            account = NCManageDatabase.shared.getAccount(predicate: NSPredicate(format: "account == %@", accountIdentifier))
+            activeTableAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", accountIdentifier))
         }
 
-        guard let account = account else {
+        guard let activeTableAccount else {
             return completion(nil, nil)
         }
 
-        let results = NCManageDatabase.shared.getDashboardWidgetApplications(account: account.account)
+        let results = NCManageDatabase.shared.getDashboardWidgetApplications(account: activeTableAccount.account)
         for result in results {
             let application = Applications(identifier: result.id, display: result.title)
             applications.append(application)
@@ -90,8 +84,7 @@ class IntentHandler: INExtension, DashboardIntentHandling, AccountIntentHandling
     }
 
     func defaultApplications(for intent: DashboardIntent) -> Applications? {
-
-        guard let account = NCManageDatabase.shared.getActiveAccount() else {
+        guard let account = NCManageDatabase.shared.getActiveTableAccount() else {
             return nil
         }
         if let result = NCManageDatabase.shared.getDashboardWidgetApplications(account: account.account).first {
@@ -101,11 +94,9 @@ class IntentHandler: INExtension, DashboardIntentHandling, AccountIntentHandling
     }
 
     // Account
-
     func provideAccountsOptionsCollection(for intent: DashboardIntent, with completion: @escaping (INObjectCollection<Accounts>?, Error?) -> Void) {
-
         var accounts: [Accounts] = []
-        let results = NCManageDatabase.shared.getAllAccount()
+        let results = NCManageDatabase.shared.getAllTableAccount()
 
         accounts.append(Accounts(identifier: "active", display: "Active account"))
 
@@ -124,8 +115,7 @@ class IntentHandler: INExtension, DashboardIntentHandling, AccountIntentHandling
     }
 
     func defaultAccounts(for intent: DashboardIntent) -> Accounts? {
-
-        if NCManageDatabase.shared.getActiveAccount() == nil {
+        if NCManageDatabase.shared.getActiveTableAccount() == nil {
             return nil
         } else {
             return Accounts(identifier: "active", display: "Active account")

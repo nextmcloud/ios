@@ -25,35 +25,35 @@ import UIKit
 
 class NCActivityCommentView: UIView, UITextFieldDelegate {
     @IBOutlet weak var imageItem: UIImageView!
-    @IBOutlet weak var labelUser: UILabel!
     @IBOutlet weak var newCommentField: UITextField!
 
     var completionHandler: ((String?) -> Void)?
 
-    func setup(urlBase: NCUserBaseUrl, account: tableAccount, completionHandler: @escaping (String?) -> Void) {
+    func setup(account: String, completionHandler: @escaping (String?) -> Void) {
+        let session = NCSession.shared.getSession(account: account)
         self.completionHandler = completionHandler
         newCommentField.placeholder = NSLocalizedString("_new_comment_", comment: "")
         newCommentField.delegate = self
 
-        let fileName = urlBase.userBaseUrl + "-" + urlBase.user + ".png"
+        let fileName = NCSession.shared.getFileName(urlBase: session.urlBase, user: session.user)
         let fileNameLocalPath = NCUtilityFileSystem().directoryUserData + "/" + fileName
         if let image = UIImage(contentsOfFile: fileNameLocalPath) {
             imageItem.image = image
         } else {
-            imageItem.image = UIImage(named: "avatar")
+            imageItem.image = NCUtility().loadImage(named: "person.crop.circle", colors: [NCBrandColor.shared.iconImageColor])
         }
-
-        if account.displayName.isEmpty {
-            labelUser.text = account.user
-        } else {
-            labelUser.text = account.displayName
-        }
-        labelUser.textColor = .label
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         completionHandler?(textField.text)
         return true
+    }
+}
+
+extension NCActivityCommentView: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        completionHandler?(searchBar.text)
     }
 }

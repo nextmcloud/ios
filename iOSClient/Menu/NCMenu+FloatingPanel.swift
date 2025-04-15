@@ -27,30 +27,29 @@ import UIKit
 
 class NCMenuFloatingPanelLayout: FloatingPanelLayout {
     var position: FloatingPanelPosition = .bottom
-
     var initialState: FloatingPanelState = .full
-
     var anchors: [FloatingPanelState: FloatingPanelLayoutAnchoring] {
         [
             .full: FloatingPanelLayoutAnchor(absoluteInset: topInset, edge: .top, referenceGuide: .superview)
         ]
     }
-
     let topInset: CGFloat
 
     init(actionsHeight: CGFloat) {
-        // sometimes UIScreen.main.bounds.size.height is not updated correctly
-        // this ensures we use the correct height value
-        // can't use `layoutFor size` since menu is dieplayed on top of the whole screen not just the VC
-        let screenHeight = UIDevice.current.orientation.isLandscapeHardCheck
-        ? min(UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)
-        : max(UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)
-        let window = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
-        let bottomInset = window?.rootViewController?.view.safeAreaInsets.bottom ?? 0
-        let panelHeight = CGFloat(actionsHeight) + bottomInset
+        guard let windowScene = UIApplication.shared.connectedScenes.first(where: { $0 is UIWindowScene }) as? UIWindowScene,
+              let window = windowScene.windows.first(where: { $0.isKeyWindow })
+        else {
+            topInset = 48
+            return
+        }
+        let screenHeight = UIDevice.current.orientation.isLandscape
+        ? min(window.frame.size.width, window.frame.size.height)
+        : max(window.frame.size.width, window.frame.size.height)
+        let bottomInset = window.rootViewController?.view.safeAreaInsets.bottom ?? 0
+        let panelHeight = actionsHeight + bottomInset
 
         topInset = max(48, screenHeight - panelHeight)
-    }
+     }
 
     func prepareLayout(surfaceView: UIView, in view: UIView) -> [NSLayoutConstraint] {
         return [
@@ -86,6 +85,8 @@ class NCMenuPanelController: FloatingPanelController {
 
         surfaceView.grabberHandle.accessibilityCustomActions = [collapseAction]
         surfaceView.grabberHandle.isAccessibilityElement = true
+
+        contentInsetAdjustmentBehavior = .never
     }
 
     @objc private func accessibilityActionCollapsePanel() {

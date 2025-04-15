@@ -22,15 +22,15 @@
 //
 
 import UIKit
-import WebKit
+@preconcurrency import WebKit
 
 class NCViewerRichWorkspaceWebView: UIViewController, WKNavigationDelegate, WKScriptMessageHandler {
 
     @IBOutlet weak var webView: WKWebView!
     @IBOutlet weak var webViewBottomConstraint: NSLayoutConstraint!
 
-    @objc var metadata: tableMetadata?
-    @objc var url: String = ""
+    var metadata: tableMetadata?
+    var url: String = ""
 
     // MARK: - View Life Cycle
 
@@ -49,6 +49,15 @@ class NCViewerRichWorkspaceWebView: UIViewController, WKNavigationDelegate, WKSc
         webView.navigationDelegate = self
         webView.customUserAgent = userAgent
         webView.load(request)
+    }
+
+    deinit {
+        print("dealloc")
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: "DirectEditingMobileInterface")
     }
 
     @objc func keyboardDidShow(notification: Notification) {

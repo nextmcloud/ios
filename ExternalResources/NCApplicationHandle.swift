@@ -28,8 +28,6 @@ import Parchment
 
 class NCApplicationHandle: NSObject {
 
-    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-
     // class: AppDelegate
     // func nextcloudPushNotificationAction(data: [String: AnyObject])
     func nextcloudPushNotificationAction(data: [String: AnyObject]) -> [String: AnyObject]? {
@@ -55,7 +53,7 @@ class NCApplicationHandle: NSObject {
 
     // class: NCCollectionViewCommon (+Menu)
     // func: toggleMenu(metadata: tableMetadata, imageIcon: UIImage?)
-    func addCollectionViewCommonMenu(metadata: tableMetadata, imageIcon: UIImage?, actions: inout [NCMenuAction]) {
+    func addCollectionViewCommonMenu(metadata: tableMetadata, image: UIImage?, actions: inout [NCMenuAction]) {
     }
 
     // class: NCMore

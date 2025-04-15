@@ -26,56 +26,50 @@ import NextcloudKit
 
 class NCRecent: NCCollectionViewCommon {
 
-    // MARK: - View Life Cycle
-
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
 
         titleCurrentFolder = NSLocalizedString("_recent_", comment: "")
         layoutKey = NCGlobal.shared.layoutViewRecent
         enableSearchBar = false
-        headerMenuButtonsView = false
         headerRichWorkspaceDisable = true
-        emptyImage = utility.loadImage(named: "clock.arrow.circlepath", color: .gray, size: UIScreen.main.bounds.width)
+        emptyImageName = "clock.arrow.circlepath"
         emptyTitle = "_files_no_files_"
         emptyDescription = ""
     }
 
+    // MARK: - View Life Cycle
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        navigationController?.setFileAppreance()
+        reloadDataSource()
     }
 
-    // MARK: - DataSource + NC Endpoint
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
 
-    override func queryDB(isForced: Bool) {
-
-        let metadatas = NCManageDatabase.shared.getAdvancedMetadatas(predicate: NSPredicate(format: "account == %@", self.appDelegate.account), page: 1, limit: 100, sorted: "date", ascending: false)
-        self.dataSource = NCDataSource(metadatas: metadatas,
-                                       account: self.appDelegate.account,
-                                       directoryOnTop: false,
-                                       favoriteOnTop: false,
-                                       groupByField: self.groupByField,
-                                       providers: self.providers,
-                                       searchResults: self.searchResults)
+        getServerData()
     }
 
-    override func reloadDataSource(isForced: Bool = true) {
-        super.reloadDataSource()
+    // MARK: - DataSource
 
-        DispatchQueue.global().async {
-            self.queryDB(isForced: isForced)
-            DispatchQueue.main.async {
-                self.refreshControl.endRefreshing()
-                self.collectionView.reloadData()
-            }
+    override func reloadDataSource() {
+        var metadatas: [tableMetadata] = []
+
+        if let results = self.database.getResultsMetadatas(predicate: NSPredicate(format: "account == %@ AND fileName != '.'", session.account), sortedByKeyPath: "date", ascending: false) {
+            metadatas = Array(results.freeze())
         }
+
+        layoutForView?.sort = "date"
+        layoutForView?.ascending = false
+
+        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView)
+
+        super.reloadDataSource()
     }
 
-    override func reloadDataSourceNetwork(isForced: Bool = false) {
-        super.reloadDataSourceNetwork(isForced: isForced)
-
+    override func getServerData() {
         let requestBodyRecent =
         """
         <?xml version=\"1.0\"?>
@@ -126,7 +120,7 @@ class NCRecent: NCCollectionViewCommon {
         <d:orderby>
             <d:order>
                 <d:prop>
-                    <d:getlastmodified/>
+        /Users/marinofaggiana/Developer/ios/iOSClient/Assistant                 <d:getlastmodified/>
                 </d:prop>
                 <d:descending/>
             </d:order>
@@ -142,33 +136,25 @@ class NCRecent: NCCollectionViewCommon {
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
         let lessDateString = dateFormatter.string(from: Date())
-        let requestBody = String(format: requestBodyRecent, "/files/" + appDelegate.userId, lessDateString)
+        let requestBody = String(format: requestBodyRecent, "/files/" + session.userId, lessDateString)
 
-        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Reload data source network recent forced \(isForced)")
-
-        isReloadDataSourceNetworkInProgress = true
-        collectionView?.reloadData()
-
-        NextcloudKit.shared.searchBodyRequest(serverUrl: appDelegate.urlBase,
+        NextcloudKit.shared.searchBodyRequest(serverUrl: session.urlBase,
                                               requestBody: requestBody,
                                               showHiddenFiles: NCKeychain().showHiddenFiles,
-                                              options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { account, files, _, error in
-
-            self.isReloadDataSourceNetworkInProgress = false
-            if error == .success {
-                NCManageDatabase.shared.convertFilesToMetadatas(files, useMetadataFolder: false) { _, metadatasFolder, metadatas in
-                    // Update sub directories
-                    for metadata in metadatasFolder {
-                        let serverUrl = metadata.serverUrl + "/" + metadata.fileName
-                        NCManageDatabase.shared.addDirectory(encrypted: metadata.e2eEncrypted, favorite: metadata.favorite, ocId: metadata.ocId, fileId: metadata.fileId, etag: nil, permissions: metadata.permissions, serverUrl: serverUrl, account: account)
-                    }
+                                              account: session.account) { task in
+            self.dataSourceTask = task
+            if self.dataSource.isEmpty() {
+                self.collectionView.reloadData()
+            }
+        } completion: { _, files, _, error in
+            if error == .success, let files {
+                self.database.convertFilesToMetadatas(files, useFirstAsMetadataFolder: false) { _, metadatas in
                     // Add metadatas
-                    NCManageDatabase.shared.addMetadatas(metadatas)
+                    self.database.addMetadatas(metadatas)
                     self.reloadDataSource()
                 }
-            } else {
-                self.reloadDataSource()
             }
+            self.refreshControl.endRefreshing()
         }
     }
 }

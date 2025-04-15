@@ -22,11 +22,11 @@
 //
 
 import Foundation
+import UIKit
 import RealmSwift
 import NextcloudKit
 
 class tableAvatar: Object {
-
     @objc dynamic var date = NSDate()
     @objc dynamic var etag = ""
     @objc dynamic var fileName = ""
@@ -38,9 +38,7 @@ class tableAvatar: Object {
 }
 
 extension NCManageDatabase {
-
     func addAvatar(fileName: String, etag: String) {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -52,26 +50,22 @@ extension NCManageDatabase {
                 realm.add(addObject, update: .all)
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func getTableAvatar(fileName: String) -> tableAvatar? {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             guard let result = realm.objects(tableAvatar.self).filter("fileName == %@", fileName).first else { return nil }
             return tableAvatar.init(value: result)
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
-
         return nil
     }
 
     func clearAllAvatarLoaded() {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -82,13 +76,12 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     @discardableResult
     func setAvatarLoaded(fileName: String) -> UIImage? {
-
         let fileNameLocalPath = utilityFileSystem.directoryUserData + "/" + fileName
         var image: UIImage?
 
@@ -105,32 +98,27 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
-
         return image
     }
 
-    func getImageAvatarLoaded(fileName: String) -> UIImage? {
-
+    func getImageAvatarLoaded(fileName: String) -> (image: UIImage?, tableAvatar: tableAvatar?) {
         let fileNameLocalPath = utilityFileSystem.directoryUserData + "/" + fileName
+        let image = UIImage(contentsOfFile: fileNameLocalPath)
 
         do {
             let realm = try Realm()
-            realm.refresh()
             let result = realm.objects(tableAvatar.self).filter("fileName == %@", fileName).first
             if result == nil {
                 utilityFileSystem.removeFile(atPath: fileNameLocalPath)
-                return nil
-            } else if result?.loaded == false {
-                return nil
             }
-            return UIImage(contentsOfFile: fileNameLocalPath)
+            return (image, result)
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
 
         utilityFileSystem.removeFile(atPath: fileNameLocalPath)
-        return nil
+        return (nil, nil)
     }
 }

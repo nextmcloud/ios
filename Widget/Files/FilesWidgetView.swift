@@ -38,12 +38,12 @@ struct FilesWidgetView: View {
         let linkActionVoiceMemo: URL = URL(string: NCGlobal.shared.widgetActionVoiceMemo + parameterLink) != nil ? URL(string: NCGlobal.shared.widgetActionVoiceMemo + parameterLink)! : URL(string: NCGlobal.shared.widgetActionVoiceMemo)!
 
         GeometryReader { geo in
-
             if entry.isEmpty {
                 VStack(alignment: .center) {
                     Image(systemName: "checkmark")
                         .resizable()
                         .scaledToFit()
+                        .font(Font.system(.body).weight(.light))
                         .frame(width: 50, height: 50)
                     Text(NSLocalizedString("_no_items_", comment: ""))
                         .font(.system(size: 25))
@@ -57,7 +57,6 @@ struct FilesWidgetView: View {
             ZStack(alignment: .topLeading) {
 
                 HStack {
-
                     Text(entry.tile)
                         .font(.system(size: 12))
                         .fontWeight(.bold)
@@ -70,39 +69,43 @@ struct FilesWidgetView: View {
 
                 if !entry.isEmpty {
                     VStack(alignment: .leading) {
-
                         VStack(spacing: 0) {
-
                             ForEach(entry.datas, id: \.id) { element in
-
                                 Link(destination: element.url) {
-
                                     HStack {
-
-                                        Image(uiImage: element.image)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 35, height: 35)
-                                            .clipped()
-                                            .cornerRadius(5)
+                                        if element.useTypeIconFile {
+                                            Image(uiImage: element.image)
+                                                .resizable()
+                                                .renderingMode(.template)
+                                                .foregroundColor(Color(NCBrandColor.shared.iconImageColor2))
+                                                .scaledToFit()
+                                                .frame(width: 35, height: 35)
+                                        } else {
+                                            Image(uiImage: element.image)
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 35, height: 35)
+                                                .clipped()
+                                                .cornerRadius(5)
+                                        }
 
                                         VStack(alignment: .leading, spacing: 2) {
-
                                             Text(element.title)
                                                 .font(.system(size: 12))
                                                 .fontWeight(.regular)
-
                                             Text(element.subTitle)
                                                 .font(.system(size: CGFloat(10)))
-                                                .foregroundColor(Color(.systemGray))
+                                                .foregroundColor(Color(NCBrandColor.shared.iconImageColor2))
                                         }
                                         Spacer()
                                     }
                                     .padding(.leading, 10)
                                     .frame(height: 50)
                                 }
-                                Divider()
-                                    .padding(.leading, 54)
+                                if element != entry.datas.last {
+                                    Divider()
+                                        .padding(.leading, 54)
+                                }
                             }
                         }
                     }
@@ -111,16 +114,15 @@ struct FilesWidgetView: View {
                 }
 
                 HStack(spacing: 0) {
-
                     let sizeButton: CGFloat = 40
 
                     Link(destination: entry.isPlaceholder ? linkNoAction : linkActionUploadAsset, label: {
                         Image("addImage")
                             .resizable()
                             .renderingMode(.template)
-                            .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brandText))
+                            .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getText(account: entry.account)))
                             .padding(11)
-                            .background(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brand))
+                            .background(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getElement(account: entry.account)))
                             .clipShape(Circle())
                             .scaledToFit()
                             .frame(width: geo.size.width / 4, height: sizeButton)
@@ -130,11 +132,12 @@ struct FilesWidgetView: View {
                         Image(systemName: "doc.text.viewfinder")
                             .resizable()
                             .renderingMode(.template)
-                            .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brandText))
+                            .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getText(account: entry.account)))
                             .padding(11)
-                            .background(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brand))
+                            .background(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getElement(account: entry.account)))
                             .clipShape(Circle())
                             .scaledToFit()
+                            .font(Font.system(.body).weight(.light))
                             .frame(width: geo.size.width / 4, height: sizeButton)
                     })
 
@@ -142,9 +145,9 @@ struct FilesWidgetView: View {
                         Image("note.text")
                             .resizable()
                             .renderingMode(.template)
-                            .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brandText))
+                            .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getText(account: entry.account)))
                             .padding(11)
-                            .background(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brand))
+                            .background(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getElement(account: entry.account)))
                             .clipShape(Circle())
                             .scaledToFit()
                             .frame(width: geo.size.width / 4, height: sizeButton)
@@ -154,29 +157,29 @@ struct FilesWidgetView: View {
                         Image("microphone")
                             .resizable()
                             .renderingMode(.template)
-                            .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brandText))
+                            .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getText(account: entry.account)))
                             .padding(11)
-                            .background(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brand))
+                            .background(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getElement(account: entry.account)))
                             .clipShape(Circle())
                             .scaledToFit()
                             .frame(width: geo.size.width / 4, height: sizeButton)
                     })
                 }
-                .frame(width: geo.size.width, height: geo.size.height - 25, alignment: .bottomTrailing)
+                .frame(width: geo.size.width, height: geo.size.height - 22, alignment: .bottomTrailing)
                 .redacted(reason: entry.isPlaceholder ? .placeholder : [])
 
                 HStack {
-
                     Image(systemName: entry.footerImage)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 15, height: 15)
-                        .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brand))
+                        .font(Font.system(.body).weight(.light))
+                        .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getElement(account: entry.account)))
 
                     Text(entry.footerText)
                         .font(.caption2)
                         .lineLimit(1)
-                        .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brand))
+                        .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getElement(account: entry.account)))
                 }
                 .padding(.horizontal, 15.0)
                 .frame(maxWidth: geo.size.width, maxHeight: geo.size.height - 2, alignment: .bottomTrailing)
@@ -189,7 +192,7 @@ struct FilesWidgetView: View {
 struct FilesWidget_Previews: PreviewProvider {
     static var previews: some View {
         let datas = Array(filesDatasTest[0...4])
-        let entry = FilesDataEntry(date: Date(), datas: datas, isPlaceholder: false, isEmpty: true, userId: "", url: "", tile: "Good afternoon, Marino Faggiana", footerImage: "checkmark.icloud", footerText: "Nextcloud files")
+        let entry = FilesDataEntry(date: Date(), datas: datas, isPlaceholder: false, isEmpty: true, userId: "", url: "", account: "", tile: "Good afternoon, Marino Faggiana", footerImage: "checkmark.icloud", footerText: "Nextcloud files")
         FilesWidgetView(entry: entry).previewContext(WidgetPreviewContext(family: .systemLarge))
     }
 }

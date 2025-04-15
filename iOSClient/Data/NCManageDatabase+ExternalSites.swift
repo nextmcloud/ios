@@ -22,11 +22,11 @@
 //
 
 import Foundation
+import UIKit
 import RealmSwift
 import NextcloudKit
 
 class tableExternalSites: Object {
-
     @objc dynamic var account = ""
     @objc dynamic var icon = ""
     @objc dynamic var idExternalSite: Int = 0
@@ -37,9 +37,7 @@ class tableExternalSites: Object {
 }
 
 extension NCManageDatabase {
-
     func addExternalSites(_ externalSite: NKExternalSite, account: String) {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -56,12 +54,11 @@ extension NCManageDatabase {
                 realm.add(addObject)
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func deleteExternalSites(account: String) {
-
         do {
             let realm = try Realm()
             try realm.write {
@@ -69,15 +66,13 @@ extension NCManageDatabase {
                 realm.delete(results)
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func getAllExternalSites(account: String) -> [tableExternalSites]? {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             let results = realm.objects(tableExternalSites.self).filter("account == %@", account).sorted(byKeyPath: "idExternalSite", ascending: true)
             if results.isEmpty {
                 return nil
@@ -85,9 +80,8 @@ extension NCManageDatabase {
                 return Array(results.map { tableExternalSites.init(value: $0) })
             }
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access to database: \(error)")
         }
-
         return nil
     }
 }

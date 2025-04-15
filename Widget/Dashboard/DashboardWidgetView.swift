@@ -25,18 +25,15 @@ import SwiftUI
 import WidgetKit
 
 struct DashboardWidgetView: View {
-
     var entry: DashboardDataEntry
-
     var body: some View {
-
         GeometryReader { geo in
-
             if entry.isEmpty {
                 VStack(alignment: .center) {
                     Image(systemName: "checkmark")
                         .resizable()
                         .scaledToFit()
+                        .font(Font.system(.body).weight(.light))
                         .frame(width: 50, height: 50)
                     Text(NSLocalizedString("_no_items_", comment: ""))
                         .font(.system(size: 25))
@@ -48,9 +45,7 @@ struct DashboardWidgetView: View {
             }
 
             ZStack(alignment: .topLeading) {
-
                 HStack {
-
                     Image(uiImage: entry.titleImage)
                         .renderingMode(.template)
                         .resizable()
@@ -143,8 +138,10 @@ struct DashboardWidgetView: View {
                                     .padding(.leading, 10)
                                     .frame(height: 50)
                                 }
-                                Divider()
-                                    .padding(.leading, 54)
+                                if element != entry.datas.last {
+                                    Divider()
+                                        .padding(.leading, 54)
+                                }
                             }
                         }
                     }
@@ -155,9 +152,8 @@ struct DashboardWidgetView: View {
                 if let buttons = entry.buttons, !buttons.isEmpty, !entry.isPlaceholder {
 
                     HStack(spacing: 10) {
-
-                        let brandColor = Color(NCBrandColor.shared.brand)
-                        let brandTextColor = Color(NCBrandColor.shared.brandText)
+                        let brandColor = Color(NCBrandColor.shared.getElement(account: entry.account))
+                        let brandTextColor = Color(NCBrandColor.shared.getText(account: entry.account))
 
                         ForEach(buttons, id: \.index) { element in
                             Link(destination: URL(string: element.link)!, label: {
@@ -181,12 +177,13 @@ struct DashboardWidgetView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 15, height: 15)
-                        .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brand))
+                        .font(Font.system(.body).weight(.light))
+                        .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getElement(account: entry.account)))
 
                     Text(entry.footerText)
                         .font(.caption2)
                         .lineLimit(1)
-                        .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.brand))
+                        .foregroundColor(entry.isPlaceholder ? Color(.systemGray4) : Color(NCBrandColor.shared.getElement(account: entry.account)))
                 }
                 .padding(.horizontal, 15.0)
                 .frame(maxWidth: geo.size.width, maxHeight: geo.size.height - 2, alignment: .bottomTrailing)
@@ -201,7 +198,7 @@ struct DashboardWidget_Previews: PreviewProvider {
         let datas = Array(dashboardDatasTest[0...4])
         let title = "Dashboard"
         let titleImage = UIImage(named: "widget")!
-        let entry = DashboardDataEntry(date: Date(), datas: datas, dashboard: nil, buttons: nil, isPlaceholder: false, isEmpty: true, titleImage: titleImage, title: title, footerImage: "checkmark.icloud", footerText: "Nextcloud widget")
+        let entry = DashboardDataEntry(date: Date(), datas: datas, dashboard: nil, buttons: nil, isPlaceholder: false, isEmpty: true, titleImage: titleImage, title: title, footerImage: "checkmark.icloud", footerText: "Nextcloud widget", account: "")
         DashboardWidgetView(entry: entry).previewContext(WidgetPreviewContext(family: .systemLarge))
     }
 }

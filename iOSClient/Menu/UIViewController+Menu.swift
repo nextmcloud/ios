@@ -22,12 +22,13 @@
 //
 
 import Foundation
+import UIKit
+import MessageUI
 import SVGKit
 import NextcloudKit
-import UIKit
 
 extension UIViewController {
-    fileprivate func handleProfileAction(_ action: NKHovercard.Action, for userId: String) {
+    fileprivate func handleProfileAction(_ action: NKHovercard.Action, for userId: String, session: NCSession.Session) {
         switch action.appId {
         case "email":
             guard
@@ -43,8 +44,7 @@ extension UIViewController {
 
         case "spreed":
             guard
-                let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-                let talkUrl = URL(string: "nextcloudtalk://open-conversation?server=\(appDelegate.urlBase)&user=\(appDelegate.userId)&withUser=\(userId)"),
+                let talkUrl = URL(string: "nextcloudtalk://open-conversation?server=\(session.urlBase)&user=\(session.userId)&withUser=\(userId)"),
                 UIApplication.shared.canOpenURL(talkUrl)
             else { fallthrough /* default: open web link in browser */ }
             UIApplication.shared.open(talkUrl)
@@ -59,33 +59,28 @@ extension UIViewController {
         }
     }
 
-    func showProfileMenu(userId: String) {
+    func showProfileMenu(userId: String, session: NCSession.Session) {
+        guard NCCapabilities.shared.getCapabilities(account: session.account).capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion23 else { return }
 
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        guard NCGlobal.shared.capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion23 else { return }
-
-        NextcloudKit.shared.getHovercard(for: userId) { account, card, _, _ in
-            guard let card = card, account == appDelegate.account else { return }
+        NextcloudKit.shared.getHovercard(for: userId, account: session.account) { account, card, _, _ in
+            guard let card = card, account == session.account else { return }
 
             let personHeader = NCMenuAction(
                 title: card.displayName,
-                icon: NCUtility().loadUserImage(
-                    for: userId,
-                       displayName: card.displayName,
-                       userBaseUrl: appDelegate),
+                icon: NCUtility().loadUserImage(for: userId, displayName: card.displayName, urlBase: session.urlBase),
                 action: nil)
 
             let actions = card.actions.map { action -> NCMenuAction in
-                var image = NCUtility().loadImage(named: "user", color: .label)
+                var image = NCUtility().loadImage(named: "user", colors: [NCBrandColor.shared.iconImageColor])
                 if let url = URL(string: action.icon),
                    let svgSource = SVGKSourceURL.source(from: url),
                    let svg = SVGKImage(source: svgSource) {
-                    image = svg.uiImage.withTintColor(.label, renderingMode: .alwaysOriginal)
+                    image = svg.uiImage.withTintColor(NCBrandColor.shared.iconImageColor, renderingMode: .alwaysOriginal)
                 }
                 return NCMenuAction(
                     title: action.title,
                     icon: image,
-                    action: { _ in self.handleProfileAction(action, for: userId) })
+                    action: { _ in self.handleProfileAction(action, for: userId, session: session) })
             }
 
             let allActions = [personHeader] + actions
@@ -107,7 +102,7 @@ extension UIViewController {
         present(mail, animated: true)
     }
 
-    func presentMenu(with actions: [NCMenuAction], menuColor: UIColor = .systemBackground, textColor: UIColor = .label) {
+    func presentMenu(with actions: [NCMenuAction], menuColor: UIColor = .systemBackground, textColor: UIColor = NCBrandColor.shared.textColor) {
         guard !actions.isEmpty else { return }
         let actions = actions.sorted(by: { $0.order < $1.order })
         guard let menuViewController = NCMenu.makeNCMenu(with: actions, menuColor: menuColor, textColor: textColor) else {
@@ -126,7 +121,7 @@ extension UIViewController {
     }
 }
 
-extension UIViewController: MFMailComposeViewControllerDelegate {
+extension UIViewController: @retroactive MFMailComposeViewControllerDelegate {
     public func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         controller.dismiss(animated: true)
     }

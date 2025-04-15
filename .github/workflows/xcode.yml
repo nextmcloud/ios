@@ -1,4 +1,4 @@
-name: Build main target
+name: Build and test main target
 
 on:
   push:
@@ -6,67 +6,136 @@ on:
       - master
       - develop
   pull_request:
-    types: [synchronize, opened, reopened, ready_for_review]
+    types:
+      - synchronize
+      - opened
+      - reopened
+      - ready_for_review
     branches:
       - master
       - develop
 
+env:
+  PROJECT: Nextcloud.xcodeproj
+  DESTINATION: platform=iOS Simulator,name=iPhone 16,OS=18.2
+  SCHEME: Nextcloud
+  SERVER_BRANCH: stable30
+  PHP_VERSION: 8.3
+
 jobs:
-  build-and-test:
-    name: Build and Test
-    runs-on: macos-latest
+  build:
+    name: Build
+    runs-on: macos-15
     if: github.event.pull_request.draft == false
-    env:
-      PROJECT: Nextcloud.xcodeproj
-      DESTINATION: platform=iOS Simulator,name=iPhone 14
-      SCHEME: Nextcloud
+
     steps:
-    - name: Set env var
-      run: echo "DEVELOPER_DIR=$(xcode-select --print-path)" >> $GITHUB_ENV
-    - uses: actions/checkout@v3
-    - name: Setup Bundler and Install Gems
-      run: |
-        gem install bundler
-        bundle install
-        bundle update
-    - name: Restore Carhage Cache
-      uses: actions/cache@v3
-      id: carthage-cache
-      with:
-        path: Carthage
-        key: ${{ runner.os }}-carthage-${{ hashFiles('**/Cartfile.resolved') }}
-        restore-keys: |
-          ${{ runner.os }}-carthage-
-    - name: Carthage
-      if: steps.carthage-cache.outputs.cache-hit != 'true'
-      run: carthage bootstrap --use-xcframeworks --platform iOS
+    - uses: actions/checkout@v4
+
     - name: Download GoogleService-Info.plist
       run: wget "https://raw.githubusercontent.com/firebase/quickstart-ios/master/mock-GoogleService-Info.plist" -O GoogleService-Info.plist
-    - name: Install docker
+
+    - name: Run Xcode Build
       run: |
-        brew install colima
-        brew install docker
-        colima start
-    - name: Create docker test server and export enviroment variables
+        set -o pipefail && \
+        xcodebuild build-for-testing \
+        -scheme "${{ env.SCHEME }}" \
+        -destination "${{ env.DESTINATION }}" \
+        -derivedDataPath "DerivedData" \
+        | xcbeautify --quieter
+
+    - name: Upload Build Products
+      uses: actions/upload-artifact@v4
+      with:
+        name: Nextcloud for iOS
+        path: DerivedData/Build/Products
+        retention-days: 4
+
+  test:
+    name: Run Tests
+    runs-on: macos-15
+    needs: [build]
+
+    # Temporarily, project has no effective tests except UI tests which are unfeasible on virtualized GitHub runners (see #3291)
+    # Previously: github.event.pull_request.draft == false
+    if: false
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Prepare PHP ${{ env.PHP_VERSION }}
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        # https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
+        extensions: apcu, bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, pgsql, pdo_pgsql
+        coverage: none
+        ini-file: development
+        ini-values: apc.enable_cli=on, disable_functions=
+
+    - name: Checkout Nextcloud Server
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+        repository: nextcloud/server
+        path: server
+        ref: ${{ env.SERVER_BRANCH }}
+
+    - name: Checkout Download Limits App
+      uses: actions/checkout@v4
+      with:
+        repository: nextcloud/files_downloadlimit
+        path: server/apps/files_downloadlimit
+        ref: ${{ env.SERVER_BRANCH }}
+
+    - name: Install Nextcloud Server
       run: |
-        source ./create-docker-test-server.sh
-        if [ ! -f ".env-vars" ]; then
-            touch .env-vars
-            echo "export TEST_SERVER_URL=$TEST_SERVER_URL" >> .env-vars
-            echo "export TEST_USER=$TEST_USER" >> .env-vars
-            echo "export TEST_APP_PASSWORD=$TEST_APP_PASSWORD" >> .env-vars
+        mkdir server/data
+        ./server/occ maintenance:install --verbose --database=sqlite --database-name=nextcloud --database-host=127.0.0.1 --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
+        ./server/occ config:system:set hashing_default_password --value=true --type=boolean
+        ./server/occ config:system:set auth.bruteforce.protection.enabled --value false --type bool
+        ./server/occ config:system:set ratelimit.protection.enabled --value false --type bool
+        ./server/occ config:system:set memcache.local --value="\\OC\\Memcache\\APCu"
+        ./server/occ config:system:set memcache.distributed --value="\\OC\\Memcache\\APCu"
+        ./server/occ app:enable files_downloadlimit
+        ./server/occ background:cron
+        PHP_CLI_SERVER_WORKERS=5 php -S localhost:8080 -t server/ &
+
+    - name: Download Build
+      uses: actions/download-artifact@v4
+      with:
+        name: Nextcloud for iOS
+
+    - name: Assert Nextcloud Server Status
+      run: curl -s --retry 5 --retry-delay 60 --retry-all-errors http://localhost:8080/status.php || true
+
+    - name: Boot iOS Simulator
+      run: |
+        xcrun simctl boot "iPhone 16"
+        xcrun simctl bootstatus "iPhone 16" || echo "Simulator booted"
+
+    - name: Check if Safari is installed
+      run: |
+        if xcrun simctl listapps booted | grep -q com.apple.mobilesafari; then
+          echo "Safari is installed in the simulator."
+        else
+          echo "Safari is NOT installed in the simulator."
+          exit 1
         fi
-    - name: Build & Test Nextcloud iOS
+
+    - name: Run Xcode Test
       run: |
-        set -o pipefail && xcodebuild test -project $PROJECT \
-        -scheme "$SCHEME" \
-        -destination "$DESTINATION" \
-        -enableCodeCoverage YES \
+        set -o pipefail && \
+        xcodebuild test-without-building \
+        -xctestrun $(find . -type f -name "*.xctestrun") \
+        -destination "${{ env.DESTINATION }}" \
+        -derivedDataPath "DerivedData" \
         -test-iterations 3 \
         -retry-tests-on-failure \
-        | xcpretty
-    - name: Upload coverage to codecov
-      run: |
-        bundle exec slather
-        bash <(curl -s https://codecov.io/bash) -f ./cobertura.xml -X coveragepy -X gcov -X xcode -t ${{ secrets.CODECOV_TOKEN }}
+        -resultBundlePath "TestResult.xcresult"
 
+    - name: Upload Xcode Test Results
+      uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: TestResult.xcresult
+        path: "TestResult.xcresult"

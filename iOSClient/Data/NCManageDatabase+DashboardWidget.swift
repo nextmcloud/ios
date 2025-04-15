@@ -22,11 +22,11 @@
 //
 
 import Foundation
+import UIKit
 import RealmSwift
 import NextcloudKit
 
 class tableDashboardWidget: Object {
-
     @Persisted(primaryKey: true) var index = ""
     @Persisted var account = ""
     @Persisted var id = ""
@@ -39,7 +39,6 @@ class tableDashboardWidget: Object {
 }
 
 class tableDashboardWidgetButton: Object {
-
     @Persisted(primaryKey: true) var index = ""
     @Persisted var account = ""
     @Persisted var id = ""
@@ -49,46 +48,36 @@ class tableDashboardWidgetButton: Object {
 }
 
 extension NCManageDatabase {
-
     func getDashboardWidget(account: String, id: String) -> (tableDashboardWidget?, [tableDashboardWidgetButton]?) {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             guard let resultDashboard = realm.objects(tableDashboardWidget.self).filter("account == %@ AND id == %@", account, id).first else { return (nil, nil) }
             let resultsButton = realm.objects(tableDashboardWidgetButton.self).filter("account == %@ AND id == %@", account, id).sorted(byKeyPath: "type", ascending: true)
             return (tableDashboardWidget.init(value: resultDashboard), Array(resultsButton.map { tableDashboardWidgetButton.init(value: $0) }))
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
-
         return (nil, nil)
     }
 
     func getDashboardWidgetApplications(account: String) -> [tableDashboardWidget] {
-
         do {
             let realm = try Realm()
-            realm.refresh()
             let sortProperties = [SortDescriptor(keyPath: "order", ascending: true), SortDescriptor(keyPath: "title", ascending: true)]
             let results = realm.objects(tableDashboardWidget.self).filter("account == %@", account).sorted(by: sortProperties)
             return Array(results.map { tableDashboardWidget.init(value: $0) })
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
-
         return []
     }
 
     func addDashboardWidget(account: String, dashboardWidgets: [NCCDashboardWidget]) {
-
         do {
             let realm = try Realm()
             try realm.write {
-
                 let resultDashboard = realm.objects(tableDashboardWidget.self).filter("account == %@", account)
                 realm.delete(resultDashboard)
-
                 let resultDashboardButton = realm.objects(tableDashboardWidgetButton.self).filter("account == %@", account)
                 realm.delete(resultDashboardButton)
 
@@ -119,7 +108,7 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 }

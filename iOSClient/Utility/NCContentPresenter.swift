@@ -27,7 +27,6 @@ import CFNetwork
 import NextcloudKit
 
 class NCContentPresenter: NSObject {
-
     typealias MainFont = Font.HelveticaNeue
     enum Font {
         enum HelveticaNeue: String {
@@ -59,6 +58,10 @@ class NCContentPresenter: NSObject {
 
     // MARK: - Message
 
+    func showCustomMessage(title: String = "", message: String, priority: EKAttributes.Precedence.Priority = .normal, delay: TimeInterval = NCGlobal.shared.dismissAfterSecond, type: messageType) {
+        self.flatTop(title: NSLocalizedString(title, comment: ""), description: message, delay: delay, type: type, priority: priority, dropEnqueuedEntries: false)
+    }
+
     func showError(error: NKError, priority: EKAttributes.Precedence.Priority = .normal) {
         messageNotification(
             "_error_",
@@ -78,7 +81,7 @@ class NCContentPresenter: NSObject {
     }
 
     func showInfo(title: String = "", description: String = "") {
-        self.flatTop(title: NSLocalizedString(title, comment: ""), description: NSLocalizedString(description, comment: ""), delay: NCGlobal.shared.dismissAfterSecond, imageName: nil, type: .info, priority: .normal)
+        self.flatTop(title: NSLocalizedString(title, comment: ""), description: NSLocalizedString(description, comment: ""), delay: NCGlobal.shared.dismissAfterSecond, type: .info, priority: .normal)
     }
 
     func showWarning(error: NKError, priority: EKAttributes.Precedence.Priority = .normal) {
@@ -90,7 +93,7 @@ class NCContentPresenter: NSObject {
             priority: priority)
     }
 
-    @objc func messageNotification(_ title: String, error: NKError, delay: TimeInterval, type: messageType, afterDelay: TimeInterval = 0) {
+    func messageNotification(_ title: String, error: NKError, delay: TimeInterval, type: messageType, afterDelay: TimeInterval = 0) {
         messageNotification(title, error: error, delay: delay, type: type, priority: .normal, dropEnqueuedEntries: false, afterDelay: afterDelay)
     }
 
@@ -108,8 +111,8 @@ class NCContentPresenter: NSObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + afterDelay) {
             switch error.errorCode {
             case Int(CFNetworkErrors.cfurlErrorNotConnectedToInternet.rawValue):
-                let image = UIImage(named: "networkInProgress")!.image(color: .white, size: 20)
-                self.noteTop(text: NSLocalizedString(title, comment: ""), image: image, color: .lightGray, delay: delay, priority: .max)
+                let image = UIImage(named: "InfoNetwork")?.image(color: .white, size: 20)
+                self.noteTop(text: NSLocalizedString("_network_not_available_", comment: ""), image: image, color: .lightGray, delay: delay, priority: .max)
             default:
                 var responseMessage = ""
                 if let data = error.responseData {
@@ -123,20 +126,51 @@ class NCContentPresenter: NSObject {
                     }
                 }
                 if error.errorDescription.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return }
-                let description = NSLocalizedString(error.errorDescription, comment: "")
-                self.flatTop(title: NSLocalizedString(title, comment: ""), description: description + responseMessage, delay: delay, imageName: nil, type: type, priority: priority, dropEnqueuedEntries: dropEnqueuedEntries)
+                var description = NSLocalizedString(error.errorDescription, comment: "")
+                description = description.replacingOccurrences(of: "\t", with: "\n")
+                self.flatTop(title: NSLocalizedString(title, comment: ""), description: description + responseMessage, delay: delay, type: type, priority: priority, dropEnqueuedEntries: dropEnqueuedEntries)
             }
+        }
+    }
+
+    func showProcessingNote() {
+        DispatchQueue.main.async {
+            var attributes = EKAttributes.topFloat
+            let text = "Waiting for the goodies to arrive!"
+            let style = EKProperty.LabelStyle(
+                font: MainFont.light.with(size: 14),
+                color: .white,
+                alignment: .center,
+                displayMode: EKAttributes.DisplayMode.inferred
+            )
+            let labelContent = EKProperty.LabelContent(
+                text: text,
+                style: style
+            )
+            let contentView = EKProcessingNoteMessageView(
+                with: labelContent,
+                activityIndicator: .medium
+            )
+            attributes.windowLevel = .normal
+            attributes.entryBackground = .color(color: EKColor(self.getBackgroundColorFromType(.info)))
+            attributes.displayDuration = .infinity
+            attributes.positionConstraints.verticalOffset = 20
+            attributes.positionConstraints.size = .init(width: .offset(value: 20), height: .intrinsic)
+            attributes.positionConstraints.maxSize = .init(width: .constant(value: min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)), height: .intrinsic)
+            attributes.shadow = .active(with: .init(color: .black, opacity: 0.5, radius: 10, offset: .zero))
+            attributes.scroll = .enabled(swipeable: true, pullbackAnimation: .jolt)
+            attributes.popBehavior = .animated(animation: .init(translate: .init(duration: 0.2)))
+
+            SwiftEntryKit.display(entry: contentView, using: attributes)
         }
     }
 
     // MARK: - Flat message
 
-    private func flatTop(title: String, description: String, delay: TimeInterval, imageName: String?, type: messageType, priority: EKAttributes.Precedence.Priority = .normal, dropEnqueuedEntries: Bool = false) {
-
+    private func flatTop(title: String, description: String, delay: TimeInterval, type: messageType, priority: EKAttributes.Precedence.Priority = .normal, dropEnqueuedEntries: Bool = false) {
         if SwiftEntryKit.isCurrentlyDisplaying(entryNamed: title + description) { return }
 
         var attributes = EKAttributes.topFloat
-        var image: UIImage?
 
         attributes.windowLevel = .normal
         attributes.displayDuration = delay
@@ -149,13 +183,7 @@ class NCContentPresenter: NSObject {
 
         let title = EKProperty.LabelContent(text: title, style: .init(font: MainFont.bold.with(size: 16), color: .white))
         let description = EKProperty.LabelContent(text: description, style: .init(font: MainFont.medium.with(size: 13), color: .white))
-
-        if imageName == nil {
-            image = getImageFromType(type)
-        } else {
-            image = UIImage(named: imageName!)
-        }
-        let imageMessage = EKProperty.ImageContent(image: image!, size: CGSize(width: 35, height: 35))
+        let imageMessage = EKProperty.ImageContent(image: getImageFromType(type), size: CGSize(width: 35, height: 35))
 
         let simpleMessage = EKSimpleMessage(image: imageMessage, title: title, description: description)
         let notificationMessage = EKNotificationMessage(simpleMessage: simpleMessage)
@@ -263,7 +291,7 @@ class NCContentPresenter: NSObject {
     private func getBackgroundColorFromType(_ type: messageType) -> UIColor {
         switch type {
         case .info:
-            return NCBrandColor.shared.brandElement
+            return NCBrandColor.shared.customer
         case .error:
             return UIColor(red: 1, green: 0, blue: 0, alpha: 0.9)
         case .success:
@@ -273,16 +301,16 @@ class NCContentPresenter: NSObject {
         }
     }
 
-    private func getImageFromType(_ type: messageType) -> UIImage? {
+    private func getImageFromType(_ type: messageType) -> UIImage {
         switch type {
         case .info:
-            return UIImage(named: "iconInfo")
+            return UIImage(named: "iconInfo")!
         case .error:
-            return UIImage(named: "iconError")
+            return UIImage(named: "iconError")!
         case .success:
-            return UIImage(named: "iconSuccess")
+            return UIImage(named: "iconSuccess")!
         default:
-            return nil
+            return UIImage(named: "iconInfo")!
         }
     }
 

@@ -3,5 +3,5 @@
 //
 
 #import "NCEndToEndEncryption.h"
-#import "CCUtility.h"
 #import "UIImage+animatedGIF.h"
+#import "TOPasscodeViewController.h"

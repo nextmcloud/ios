@@ -23,10 +23,9 @@
 
 import UIKit
 import NextcloudKit
+import RealmSwift
 
 class NCGroupfolders: NCCollectionViewCommon {
-
-    // MARK: - View Life Cycle
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -34,87 +33,72 @@ class NCGroupfolders: NCCollectionViewCommon {
         titleCurrentFolder = NSLocalizedString("_group_folders_", comment: "")
         layoutKey = NCGlobal.shared.layoutViewGroupfolders
         enableSearchBar = false
-        headerMenuButtonsView = true
         headerRichWorkspaceDisable = true
-        emptyImage = UIImage(named: "folder_group")?.image(color: NCBrandColor.shared.brandElement, size: UIScreen.main.bounds.width)
+        emptyImageName = "folder_group"
         emptyTitle = "_files_no_files_"
         emptyDescription = "_tutorial_groupfolders_view_"
     }
 
+    // MARK: - View Life Cycle
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        navigationController?.setFileAppreance()
+        reloadDataSource()
     }
 
-    // MARK: - DataSource + NC Endpoint
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
 
-    override func queryDB(isForced: Bool) {
+        getServerData()
+    }
 
+    // MARK: - DataSource
+
+    override func reloadDataSource() {
         var metadatas: [tableMetadata] = []
 
         if self.serverUrl.isEmpty {
-            metadatas = NCManageDatabase.shared.getMetadatasFromGroupfolders(account: self.appDelegate.account, urlBase: self.appDelegate.urlBase, userId: self.appDelegate.userId)
+            if let results = database.getResultsMetadatasFromGroupfolders(session: session) {
+                metadatas = Array(results.freeze())
+            }
         } else {
-            metadatas = NCManageDatabase.shared.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", self.appDelegate.account, self.serverUrl))
+            metadatas = self.database.getResultsMetadatasPredicate(self.defaultPredicate, layoutForView: layoutForView)
         }
 
-        self.dataSource = NCDataSource(
-            metadatas: metadatas,
-            account: self.appDelegate.account,
-            sort: self.layoutForView?.sort,
-            ascending: self.layoutForView?.ascending,
-            directoryOnTop: self.layoutForView?.directoryOnTop,
-            favoriteOnTop: true,
-            groupByField: self.groupByField,
-            providers: self.providers,
-            searchResults: self.searchResults)
-    }
+        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView)
 
-    override func reloadDataSource(isForced: Bool = true) {
         super.reloadDataSource()
-
-        self.queryDB(isForced: isForced)
-        DispatchQueue.main.async {
-            self.isReloadDataSourceNetworkInProgress = false
-            self.refreshControl.endRefreshing()
-            self.collectionView.reloadData()
-        }
     }
 
-    override func reloadDataSourceNetwork(isForced: Bool = false) {
-        super.reloadDataSourceNetwork(isForced: isForced)
+    override func getServerData() {
+        let homeServerUrl = utilityFileSystem.getHomeServer(session: session)
 
-        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Reload data source network groupfolders forced \(isForced)")
-
-        isReloadDataSourceNetworkInProgress = true
-        collectionView?.reloadData()
-
-        let homeServerUrl = utilityFileSystem.getHomeServer(urlBase: self.appDelegate.urlBase, userId: self.appDelegate.userId)
-
-        NextcloudKit.shared.getGroupfolders(options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { account, results, _, error in
-
+        NextcloudKit.shared.getGroupfolders(account: session.account) { task in
+            self.dataSourceTask = task
+            if self.dataSource.isEmpty() {
+                self.collectionView.reloadData()
+            }
+        } completion: { account, results, _, error in
             if error == .success, let groupfolders = results {
-                NCManageDatabase.shared.addGroupfolders(account: account, groupfolders: groupfolders)
+                self.database.addGroupfolders(account: account, groupfolders: groupfolders)
                 Task {
                     for groupfolder in groupfolders {
                         let mountPoint = groupfolder.mountPoint.hasPrefix("/") ? groupfolder.mountPoint : "/" + groupfolder.mountPoint
                         let serverUrlFileName = homeServerUrl + mountPoint
-                        if NCManageDatabase.shared.getMetadataFromDirectory(account: self.appDelegate.account, serverUrl: serverUrlFileName) == nil {
-                            let results = await NextcloudKit.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", showHiddenFiles: NCKeychain().showHiddenFiles)
-                            if results.error == .success, let file = results.files.first {
-                                let isDirectoryE2EE = self.utilityFileSystem.isDirectoryE2EE(file: file)
-                                let metadata = NCManageDatabase.shared.convertFileToMetadata(file, isDirectoryE2EE: isDirectoryE2EE)
-                                NCManageDatabase.shared.addMetadata(metadata)
-                                NCManageDatabase.shared.addDirectory(encrypted: isDirectoryE2EE, favorite: metadata.favorite, ocId: metadata.ocId, fileId: metadata.fileId, etag: nil, permissions: metadata.permissions, serverUrl: serverUrlFileName, account: metadata.account)
-                            }
+                        let results = await NCNetworking.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", showHiddenFiles: NCKeychain().showHiddenFiles, account: account)
+
+                        if results.error == .success, let file = results.files?.first {
+                            let isDirectoryE2EE = self.utilityFileSystem.isDirectoryE2EE(file: file)
+                            let metadata = self.database.convertFileToMetadata(file, isDirectoryE2EE: isDirectoryE2EE)
+                            self.database.addMetadata(metadata)
+                            self.database.addDirectory(e2eEncrypted: isDirectoryE2EE, favorite: metadata.favorite, ocId: metadata.ocId, fileId: metadata.fileId, permissions: metadata.permissions, serverUrl: serverUrlFileName, account: metadata.account)
                         }
                     }
                     self.reloadDataSource()
                 }
-            } else if error != .success {
-                self.reloadDataSource()
             }
+            self.refreshControl.endRefreshing()
         }
     }
 }

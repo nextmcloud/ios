@@ -23,7 +23,6 @@
 
 #import "NCEndToEndEncryption.h"
 #import "NCBridgeSwift.h"
-#import "CCUtility.h"
 
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonKeyDerivation.h>
@@ -62,13 +61,13 @@
 @implementation NCEndToEndEncryption
 
 //Singleton
-+ (instancetype)sharedManager {
-    static NCEndToEndEncryption *NCEndToEndEncryption = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        NCEndToEndEncryption = [self new];
++ (instancetype)shared {
+    static dispatch_once_t once;
+    static NCEndToEndEncryption *shared;
+    dispatch_once(&once, ^{
+        shared = [self new];
     });
-    return NCEndToEndEncryption;
+    return shared;
 }
 
 #
@@ -77,29 +76,30 @@
 
 - (BOOL)generateCertificateX509WithUserId:(NSString *)userId directory:(NSString *)directory
 {
-    OPENSSL_init();
-    
-    int ret;
-    EVP_PKEY * pkey;
-    pkey = EVP_PKEY_new();
-    RSA * rsa;
-    BIGNUM *bignum = BN_new();
-    ret = BN_set_word(bignum, RSA_F4);
-    if (ret != 1) {
-        return NO;
+    EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
+    if (!ctx) {
+        return FALSE;
     }
 
-    rsa = RSA_new();
-    ret = RSA_generate_key_ex(rsa, 2048, bignum, NULL);
-    if (ret != 1) {
-        return NO;
+    // Generate an new RSA KEY
+    if (EVP_PKEY_keygen_init(ctx) <= 0) {
+        EVP_PKEY_CTX_free(ctx);
+        return FALSE;
     }
-    
-    EVP_PKEY_assign_RSA(pkey, rsa);
-    
-    X509 * x509;
-    x509 = X509_new();
-    
+
+    if (EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, 2048) <= 0) {
+        EVP_PKEY_CTX_free(ctx);
+        return FALSE;
+    }
+
+    EVP_PKEY *pkey = NULL;
+    if (EVP_PKEY_keygen(ctx, &pkey) <= 0) {
+        EVP_PKEY_CTX_free(ctx);
+        return FALSE;
+    }
+
+    X509 *x509 = X509_new();
+
     ASN1_INTEGER_set(X509_get_serialNumber(x509), 1);
     
     long notBefore = [[NSDate date] timeIntervalSinceDate:[NSDate date]];
@@ -177,8 +177,8 @@
     
     BIO_read(csrBIO, keyBytes, len);
     _csrData = [NSData dataWithBytes:keyBytes length:len];
-    NSLog(@"[LOG] \n%@", [[NSString alloc] initWithData:_csrData encoding:NSUTF8StringEncoding]);
-    
+    NSLog(@"[INFO] \n%@", [[NSString alloc] initWithData:_csrData encoding:NSUTF8StringEncoding]);
+
     // PublicKey
     BIO *publicKeyBIO = BIO_new(BIO_s_mem());
     PEM_write_bio_PUBKEY(publicKeyBIO, pkey);
@@ -189,8 +189,8 @@
     BIO_read(publicKeyBIO, keyBytes, len);
     _publicKeyData = [NSData dataWithBytes:keyBytes length:len];
     self.generatedPublicKey = [[NSString alloc] initWithData:_publicKeyData encoding:NSUTF8StringEncoding];
-    NSLog(@"[LOG] \n%@", self.generatedPublicKey);
-    
+    NSLog(@"[INFO] \n%@", self.generatedPublicKey);
+
     // PrivateKey
     BIO *privateKeyBIO = BIO_new(BIO_s_mem());
     PEM_write_bio_PKCS8PrivateKey(privateKeyBIO, pkey, NULL, NULL, 0, NULL, NULL);
@@ -201,8 +201,8 @@
     BIO_read(privateKeyBIO, keyBytes, len);
     _privateKeyData = [NSData dataWithBytes:keyBytes length:len];
     self.generatedPrivateKey = [[NSString alloc] initWithData:_privateKeyData encoding:NSUTF8StringEncoding];
-    NSLog(@"[LOG] \n%@", self.generatedPrivateKey);
-    
+    NSLog(@"[INFO] \n%@", self.generatedPrivateKey);
+
     if(keyBytes)
         free(keyBytes);
     
@@ -235,7 +235,7 @@
     BIO_free(certBio);
     X509_free(certX509);
     
-    NSLog(@"[LOG] \n%@", publicKey);
+    NSLog(@"[INFO] \n%@", publicKey);
     return publicKey;
 }
 
@@ -251,7 +251,7 @@
         fclose(f);
         return NO;
     }
-    NSLog(@"[LOG] Saved cert to %@", certificatePath);
+    NSLog(@"[INFO] Saved cert to %@", certificatePath);
     fclose(f);
     
     // PublicKey
@@ -262,7 +262,7 @@
         fclose(f);
         return NO;
     }
-    NSLog(@"[LOG] Saved publicKey to %@", publicKeyPath);
+    NSLog(@"[INFO] Saved publicKey to %@", publicKeyPath);
     fclose(f);
     
     // Here you write the private key (pkey) to disk. OpenSSL will encrypt the
@@ -277,7 +277,7 @@
         fclose(f);
         return NO;
     }
-    NSLog(@"[LOG] Saved privatekey to %@", privatekeyPath);
+    NSLog(@"[INFO] Saved privatekey to %@", privatekeyPath);
     fclose(f);
     
     // CSR Request sha256
@@ -289,7 +289,7 @@
         fclose(f);
         return NO;
     }
-    NSLog(@"[LOG] Saved csr to %@", csrPath);
+    NSLog(@"[INFO] Saved csr to %@", csrPath);
     fclose(f);
     
     return YES;
@@ -308,7 +308,7 @@
         fclose(f);
         return NO;
     }
-    NSLog(@"[LOG] Saved p12 to %@", path);
+    NSLog(@"[INFO] Saved p12 to %@", path);
     fclose(f);
     
     return YES;
@@ -1382,22 +1382,6 @@
         [output appendFormat:@"%02x", digest[i]];
     
     return output;
-}
-
-- (NSData *)hashValueMD5OfData:(NSData *)data
-{
-    MD5_CTX md5Ctx;
-    unsigned char hashValue[MD5_DIGEST_LENGTH];
-    if(!MD5_Init(&md5Ctx)) {
-        return nil;
-    }
-    if (!MD5_Update(&md5Ctx, data.bytes, data.length)) {
-        return nil;
-    }
-    if (!MD5_Final(hashValue, &md5Ctx)) {
-        return nil;
-    }
-    return [NSData dataWithBytes:hashValue length:MD5_DIGEST_LENGTH];
 }
 
 - (NSString *)hexadecimalString:(NSData *)input

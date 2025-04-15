@@ -47,7 +47,7 @@ class NCActivityIndicator: NSObject {
             self.activityIndicator = UIActivityIndicatorView(style: style)
             guard let activityIndicator = self.activityIndicator, self.viewBackgroundActivityIndicator == nil else { return }
 
-            activityIndicator.color = .label
+            activityIndicator.color = NCBrandColor.shared.textColor
             activityIndicator.hidesWhenStopped = true
             activityIndicator.translatesAutoresizingMaskIntoConstraints = false
 
@@ -117,7 +117,7 @@ class NCActivityIndicator: NSObject {
 
     @objc func stop() {
 
-        DispatchQueue.main.async {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
 
             self.activityIndicator?.stopAnimating()
             self.activityIndicator?.removeFromSuperview()

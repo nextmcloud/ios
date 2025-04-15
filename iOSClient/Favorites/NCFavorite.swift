@@ -26,81 +26,63 @@ import NextcloudKit
 
 class NCFavorite: NCCollectionViewCommon {
 
-    // MARK: - View Life Cycle
-
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
 
         titleCurrentFolder = NSLocalizedString("_favorites_", comment: "")
         layoutKey = NCGlobal.shared.layoutViewFavorite
         enableSearchBar = false
-        headerMenuButtonsView = true
         headerRichWorkspaceDisable = true
-        emptyImage = UIImage(named: "star.fill")?.image(color: NCBrandColor.shared.yellowFavorite, size: UIScreen.main.bounds.width)
+        emptyImageName = "star.fill"
+        emptyImageColors = [NCBrandColor.shared.yellowFavorite]
         emptyTitle = "_favorite_no_files_"
         emptyDescription = "_tutorial_favorite_view_"
     }
 
+    // MARK: - View Life Cycle
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        navigationController?.setFileAppreance()
+        reloadDataSource()
     }
 
-    // MARK: - DataSource + NC Endpoint
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
 
-    override func queryDB(isForced: Bool) {
+        getServerData()
+    }
 
-        var metadatas: [tableMetadata] = []
+    // MARK: - DataSource
+
+    override func reloadDataSource() {
+        var predicate = self.defaultPredicate
 
         if self.serverUrl.isEmpty {
-            metadatas = NCManageDatabase.shared.getMetadatas(predicate: NSPredicate(format: "account == %@ AND favorite == true", self.appDelegate.account))
-        } else {
-            metadatas = NCManageDatabase.shared.getMetadatas(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", self.appDelegate.account, self.serverUrl))
+           predicate = NSPredicate(format: "account == %@ AND favorite == true AND NOT (status IN %@)", session.account, global.metadataStatusHideInView)
         }
 
-        self.dataSource = NCDataSource(metadatas: metadatas,
-                                       account: self.appDelegate.account,
-                                       sort: self.layoutForView?.sort,
-                                       ascending: self.layoutForView?.ascending,
-                                       directoryOnTop: self.layoutForView?.directoryOnTop,
-                                       favoriteOnTop: true,
-                                       groupByField: self.groupByField,
-                                       providers: self.providers,
-                                       searchResults: self.searchResults)
+        let metadatas = self.database.getResultsMetadatasPredicate(predicate, layoutForView: layoutForView)
+
+        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView)
+
+        super.reloadDataSource()
     }
 
-    override func reloadDataSource(isForced: Bool = true) {
-        super.reloadDataSource()
-
-        DispatchQueue.global().async {
-            self.queryDB(isForced: isForced)
-            DispatchQueue.main.async {
-                self.refreshControl.endRefreshing()
+    override func getServerData() {
+        NextcloudKit.shared.listingFavorites(showHiddenFiles: NCKeychain().showHiddenFiles, account: session.account) { task in
+            self.dataSourceTask = task
+            if self.dataSource.isEmpty() {
                 self.collectionView.reloadData()
             }
-        }
-    }
-
-    override func reloadDataSourceNetwork(isForced: Bool = false) {
-        super.reloadDataSourceNetwork(isForced: isForced)
-
-        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Reload data source network favorite forced \(isForced)")
-
-        isReloadDataSourceNetworkInProgress = true
-        collectionView?.reloadData()
-
-        NextcloudKit.shared.listingFavorites(showHiddenFiles: NCKeychain().showHiddenFiles,
-                                             options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { account, files, _, error in
-
-            self.isReloadDataSourceNetworkInProgress = false
-            if error == .success {
-                NCManageDatabase.shared.convertFilesToMetadatas(files, useMetadataFolder: false) { _, _, metadatas in
-                    NCManageDatabase.shared.updateMetadatasFavorite(account: account, metadatas: metadatas)
+        } completion: { account, files, _, error in
+            if error == .success, let files {
+                self.database.convertFilesToMetadatas(files, useFirstAsMetadataFolder: false) { _, metadatas in
+                    self.database.updateMetadatasFavorite(account: account, metadatas: metadatas)
                     self.reloadDataSource()
                 }
             }
-            self.reloadDataSource()
+            self.refreshControl.endRefreshing()
         }
     }
 }

@@ -22,6 +22,8 @@
 //
 
 import UIKit
+import AVFAudio
+import Photos
 
 class NCAskAuthorization: NSObject {
 
@@ -61,7 +63,7 @@ class NCAskAuthorization: NSObject {
         }
     }
 
-    @objc func askAuthorizationPhotoLibrary(viewController: UIViewController?, completion: @escaping (_ hasPermission: Bool) -> Void) {
+    @objc func askAuthorizationPhotoLibrary(controller: UIViewController?, completion: @escaping (_ hasPermission: Bool) -> Void) {
 
         switch PHPhotoLibrary.authorizationStatus() {
         case PHAuthorizationStatus.authorized:
@@ -78,14 +80,14 @@ class NCAskAuthorization: NSObject {
                 completion(false)
             }))
             DispatchQueue.main.async {
-                viewController?.present(alert, animated: true, completion: nil)
+                controller?.present(alert, animated: true, completion: nil)
             }
         case PHAuthorizationStatus.notDetermined:
             isRequesting = true
             PHPhotoLibrary.requestAuthorization { allowed in
                 self.isRequesting = false
 #if !EXTENSION
-                DispatchQueue.main.async { (UIApplication.shared.delegate as? AppDelegate)?.hidePrivacyProtectionWindow() }
+                // DispatchQueue.main.async { NCPasscode.shared.hidePrivacyProtectionWindow() }
 #endif
                 DispatchQueue.main.async {
                     if allowed == PHAuthorizationStatus.authorized {

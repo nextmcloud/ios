@@ -23,49 +23,48 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Realm
 import UIKit
 import NextcloudKit
+import RealmSwift
 
-class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDelegate, NCSectionHeaderMenuDelegate, NCEmptyDataSetDelegate, NCGridCellDelegate {
-
+class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegate {
     @IBOutlet weak var collectionView: UICollectionView!
 
-    var trashPath = ""
+    var filePath = ""
     var titleCurrentFolder = NSLocalizedString("_trash_view_", comment: "")
     var blinkFileId: String?
-    var emptyDataSet: NCEmptyDataSet?
-    var selectableDataSource: [RealmSwiftObject] { datasource }
-
-    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+    var dataSourceTask: URLSessionTask?
     let utilityFileSystem = NCUtilityFileSystem()
+    let database = NCManageDatabase.shared
     let utility = NCUtility()
-
-    internal var isEditMode = false
-    internal var selectOcId: [String] = []
-    internal var selectIndexPath: [IndexPath] = []
-
-    var datasource: [tableTrash] = []
+    var isEditMode = false
+    var selectOcId: [String] = []
+    var tabBarSelect: NCTrashSelectTabBar!
+    var datasource: Results<tableTrash>?
     var layoutForView: NCDBLayoutForView?
     var listLayout: NCListLayout!
     var gridLayout: NCGridLayout!
     var layoutKey = NCGlobal.shared.layoutViewTrash
-
-    private let refreshControl = UIRefreshControl()
+    let refreshControl = UIRefreshControl()
+    var filename: String?
+    var session: NCSession.Session {
+        NCSession.shared.getSession(controller: tabBarController)
+    }
 
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
+        super.viewDidLoad()
+
+        tabBarSelect = NCTrashSelectTabBar(tabBarController: tabBarController, delegate: self)
 
         view.backgroundColor = .systemBackground
         self.navigationController?.navigationBar.prefersLargeTitles = true
 
-        // Cell
         collectionView.register(UINib(nibName: "NCTrashListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
-        collectionView.register(UINib(nibName: "NCGridCell", bundle: nil), forCellWithReuseIdentifier: "gridCell")
+        collectionView.register(UINib(nibName: "NCTrashGridCell", bundle: nil), forCellWithReuseIdentifier: "gridCell")
 
-        // Header - Footer
-        collectionView.register(UINib(nibName: "NCSectionHeaderMenu", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionHeaderMenu")
+        collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
         collectionView.register(UINib(nibName: "NCSectionFooter", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "sectionFooter")
 
         collectionView.alwaysBounceVertical = true
@@ -76,24 +75,19 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
 
         // Add Refresh Control
         collectionView.refreshControl = refreshControl
-        refreshControl.tintColor = .gray
+        refreshControl.tintColor = NCBrandColor.shared.textColor2
         refreshControl.addTarget(self, action: #selector(loadListingTrash), for: .valueChanged)
-
-        // Empty
-        emptyDataSet = NCEmptyDataSet(view: collectionView, offset: NCGlobal.shared.heightButtonsView, delegate: self)
 
         NotificationCenter.default.addObserver(self, selector: #selector(reloadDataSource), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadDataSource), object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
 
-        appDelegate.activeViewController = self
-
-        navigationController?.setFileAppreance()
+        navigationController?.setNavigationBarAppearance()
         navigationItem.title = titleCurrentFolder
 
-        layoutForView = NCManageDatabase.shared.getLayoutForView(account: appDelegate.account, key: NCGlobal.shared.layoutViewTrash, serverUrl: "")
-        gridLayout.itemForLine = CGFloat(layoutForView?.itemForLine ?? 3)
+        layoutForView = self.database.getLayoutForView(account: session.account, key: NCGlobal.shared.layoutViewTrash, serverUrl: "")
 
         if layoutForView?.layout == NCGlobal.shared.layoutList {
             collectionView.collectionViewLayout = listLayout
@@ -101,68 +95,70 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
             collectionView.collectionViewLayout = gridLayout
         }
 
-        setNavigationItem()
-        reloadDataSource()
-    }
+        isEditMode = false
+        setNavigationRightItems()
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+        reloadDataSource()
         loadListingTrash()
     }
 
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
 
-        coordinator.animate(alongsideTransition: nil) { _ in
-            self.collectionView?.collectionViewLayout.invalidateLayout()
+        // Cancel Queue & Retrieves Properties
+        NCNetworking.shared.downloadThumbnailTrashQueue.cancelAll()
+        dataSourceTask?.cancel()
+    }
+
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+
+        if let frame = tabBarController?.tabBar.frame {
+            tabBarSelect.hostingController?.view.frame = frame
         }
     }
 
-    // MARK: - Empty
+    // MARK: - Layout
 
-    func emptyDataSetView(_ view: NCEmptyView) {
-        view.emptyImage.image = UIImage(named: "trash")?.image(color: .gray, size: UIScreen.main.bounds.width)
-        view.emptyTitle.text = NSLocalizedString("_trash_no_trash_", comment: "")
-        view.emptyDescription.text = NSLocalizedString("_trash_no_trash_description_", comment: "")
+    func setNavigationRightItems() {
+        func createMenuActions() -> [UIMenuElement] {
+            guard let layoutForView = self.database.getLayoutForView(account: session.account, key: layoutKey, serverUrl: ""),
+                  let datasource else { return [] }
+            let select = UIAction(title: NSLocalizedString("_select_", comment: ""), image: utility.loadImage(named: "checkmark.circle", colors: [NCBrandColor.shared.iconImageColor]), attributes: datasource.isEmpty ? .disabled : []) { _ in
+                self.setEditMode(true)
+            }
+            let list = UIAction(title: NSLocalizedString("_list_", comment: ""), image: utility.loadImage(named: "list.bullet", colors: [NCBrandColor.shared.iconImageColor]), state: layoutForView.layout == NCGlobal.shared.layoutList ? .on : .off) { _ in
+                self.onListSelected()
+                self.setNavigationRightItems()
+            }
+            let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""), image: utility.loadImage(named: "square.grid.2x2", colors: [NCBrandColor.shared.iconImageColor]), state: layoutForView.layout == NCGlobal.shared.layoutGrid ? .on : .off) { _ in
+                self.onGridSelected()
+                self.setNavigationRightItems()
+            }
+            let viewStyleSubmenu = UIMenu(title: "", options: .displayInline, children: [list, grid])
+
+            return [select, viewStyleSubmenu]
+        }
+
+        if isEditMode {
+            tabBarSelect.update(selectOcId: selectOcId)
+            tabBarSelect.show()
+            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done) {
+                self.setEditMode(false)
+            }
+            navigationItem.rightBarButtonItems = [select]
+        } else if navigationItem.rightBarButtonItems == nil || (!isEditMode && !tabBarSelect.isHidden()) {
+            tabBarSelect.hide()
+            let menu = UIBarButtonItem(image: utility.loadImage(named: "ellipsis.circle", colors: [NCBrandColor.shared.iconImageColor]), menu: UIMenu(children: createMenuActions()))
+            navigationItem.rightBarButtonItems = [menu]
+        } else {
+            navigationItem.rightBarButtonItems?.first?.menu = navigationItem.rightBarButtonItems?.first?.menu?.replacingChildren(createMenuActions())
+        }
     }
 
     // MARK: TAP EVENT
 
-    func tapButtonSwitch(_ sender: Any) {
-
-        if collectionView.collectionViewLayout == gridLayout {
-
-            // list layout
-            layoutForView?.layout = NCGlobal.shared.layoutList
-            NCManageDatabase.shared.setLayoutForView(account: appDelegate.account, key: NCGlobal.shared.layoutViewTrash, serverUrl: "", layout: layoutForView?.layout)
-
-            self.collectionView.reloadData()
-            self.collectionView.collectionViewLayout.invalidateLayout()
-            self.collectionView.setCollectionViewLayout(self.listLayout, animated: true)
-
-        } else {
-
-            // grid layout
-            layoutForView?.layout = NCGlobal.shared.layoutGrid
-            NCManageDatabase.shared.setLayoutForView(account: appDelegate.account, key: NCGlobal.shared.layoutViewTrash, serverUrl: "", layout: layoutForView?.layout)
-
-            self.collectionView.reloadData()
-            self.collectionView.collectionViewLayout.invalidateLayout()
-            self.collectionView.setCollectionViewLayout(self.gridLayout, animated: true)
-        }
-    }
-
-    func tapButtonOrder(_ sender: Any) {
-        let sortMenu = NCSortMenu()
-        sortMenu.toggleMenu(viewController: self, account: appDelegate.account, key: NCGlobal.shared.layoutViewTrash, sortButton: sender as? UIButton, serverUrl: "", hideDirectoryOnTop: true)
-    }
-
-    func tapButtonMore(_ sender: Any) {
-        toggleMenuMoreHeader()
-    }
-
     func tapRestoreListItem(with ocId: String, image: UIImage?, sender: Any) {
-
         if !isEditMode {
             restoreItem(with: ocId)
         } else if let button = sender as? UIView {
@@ -173,7 +169,6 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
     }
 
     func tapMoreListItem(with objectId: String, image: UIImage?, sender: Any) {
-
         if !isEditMode {
             toggleMenuMore(with: objectId, image: image, isGridCell: false)
         } else if let button = sender as? UIView {
@@ -183,8 +178,7 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
         } // else: undefined sender
     }
 
-    func tapMoreGridItem(with objectId: String, namedButtonMore: String, image: UIImage?, sender: Any) {
-
+    func tapMoreGridItem(with objectId: String, image: UIImage?, sender: Any) {
         if !isEditMode {
             toggleMenuMore(with: objectId, image: image, isGridCell: true)
         } else if let button = sender as? UIView {
@@ -194,58 +188,19 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
         }
     }
 
-    func tapButton1(_ sender: Any) {
-
-        if isEditMode {
-            if selectOcId.isEmpty { return }
-            self.selectOcId.forEach(self.restoreItem)
-            self.tapSelect()
-        } else {
-            if datasource.isEmpty { return }
-            datasource.forEach({ self.restoreItem(with: $0.fileId) })
-        }
-    }
-
-    func tapButton2(_ sender: Any) {
-
-        if isEditMode {
-            if selectOcId.isEmpty { return }
-            let alert = UIAlertController(title: NSLocalizedString("_trash_delete_selected_", comment: ""), message: "", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_delete_", comment: ""), style: .destructive, handler: { _ in
-                self.selectOcId.forEach(self.deleteItem)
-                self.tapSelect()
-            }))
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: { _ in }))
-            self.present(alert, animated: true, completion: nil)
-        } else {
-            if datasource.isEmpty { return }
-            let alert = UIAlertController(title: NSLocalizedString("_trash_delete_all_description_", comment: ""), message: "", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_trash_delete_all_", comment: ""), style: .destructive, handler: { _ in
-                self.emptyTrash()
-            }))
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
-            self.present(alert, animated: true, completion: nil)
-        }
-    }
-
     func longPressGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
-    func longPressMoreGridItem(with objectId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+    func longPressMoreGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
     // MARK: - DataSource
 
-    @objc func reloadDataSource(isForced: Bool = true) {
-
-        layoutForView = NCManageDatabase.shared.getLayoutForView(account: appDelegate.account, key: NCGlobal.shared.layoutViewTrash, serverUrl: "")
-        datasource.removeAll()
-        guard let trashPath = self.getTrashPath(), let tashItems = NCManageDatabase.shared.getTrash(filePath: trashPath, sort: layoutForView?.sort, ascending: layoutForView?.ascending, account: appDelegate.account) else {
-            return
-        }
-
-        datasource = tashItems
+    @objc func reloadDataSource(withQueryDB: Bool = true) {
+        datasource = self.database.getResultsTrash(filePath: getFilePath(), account: session.account)
         collectionView.reloadData()
-        guard let blinkFileId = blinkFileId else { return }
-        for itemIx in 0..<self.datasource.count where self.datasource[itemIx].fileId.contains(blinkFileId) {
+        setNavigationRightItems()
+
+        guard let blinkFileId, let datasource else { return }
+        for itemIx in 0..<datasource.count where datasource[itemIx].fileId.contains(blinkFileId) {
             let indexPath = IndexPath(item: itemIx, section: 0)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 UIView.animate(withDuration: 0.3) {
@@ -262,111 +217,13 @@ class NCTrash: UIViewController, NCSelectableNavigationView, NCTrashListCellDele
         }
     }
 
-    func getTrashPath() -> String? {
-
-        if self.trashPath.isEmpty {
-            guard let userId = (appDelegate.userId as NSString).addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlFragmentAllowed) else { return nil }
-            let trashPath = appDelegate.urlBase + "/" + NextcloudKit.shared.nkCommonInstance.dav + "/trashbin/" + userId + "/trash/"
-            return trashPath
+    func getFilePath() -> String {
+        if filePath.isEmpty {
+            guard let userId = (session.userId as NSString).addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlFragmentAllowed) else { return "" }
+            let filePath = session.urlBase + "/remote.php/dav/trashbin/" + userId + "/trash"
+            return filePath + "/"
         } else {
-            return self.trashPath
-        }
-    }
-}
-
-// MARK: - NC API & Algorithm
-
-extension NCTrash {
-
-    @objc func loadListingTrash() {
-
-        NextcloudKit.shared.listingTrash(showHiddenFiles: false) { account, items, _, error in
-
-            DispatchQueue.main.async { self.refreshControl.endRefreshing() }
-
-            guard error == .success, account == self.appDelegate.account, let trashPath = self.getTrashPath() else {
-                NCContentPresenter().showError(error: error)
-                return
-            }
-
-            NCManageDatabase.shared.deleteTrash(filePath: trashPath, account: self.appDelegate.account)
-            NCManageDatabase.shared.addTrash(account: account, items: items)
-
-            self.reloadDataSource()
-        }
-    }
-
-    func restoreItem(with fileId: String) {
-
-        guard let tableTrash = NCManageDatabase.shared.getTrashItem(fileId: fileId, account: appDelegate.account) else { return }
-        let fileNameFrom = tableTrash.filePath + tableTrash.fileName
-        let fileNameTo = appDelegate.urlBase + "/" + NextcloudKit.shared.nkCommonInstance.dav + "/trashbin/" + appDelegate.userId + "/restore/" + tableTrash.fileName
-
-        NextcloudKit.shared.moveFileOrFolder(serverUrlFileNameSource: fileNameFrom, serverUrlFileNameDestination: fileNameTo, overwrite: true) { account, error in
-
-            guard error == .success, account == self.appDelegate.account else {
-                NCContentPresenter().showError(error: error)
-                return
-            }
-
-            NCManageDatabase.shared.deleteTrash(fileId: fileId, account: account)
-            self.reloadDataSource()
-        }
-    }
-
-    func emptyTrash() {
-
-        let serverUrlFileName = appDelegate.urlBase + "/" + NextcloudKit.shared.nkCommonInstance.dav + "/trashbin/" + appDelegate.userId + "/trash"
-
-        NextcloudKit.shared.deleteFileOrFolder(serverUrlFileName: serverUrlFileName) { account, error in
-
-            guard error == .success, account == self.appDelegate.account else {
-                NCContentPresenter().showError(error: error)
-                return
-            }
-
-            NCManageDatabase.shared.deleteTrash(fileId: nil, account: self.appDelegate.account)
-            self.reloadDataSource()
-        }
-    }
-
-    func deleteItem(with fileId: String) {
-
-        guard let tableTrash = NCManageDatabase.shared.getTrashItem(fileId: fileId, account: appDelegate.account) else { return }
-        let serverUrlFileName = tableTrash.filePath + tableTrash.fileName
-
-        NextcloudKit.shared.deleteFileOrFolder(serverUrlFileName: serverUrlFileName) { account, error in
-
-            guard error == .success, account == self.appDelegate.account else {
-                NCContentPresenter().showError(error: error)
-                return
-            }
-
-            NCManageDatabase.shared.deleteTrash(fileId: fileId, account: account)
-            self.reloadDataSource()
-        }
-    }
-
-    func downloadThumbnail(with tableTrash: tableTrash, indexPath: IndexPath) {
-
-        let fileNamePreviewLocalPath = utilityFileSystem.getDirectoryProviderStoragePreviewOcId(tableTrash.fileId, etag: tableTrash.fileName)
-        let fileNameIconLocalPath = utilityFileSystem.getDirectoryProviderStorageIconOcId(tableTrash.fileId, etag: tableTrash.fileName)
-
-        NextcloudKit.shared.downloadPreview(fileNamePathOrFileId: tableTrash.fileId,
-                                            fileNamePreviewLocalPath: fileNamePreviewLocalPath,
-                                            widthPreview: NCGlobal.shared.sizePreview,
-                                            heightPreview: NCGlobal.shared.sizePreview,
-                                            fileNameIconLocalPath: fileNameIconLocalPath,
-                                            sizeIcon: NCGlobal.shared.sizeIcon,
-                                            etag: nil,
-                                            endpointTrashbin: true) { account, _, imageIcon, _, _, error in
-            guard error == .success, let imageIcon = imageIcon, account == self.appDelegate.account,
-                let cell = self.collectionView.cellForItem(at: indexPath) else { return }
-            if let cell = cell as? NCTrashListCell {
-                cell.imageItem.image = imageIcon
-            } else if let cell = cell as? NCGridCell {
-                cell.imageItem.image = imageIcon
-            } // else: undefined cell
+            return filePath + "/"
         }
     }
 }

@@ -28,87 +28,10 @@ import FloatingPanel
 import NextcloudKit
 
 extension NCTrash {
-    var selectActions: [NCMenuAction] {
-        [
-            NCMenuAction(
-                title: NSLocalizedString("_cancel_", comment: ""),
-                icon: utility.loadImage(named: "xmark"),
-                action: { _ in
-                    self.tapSelect()
-                }
-            ),
-            NCMenuAction(
-                title: NSLocalizedString("_select_all_", comment: ""),
-                icon: utility.loadImage(named: "checkmark.circle.fill"),
-                action: { _ in
-                    self.selectOcId = self.datasource.map { $0.fileId }
-                    self.collectionView.reloadData()
-                }
-            ),
-            NCMenuAction.seperator(),
-            NCMenuAction(
-                title: NSLocalizedString("_trash_restore_selected_", comment: ""),
-                icon: utility.loadImage(named: "restore"),
-                action: { _ in
-                    self.selectOcId.forEach(self.restoreItem)
-                    self.tapSelect()
-                }
-            ),
-            NCMenuAction(
-                title: NSLocalizedString("_trash_delete_selected_", comment: ""),
-                icon: utility.loadImage(named: "trash"),
-                action: { _ in
-                    let alert = UIAlertController(title: NSLocalizedString("_trash_delete_selected_", comment: ""), message: "", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: NSLocalizedString("_delete_", comment: ""), style: .destructive, handler: { _ in
-                        self.selectOcId.forEach(self.deleteItem)
-                        self.tapSelect()
-                    }))
-                    alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: { _ in }))
-                    self.present(alert, animated: true, completion: nil)
-                }
-            )
-        ]
-    }
-
-    func toggleMenuMoreHeader() {
-
-        var actions: [NCMenuAction] = []
-
-        actions.append(
-            NCMenuAction(
-                title: NSLocalizedString("_trash_restore_all_", comment: ""),
-                icon: utility.loadImage(named: "restore"),
-                action: { _ in
-                    self.datasource.forEach({ self.restoreItem(with: $0.fileId) })
-                }
-            )
-        )
-
-        actions.append(
-            NCMenuAction(
-                title: NSLocalizedString("_trash_delete_all_", comment: ""),
-                icon: utility.loadImage(named: "trash"),
-                action: { _ in
-                    let alert = UIAlertController(title: NSLocalizedString("_trash_delete_all_description_", comment: ""), message: "", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: NSLocalizedString("_trash_delete_all_", comment: ""), style: .destructive, handler: { _ in
-                        self.emptyTrash()
-                    }))
-                    alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
-                    self.present(alert, animated: true, completion: nil)
-                }
-            )
-        )
-        presentMenu(with: actions)
-    }
-
     func toggleMenuMore(with objectId: String, image: UIImage?, isGridCell: Bool) {
-
-        guard let tableTrash = NCManageDatabase.shared.getTrashItem(fileId: objectId, account: appDelegate.account) else {
-            return
-        }
-
+        guard let resultTableTrash = self.database.getResultTrashItem(fileId: objectId, account: session.account) else { return }
         guard isGridCell else {
-            let alert = UIAlertController(title: NSLocalizedString("_want_delete_", comment: ""), message: tableTrash.trashbinFileName, preferredStyle: .alert)
+            let alert = UIAlertController(title: NSLocalizedString("_want_delete_", comment: ""), message: resultTableTrash.trashbinFileName, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("_delete_", comment: ""), style: .destructive, handler: { _ in
                 self.deleteItem(with: objectId)
             }))
@@ -121,19 +44,19 @@ extension NCTrash {
         var actions: [NCMenuAction] = []
 
         var iconHeader: UIImage!
-        if let icon = UIImage(contentsOfFile: utilityFileSystem.getDirectoryProviderStorageIconOcId(tableTrash.fileId, etag: tableTrash.fileName)) {
+        if let icon = utility.getImage(ocId: resultTableTrash.fileId, etag: resultTableTrash.fileName, ext: NCGlobal.shared.previewExt512) {
             iconHeader = icon
         } else {
-            if tableTrash.directory {
-                iconHeader = UIImage(named: "folder")!.image(color: UIColor.systemGray, size: 50)
+            if resultTableTrash.directory {
+                iconHeader = NCImageCache.shared.getFolder(account: resultTableTrash.account)
             } else {
-                iconHeader = UIImage(named: tableTrash.iconName)
+                iconHeader = NCImageCache.shared.getImageFile()
             }
         }
 
         actions.append(
             NCMenuAction(
-                title: tableTrash.trashbinFileName,
+                title: resultTableTrash.trashbinFileName,
                 icon: iconHeader,
                 action: nil
             )
@@ -142,7 +65,7 @@ extension NCTrash {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_restore_", comment: ""),
-                icon: UIImage(named: "restore")!.image(color: UIColor.systemGray, size: 50),
+                icon: utility.loadImage(named: "arrow.circlepath", colors: [NCBrandColor.shared.iconImageColor]),
                 action: { _ in
                     self.restoreItem(with: objectId)
                 }
@@ -152,7 +75,8 @@ extension NCTrash {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_delete_", comment: ""),
-                icon: utility.loadImage(named: "trash"),
+                destructive: true,
+                icon: utility.loadImage(named: "trash", colors: [.red]),
                 action: { _ in
                     self.deleteItem(with: objectId)
                 }

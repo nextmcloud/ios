@@ -21,20 +21,20 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import UIKit
 import WidgetKit
 import Intents
 import SwiftUI
 
 struct FilesWidgetProvider: IntentTimelineProvider {
-
     typealias Entry = FilesDataEntry
     typealias Intent = AccountIntent
 
     func placeholder(in context: Context) -> Entry {
         let filesItems = getFilesItems(displaySize: context.displaySize)
         let datasPlaceholder = Array(filesDatasTest[0...filesItems - 1])
-        let title = getTitleFilesWidget(account: nil)
-        return Entry(date: Date(), datas: datasPlaceholder, isPlaceholder: true, isEmpty: false, userId: "", url: "", tile: title, footerImage: "checkmark.icloud", footerText: NCBrandOptions.shared.brand + " files")
+        let title = getTitleFilesWidget(tableAccount: nil)
+        return Entry(date: Date(), datas: datasPlaceholder, isPlaceholder: true, isEmpty: false, userId: "", url: "", account: "", tile: title, footerImage: "checkmark.icloud", footerText: NCBrandOptions.shared.brand + " files")
     }
 
     func getSnapshot(for configuration: AccountIntent, in context: Context, completion: @escaping (Entry) -> Void) {
