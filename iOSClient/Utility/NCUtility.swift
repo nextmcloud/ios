@@ -14,7 +14,100 @@ final class NCUtility: NSObject, Sendable {
     let utilityFileSystem = NCUtilityFileSystem()
     let global = NCGlobal.shared
 
-    func ocIdToFileId(ocId: String?) -> String? {
+    @objc func isSimulatorOrTestFlight() -> Bool {
+        guard let path = Bundle.main.appStoreReceiptURL?.path else {
+            return false
+        }
+        return path.contains("CoreSimulator") || path.contains("sandboxReceipt")
+    }
+
+    func isSimulator() -> Bool {
+        guard let path = Bundle.main.appStoreReceiptURL?.path else {
+            return false
+        }
+        return path.contains("CoreSimulator")
+    }
+
+    func isTypeFileRichDocument(_ metadata: tableMetadata) -> Bool {
+        let fileExtension = (metadata.fileNameView as NSString).pathExtension
+        guard let capabilities = NCNetworking.shared.capabilities[metadata.account],
+              !fileExtension.isEmpty,
+              let mimeType = UTType(tag: fileExtension.uppercased(), tagClass: .filenameExtension, conformingTo: nil)?.identifier else {
+            return false
+        }
+
+        /// contentype
+        if !capabilities.richDocumentsMimetypes.filter({ $0.contains(metadata.contentType) || $0.contains("text/plain") }).isEmpty {
+            return true
+        }
+
+        /// mimetype
+        if !capabilities.richDocumentsMimetypes.isEmpty && mimeType.components(separatedBy: ".").count > 2 {
+            let mimeTypeArray = mimeType.components(separatedBy: ".")
+            let mimeType = mimeTypeArray[mimeTypeArray.count - 2] + "." + mimeTypeArray[mimeTypeArray.count - 1]
+            if !capabilities.richDocumentsMimetypes.filter({ $0.contains(mimeType) }).isEmpty {
+                return true
+            }
+        }
+        return false
+    }
+
+    func editorsDirectEditing(account: String, contentType: String) -> [String] {
+        var identifiers: [String] = []
+        let capabilities = NCNetworking.shared.capabilities[account]
+
+        capabilities?.directEditingEditors.forEach { editor in
+            editor.mimetypes.forEach { mimetype in
+                if mimetype == contentType {
+                    identifiers.append(editor.identifier)
+                }
+                // HARDCODE
+                // https://github.com/nextcloud/text/issues/913
+                if mimetype == "text/markdown" && contentType == "text/x-markdown" {
+                    identifiers.append(editor.identifier)
+                }
+                if contentType == "text/html" {
+                    identifiers.append(editor.identifier)
+                }
+            }
+
+            editor.optionalMimetypes.forEach { mimetype in
+                if mimetype == contentType {
+                    identifiers.append(editor.identifier)
+                }
+            }
+        }
+
+        return Array(Set(identifiers))
+    }
+
+    func getCustomUserAgentNCText() -> String {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            // NOTE: Hardcoded (May 2022)
+            // Tested for iPhone SE (1st), iOS 12 iPhone Pro Max, iOS 15.4
+            // 605.1.15 = WebKit build version
+            // 15E148 = frozen iOS build number according to: https://chromestatus.com/feature/4558585463832576
+            return userAgent + " " + "AppleWebKit/605.1.15 Mobile/15E148"
+        } else {
+            return userAgent
+        }
+    }
+
+    func getCustomUserAgentOnlyOffice() -> String {
+        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")!
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return "Mozilla/5.0 (iPad) Nextcloud-iOS/\(appVersion)"
+        } else {
+            return "Mozilla/5.0 (iPhone) Mobile Nextcloud-iOS/\(appVersion)"
+        }
+    }
+
+    @objc func isQuickLookDisplayable(metadata: tableMetadata) -> Bool {
+        return true
+    }
+
+//    func ocIdToFileId(ocId: String?) -> String? {
+    @objc func ocIdToFileId(ocId: String?) -> String? {
         guard let ocId = ocId else { return nil }
         let items = ocId.components(separatedBy: "oc")
 
@@ -190,12 +283,20 @@ final class NCUtility: NSObject, Sendable {
         return (usedmegabytes, totalmegabytes)
     }
 
-    func getHeightHeaderEmptyData(view: UIView, portraitOffset: CGFloat, landscapeOffset: CGFloat) -> CGFloat {
+//    func removeForbiddenCharacters(_ fileName: String) -> String {
+//        var fileName = fileName
+//        for character in global.forbiddenCharacters {
+//            fileName = fileName.replacingOccurrences(of: character, with: "")
+//        }
+//        return fileName
+//    }
+    
+    func getHeightHeaderEmptyData(view: UIView, portraitOffset: CGFloat, landscapeOffset: CGFloat, isHeaderMenuTransferViewEnabled: Bool = false) -> CGFloat {
         var height: CGFloat = 0
         if UIDevice.current.orientation.isPortrait {
             height = (view.frame.height / 2) - (view.safeAreaInsets.top / 2) + portraitOffset
         } else {
-            height = (view.frame.height / 2) + landscapeOffset
+            height = (view.frame.height / 2) + landscapeOffset + CGFloat(isHeaderMenuTransferViewEnabled ? 35 : 0)
         }
         return height
     }
