@@ -160,7 +160,6 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         imageItem?.addGestureRecognizer(tapGesture)
         buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         buttonMenu.contentMode = .scaleAspectFill
-//        buttonMenu.setImage(NCImageCache.images.buttonMore.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
         imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
         switchCanEdit.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
