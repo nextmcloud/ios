@@ -2414,6 +2414,7 @@
 				CA1700013000000000000002 /* NCUploadedAssetsCleanupTests.swift */,
 				AA52EB452D42AC5A0089C348 /* Placeholder.swift */,
 				B5E2E6D32DAE52B500AB2EDD /* SharingTest.swift */,
+				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
