@@ -28,6 +28,7 @@ import NextcloudKit
 extension NCShare {
     func toggleShareMenu(for share: tableShare, sendMail: Bool, folder: Bool, sender: Any) {
 
+        let capabilities = NCCapabilities.shared.getCapabilities(account: self.metadata.account)
         var actions = [NCMenuAction]()
 
         if !folder {

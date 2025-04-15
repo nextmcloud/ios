@@ -154,8 +154,11 @@ class NCService: NSObject {
     }
 
     private func requestServerCapabilities(account: String, controller: NCMainTabBarController?) {
+        let session = NCSession.shared.getSession(account: account)
         NextcloudKit.shared.getCapabilities(account: account, options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { account, presponseData, error in
             guard error == .success, let data = presponseData?.data else {
+                NCBrandColor.shared.settingThemingColor(account: account)
+                NCImageCache.shared.createImagesBrandCache()
                 return
             }
 
@@ -180,26 +183,13 @@ class NCService: NSObject {
 
             // Theming
             if NCBrandColor.shared.settingThemingColor(account: account) {
+                NCImageCache.shared.createImagesBrandCache()
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming, userInfo: ["account": account])
             }
             
             // File Sharing
             if NCGlobal.shared.capabilityFileSharingApiEnabled {
-                let home = self.utilityFileSystem.getHomeServer(urlBase: self.appDelegate.urlBase, userId: self.appDelegate.userId)
-                NextcloudKit.shared.readShares(parameters: NKShareParameter()) { account, shares, data, error in
-                    if error == .success {
-                        NCManageDatabase.shared.deleteTableShare(account: account)
-                        if let shares = shares, !shares.isEmpty {
-                            NCManageDatabase.shared.addShare(account: account, home: home, shares: shares)
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
-                        }
-                    }
-                }
-            }
-            
-            // File Sharing
-            if NCGlobal.shared.capabilityFileSharingApiEnabled {
-                let home = self.utilityFileSystem.getHomeServer(urlBase: self.appDelegate.urlBase, userId: self.appDelegate.userId)
+                let home = self.utilityFileSystem.getHomeServer(session: session)
                 NextcloudKit.shared.readShares(parameters: NKShareParameter()) { account, shares, data, error in
                     if error == .success {
                         NCManageDatabase.shared.deleteTableShare(account: account)

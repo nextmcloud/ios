@@ -100,12 +100,15 @@ class NCShareNetworking: NSObject {
     
     func createShareLink(password: String?) {
         NCActivityIndicator.shared.start(backgroundView: view)
-        let filenamePath = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, urlBase: metadata.urlBase, userId: metadata.userId)
-        NextcloudKit.shared.createShareLink(path: filenamePath) { [self] account, share, data, error in
+        let filenamePath = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
+        NextcloudKit.shared.createShareLink(path: filenamePath, account: metadata.account) { [self] account, share, data, error in
             NCActivityIndicator.shared.stop()
             if error == .success && share != nil {
-                let home = utilityFileSystem.getHomeServer(urlBase: self.metadata.urlBase, userId: self.metadata.userId)
+                let home = self.utilityFileSystem.getHomeServer(session: self.session)
                 NCManageDatabase.shared.addShare(account: self.metadata.account, home:home, shares: [share!])
+                if !metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__SHARE_FILE ,metadata: metadata)
+                }
             } else if error != .success{
                 NCContentPresenter().showError(error: error)
             }
@@ -138,6 +141,10 @@ class NCShareNetworking: NSObject {
                 }
 
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateShare, userInfo: ["account": self.metadata.account, "serverUrl": self.metadata.serverUrl])
+
+                if !self.metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__SHARE_FILE ,metadata: self.metadata)
+                }
             } else {
                 NCContentPresenter().showError(error: error)
             }
