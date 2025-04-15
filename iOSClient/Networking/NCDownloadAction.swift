@@ -241,7 +241,7 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
         let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
         var page = page
 
-        NCActivityIndicator.shared.start(backgroundView: viewController.view)
+        DispatchQueue.main.async { NCActivityIndicator.shared.start(backgroundView: viewController.view) }
         NCNetworking.shared.readFile(serverUrlFileName: serverUrlFileName, account: metadata.account, queue: .main) { account, metadata, error in
             NCActivityIndicator.shared.stop()
 
