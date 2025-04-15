@@ -31,6 +31,7 @@ class NCShareExtension: UIViewController {
     var filesName: [String] = []
     // -------------------------------------------------------------
 
+    var emptyDataSet: NCEmptyDataSet?
     let keyLayout = NCGlobal.shared.layoutViewShareExtension
     var metadataFolder: tableMetadata?
     var dataSourceTask: URLSessionTask?
@@ -58,9 +59,12 @@ class NCShareExtension: UIViewController {
 
         self.navigationController?.navigationBar.prefersLargeTitles = false
 
-        collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
         collectionView.register(UINib(nibName: "NCListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
         collectionView.collectionViewLayout = NCListLayout()
+        collectionView.refreshControl = refreshControl
+        refreshControl.tintColor = NCBrandColor.shared.brandText
+        refreshControl.backgroundColor = .systemBackground
+        refreshControl.addTarget(self, action: #selector(reloadDatasource), for: .valueChanged)
 
         commandView.backgroundColor = .secondarySystemBackground
         separatorView.backgroundColor = .separator
@@ -72,7 +76,7 @@ class NCShareExtension: UIViewController {
         commandViewHeightConstraint.constant = heightCommandView
 
         createFolderView.layer.cornerRadius = 10
-        createFolderImage.image = utility.loadImage(named: "folder.badge.plus", colors: [NCBrandColor.shared.iconImageColor])
+        createFolderImage.image = utility.loadImage(named: "folder.badge.plus", colors: [NCBrandColor.shared.iconColor])
         createFolderLabel.text = NSLocalizedString("_create_folder_", comment: "")
         let createFolderGesture = UITapGestureRecognizer(target: self, action: #selector(actionCreateFolder(_:)))
         createFolderView.addGestureRecognizer(createFolderGesture)
@@ -102,6 +106,9 @@ class NCShareExtension: UIViewController {
         if let account = extensionData.getTblAccoun()?.account {
             accountRequestChangeAccount(account: account, controller: nil)
         }
+        NCImageCache.shared.createImagesCache()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(didCreateFolder(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterCreateFolder), object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -215,6 +222,10 @@ class NCShareExtension: UIViewController {
             self.tableView.isScrollEnabled = false
         }
         uploadLabel.text = NSLocalizedString("_upload_", comment: "") + " \(filesName.count) " + NSLocalizedString("_files_", comment: "")
+        
+        // Empty
+        emptyDataSet = NCEmptyDataSet(view: collectionView, offset: -50 * counter, delegate: self)
+
         self.tableView.reloadData()
     }
 
