@@ -112,7 +112,7 @@ enum NCShareCommon {
     }
     
     func isCurrentUserIsFileOwner(fileOwnerId: String) -> Bool {
-        if let currentUser = NCManageDatabase.shared.getActiveAccount(), currentUser.userId == fileOwnerId {
+        if let currentUser = NCManageDatabase.shared.getActiveTableAccount(), currentUser.userId == fileOwnerId {
             return true
         }
         return false
