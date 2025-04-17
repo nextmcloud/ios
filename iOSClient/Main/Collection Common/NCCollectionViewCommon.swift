@@ -80,6 +80,12 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     var titleCurrentFolder = ""
     var titlePreviusFolder: String?
     var enableSearchBar: Bool = false
+    let maxImageGrid: CGFloat = 7
+    var headerMenu: NCSectionHeaderMenu?
+    var headerMenuTransferView = false
+    var headerMenuButtonsView: Bool = true
+    var headerRichWorkspaceDisable: Bool = false
+    
     var groupByField = "name"
 
     var emptyImageName: String?
@@ -103,6 +109,11 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     var numberOfColumns: Int = 0
     var lastNumberOfColumns: Int = 0
 
+    var isTransitioning: Bool = false
+    var selectableDataSource: [RealmSwiftObject] { dataSource.getMetadataSourceForAllSections() }
+    var pushed: Bool = false
+    var emptyDataSet: NCEmptyDataSet?
+    
     let heightHeaderRecommendations: CGFloat = 160
     let heightHeaderSection: CGFloat = 30
 
@@ -227,6 +238,9 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                 }
             }
         }
+        
+        // Empty
+        emptyDataSet = NCEmptyDataSet(view: collectionView, offset: getHeaderHeight(), delegate: self)
 
         // Empty
         emptyDataSet = NCEmptyDataSet(view: collectionView, offset: getHeaderHeight(), delegate: self)
@@ -247,6 +261,14 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
         let dropInteraction = UIDropInteraction(delegate: self)
         self.navigationController?.navigationItem.leftBarButtonItems?.first?.customView?.addInteraction(dropInteraction)
+        
+        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed") || isApplicationUpdated()){
+            redirectToPrivacyViewController()
+            
+            //set current app version
+            let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String
+            UserDefaults.standard.set(appVersion, forKey: "CurrentAppVersion")
+        }
 
         if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed") || isApplicationUpdated()){
             redirectToPrivacyViewController()
@@ -278,6 +300,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         navigationController?.setNavigationBarHidden(false, animated: true)
         
         appDelegate.activeViewController = self
+
         isEditMode = false
 
         /// Magentacloud branding changes hide user account button on left navigation bar
@@ -357,6 +380,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterDeleteFile), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterCopyMoveFile), object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterCopyFile), object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterMoveFile), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterRenameFile), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterCreateFolder), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterFavoriteFile), object: nil)
@@ -475,6 +500,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         }
 
         self.collectionView.collectionViewLayout.invalidateLayout()
+
+//        (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
     }
 
     @objc func reloadDataSource(_ notification: NSNotification) {
@@ -806,12 +833,79 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         }
     }
 
+    @objc func triggerProgressTask(_ notification: NSNotification) {
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let progressNumber = userInfo["progress"] as? NSNumber,
+              let totalBytes = userInfo["totalBytes"] as? Int64,
+              let totalBytesExpected = userInfo["totalBytesExpected"] as? Int64,
+              let ocId = userInfo["ocId"] as? String,
+              let ocIdTransfer = userInfo["ocIdTransfer"] as? String,
+              let session = userInfo["session"] as? String
+        else { return }
+
+        let chunk: Int = userInfo["chunk"] as? Int ?? 0
+        let e2eEncrypted: Bool = userInfo["e2eEncrypted"] as? Bool ?? false
+
+        let transfer = NCTransferProgress.shared.append(NCTransferProgress.Transfer(ocId: ocId, ocIdTransfer: ocIdTransfer, session: session, chunk: chunk, e2eEncrypted: e2eEncrypted, progressNumber: progressNumber, totalBytes: totalBytes, totalBytesExpected: totalBytesExpected))
+
+        // HEADER
+//        if self.headerMenuTransferView, transfer.session.contains("upload") {
+//            self.sectionFirstHeader?.setViewTransfer(isHidden: false, progress: transfer.progressNumber.floatValue)
+//            self.sectionFirstHeaderEmptyData?.setViewTransfer(isHidden: false, progress: transfer.progressNumber.floatValue)
+//        }
+        
+        DispatchQueue.main.async {
+            if self.headerMenuTransferView && (chunk > 0 || e2eEncrypted) {
+                if NCNetworking.shared.transferInForegorund?.ocId == ocId {
+                    NCNetworking.shared.transferInForegorund?.progress = progressNumber.floatValue
+                } else {
+                    NCNetworking.shared.transferInForegorund = NCNetworking.TransferInForegorund(ocId: ocId, progress: progressNumber.floatValue)
+                    self.collectionView.reloadData()
+                }
+                self.headerMenu?.progressTransfer.progress = transfer.progressNumber.floatValue
+            } else {
+                guard let indexPath = self.dataSource.getIndexPathMetadata(ocId: ocId).indexPath,
+                      let cell = self.collectionView?.cellForItem(at: indexPath),
+                      let cell = cell as? NCCellProtocol else { return }
+                if progressNumber.floatValue == 1 && !(cell is NCTransferCell) {
+                    cell.fileProgressView?.isHidden = true
+                    cell.fileProgressView?.progress = .zero
+                    cell.setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCImageCache.images.buttonMore)
+                    if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
+                        cell.writeInfoDateSize(date: metadata.date, size: metadata.size)
+                    } else {
+                        cell.fileInfoLabel?.text = ""
+                        cell.fileSubinfoLabel?.text = ""
+                    }
+                } else {
+                    cell.fileProgressView?.isHidden = false
+                    cell.fileProgressView?.progress = progressNumber.floatValue
+                    cell.setButtonMore(named: NCGlobal.shared.buttonMoreStop, image: NCImageCache.images.buttonStop)
+                    let status = userInfo["status"] as? Int ?? NCGlobal.shared.metadataStatusNormal
+                    if status == NCGlobal.shared.metadataStatusDownloading {
+                        cell.fileInfoLabel?.text = self.utilityFileSystem.transformedSize(totalBytesExpected)
+                        cell.fileSubinfoLabel?.text = self.infoLabelsSeparator + "↓ " + self.utilityFileSystem.transformedSize(totalBytes)
+                    } else if status == NCGlobal.shared.metadataStatusUploading {
+                        if totalBytes > 0 {
+                            cell.fileInfoLabel?.text = self.utilityFileSystem.transformedSize(totalBytesExpected)
+                            cell.fileSubinfoLabel?.text = self.infoLabelsSeparator + "↑ " + self.utilityFileSystem.transformedSize(totalBytes)
+                        } else {
+                            cell.fileInfoLabel?.text = self.utilityFileSystem.transformedSize(totalBytesExpected)
+                            cell.fileSubinfoLabel?.text = self.infoLabelsSeparator + "↑ …"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     // MARK: - Layout
 
     func setNavigationLeftItems() {
         navigationItem.title = titleCurrentFolder
     }
 
+    
     func getNavigationTitle() -> String {
         let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account))
         if let tableAccount,
@@ -914,6 +1008,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     func tapMoreGridItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any) {
         if isEditMode { return }
         guard let metadata = self.database.getMetadataFromOcId(ocId) else { return }
+//        toggleMenu(metadata: metadata, image: image)
         if namedButtonMore == NCGlobal.shared.buttonMoreMore || namedButtonMore == NCGlobal.shared.buttonMoreLock {
             toggleMenu(metadata: metadata, image: image)
         } else if namedButtonMore == NCGlobal.shared.buttonMoreStop {
@@ -980,12 +1075,50 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     func longPressMoreListItem(with ocId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
+        guard let layoutForView = NCManageDatabase.shared.getLayoutForView(account: session.account, key: layoutKey, serverUrl: serverUrl) else { return }
+
+        if layoutForView.layout == NCGlobal.shared.layoutGrid {
+            layoutForView.layout = NCGlobal.shared.layoutList
+        } else {
+            layoutForView.layout = NCGlobal.shared.layoutGrid
+        }
+        self.layoutForView = NCManageDatabase.shared.setLayoutForView(layoutForView: layoutForView)
+        self.collectionView.reloadData()
+        self.collectionView.collectionViewLayout.invalidateLayout()
+        self.collectionView.setCollectionViewLayout(layoutForView.layout == NCGlobal.shared.layoutList ? self.listLayout : self.gridLayout, animated: true) {_ in self.isTransitioning = false }
+    }
+
+    func tapButtonOrder(_ sender: Any) {
+        
+//        if let titleButtonHeader = NCKeychain().getTitleButtonHeader(account: session.account), !titleButtonHeader.isEmpty {
+//            layoutForView?.titleButtonHeader = titleButtonHeader
+//        }
+//        NCManageDatabase.shared.setLayoutForView(layoutForView: layoutForView!)
+        
+        let sortMenu = NCSortMenu()
+        sortMenu.toggleMenu(viewController: self, account: session.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
+    }
+
     func longPressPhotoItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+    
+    func longPressListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+    
+    func tapShareListItem(with objectId: String, indexPath: IndexPath, sender: Any) { }
 
     func longPressGridItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
         
     func longPressMoreGridItem(with ocId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
+    func longPressMoreListItem(with ocId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+    
+    func longPressGridItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+        
+    func longPressMoreGridItem(with ocId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+    
+    func tapButtonTransfer(_ sender: Any) { }
+    
+    func tapMorePhotoItem(with ocId: String, ocIdTransfer: String, image: UIImage?, sender: Any) { }
+    
     @objc func longPressCollecationView(_ gestureRecognizer: UILongPressGestureRecognizer) {
         openMenuItems(with: nil, gestureRecognizer: gestureRecognizer)
     }
@@ -1048,6 +1181,9 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         // get layout for view
         layoutForView = NCManageDatabase.shared.getLayoutForView(account: session.account, key: layoutKey, serverUrl: serverUrl)
         
+
+        // get layout for view
+        layoutForView = NCManageDatabase.shared.getLayoutForView(account: session.account, key: layoutKey, serverUrl: serverUrl)
         // set GroupField for Grid
         if !isSearchingMode && layoutForView?.layout == NCGlobal.shared.layoutGrid {
             groupByField = "classFile"
@@ -1061,6 +1197,13 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         }
 
         DispatchQueue.main.async {
+//            UIView.transition(with: self.collectionView,
+//                              duration: 0.20,
+//                              options: .transitionCrossDissolve,
+//                              animations: { self.collectionView.reloadData() },
+//                              completion: nil)
+//
+//            (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
             self.refreshControl.endRefreshing()
             self.collectionView.reloadData()
             self.setNavigationRightItems()
@@ -1172,8 +1315,48 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         navigationController?.pushViewController(viewController, animated: true)
     }
 
+    func pushViewController(viewController: UIViewController) {
+        if pushed { return }
+
+        pushed = true
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+    
     // MARK: - Header size
 
+//    func getHeaderHeight(section: Int) -> (heightHeaderRichWorkspace: CGFloat,
+//                                           heightHeaderRecommendations: CGFloat,
+//                                           heightHeaderSection: CGFloat) {
+//        var heightHeaderRichWorkspace: CGFloat = 0
+//        var heightHeaderRecommendations: CGFloat = 0
+//        var heightHeaderSection: CGFloat = 0
+//
+//        if showDescription,
+//           !isSearchingMode,
+//           let richWorkspaceText = self.richWorkspaceText,
+//           !richWorkspaceText.trimmingCharacters(in: .whitespaces).isEmpty {
+//            heightHeaderRichWorkspace = UIScreen.main.bounds.size.height / 6
+//        }
+//
+//        if isRecommendationActived,
+//           !isSearchingMode,
+//           NCKeychain().showRecommendedFiles,
+//           !self.database.getRecommendedFiles(account: self.session.account).isEmpty {
+//            heightHeaderRecommendations = self.heightHeaderRecommendations
+//            heightHeaderSection = self.heightHeaderSection
+//        }
+//
+//        if isSearchingMode || layoutForView?.groupBy != "none" || self.dataSource.numberOfSections() > 1 {
+//            if section == 0 {
+//                return (heightHeaderRichWorkspace, heightHeaderRecommendations, self.heightHeaderSection)
+//            } else {
+//                return (0, 0, self.heightHeaderSection)
+//            }
+//        } else {
+//            return (heightHeaderRichWorkspace, heightHeaderRecommendations, heightHeaderSection)
+//        }
+//    }
+    
     func isHeaderMenuTransferViewEnabled() -> [tableMetadata]? {
         if headerMenuTransferView,
            NCNetworking.shared.isOnline,
