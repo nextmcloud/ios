@@ -49,6 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var loginFlowV2Endpoint = ""
     var loginFlowV2Login = ""
 
+    let database = NCManageDatabase.shared
     var window: UIWindow?
     @objc var sceneIdentifier: String = ""
     @objc var activeViewController: UIViewController?
@@ -128,11 +129,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         _ = NCActionCenter.shared
         _ = NCNetworkingProcess.shared
 
+//        if account.isEmpty {
+//            if NCBrandOptions.shared.disable_intro {
+//                openLogin(viewController: nil, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+//            } else {
+//                if let viewController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() {
+//                    let navigationController = NCLoginNavigationController(rootViewController: viewController)
+//                    window?.rootViewController = navigationController
+//                    window?.makeKeyAndVisible()
+//                }
+//            }
+//        } else {
+//            NCPasscode.shared.presentPasscode(delegate: self) {
+//                NCPasscode.shared.enableTouchFaceID()
+//            }
+//        }
         adjust.configAdjust()
         adjust.subsessionStart()
         TealiumHelper.shared.start()
         FirebaseApp.configure()
         
+
         return true
     }
 
@@ -351,6 +368,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func openLogin(selector: Int, window: UIWindow? = nil) {
         UIApplication.shared.allSceneSessionDestructionExceptFirst()
 
+//        func showLoginViewController(_ viewController: UIViewController?) {
+//            guard let viewController else { return }
+//            let navigationController = NCLoginNavigationController(rootViewController: viewController)
+//
+//            navigationController.modalPresentationStyle = .fullScreen
+//            navigationController.navigationBar.barStyle = .black
+//            navigationController.navigationBar.tintColor = NCBrandColor.shared.customerText
+//            navigationController.navigationBar.barTintColor = NCBrandColor.shared.customer
+//            navigationController.navigationBar.isTranslucent = false
+//
+//            if let controller = UIApplication.shared.firstWindow?.rootViewController {
+//                if let presentedVC = controller.presentedViewController, !(presentedVC is NCLoginNavigationController) {
+//                    presentedVC.dismiss(animated: false) {
+//                        controller.present(navigationController, animated: true)
+//                    }
+//                } else {
+//                    controller.present(navigationController, animated: true)
+//                }
+//            } else {
+//                window?.rootViewController = navigationController
+//                window?.makeKeyAndVisible()
+//            }
+//        }
+
         // Nextcloud standard login
         if selector == NCGlobal.shared.introSignup {
             if activeLogin?.view.window == nil {
@@ -525,6 +566,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }))
 
         UIApplication.shared.firstWindow?.rootViewController?.present(alertController, animated: true)
+    }
+    
+    // MARK: - Account
+
+    @objc func changeAccount(_ account: String, userProfile: NKUserProfile?) {
+//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeUser)
+    }
+
+    @objc func deleteAccount(_ account: String, wipe: Bool) {
+        NCAccount().deleteAccount(account, wipe: wipe)
+    }
+
+    func deleteAllAccounts() {
+        let accounts = NCManageDatabase.shared.getAccounts()
+        accounts?.forEach({ account in
+            deleteAccount(account, wipe: true)
+        })
+    }
+
+    func updateShareAccounts() -> Error? {
+        return NCAccount().updateAppsShareAccounts()
     }
 
     // MARK: - Account

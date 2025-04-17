@@ -304,6 +304,10 @@
 		B5D45E6D2DA510E000773929 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */; };
 		B5D45E6E2DA510E000773929 /* NCRenameFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E6B2DA510E000773929 /* NCRenameFile.swift */; };
 		B5D45E702DA5119A00773929 /* RenameFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E6F2DA5119A00773929 /* RenameFileTests.swift */; };
+		B5D45E5F2DA50C8500773929 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E5D2DA50C8500773929 /* TealiumHelper.swift */; };
+		B5D45E602DA50C8500773929 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E5C2DA50C8500773929 /* AdjustHelper.m */; };
+		B5D45E632DA50D6A00773929 /* CCManageAutoUpload.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E622DA50D6A00773929 /* CCManageAutoUpload.m */; };
+		B5D45E642DA50D6A00773929 /* CCAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E612DA50D6A00773929 /* CCAdvanced.m */; };
 		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
@@ -1747,6 +1751,11 @@
 		B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCRenameFile.storyboard; sourceTree = "<group>"; };
 		B5D45E6B2DA510E000773929 /* NCRenameFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCRenameFile.swift; sourceTree = "<group>"; };
 		B5D45E6F2DA5119A00773929 /* RenameFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameFileTests.swift; sourceTree = "<group>"; };
+		B5D45E5B2DA50C8500773929 /* AdjustHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
+		B5D45E5C2DA50C8500773929 /* AdjustHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
+		B5D45E5D2DA50C8500773929 /* TealiumHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
+		B5D45E612DA50D6A00773929 /* CCAdvanced.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCAdvanced.m; sourceTree = "<group>"; };
+		B5D45E622DA50D6A00773929 /* CCManageAutoUpload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCManageAutoUpload.m; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -2774,6 +2783,14 @@
 				B5D45E6B2DA510E000773929 /* NCRenameFile.swift */,
 			);
 			path = "Rename file";
+		B5D45E5E2DA50C8500773929 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				B5D45E5B2DA50C8500773929 /* AdjustHelper.h */,
+				B5D45E5C2DA50C8500773929 /* AdjustHelper.m */,
+				B5D45E5D2DA50C8500773929 /* TealiumHelper.swift */,
+			);
+			path = Helper;
 			sourceTree = "<group>";
 		};
 		C0046CDB2A17B98400D87C9D /* NextcloudUITests */ = {
@@ -3265,6 +3282,8 @@
 				B543153E2DA669C700981E7E /* RequiredDataCollectionSwitch.xib */,
 				B543153F2DA669C700981E7E /* SaveSettingsCustomButtonCell.swift */,
 				B54315402DA669C700981E7E /* SaveSettingsCustomButtonCell.xib */,
+				B5D45E612DA50D6A00773929 /* CCAdvanced.m */,
+				B5D45E622DA50D6A00773929 /* CCManageAutoUpload.m */,
 				F768820B2C0DD1E7001CF441 /* Settings */,
 				F76882162C0DD1E7001CF441 /* AutoUpload */,
 				F389C9F32CEE381E00049762 /* SelectAlbum */,
@@ -4005,6 +4024,7 @@
 				B52FAE9B2DA8DED9001AB1BD /* NMC Custom Views */,
 				B54315332DA64D6500981E7E /* AppUtility.swift */,
 				B5D45E722DA5172900773929 /* AppUpdate */,
+				B5D45E5E2DA50C8500773929 /* Helper */,
 				F702F2CC25EE5B4F008F8E80 /* AppDelegate.swift */,
 				F794E13E2BBC0F70003693D7 /* SceneDelegate.swift */,
 				F77DD6A72C5CC093009448FB /* NCSession.swift */,
@@ -5601,6 +5621,8 @@
 				F75DD765290ABB25002EB562 /* Intent.intentdefinition in Sources */,
 				F7D4BF012CA1831900A5E746 /* NCCollectionViewCommonPinchGesture.swift in Sources */,
 				F74B6D952A7E239A00F03C5F /* NCManageDatabase+Chunk.swift in Sources */,
+				B5D45E632DA50D6A00773929 /* CCManageAutoUpload.m in Sources */,
+				B5D45E642DA50D6A00773929 /* CCAdvanced.m in Sources */,
 				F7A8FD522C5E2557006C9CF8 /* NCAccount.swift in Sources */,
 				F310B1EF2BA862F1001C42F5 /* NCViewerMedia+VisionKit.swift in Sources */,
 				F702F2F725EE5CED008F8E80 /* NCLogin.swift in Sources */,
@@ -5617,6 +5639,8 @@
 				3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */,
 				F710D1F52405770F00A6033D /* NCViewerPDF.swift in Sources */,
 				F389C9F52CEE383300049762 /* SelectAlbumView.swift in Sources */,
+				B5D45E5F2DA50C8500773929 /* TealiumHelper.swift in Sources */,
+				B5D45E602DA50C8500773929 /* AdjustHelper.m in Sources */,
 				F7B6B70427C4E7FA00A7F6EB /* NCScan+CollectionView.swift in Sources */,
 				F7816EF22C2C3E1F00A52517 /* NCPushNotification.swift in Sources */,
 				F76882342C0DD1E7001CF441 /* NCDisplayView.swift in Sources */,
