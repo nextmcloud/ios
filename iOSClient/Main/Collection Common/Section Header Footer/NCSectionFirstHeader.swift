@@ -26,24 +26,50 @@ import MarkdownKit
 import NextcloudKit
 
 protocol NCSectionFirstHeaderDelegate: AnyObject {
+    func tapButtonSwitch(_ sender: Any)
+    func tapButtonOrder(_ sender: Any)
+    func tapButtonMore(_ sender: Any)
+    func tapButtonTransfer(_ sender: Any)
     func tapRichWorkspace(_ sender: Any)
     func tapRecommendations(with metadata: tableMetadata)
     func tapRecommendationsButtonMenu(with metadata: tableMetadata, image: UIImage?)
 }
 
+extension NCSectionFirstHeaderDelegate {
+    func tapButtonSwitch(_ sender: Any) {}
+    func tapButtonOrder(_ sender: Any) {}
+    func tapButtonMore(_ sender: Any) {}
+}
+
 class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegate {
+
+    @IBOutlet weak var buttonSwitch: UIButton!
+    @IBOutlet weak var buttonOrder: UIButton!
+    @IBOutlet weak var buttonMore: UIButton!
+    @IBOutlet weak var buttonTransfer: UIButton!
+    @IBOutlet weak var imageButtonTransfer: UIImageView!
+    @IBOutlet weak var labelTransfer: UILabel!
+    @IBOutlet weak var progressTransfer: UIProgressView!
+    @IBOutlet weak var transferSeparatorBottom: UIView!
+    @IBOutlet weak var textViewRichWorkspace: UITextView!
+    @IBOutlet weak var labelSection: UILabel!
+    @IBOutlet weak var viewTransfer: UIView!
     @IBOutlet weak var viewRichWorkspace: UIView!
     @IBOutlet weak var viewRecommendations: UIView!
     @IBOutlet weak var viewSection: UIView!
+    @IBOutlet weak var viewButtonsView: UIView!
+    @IBOutlet weak var viewSeparator: UIView!
 
+    @IBOutlet weak var viewTransferHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var viewButtonsViewHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var viewSeparatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewRichWorkspaceHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewRecommendationsHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var viewSectionHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var transferSeparatorBottomHeightConstraint: NSLayoutConstraint!
 
-    @IBOutlet weak var textViewRichWorkspace: UITextView!
     @IBOutlet weak var collectionViewRecommendations: UICollectionView!
     @IBOutlet weak var labelRecommendations: UILabel!
-    @IBOutlet weak var labelSection: UILabel!
 
     private weak var delegate: NCSectionFirstHeaderDelegate?
     private let utility = NCUtility()
@@ -62,11 +88,26 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         richWorkspaceGradient.startPoint = CGPoint(x: 0, y: 0.8)
         richWorkspaceGradient.endPoint = CGPoint(x: 0, y: 0.9)
         viewRichWorkspace.layer.addSublayer(richWorkspaceGradient)
+        backgroundColor = .clear
+        
+        //Button
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet")!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
+
+        buttonOrder.setTitle("", for: .normal)
+        buttonOrder.setTitleColor(NCBrandColor.shared.brand, for: .normal)
+        buttonMore.setImage(UIImage(named: "more")!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
+
+        // Gradient
+//        gradient.startPoint = CGPoint(x: 0, y: 0.8)
+//        gradient.endPoint = CGPoint(x: 0, y: 0.9)
+//        viewRichWorkspace.layer.addSublayer(gradient)
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(touchUpInsideViewRichWorkspace(_:)))
         tap.delegate = self
         viewRichWorkspace?.addGestureRecognizer(tap)
-
+        viewSeparatorHeightConstraint.constant = 0.5
+        viewSeparator.backgroundColor = .separator
+        
         markdownParser = MarkdownParser(font: UIFont.systemFont(ofSize: 15), color: NCBrandColor.shared.textColor)
         markdownParser.header.font = UIFont.systemFont(ofSize: 25)
         if let richWorkspaceText = richWorkspaceText {
@@ -90,6 +131,19 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         //
         labelSection.text = ""
         viewSectionHeightConstraint.constant = 0
+
+        buttonTransfer.backgroundColor = .clear
+        buttonTransfer.setImage(nil, for: .normal)
+        buttonTransfer.layer.cornerRadius = 6
+        buttonTransfer.layer.masksToBounds = true
+        imageButtonTransfer.image = UIImage(systemName: "stop.circle")
+        imageButtonTransfer.tintColor = .white
+        labelTransfer.text = ""
+        progressTransfer.progress = 0
+        progressTransfer.tintColor = NCBrandColor.shared.brand
+        progressTransfer.trackTintColor = NCBrandColor.shared.brand.withAlphaComponent(0.2)
+        transferSeparatorBottom.backgroundColor = .separator
+        transferSeparatorBottomHeightConstraint.constant = 0.5
     }
 
     override func layoutSublayers(of layer: CALayer) {
@@ -105,6 +159,44 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         setRichWorkspaceColor()
     }
 
+    // MARK: - View
+
+    func setStatusButtonsView(enable: Bool) {
+
+        buttonSwitch.isEnabled = enable
+        buttonOrder.isEnabled = enable
+        buttonMore.isEnabled = enable
+    }
+
+    func buttonMoreIsHidden(_ isHidden: Bool) {
+        buttonMore.isHidden = isHidden
+    }
+    
+    func setImageSwitchList() {
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet")!.image(color: NCBrandColor.shared.iconColor, width: 20, height: 15), for: .normal)
+    }
+
+    func setImageSwitchGrid() {
+        buttonSwitch.setImage(UIImage(systemName: "square.grid.2x2")!.image(color: NCBrandColor.shared.iconColor, size: 20), for: .normal)
+    }
+
+    func setButtonsView(height: CGFloat) {
+
+        viewButtonsViewHeightConstraint.constant = height
+        if height == 0 {
+            viewButtonsView.isHidden = true
+        } else {
+            viewButtonsView.isHidden = false
+        }
+    }
+
+    func setSortedTitle(_ title: String) {
+
+        let title = NSLocalizedString(title, comment: "")
+        buttonOrder.setTitle(title, for: .normal)
+    }
+
+    // MARK: - RichWorkspace
     func setContent(heightHeaderRichWorkspace: CGFloat,
                     richWorkspaceText: String?,
                     heightHeaderRecommendations: CGFloat,
@@ -116,7 +208,7 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         viewRichWorkspaceHeightConstraint.constant = heightHeaderRichWorkspace
         viewRecommendationsHeightConstraint.constant = heightHeaderRecommendations
         viewSectionHeightConstraint.constant = heightHeaderSection
-
+        
         if let richWorkspaceText, richWorkspaceText != self.richWorkspaceText {
             textViewRichWorkspace.attributedText = markdownParser.parse(richWorkspaceText)
             self.richWorkspaceText = richWorkspaceText
@@ -126,24 +218,55 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         self.labelSection.text = sectionText
         self.viewController = viewController
         self.delegate = delegate
-
+        
         if heightHeaderRichWorkspace != 0, let richWorkspaceText, !richWorkspaceText.isEmpty {
             viewRichWorkspace.isHidden = false
         } else {
             viewRichWorkspace.isHidden = true
         }
+    }
+    
+    func setRichWorkspaceText(_ text: String?) {
+        guard let text = text else { return }
 
-        if heightHeaderRecommendations != 0 && !recommendations.isEmpty {
-            viewRecommendations.isHidden = false
+        if text != self.richWorkspaceText {
+            textViewRichWorkspace.attributedText = markdownParser.parse(text)
+            self.richWorkspaceText = text
+        }
+    }
+
+    // MARK: - Transfer
+
+    func setViewTransfer(isHidden: Bool, ocId: String? = nil, text: String? = nil, progress: Float? = nil) {
+        labelTransfer.text = text
+        viewTransfer.isHidden = isHidden
+        progressTransfer.progress = 0
+
+        if isHidden {
+            viewTransferHeightConstraint.constant = 0
         } else {
-            viewRecommendations.isHidden = true
+            var image: UIImage?
+            if let ocId,
+               let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
+                image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt256)?.darken()
+                if image == nil {
+                    image = UIImage(named: metadata.iconName)
+                    buttonTransfer.backgroundColor = .lightGray
+                } else {
+                    buttonTransfer.backgroundColor = .clear
+                }
+            }
+            viewTransferHeightConstraint.constant = NCGlobal.shared.heightHeaderTransfer
+            if let progress {
+                progressTransfer.progress = progress
+            }
         }
 
-        if heightHeaderSection == 0 {
-            viewSection.isHidden = true
-        } else {
-            viewSection.isHidden = false
-        }
+//        if heightHeaderSection == 0 {
+//            viewSection.isHidden = true
+//        } else {
+//            viewSection.isHidden = false
+//        }
 
         self.collectionViewRecommendations.reloadData()
     }
@@ -156,6 +279,24 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         } else {
             richWorkspaceGradient.colors = [UIColor(white: 1, alpha: 0).cgColor, UIColor.white.cgColor]
         }
+    }
+        
+    // MARK: - Action
+    
+    @IBAction func touchUpInsideSwitch(_ sender: Any) {
+        delegate?.tapButtonSwitch(sender)
+    }
+
+    @IBAction func touchUpInsideOrder(_ sender: Any) {
+        delegate?.tapButtonOrder(sender)
+    }
+    
+    @IBAction func touchUpInsideMore(_ sender: Any) {
+        delegate?.tapButtonMore(sender)
+    }
+
+    @IBAction func touchUpTransfer(_ sender: Any) {
+       delegate?.tapButtonTransfer(sender)
     }
 
     @objc func touchUpInsideViewRichWorkspace(_ sender: Any) {
