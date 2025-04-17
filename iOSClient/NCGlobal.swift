@@ -369,6 +369,8 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let notificationCenterStatusEditing                         = "statusEditing"
     let notificationCenterStatusFileDrop                        = "statusFileDrop"
     
+
+
     let notificationCenterPlayerIsPlaying                       = "playerIsPlaying"
     let notificationCenterPlayerStoppedPlaying                  = "playerStoppedPlaying"
     
