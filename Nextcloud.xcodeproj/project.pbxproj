@@ -285,6 +285,7 @@
 		B543155E2DA6929700981E7E /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B54315542DA6929700981E7E /* TextTableViewCell.xib */; };
 		B543155F2DA6929700981E7E /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B54315502DA6929700981E7E /* FolderPathCustomCell.xib */; };
 		B54315602DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B54315512DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard */; };
+		B543154C2DA690B700981E7E /* NCNotificationText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543154B2DA690B700981E7E /* NCNotificationText.swift */; };
 		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
@@ -1709,6 +1710,7 @@
 		B54315522DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadVoiceNote.swift; sourceTree = "<group>"; };
 		B54315532DA6929700981E7E /* TextTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
 		B54315542DA6929700981E7E /* TextTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
+		B543154B2DA690B700981E7E /* NCNotificationText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNotificationText.swift; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -2531,6 +2533,7 @@
 				B568C2B02DA7AA5F0072FCB4 /* MoreTests.swift */,
 				B568C2AC2DA7A9000072FCB4 /* AssetUploadTest.swift */,
 				B543154D2DA6913C00981E7E /* AudioUploadTests.swift */,
+				B543154B2DA690B700981E7E /* NCNotificationText.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = Helper;
@@ -4881,6 +4884,7 @@
 				566EB81C2B3D889D00FB7CAD /* E2EETests.swift in Sources */,
 				566EB7E62B3D7AE900FB7CAD /* ScanTests.swift in Sources */,
 				B5E2E6D42DAE52B500AB2EDD /* SharingTest.swift in Sources */,
+				B543154C2DA690B700981E7E /* NCNotificationText.swift in Sources */,
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
 				566FCF552B3ECBDE00168DEA /* RenameFileTests.swift in Sources */,
 				566EB80F2B3D833000FB7CAD /* AudioUploadTests.swift in Sources */,
