@@ -177,7 +177,7 @@ private var hasChangesQuickLook: Bool = false
         toolbarConfig.optionButtonFontSize = 16
         toolbarConfig.optionButtonFontSizeForPad = 21
         toolbarConfig.backgroundColor = .systemGray6
-        toolbarConfig.foregroundColor = .systemBlue
+        toolbarConfig.foregroundColor = NCBrandColor.shared.customer
 
         var viewConfig = CropViewConfig()
         viewConfig.cropMaskVisualEffectType = .none
