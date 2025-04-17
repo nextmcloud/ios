@@ -45,8 +45,8 @@ extension NCNetworking {
                 completion(afError, error)
             }
         } else {
-            downloadFileInBackground(metadata: metadata, start: start, completion: { afError, error in
-                completion(afError, error)
+            downloadFileInBackground(metadata: metadata, start: start, completion: { error in
+                completion(nil, error)
             })
         }
     }
@@ -132,14 +132,15 @@ extension NCNetworking {
                                           start: @escaping () -> Void = { },
                                           requestHandler: @escaping (_ request: DownloadRequest) -> Void = { _ in },
                                           progressHandler: @escaping (_ progress: Progress) -> Void = { _ in },
-                                          completion: @escaping (_ afError: AFError?, _ error: NKError) -> Void = { _, _ in }) {
+                                          completion: @escaping (_ error: NKError) -> Void) {
         let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
         let fileNameLocalPath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)
 
         start()
 
-        if let task = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance).download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, account: metadata.account) {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Download file \(metadata.fileNameView) with task with taskIdentifier \(task.taskIdentifier)")
+        let (task, error) = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance).download(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, account: metadata.account)
+
+        if let task, error == .success {
             database.setMetadataSession(ocId: metadata.ocId,
                                         sessionTaskIdentifier: task.taskIdentifier,
                                         status: self.global.metadataStatusDownloading)
@@ -150,7 +151,6 @@ extension NCNetworking {
                                                                    "session": metadata.session,
                                                                    "serverUrl": metadata.serverUrl,
                                                                    "account": metadata.account])
-            completion(nil, NKError())
         } else {
             database.setMetadataSession(ocId: metadata.ocId,
                                         session: "",
@@ -158,8 +158,9 @@ extension NCNetworking {
                                         sessionError: "",
                                         selector: "",
                                         status: self.global.metadataStatusNormal)
-            completion(nil, NKError(errorCode: self.global.errorResourceNotFound, errorDescription: "task null"))
         }
+
+        completion(error)
     }
 
     func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
@@ -185,13 +186,12 @@ extension NCNetworking {
                           length: Int64,
                           task: URLSessionTask,
                           error: NKError) {
-        if let delegate {
-            return delegate.downloadComplete(fileName: fileName, serverUrl: serverUrl, etag: etag, date: date, dateLastModified: dateLastModified, length: length, task: task, error: error)
-        }
 
         DispatchQueue.global().async {
             guard let url = task.currentRequest?.url,
                   let metadata = self.database.getMetadata(from: url, sessionTaskIdentifier: task.taskIdentifier) else { return }
+
+            NextcloudKit.shared.nkCommonInstance.appendServerErrorAccount(metadata.account, errorCode: error.errorCode)
 
             if error == .success {
                 NCTransferProgress.shared.clearCountError(ocIdTransfer: metadata.ocIdTransfer)
@@ -235,6 +235,7 @@ extension NCNetworking {
                                                             second: 0.5)
             } else {
                 NCTransferProgress.shared.clearCountError(ocIdTransfer: metadata.ocIdTransfer)
+
                 self.database.setMetadataSession(ocId: metadata.ocId,
                                                  session: "",
                                                  sessionTaskIdentifier: 0,
@@ -262,9 +263,6 @@ extension NCNetworking {
                           serverUrl: String,
                           session: URLSession,
                           task: URLSessionTask) {
-        if let delegate {
-            return delegate.downloadProgress(progress, totalBytes: totalBytes, totalBytesExpected: totalBytesExpected, fileName: fileName, serverUrl: serverUrl, session: session, task: task)
-        }
 
         DispatchQueue.global().async {
             if let metadata = self.database.getResultMetadataFromFileName(fileName, serverUrl: serverUrl, sessionTaskIdentifier: task.taskIdentifier) {
@@ -281,33 +279,6 @@ extension NCNetworking {
                                                                        "totalBytes": NSNumber(value: totalBytes),
                                                                        "totalBytesExpected": NSNumber(value: totalBytesExpected)])
             }
-        }
-    }
-}
-
-class NCOperationDownload: ConcurrentOperation, @unchecked Sendable {
-    var metadata: tableMetadata
-    var selector: String
-
-    init(metadata: tableMetadata, selector: String) {
-        self.metadata = tableMetadata.init(value: metadata)
-        self.selector = selector
-    }
-
-    override func start() {
-        guard !isCancelled else { return self.finish() }
-
-        metadata.session = NCNetworking.shared.sessionDownload
-        metadata.sessionError = ""
-        metadata.sessionSelector = selector
-        metadata.sessionTaskIdentifier = 0
-        metadata.status = NCGlobal.shared.metadataStatusWaitDownload
-
-        let metadata = NCManageDatabase.shared.addMetadata(metadata)
-
-        NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true) {
-        } completion: { _, _ in
-            self.finish()
         }
     }
 }

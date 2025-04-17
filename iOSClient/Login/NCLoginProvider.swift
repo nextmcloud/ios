@@ -1,25 +1,6 @@
-//
-//  NCLoginProvider.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 21/08/2019.
-//  Copyright © 2019 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2025 Milen Pivchev
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import WebKit
@@ -32,25 +13,45 @@ class NCLoginProvider: UIViewController {
     let utility = NCUtility()
     var titleView: String = ""
     var urlBase = ""
+    var uiColor: UIColor = .white
+    var pollTimer: DispatchSourceTimer?
+    weak var delegate: NCLoginProviderDelegate?
+    var controller: NCMainTabBarController?
 
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .stop, target: self, action: #selector(self.closeView(sender:)))
 
         webView = WKWebView(frame: CGRect.zero, configuration: WKWebViewConfiguration())
-        webView!.navigationDelegate = self
-        view.addSubview(webView!)
+        if let webView {
+            webView.navigationDelegate = self
+            view.addSubview(webView)
 
-        webView!.translatesAutoresizingMaskIntoConstraints = false
-        webView!.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
-        webView!.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
-        webView!.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
-        webView!.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
+            webView.translatesAutoresizingMaskIntoConstraints = false
+            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
+            webView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0).isActive = true
+            webView.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
+            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
+        }
 
-        if let url = URL(string: urlBase) {
-            loadWebPage(webView: webView!, url: url)
+        let navigationItemBack = UIBarButtonItem(image: UIImage(systemName: "arrow.left"), style: .done, target: self, action: #selector(goBack))
+        navigationItemBack.tintColor = uiColor
+        navigationItem.leftBarButtonItem = navigationItemBack
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        if let url = URL(string: urlBase),
+           let webView {
+            HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+
+            WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records, completionHandler: {
+                    self.loadWebPage(webView: webView, url: url)
+                })
+            }
         } else {
             let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_login_url_error_")
             NCContentPresenter().showError(error: error, priority: .max)
@@ -78,12 +79,21 @@ class NCLoginProvider: UIViewController {
         super.viewDidAppear(animated)
         // Stop timer error network
         appDelegate.timerErrorNetworkingDisabled = true
+//        appDelegate.timerErrorNetworkingDisabled = true
+        if let account = NCManageDatabase.shared.getActiveTableAccount(), NCKeychain().getPassword(account: account.account).isEmpty {
+
+            let message = "\n" + NSLocalizedString("_password_not_present_", comment: "")
+            let alertController = UIAlertController(title: titleView, message: message, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
+            present(alertController, animated: true)
+        }
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         NCActivityIndicator.shared.stop()
         appDelegate.timerErrorNetworkingDisabled = false
+//        appDelegate.timerErrorNetworkingDisabled = false
     }
 
     func loadWebPage(webView: WKWebView, url: URL) {
@@ -103,8 +113,56 @@ class NCLoginProvider: UIViewController {
         webView.load(request)
     }
 
-    @objc func closeView(sender: UIBarButtonItem) {
-        self.dismiss(animated: true, completion: nil)
+    @objc func goBack() {
+        delegate?.onBack()
+
+        if isModal {
+            dismiss(animated: true)
+        } else {
+            navigationController?.popViewController(animated: true)
+        }
+    }
+
+    func getPollResponse(loginFlowV2Token: String, loginFlowV2Endpoint: String, loginOptions: NKRequestOptions) async -> (urlBase: String, loginName: String, appPassword: String)? {
+        await withCheckedContinuation { continuation in
+            NextcloudKit.shared.getLoginFlowV2Poll(token: loginFlowV2Token, endpoint: loginFlowV2Endpoint, options: loginOptions) { server, loginName, appPassword, _, error in
+                if error == .success, let urlBase = server, let user = loginName, let appPassword {
+                    continuation.resume(returning: (urlBase, user, appPassword))
+                } else {
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    func handleGrant(urlBase: String, loginName: String, appPassword: String) async {
+        await withCheckedContinuation { continuation in
+            if self.controller == nil {
+                self.controller = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
+            }
+
+            NCAccount().createAccount(viewController: self, urlBase: urlBase, user: loginName, password: appPassword, controller: controller) {
+                continuation.resume()
+            }
+        }
+    }
+
+    func poll(loginFlowV2Token: String, loginFlowV2Endpoint: String, loginFlowV2Login: String) {
+        let loginOptions = NKRequestOptions(customUserAgent: userAgent)
+        var grantValues: (urlBase: String, loginName: String, appPassword: String)?
+
+        Task { @MainActor in
+            repeat {
+                grantValues = await getPollResponse(loginFlowV2Token: loginFlowV2Token, loginFlowV2Endpoint: loginFlowV2Endpoint, loginOptions: loginOptions)
+                try await Task.sleep(nanoseconds: 1_000_000_000) // .seconds() is not supported on iOS 15 yet.
+            } while grantValues == nil
+
+            guard let grantValues else {
+                return
+            }
+
+            await handleGrant(urlBase: grantValues.urlBase, loginName: grantValues.loginName, appPassword: grantValues.appPassword)
+        }
     }
 }
 
@@ -123,6 +181,7 @@ extension NCLoginProvider: WKNavigationDelegate {
             return
         }
 
+        // Login via provider
         if urlString.hasPrefix(NCBrandOptions.shared.webLoginAutenticationProtocol) == true && urlString.contains("login") == true {
             var server: String = ""
             var user: String = ""
@@ -139,7 +198,12 @@ extension NCLoginProvider: WKNavigationDelegate {
                 let server: String = server.replacingOccurrences(of: "/server:", with: "")
                 let username: String = user.replacingOccurrences(of: "user:", with: "").replacingOccurrences(of: "+", with: " ")
                 let password: String = password.replacingOccurrences(of: "password:", with: "")
-                createAccount(server: server, username: username, password: password)
+
+                if self.controller == nil {
+                    self.controller = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
+                }
+
+                NCAccount().createAccount(viewController: self, urlBase: server, user: username, password: password, controller: controller)
             }
         }
     }
@@ -159,7 +223,7 @@ extension NCLoginProvider: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        NCActivityIndicator.shared.startActivity(style: .medium, blurEffect: false)
+        NCActivityIndicator.shared.startActivity(backgroundView: self.view, style: .medium, blurEffect: false)
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -175,6 +239,7 @@ extension NCLoginProvider: WKNavigationDelegate {
         let user = username
 
         NextcloudKit.shared.setup(account: account, user: user, userId: user, password: password, urlBase: urlBase)
+//        NextcloudKit.shared.setup(account: account, user: user, userId: user, password: password, urlBase: urlBase)
         NextcloudKit.shared.getUserProfile(account: account) { _, userProfile, _, error in
             if error == .success, let userProfile {
                 NextcloudKit.shared.appendSession(account: account,
@@ -192,6 +257,9 @@ extension NCLoginProvider: WKNavigationDelegate {
                 NCManageDatabase.shared.deleteAccount(account)
                 NCManageDatabase.shared.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
                 self.appDelegate.changeAccount(account, userProfile: userProfile) { }
+                NCAccount().deleteAccount(account)
+                NCManageDatabase.shared.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
+                NCAccount().changeAccount(account, userProfile: userProfile, controller: nil) { }
                 let window = UIApplication.shared.firstWindow
                 if window?.rootViewController is NCMainTabBarController {
                     self.dismiss(animated: true)

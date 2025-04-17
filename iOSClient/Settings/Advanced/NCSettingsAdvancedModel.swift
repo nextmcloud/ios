@@ -122,6 +122,7 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
     func updateSelectedLogLevel() {
         keychain.logLevel = selectedLogLevel.rawValue
         NextcloudKit.shared.nkCommonInstance.levelLog = selectedLogLevel.rawValue
+        exit(0)
     }
 
     /// Updates the value of `selectedInterval` in the keychain.
@@ -131,7 +132,7 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
 
     /// Clears cache
     func clearCache() {
-        NCActivityIndicator.shared.startActivity(style: .large, blurEffect: true)
+        NCActivityIndicator.shared.startActivity(backgroundView: self.controller?.view, style: .large, blurEffect: true)
         // Cancel all networking tasks
         NCNetworking.shared.cancelAllTask()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -147,8 +148,6 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
             ufs.removeDocumentsDirectory()
             ufs.removeTemporaryDirectory()
             ufs.createDirectoryStandard()
-
-            NCAutoUpload.shared.alignPhotoLibrary(controller: self.controller, account: self.session.account)
 
             NCActivityIndicator.shared.stop()
             self.calculateSize()
@@ -202,12 +201,10 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
         NextcloudKit.shared.nkCommonInstance.clearFileLog()
         // Fetch the log level from the keychain
         let logLevel = keychain.logLevel
-        // Check if the app is running in a simulator or TestFlight environment
-        let isSimulatorOrTestFlight = NCUtility().isSimulatorOrTestFlight()
         // Get the app's version and copyright information
         let versionNextcloudiOS = String(format: NCBrandOptions.shared.textCopyrightNextcloudiOS, NCUtility().getVersionApp(withBuild: true))
         // Construct the log message
-        let logMessage = "[INFO] Clear log with level \(logLevel) \(versionNextcloudiOS)" + (isSimulatorOrTestFlight ? " (Simulator / TestFlight)" : "")
+        let logMessage = "[INFO] Clear log with level \(logLevel) \(versionNextcloudiOS)"
         // Write the log entry about the log clearance
         NextcloudKit.shared.nkCommonInstance.writeLog(logMessage)
         // Set the alert state to show that log file has been cleared

@@ -132,6 +132,8 @@
     section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_diagnostics_", nil)];
     [form addFormSection:section];
         
+//    if ([[NSFileManager defaultManager] fileExistsAtPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] && NCBrandOptions.shared.disable_log == false) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:@""] && NCBrandOptions.shared.disable_log == false) {
     if ([[NSFileManager defaultManager] fileExistsAtPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] && NCBrandOptions.shared.disable_log == false) {
         
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"log" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_view_log_", nil)];
@@ -143,6 +145,8 @@
         row.action.formBlock = ^(XLFormRowDescriptor * sender) {
                     
             [self deselectFormRow:sender];
+//            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] fileNameSource:@"" isEditingEnabled:false metadata:nil];
+            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:@""] fileNameSource:@"" isEditingEnabled:false metadata:nil];
             NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] isEditingEnabled:false metadata:nil];
             [self presentViewController:viewerQuickLook animated:YES completion:nil];
         };
@@ -158,11 +162,17 @@
                     
             [self deselectFormRow:sender];
 
+//            [[[NextcloudKit shared] nkCommonInstance] clearFileLog];
             [[[NextcloudKit shared] nkCommonInstance] clearFileLog];
             
             NSInteger logLevel = [[NCKeychain alloc] init].logLevel;
             BOOL isSimulatorOrTestFlight = [[[NCUtility alloc] init] isSimulatorOrTestFlight];
             NSString *versionNextcloudiOS = [NSString stringWithFormat:[NCBrandOptions shared].textCopyrightNextcloudiOS, [[[NCUtility alloc] init] getVersionAppWithBuild:true]];
+//            if (isSimulatorOrTestFlight) {
+//                [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@ (Simulator / TestFlight)", (unsigned long)logLevel, versionNextcloudiOS]];
+//            } else {
+//                [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@", (unsigned long)logLevel, versionNextcloudiOS]];
+//            }
             if (isSimulatorOrTestFlight) {
                 [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@ (Simulator / TestFlight)", (unsigned long)logLevel, versionNextcloudiOS]];
             } else {
@@ -238,6 +248,7 @@
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+    row.cellConfigForSelector[@"tintColor"] = NCBrandColor.shared.customer;
     row.selectorTitle = NSLocalizedString(@"_delete_old_files_", nil);
     row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:NSLocalizedString(@"_never_", nil)],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(365) displayText:NSLocalizedString(@"_1_year_", nil)],
@@ -350,6 +361,7 @@
         
         NSInteger levelLog = [[rowDescriptor.value valueData] intValue];
         [[NCKeychain alloc] init].logLevel = levelLog;
+//        [[[NextcloudKit shared] nkCommonInstance] setLevelLog:levelLog];
         [[[NextcloudKit shared] nkCommonInstance] setLevelLog:levelLog];
     }
 
@@ -383,6 +395,7 @@
 
         [ufs createDirectoryStandard];
 
+        [[NCAutoUpload shared] alignPhotoLibraryWithController:self account:appDelegate.account];
         [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
 
         [[NCImageCache shared] createMediaCacheWithAccount:appDelegate.account withCacheSize:true];

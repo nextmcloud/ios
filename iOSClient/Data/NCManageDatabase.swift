@@ -33,14 +33,12 @@ protocol DateCompareable {
     var dateKey: Date { get }
 }
 
-class NCManageDatabase: NSObject {
-    @objc static let shared: NCManageDatabase = {
-        let instance = NCManageDatabase()
-        return instance
-    }()
+final class NCManageDatabase: Sendable {
+    static let shared = NCManageDatabase()
+
     let utilityFileSystem = NCUtilityFileSystem()
 
-    override init() {
+    init() {
         func migrationSchema(_ migration: Migration, _ oldSchemaVersion: UInt64) {
             if oldSchemaVersion < 365 {
                 migration.deleteData(forType: tableMetadata.className())
@@ -48,8 +46,8 @@ class NCManageDatabase: NSObject {
                     newObject?["etag"] = ""
                 }
             }
-            if oldSchemaVersion < 375 {
-                // nothing
+            if oldSchemaVersion < databaseSchemaVersion {
+                // automatic conversion for delete object / properties
             }
         }
 
@@ -74,7 +72,6 @@ class NCManageDatabase: NSObject {
                                 tableTag.self,
                                 tableAccount.self,
                                 tableCapabilities.self,
-                                tablePhotoLibrary.self,
                                 tableE2eEncryption.self,
                                 tableE2eEncryptionLock.self,
                                 tableE2eMetadata12.self,
@@ -111,38 +108,67 @@ class NCManageDatabase: NSObject {
                                     tableCapabilities.self,
                                     tableE2eEncryption.self]
             }
+
+            Realm.Configuration.defaultConfiguration =
+            Realm.Configuration(fileURL: databaseFileUrlPath,
+                                schemaVersion: databaseSchemaVersion,
+                                migrationBlock: { migration, oldSchemaVersion in
+                                    migrationSchema(migration, oldSchemaVersion)
+                                }, shouldCompactOnLaunch: { totalBytes, usedBytes in
+                                    compactDB(totalBytes, usedBytes)
+                                }, objectTypes: objectTypesAppex)
+
             do {
-                Realm.Configuration.defaultConfiguration =
-                Realm.Configuration(fileURL: databaseFileUrlPath,
-                                    schemaVersion: databaseSchemaVersion,
-                                    migrationBlock: { migration, oldSchemaVersion in
-                                        migrationSchema(migration, oldSchemaVersion)
-                                    }, shouldCompactOnLaunch: { totalBytes, usedBytes in
-                                        compactDB(totalBytes, usedBytes)
-                                    }, objectTypes: objectTypesAppex)
                 realm = try Realm()
                 if let realm, let url = realm.configuration.fileURL {
                     print("Realm is located at: \(url)")
                 }
             } catch let error {
-                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] DATABASE ERROR: \(error.localizedDescription)")
+                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] DATABASE: \(error.localizedDescription)")
             }
         } else {
+            Realm.Configuration.defaultConfiguration =
+            Realm.Configuration(fileURL: databaseFileUrlPath,
+                                schemaVersion: databaseSchemaVersion,
+                                migrationBlock: { migration, oldSchemaVersion in
+                                    migrationSchema(migration, oldSchemaVersion)
+                                }, shouldCompactOnLaunch: { totalBytes, usedBytes in
+                                    compactDB(totalBytes, usedBytes)
+                                })
             do {
-                Realm.Configuration.defaultConfiguration =
-                Realm.Configuration(fileURL: databaseFileUrlPath,
-                                    schemaVersion: databaseSchemaVersion,
-                                    migrationBlock: { migration, oldSchemaVersion in
-                                        migrationSchema(migration, oldSchemaVersion)
-                                    }, shouldCompactOnLaunch: { totalBytes, usedBytes in
-                                        compactDB(totalBytes, usedBytes)
-                                    })
                 realm = try Realm()
                 if let realm, let url = realm.configuration.fileURL {
                     print("Realm is located at: \(url)")
                 }
+
+                backupTableAccountToFile()
+
             } catch let error {
-                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] DATABASE ERROR: \(error.localizedDescription)")
+                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] DATABASE: \(error.localizedDescription)")
+
+                if let realmURL = databaseFileUrlPath {
+                    let filesToDelete = [
+                        realmURL,
+                        realmURL.appendingPathExtension("lock"),
+                        realmURL.appendingPathExtension("note"),
+                        realmURL.appendingPathExtension("management")
+                    ]
+
+                    for file in filesToDelete {
+                        do {
+                            try FileManager.default.removeItem(at: file)
+                        } catch { }
+                    }
+                }
+
+                do {
+                    _ = try Realm()
+
+                    restoreTableAccountFromFile()
+
+                } catch let error {
+                    NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Account restoration: \(error.localizedDescription)")
+                }
             }
         }
     }
@@ -193,14 +219,18 @@ class NCManageDatabase: NSObject {
         self.clearTable(TableGroupfoldersGroups.self, account: account)
         self.clearTable(tableLocalFile.self, account: account)
         self.clearTable(tableMetadata.self, account: account)
-        self.clearTable(tablePhotoLibrary.self, account: account)
         self.clearTable(tableShare.self, account: account)
         self.clearTable(TableSecurityGuardDiagnostics.self, account: account)
         self.clearTable(tableTag.self, account: account)
         self.clearTable(tableTrash.self, account: account)
         self.clearTable(tableUserStatus.self, account: account)
         self.clearTable(tableVideo.self, account: account)
+        self.clearTable(TableDownloadLimit.self, account: account)
         self.clearTable(tableRecommendedFiles.self, account: account)
+        self.clearTable(NCDBLayoutForView.self, account: account)
+        if account == nil {
+            self.clearTable(NCKeyValue.self)
+        }
     }
 
     func clearTablesE2EE(account: String?) {

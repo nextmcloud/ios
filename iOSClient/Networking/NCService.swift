@@ -22,7 +22,7 @@
 //
 
 import UIKit
-import NextcloudKit
+@preconcurrency import NextcloudKit
 import RealmSwift
 
 class NCService: NSObject {
@@ -33,13 +33,15 @@ class NCService: NSObject {
     // MARK: -
 
     public func startRequestServicesServer(account: String, controller: NCMainTabBarController?) {
-        guard !account.isEmpty, UIApplication.shared.applicationState == .active else { return }
+        guard !account.isEmpty
+        else {
+            return
+        }
+
+        self.database.clearAllAvatarLoaded()
+        self.addInternalTypeIdentifier(account: account)
 
         Task(priority: .background) {
-            self.database.clearAllAvatarLoaded()
-            NCPushNotification.shared.pushNotification()
-            addInternalTypeIdentifier(account: account)
-
             let result = await requestServerStatus(account: account, controller: controller)
             if result {
                 requestServerCapabilities(account: account, controller: controller)
@@ -106,22 +108,11 @@ class NCService: NSObject {
         }
 
         let resultUserProfile = await NCNetworking.shared.getUserProfile(account: account, options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue))
-        if resultUserProfile.error == .success, let userProfile = resultUserProfile.userProfile {
+        if resultUserProfile.error == .success,
+           let userProfile = resultUserProfile.userProfile {
             self.database.setAccountUserProfile(account: resultUserProfile.account, userProfile: userProfile)
             return true
-        } else if resultUserProfile.error.errorCode == NCGlobal.shared.errorUnauthorized401 || resultUserProfile.error.errorCode == NCGlobal.shared.errorUnauthorized997 {
-            /// Ops the server has Unauthorized, cancel allTask and go to in CheckRemoteUser
-            NCNetworking.shared.cancelAllTask()
-            ///
-            DispatchQueue.main.async {
-                if UIApplication.shared.applicationState == .active && NCNetworking.shared.isOnline {
-                    NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] The server has response with Unauthorized go checkRemoteUser \(resultUserProfile.error.errorCode)")
-                    NCNetworkingCheckRemoteUser().checkRemoteUser(account: resultUserProfile.account, controller: controller, error: resultUserProfile.error)
-                }
-            }
-            return false
         } else {
-            NCContentPresenter().showError(error: resultUserProfile.error, priority: .max)
             return false
         }
     }
@@ -164,8 +155,11 @@ class NCService: NSObject {
     }
 
     private func requestServerCapabilities(account: String, controller: NCMainTabBarController?) {
+        let session = NCSession.shared.getSession(account: account)
         NextcloudKit.shared.getCapabilities(account: account, options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { account, presponseData, error in
             guard error == .success, let data = presponseData?.data else {
+                NCBrandColor.shared.settingThemingColor(account: account)
+                NCImageCache.shared.createImagesBrandCache()
                 return
             }
 
@@ -190,6 +184,7 @@ class NCService: NSObject {
 
             // Theming
             if NCBrandColor.shared.settingThemingColor(account: account) {
+                NCImageCache.shared.createImagesBrandCache()
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming, userInfo: ["account": account])
             }
             
@@ -224,6 +219,7 @@ class NCService: NSObject {
             // File Sharing
             if NCGlobal.shared.capabilityFileSharingApiEnabled {
                 let home = self.utilityFileSystem.getHomeServer(urlBase: self.appDelegate.urlBase, userId: self.appDelegate.userId)
+                let home = self.utilityFileSystem.getHomeServer(session: session)
                 NextcloudKit.shared.readShares(parameters: NKShareParameter()) { account, shares, data, error in
                     if error == .success {
                         NCManageDatabase.shared.deleteTableShare(account: account)

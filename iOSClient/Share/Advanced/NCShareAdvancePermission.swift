@@ -67,10 +67,32 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         }
     }
 
+    let database = NCManageDatabase.shared
+
     var oldTableShare: tableShare?
-    var share: NCTableShareable!
-    var isNewShare: Bool { share is NCTableShareOptions }
+
+    ///
+    /// View model for the share link user interface.
+    ///
+    var share: (any Shareable)!
+
+    ///
+    /// Determining whether the currently represented share is new based on its concrete type.
+    ///
+    var isNewShare: Bool { share is TransientShare }
+
+    ///
+    /// The subject to share.
+    ///
     var metadata: tableMetadata!
+
+    ///
+    /// The possible download limit associated with this share.
+    ///
+    /// This can only be created after the share has been actually created due to its requirement of the share token provided by the server.
+    ///
+    var downloadLimit: DownloadLimitViewModel = .unlimited
+
     var shareConfig: NCShareConfig!
     var networking: NCShareNetworking?
     let tableViewBottomInset: CGFloat = 80.0
@@ -797,5 +819,13 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         let alertController = UIAlertController(title: "", message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { action in }))
         self.present(alertController, animated: true)
+    }
+}
+
+// MARK: - NCShareDownloadLimitTableViewControllerDelegate
+
+extension NCShareAdvancePermission: NCShareDownloadLimitTableViewControllerDelegate {
+    func didSetDownloadLimit(_ downloadLimit: DownloadLimitViewModel) {
+        self.downloadLimit = downloadLimit
     }
 }

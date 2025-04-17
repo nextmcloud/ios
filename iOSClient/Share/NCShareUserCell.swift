@@ -107,6 +107,7 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         super.awakeFromNib()
         buttonMenu.contentMode = .scaleAspectFill
         buttonMenu.setImage(NCImageCache.images.buttonMore.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
+        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
         imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
         switchCanEdit.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)

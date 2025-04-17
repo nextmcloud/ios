@@ -8,6 +8,7 @@
 
 import Foundation
 
+import XLForm
 
 class PdfWithoutOcrSwitchView: XLFormBaseCell{
     @IBOutlet weak var cellLabel: UILabel!

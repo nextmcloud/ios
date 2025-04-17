@@ -31,17 +31,19 @@ class tableAccount: Object {
     @objc dynamic var active: Bool = false
     @objc dynamic var address = ""
     @objc dynamic var alias = ""
-    @objc dynamic var autoUpload: Bool = false
     @objc dynamic var autoUploadCreateSubfolder: Bool = false
     @objc dynamic var autoUploadSubfolderGranularity: Int = NCGlobal.shared.subfolderGranularityMonthly
     @objc dynamic var autoUploadDirectory = ""
     @objc dynamic var autoUploadFileName = ""
-    @objc dynamic var autoUploadFull: Bool = false
+    @objc dynamic var autoUploadStart: Bool = false
     @objc dynamic var autoUploadImage: Bool = false
     @objc dynamic var autoUploadVideo: Bool = false
-    @objc dynamic var autoUploadFavoritesOnly: Bool = false
     @objc dynamic var autoUploadWWAnPhoto: Bool = false
     @objc dynamic var autoUploadWWAnVideo: Bool = false
+    /// The Date from which new photos should be uploaded
+    @objc dynamic var autoUploadSinceDate: Date?
+    /// The date of the most recently uploaded asset
+    @objc dynamic var autoUploadLastUploadedDate: Date?
     @objc dynamic var backend = ""
     @objc dynamic var backendCapabilitiesSetDisplayName: Bool = false
     @objc dynamic var backendCapabilitiesSetPassword: Bool = false
@@ -54,7 +56,6 @@ class tableAccount: Object {
     @objc dynamic var locale = ""
     @objc dynamic var mediaPath = ""
     @objc dynamic var organisation = ""
-    @objc dynamic var password = ""
     @objc dynamic var phone = ""
     @objc dynamic var quota: Int64 = 0
     @objc dynamic var quotaFree: Int64 = 0
@@ -79,9 +80,117 @@ class tableAccount: Object {
     override static func primaryKey() -> String {
         return "account"
     }
+
+    func tableAccountToCodable() -> tableAccountCodable {
+        return tableAccountCodable(account: self.account, active: self.active, alias: self.alias, autoUploadCreateSubfolder: self.autoUploadCreateSubfolder, autoUploadSubfolderGranularity: self.autoUploadSubfolderGranularity, autoUploadDirectory: self.autoUploadDirectory, autoUploadFileName: self.autoUploadFileName, autoUploadStart: self.autoUploadStart, autoUploadImage: self.autoUploadImage, autoUploadVideo: self.autoUploadVideo, autoUploadWWAnPhoto: self.autoUploadWWAnPhoto, autoUploadWWAnVideo: self.autoUploadWWAnVideo, user: self.user, userId: self.userId, urlBase: self.urlBase)
+    }
+
+    convenience init(codableObject: tableAccountCodable) {
+        self.init()
+        self.account = codableObject.account
+        self.active = codableObject.active
+        self.alias = codableObject.alias
+
+        self.autoUploadCreateSubfolder = codableObject.autoUploadCreateSubfolder
+        self.autoUploadSubfolderGranularity = codableObject.autoUploadSubfolderGranularity
+        self.autoUploadDirectory = codableObject.autoUploadDirectory
+        self.autoUploadFileName = codableObject.autoUploadFileName
+        self.autoUploadStart = codableObject.autoUploadStart
+        self.autoUploadImage = codableObject.autoUploadImage
+        self.autoUploadVideo = codableObject.autoUploadVideo
+        self.autoUploadWWAnPhoto = codableObject.autoUploadWWAnPhoto
+        self.autoUploadWWAnVideo = codableObject.autoUploadWWAnVideo
+
+        self.user = codableObject.user
+        self.userId = codableObject.userId
+        self.urlBase = codableObject.urlBase
+    }
+}
+
+struct tableAccountCodable: Codable {
+    var account: String
+    var active: Bool
+    var alias: String
+
+    var autoUploadCreateSubfolder: Bool
+    var autoUploadSubfolderGranularity: Int
+    var autoUploadDirectory = ""
+    var autoUploadFileName: String
+    var autoUploadStart: Bool
+    var autoUploadImage: Bool
+    var autoUploadVideo: Bool
+    var autoUploadWWAnPhoto: Bool
+    var autoUploadWWAnVideo: Bool
+
+    var user: String
+    var userId: String
+    var urlBase: String
 }
 
 extension NCManageDatabase {
+    func backupTableAccountToFile() {
+        let dirGroup = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
+        guard let fileURL = dirGroup?.appendingPathComponent(NCGlobal.shared.appDatabaseNextcloud + "/" + tableAccountBackup) else {
+            return
+        }
+
+        do {
+            let realm = try Realm()
+            var codableObjects: [tableAccountCodable] = []
+            let encoder = JSONEncoder()
+
+            encoder.outputFormatting = .prettyPrinted
+
+            for tblAccount in realm.objects(tableAccount.self) {
+                if !NCKeychain().getPassword(account: tblAccount.account).isEmpty {
+                    let codableObject = tblAccount.tableAccountToCodable()
+                    codableObjects.append(codableObject)
+                }
+            }
+
+            if !codableObjects.isEmpty {
+                let jsonData = try encoder.encode(codableObjects)
+                try jsonData.write(to: fileURL)
+            }
+        } catch {
+            print("Error: \(error)")
+        }
+    }
+
+    func restoreTableAccountFromFile() {
+        let dirGroup = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
+        guard let fileURL = dirGroup?.appendingPathComponent(NCGlobal.shared.appDatabaseNextcloud + "/" + tableAccountBackup) else {
+            return
+        }
+
+        NextcloudKit.shared.nkCommonInstance.writeLog("DATABASE: Trying to restore account from backup...")
+
+        if !FileManager.default.fileExists(atPath: fileURL.path) {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] DATABASE: Account restore backup not found at: \(fileURL.path)")
+            return
+        }
+
+        do {
+            let realm = try Realm()
+            let jsonData = try Data(contentsOf: fileURL)
+            let decoder = JSONDecoder()
+            let codableObjects = try decoder.decode([tableAccountCodable].self, from: jsonData)
+
+            try realm.write {
+                for codableObject in codableObjects {
+                    if !NCKeychain().getPassword(account: codableObject.account).isEmpty {
+                        let tableAccount = tableAccount(codableObject: codableObject)
+                        realm.add(tableAccount)
+                    }
+                }
+            }
+
+            NextcloudKit.shared.nkCommonInstance.writeLog("DATABASE: Account restored")
+        } catch {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] DATABASE: Account restore error: \(error)")
+        }
+    }
+
     func addAccount(_ account: String, urlBase: String, user: String, userId: String, password: String) {
         do {
             let realm = try Realm()
@@ -100,6 +209,12 @@ extension NCManageDatabase {
         } catch let error {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
+    }
+
+    func updateAccountProperty<T>(_ keyPath: ReferenceWritableKeyPath<tableAccount, T>, value: T, account: String) {
+        guard let activeAccount = getTableAccount(account: account) else { return }
+        activeAccount[keyPath: keyPath] = value
+        updateAccount(activeAccount)
     }
 
     func updateAccount(_ account: tableAccount) {
@@ -236,7 +351,21 @@ extension NCManageDatabase {
         return NCGlobal.shared.subfolderGranularityMonthly
     }
 
-    func setAccountActive(_ account: String) {
+    func getAccountAutoUploadFromFromDate() -> Date? {
+        do {
+            let realm = try Realm()
+            guard let result = realm.objects(tableAccount.self).filter("active == true").first else { return .distantPast }
+            return result.autoUploadSinceDate
+        } catch let error as NSError {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
+        }
+
+        return nil
+    }
+
+    @discardableResult
+    func setAccountActive(_ account: String) -> tableAccount? {
+        var tblAccount: tableAccount?
         do {
             let realm = try Realm()
             try realm.write {
@@ -244,14 +373,18 @@ extension NCManageDatabase {
                 for result in results {
                     if result.account == account {
                         result.active = true
+                        tblAccount = tableAccount(value: result)
                     } else {
                         result.active = false
                     }
                 }
+
             }
         } catch let error {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
+
+        return tblAccount
     }
 
     func setAccountAutoUploadProperty(_ property: String, state: Bool) {

@@ -33,6 +33,10 @@ class NCDocumentCamera: NSObject, VNDocumentCameraViewControllerDelegate {
     }()
     var viewController: UIViewController?
     let utilityFileSystem = NCUtilityFileSystem()
+    var controller: NCMainTabBarController!
+    var session: NCSession.Session {
+        NCSession.shared.getSession(controller: controller)
+    }
 
     func openScannerDocument(viewController: UIViewController?) {
         guard VNDocumentCameraViewController.isSupported else { return }
@@ -106,6 +110,9 @@ class NCDocumentCamera: NSObject, VNDocumentCameraViewControllerDelegate {
             var images: [UIImage] = []
             var serverUrl = appDelegate?.activeServerUrl ?? ""
 
+            let controller = self.viewController as? NCMainTabBarController
+            let serverUrl = controller?.currentServerUrl() ?? ""
+            
             for image in imagesDestination {
                 images.append(image)
             }

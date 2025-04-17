@@ -108,7 +108,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
             let navigationController = self.navigationController else { return }
         self.checkEnforcedPassword(shareType: shareCommon.SHARE_TYPE_LINK) { password in
             advancePermission.networking = self.networking
-            advancePermission.share = NCTableShareOptions.shareLink(metadata: self.metadata, password: password)
+            advancePermission.share = TransientShare.shareLink(metadata: self.metadata, password: password)
             advancePermission.metadata = self.metadata
             navigationController.pushViewController(advancePermission, animated: true)
         }
@@ -117,6 +117,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     // MARK: - Notification Center
 
     @objc func openShareProfile() {
+        guard let metadata = metadata else { return }
         self.showProfileMenu(userId: metadata.ownerId, session: session)
     }
     
@@ -240,7 +241,9 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     // MARK: -
 
     @objc func reloadData() {
-        shares = self.database.getTableShares(metadata: metadata)
+        if let metadata = metadata {
+            shares = self.database.getTableShares(metadata: metadata)
+        }
         tableView.reloadData()
     }
 
@@ -259,6 +262,83 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
         } else {
             networking?.getSharees(searchString: searchString)
         }
+        networking?.getSharees(searchString: searchString)
+    }
+    
+    @IBAction func searchFieldDidChange(textField: UITextField) {
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(searchSharees), object: nil)
+        guard let searchString = textField.text else {return}
+        if searchString.count == 0 {
+            dropDown.hide()
+        } else {
+//            networking?.getSharees(searchString: searchString)
+            perform(#selector(searchSharees), with: nil, afterDelay: 0.5)
+        }
+    }
+    
+    @objc private func searchSharees() {
+        // https://stackoverflow.com/questions/25471114/how-to-validate-an-e-mail-address-in-swift
+        func isValidEmail(_ email: String) -> Bool {
+
+            let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+            let emailPred = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
+            return emailPred.evaluate(with: email)
+        }
+        guard let searchString = textField?.text, !searchString.isEmpty else { return }
+        if searchString.contains("@"), !isValidEmail(searchString) { return }
+        networking?.getSharees(searchString: searchString)
+    }
+    
+    @IBAction func createLinkClicked(_ sender: Any) {
+        appDelegate?.adjust.trackEvent(TriggerEvent(CreateLink.rawValue))
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.sharing.create", data: ["": ""])
+        self.touchUpInsideButtonMenu(sender)
+    }
+    
+    @IBAction func touchUpInsideButtonMenu(_ sender: Any) {
+        
+        guard let metadata = metadata else { return }
+        let isFilesSharingPublicPasswordEnforced = NCCapabilities.Capabilities().capabilityFileSharingPubPasswdEnforced
+        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
+        
+        if isFilesSharingPublicPasswordEnforced && shares.firstShareLink == nil {
+            let alertController = UIAlertController(title: NSLocalizedString("_enforce_password_protection_", comment: ""), message: "", preferredStyle: .alert)
+            alertController.addTextField { (textField) in
+                textField.isSecureTextEntry = true
+            }
+            alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .default) { (action:UIAlertAction) in })
+            let okAction = UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default) {[weak self] (action:UIAlertAction) in
+                let password = alertController.textFields?.first?.text
+                self?.networking?.createShareLink(password: password ?? "")
+            }
+            
+            alertController.addAction(okAction)
+            
+            present(alertController, animated: true, completion:nil)
+        } else if shares.firstShareLink == nil {
+            networking?.createShareLink(password: "")
+        } else {
+            networking?.createShareLink(password: "")
+        }
+        
+    }
+    
+    @IBAction func selectContactClicked(_ sender: Any) {
+        let cnPicker = CNContactPickerViewController()
+        cnPicker.delegate = self
+        cnPicker.displayedPropertyKeys = [CNContactEmailAddressesKey]
+        cnPicker.predicateForEnablingContact = NSPredicate(format: "emailAddresses.@count > 0")
+        cnPicker.predicateForSelectionOfProperty = NSPredicate(format: "emailAddresses.@count > 0")
+        
+        self.present(cnPicker, animated: true)
+    }
+    
+    func checkEnforcedPassword(shareType: Int, completion: @escaping (String?) -> Void) {
+        guard NCCapabilities.Capabilities().capabilityFileSharingPubPasswdEnforced,
+              shareType == shareCommon.SHARE_TYPE_LINK || shareType == shareCommon.SHARE_TYPE_EMAIL
+        else { return completion(nil) }
+
+        self.present(UIAlertController.password(titleKey: "_enforce_password_protection_", completion: completion), animated: true)
     }
     
     @IBAction func createLinkClicked(_ sender: Any) {
@@ -312,9 +392,11 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
 
         self.present(UIAlertController.password(titleKey: "_enforce_password_protection_", completion: completion), animated: true)
     }
+}
 
     // MARK: - NCShareNetworkingDelegate
 
+extension NCShare: NCShareNetworkingDelegate {
     func readShareCompleted() {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
     }
@@ -383,7 +465,7 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
                 let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
                 let navigationController = self.navigationController else { return }
             self.checkEnforcedPassword(shareType: sharee.shareType) { password in
-                let shareOptions = NCTableShareOptions(sharee: sharee, metadata: self.metadata, password: password)
+                let shareOptions = TransientShare(sharee: sharee, metadata: self.metadata, password: password)
                 advancePermission.share = shareOptions
                 advancePermission.networking = self.networking
                 advancePermission.metadata = self.metadata
@@ -392,6 +474,14 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
         }
 
         dropDown.show()
+    }
+
+    func downloadLimitRemoved(by token: String) {
+        database.deleteDownloadLimit(byAccount: metadata.account, shareToken: token)
+    }
+
+    func downloadLimitSet(to limit: Int, by token: String) {
+        database.createDownloadLimit(account: metadata.account, count: 0, limit: limit, token: token)
     }
     
     func checkIsCollaboraFile() -> Bool {
@@ -485,6 +575,7 @@ extension NCShare: UITableViewDataSource {
                 cell.tableShare = tableShare
                 cell.delegate = self
                 cell.setupCellUI(userId: appDelegate.userId)
+                cell.setupCellUI(userId: session.userId)
                 let isEditingAllowed = shareCommon.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.fileExtension ?? "", shareType: tableShare.shareType)
                 if isEditingAllowed || checkIsCollaboraFile() {
                     cell.btnQuickStatus.isEnabled = true
@@ -515,6 +606,9 @@ extension NCShare: UITableViewDataSource {
         
         if FileManager.default.fileExists(atPath: utilityFileSystem.getDirectoryProviderStorageIconOcId(metadata?.ocId ?? "", etag: metadata?.etag ?? "")) {
             headerView.fullWidthImageView.image = UIImage(contentsOfFile: utilityFileSystem.getDirectoryProviderStorageIconOcId(metadata?.ocId ?? "", etag: metadata?.etag ?? ""))
+        if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024) {
+            headerView.fullWidthImageView.image = image
+//            headerView.fullWidthImageView.image = UIImage(contentsOfFile: utilityFileSystem.getDirectoryProviderStorageIconOcId(metadata?.ocId ?? "", etag: metadata?.etag ?? ""))
             headerView.fullWidthImageView.contentMode = .scaleAspectFill
             headerView.imageView.isHidden = true
         } else {
@@ -525,6 +619,16 @@ extension NCShare: UITableViewDataSource {
                 headerView.imageView.image = metadata!.fileExtension == "odg" ? UIImage(named: "file-diagram") : UIImage.init(named: metadata!.iconName)
             } else {
                 headerView.imageView.image = UIImage(named: "file")
+                let image = (metadata?.e2eEncrypted ?? false) ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
+                headerView.imageView.image = image
+            } else if !(metadata?.iconName.isEmpty ?? false) {
+                if let image = UIImage.init(named: metadata!.iconName) {
+                    headerView.imageView.image = metadata!.fileExtension == "odg" ? UIImage(named: "diagram") : image
+                } else {
+                    headerView.imageView.image = metadata!.fileExtension == "odg" ? UIImage(named: "diagram") : NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+                }
+            } else {
+                headerView.imageView.image = NCImageCache.shared.getImageFile()
             }
         }
     
@@ -544,10 +648,15 @@ extension NCShare: UITableViewDataSource {
     }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return metadata?.ownerId != appDelegate?.userId ? canReshare ? UITableView.automaticDimension : 350 : 320
+        return metadata?.ownerId != session?.userId ? canReshare ? 400 : 350 : 320
+    }
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return metadata?.ownerId != session?.userId ? canReshare ? UITableView.automaticDimension : 350 : 320
     }
 }
 
 //MARK: CNContactPickerDelegate
+
 extension NCShare: CNContactPickerDelegate {
     func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
         if  contact.emailAddresses.count > 1 {
@@ -584,3 +693,29 @@ extension NCShare: CNContactPickerDelegate {
     }
 }
 
+// MARK: - UISearchBarDelegate
+
+extension NCShare: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(searchSharees), object: nil)
+
+        if searchText.isEmpty {
+            dropDown.hide()
+        } else {
+            perform(#selector(searchSharees), with: nil, afterDelay: 0.5)
+        }
+    }
+
+    @objc private func searchSharees() {
+        // https://stackoverflow.com/questions/25471114/how-to-validate-an-e-mail-address-in-swift
+        func isValidEmail(_ email: String) -> Bool {
+
+            let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+            let emailPred = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
+            return emailPred.evaluate(with: email)
+        }
+        guard let searchString = searchField.text, !searchString.isEmpty else { return }
+        if searchString.contains("@"), !isValidEmail(searchString) { return }
+        networking?.getSharees(searchString: searchString)
+    }
+}

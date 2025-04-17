@@ -84,10 +84,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 }
             }
             if NCBrandOptions.shared.disable_intro {
-                appDelegate.openLogin(selector: NCGlobal.shared.introLogin, window: window)
+                if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
+                    let navigationController = UINavigationController(rootViewController: viewController)
+                    window?.rootViewController = navigationController
+                    window?.makeKeyAndVisible()
+                }
             } else {
-                if let viewController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? NCIntroViewController {
-                    let navigationController = NCLoginNavigationController(rootViewController: viewController)
+                if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
                     window?.rootViewController = navigationController
                     window?.makeKeyAndVisible()
                 }
@@ -102,13 +105,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene will enter in foreground")
         let session = SceneManager.shared.getSession(scene: scene)
-
-        // In Login mode is possible ONLY 1 window
-        if (UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }).count > 1,
-           (appDelegate?.activeLogin?.view.window != nil || appDelegate?.activeLoginWeb?.view.window != nil) || (UIApplication.shared.firstWindow?.rootViewController is NCLoginNavigationController) {
-            UIApplication.shared.allSceneSessionDestructionExceptFirst()
-            return
-        }
         guard !session.account.isEmpty else { return }
 
         hidePrivacyProtectionWindow()
@@ -123,6 +119,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
         }
         AppUpdater().checkForUpdate()
+//        AppUpdater().checkForUpdate()
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
     }
 
@@ -131,6 +128,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let controller = SceneManager.shared.getController(scene: scene)
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene did become active")
 
+        let oldVersion = UserDefaults.standard.value(forKey: NCSettingsBundleHelper.SettingsBundleKeys.BuildVersionKey) as? String
+        AppUpdater().checkForUpdate()
+        AnalyticsHelper.shared.trackAppVersion(oldVersion: oldVersion)
+        if let userAccount = NCManageDatabase.shared.getActiveTableAccount() {
+            AnalyticsHelper.shared.trackUsedStorageData(quotaUsed: userAccount.quotaUsed)
+        }
+
+        NCSettingsBundleHelper.setVersionAndBuildNumber()
+        NCSettingsBundleHelper.checkAndExecuteSettings(delay: 0.5)
+        
+//        if !NCAskAuthorization().isRequesting {
+//            NCPasscode.shared.hidePrivacyProtectionWindow()
+//        }
+        
         hidePrivacyProtectionWindow()
 
         NCAutoUpload.shared.initAutoUpload(controller: nil, account: session.account) { num in
@@ -160,7 +171,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             */
         }
 
-        ///
+        WidgetCenter.shared.reloadAllTimelines()
+
         let session = SceneManager.shared.getSession(scene: scene)
         guard !session.account.isEmpty else { return }
 
@@ -173,21 +185,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 showPrivacyProtectionWindow()
             }
         }
-
-        // Clear older files
-        let days = NCKeychain().cleanUpDay
-        let utilityFileSystem = NCUtilityFileSystem()
-        utilityFileSystem.cleanUp(directory: utilityFileSystem.directoryProviderStorage, days: TimeInterval(days))
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene did enter in background")
+        database.backupTableAccountToFile()
         let session = SceneManager.shared.getSession(scene: scene)
         guard let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)) else {
             return
         }
 
-        if tableAccount.autoUpload {
+        if tableAccount.autoUploadStart {
             NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Auto upload: true")
             if UIApplication.shared.backgroundRefreshStatus == .available {
                 NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Auto upload in background: true")
@@ -210,6 +218,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if NCKeychain().presentPasscode {
             showPrivacyProtectionWindow()
         }
+
+        // Clear older files
+        let days = NCKeychain().cleanUpDay
+        let utilityFileSystem = NCUtilityFileSystem()
+        utilityFileSystem.cleanUp(directory: utilityFileSystem.directoryProviderStorage, days: TimeInterval(days))
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
@@ -426,7 +439,7 @@ extension SceneDelegate: NCAccountRequestDelegate {
 
 // MARK: - Scene Manager
 
-class SceneManager {
+final class SceneManager: @unchecked Sendable {
     static let shared = SceneManager()
     private var sceneController: [NCMainTabBarController: UIScene] = [:]
 

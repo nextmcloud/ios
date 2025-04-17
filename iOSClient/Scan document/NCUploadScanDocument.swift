@@ -287,7 +287,7 @@ class NCUploadScanDocument: ObservableObject {
 // MARK: - Delegate
 
 extension NCUploadScanDocument: NCSelectDelegate {
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
         if let serverUrl = serverUrl {
             self.serverUrl = serverUrl
         }
@@ -375,9 +375,7 @@ struct UploadScanDocumentView: View {
                             TextField(NSLocalizedString("_enter_filename_", comment: ""), text: $fileName)
                                 .multilineTextAlignment(.trailing)
                                 .onChange(of: fileName) { _ in
-                                    let controller = (UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController)
-
-                                    if let fileNameError = FileNameValidator.shared.checkFileName(fileName, account: controller?.account) {
+                                    if let fileNameError = FileNameValidator.checkFileName(fileName, account: self.model.controller?.account) {
                                         footer = fileNameError.errorDescription
                                     } else {
                                         footer = ""

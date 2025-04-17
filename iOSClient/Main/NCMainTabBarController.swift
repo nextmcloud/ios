@@ -23,6 +23,7 @@
 
 import UIKit
 import SwiftUI
+import NextcloudKit
 
 struct NavigationCollectionViewCommon {
     var serverUrl: String
@@ -37,12 +38,9 @@ class NCMainTabBarController: UITabBarController {
     var documentPickerViewController: NCDocumentPickerViewController?
     let navigationCollectionViewCommon = ThreadSafeArray<NavigationCollectionViewCommon>()
     private var previousIndex: Int?
-
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-
-        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
-    }
+    private let groupDefaults = UserDefaults(suiteName: NCBrandOptions.shared.capabilitiesGroup)
+    private var checkUserDelaultErrorInProgress: Bool = false
+    private var timer: Timer?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,6 +48,41 @@ class NCMainTabBarController: UITabBarController {
 
         if #available(iOS 17.0, *) {
             traitOverrides.horizontalSizeClass = .compact
+        }
+
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil, queue: .main) { [weak self] notification in
+            if let userInfo = notification.userInfo as? NSDictionary,
+               let account = userInfo["account"] as? String,
+               let tabBar = self?.tabBar as? NCMainTabBar,
+               self?.account == account {
+                let color = NCBrandColor.shared.getElement(account: account)
+                tabBar.color = color
+                tabBar.tintColor = color
+                tabBar.setNeedsDisplay()
+            }
+        }
+
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterCheckUserDelaultErrorDone), object: nil, queue: nil) { notification in
+            if let userInfo = notification.userInfo,
+               let account = userInfo["account"] as? String,
+               let controller = userInfo["controller"] as? NCMainTabBarController,
+               account == self.account,
+               controller == self {
+                self.checkUserDelaultErrorInProgress = false
+            }
+        }
+
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
+            self.timer?.invalidate()
+            self.timer = nil
+        }
+
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { _ in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if UIApplication.shared.applicationState == .active {
+                    self.timerCheckServerError()
+                }
+            }
         }
     }
 
@@ -65,18 +98,12 @@ class NCMainTabBarController: UITabBarController {
         }
     }
 
-    @objc func changeTheming(_ notification: NSNotification) {
-        guard let userInfo = notification.userInfo as? NSDictionary else { return }
-        let account = userInfo["account"] as? String
-
-        if let tabBar = self.tabBar as? NCMainTabBar,
-           self.account == account {
-            let color = NCBrandColor.shared.getElement(account: account)
-            tabBar.color = color
-            tabBar.tintColor = color
-
-            tabBar.setNeedsDisplay()
-        }
+    private func timerCheckServerError() {
+        self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { _ in
+            NCNetworking.shared.checkServerError(account: self.account, controller: self) {
+                self.timerCheckServerError()
+            }
+        })
     }
 
     func currentViewController() -> UIViewController? {

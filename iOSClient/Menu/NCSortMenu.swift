@@ -30,6 +30,7 @@ class NCSortMenu: NSObject {
     private var sortButton: UIButton?
     private var serverUrl: String = ""
     private var hideDirectoryOnTop: Bool?
+    private var account: String = ""
 
     private var key = ""
 
@@ -39,6 +40,7 @@ class NCSortMenu: NSObject {
         self.sortButton = sortButton
         self.serverUrl = serverUrl
         self.hideDirectoryOnTop = hideDirectoryOnTop
+        self.account = account
 
         guard let layoutForView = NCManageDatabase.shared.getLayoutForView(account: account, key: key, serverUrl: serverUrl) else { return }
         var actions = [NCMenuAction]()
@@ -51,6 +53,10 @@ class NCSortMenu: NSObject {
         } else {
             title = NSLocalizedString("_order_by_name_a_z_", comment: "")
             icon = UIImage(named: "sortFileNameAZ")!.image(color: NCBrandColor.shared.iconImageColor, size: 50)
+            icon = UIImage(named: "sortFileNameZA")!.image(color: NCBrandColor.shared.iconColor, size: 50)
+        } else {
+            title = NSLocalizedString("_order_by_name_a_z_", comment: "")
+            icon = UIImage(named: "sortFileNameAZ")!.image(color: NCBrandColor.shared.iconColor, size: 50)
         }
 
         actions.append(
@@ -73,6 +79,10 @@ class NCSortMenu: NSObject {
         } else {
             title = NSLocalizedString("_order_by_date_less_recent_", comment: "")
             icon = UIImage(named: "sortDateLessRecent")!.image(color: NCBrandColor.shared.iconImageColor, size: 50)
+            icon = UIImage(named: "sortDateMoreRecent")!.image(color: NCBrandColor.shared.iconColor, size: 50)
+        } else {
+            title = NSLocalizedString("_order_by_date_less_recent_", comment: "")
+            icon = UIImage(named: "sortDateLessRecent")!.image(color: NCBrandColor.shared.iconColor, size: 50)
         }
 
         actions.append(
@@ -95,6 +105,10 @@ class NCSortMenu: NSObject {
         } else {
             title = NSLocalizedString("_order_by_size_smallest_", comment: "")
             icon = UIImage(named: "sortSmallest")!.image(color: NCBrandColor.shared.iconImageColor, size: 50)
+            icon = UIImage(named: "sortLargest")!.image(color: NCBrandColor.shared.iconColor, size: 50)
+        } else {
+            title = NSLocalizedString("_order_by_size_smallest_", comment: "")
+            icon = UIImage(named: "sortSmallest")!.image(color: NCBrandColor.shared.iconColor, size: 50)
         }
 
         actions.append(
@@ -116,10 +130,12 @@ class NCSortMenu: NSObject {
                 NCMenuAction(
                     title: NSLocalizedString("_directory_on_top_no_", comment: ""),
                     icon: UIImage(named: "foldersOnTop")!.image(color: NCBrandColor.shared.iconImageColor, size: 50),
+                    icon: UIImage(named: "foldersOnTop")!.image(color: NCBrandColor.shared.iconColor, size: 50),
                     selected: layoutForView.directoryOnTop,
                     on: layoutForView.directoryOnTop,
                     action: { _ in
                         layoutForView.directoryOnTop = !layoutForView.directoryOnTop
+                        NCKeychain().setDirectoryOnTop(account: self.account, value: layoutForView.directoryOnTop)
                         self.actionMenu(layoutForView: layoutForView)
                     }
                 )
@@ -144,6 +160,11 @@ class NCSortMenu: NSObject {
 
         self.sortButton?.setTitle(NSLocalizedString(layoutForView.titleButtonHeader, comment: ""), for: .normal)
         NCManageDatabase.shared.setLayoutForView(layoutForView: layoutForView)
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeLayout,
+                                                    object: nil,
+                                                    userInfo: ["account": self.account,
+                                                               "serverUrl": self.serverUrl,
+                                                               "layoutForView": layoutForView])
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
     }
 }

@@ -58,7 +58,7 @@ struct NCUploadAssetsView: View {
                                         }
                                         if item.data != nil {
                                             Button(action: {
-                                                if let image = model.previewStore[index].asset.fullResolutionImage?.resizeImage(size: CGSize(width: 300, height: 300), isAspectRation: true) {
+                                                if let image = model.previewStore[index].asset.fullResolutionImage?.resizeImage(size: CGSize(width: 240, height: 240), isAspectRation: true) {
                                                     model.previewStore[index].image = image
                                                     model.previewStore[index].data = nil
                                                     model.previewStore[index].assetType = model.previewStore[index].asset.type
@@ -123,7 +123,7 @@ struct NCUploadAssetsView: View {
                                             }
                                     }
                                     .onChange(of: renameFileName) { newValue in
-                                        if let error = FileNameValidator.shared.checkFileName(newValue, account: model.controller?.account) {
+                                        if let error = FileNameValidator.checkFileName(newValue, account: model.controller?.account) {
                                             renameError = error.errorDescription
                                         } else {
                                             renameError = ""
@@ -135,18 +135,23 @@ struct NCUploadAssetsView: View {
                     }
 
                     Section {
-                        Toggle(isOn: $model.useAutoUploadFolder, label: {
-                            Text(NSLocalizedString("_use_folder_auto_upload_", comment: ""))
-                                .font(.system(size: 15))
-                        })
-                        .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.getElement(account: metadata?.account))))
-
-                        if model.useAutoUploadFolder {
-                            Toggle(isOn: $model.useAutoUploadSubFolder, label: {
-                                Text(NSLocalizedString("_autoupload_create_subfolder_", comment: ""))
+                        ///
+                        /// Auto upload requires creating folders and subfolders which are difficult to manage offline
+                        /// 
+                        if NCNetworking.shared.isOnline {
+                            Toggle(isOn: $model.useAutoUploadFolder, label: {
+                                Text(NSLocalizedString("_use_folder_auto_upload_", comment: ""))
                                     .font(.system(size: 15))
                             })
                             .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.getElement(account: metadata?.account))))
+
+                            if model.useAutoUploadFolder {
+                                Toggle(isOn: $model.useAutoUploadSubFolder, label: {
+                                    Text(NSLocalizedString("_autoupload_create_subfolder_", comment: ""))
+                                        .font(.system(size: 15))
+                                })
+                                .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.getElement(account: metadata?.account))))
+                            }
                         }
 
                         if !model.useAutoUploadFolder {
@@ -242,11 +247,26 @@ struct NCUploadAssetsView: View {
             ZStack(alignment: .bottomTrailing) {
                 if index < model.previewStore.count {
                     let item = model.previewStore[index]
-                    Image(uiImage: item.image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 80, height: 80, alignment: .center)
-                        .cornerRadius(10)
+                    if let image = item.image {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 80, height: 80, alignment: .center)
+                            .cornerRadius(10)
+                    } else {
+                        Color(.lightGray) // Placeholder
+                            .frame(width: 80, height: 80)
+                            .cornerRadius(10)
+                            .onAppear {
+                                DispatchQueue.main.async {
+                                    if let asset = item.asset.phAsset,
+                                       let image = model.lowResolutionImage(asset: asset) {
+                                        model.previewStore[index].image = image
+                                    }
+                                }
+                            }
+                    }
+
                     if item.assetType == .livePhoto && item.data == nil {
                         Image(systemName: "livephoto")
                             .resizable()

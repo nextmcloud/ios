@@ -112,6 +112,8 @@ class NCFiles: NCCollectionViewCommon {
         if !isSearchingMode {
             getServerData()
         }
+
+        self.showTipAutoUpload()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -128,7 +130,6 @@ class NCFiles: NCCollectionViewCommon {
         else {
             return super.reloadDataSource()
         }
-        let directoryOnTop = NCKeychain().getDirectoryOnTop(account: session.account)
 
         // Watchdog: this is only a fail safe "dead lock", I don't think the timeout will ever be called but at least nothing gets stuck, if after 5 sec. (which is a long time in this routine), the semaphore is still locked
         //
@@ -147,9 +148,9 @@ class NCFiles: NCCollectionViewCommon {
         self.metadataFolder = database.getMetadataFolder(session: session, serverUrl: self.serverUrl)
         self.richWorkspaceText = database.getTableDirectory(predicate: predicateDirectory)?.richWorkspace
 
-        let metadatas = self.database.getResultsMetadatasPredicate(predicate, layoutForView: layoutForView, directoryOnTop: directoryOnTop)
+        let metadatas = self.database.getResultsMetadatasPredicate(predicate, layoutForView: layoutForView)
 
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView, directoryOnTop: directoryOnTop)
+        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView)
 
         if metadatas.isEmpty {
             self.semaphoreReloadDataSource.signal()
@@ -183,13 +184,6 @@ class NCFiles: NCCollectionViewCommon {
             return false
         }
 
-        /// Recommendation
-        if isRecommendationActived {
-            Task.detached {
-                await NCNetworking.shared.createRecommendations(session: self.session)
-            }
-        }
-
         DispatchQueue.global().async {
             self.networkReadFolder { metadatas, isChanged, error in
                 DispatchQueue.main.async {
@@ -203,21 +197,16 @@ class NCFiles: NCCollectionViewCommon {
                 if error == .success {
                     let metadatas: [tableMetadata] = metadatas ?? self.dataSource.getMetadatas()
                     for metadata in metadatas where !metadata.directory && downloadMetadata(metadata) {
-                        if NCNetworking.shared.downloadQueue.operations.filter({ ($0 as? NCOperationDownload)?.metadata.ocId == metadata.ocId }).isEmpty {
-                            NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorDownloadFile))
-                        }
+                        self.database.setMetadatasSessionInWaitDownload(metadatas: [metadata],
+                                                                        session: NCNetworking.shared.sessionDownload,
+                                                                        selector: NCGlobal.shared.selectorDownloadFile,
+                                                                        sceneIdentifier: self.controller?.sceneIdentifier)
+                        NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
                     }
-                } else if error.errorCode == self.global.errorForbidden {
-                    DispatchQueue.main.async {
-                        if self.presentedViewController == nil {
-                            NextcloudKit.shared.getTermsOfService(account: self.session.account) { _, tos, _, error in
-                                if error == .success, let tos {
-                                    let termOfServiceModel = NCTermOfServiceModel(controller: self.controller, tos: tos)
-                                    let termOfServiceView = NCTermOfServiceModelView(model: termOfServiceModel)
-                                    let termOfServiceController = UIHostingController(rootView: termOfServiceView)
-                                    self.present(termOfServiceController, animated: true, completion: nil)
-                                }
-                            }
+                    /// Recommendation
+                    if self.isRecommendationActived {
+                        Task.detached {
+                            await NCNetworking.shared.createRecommendations(session: self.session)
                         }
                     }
                 }
@@ -358,7 +347,10 @@ class NCFiles: NCCollectionViewCommon {
         let currentAccount = session.account
 
         if database.getAllTableAccount().isEmpty {
-            appDelegate.openLogin(selector: NCGlobal.shared.introLogin)
+            if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+                navigationController.modalPresentationStyle = .fullScreen
+                self.present(navigationController, animated: true)
+            }
         } else if let account = tableAccount?.account, account != currentAccount {
             NCAccount().changeAccount(account, userProfile: nil, controller: controller) { }
         } else if self.serverUrl == self.utilityFileSystem.getHomeServer(session: self.session) {

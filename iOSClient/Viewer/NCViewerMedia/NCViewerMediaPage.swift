@@ -55,6 +55,7 @@ class NCViewerMediaPage: UIViewController {
     var previousTrackCommand: Any?
     let utilityFileSystem = NCUtilityFileSystem()
     let database = NCManageDatabase.shared
+    var prefersLargeTitles: Bool?
 
     // This prevents the scroll views to scroll when you drag and drop files/images/subjects (from this or other apps)
     // https://forums.developer.apple.com/forums/thread/89396 and https://forums.developer.apple.com/forums/thread/115736
@@ -98,6 +99,8 @@ class NCViewerMediaPage: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        prefersLargeTitles = navigationController?.navigationBar.prefersLargeTitles
 
         navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
         let metadata = database.getMetadataFromOcId(ocIds[currentIndex])!
@@ -156,6 +159,7 @@ class NCViewerMediaPage: UIViewController {
 
     deinit {
         timerAutoHide?.invalidate()
+        timerAutoHide = nil
 
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterEnableSwipeGesture), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDisableSwipeGesture), object: nil)
@@ -175,6 +179,15 @@ class NCViewerMediaPage: UIViewController {
         super.viewDidAppear(animated)
 
         startTimerAutoHide()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        if let prefersLargeTitles {
+            navigationController?.navigationBar.prefersLargeTitles = prefersLargeTitles
+        }
+        changeScreenMode(mode: .normal)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -331,7 +344,13 @@ class NCViewerMediaPage: UIViewController {
 
         self.progressView.progress = 0
         let metadata = self.currentViewController.metadata
-        guard metadata.ocId == ocId, self.utilityFileSystem.fileProviderStorageExists(metadata) else { return }
+
+        guard !metadata.isInvalidated,
+              metadata.ocId == ocId,
+              self.utilityFileSystem.fileProviderStorageExists(metadata)
+        else {
+            return
+        }
 
         if metadata.isAudioOrVideo, let ncplayer = self.currentViewController.ncplayer {
             let url = URL(fileURLWithPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
@@ -585,7 +604,6 @@ extension NCViewerMediaPage: UIGestureRecognizerDelegate {
     }
 
     @objc func didPanWith(gestureRecognizer: UIPanGestureRecognizer) {
-
         currentViewController.didPanWith(gestureRecognizer: gestureRecognizer)
     }
 
@@ -601,7 +619,6 @@ extension NCViewerMediaPage: UIGestureRecognizerDelegate {
 
     // MARK: - Live Photo
     @objc func didLongpressGestureEvent(gestureRecognizer: UITapGestureRecognizer) {
-
         if !currentViewController.metadata.isLivePhoto || currentViewController.detailView.isShown { return }
 
         if gestureRecognizer.state == .began {

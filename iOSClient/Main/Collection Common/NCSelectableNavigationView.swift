@@ -40,6 +40,12 @@ public protocol NCSelectableViewTabBar {
 
 protocol NCSelectableNavigationView: AnyObject {
     var viewController: UIViewController { get }
+//    var appDelegate: AppDelegate { get }
+    var selectableDataSource: [RealmSwiftObject] { get }
+    var collectionView: UICollectionView! { get set }
+    var isEditMode: Bool { get set }
+    var fileSelect: [String] { get set }
+//    var selectIndexPaths: [IndexPath] { get set }
     var appDelegate: AppDelegate { get }
     var selectableDataSource: [RealmSwiftObject] { get }
     var collectionView: UICollectionView! { get set }
@@ -51,6 +57,10 @@ protocol NCSelectableNavigationView: AnyObject {
     var navigationController: UINavigationController? { get }
     var layoutKey: String { get }
     var serverUrl: String { get }
+//    var tabBarSelect: NCSelectableViewTabBar? { get set }
+//    var dataSource: NCCollectionViewDataSource { get set }
+
+//    func reloadDataSource(withQueryDB: Bool)
     var tabBarSelect: NCSelectableViewTabBar? { get set }
 
     func reloadDataSource(withQueryDB: Bool)
@@ -76,6 +86,8 @@ extension NCSelectableNavigationView {
     func toggleSelect(isOn: Bool? = nil) {
         DispatchQueue.main.async {
             self.isEditMode = isOn ?? !self.isEditMode
+            self.fileSelect.removeAll()
+//            self.selectIndexPaths.removeAll()
             self.selectOcId.removeAll()
             self.selectIndexPaths.removeAll()
             self.setNavigationLeftItems()
@@ -85,6 +97,9 @@ extension NCSelectableNavigationView {
     }
 
     func collectionViewSelectAll() {
+        
+        fileSelect = selectableDataSource.compactMap({ $0.primaryKeyValue })
+//        fileSelect = NCCollectionViewDataSource().getMetadataSourceForAllSections().compactMap({ $0.primaryKeyValue })
         selectOcId = selectableDataSource.compactMap({ $0.primaryKeyValue })
         collectionView.reloadData()
         setNavigationRightItems(enableMenu: false)
@@ -93,6 +108,15 @@ extension NCSelectableNavigationView {
     func tapNotification() {
         if let viewController = UIStoryboard(name: "NCNotification", bundle: nil).instantiateInitialViewController() as? NCNotification {
             navigationController?.pushViewController(viewController, animated: true)
+        }
+    }
+    
+    func tapTransfer() {
+        if let navController = UIStoryboard(name: "NCTransfers", bundle: nil).instantiateInitialViewController() as? UINavigationController,
+           let viewController = navController.topViewController as? NCTransfers {
+            viewController.modalPresentationStyle = .pageSheet
+//            self.present(navigationController, animated: true, completion: nil)
+            navigationController?.present(navController, animated: true, completion: nil)
         }
     }
 }

@@ -50,21 +50,24 @@ extension NCMedia: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         let numberOfItemsInSection = dataSource.metadatas.count
+        let assistantEnabled = NCCapabilities.shared.getCapabilities(account: session.account).capabilityAssistantEnabled
+        if assistantEnabled {
+            assistantButton.isHidden = false
+        } else {
+            assistantButton.isHidden = true
+        }
+
         self.numberOfColumns = getColumnCount()
 
         if numberOfItemsInSection == 0 || NCNetworking.shared.isOffline {
             selectOrCancelButton.isHidden = true
             menuButton.isHidden = false
             gradientView.alpha = 0
-            activityIndicatorTrailing.constant = 50
         } else if isEditMode {
             selectOrCancelButton.isHidden = false
-            menuButton.isHidden = true
-            activityIndicatorTrailing.constant = 150
         } else {
             selectOrCancelButton.isHidden = false
             menuButton.isHidden = false
-            activityIndicatorTrailing.constant = 150
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             self.setTitleDate()
@@ -74,10 +77,6 @@ extension NCMedia: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let metadata = dataSource.getMetadata(indexPath: indexPath) else { return }
-
-        if !hiddenCellMetadats.contains(metadata.ocId + metadata.etag) {
-            hiddenCellMetadats.append(metadata.ocId + metadata.etag)
-        }
 
         if !collectionView.indexPathsForVisibleItems.contains(indexPath) {
             for case let operation as NCMediaDownloadThumbnail in NCNetworking.shared.downloadThumbnailQueue.operations where operation.metadata.ocId == metadata.ocId {
@@ -105,7 +104,7 @@ extension NCMedia: UICollectionViewDataSource {
         let imageCache = imageCache.getImageCache(ocId: metadata.ocId, etag: metadata.etag, ext: ext)
 
         cell.imageItem.image = imageCache
-        cell.date = metadata.date as Date
+        cell.datePhotosOriginal = metadata.datePhotosOriginal as Date
         cell.ocId = metadata.ocId
         cell.imageStatus.image = nil
 

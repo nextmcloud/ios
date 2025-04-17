@@ -94,6 +94,8 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
                 navigationController.modalPresentationStyle = .formSheet
                 viewController.setup(serverUrl: self.appDelegate.activeServerUrl, fileNamePath: NSTemporaryDirectory() + self.fileName, fileName: self.fileName)
                 self.appDelegate.window?.rootViewController?.present(navigationController, animated: true)
+                viewController.setup(serverUrl: controller.currentServerUrl(), fileNamePath: NSTemporaryDirectory() + self.fileName, fileName: self.fileName)
+                UIApplication.shared.firstWindow?.rootViewController?.present(navigationController, animated: true)
             }
         } else {
             do {
@@ -116,7 +118,7 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
                                                               url: "",
                                                               contentType: "",
                                                               session: self.session,
-                                                              sceneIdentifier: self.controller?.sceneIdentifier)
+                                                              sceneIdentifier: self.appDelegate.sceneIdentifier)
 
         metadata.session = NCNetworking.shared.sessionUploadBackground
         metadata.sessionSelector = NCGlobal.shared.selectorUploadFile

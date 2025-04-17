@@ -62,6 +62,15 @@ class AppUpdater {
             if status == .success {
                 remoteConfig.activate { value, error in
                     // Remote config values fetched successfully
+                    let iOSVersionString = remoteConfig["ios_app_version"].stringValue ?? "default_value"
+                    let isForcheUpdate = remoteConfig["ios_force_update"].boolValue
+                    if let currentVersionString = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String,
+                       let currentVersion = Int(currentVersionString.replacingOccurrences(of: ".", with: "")),
+                    let iOSVersion = Int(iOSVersionString.replacingOccurrences(of: ".", with: "")) {
+//                    if let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+                        if iOSVersion != currentVersion {
+                            // There is an update available
+                            completion(iOSVersionString,isForcheUpdate)
                     let iOSVersion = remoteConfig["ios_app_version"].stringValue ?? "default_value"
                     let isForcheUpdate = remoteConfig["ios_force_update"].boolValue
                     if let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {

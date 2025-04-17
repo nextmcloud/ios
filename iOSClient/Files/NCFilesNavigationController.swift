@@ -7,67 +7,12 @@ import SwiftUI
 import NextcloudKit
 
 class NCFilesNavigationController: NCMainNavigationController {
-    private var timerProcess: Timer?
-
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-
-    let menuButton = UIButton(type: .system)
-    var menuBarButtonItem: UIBarButtonItem {
-        let item = UIBarButtonItem(customView: menuButton)
-        item.tag = menuButtonTag
-        return item
-    }
-
-    let notificationsButton = UIButton(type: .system)
-    var notificationsButtonItem: UIBarButtonItem {
-        let item = UIBarButtonItem(customView: notificationsButton)
-        item.tag = notificationsButtonTag
-        return item
-    }
-
-    let transfersButton = UIButton(type: .system)
-    var transfersButtonItem: UIBarButtonItem {
-        let item = UIBarButtonItem(customView: transfersButton)
-        item.tag = transfersButtonTag
-        return item
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        menuButton.setImage(UIImage(systemName: "ellipsis.circle"), for: .normal)
-        menuButton.tintColor = NCBrandColor.shared.iconImageColor
-        menuButton.menu = createRightMenu()
-        menuButton.showsMenuAsPrimaryAction = true
-
-        notificationsButton.setImage(UIImage(systemName: "bell.fill"), for: .normal)
-        notificationsButton.tintColor = NCBrandColor.shared.iconImageColor
-        notificationsButton.addAction(UIAction(handler: { _ in
-            if let viewController = UIStoryboard(name: "NCNotification", bundle: nil).instantiateInitialViewController() as? NCNotification {
-                viewController.session = self.session
-                self.pushViewController(viewController, animated: true)
-            }
-        }), for: .touchUpInside)
-
-        transfersButton.setImage(UIImage(systemName: "arrow.left.arrow.right.circle.fill"), for: .normal)
-        transfersButton.tintColor = NCBrandColor.shared.iconImageColor
-        transfersButton.addAction(UIAction(handler: { _ in
-            if let navigationController = UIStoryboard(name: "NCTransfers", bundle: nil).instantiateInitialViewController() as? UINavigationController,
-               let viewController = navigationController.topViewController as? NCTransfers {
-                viewController.modalPresentationStyle = .pageSheet
-                self.present(navigationController, animated: true, completion: nil)
-            }
-        }), for: .touchUpInside)
-
-        self.timerProcess = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
-            self.updateRightBarButtonItems()
-        })
-
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadAvatar), object: nil, queue: nil) { notification in
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.collectionViewCommon?.showTip()
+                self.collectionViewCommon?.showTipAccounts()
             }
             guard let userInfo = notification.userInfo as NSDictionary?,
                   let error = userInfo["error"] as? NKError,
@@ -80,51 +25,26 @@ class NCFilesNavigationController: NCMainNavigationController {
         }
     }
 
-    override func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-        super.navigationController(navigationController, willShow: viewController, animated: animated)
-        self.updateRightBarButtonItems()
-    }
+    // MARK: - Right
 
-    // MARK: -
-
-    func updateRightBarButtonItems() {
-        guard let collectionViewCommon,
-              !collectionViewCommon.isEditMode
-        else {
-            return
-        }
-        let resultsCount = self.database.getResultsMetadatas(predicate: NSPredicate(format: "status != %i", NCGlobal.shared.metadataStatusNormal))?.count ?? 0
-        var tempRightBarButtonItems = [self.menuBarButtonItem]
-
-        if controller?.availableNotifications ?? false {
-            tempRightBarButtonItems.append(self.notificationsButtonItem)
-        }
-
-        if resultsCount > 0 {
-            tempRightBarButtonItems.append(self.transfersButtonItem)
-        }
-
-        if collectionViewCommon.navigationItem.rightBarButtonItems?.count != tempRightBarButtonItems.count {
-            collectionViewCommon.navigationItem.rightBarButtonItems = tempRightBarButtonItems
-        }
-    }
-
-    func createRightMenu() -> UIMenu? {
-        guard let items = self.createMenuActions(),
+    override func createRightMenu() -> UIMenu? {
+        guard let items = self.createRightMenuActions(),
               let collectionViewCommon
         else {
             return nil
         }
 
         if collectionViewCommon.serverUrl == utilityFileSystem.getHomeServer(session: session) {
-            let additionalSubmenu = UIMenu(title: "", options: .displayInline, children: [items.foldersOnTop, items.personalFilesOnlyAction, items.showDescription, items.showRecommendedFiles])
+            let additionalSubmenu = UIMenu(title: "", options: .displayInline, children: [items.personalFilesOnlyAction, items.showDescription, items.showRecommendedFiles])
             return UIMenu(children: [items.select, items.viewStyleSubmenu, items.sortSubmenu, additionalSubmenu])
 
         } else {
-            let additionalSubmenu = UIMenu(title: "", options: .displayInline, children: [items.foldersOnTop, items.personalFilesOnlyAction, items.showDescription])
+            let additionalSubmenu = UIMenu(title: "", options: .displayInline, children: [items.showDescription])
             return UIMenu(children: [items.select, items.viewStyleSubmenu, items.sortSubmenu, additionalSubmenu])
         }
     }
+
+    // MARK: - Left
 
     override func setNavigationLeftItems() {
         guard let tableAccount = database.getTableAccount(predicate: NSPredicate(format: "account == %@", self.session.account))
@@ -146,7 +66,8 @@ class NCFilesNavigationController: NCMainNavigationController {
         func createLeftMenu() -> UIMenu? {
             var childrenAccountSubmenu: [UIMenuElement] = []
             let accounts = database.getAllAccountOrderAlias()
-            guard !accounts.isEmpty
+            guard !accounts.isEmpty,
+                  let controller = collectionViewCommon?.controller
             else {
                 return nil
             }
@@ -163,7 +84,7 @@ class NCFilesNavigationController: NCMainNavigationController {
                     name = account.alias
                 }
 
-                let action = UIAction(title: name, image: image, state: account.active ? .on : .off) { _ in
+                let action = UIAction(title: name, image: image, state: account.account == controller.account ? .on : .off) { _ in
                     if !account.active {
                         NCAccount().changeAccount(account.account, userProfile: nil, controller: self.controller) { }
                         self.collectionViewCommon?.setEditMode(false)
@@ -175,7 +96,22 @@ class NCFilesNavigationController: NCMainNavigationController {
             }
 
             let addAccountAction = UIAction(title: NSLocalizedString("_add_account_", comment: ""), image: utility.loadImage(named: "person.crop.circle.badge.plus", colors: NCBrandColor.shared.iconImageMultiColors)) { _ in
-                self.appDelegate.openLogin(selector: self.global.introLogin)
+                if NCBrandOptions.shared.disable_intro {
+                    if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
+                        viewController.controller = self.controller
+                        let navigationController = UINavigationController(rootViewController: viewController)
+                        navigationController.modalPresentationStyle = .fullScreen
+                        self.present(navigationController, animated: true)
+                    }
+                } else {
+                    if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+                        if let viewController = navigationController.topViewController as? NCIntroViewController {
+                            viewController.controller = nil
+                        }
+                        navigationController.modalPresentationStyle = .fullScreen
+                        self.present(navigationController, animated: true)
+                    }
+                }
             }
 
             let settingsAccountAction = UIAction(title: NSLocalizedString("_account_settings_", comment: ""), image: utility.loadImage(named: "gear", colors: [NCBrandColor.shared.iconImageColor])) { _ in
@@ -200,6 +136,7 @@ class NCFilesNavigationController: NCMainNavigationController {
         if self.collectionViewCommon?.navigationItem.leftBarButtonItems == nil {
             let accountButton = AccountSwitcherButton(type: .custom)
 
+            accountButton.accessibilityIdentifier = "accountSwitcher"
             accountButton.setImage(image, for: .normal)
             accountButton.semanticContentAttribute = .forceLeftToRight
             accountButton.sizeToFit()
@@ -219,45 +156,6 @@ class NCFilesNavigationController: NCMainNavigationController {
             let accountButton = self.collectionViewCommon?.navigationItem.leftBarButtonItems?.first?.customView as? UIButton
             accountButton?.setImage(image, for: .normal)
             accountButton?.menu = createLeftMenu()
-        }
-    }
-
-    override func setNavigationRightItems() {
-        guard let collectionViewCommon else {
-            self.collectionViewCommon?.navigationItem.rightBarButtonItems = nil
-            return
-        }
-
-        if collectionViewCommon.isEditMode {
-            collectionViewCommon.tabBarSelect?.update(fileSelect: collectionViewCommon.fileSelect, metadatas: collectionViewCommon.getSelectedMetadatas(), userId: session.userId)
-            collectionViewCommon.tabBarSelect?.show()
-
-            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done) {
-                collectionViewCommon.setEditMode(false)
-                collectionViewCommon.collectionView.reloadData()
-                collectionViewCommon.navigationItem.rightBarButtonItems = [self.menuBarButtonItem]
-            }
-
-            self.collectionViewCommon?.navigationItem.rightBarButtonItems = [select]
-
-        } else if self.collectionViewCommon?.navigationItem.rightBarButtonItems == nil || (!collectionViewCommon.isEditMode && !(collectionViewCommon.tabBarSelect?.isHidden() ?? true)) {
-            collectionViewCommon.tabBarSelect?.hide()
-
-            self.updateRightBarButtonItems()
-
-        } else {
-
-            if let rightBarButtonItems = self.collectionViewCommon?.navigationItem.rightBarButtonItems,
-               let menuBarButtonItem = rightBarButtonItems.first(where: { $0.tag == menuButtonTag }),
-               let menuButton = menuBarButtonItem.customView as? UIButton {
-                menuButton.menu = createRightMenu()
-            }
-        }
-
-        // fix, if the tabbar was hidden before the update, set it in hidden
-        if self.tabBarController?.tabBar.isHidden ?? true,
-           collectionViewCommon.tabBarSelect?.isHidden() ?? true {
-            self.tabBarController?.tabBar.isHidden = true
         }
     }
 }

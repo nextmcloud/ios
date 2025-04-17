@@ -51,6 +51,7 @@ class NCShareExtension: UIViewController {
     var filesName: [String] = []
     // -------------------------------------------------------------
 
+    var emptyDataSet: NCEmptyDataSet?
     let keyLayout = NCGlobal.shared.layoutViewShareExtension
     var metadataFolder: tableMetadata?
     var dataSourceTask: URLSessionTask?
@@ -89,12 +90,11 @@ class NCShareExtension: UIViewController {
 
         self.navigationController?.navigationBar.prefersLargeTitles = false
 
-        collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
         collectionView.register(UINib(nibName: "NCListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
         collectionView.collectionViewLayout = NCListLayout()
 
         collectionView.refreshControl = refreshControl
-        refreshControl.tintColor = NCBrandColor.shared.iconImageColor
+        refreshControl.tintColor = NCBrandColor.shared.brandText
         refreshControl.backgroundColor = .systemBackground
         refreshControl.addTarget(self, action: #selector(reloadDatasource), for: .valueChanged)
 
@@ -108,7 +108,7 @@ class NCShareExtension: UIViewController {
         commandViewHeightConstraint.constant = heightCommandView
 
         createFolderView.layer.cornerRadius = 10
-        createFolderImage.image = utility.loadImage(named: "folder.badge.plus", colors: [NCBrandColor.shared.iconImageColor])
+        createFolderImage.image = utility.loadImage(named: "folder.badge.plus", colors: [NCBrandColor.shared.iconColor])
         createFolderLabel.text = NSLocalizedString("_create_folder_", comment: "")
         let createFolderGesture = UITapGestureRecognizer(target: self, action: #selector(actionCreateFolder))
         createFolderView.addGestureRecognizer(createFolderGesture)
@@ -122,16 +122,11 @@ class NCShareExtension: UIViewController {
 
         // LOG
         let levelLog = NCKeychain().logLevel
-        let isSimulatorOrTestFlight = utility.isSimulatorOrTestFlight()
         let versionNextcloudiOS = String(format: NCBrandOptions.shared.textCopyrightNextcloudiOS, utility.getVersionApp())
 
         NextcloudKit.shared.nkCommonInstance.levelLog = levelLog
         NextcloudKit.shared.nkCommonInstance.pathLog = utilityFileSystem.directoryGroup
-        if isSimulatorOrTestFlight {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start Share session with level \(levelLog) " + versionNextcloudiOS + " (Simulator / TestFlight)")
-        } else {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start Share session with level \(levelLog) " + versionNextcloudiOS)
-        }
+        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start Share session with level \(levelLog) " + versionNextcloudiOS)
 
         hud.indicatorView = JGProgressHUDRingIndicatorView()
         if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
@@ -139,6 +134,7 @@ class NCShareExtension: UIViewController {
             indicatorView.ringColor = NCBrandColor.shared.brandElement
         }
         NCBrandColor.shared.createUserColors()
+        NCImageCache.shared.createImagesCache()
 
         NotificationCenter.default.addObserver(self, selector: #selector(didCreateFolder(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterCreateFolder), object: nil)
     }
@@ -242,6 +238,10 @@ class NCShareExtension: UIViewController {
             self.tableView.isScrollEnabled = false
         }
         uploadLabel.text = NSLocalizedString("_upload_", comment: "") + " \(filesName.count) " + NSLocalizedString("_files_", comment: "")
+        
+        // Empty
+        emptyDataSet = NCEmptyDataSet(view: collectionView, offset: -50 * counter, delegate: self)
+
         self.tableView.reloadData()
     }
 
@@ -274,13 +274,13 @@ extension NCShareExtension {
         var invalidNameIndexes: [Int] = []
 
         for (index, fileName) in filesName.enumerated() {
-            let newFileName = FileAutoRenamer.shared.rename(fileName, account: session.account)
+            let newFileName = FileAutoRenamer.rename(fileName, account: session.account)
 
             if fileName != newFileName {
                 renameFile(oldName: fileName, newName: newFileName, account: session.account)
             }
 
-            if let fileNameError = FileNameValidator.shared.checkFileName(newFileName, account: session.account) {
+            if let fileNameError = FileNameValidator.checkFileName(newFileName, account: session.account) {
                 if filesName.count == 1 {
                     showRenameFileDialog(named: fileName, account: account)
                     return

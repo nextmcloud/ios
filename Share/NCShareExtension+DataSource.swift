@@ -34,7 +34,7 @@ extension NCShareExtension: UICollectionViewDelegate {
             showAlert(title: "_info_", description: "_e2e_goto_settings_for_enable_")
         }
 
-        if let fileNameError = FileNameValidator.shared.checkFileName(metadata.fileNameView, account: session.account) {
+        if let fileNameError = FileNameValidator.checkFileName(metadata.fileNameView, account: session.account) {
             present(UIAlertController.warning(message: "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
             return
         }
@@ -154,7 +154,7 @@ extension NCShareExtension: UICollectionViewDataSource {
             cell.imageItem.image = NCImageCache.shared.getFolder(account: metadata.account)
         }
 
-        cell.labelInfo.text = utility.dateDiff(metadata.date as Date)
+        cell.labelInfo.text = utility.getRelativeDateTitle(metadata.date as Date)
 
         let lockServerUrl = utilityFileSystem.stringAppendServerUrl(metadata.serverUrl, addFileName: metadata.fileName)
         let tableDirectory = self.database.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, lockServerUrl))

@@ -49,13 +49,14 @@ class NCMoreAppSuggestionsCell: BaseNCMoreCell {
         moreAppsView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(moreAppsTapped)))
     }
 
-    override func setupCell(account: String) {
-        assistantView.isHidden = !NCCapabilities.shared.getCapabilities(account: account).capabilityAssistantEnabled
-    }
+//    override func setupCell(account: String) {
+//        assistantView.isHidden = !NCCapabilities.shared.getCapabilities(account: account).capabilityAssistantEnabled
+//    }
 
     @objc func assistantTapped() {
         if let viewController = self.window?.rootViewController {
-            let assistant = NCAssistant().environmentObject(NCAssistantTask(controller: controller))
+            let assistant = NCAssistant()
+                .environmentObject(NCAssistantModel(controller: self.controller))
             let hostingController = UIHostingController(rootView: assistant)
             viewController.present(hostingController, animated: true, completion: nil)
         }

@@ -40,6 +40,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var separator: UIView!
     @IBOutlet weak var labelShared: UILabel!
+    @IBOutlet weak var tag0: UILabel!
+    @IBOutlet weak var tag1: UILabel!
+    @IBOutlet weak var progressView: UIProgressView!
+
     @IBOutlet weak var imageItemLeftConstraint: NSLayoutConstraint!
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var subInfoTrailingConstraint: NSLayoutConstraint!
@@ -47,6 +51,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     private var objectId = ""
     private var user = ""
     var indexPath = IndexPath()
+    private var ocId = ""
+    private var ocIdTransfer = ""
+    private var user = ""
 
     weak var listCellDelegate: NCListCellDelegate?
     var namedButtonMore = ""
@@ -57,6 +64,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     var fileObjectId: String? {
         get { return objectId }
         set { objectId = newValue ?? "" }
+    var fileOcId: String? {
+        get { return ocId }
+        set { ocId = newValue ?? "" }
     }
     var filePreviewImageView: UIImageView? {
         get { return imageItem }
@@ -110,17 +120,22 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         get { return separator }
         set { separator = newValue }
     }
+
     var fileSharedLabel: UILabel? {
         get { return labelShared }
         set { labelShared = newValue }
     }
+
     override func awakeFromNib() {
         super.awakeFromNib()
 
+    func initCell() {
+        
         imageItem.layer.cornerRadius = 6
         imageItem.layer.masksToBounds = true
 
         // use entire cell as accessibility element
+        
         accessibilityHint = nil
         accessibilityLabel = nil
         accessibilityValue = nil
@@ -129,6 +144,27 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         progressView.tintColor = NCBrandColor.shared.brandElement
         progressView.transform = CGAffineTransform(scaleX: 1.0, y: 0.5)
         progressView.trackTintColor = .clear
+        progressView.tintColor = NCBrandColor.shared.brand
+        progressView.transform = CGAffineTransform(scaleX: 1.0, y: 0.5)
+        progressView.trackTintColor = .clear
+        imageSelect.isHidden = true
+        
+//        imageItem.image = nil
+//        imageItem.layer.cornerRadius = 6
+//        imageItem.layer.masksToBounds = true
+//        imageStatus.image = nil
+//        imageFavorite.image = nil
+//        imageFavoriteBackground.isHidden = true
+//        imageLocal.image = nil
+//        labelTitle.text = ""
+//        labelInfo.text = ""
+//        labelSubinfo.text = ""
+//        imageShared.image = nil
+//        imageMore.image = nil
+        separatorHeightConstraint.constant = 0.5
+//        tag0.text = ""
+//        tag1.text = ""
+        titleInfoTrailingDefault()
 
         let longPressedGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gestureRecognizer:)))
         longPressedGesture.minimumPressDuration = 0.5
@@ -144,6 +180,23 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         labelTitle.textColor = .label
         labelInfo.textColor = .systemGray
         labelSubinfo.textColor = .systemGray
+        titleInfoTrailingDefault()
+
+        labelTitle.text = ""
+        labelInfo.text = ""
+        
+        separator.backgroundColor = .separator
+        separatorHeightConstraint.constant = 0.5
+
+        labelTitle.text = ""
+        labelInfo.text = ""
+        labelSubinfo.text = ""
+        labelTitle.textColor = .label
+        labelInfo.textColor = .systemGray
+        labelSubinfo.textColor = .systemGray
+        setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCImageCache.images.buttonMore)
+        imageMore.isHidden = false
+        buttonMore.isHidden = false
     }
 
     override func prepareForReuse() {
@@ -152,6 +205,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         accessibilityHint = nil
         accessibilityLabel = nil
         accessibilityValue = nil
+        initCell()
     }
 
     override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
@@ -168,6 +222,15 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
     @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
         listCellDelegate?.longPressListItem(with: objectId, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
+        listCellDelegate?.tapMoreListItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
+    }
+
+    @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
+        listCellDelegate?.longPressListItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, gestureRecognizer: gestureRecognizer)
+    }
+    
+    @objc func longPressInsideMore(gestureRecognizer: UILongPressGestureRecognizer) {
+        listCellDelegate?.longPressMoreListItem(with: ocId, namedButtonMore: namedButtonMore, gestureRecognizer: gestureRecognizer)
     }
 
     fileprivate func setA11yActions() {
@@ -215,6 +278,8 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
     func selected(_ status: Bool, isEditMode: Bool) {
         if isEditMode {
+    func selectMode(_ status: Bool) {
+        if status {
             imageItemLeftConstraint.constant = 45
             imageSelect.isHidden = false
             imageMore.isHidden = true
@@ -230,21 +295,42 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             backgroundView = nil
             setA11yActions()
         }
+    }
+    
+    func selected(_ status: Bool, isEditMode: Bool) {
+        // NMC-1190 - iOS - Files - Deleting files while files are still uploading won't delete properly : to fix this issue remove check for !metadata.isInTransfer in below line
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.isInTransfer, !metadata.e2eEncrypted else {
+//        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
+            backgroundView = nil
+            separator.isHidden = false
+            imageSelect.isHidden = true
+
+            return
+        }
+
         if status {
+            var blurEffect: UIVisualEffect?
             var blurEffectView: UIView?
-            blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
-            blurEffectView?.backgroundColor = .lightGray
+            if traitCollection.userInterfaceStyle == .dark {
+                blurEffect = UIBlurEffect(style: .dark)
+                blurEffectView = UIVisualEffectView(effect: blurEffect)
+                blurEffectView?.backgroundColor = .black
+            } else {
+                blurEffect = UIBlurEffect(style: .extraLight)
+                blurEffectView = UIVisualEffectView(effect: blurEffect)
+                blurEffectView?.backgroundColor = .lightGray
+            }
             blurEffectView?.frame = self.bounds
             blurEffectView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             imageSelect.image = NCImageCache.images.checkedYes
             backgroundView = blurEffectView
+            imageSelect.image = NCImageCache.images.checkedYes
             separator.isHidden = true
         } else {
             imageSelect.image = NCImageCache.images.checkedNo
             backgroundView = nil
             separator.isHidden = false
         }
-
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
@@ -255,6 +341,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         labelInfo.text = NCUtility().dateDiff(date as Date)
         labelSubinfo.text = NCUtilityFileSystem().transformedSize(size)
 //        labelSubinfo.text = ""
+        labelSubinfo.text = ""
     }
 
     func setAccessibility(label: String, value: String) {
@@ -267,6 +354,10 @@ protocol NCListCellDelegate: AnyObject {
     func tapShareListItem(with objectId: String, indexPath: IndexPath, sender: Any)
     func tapMoreListItem(with objectId: String, namedButtonMore: String, image: UIImage?, indexPath: IndexPath, sender: Any)
     func longPressListItem(with objectId: String, indexPath: IndexPath, gestureRecognizer: UILongPressGestureRecognizer)
+    func tapShareListItem(with ocId: String, ocIdTransfer: String, sender: Any)
+    func tapMoreListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any)
+    func longPressMoreListItem(with ocId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
+    func longPressListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
 }
 
 // MARK: - List Layout

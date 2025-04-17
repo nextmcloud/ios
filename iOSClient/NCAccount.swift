@@ -27,15 +27,20 @@ import NextcloudKit
 
 class NCAccount: NSObject {
     let database = NCManageDatabase.shared
+    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
 
-    func createAccount(urlBase: String,
+    func createAccount(viewController: UIViewController,
+                       urlBase: String,
                        user: String,
                        password: String,
                        controller: NCMainTabBarController?,
-                       completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+                       completion: @escaping () -> Void = {}) {
         var urlBase = urlBase
         if urlBase.last == "/" { urlBase = String(urlBase.dropLast()) }
         let account: String = "\(user) \(urlBase)"
+
+        /// Remove Account Server in Error
+        NCNetworking.shared.removeServerErrorAccount(account)
 
         NextcloudKit.shared.appendSession(account: account,
                                           urlBase: urlBase,
@@ -56,14 +61,31 @@ class NCAccount: NSObject {
                 self.database.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
                 self.changeAccount(account, userProfile: userProfile, controller: controller) {
                     NCKeychain().setClientCertificate(account: account, p12Data: NCNetworking.shared.p12Data, p12Password: NCNetworking.shared.p12Password)
-                    completion(account, error)
+                }
+                if let controller {
+                    controller.account = account
+                    viewController.dismiss(animated: true)
+                } else if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as? NCMainTabBarController {
+                    controller.account = account
+                    controller.modalPresentationStyle = .fullScreen
+                    controller.view.alpha = 0
+
+                    UIApplication.shared.firstWindow?.rootViewController = controller
+                    UIApplication.shared.firstWindow?.makeKeyAndVisible()
+
+                    if let scene = UIApplication.shared.firstWindow?.windowScene {
+                        SceneManager.shared.register(scene: scene, withRootViewController: controller)
+                    }
+
+                    UIView.animate(withDuration: 0.5) {
+                        controller.view.alpha = 1
+                    }
                 }
             } else {
                 NextcloudKit.shared.removeSession(account: account)
                 let alertController = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: error.errorDescription, preferredStyle: .alert)
                 alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
-                UIApplication.shared.firstWindow?.rootViewController?.present(alertController, animated: true)
-                completion(account, error)
+                viewController.present(alertController, animated: true)
             }
         }
     }
@@ -72,31 +94,32 @@ class NCAccount: NSObject {
                        userProfile: NKUserProfile?,
                        controller: NCMainTabBarController?,
                        completion: () -> Void) {
-        /// Set account
-        controller?.account = account
-        database.setAccountActive(account)
-        /// Set capabilities
-        database.setCapabilities(account: account)
-        /// Set User Profile
-        if let userProfile {
-            database.setAccountUserProfile(account: account, userProfile: userProfile)
-        }
-        /// Start Push Notification
-        NCPushNotification.shared.pushNotification()
-        /// Start the service
-        NCService().startRequestServicesServer(account: account, controller: controller)
-        /// Start the auto upload
-        NCAutoUpload.shared.initAutoUpload(controller: nil, account: account) { num in
-            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Initialize Auto upload with \(num) uploads")
-        }
-        /// Color
-        NCBrandColor.shared.settingThemingColor(account: account)
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming, userInfo: ["account": account])
-        /// Notification
-        if let controller {
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeUser, userInfo: ["account": account, "controller": controller])
-        } else {
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeUser, userInfo: ["account": account])
+        if let tblAccount = database.setAccountActive(account) {
+            /// Set account
+            controller?.account = account
+            /// Set capabilities
+            database.setCapabilities(account: account)
+            /// Set User Profile
+            if let userProfile {
+                database.setAccountUserProfile(account: account, userProfile: userProfile)
+            }
+            /// Subscribing Push Notification
+            appDelegate.subscribingPushNotification(account: tblAccount.account, urlBase: tblAccount.urlBase, user: tblAccount.user)
+            /// Start the service
+            NCService().startRequestServicesServer(account: account, controller: controller)
+            /// Start the auto upload
+            NCAutoUpload.shared.initAutoUpload(controller: nil, account: account) { num in
+                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Initialize Auto upload with \(num) uploads")
+            }
+            /// Color
+            NCBrandColor.shared.settingThemingColor(account: account)
+            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming, userInfo: ["account": account])
+            /// Notification
+            if let controller {
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeUser, userInfo: ["account": account, "controller": controller])
+            } else {
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeUser, userInfo: ["account": account])
+            }
         }
 
         completion()
@@ -106,9 +129,11 @@ class NCAccount: NSObject {
         UIApplication.shared.allSceneSessionDestructionExceptFirst()
 
         /// Unsubscribing Push Notification
+#if !targetEnvironment(simulator)
         if let tableAccount = database.getTableAccount(predicate: NSPredicate(format: "account == %@", account)) {
-            NCPushNotification.shared.unsubscribingNextcloudServerPushNotification(account: tableAccount.account, urlBase: tableAccount.urlBase, user: tableAccount.user, withSubscribing: false)
+            NCPushNotification.shared.unsubscribingNextcloudServerPushNotification(account: tableAccount.account, urlBase: tableAccount.urlBase, user: tableAccount.user)
         }
+#endif
         /// Remove al local files
         if wipe {
             let results = database.getTableLocalFiles(predicate: NSPredicate(format: "account == %@", account), sorted: "ocId", ascending: false)
@@ -132,6 +157,8 @@ class NCAccount: NSObject {
         NCKeychain().clearAllKeysPushNotification(account: account)
         /// Remove User Default Data
         NCNetworking.shared.removeAllKeyUserDefaultsData(account: account)
+        /// Remove Account Server in Error
+        NCNetworking.shared.removeServerErrorAccount(account)
 
         completion()
     }
@@ -155,5 +182,56 @@ class NCAccount: NSObject {
             accounts.append(NKShareAccounts.DataAccounts(withUrl: account.urlBase, user: account.user, name: name, image: image))
         }
         return NKShareAccounts().putShareAccounts(at: dirGroupApps, app: NCGlobal.shared.appScheme, dataAccounts: accounts)
+    }
+
+    func checkRemoteUser(account: String, controller: NCMainTabBarController?, completion: @escaping () -> Void = {}) {
+        let token = NCKeychain().getPassword(account: account)
+        guard let tableAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", account))
+        else {
+            return completion()
+        }
+
+        func setAccount() {
+            if let accounts = NCManageDatabase.shared.getAccounts(),
+               account.count > 0,
+               let account = accounts.first {
+                changeAccount(account, userProfile: nil, controller: controller) { }
+            } else {
+                if NCBrandOptions.shared.disable_intro {
+                    if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
+                        viewController.controller = controller
+                        let navigationController = UINavigationController(rootViewController: viewController)
+                        navigationController.modalPresentationStyle = .fullScreen
+                        controller?.present(navigationController, animated: true)
+                    }
+                } else {
+                    if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+                        if let viewController = navigationController.topViewController as? NCIntroViewController {
+                            viewController.controller = controller
+                        }
+                        navigationController.modalPresentationStyle = .fullScreen
+                        controller?.present(navigationController, animated: true)
+                    }
+                }
+            }
+
+            completion()
+        }
+
+        NCContentPresenter().showCustomMessage(title: "", message: String(format: NSLocalizedString("_account_unauthorized_", comment: ""), account), priority: .high, delay: NCGlobal.shared.dismissAfterSecondLong, type: .error)
+
+        NextcloudKit.shared.getRemoteWipeStatus(serverUrl: tableAccount.urlBase, token: token, account: tableAccount.account) { account, wipe, _, error in
+            /// REMOVE ACCOUNT
+            NCAccount().deleteAccount(account, wipe: wipe)
+
+            if wipe {
+                NextcloudKit.shared.setRemoteWipeCompletition(serverUrl: tableAccount.urlBase, token: token, account: tableAccount.account) { _, _, error in
+                    NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Set Remote Wipe Completition error code: \(error.errorCode)")
+                    setAccount()
+                }
+            } else {
+                setAccount()
+            }
+        }
     }
 }

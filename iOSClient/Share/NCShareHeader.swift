@@ -40,11 +40,14 @@ class NCShareAdvancePermissionHeader: UIView {
         backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         if FileManager.default.fileExists(atPath: utilityFileSystem.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)) {
             fullWidthImageView.image = utility.getImageMetadata(metadata, for: frame.height)
+        if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024) {
+            fullWidthImageView.image = image
             fullWidthImageView.contentMode = .scaleAspectFill
             imageView.isHidden = true
         } else {
             if metadata.directory {
                 imageView.image = UIImage.init(named: "folder")
+                imageView.image = metadata.e2eEncrypted ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
             } else if !metadata.iconName.isEmpty {
                 imageView.image = UIImage.init(named: metadata.iconName)
             } else {

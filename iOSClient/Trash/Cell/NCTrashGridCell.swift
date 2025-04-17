@@ -128,7 +128,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         
         self.accessibilityCustomActions = [
             UIAccessibilityCustomAction(
-                name: NSLocalizedString("_more_", comment: ""),
+                name: NSLocalizedString(moreName, comment: ""),
                 target: self,
                 selector: #selector(touchUpInsideMore))
         ]
@@ -147,20 +147,26 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
 
     func selected(_ status: Bool, isEditMode: Bool, account: String) {
         if isEditMode {
+            imageSelect.isHidden = false
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
         } else {
+            imageSelect.isHidden = true
             buttonMore.isHidden = false
+            imageVisualEffect.isHidden = true
             setA11yActions()
         }
         if status {
+            let traitCollectionUserInterfaceStyleDark = traitCollection.userInterfaceStyle == .dark
+            imageVisualEffect.effect = UIBlurEffect(style: traitCollectionUserInterfaceStyleDark ? .dark : .extraLight)
+            imageVisualEffect.backgroundColor = traitCollectionUserInterfaceStyleDark ? .black : .lightGray
             imageSelect.image = NCImageCache.shared.getImageCheckedYes()
-            imageSelect.isHidden = false
             imageVisualEffect.isHidden = false
         } else {
             imageSelect.image = NCImageCache.images.checkedNo
             imageSelect.image = NCImageCache.shared.getImageCheckedNo()
             imageVisualEffect.isHidden = true
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
         }
     }
 

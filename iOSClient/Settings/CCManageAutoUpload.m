@@ -43,6 +43,7 @@
     XLFormSectionDescriptor *section;
     XLFormRowDescriptor *row;
  
+    tableAccount *activeAccount = [[NCManageDatabase shared] getActiveTableAccount];
     tableAccount *activeAccount = [[NCManageDatabase shared] getActiveAccount];
     
     // Auto Upload
@@ -234,6 +235,7 @@
     [super viewWillAppear:animated];
     
     appDelegate.activeViewController = self;
+    [[[NCAskAuthorization alloc] init] askAuthorizationPhotoLibraryWithController:self completion:^(BOOL status) { }];
     [[[NCAskAuthorization alloc] init] askAuthorizationPhotoLibraryWithViewController:self completion:^(BOOL status) { }];
 }
 
@@ -253,6 +255,7 @@
 {
     [super formRowDescriptorValueHasChanged:rowDescriptor oldValue:oldValue newValue:newValue];
     
+    tableAccount *activeAccount = [[NCManageDatabase shared] getActiveTableAccount];
     tableAccount *activeAccount = [[NCManageDatabase shared] getActiveAccount];
     
     if ([rowDescriptor.tag isEqualToString:@"autoUpload"]) {
@@ -271,6 +274,8 @@
                 [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadVideo" state:YES];
             }
             
+            [[NCAutoUpload shared] alignPhotoLibraryWithController:self account:appDelegate.account];
+                        
             [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
             
         } else {
@@ -294,6 +299,7 @@
         
         if ([[rowDescriptor.value valueData] boolValue] == YES) {
             
+            [[NCAutoUpload shared] autoUploadFullPhotosWithController:self log:@"Auto upload full" account:appDelegate.account];
             [[NCAutoUpload shared] autoUploadFullPhotosWithViewController:self log:@"Auto upload full"];
             [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadFull" state:YES];
             
@@ -309,6 +315,7 @@
         [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadImage" state:[[rowDescriptor.value valueData] boolValue]];
 
         if ([[rowDescriptor.value valueData] boolValue] == YES) {
+            [[NCAutoUpload shared] alignPhotoLibraryWithController:self account:appDelegate.account];
             [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
         }
     }
@@ -323,6 +330,7 @@
         [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadVideo" state:[[rowDescriptor.value valueData] boolValue]];
 
         if ([[rowDescriptor.value valueData] boolValue] == YES){
+            [[NCAutoUpload shared] alignPhotoLibraryWithController:self account:appDelegate.account];
             [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
         }
     }
@@ -370,6 +378,7 @@
     XLFormRowDescriptor *rowAutoUploadFileName = [self.form formRowWithTag:@"autoUploadFileName"];
         
     // - STATUS ---------------------
+    tableAccount *activeAccount = [[NCManageDatabase shared] getActiveTableAccount];
     tableAccount *activeAccount = [[NCManageDatabase shared] getActiveAccount];
     
     if (activeAccount.autoUpload)
@@ -428,6 +437,7 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
+    tableAccount *activeAccount = [[NCManageDatabase shared] getActiveTableAccount];
     tableAccount *activeAccount = [[NCManageDatabase shared] getActiveAccount];
     NSString *sectionName;
     NSString *autoUploadPath = [NSString stringWithFormat:@"%@/%@", [[NCManageDatabase shared] getAccountAutoUploadDirectoryWithUrlBase:appDelegate.urlBase userId:appDelegate.userId account:appDelegate.account], [[NCManageDatabase shared] getAccountAutoUploadFileName]];
@@ -455,6 +465,7 @@
             break;
         case 7:
             if (activeAccount.autoUpload) sectionName =  NSLocalizedString(@"_autoupload_fullphotos_footer_", nil);
+            if (activeAccount.autoUpload) sectionName =  NSLocalizedString(@"_autoupload_fullphotos_footer_", nil);
             else sectionName = @"";
             break;
         case 5:
@@ -475,6 +486,8 @@
 
         NSString* home = [[[NCUtilityFileSystem alloc] init] getHomeServerWithUrlBase:appDelegate.urlBase userId:appDelegate.userId];
         if ([serverUrl isEqualToString:home]) {
+//            NKError *error = [[NKError alloc] initWithErrorCode:NCGlobal.shared.errorInternalError errorDescription:@"_autoupload_error_select_folder_"];// responseData:nil];
+//            [[[NCContentPresenter alloc] init] messageNotification:@"_error_" error:error delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError afterDelay:0];
             NKError *error = [[NKError alloc] initWithErrorCode:NCGlobal.shared.errorInternalError errorDescription:@"_autoupload_error_select_folder_" responseData:nil];
             [[[NCContentPresenter alloc] init] messageNotification:@"_error_" error:error delay:[[NCGlobal shared] dismissAfterSecond] type:messageTypeError afterDelay:0];
             return;

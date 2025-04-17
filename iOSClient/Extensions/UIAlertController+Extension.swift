@@ -57,33 +57,39 @@ extension UIAlertController {
                 if NCNetworking.shared.isOffline {
                     return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
                 }
-                #if !EXTENSION
                 Task {
                     await NCNetworkingE2EECreateFolder().createFolder(fileName: fileNameFolder, serverUrl: serverUrl, withPush: true, sceneIdentifier: sceneIdentifier, session: session)
                 }
-                #endif
             } else {
-                #if EXTENSION
-                NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: serverUrl, overwrite: false, withPush: true, sceneIdentifier: sceneIdentifier, session: session) { error in
-                    if let completion {
-                        DispatchQueue.main.async { completion(error) }
-                    }
+#if EXTENSION
+                Task {
+                    let error = await NCNetworking.shared.createFolder(fileName: fileNameFolder, serverUrl: serverUrl, overwrite: false, withPush: true, sceneIdentifier: sceneIdentifier, session: session)
+                    completion?(error)
                 }
-                #else
-                let metadataForCreateFolder = NCManageDatabase.shared.createMetadata(fileName: fileNameFolder,
-                                                                                     fileNameView: fileNameFolder,
-                                                                                     ocId: NSUUID().uuidString,
-                                                                                     serverUrl: serverUrl,
-                                                                                     url: "",
-                                                                                     contentType: "httpd/unix-directory",
-                                                                                     directory: true,
-                                                                                     session: session,
-                                                                                     sceneIdentifier: sceneIdentifier)
-                metadataForCreateFolder.status = NCGlobal.shared.metadataStatusWaitCreateFolder
-                metadataForCreateFolder.sessionDate = Date()
-                NCManageDatabase.shared.addMetadata(metadataForCreateFolder)
-                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCreateFolder, userInfo: ["ocId": metadataForCreateFolder.ocId, "serverUrl": metadataForCreateFolder.serverUrl, "account": metadataForCreateFolder.account, "withPush": true, "sceneIdentifier": sceneIdentifier as Any])
-                #endif
+#else
+                var metadata = tableMetadata()
+
+                if let result = NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView == %@", session.account, serverUrl, fileNameFolder)) {
+                    metadata = result
+                } else {
+                    metadata = NCManageDatabase.shared.createMetadata(fileName: fileNameFolder,
+                                                                      fileNameView: fileNameFolder,
+                                                                      ocId: NSUUID().uuidString,
+                                                                      serverUrl: serverUrl,
+                                                                      url: "",
+                                                                      contentType: "httpd/unix-directory",
+                                                                      directory: true,
+                                                                      session: session,
+                                                                      sceneIdentifier: sceneIdentifier)
+                }
+
+                metadata.status = NCGlobal.shared.metadataStatusWaitCreateFolder
+                metadata.sessionDate = Date()
+
+                NCManageDatabase.shared.addMetadata(metadata)
+
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCreateFolder, userInfo: ["ocId": metadata.ocId, "serverUrl": metadata.serverUrl, "account": metadata.account, "withPush": true, "sceneIdentifier": sceneIdentifier as Any])
+#endif
             }
         })
 
@@ -102,8 +108,8 @@ extension UIAlertController {
             queue: .main) { _ in
                 guard let text = alertController.textFields?.first?.text else { return }
                 let folderName = text.trimmingCharacters(in: .whitespaces)
-                let isFileHidden = FileNameValidator.shared.isFileHidden(text)
-                let textCheck = FileNameValidator.shared.checkFileName(folderName, account: session.account)
+                let isFileHidden = FileNameValidator.isFileHidden(text)
+                let textCheck = FileNameValidator.checkFileName(folderName, account: session.account)
 
                 okAction.isEnabled = !text.isEmpty && textCheck?.error == nil
 
@@ -206,7 +212,7 @@ extension UIAlertController {
         let oldExtension = fileName.fileExtension
 
         let text = alertController.textFields?.first?.text ?? ""
-        let textCheck = FileNameValidator.shared.checkFileName(text, account: account)
+        let textCheck = FileNameValidator.checkFileName(text, account: account)
         var message = textCheck?.error.localizedDescription ?? ""
         var messageColor = UIColor.red
 
@@ -236,8 +242,8 @@ extension UIAlertController {
                 guard let text = alertController.textFields?.first?.text else { return }
                 let newExtension = text.fileExtension
 
-                let textCheck = FileNameValidator.shared.checkFileName(text, account: account)
-                let isFileHidden = FileNameValidator.shared.isFileHidden(text)
+                let textCheck = FileNameValidator.checkFileName(text, account: account)
+                let isFileHidden = FileNameValidator.isFileHidden(text)
 
                 okAction.isEnabled = !text.isEmpty && textCheck?.error == nil
 

@@ -39,6 +39,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     private let titles = [NSLocalizedString("", comment: ""), NSLocalizedString("", comment: ""), NSLocalizedString("", comment: "")]
     private var images:[UIImage?] = []
     private var timerAutoScroll: Timer?
+
     private var textColor: UIColor = .white
     private var textColorOpponent: UIColor = .black
     private let imagesLandscape = [UIImage(named: "introSlideLand1"), UIImage(named: "introSlideLand2"), UIImage(named: "introSlideLand3")]
@@ -75,6 +76,12 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         self.navigationController?.view.backgroundColor = NCBrandColor.shared.customer
         self.navigationController?.navigationBar.tintColor = textColor
 
+        if !NCManageDatabase.shared.getAllTableAccount().isEmpty {
+            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .done, target: self, action: #selector(self.actionCancel))
+            navigationItemCancel.tintColor = textColor
+            navigationItem.leftBarButtonItem = navigationItemCancel
+        }
+
         pageControl.currentPageIndicatorTintColor = textColor
         pageControl.pageIndicatorTintColor = .lightGray
 
@@ -103,6 +110,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         pageControl.numberOfPages = self.titles.count
 
         view.backgroundColor = NCBrandColor.shared.customer
+
         timerAutoScroll = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(NCIntroViewController.autoScroll)), userInfo: nil, repeats: true)
         NotificationCenter.default.addObserver(self, selector: #selector(resetPageController(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
@@ -193,7 +201,14 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        timerAutoScroll?.invalidate()
+        timer?.invalidate()
+        timer = nil
+    }
+
+    // MARK: - Action
+
+    @objc func actionCancel() {
+        dismiss(animated: true) { }
     }
 
     @IBAction func login(_ sender: Any) {
@@ -205,6 +220,8 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
             if NextcloudKit.shared.isNetworkReachable() {
                 appDelegate.openLogin(selector: NCGlobal.shared.introLogin, openLoginWeb: false)
                 appDelegate.openLogin(selector: NCGlobal.shared.introLogin)
+//                appDelegate.openLogin(selector: NCGlobal.shared.introLogin)
+                appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
             } else {
                 showNoInternetAlert()
             }
@@ -217,8 +234,12 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         self.present(alertController, animated: true)
     }
 
-    @IBAction func signup(_ sender: Any) {
-        appDelegate.openLogin(selector: NCGlobal.shared.introSignup)
+    @IBAction func signupWithProvider(_ sender: Any) {
+        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
+            viewController.controller = self.controller
+            viewController.urlBase = NCBrandOptions.shared.linkloginPreferredProviders
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
     }
 
     @IBAction func host(_ sender: Any) {

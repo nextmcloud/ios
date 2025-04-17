@@ -1,4 +1,5 @@
 //
+//
 //  NCShareNewUserAddComment.swift
 //  Nextcloud
 //
@@ -24,7 +25,7 @@
 import UIKit
 import NextcloudKit
 
-class NCShareNewUserAddComment: UIViewController, NCShareDetail {
+class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting {
 
     @IBOutlet weak var headerContainerView: UIView!
     @IBOutlet weak var labelSharing: UILabel!

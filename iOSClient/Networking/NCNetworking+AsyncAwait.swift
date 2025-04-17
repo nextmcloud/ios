@@ -121,6 +121,7 @@ extension NCNetworking {
         })
     }
 
+    @discardableResult
     func createFolder(serverUrlFileName: String,
                       account: String,
                       options: NKRequestOptions = NKRequestOptions()) async -> (account: String, ocId: String?, date: Date?, responseData: AFDataResponse<Data?>?, error: NKError) {
@@ -131,15 +132,10 @@ extension NCNetworking {
         })
     }
 
-    func createFolder(metadata: tableMetadata) async -> NKError {
-        await withUnsafeContinuation({ continuation in
-            self.createFolder(fileName: metadata.fileName, serverUrl: metadata.serverUrl, overwrite: true, withPush: false, metadata: metadata, sceneIdentifier: nil, session: NCSession.shared.getSession(account: metadata.account)) { error in
-                continuation.resume(returning: error)
-            }
-        })
-    }
-
-    func setFavorite(fileName: String, favorite: Bool, account: String) async -> NKError {
+    func setFavorite(fileName: String,
+                     favorite: Bool,
+                     account: String,
+                     options: NKRequestOptions = NKRequestOptions()) async -> NKError {
         await withUnsafeContinuation({ continuation in
             NextcloudKit.shared.setFavorite(fileName: fileName, favorite: favorite, account: account) { _, _, error in
                 continuation.resume(returning: error)
@@ -165,11 +161,10 @@ extension NCNetworking {
                      greaterDate: Any,
                      elementDate: String,
                      limit: Int,
-                     showHiddenFiles: Bool,
                      account: String,
                      options: NKRequestOptions = NKRequestOptions()) async -> (account: String, files: [NKFile]?, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.searchMedia(path: path, lessDate: lessDate, greaterDate: greaterDate, elementDate: elementDate, limit: limit, showHiddenFiles: showHiddenFiles, account: account, options: options) { account, files, responseData, error in
+            NextcloudKit.shared.searchMedia(path: path, lessDate: lessDate, greaterDate: greaterDate, elementDate: elementDate, limit: limit, account: account, options: options) { account, files, responseData, error in
                 continuation.resume(returning: (account, files, responseData, error))
             }
         })

@@ -28,6 +28,7 @@
 #import "NCBridgeSwift.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import <TOPasscodeViewController/TOPasscodeViewController.h>
+//#import <TOPasscodeViewController/TOPasscodeViewController.h>
 
 #define alertViewEsci 1
 #define alertViewAzzeraCache 2
@@ -123,6 +124,7 @@
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"advanced" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_advanced_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+    [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:[[UIImage imageNamed:@"gear"] imageWithColor:NCBrandColor.shared.iconColor size:25] forKey:@"imageView.image"];
     row.action.viewControllerClass = [CCAdvanced class];
