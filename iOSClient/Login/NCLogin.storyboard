@@ -162,6 +162,21 @@
             </objects>
             <point key="canvasLocation" x="5421.739130434783" y="-1210.0446428571429"/>
         </scene>
+        <!--Login Web-->
+        <scene sceneID="j8o-Lk-HsF">
+            <objects>
+                <viewController storyboardIdentifier="NCLoginWeb" id="hFi-DN-BXw" customClass="NCLoginWeb" customModule="Nextcloud" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Npw-WL-mzw">
+                        <rect key="frame" x="0.0" y="0.0" width="440" height="956"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="763-qA-dBR"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="fJz-iW-pCF" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="6145" y="-1212"/>
+        </scene>
     </scenes>
     <resources>
         <image name="arrow.right" catalog="system" width="128" height="95"/>
