@@ -301,6 +301,9 @@
 		B54315342DA64D6500981E7E /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315332DA64D6500981E7E /* AppUtility.swift */; };
 		B54315302DA647A400981E7E /* NCLoginWeb.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543152F2DA647A400981E7E /* NCLoginWeb.swift */; };
 		B5D45E732DA5172900773929 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E712DA5172900773929 /* AppUpdater.swift */; };
+		B5D45E6D2DA510E000773929 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */; };
+		B5D45E6E2DA510E000773929 /* NCRenameFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E6B2DA510E000773929 /* NCRenameFile.swift */; };
+		B5D45E702DA5119A00773929 /* RenameFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E6F2DA5119A00773929 /* RenameFileTests.swift */; };
 		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
@@ -1741,6 +1744,9 @@
 		B54315332DA64D6500981E7E /* AppUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUtility.swift; sourceTree = "<group>"; };
 		B543152F2DA647A400981E7E /* NCLoginWeb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCLoginWeb.swift; sourceTree = "<group>"; };
 		B5D45E712DA5172900773929 /* AppUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdater.swift; sourceTree = "<group>"; };
+		B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCRenameFile.storyboard; sourceTree = "<group>"; };
+		B5D45E6B2DA510E000773929 /* NCRenameFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCRenameFile.swift; sourceTree = "<group>"; };
+		B5D45E6F2DA5119A00773929 /* RenameFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameFileTests.swift; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -2566,6 +2572,7 @@
 				B543154B2DA690B700981E7E /* NCNotificationText.swift */,
 				B54315352DA64EB100981E7E /* PrivacyPolicyTest.swift */,
 				B54315312DA64BAF00981E7E /* OnboardingTestCase.swift */,
+				B5D45E6F2DA5119A00773929 /* RenameFileTests.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = Helper;
@@ -2760,6 +2767,13 @@
 				B52FAE9A2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib */,
 			);
 			path = "NMC Custom Views";
+		B5D45E6C2DA510E000773929 /* Rename file */ = {
+			isa = PBXGroup;
+			children = (
+				B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */,
+				B5D45E6B2DA510E000773929 /* NCRenameFile.swift */,
+			);
+			path = "Rename file";
 			sourceTree = "<group>";
 		};
 		C0046CDB2A17B98400D87C9D /* NextcloudUITests */ = {
@@ -4026,6 +4040,7 @@
 				F7381ED9218218A4000B1560 /* Offline */,
 				F713418B2597513800768D21 /* PushNotification */,
 				F765F72E25237E3F00391DBE /* Recent */,
+				B5D45E6C2DA510E000773929 /* Rename file */,
 				F7CADB3D23CCDDA1000EEC78 /* RichWorkspace */,
 				F76882042C0DD1E7001CF441 /* Settings */,
 				F758B41E212C516300515F55 /* Scan document */,
@@ -4735,6 +4750,7 @@
 				B568C2B32DA7AAAE0072FCB4 /* NCMoreUserCell.xib in Resources */,
 				F7CA212E25F1333300826ABB /* NCAccountRequest.storyboard in Resources */,
 				566EB7FD2B3D7B5F00FB7CAD /* ScanDocumentPathView.xib in Resources */,
+				B5D45E6D2DA510E000773929 /* NCRenameFile.storyboard in Resources */,
 				F717402D24F699A5000C87D5 /* NCFavorite.storyboard in Resources */,
 				F723B3DD22FC6D1D00301EFE /* NCShareCommentsCell.xib in Resources */,
 				F78ACD4B21903F850088454D /* NCTrashListCell.xib in Resources */,
@@ -4932,6 +4948,7 @@
 				F372087D2BAB4C0F006B5430 /* TestConstants.swift in Sources */,
 				B52FAEA12DA8ED40001AB1BD /* AudioUploadTests.swift in Sources */,
 				B543154E2DA6913C00981E7E /* AudioUploadTests.swift in Sources */,
+				B5D45E702DA5119A00773929 /* RenameFileTests.swift in Sources */,
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
 				566FCF4D2B3EB78F00168DEA /* OnboardingTestCase.swift in Sources */,
 				566EB81E2B3D8C5500FB7CAD /* SettingsTestCases.swift in Sources */,
@@ -5742,6 +5759,7 @@
 				F76882252C0DD1E7001CF441 /* NCSettingsAdvancedModel.swift in Sources */,
 				B54315302DA647A400981E7E /* NCLoginWeb.swift in Sources */,
 				F7C7B489245EBA4100D93E60 /* NCViewerQuickLook.swift in Sources */,
+				B5D45E6E2DA510E000773929 /* NCRenameFile.swift in Sources */,
 				F758B45E212C569D00515F55 /* NCScanCell.swift in Sources */,
 				F78B87E72B62527100C65ADC /* NCMediaDataSource.swift in Sources */,
 				B52FAEAC2DA8EF2C001AB1BD /* NCCreateFormUploadScanDocument.swift in Sources */,
