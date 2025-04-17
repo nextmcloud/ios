@@ -169,6 +169,7 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let heightFooterButton: CGFloat                 = 30
     let endHeightFooter: CGFloat                    = 85
     
+
     // Text -  OnlyOffice - Collabora - QuickLook
     //
     let editorText                                  = "text"
