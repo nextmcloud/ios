@@ -26,17 +26,18 @@ import UIKit
 import NextcloudKit
 
 extension NCShare {
-    func toggleShareMenu(for share: tableShare) {
+    func toggleShareMenu(for share: tableShare, sendMail: Bool, folder: Bool, sender: Any) {
+
         let capabilities = NCCapabilities.shared.getCapabilities(account: self.metadata.account)
         var actions = [NCMenuAction]()
 
-        if share.shareType == 3, canReshare {
+        if !folder {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_share_add_sharelink_", comment: ""),
-                    icon: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor]),
+                    title: NSLocalizedString("_open_in_", comment: ""),
+                    icon: utility.loadImage(named: "viewInFolder").imageColor(NCBrandColor.shared.brandElement),
                     action: { _ in
-                        self.makeNewLinkShare()
+                        NCShareCommon().copyLink(link: share.url, viewController: self, sender: sender)
                     }
                 )
             )
@@ -44,15 +45,17 @@ extension NCShare {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_details_", comment: ""),
-                icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
-                accessibilityIdentifier: "shareMenu/details",
+//                title: NSLocalizedString("_details_", comment: ""),
+//                icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
+//                accessibilityIdentifier: "shareMenu/details",
+                title: NSLocalizedString("_advance_permissions_", comment: ""),
+                icon: utility.loadImage(named: "rename").imageColor(NCBrandColor.shared.brandElement),
                 action: { _ in
                     guard
                         let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
                         let navigationController = self.navigationController, !share.isInvalidated else { return }
                     advancePermission.networking = self.networking
-                    advancePermission.share = tableShare(value: share)
+                    advancePermission.share = share
                     advancePermission.oldTableShare = tableShare(value: share)
                     advancePermission.metadata = self.metadata
 
@@ -64,12 +67,28 @@ extension NCShare {
                 }
             )
         )
-
+        
+        if sendMail {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_send_new_email_", comment: ""),
+                    icon: NCUtility().loadImage(named: "email").imageColor(NCBrandColor.shared.brandElement),
+                    action: { menuAction in
+                        let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+                        guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
+                        viewNewUserComment.metadata = self.metadata
+                        viewNewUserComment.share = tableShare(value: share)
+                        viewNewUserComment.networking = self.networking
+                        self.navigationController?.pushViewController(viewNewUserComment, animated: true)
+                    }
+                )
+            )
+        }
+        
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_share_unshare_", comment: ""),
-                destructive: true,
-                icon: utility.loadImage(named: "person.2.slash"),
+                icon: utility.loadImage(named: "trash").imageColor(NCBrandColor.shared.brandElement),
                 action: { _ in
                     Task {
                         if share.shareType != NCShareCommon().SHARE_TYPE_LINK, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.capabilityE2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
@@ -99,7 +118,7 @@ extension NCShare {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_share_read_only_", comment: ""),
-                icon: utility.loadImage(named: "eye", colors: [NCBrandColor.shared.iconImageColor]),
+                icon: UIImage(),
                 selected: tableShare.permissions == (permissions.permissionReadShare + permissions.permissionShareShare) || tableShare.permissions == permissions.permissionReadShare,
                 on: false,
                 action: { _ in
@@ -113,7 +132,7 @@ extension NCShare {
         actions.append(
             NCMenuAction(
                 title: isDirectory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
-                icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
+                icon: UIImage(),
                 selected: hasUploadPermission(tableShare: tableShare),
                 on: false,
                 action: { _ in
@@ -124,6 +143,21 @@ extension NCShare {
             )
         )
 
+        if isDirectory,
+           NCShareCommon().isFileDropOptionVisible(isDirectory: isDirectory, shareType: tableShare.shareType) {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_share_file_drop_", comment: ""),
+                    icon: tableShare.permissions == permissions.permissionCreateShare ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) ?? UIImage() : UIImage(),
+                    selected: false,
+                    on: false,
+                    action: { menuAction in
+                        self.updateSharePermissions(share: tableShare, permissions: permissions.permissionCreateShare)
+                    }
+                )
+            )
+        }
+        
         self.presentMenu(with: actions)
     }
 
