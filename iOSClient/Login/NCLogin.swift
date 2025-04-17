@@ -90,6 +90,9 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
             baseUrlTextField.alpha = 0.5
             urlBase = NCBrandOptions.shared.loginBaseUrl
         }
+        
+        // qrcode
+        qrCode.setImage(UIImage(named: "qrcode")?.image(color: textColor, size: 100), for: .normal)
 
         // certificate
         certificate.setImage(UIImage(named: "certificate")?.image(color: textColor, size: 100), for: .normal)
@@ -324,16 +327,25 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
                 if let host = URL(string: url)?.host {
                     NCNetworking.shared.writeCertificate(host: host)
                 }
-                let loginOptions = NKRequestOptions(customUserAgent: userAgent)
-                NextcloudKit.shared.getLoginFlowV2(serverUrl: url, options: loginOptions) { [self] token, endpoint, login, _, error in
+                NextcloudKit.shared.getLoginFlowV2(serverUrl: url) { [self] token, endpoint, login, _, error in                    
                     // Login Flow V2
-                    if error == .success, let token, let endpoint, let login {
-                        let safariVC = NCLoginProvider()
-                        safariVC.urlBase = login
-                        safariVC.uiColor = textColor
-                        safariVC.delegate = self
-                        safariVC.poll(loginFlowV2Token: token, loginFlowV2Endpoint: endpoint, loginFlowV2Login: login)
-                        navigationController?.pushViewController(safariVC, animated: true)
+                    if error == .success && NCBrandOptions.shared.use_loginflowv2 && token != nil && endpoint != nil && login != nil {
+
+                        if let loginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb {
+
+                            loginWeb.urlBase = url
+                            loginWeb.user = user
+                            loginWeb.loginFlowV2Available = true
+                            loginWeb.loginFlowV2Token = token!
+                            loginWeb.loginFlowV2Endpoint = endpoint!
+                            loginWeb.loginFlowV2Login = login!
+
+                            self.navigationController?.pushViewController(loginWeb, animated: true)
+                        }
+                    } else if serverInfo.versionMajor < NCGlobal.shared.nextcloudVersion12 { // No login flow available
+                        let alertController = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: NSLocalizedString("_webflow_not_available_", comment: ""), preferredStyle: .alert)
+                        alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
+                        present(alertController, animated: true, completion: { })
                     }
                 }
             case .failure(let error):
