@@ -297,6 +297,8 @@
 		B54315482DA669C700981E7E /* NCSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B543153A2DA669C700981E7E /* NCSettings.storyboard */; };
 		B54315492DA669C700981E7E /* SaveSettingsCustomButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B54315402DA669C700981E7E /* SaveSettingsCustomButtonCell.xib */; };
 		B543154A2DA669C700981E7E /* RequiredDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = B543153E2DA669C700981E7E /* RequiredDataCollectionSwitch.xib */; };
+		B54315322DA64BAF00981E7E /* OnboardingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315312DA64BAF00981E7E /* OnboardingTestCase.swift */; };
+		B54315342DA64D6500981E7E /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315332DA64D6500981E7E /* AppUtility.swift */; };
 		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
@@ -1733,6 +1735,8 @@
 		B543153E2DA669C700981E7E /* RequiredDataCollectionSwitch.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RequiredDataCollectionSwitch.xib; sourceTree = "<group>"; };
 		B543153F2DA669C700981E7E /* SaveSettingsCustomButtonCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveSettingsCustomButtonCell.swift; sourceTree = "<group>"; };
 		B54315402DA669C700981E7E /* SaveSettingsCustomButtonCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SaveSettingsCustomButtonCell.xib; sourceTree = "<group>"; };
+		B54315312DA64BAF00981E7E /* OnboardingTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTestCase.swift; sourceTree = "<group>"; };
+		B54315332DA64D6500981E7E /* AppUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUtility.swift; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -2557,6 +2561,7 @@
 				B543154D2DA6913C00981E7E /* AudioUploadTests.swift */,
 				B543154B2DA690B700981E7E /* NCNotificationText.swift */,
 				B54315352DA64EB100981E7E /* PrivacyPolicyTest.swift */,
+				B54315312DA64BAF00981E7E /* OnboardingTestCase.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = Helper;
@@ -3974,6 +3979,7 @@
 				56A32E6F2CE4B75C0020EFF5 /* Analytics */,
 				AA517BB42D66149900F8D37C /* .tx */,
 				B52FAE9B2DA8DED9001AB1BD /* NMC Custom Views */,
+				B54315332DA64D6500981E7E /* AppUtility.swift */,
 				F702F2CC25EE5B4F008F8E80 /* AppDelegate.swift */,
 				F794E13E2BBC0F70003693D7 /* SceneDelegate.swift */,
 				F77DD6A72C5CC093009448FB /* NCSession.swift */,
@@ -5609,6 +5615,7 @@
 				F7FA80002C0F4F3B0072FC60 /* NCUploadAssetsModel.swift in Sources */,
 				F719D9E2288D396100762E33 /* NCColorPicker.swift in Sources */,
 				F73EF7DF2B02266D0087E6E9 /* NCManageDatabase+Trash.swift in Sources */,
+				B54315342DA64D6500981E7E /* AppUtility.swift in Sources */,
 				F79B646026CA661600838ACA /* UIControl+Extension.swift in Sources */,
 				F768823E2C0DD305001CF441 /* LazyView.swift in Sources */,
 				F3E173B02C9AF637006D177A /* ScreenAwakeManager.swift in Sources */,
