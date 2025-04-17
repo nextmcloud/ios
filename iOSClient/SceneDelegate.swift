@@ -77,7 +77,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         } else {
             NCKeychain().removeAll()
             if let bundleID = Bundle.main.bundleIdentifier {
+                let lastUpdateCheckDate = UserDefaults.standard.object(forKey: AppUpdaterKey.lastUpdateCheckDate)
                 UserDefaults.standard.removePersistentDomain(forName: bundleID)
+                if lastUpdateCheckDate != nil {
+                    UserDefaults.standard.setValue(lastUpdateCheckDate, forKey: AppUpdaterKey.lastUpdateCheckDate)
+                }
             }
             if NCBrandOptions.shared.disable_intro {
                 if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
@@ -114,7 +118,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 requestedAccount(controller: controller)
             }
         }
-
+//        AppUpdater().checkForUpdate()
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
     }
 
@@ -123,6 +127,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let controller = SceneManager.shared.getController(scene: scene)
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene did become active")
 
+        let oldVersion = UserDefaults.standard.value(forKey: NCSettingsBundleHelper.SettingsBundleKeys.BuildVersionKey) as? String
+        AppUpdater().checkForUpdate()
+        AnalyticsHelper.shared.trackAppVersion(oldVersion: oldVersion)
+        if let userAccount = NCManageDatabase.shared.getActiveTableAccount() {
+            AnalyticsHelper.shared.trackUsedStorageData(quotaUsed: userAccount.quotaUsed)
+        }
+
+        NCSettingsBundleHelper.setVersionAndBuildNumber()
+        NCSettingsBundleHelper.checkAndExecuteSettings(delay: 0.5)
+        
+//        if !NCAskAuthorization().isRequesting {
+//            NCPasscode.shared.hidePrivacyProtectionWindow()
+//        }
+        
         hidePrivacyProtectionWindow()
 
         NCAutoUpload.shared.initAutoUpload(controller: nil, account: session.account) { num in
