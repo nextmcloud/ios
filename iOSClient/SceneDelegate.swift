@@ -36,8 +36,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     private let database = NCManageDatabase.shared
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let windowScene = (scene as? UIWindowScene),
-              let appDelegate else { return }
+        guard let windowScene = (scene as? UIWindowScene)
+        else {
+            return
+        }
 
         self.window = UIWindow(windowScene: windowScene)
         if !NCKeychain().appearanceAutomatic {
@@ -101,9 +103,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene will enter in foreground")
         let session = SceneManager.shared.getSession(scene: scene)
+        let controller = SceneManager.shared.getController(scene: scene)
         guard !session.account.isEmpty else { return }
 
         hidePrivacyProtectionWindow()
+
         if let window = SceneManager.shared.getWindow(scene: scene), let controller = SceneManager.shared.getController(scene: scene) {
             window.rootViewController = controller
             if NCKeychain().presentPasscode {
@@ -115,21 +119,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
         }
 
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
-    }
-
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        let session = SceneManager.shared.getSession(scene: scene)
-        let controller = SceneManager.shared.getController(scene: scene)
-        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene did become active")
-
-        hidePrivacyProtectionWindow()
-
         NCAutoUpload.shared.initAutoUpload(controller: nil, account: session.account) { num in
             NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Initialize Auto upload with \(num) uploads")
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             NCService().startRequestServicesServer(account: session.account, controller: controller)
         }
 
@@ -138,6 +132,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 await NCNetworking.shared.verifyZombie()
             }
         }
+
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
+
+    }
+
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene did become active")
+        let session = SceneManager.shared.getSession(scene: scene)
+        guard !session.account.isEmpty else { return }
+
+        hidePrivacyProtectionWindow()
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
@@ -392,7 +397,7 @@ extension SceneDelegate: NCPasscodeDelegate {
             accountRequestVC.enableAddAccount = false
             accountRequestVC.dismissDidEnterBackground = false
             accountRequestVC.delegate = self
-            accountRequestVC.startTimer()
+            accountRequestVC.startTimer(nil)
 
             let screenHeighMax = UIScreen.main.bounds.height - (UIScreen.main.bounds.height / 5)
             let numberCell = tableAccounts.count

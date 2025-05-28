@@ -28,16 +28,19 @@ import FloatingPanel
 import NextcloudKit
 
 extension NCTrash {
-    func toggleMenuMore(with objectId: String, image: UIImage?, isGridCell: Bool) {
-        guard let resultTableTrash = self.database.getResultTrashItem(fileId: objectId, account: session.account) else { return }
-        guard isGridCell else {
+    func toggleMenuMore(with objectId: String, image: UIImage?, isGridCell: Bool, sender: Any?) {
+        guard let resultTableTrash = self.database.getResultTrash(fileId: objectId, account: session.account)
+        else {
+            return
+        }
+        guard isGridCell
+        else {
             let alert = UIAlertController(title: NSLocalizedString("_want_delete_", comment: ""), message: resultTableTrash.trashbinFileName, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("_delete_", comment: ""), style: .destructive, handler: { _ in
                 self.deleteItem(with: objectId)
             }))
             alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
             self.present(alert, animated: true, completion: nil)
-
             return
         }
 
@@ -58,6 +61,7 @@ extension NCTrash {
             NCMenuAction(
                 title: resultTableTrash.trashbinFileName,
                 icon: iconHeader,
+                sender: sender,
                 action: nil
             )
         )
@@ -66,6 +70,7 @@ extension NCTrash {
             NCMenuAction(
                 title: NSLocalizedString("_restore_", comment: ""),
                 icon: utility.loadImage(named: "arrow.circlepath", colors: [NCBrandColor.shared.iconImageColor]),
+                sender: sender,
                 action: { _ in
                     self.restoreItem(with: objectId)
                 }
@@ -77,12 +82,13 @@ extension NCTrash {
                 title: NSLocalizedString("_delete_", comment: ""),
                 destructive: true,
                 icon: utility.loadImage(named: "trash", colors: [.red]),
+                sender: sender,
                 action: { _ in
                     self.deleteItem(with: objectId)
                 }
             )
         )
 
-        presentMenu(with: actions)
+        presentMenu(with: actions, controller: controller, sender: sender)
     }
 }

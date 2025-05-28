@@ -91,6 +91,8 @@ class NCService: NSObject {
 
     private func requestServerStatus(account: String, controller: NCMainTabBarController?) async -> Bool {
         let serverUrl = NCSession.shared.getSession(account: account).urlBase
+        let userId = NCSession.shared.getSession(account: account).userId
+        let user = NCSession.shared.getSession(account: account).user
         switch await NCNetworking.shared.getServerStatus(serverUrl: serverUrl, options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) {
         case .success(let serverInfo):
             if serverInfo.maintenance {
@@ -107,9 +109,10 @@ class NCService: NSObject {
             return false
         }
 
-        let resultUserProfile = await NCNetworking.shared.getUserProfile(account: account, options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue))
+        let resultUserProfile = await NCNetworking.shared.getUserMetadata(account: account, userId: userId, options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue))
         if resultUserProfile.error == .success,
-           let userProfile = resultUserProfile.userProfile {
+           let userProfile = resultUserProfile.userProfile,
+           userId == userProfile.userId {
             self.database.setAccountUserProfile(account: resultUserProfile.account, userProfile: userProfile)
             return true
         } else {
@@ -118,7 +121,8 @@ class NCService: NSObject {
     }
 
     func synchronize(account: String) {
-        NextcloudKit.shared.listingFavorites(showHiddenFiles: NCKeychain().showHiddenFiles,
+        let showHiddenFiles = NCKeychain().getShowHiddenFiles(account: account)
+        NextcloudKit.shared.listingFavorites(showHiddenFiles: showHiddenFiles,
                                              account: account,
                                              options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { account, files, _, error in
             guard error == .success, let files else { return }
@@ -217,17 +221,6 @@ class NCService: NSObject {
                 }
             }
 
-            // Notifications
-            controller?.availableNotifications = false
-            if capability.capabilityNotification.count > 0 {
-                NextcloudKit.shared.getNotifications(account: account) { _ in
-                } completion: { _, notifications, _, error in
-                    if error == .success, let notifications = notifications, notifications.count > 0 {
-                        controller?.availableNotifications = true
-                    }
-                }
-            }
-
             // Added UTI for Collabora
             capability.capabilityRichDocumentsMimetypes.forEach { mimeType in
                 NextcloudKit.shared.nkCommonInstance.addInternalTypeIdentifier(typeIdentifier: mimeType, classFile: NKCommon.TypeClassFile.document.rawValue, editor: NCGlobal.shared.editorCollabora, iconName: NKCommon.TypeIconFile.document.rawValue, name: "document", account: account)
@@ -239,6 +232,8 @@ class NCService: NSObject {
                     NextcloudKit.shared.nkCommonInstance.addInternalTypeIdentifier(typeIdentifier: directEditing.mimetype, classFile: NKCommon.TypeClassFile.document.rawValue, editor: directEditing.editor, iconName: NKCommon.TypeIconFile.document.rawValue, name: "document", account: account)
                 }
             }
+
+            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateNotification)
         }
     }
 
