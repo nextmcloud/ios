@@ -120,7 +120,9 @@ class NCSharePaging: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": metadata.serverUrl])
+        NCNetworking.shared.notifyAllDelegates { delegate in
+            delegate.transferReloadData(serverUrl: metadata.serverUrl)
+        }
     }
 
     deinit {
@@ -225,13 +227,8 @@ extension NCSharePaging: PagingViewControllerDataSource {
 // MARK: - Header
 
 class NCShareHeaderViewController: PagingViewController {
-
     public var image: UIImage?
     public var metadata = tableMetadata()
-
-    public var activityEnabled = true
-    public var commentsEnabled = true
-    public var sharingEnabled = true
 
     override func loadView() {
         view = NCSharePagingView(
