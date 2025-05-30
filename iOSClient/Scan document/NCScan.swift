@@ -56,15 +56,13 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
         NCSession.shared.getSession(controller: controller)
     }
 
-    private var tipView: EasyTipView?
-
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         view.backgroundColor = .secondarySystemGroupedBackground
-        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
+//        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
         navigationItem.title = NSLocalizedString("_scanned_images_", comment: "")
 
         collectionViewSource.dragInteractionEnabled = true
@@ -341,7 +339,7 @@ extension NCScan: EasyTipViewDelegate {
         if !self.database.tipExists(NCGlobal.shared.tipScanAddImage) {
             var preferences = EasyTipView.Preferences()
             preferences.drawing.foregroundColor = .white
-            preferences.drawing.backgroundColor = .lightGray
+            preferences.drawing.backgroundColor = NCBrandColor.shared.customer
             preferences.drawing.textAlignment = .left
             preferences.drawing.arrowPosition = .left
             preferences.drawing.cornerRadius = 10
