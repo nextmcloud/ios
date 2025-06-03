@@ -37,6 +37,38 @@ import SwiftUI
     func didAskForClientCertificate()
 }
 
+protocol NCTransferDelegate: AnyObject {
+    var sceneIdentifier: String { get }
+    func transferProgressDidUpdate(progress: Float,
+                                   totalBytes: Int64,
+                                   totalBytesExpected: Int64,
+                                   fileName: String,
+                                   serverUrl: String)
+
+    func transferChange(status: String, metadata: tableMetadata, error: NKError)
+    func transferChange(status: String, metadatasError: [tableMetadata: NKError])
+    func transferReloadData(serverUrl: String?)
+    func transferRequestData(serverUrl: String?)
+    func transferCopy(metadata: tableMetadata, error: NKError)
+    func transferMove(metadata: tableMetadata, error: NKError)
+    func transferFileExists(ocId: String, exists: Bool)
+}
+
+extension NCTransferDelegate {
+    func transferProgressDidUpdate(progress: Float,
+                                   totalBytes: Int64,
+                                   totalBytesExpected: Int64,
+                                   fileName: String,
+                                   serverUrl: String) {}
+    func transferChange(status: String, metadata: tableMetadata, error: NKError) {}
+    func transferChange(status: String, metadatasError: [tableMetadata: NKError]) {}
+    func transferReloadData(serverUrl: String?) {}
+    func transferRequestData(serverUrl: String?) {}
+    func transferCopy(metadata: tableMetadata, error: NKError) {}
+    func transferMove(metadata: tableMetadata, error: NKError) {}
+    func transferFileExists(ocId: String, exists: Bool) {}
+}
+
 class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     static let shared = NCNetworking()
 
@@ -71,6 +103,49 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
         return networkReachability == NKCommon.TypeReachability.reachableEthernetOrWiFi || networkReachability == NKCommon.TypeReachability.reachableCellular
     }
 
+    /// Delegate for multi scene
+    private var transferDelegates = NSHashTable<AnyObject>.weakObjects()
+
+    func addDelegate(_ delegate: NCTransferDelegate) {
+        transferDelegates.add(delegate)
+    }
+
+    func removeDelegate(_ delegate: NCTransferDelegate) {
+        transferDelegates.remove(delegate)
+    }
+
+    func notifyAllDelegates(_ block: (NCTransferDelegate) -> Void) {
+        for delegate in transferDelegates.allObjects {
+            if let delegate = delegate as? NCTransferDelegate {
+                block(delegate)
+            }
+        }
+    }
+
+    func notifyDelegate(forScene sceneIdentifier: String, _ block: (NCTransferDelegate) -> Void) {
+        for delegate in transferDelegates.allObjects {
+            if let delegate = delegate as? NCTransferDelegate, delegate.sceneIdentifier == sceneIdentifier {
+                block(delegate)
+            }
+        }
+    }
+
+    func notifyDelegates(forScene sceneIdentifier: String,
+                         matching: (NCTransferDelegate) -> Void,
+                         others: (NCTransferDelegate) -> Void) {
+        for delegate in transferDelegates.allObjects {
+            guard let delegate = delegate as? NCTransferDelegate
+            else {
+                continue
+            }
+            if delegate.sceneIdentifier == sceneIdentifier {
+                matching(delegate)
+            } else {
+                others(delegate)
+            }
+        }
+    }
+
     // OPERATIONQUEUE
     let downloadThumbnailQueue = Queuer(name: "downloadThumbnailQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
     let downloadThumbnailActivityQueue = Queuer(name: "downloadThumbnailActivityQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
@@ -93,10 +168,6 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
                     self.getActiveAccountCertificate(account: account)
                 }
             }
-        }
-
-        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { _ in
-            NCTransferProgress.shared.clearAllCountError()
         }
     }
 
@@ -282,49 +353,57 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
         (self.p12Data, self.p12Password) = NCKeychain().getClientCertificate(account: account)
     }
 
-    // MARK: - User Default Data Request
+    // MARK: - Util FileSystem Safe
+#if !EXTENSION
+    func removeFileInBackgroundSafe(atPath: String) {
+        var bgTask: UIBackgroundTaskIdentifier = .invalid
 
-    func isResponseDataChanged<T>(account: String, responseData: AFDataResponse<T>?) -> Bool {
-        guard let responseData,
-              let request = responseData.request else { return true }
-        let key = getResponseDataKey(account: account, request: request)
-        let retrievedData = UserDefaults.standard.data(forKey: key)
-
-        switch responseData.result {
-        case .success(let data):
-            if let data = data as? Data {
-                if retrievedData != data, let request = responseData.request {
-                    let key = getResponseDataKey(account: account, request: request)
-                    UserDefaults.standard.set(data, forKey: key)
-                }
-                return retrievedData != data
-            } else {
-                return true
-            }
-        case .failure(let error):
-            print("Errore: \(error.localizedDescription)")
-            return true
+        bgTask = UIApplication.shared.beginBackgroundTask(withName: "SafeRemove") {
+            UIApplication.shared.endBackgroundTask(bgTask)
+            bgTask = .invalid
         }
-    }
 
-    func removeAllKeyUserDefaultsData(account: String?) {
-        let userDefaults = UserDefaults.standard
+        DispatchQueue.global().async {
+            defer {
+                UIApplication.shared.endBackgroundTask(bgTask)
+                bgTask = .invalid
+            }
 
-        for key in userDefaults.dictionaryRepresentation().keys {
-            if let account {
-                if key.hasPrefix(account) {
-                    userDefaults.removeObject(forKey: key)
-                }
-            } else {
-                userDefaults.removeObject(forKey: key)
+            do {
+                try FileManager.default.removeItem(atPath: atPath)
+            } catch {
+                print("Errore nella rimozione file:", error)
             }
         }
     }
 
-    private func getResponseDataKey(account: String, request: URLRequest) -> String {
-        let depth = request.allHTTPHeaderFields?["Depth"] ?? "none"
-        let key = account + "|" + (request.url?.absoluteString ?? "") + "|Depth=\(depth)|" + (request.httpMethod ?? "")
+    func moveFileSafely(atPath: String, toPath: String) {
+        if atPath == toPath { return }
 
-        return key
+        var bgTask: UIBackgroundTaskIdentifier = .invalid
+        bgTask = UIApplication.shared.beginBackgroundTask(withName: "MoveFile") {
+            UIApplication.shared.endBackgroundTask(bgTask)
+            bgTask = .invalid
+        }
+
+        DispatchQueue.global().async {
+            defer {
+                UIApplication.shared.endBackgroundTask(bgTask)
+                bgTask = .invalid
+            }
+
+            do {
+                if FileManager.default.fileExists(atPath: toPath) {
+                    try FileManager.default.removeItem(atPath: toPath)
+                }
+
+                try FileManager.default.copyItem(atPath: atPath, toPath: toPath)
+                try FileManager.default.removeItem(atPath: atPath)
+
+            } catch {
+                print("Errore nello spostamento file:", error)
+            }
+        }
     }
+#endif
 }

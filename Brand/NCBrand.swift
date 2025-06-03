@@ -1,25 +1,6 @@
-//
-//  NCBrandColor.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 24/04/17.
-//  Copyright (c) 2017 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2017 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 
@@ -29,6 +10,22 @@ let userAgent: String = {
     return "Mozilla/5.0 (iOS) Magenta-iOS/\(appVersion)"
 }()
 
+@objc class NCBrandOptions: NSObject, @unchecked Sendable {
+    @objc static let shared: NCBrandOptions = {
+        let instance = NCBrandOptions()
+        return instance
+    }()
+
+ /*
+ Codname Matheria
+
+ Matheria represents a pivotal step forward in the evolution of our software. This release delivers substantial architectural enhancements, increased performance, and a robust foundation for future innovations.
+
+ The codename embodies the concept of dynamic, living matter — reflecting our vision of a platform that is not only powerful and reliable, but also capable of continuous transformation and intelligent adaptation.
+ */
+
+//final class NCBrandOptions: @unchecked Sendable {
+//    static let shared = NCBrandOptions()
 @objc class NCBrandOptions: NSObject, @unchecked Sendable {
     @objc static let shared: NCBrandOptions = {
         let instance = NCBrandOptions()
@@ -104,6 +101,21 @@ let userAgent: String = {
     var use_themingColor:                Bool = false
 
     var disable_intro:       Bool = true
+    var use_AppConfig: Bool = false
+    @objc public var capabilitiesGroup:              String = "group.de.telekom.Mediencenter"
+    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
+
+    // BRAND ONLY
+    // Set use_login_web_personalized to true for prod and false for configurable path
+    @objc public var use_login_web_personalized: Bool = true                               // Don't touch me !!
+    @objc public var use_AppConfig: Bool = false                                                // Don't touch me !!
+    @objc public var use_GroupApps: Bool = true                                                 // Don't touch me !!
+
+    // Options
+    // Use server theming color
+    var use_themingColor:                Bool = false
+
+    var disable_intro:       Bool = true
     var disable_request_login_url: Bool = false
     var disable_multiaccount:            Bool = true
     var disable_more_external_site: Bool = false
@@ -137,7 +149,22 @@ let userAgent: String = {
     @objc var enforce_passcode_lock = false
     @objc var use_in_app_browser_for_login = false
 
-    // (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
+    @objc var disable_intro:       Bool = false//true
+    @objc var disable_request_login_url:       Bool = false//true
+    @objc public var disable_multiaccount:            Bool = true
+    @objc public var disable_manage_account:          Bool = false
+    @objc var disable_more_external_site: Bool = false
+    @objc var disable_openin_file: Bool = false                                          // Don't touch me !!
+    @objc var disable_crash_service:             Bool = true
+    @objc var disable_log: Bool = false
+    @objc var disable_mobileconfig: Bool = false
+    @objc var disable_show_more_nextcloud_apps_in_settings:         Bool = true
+    @objc var doNotAskPasscodeAtStartup: Bool = false
+    @objc var disable_source_code_in_settings: Bool = false
+    @objc var enforce_passcode_lock = false
+    @objc var use_in_app_browser_for_login = false
+
+    // Example: (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
     var enforce_servers: [(name: String, url: String)] = []
 
     // Internal option behaviour

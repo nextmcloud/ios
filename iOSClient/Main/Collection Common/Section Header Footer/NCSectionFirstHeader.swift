@@ -32,7 +32,13 @@ protocol NCSectionFirstHeaderDelegate: AnyObject {
     func tapButtonTransfer(_ sender: Any)
     func tapRichWorkspace(_ sender: Any)
     func tapRecommendations(with metadata: tableMetadata)
-    func tapRecommendationsButtonMenu(with metadata: tableMetadata, image: UIImage?)
+    func tapRecommendationsButtonMenu(with metadata: tableMetadata, image: UIImage?, sender: Any?)
+}
+
+extension NCSectionFirstHeaderDelegate {
+    func tapButtonSwitch(_ sender: Any) {}
+    func tapButtonOrder(_ sender: Any) {}
+    func tapButtonMore(_ sender: Any) {}
 }
 
 extension NCSectionFirstHeaderDelegate {
@@ -79,10 +85,12 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
     private weak var delegate: NCSectionFirstHeaderDelegate?
     private let utility = NCUtility()
     private var markdownParser = MarkdownParser()
+    private let global = NCGlobal.shared
     private var richWorkspaceText: String?
     private let richWorkspaceGradient: CAGradientLayer = CAGradientLayer()
     private var recommendations: [tableRecommendedFiles] = []
     private var viewController: UIViewController?
+    private var sceneIdentifier: String = ""
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -263,6 +271,7 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
                     heightHeaderSection: CGFloat,
                     sectionText: String?,
                     viewController: UIViewController?,
+                    sceneItentifier: String,
                     delegate: NCSectionFirstHeaderDelegate?) {
         viewRichWorkspaceHeightConstraint.constant = heightHeaderRichWorkspace
         viewRecommendationsHeightConstraint.constant = heightHeaderRecommendations
@@ -276,6 +285,7 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         self.recommendations = recommendations
         self.labelSection.text = sectionText
         self.viewController = viewController
+        self.sceneIdentifier = sceneItentifier
         self.delegate = delegate
         
         if heightHeaderRichWorkspace != 0, let richWorkspaceText, !richWorkspaceText.isEmpty {
@@ -376,7 +386,7 @@ extension NCSectionFirstHeader: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? NCRecommendationsCell else { fatalError() }
 
         if let metadata = NCManageDatabase.shared.getMetadataFromFileId(recommendedFiles.id) {
-            let imagePreview = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt512)
+            let imagePreview = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt512)
 
             if metadata.directory {
                 cell.image.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
@@ -391,7 +401,7 @@ extension NCSectionFirstHeader: UICollectionViewDataSource {
                     NextcloudKit.shared.downloadPreview(fileId: metadata.fileId, account: metadata.account) { _, _, _, _, responseData, error in
                         if error == .success, let data = responseData?.data {
                             self.utility.createImageFileFrom(data: data, ocId: metadata.ocId, etag: metadata.etag)
-                            if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt512) {
+                            if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt512) {
                                 for case let cell as NCRecommendationsCell in self.collectionViewRecommendations.visibleCells {
                                     if cell.id == recommendedFiles.id {
                                         cell.image.contentMode = .scaleAspectFill
@@ -453,9 +463,10 @@ extension NCSectionFirstHeader: UICollectionViewDelegate {
         return nil
 #else
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
-            return NCViewerProviderContextMenu(metadata: metadata, image: image)
+            return NCViewerProviderContextMenu(metadata: metadata, image: image, sceneIdentifier: self.sceneIdentifier)
         }, actionProvider: { _ in
-            return NCContextMenu().viewMenu(ocId: metadata.ocId, viewController: viewController, image: image)
+            let contextMenu = NCContextMenu(metadata: tableMetadata(value: metadata), viewController: viewController, sceneIdentifier: self.sceneIdentifier, image: image)
+            return contextMenu.viewMenu()
         })
 #endif
     }
@@ -470,7 +481,7 @@ extension NCSectionFirstHeader: UICollectionViewDelegateFlowLayout {
 }
 
 extension NCSectionFirstHeader: NCRecommendationsCellDelegate {
-    func touchUpInsideButtonMenu(with metadata: tableMetadata, image: UIImage?) {
-        self.delegate?.tapRecommendationsButtonMenu(with: metadata, image: image)
+    func touchUpInsideButtonMenu(with metadata: tableMetadata, image: UIImage?, sender: Any?) {
+        self.delegate?.tapRecommendationsButtonMenu(with: metadata, image: image, sender: sender)
     }
 }

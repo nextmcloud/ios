@@ -26,6 +26,27 @@ import UIKit
 class NCGlobal: NSObject, @unchecked Sendable  {
     @objc static let shared = NCGlobal()
     
+/// Used for read/write in Realm
+var isAppSuspending: Bool = false
+/// Used for know if the app in in Background mode
+var isAppInBackground: Bool = false
+
+//class NCGlobal: NSObject, @unchecked Sendable  {
+final class NCGlobal: Sendable {
+    @objc static let shared = NCGlobal()
+
+    init() {
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { _ in
+            isAppSuspending = true
+            isAppInBackground = true
+        }
+
+        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
+            isAppSuspending = false
+            isAppInBackground = false
+        }
+    }
+
     // ENUM
     //
     public enum TypeFilterScanDocument: String {
@@ -290,10 +311,10 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let metadataStatusWaitCopy: Int             = 14
     let metadataStatusWaitMove: Int             = 15
     
+
+    let metadataStatusUploadingAllMode          = [1,2,3]
     let metadataStatusInTransfer                = [-1, -2, 1, 2]
-    let metadataStatusFileDown                  = [-1, -2, -3]
     let metadataStatusHideInView                = [1, 2, 3, 11]
-    let metadataStatusHideInFileExtension       = [1, 2, 3, 10, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
     
     //  Hidden files included in the read
@@ -322,10 +343,38 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
     let notificationCenterReloadAvatar                          = "reloadAvatar"
-    let notificationCenterReloadHeader                          = "reloadHeader"
     let notificationCenterClearCache                            = "clearCache"
-    let notificationCenterChangeLayout                          = "changeLayout"                    // userInfo: account, serverUrl, layoutForView
     let notificationCenterCheckUserDelaultErrorDone             = "checkUserDelaultErrorDone"       // userInfo: account, controller
+    let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
+    
+    let notificationCenterUpdateNotification                    = "updateNotification"
+    let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
+    let notificationCenterGetServerData                         = "getServerData"                   // userInfo: serverUrl?
+    
+    let notificationCenterChangeStatusFolderE2EE                = "changeStatusFolderE2EE"          // userInfo: serverUrl
+    
+    let notificationCenterDownloadStartFile                     = "downloadStartFile"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    let notificationCenterDownloadedFile                        = "downloadedFile"                  // userInfo: ocId, ocIdTransfer, session, session, serverUrl, account, selector, error
+    let notificationCenterDownloadCancelFile                    = "downloadCancelFile"              // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    
+    let notificationCenterUploadStartFile                       = "uploadStartFile"                 // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, sessionSelector
+    let notificationCenterUploadedFile                          = "uploadedFile"                    // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadedLivePhoto                     = "uploadedLivePhoto"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadCancelFile                      = "uploadCancelFile"                // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    
+    let notificationCenterProgressTask                          = "progressTask"                    // userInfo: account, ocId, ocIdTransfer, session, serverUrl, status, chunk, e2eEncrypted, progress, totalBytes, totalBytesExpected
+    
+    let notificationCenterUpdateBadgeNumber                     = "updateBadgeNumber"               // userInfo: counterDownload, counterUpload
+    
+    let notificationCenterCreateFolder                          = "createFolder"                    // userInfo: ocId, serverUrl, account, withPush, sceneIdentifier
+    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
+    let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
+    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
+    let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
+
     let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
     
     let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
@@ -379,6 +428,24 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let notificationCenterPlayerIsPlaying                       = "playerIsPlaying"
     let notificationCenterPlayerStoppedPlaying                  = "playerStoppedPlaying"
     
+
+    // Networking Status
+    let networkingStatusCreateFolder                            = "statusCreateFolder"
+    let networkingStatusDelete                                  = "statusDelete"
+    let networkingStatusRename                                  = "statusRename"
+    let networkingStatusFavorite                                = "statusFavorite"
+
+    let networkingStatusDownloading                             = "statusDownloading"
+    let networkingStatusDownloaded                              = "statusDownloaded"
+    let networkingStatusDownloadCancel                          = "statusDownloadCancel"
+
+    let networkingStatusUploading                               = "statusUploading"
+    let networkingStatusUploaded                                = "statusUploaded"
+    let networkingStatusUploadedLivePhoto                       = "statusUploadedLivePhoto"
+    let networkingStatusUploadCancel                            = "statusUploadCancel"
+
+
+    let networkingStatusReloadAvatar                            = "statusReloadAvatar"
     let notificationCenterUpdateShare                           = "updateShare"
     
     // TIP
@@ -387,6 +454,7 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let tipAccountRequest                                       = "tipAccountRequest"
     let tipScanAddImage                                         = "tipScanAddImage"
     let tipMediaDetailView                                      = "tipMediaDetailView"
+    let tipAutoUploadButton                                     = "tipAutoUploadButton"
     let tipAutoUpload                                           = "tipAutoUpload"
     
     // ACTION

@@ -12,7 +12,6 @@ class NCMainNavigationController: UINavigationController, UINavigationController
     let utility = NCUtility()
     let utilityFileSystem = NCUtilityFileSystem()
     let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    private var timer: Timer?
 
     var controller: NCMainTabBarController? {
         self.tabBarController as? NCMainTabBarController
@@ -20,6 +19,10 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
     var collectionViewCommon: NCCollectionViewCommon? {
         topViewController as? NCCollectionViewCommon
+    }
+
+    var trashViewController: NCTrash? {
+        topViewController as? NCTrash
     }
 
     var session: NCSession.Session {
@@ -100,23 +103,35 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             }
         }), for: .touchUpInside)
 
-        navigationBar.prefersLargeTitles = true
-        setNavigationBarHidden(false, animated: true)
-
-        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
-            self.timer?.invalidate()
-            self.timer = nil
-        }
-
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                if UIApplication.shared.applicationState == .active {
-                    self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
-                        self.updateRightBarButtonItems()
-                    })
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: self.global.notificationCenterUpdateNotification), object: nil, queue: nil) { _ in
+            let capabilities = NCCapabilities.shared.getCapabilities(account: self.session.account)
+            if capabilities.capabilityNotification.count > 0 {
+                NextcloudKit.shared.getNotifications(account: self.session.account) { _ in
+                } completion: { _, notifications, _, error in
+                    if error == .success,
+                       let notifications,
+                       notifications.count > 0 {
+                        if !self.isNotificationsButtonVisible() {
+                            self.controller?.availableNotifications = true
+                            self.updateRightBarButtonItems()
+                        }
+                    } else {
+                        if self.isNotificationsButtonVisible() {
+                            self.controller?.availableNotifications = false
+                            self.updateRightBarButtonItems()
+                        }
+                    }
+                }
+            } else {
+                if self.isNotificationsButtonVisible() {
+                    self.controller?.availableNotifications = false
+                    self.updateRightBarButtonItems()
                 }
             }
         }
+
+        navigationBar.prefersLargeTitles = true
+        setNavigationBarHidden(false, animated: true)
     }
 
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
@@ -127,55 +142,49 @@ class NCMainNavigationController: UINavigationController, UINavigationController
     // MARK: - Right
 
     func setNavigationRightItems() {
-        guard let collectionViewCommon
-        else {
-            return
-        }
-
-        if collectionViewCommon.isEditMode {
+        if let collectionViewCommon,
+           collectionViewCommon.isEditMode {
             collectionViewCommon.tabBarSelect?.update(fileSelect: collectionViewCommon.fileSelect, metadatas: collectionViewCommon.getSelectedMetadatas(), userId: session.userId)
             collectionViewCommon.tabBarSelect?.show()
 
             let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done) {
                 collectionViewCommon.setEditMode(false)
-                collectionViewCommon.collectionView.reloadData()
             }
+            collectionViewCommon.navigationItem.rightBarButtonItems = [select]
+        } else if let trashViewController,
+                    trashViewController.isEditMode {
+            trashViewController.tabBarSelect.update(selectOcId: [])
+            trashViewController.tabBarSelect.show()
 
-            self.collectionViewCommon?.navigationItem.rightBarButtonItems = [select]
-
+            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done) {
+                trashViewController.setEditMode(false)
+            }
+            trashViewController.navigationItem.rightBarButtonItems = [select]
         } else {
-
-            collectionViewCommon.tabBarSelect?.hide()
+            trashViewController?.tabBarSelect?.hide()
+            collectionViewCommon?.tabBarSelect?.hide()
             self.updateRightBarButtonItems()
-        }
-
-        // fix, if the tabbar was hidden before the update, set it in hidden
-        if self.tabBarController?.tabBar.isHidden ?? true,
-           collectionViewCommon.tabBarSelect?.isHidden() ?? true {
-            self.tabBarController?.tabBar.isHidden = true
         }
     }
 
-    func updateRightBarButtonItems() {
-        guard let collectionViewCommon,
-              !collectionViewCommon.isEditMode,
-              let controller
+    func updateRightBarButtonItems(_ fileItem: UITabBarItem? = nil) {
+        guard !(collectionViewCommon?.isEditMode ?? false),
+              !(trashViewController?.isEditMode ?? false),
+              !(topViewController is NCViewerMediaPage),
+              !(topViewController is NCViewerPDF),
+              !(topViewController is NCViewerRichDocument),
+              !(topViewController is NCViewerNextcloudText)
         else {
             return
         }
+
         let capabilities = NCCapabilities.shared.getCapabilities(account: session.account)
-        let resultsCount = self.database.getResultsMetadatas(predicate: NSPredicate(format: "status != %i", NCGlobal.shared.metadataStatusNormal))?.count ?? 0
-        var tempRightBarButtonItems = [self.menuBarButtonItem]
-        var tempTotalTags = self.menuBarButtonItem.tag
+        let resultsCount = self.database.getResultsMetadatas(predicate: NSPredicate(format: "status != %i", self.global.metadataStatusNormal))?.count ?? 0
+        var tempRightBarButtonItems: [UIBarButtonItem] = createRightMenu() == nil ? [] : [self.menuBarButtonItem]
+        var tempTotalTags = tempRightBarButtonItems.count == 0 ? 0 : self.menuBarButtonItem.tag
         var totalTags = 0
 
-        if let rightBarButtonItems = self.collectionViewCommon?.navigationItem.rightBarButtonItems,
-            let menuBarButtonItem = rightBarButtonItems.first(where: { $0.tag == menuButtonTag }),
-            let menuButton = menuBarButtonItem.customView as? UIButton {
-            menuButton.menu = createRightMenu()
-        }
-
-        if let rightBarButtonItems = collectionViewCommon.navigationItem.rightBarButtonItems {
+        if let rightBarButtonItems = topViewController?.navigationItem.rightBarButtonItems {
             for item in rightBarButtonItems {
                 totalTags = totalTags + item.tag
             }
@@ -186,7 +195,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             tempTotalTags = tempTotalTags + self.assistantButtonItem.tag
         }
 
-        if controller.availableNotifications {
+        if let controller, controller.availableNotifications {
             tempRightBarButtonItems.append(self.notificationsButtonItem)
             tempTotalTags = tempTotalTags + self.notificationsButtonItem.tag
         }
@@ -197,15 +206,54 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         if totalTags != tempTotalTags {
-            collectionViewCommon.navigationItem.rightBarButtonItems = tempRightBarButtonItems
+            topViewController?.navigationItem.rightBarButtonItems = tempRightBarButtonItems
         }
+
+        // Update App Icon badge / File Icon badge
+#if DEBUG
+        if UIApplication.shared.applicationIconBadgeNumber != resultsCount {
+            UIApplication.shared.applicationIconBadgeNumber = resultsCount
+        }
+        fileItem?.badgeValue = resultsCount == 0 ? nil : "\(resultsCount)"
+#else
+        if resultsCount > 999 {
+            UIApplication.shared.applicationIconBadgeNumber = 999
+            fileItem?.badgeValue = "999+"
+        } else {
+            if UIApplication.shared.applicationIconBadgeNumber != resultsCount {
+                UIApplication.shared.applicationIconBadgeNumber = resultsCount
+            }
+            fileItem?.badgeValue = resultsCount == 0 ? nil : "\(resultsCount)"
+        }
+#endif
     }
 
     func createRightMenu() -> UIMenu? { return nil }
 
-    func createRightMenuActions() -> (select: UIAction, viewStyleSubmenu: UIMenu, sortSubmenu: UIMenu, personalFilesOnlyAction: UIAction, showDescription: UIAction, showRecommendedFiles: UIAction)? {
+    func updateRightMenu() {
+        if let rightBarButtonItems = topViewController?.navigationItem.rightBarButtonItems,
+            let menuBarButtonItem = rightBarButtonItems.first(where: { $0.tag == menuButtonTag }),
+            let menuButton = menuBarButtonItem.customView as? UIButton {
+            menuButton.menu = createRightMenu()
+        }
+    }
+
+    func createRightMenuActions() -> (select: UIAction,
+                                      viewStyleSubmenu: UIMenu,
+                                      sortSubmenu: UIMenu,
+                                      favoriteOnTop: UIAction,
+                                      directoryOnTop: UIAction,
+                                      hiddenFiles: UIAction,
+                                      personalFilesOnly: UIAction,
+                                      showDescription: UIAction,
+                                      showRecommendedFiles: UIAction?)? {
+        var showRecommendedFiles: UIAction?
+
         guard let collectionViewCommon,
-              let layoutForView = database.getLayoutForView(account: session.account, key: collectionViewCommon.layoutKey, serverUrl: collectionViewCommon.serverUrl) else { return nil }
+              let layoutForView = database.getLayoutForView(account: session.account, key: collectionViewCommon.layoutKey, serverUrl: collectionViewCommon.serverUrl)
+        else {
+            return nil
+        }
 
         let select = UIAction(title: NSLocalizedString("_select_", comment: ""),
                               image: utility.loadImage(named: "checkmark.circle"),
@@ -215,47 +263,27 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let list = UIAction(title: NSLocalizedString("_list_", comment: ""), image: utility.loadImage(named: "list.bullet"), state: layoutForView.layout == global.layoutList ? .on : .off) { _ in
-
             layoutForView.layout = self.global.layoutList
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
+            collectionViewCommon.changeLayout(layoutForView: layoutForView)
+            self.updateRightMenu()
         }
 
         let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""), image: utility.loadImage(named: "square.grid.2x2"), state: layoutForView.layout == global.layoutGrid ? .on : .off) { _ in
-
             layoutForView.layout = self.global.layoutGrid
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
+            collectionViewCommon.changeLayout(layoutForView: layoutForView)
+            self.updateRightMenu()
         }
 
         let mediaSquare = UIAction(title: NSLocalizedString("_media_square_", comment: ""), image: utility.loadImage(named: "square.grid.3x3"), state: layoutForView.layout == global.layoutPhotoSquare ? .on : .off) { _ in
-
             layoutForView.layout = self.global.layoutPhotoSquare
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
+            collectionViewCommon.changeLayout(layoutForView: layoutForView)
+            self.updateRightMenu()
         }
 
         let mediaRatio = UIAction(title: NSLocalizedString("_media_ratio_", comment: ""), image: utility.loadImage(named: "rectangle.grid.3x2"), state: layoutForView.layout == self.global.layoutPhotoRatio ? .on : .off) { _ in
-
             layoutForView.layout = self.global.layoutPhotoRatio
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
+            collectionViewCommon.changeLayout(layoutForView: layoutForView)
+            self.updateRightMenu()
         }
 
         let viewStyleSubmenu = UIMenu(title: "", options: .displayInline, children: [list, grid, mediaSquare, mediaRatio])
@@ -267,78 +295,134 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         let isSize = layoutForView.sort == "size"
 
         let byName = UIAction(title: NSLocalizedString("_name_", comment: ""), image: isName ? ascendingChevronImage : nil, state: isName ? .on : .off) { _ in
-
-            if isName { // repeated press
+            if isName {
                 layoutForView.ascending = !layoutForView.ascending
             }
             layoutForView.sort = "fileName"
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
+            collectionViewCommon.changeLayout(layoutForView: layoutForView)
+            self.updateRightMenu()
         }
 
         let byNewest = UIAction(title: NSLocalizedString("_date_", comment: ""), image: isDate ? ascendingChevronImage : nil, state: isDate ? .on : .off) { _ in
-
-            if isDate { // repeated press
+            if isDate {
                 layoutForView.ascending = !layoutForView.ascending
             }
             layoutForView.sort = "date"
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
+            collectionViewCommon.changeLayout(layoutForView: layoutForView)
+            self.updateRightMenu()
         }
 
         let byLargest = UIAction(title: NSLocalizedString("_size_", comment: ""), image: isSize ? ascendingChevronImage : nil, state: isSize ? .on : .off) { _ in
-
-            if isSize { // repeated press
+            if isSize {
                 layoutForView.ascending = !layoutForView.ascending
             }
             layoutForView.sort = "size"
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
+            collectionViewCommon.changeLayout(layoutForView: layoutForView)
+            self.updateRightMenu()
         }
 
         let sortSubmenu = UIMenu(title: NSLocalizedString("_order_by_", comment: ""), options: .displayInline, children: [byName, byNewest, byLargest])
 
+        let favoriteOnTop = NCKeychain().getFavoriteOnTop(account: self.session.account)
+        let favoriteOnTopAction = UIAction(title: NSLocalizedString("_favorite_on_top_", comment: ""), state: favoriteOnTop ? .on : .off) { _ in
+            NCKeychain().setFavoriteOnTop(account: self.session.account, value: !favoriteOnTop)
+
+            NCNetworking.shared.notifyAllDelegates { delegate in
+                delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl)
+            }
+            self.updateRightMenu()
+        }
+
+        let directoryOnTop = NCKeychain().getDirectoryOnTop(account: self.session.account)
+        let directoryOnTopAction = UIAction(title: NSLocalizedString("_directory_on_top_", comment: ""), state: directoryOnTop ? .on : .off) { _ in
+            NCKeychain().setDirectoryOnTop(account: self.session.account, value: !directoryOnTop)
+
+            NCNetworking.shared.notifyAllDelegates { delegate in
+                delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl)
+            }
+            self.updateRightMenu()
+        }
+
+        let hiddenFiles = NCKeychain().getShowHiddenFiles(account: self.session.account)
+        let hiddenFilesAction = UIAction(title: NSLocalizedString("_show_hidden_files_", comment: ""), state: hiddenFiles ? .on : .off) { _ in
+            NCKeychain().setShowHiddenFiles(account: self.session.account, value: !hiddenFiles)
+            self.collectionViewCommon?.getServerData()
+            self.updateRightMenu()
+        }
+
         let personalFilesOnly = NCKeychain().getPersonalFilesOnly(account: self.session.account)
         let personalFilesOnlyAction = UIAction(title: NSLocalizedString("_personal_files_only_", comment: ""), image: utility.loadImage(named: "folder.badge.person.crop", colors: NCBrandColor.shared.iconImageMultiColors), state: personalFilesOnly ? .on : .off) { _ in
-
             NCKeychain().setPersonalFilesOnly(account: self.session.account, value: !personalFilesOnly)
 
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": collectionViewCommon.serverUrl, "clearDataSource": true])
-            self.setNavigationRightItems()
+            NCNetworking.shared.notifyAllDelegates { delegate in
+                delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl)
+            }
+            self.updateRightMenu()
         }
 
         let showDescriptionKeychain = NCKeychain().showDescription
         let showDescription = UIAction(title: NSLocalizedString("_show_description_", comment: ""), state: showDescriptionKeychain ? .on : .off) { _ in
-
             NCKeychain().showDescription = !showDescriptionKeychain
 
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": collectionViewCommon.serverUrl, "clearDataSource": true])
-            self.setNavigationRightItems()
+            NCNetworking.shared.notifyAllDelegates { delegate in
+                delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl)
+            }
+            self.updateRightMenu()
         }
 
         let showRecommendedFilesKeychain = NCKeychain().showRecommendedFiles
         let capabilityRecommendations = NCCapabilities.shared.getCapabilities(account: session.account).capabilityRecommendations
-        let showRecommendedFiles = UIAction(title: NSLocalizedString("_show_recommended_files_", comment: ""), attributes: !capabilityRecommendations ? .disabled : [], state: showRecommendedFilesKeychain ? .on : .off) { _ in
-
-            NCKeychain().showRecommendedFiles = !showRecommendedFilesKeychain
-
-            collectionViewCommon.collectionView.reloadData()
-            self.setNavigationRightItems()
+        if capabilityRecommendations {
+            showRecommendedFiles = UIAction(title: NSLocalizedString("_show_recommended_files_", comment: ""), state: showRecommendedFilesKeychain ? .on : .off) { _ in
+                NCKeychain().showRecommendedFiles = !showRecommendedFilesKeychain
+                collectionViewCommon.collectionView.reloadData()
+                self.updateRightMenu()
+            }
         }
 
-        return (select, viewStyleSubmenu, sortSubmenu, personalFilesOnlyAction, showDescription, showRecommendedFiles)
+        return (select, viewStyleSubmenu, sortSubmenu, favoriteOnTopAction, directoryOnTopAction, hiddenFilesAction, personalFilesOnlyAction, showDescription, showRecommendedFiles)
+    }
+
+    func createTrashRightMenuActions() -> [UIMenuElement]? {
+        guard let trashViewController,
+              let layoutForView = self.database.getLayoutForView(account: session.account, key: trashViewController.layoutKey, serverUrl: "")
+        else {
+            return nil
+        }
+        var isSelectAvailable: Bool = false
+
+        if let datasource = trashViewController.datasource, !datasource.isEmpty {
+            isSelectAvailable = true
+        }
+
+        let select = UIAction(title: NSLocalizedString("_select_", comment: ""), image: utility.loadImage(named: "checkmark.circle", colors: [NCBrandColor.shared.iconImageColor]), attributes: isSelectAvailable ? [] : .disabled) { _ in
+            trashViewController.setEditMode(true)
+        }
+        let list = UIAction(title: NSLocalizedString("_list_", comment: ""), image: utility.loadImage(named: "list.bullet", colors: [NCBrandColor.shared.iconImageColor]), state: layoutForView.layout == self.global.layoutList ? .on : .off) { _ in
+            trashViewController.onListSelected()
+            self.updateRightMenu()
+        }
+        let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""), image: utility.loadImage(named: "square.grid.2x2", colors: [NCBrandColor.shared.iconImageColor]), state: layoutForView.layout == self.global.layoutGrid ? .on : .off) { _ in
+            trashViewController.onGridSelected()
+            self.updateRightMenu()
+        }
+        let viewStyleSubmenu = UIMenu(title: "", options: .displayInline, children: [list, grid])
+
+        return [select, viewStyleSubmenu]
+    }
+
+    func isNotificationsButtonVisible() -> Bool {
+        if topViewController?.navigationItem.rightBarButtonItems?.first(where: { $0.tag == notificationsButtonTag }) != nil {
+            return true
+        }
+        return false
+    }
+
+    func isTransfersButtonVisible() -> Bool {
+        if topViewController?.navigationItem.rightBarButtonItems?.first(where: { $0.tag == transfersButtonTag }) != nil {
+            return true
+        }
+        return false
     }
 
     // MARK: - Left

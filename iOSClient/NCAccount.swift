@@ -28,6 +28,7 @@ import NextcloudKit
 class NCAccount: NSObject {
     let database = NCManageDatabase.shared
     let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+    let global = NCGlobal.shared
 
     func createAccount(viewController: UIViewController,
                        urlBase: String,
@@ -56,29 +57,36 @@ class NCAccount: NSObject {
 
         NextcloudKit.shared.getUserProfile(account: account) { account, userProfile, _, error in
             if error == .success, let userProfile {
+                /// Login log debug
+                NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] Create new account \(account) with user \(user) and userId \(userProfile.userId)")
+                ///
                 NextcloudKit.shared.updateSession(account: account, userId: userProfile.userId)
                 NCSession.shared.appendSession(account: account, urlBase: urlBase, user: user, userId: userProfile.userId)
                 self.database.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
                 self.changeAccount(account, userProfile: userProfile, controller: controller) {
                     NCKeychain().setClientCertificate(account: account, p12Data: NCNetworking.shared.p12Data, p12Password: NCNetworking.shared.p12Password)
-                }
-                if let controller {
-                    controller.account = account
-                    viewController.dismiss(animated: true)
-                } else if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as? NCMainTabBarController {
-                    controller.account = account
-                    controller.modalPresentationStyle = .fullScreen
-                    controller.view.alpha = 0
+                    if let controller {
+                        controller.account = account
+                        viewController.dismiss(animated: true)
 
-                    UIApplication.shared.firstWindow?.rootViewController = controller
-                    UIApplication.shared.firstWindow?.makeKeyAndVisible()
+                        completion()
+                    } else if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as? NCMainTabBarController {
+                        controller.account = account
+                        controller.modalPresentationStyle = .fullScreen
+                        controller.view.alpha = 0
 
-                    if let scene = UIApplication.shared.firstWindow?.windowScene {
-                        SceneManager.shared.register(scene: scene, withRootViewController: controller)
-                    }
+                        UIApplication.shared.firstWindow?.rootViewController = controller
+                        UIApplication.shared.firstWindow?.makeKeyAndVisible()
 
-                    UIView.animate(withDuration: 0.5) {
-                        controller.view.alpha = 1
+                        if let scene = UIApplication.shared.firstWindow?.windowScene {
+                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
+                        }
+
+                        UIView.animate(withDuration: 0.5) {
+                            controller.view.alpha = 1
+                        }
+
+                        completion()
                     }
                 }
             } else {
@@ -86,6 +94,8 @@ class NCAccount: NSObject {
                 let alertController = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: error.errorDescription, preferredStyle: .alert)
                 alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
                 viewController.present(alertController, animated: true)
+
+                completion()
             }
         }
     }
@@ -111,14 +121,16 @@ class NCAccount: NSObject {
             NCAutoUpload.shared.initAutoUpload(controller: nil, account: account) { num in
                 NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Initialize Auto upload with \(num) uploads")
             }
+            /// Networking Process
+            NCNetworkingProcess.shared.setCurrentAccount(account)
             /// Color
             NCBrandColor.shared.settingThemingColor(account: account)
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming, userInfo: ["account": account])
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeTheming, userInfo: ["account": account])
             /// Notification
             if let controller {
-                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeUser, userInfo: ["account": account, "controller": controller])
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeUser, userInfo: ["account": account, "controller": controller])
             } else {
-                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeUser, userInfo: ["account": account])
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeUser, userInfo: ["account": account])
             }
         }
 
@@ -142,10 +154,12 @@ class NCAccount: NSObject {
                 utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(result.ocId))
             }
             /// Remove account in all database
-            database.clearDatabase(account: account, removeAccount: true)
+            database.clearDatabase(account: account, removeAccount: true, removeAutoUpload: true)
         } else {
             /// Remove account
             database.clearTable(tableAccount.self, account: account)
+            /// Remove autoupload
+            database.clearTable(tableAutoUploadTransfer.self, account: account)
         }
         /// Remove session in NextcloudKit
         NextcloudKit.shared.removeSession(account: account)
@@ -155,8 +169,6 @@ class NCAccount: NSObject {
         NCKeychain().setPassword(account: account, password: nil)
         NCKeychain().clearAllKeysEndToEnd(account: account)
         NCKeychain().clearAllKeysPushNotification(account: account)
-        /// Remove User Default Data
-        NCNetworking.shared.removeAllKeyUserDefaultsData(account: account)
         /// Remove Account Server in Error
         NCNetworking.shared.removeServerErrorAccount(account)
 
@@ -181,7 +193,7 @@ class NCAccount: NSObject {
             let image = UIImage(contentsOfFile: fileNamePath)
             accounts.append(NKShareAccounts.DataAccounts(withUrl: account.urlBase, user: account.user, name: name, image: image))
         }
-        return NKShareAccounts().putShareAccounts(at: dirGroupApps, app: NCGlobal.shared.appScheme, dataAccounts: accounts)
+        return NKShareAccounts().putShareAccounts(at: dirGroupApps, app: global.appScheme, dataAccounts: accounts)
     }
 
     func checkRemoteUser(account: String, controller: NCMainTabBarController?, completion: @escaping () -> Void = {}) {
@@ -218,7 +230,7 @@ class NCAccount: NSObject {
             completion()
         }
 
-        NCContentPresenter().showCustomMessage(title: "", message: String(format: NSLocalizedString("_account_unauthorized_", comment: ""), account), priority: .high, delay: NCGlobal.shared.dismissAfterSecondLong, type: .error)
+        NCContentPresenter().showCustomMessage(title: "", message: String(format: NSLocalizedString("_account_unauthorized_", comment: ""), account), priority: .high, delay: global.dismissAfterSecondLong, type: .error)
 
         NextcloudKit.shared.getRemoteWipeStatus(serverUrl: tableAccount.urlBase, token: token, account: tableAccount.account) { account, wipe, _, error in
             /// REMOVE ACCOUNT

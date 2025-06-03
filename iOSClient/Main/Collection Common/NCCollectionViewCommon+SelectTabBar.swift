@@ -48,6 +48,14 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
                 NCNetworking.shared.deleteMetadatas(metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
                 toggleSelect()
+            alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { _ in
+                NCNetworking.shared.setStatusWaitDelete(metadatas: metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
+                self.setEditMode(false)
+                self.reloadDataSource()
+//            alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { [self] _ in
+//                NCNetworking.shared.deleteMetadatas(metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
+//                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
+//                toggleSelect()
             })
         }
 
@@ -56,14 +64,9 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
 
             Task {
                 var error = NKError()
-                var ocId: [String] = []
                 for metadata in copyMetadatas where error == .success {
                     error = await NCNetworking.shared.deleteCache(metadata, sceneIdentifier: self.controller?.sceneIdentifier)
-                    if error == .success {
-                        ocId.append(metadata.ocId)
-                    }
                 }
-                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterDeleteFile, userInfo: ["ocId": ocId, "error": error])
             }
             toggleSelect()
         })
@@ -77,12 +80,20 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
 
         NCActionCenter.shared.openSelectView(items: metadatas, controller: self.controller)
         toggleSelect()
+        NCDownloadAction.shared.openSelectView(items: metadatas, controller: self.controller)
+        setEditMode(false)
+//        NCActionCenter.shared.openSelectView(items: metadatas, controller: self.controller)
+//        toggleSelect()
     }
 
     func share() {
         let metadatas = getSelectedMetadatas()
         NCActionCenter.shared.openActivityViewController(selectedMetadata: metadatas, controller: self.controller)
         toggleSelect()
+        NCDownloadAction.shared.openActivityViewController(selectedMetadata: metadatas, controller: self.controller, sender: nil)
+        setEditMode(false)
+//        NCActionCenter.shared.openActivityViewController(selectedMetadata: metadatas, controller: self.controller)
+//        toggleSelect()
     }
 
     func saveAsAvailableOffline(isAnyOffline: Bool) {
@@ -95,12 +106,22 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
             alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { [self] _ in
                 metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
                 toggleSelect()
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { _ in
+                metadatas.forEach { NCDownloadAction.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
+                self.setEditMode(false)
+//            alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { [self] _ in
+//                metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
+//                toggleSelect()
             }))
             alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
             self.present(alert, animated: true)
         } else {
             metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
             toggleSelect()
+            metadatas.forEach { NCDownloadAction.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
+            setEditMode(false)
+//            metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
+//            toggleSelect()
         }
     }
 
@@ -128,6 +149,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         navigationItem.hidesBackButton = editMode
         navigationController?.interactivePopGestureRecognizer?.isEnabled = !editMode
         searchController(enabled: !editMode)
+        isHiddenPlusButton(editMode)
 
         if editMode {
             navigationItem.leftBarButtonItems = nil

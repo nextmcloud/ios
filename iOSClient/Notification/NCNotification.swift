@@ -55,7 +55,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         tableView.backgroundColor = .systemBackground
         tableView.allowsSelection = false
 
-        refreshControl?.addTarget(self, action: #selector(getNetwokingNotification), for: .valueChanged)
+        refreshControl?.addTarget(self, action: #selector(getNetwokingNotification(_:)), for: .valueChanged)
 
         // Navigation controller is being presented modally
         if navigationController?.presentingViewController != nil {
@@ -80,6 +80,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         super.viewDidAppear(animated)
 
         getNetwokingNotification()
+        getNetwokingNotification(nil)
         NotificationCenter.default.addObserver(self, selector: #selector(initialize), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
     }
 
@@ -87,6 +88,10 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         super.viewWillDisappear(animated)
         
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateNotification)
+
+        // Cancel Queue & Retrieves Properties
+        dataSourceTask?.cancel()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -121,6 +126,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
     // MARK: - NotificationCenter
     @objc func initialize() {
         getNetwokingNotification()
+        getNetwokingNotification(nil)
     }
 
     // MARK: - Empty
@@ -169,7 +175,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
                let file = json["file"] as? [String: Any],
                file["type"] as? String == "file" {
                 if let id = file["id"] {
-                    NCActionCenter.shared.viewerFile(account: session.account, fileId: ("\(id)"), viewController: self)
+                    NCDownloadAction.shared.viewerFile(account: session.account, fileId: ("\(id)"), viewController: self)
                 }
             }
         } catch {
@@ -288,7 +294,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
 
     // MARK: - tap Action
 
-    func tapRemove(with notification: NKNotifications) {
+    func tapRemove(with notification: NKNotifications, sender: Any?) {
 
         NextcloudKit.shared.setNotification(serverUrl: nil, idNotification: notification.idNotification, method: "DELETE", account: session.account) { _, _, error in
             if error == .success {
@@ -305,7 +311,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         }
     }
 
-    func tapAction(with notification: NKNotifications, label: String) {
+    func tapAction(with notification: NKNotifications, label: String, sender: Any?) {
         if notification.app == NCGlobal.shared.spreedName,
            let roomToken = notification.objectId.split(separator: "/").first,
            let talkUrl = URL(string: "nextcloudtalk://open-conversation?server=\(session.urlBase)&user=\(session.userId)&withRoomToken=\(roomToken)"),
@@ -341,13 +347,13 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         } // else: Action not found
     }
 
-    func tapMore(with notification: NKNotifications) {
-       toggleMenu(notification: notification)
+    func tapMore(with notification: NKNotifications, sender: Any?) {
+       toggleMenu(notification: notification, sender: sender)
     }
 
     // MARK: - Load notification networking
 
-   @objc func getNetwokingNotification() {
+   @objc func getNetwokingNotification(_ sender: Any?) {
 
        self.tableView.reloadData()
        NextcloudKit.shared.getNotifications(account: session.account) { task in
@@ -408,7 +414,7 @@ class NCNotificationCell: UITableViewCell, NCCellProtocol {
 
     @IBAction func touchUpInsideRemove(_ sender: Any) {
         guard let notification = notification else { return }
-        delegate?.tapRemove(with: notification)
+        delegate?.tapRemove(with: notification, sender: sender)
     }
 
     @IBAction func touchUpInsidePrimary(_ sender: Any) {
@@ -416,7 +422,7 @@ class NCNotificationCell: UITableViewCell, NCCellProtocol {
                 let button = sender as? UIButton,
                 let label = button.titleLabel?.text
         else { return }
-        delegate?.tapAction(with: notification, label: label)
+        delegate?.tapAction(with: notification, label: label, sender: sender)
     }
 
     @IBAction func touchUpInsideSecondary(_ sender: Any) {
@@ -424,13 +430,17 @@ class NCNotificationCell: UITableViewCell, NCCellProtocol {
                 let button = sender as? UIButton,
                 let label = button.titleLabel?.text
         else { return }
-        delegate?.tapAction(with: notification, label: label)
+        delegate?.tapAction(with: notification, label: label, sender: sender)
     }
 
+    @IBAction func touchUpInsideMore(_ sender: Any) {
+        guard let notification = notification else { return }
+        delegate?.tapMore(with: notification, sender: sender)
+    }
 }
 
 protocol NCNotificationCellDelegate: AnyObject {
-    func tapRemove(with notification: NKNotifications)
-    func tapAction(with notification: NKNotifications, label: String)
-    func tapMore(with notification: NKNotifications)
+    func tapRemove(with notification: NKNotifications, sender: Any?)
+    func tapAction(with notification: NKNotifications, label: String, sender: Any?)
+    func tapMore(with notification: NKNotifications, sender: Any?)
 }

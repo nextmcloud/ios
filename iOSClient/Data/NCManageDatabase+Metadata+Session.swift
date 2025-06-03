@@ -1,25 +1,6 @@
-//
-//  NCManageDatabase+Metadata+Session.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 12/02/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import UIKit
@@ -27,7 +8,11 @@ import RealmSwift
 import NextcloudKit
 
 extension NCManageDatabase {
-    func setMetadataSession(ocId: String,
+
+    // MARK: - Realm Write
+
+    @discardableResult
+    func setMetadataSession(metadata: tableMetadata,
                             newFileName: String? = nil,
                             session: String? = nil,
                             sessionTaskIdentifier: Int? = nil,
@@ -35,160 +20,153 @@ extension NCManageDatabase {
                             selector: String? = nil,
                             status: Int? = nil,
                             etag: String? = nil,
-                            errorCode: Int? = nil) {
+                            errorCode: Int? = nil) -> tableMetadata {
+        let mutableMetadata = tableMetadata(value: metadata)
 
-        do {
-            let realm = try Realm()
-            try realm.write {
-                if let result = realm.objects(tableMetadata.self).filter("ocId == %@", ocId).first {
-                    if let newFileName = newFileName {
-                        result.fileName = newFileName
-                        result.fileNameView = newFileName
-                    }
-                    if let session {
-                        result.session = session
-                    }
-                    if let sessionTaskIdentifier {
-                        result.sessionTaskIdentifier = sessionTaskIdentifier
-                    }
-                    if let sessionError {
-                        result.sessionError = sessionError
-                        if sessionError.isEmpty {
-                            result.errorCode = 0
-                        }
-                    }
-                    if let selector {
-                        result.sessionSelector = selector
-                    }
-                    if let status {
-                        result.status = status
-                        if status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusWaitUpload {
-                            result.sessionDate = Date()
-                        } else if status == NCGlobal.shared.metadataStatusNormal {
-                            result.sessionDate = nil
-                        }
-                    }
-                    if let etag {
-                        result.etag = etag
-                    }
-                    if let errorCode {
-                        result.errorCode = errorCode
-                    }
-                }
+        if let name = newFileName {
+            mutableMetadata.fileName = name
+            mutableMetadata.fileNameView = name
+        }
+
+        if let session { mutableMetadata.session = session }
+        if let sessionTaskIdentifier { mutableMetadata.sessionTaskIdentifier = sessionTaskIdentifier }
+        if let sessionError {
+            mutableMetadata.sessionError = sessionError
+            if sessionError.isEmpty {
+                mutableMetadata.errorCode = 0
             }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        }
+        if let selector {
+            mutableMetadata.sessionSelector = selector
+        }
+
+        if let status {
+            mutableMetadata.status = status
+            switch status {
+            case NCGlobal.shared.metadataStatusWaitDownload,
+                 NCGlobal.shared.metadataStatusWaitUpload:
+                mutableMetadata.sessionDate = Date()
+            case NCGlobal.shared.metadataStatusNormal:
+                mutableMetadata.sessionDate = nil
+            default:
+                break
+            }
+        }
+
+        if let etag { mutableMetadata.etag = etag }
+        if let errorCode { mutableMetadata.errorCode = errorCode }
+
+        performRealmWrite(sync: true) { realm in
+            realm.add(mutableMetadata, update: .all)
+        }
+
+        return tableMetadata(value: mutableMetadata)
+    }
+
+    func setMetadatasSessionInWaitDownload(metadatas: [tableMetadata],
+                                           session: String,
+                                           selector: String,
+                                           sceneIdentifier: String? = nil) {
+        guard !metadatas.isEmpty else { return }
+        let detached = metadatas.map { tableMetadata(value: $0) }
+
+        performRealmWrite(sync: true) { realm in
+            for metadata in detached {
+                metadata.sceneIdentifier = sceneIdentifier
+                metadata.session = session
+                metadata.sessionTaskIdentifier = 0
+                metadata.sessionError = ""
+                metadata.sessionSelector = selector
+                metadata.status = NCGlobal.shared.metadataStatusWaitDownload
+                metadata.sessionDate = Date()
+
+                realm.add(metadata, update: .all)
+            }
         }
     }
 
     @discardableResult
-    func setMetadatasSessionInWaitDownload(metadatas: [tableMetadata], session: String, selector: String, sceneIdentifier: String? = nil) -> tableMetadata? {
-        if metadatas.isEmpty { return nil }
-        var metadataUpdated: tableMetadata?
+    func setMetadataSessionInWaitDownload(metadata: tableMetadata,
+                                          session: String,
+                                          selector: String,
+                                          sceneIdentifier: String? = nil) -> tableMetadata {
+        let detached = tableMetadata(value: metadata)
 
-        do {
-            let realm = try Realm()
-            try realm.write {
-                for metadata in metadatas {
-                    if let result = realm.objects(tableMetadata.self).filter("ocId == %@", metadata.ocId).first {
-                        result.sceneIdentifier = sceneIdentifier
-                        result.session = session
-                        result.sessionTaskIdentifier = 0
-                        result.sessionError = ""
-                        result.sessionSelector = selector
-                        result.status = NCGlobal.shared.metadataStatusWaitDownload
-                        result.sessionDate = Date()
-                        metadataUpdated = tableMetadata(value: result)
-                    } else {
-                        metadata.sceneIdentifier = sceneIdentifier
-                        metadata.session = session
-                        metadata.sessionTaskIdentifier = 0
-                        metadata.sessionError = ""
-                        metadata.sessionSelector = selector
-                        metadata.status = NCGlobal.shared.metadataStatusWaitDownload
-                        metadata.sessionDate = Date()
-                        realm.add(metadata, update: .all)
-                        metadataUpdated = tableMetadata(value: metadata)
-                    }
-                }
-            }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        detached.sceneIdentifier = sceneIdentifier
+        detached.session = session
+        detached.sessionTaskIdentifier = 0
+        detached.sessionError = ""
+        detached.sessionSelector = selector
+        detached.status = NCGlobal.shared.metadataStatusWaitDownload
+        detached.sessionDate = Date()
+
+        performRealmWrite(sync: true) { realm in
+            realm.add(detached, update: .all)
         }
 
-        return metadataUpdated
+        return tableMetadata(value: detached)
     }
 
     func clearMetadataSession(metadatas: [tableMetadata]) {
-        do {
-            let realm = try Realm()
-            try realm.write {
-                for metadata in metadatas {
-                    if let result = realm.objects(tableMetadata.self).filter("ocId == %@", metadata.ocId).first {
-                        result.sceneIdentifier = nil
-                        result.session = ""
-                        result.sessionTaskIdentifier = 0
-                        result.sessionError = ""
-                        result.sessionSelector = ""
-                        result.sessionDate = nil
-                        result.status = NCGlobal.shared.metadataStatusNormal
-                    }
-                }
+        guard !metadatas.isEmpty
+        else {
+            return
+        }
+        let detachedMetadatas = metadatas.map { tableMetadata(value: $0) }
+
+        performRealmWrite(sync: true) { realm in
+            detachedMetadatas.forEach { metadata in
+                metadata.sceneIdentifier = nil
+                metadata.session = ""
+                metadata.sessionTaskIdentifier = 0
+                metadata.sessionError = ""
+                metadata.sessionSelector = ""
+                metadata.sessionDate = nil
+                metadata.status = NCGlobal.shared.metadataStatusNormal
+
+                realm.add(metadata, update: .all)
             }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func clearMetadataSession(metadata: tableMetadata) {
-        do {
-            let realm = try Realm()
-            try realm.write {
-                if let result = realm.objects(tableMetadata.self).filter("ocId == %@", metadata.ocId).first {
-                    result.sceneIdentifier = nil
-                    result.session = ""
-                    result.sessionTaskIdentifier = 0
-                    result.sessionError = ""
-                    result.sessionSelector = ""
-                    result.sessionDate = nil
-                    result.status = NCGlobal.shared.metadataStatusNormal
-                }
-            }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        let detached = tableMetadata(value: metadata)
+
+        detached.sceneIdentifier = nil
+        detached.session = ""
+        detached.sessionTaskIdentifier = 0
+        detached.sessionError = ""
+        detached.sessionSelector = ""
+        detached.sessionDate = nil
+        detached.status = NCGlobal.shared.metadataStatusNormal
+
+        performRealmWrite(sync: true) { realm in
+            realm.add(detached, update: .all)
         }
     }
 
     @discardableResult
-    func setMetadataStatus(ocId: String, status: Int) -> tableMetadata? {
-        var result: tableMetadata?
+    func setMetadataStatus(metadata: tableMetadata, status: Int) -> tableMetadata {
+        let detached = tableMetadata(value: metadata)
 
-        do {
-            let realm = try Realm()
-            try realm.write {
-                result = realm.objects(tableMetadata.self).filter("ocId == %@", ocId).first
-                result?.status = status
+        detached.status = status
 
-                if status == NCGlobal.shared.metadataStatusNormal {
-                    result?.sessionDate = nil
-                } else {
-                    result?.sessionDate = Date()
-                }
-            }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        performRealmWrite(sync: true) { realm in
+            realm.add(detached, update: .all)
+
         }
-        if let result {
-            return tableMetadata.init(value: result)
-        } else {
-            return nil
-        }
+
+        return tableMetadata(value: detached)
     }
+
+    // MARK: - Realm Read
 
     func getMetadata(from url: URL?, sessionTaskIdentifier: Int) -> tableMetadata? {
         guard let url,
               var serverUrl = url.deletingLastPathComponent().absoluteString.removingPercentEncoding
-        else { return nil }
+        else {
+            return nil
+        }
         let fileName = url.lastPathComponent
 
         if serverUrl.hasSuffix("/") {

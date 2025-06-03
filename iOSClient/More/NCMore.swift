@@ -87,7 +87,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         tableView.register(NCMoreAppSuggestionsCell.fromNib(), forCellReuseIdentifier: NCMoreAppSuggestionsCell.reuseIdentifier)
 
         // create tap gesture recognizer
-        let tapQuota = UITapGestureRecognizer(target: self, action: #selector(tapLabelQuotaExternalSite))
+        let tapQuota = UITapGestureRecognizer(target: self, action: #selector(tapLabelQuotaExternalSite(_:)))
         labelQuotaExternalSite.isUserInteractionEnabled = true
         labelQuotaExternalSite.addGestureRecognizer(tapQuota)
     }
@@ -275,6 +275,10 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : External
         if NCBrandOptions.shared.disable_more_external_site == false {
             if let externalSites = NCManageDatabase.shared.getAllExternalSites(account: appDelegate.account) {
+        }
+        
+        // ITEM : External
+        if NCBrandOptions.shared.disable_more_external_site == false {
         }
         
         // ITEM : External

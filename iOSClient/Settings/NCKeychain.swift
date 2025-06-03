@@ -491,7 +491,20 @@ import KeychainAccess
         }
     }
 
-    /* OBSOLETE
+    func setFavoriteOnTop(account: String, value: Bool) {
+        let key = "favoriteOnTop" + account
+        keychain[key] = String(value)
+    }
+
+    func getFavoriteOnTop(account: String) -> Bool {
+        let key = "favoriteOnTop" + account
+        if let value = try? keychain.get(key), let result = Bool(value) {
+            return result
+        } else {
+            return true
+        }
+    }
+
     func setDirectoryOnTop(account: String, value: Bool) {
         let key = "directoryOnTop" + account
         keychain[key] = String(value)
@@ -505,7 +518,20 @@ import KeychainAccess
             return true
         }
     }
-    */
+
+    func setShowHiddenFiles(account: String, value: Bool) {
+        let key = "showHiddenFiles" + account
+        keychain[key] = String(value)
+    }
+
+    func getShowHiddenFiles(account: String) -> Bool {
+        let key = "showHiddenFiles" + account
+        if let value = try? keychain.get(key), let result = Bool(value) {
+            return result
+        } else {
+            return false
+        }
+    }
 
     func setTitleButtonHeader(account: String, value: String?) {
         let key = "titleButtonHeader" + account

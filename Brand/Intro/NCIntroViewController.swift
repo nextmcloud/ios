@@ -77,7 +77,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         self.navigationController?.navigationBar.tintColor = textColor
 
         if !NCManageDatabase.shared.getAllTableAccount().isEmpty {
-            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .done, target: self, action: #selector(self.actionCancel))
+            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .done, target: self, action: #selector(actionCancel(_:)))
             navigationItemCancel.tintColor = textColor
             navigationItem.leftBarButtonItem = navigationItemCancel
         }
@@ -156,8 +156,34 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         pageControl.currentPage = 0
         introCollectionView.scrollToItem(at: IndexPath(row: pageControl.currentPage, section: 0), at: .centeredHorizontally, animated: true)
     }
+    
+    override func viewDidLayoutSubviews() {
+        if UIScreen.main.bounds.width < 350 || UIScreen.main.bounds.height > 800 {
+            contstraintBottomLoginButton.constant = 15
+        }
+    }
 
-    @objc func autoScroll() {
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        timerAutoScroll?.invalidate()
+        AppUtility.lockOrientation(UIInterfaceOrientationMask.all)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        let isEightPlusDevice = UIScreen.main.bounds.height == 736
+        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : (isEightPlusDevice ? imagesEightPortrait : imagesPortrait)
+        pageControl.currentPage = 0
+        introCollectionView.collectionViewLayout.invalidateLayout()
+        self.introCollectionView.reloadData()
+    }
+    
+    @objc func resetPageController(_ notification: NSNotification){
+        pageControl.currentPage = 0
+        introCollectionView.scrollToItem(at: IndexPath(row: pageControl.currentPage, section: 0), at: .centeredHorizontally, animated: true)
+    }
+
+    @objc func autoScroll(_ sender: Any?) {
         if pageControl.currentPage + 1 >= titles.count {
             pageControl.currentPage = 0
         } else {
@@ -207,7 +233,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
 
     // MARK: - Action
 
-    @objc func actionCancel() {
+    @objc func actionCancel(_ sender: Any?) {
         dismiss(animated: true) { }
     }
 
