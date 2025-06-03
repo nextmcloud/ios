@@ -276,6 +276,15 @@
 		B568C2B32DA7AAAE0072FCB4 /* NCMoreUserCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B568C2B22DA7AAAE0072FCB4 /* NCMoreUserCell.xib */; };
 		B568C2B52DA7AADD0072FCB4 /* NCMoreUserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2B42DA7AADD0072FCB4 /* NCMoreUserCell.swift */; };
 		B568C2AD2DA7A9000072FCB4 /* AssetUploadTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2AC2DA7A9000072FCB4 /* AssetUploadTest.swift */; };
+		B543154E2DA6913C00981E7E /* AudioUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543154D2DA6913C00981E7E /* AudioUploadTests.swift */; };
+		B54315552DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315522DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift */; };
+		B543155A2DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B54315512DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard */; };
+		B543155B2DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315522DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift */; };
+		B543155C2DA6929700981E7E /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543154F2DA6929700981E7E /* FolderPathCustomCell.swift */; };
+		B543155D2DA6929700981E7E /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315532DA6929700981E7E /* TextTableViewCell.swift */; };
+		B543155E2DA6929700981E7E /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B54315542DA6929700981E7E /* TextTableViewCell.xib */; };
+		B543155F2DA6929700981E7E /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B54315502DA6929700981E7E /* FolderPathCustomCell.xib */; };
+		B54315602DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B54315512DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard */; };
 		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
@@ -1684,6 +1693,13 @@
 		B568C2B22DA7AAAE0072FCB4 /* NCMoreUserCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCMoreUserCell.xib; sourceTree = "<group>"; };
 		B568C2B42DA7AADD0072FCB4 /* NCMoreUserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMoreUserCell.swift; sourceTree = "<group>"; };
 		B568C2AC2DA7A9000072FCB4 /* AssetUploadTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetUploadTest.swift; sourceTree = "<group>"; };
+		B543154D2DA6913C00981E7E /* AudioUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUploadTests.swift; sourceTree = "<group>"; };
+		B543154F2DA6929700981E7E /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
+		B54315502DA6929700981E7E /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
+		B54315512DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCCreateFormUploadVoiceNote.storyboard; sourceTree = "<group>"; };
+		B54315522DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadVoiceNote.swift; sourceTree = "<group>"; };
+		B54315532DA6929700981E7E /* TextTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
+		B54315542DA6929700981E7E /* TextTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -2505,6 +2521,7 @@
 				B568C2B62DA7B5060072FCB4 /* SettingsTestCases.swift */,
 				B568C2B02DA7AA5F0072FCB4 /* MoreTests.swift */,
 				B568C2AC2DA7A9000072FCB4 /* AssetUploadTest.swift */,
+				B543154D2DA6913C00981E7E /* AudioUploadTests.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = Helper;
@@ -3787,6 +3804,12 @@
 				B5E2E7272DAE880700AB2EDD /* NCCreateFormUploadVoiceNote.swift */,
 				B52FAE912DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.storyboard */,
 				B52FAE922DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift */,
+				B543154F2DA6929700981E7E /* FolderPathCustomCell.swift */,
+				B54315502DA6929700981E7E /* FolderPathCustomCell.xib */,
+				B54315512DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard */,
+				B54315522DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift */,
+				B54315532DA6929700981E7E /* TextTableViewCell.swift */,
+				B54315542DA6929700981E7E /* TextTableViewCell.xib */,
 				F7FA7FFD2C0F4F3B0072FC60 /* Upload Assets */,
 				F7A509242C26BD5D00326106 /* NCCreateDocument.swift */,
 				566FCF2A2B3EAD4700168DEA /* TextTableViewCell.swift */,
@@ -4531,6 +4554,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B543155A2DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard in Resources */,
 				F714803B262EBE3900693E51 /* MainInterface.storyboard in Resources */,
 				F7148054262ED51000693E51 /* NCListCell.xib in Resources */,
 				F7D57C8626317BDA00DE301D /* NCAccountRequest.storyboard in Resources */,
@@ -4670,6 +4694,9 @@
 				B52FAED12DA8EF84001AB1BD /* PdfWithoutOcrSwitchView.xib in Resources */,
 				F7F4F10627ECDBDB008676F9 /* Inconsolata-Medium.ttf in Resources */,
 				F7AC934A296193050002BC0F /* Reasons to use Nextcloud.pdf in Resources */,
+				B543155E2DA6929700981E7E /* TextTableViewCell.xib in Resources */,
+				B543155F2DA6929700981E7E /* FolderPathCustomCell.xib in Resources */,
+				B54315602DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard in Resources */,
 				F7A60F87292D215000FCE1F2 /* NCShareAccounts.storyboard in Resources */,
 				F761856A29E98543006EB3B0 /* NCIntro.storyboard in Resources */,
 				F719D9E0288D37A300762E33 /* NCColorPicker.storyboard in Resources */,
@@ -4837,6 +4864,7 @@
 				566EB7C62B3D59B900FB7CAD /* MoveAndCopyTests.swift in Sources */,
 				F372087D2BAB4C0F006B5430 /* TestConstants.swift in Sources */,
 				B52FAEA12DA8ED40001AB1BD /* AudioUploadTests.swift in Sources */,
+				B543154E2DA6913C00981E7E /* AudioUploadTests.swift in Sources */,
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
 				566FCF4D2B3EB78F00168DEA /* OnboardingTestCase.swift in Sources */,
 				566EB81E2B3D8C5500FB7CAD /* SettingsTestCases.swift in Sources */,
@@ -5058,6 +5086,8 @@
 				F33EE6F52BF4C9B200CA1A51 /* PKCS12.swift in Sources */,
 				F77DD6AB2C5CC093009448FB /* NCSession.swift in Sources */,
 				F76D364728A4F8BF00214537 /* NCActivityIndicator.swift in Sources */,
+				F73EF7CA2B0225610087E6E9 /* NCManageDatabase+PhotoLibrary.swift in Sources */,
+				B54315552DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift in Sources */,
 				F7BFFD2A2C8854200029A201 /* NCHud.swift in Sources */,
 				F749B654297B0F2400087535 /* NCManageDatabase+Avatar.swift in Sources */,
 				AF22B208277B4E4C00DAB0CC /* NCCreateFormUploadConflictCell.swift in Sources */,
@@ -5452,6 +5482,9 @@
 				F3C587AE2D47E4FE004532DB /* PHAssetCollectionThumbnailLoader.swift in Sources */,
 				F78F74362163781100C2ADAD /* NCTrash.swift in Sources */,
 				F39298972A3B12CB00509762 /* BaseNCMoreCell.swift in Sources */,
+				B543155B2DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift in Sources */,
+				B543155C2DA6929700981E7E /* FolderPathCustomCell.swift in Sources */,
+				B543155D2DA6929700981E7E /* TextTableViewCell.swift in Sources */,
 				AF2D7C7C2742556F00ADF566 /* NCShareLinkCell.swift in Sources */,
 				F7E41316294A19B300839300 /* UIView+Extension.swift in Sources */,
 				F7C30E00291BD2610017149B /* NCNetworkingE2EERename.swift in Sources */,
