@@ -40,6 +40,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var separator: UIView!
     @IBOutlet weak var labelShared: UILabel!
+    @IBOutlet weak var tag0: UILabel!
+    @IBOutlet weak var tag1: UILabel!
+    @IBOutlet weak var progressView: UIProgressView!
+
     @IBOutlet weak var imageItemLeftConstraint: NSLayoutConstraint!
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var subInfoTrailingConstraint: NSLayoutConstraint!
@@ -127,6 +131,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         imageItem.layer.masksToBounds = true
 
         // use entire cell as accessibility element
+        
         accessibilityHint = nil
         accessibilityLabel = nil
         accessibilityValue = nil
@@ -136,6 +141,23 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         progressView.transform = CGAffineTransform(scaleX: 1.0, y: 0.5)
         progressView.trackTintColor = .clear
         imageSelect.isHidden = true
+        
+//        imageItem.image = nil
+//        imageItem.layer.cornerRadius = 6
+//        imageItem.layer.masksToBounds = true
+//        imageStatus.image = nil
+//        imageFavorite.image = nil
+//        imageFavoriteBackground.isHidden = true
+//        imageLocal.image = nil
+//        labelTitle.text = ""
+//        labelInfo.text = ""
+//        labelSubinfo.text = ""
+//        imageShared.image = nil
+//        imageMore.image = nil
+        separatorHeightConstraint.constant = 0.5
+//        tag0.text = ""
+//        tag1.text = ""
+        titleInfoTrailingDefault()
 
         let longPressedGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gestureRecognizer:)))
         longPressedGesture.minimumPressDuration = 0.5
@@ -149,6 +171,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
         labelTitle.text = ""
         labelInfo.text = ""
+        
+        separator.backgroundColor = .separator
+        separatorHeightConstraint.constant = 0.5
+
+        labelTitle.text = ""
+        labelInfo.text = ""
+        labelSubinfo.text = ""
         labelTitle.textColor = .label
         labelInfo.textColor = .systemGray
         labelSubinfo.textColor = .systemGray
@@ -247,6 +276,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     func selected(_ status: Bool, isEditMode: Bool) {
         // NMC-1190 - iOS - Files - Deleting files while files are still uploading won't delete properly : to fix this issue remove check for !metadata.isInTransfer in below line
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.isInTransfer, !metadata.e2eEncrypted else {
+//        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
             backgroundView = nil
             separator.isHidden = false
             imageSelect.isHidden = true
