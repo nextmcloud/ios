@@ -25,6 +25,7 @@
 import Foundation
 import UIKit
 import NextcloudKit
+import SVGKit
 
 class NCMenuAction {
     let accessibilityIdentifier: String?
@@ -89,7 +90,7 @@ extension NCMenuAction {
     static func selectAllAction(sender: Any?, action: @escaping () -> Void) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_select_all_", comment: ""),
-            icon: NCUtility().loadImage(named: "checkmark.circle.fill", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "checkmark.circle.fill", colors: [NCBrandColor.shared.iconColor]),
             sender: sender,
             action: { _ in action() }
         )
@@ -99,7 +100,7 @@ extension NCMenuAction {
     static func cancelAction(sender: Any?, action: @escaping () -> Void) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_cancel_", comment: ""),
-            icon: NCUtility().loadImage(named: "xmark", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "xmark", colors: [NCBrandColor.shared.iconColor]),
             sender: sender,
             action: { _ in action() }
         )
@@ -111,7 +112,7 @@ extension NCMenuAction {
         var message = NSLocalizedString("_want_delete_", comment: "")
         var icon = "trash"
         var destructive = false
-        var color = NCBrandColor.shared.iconImageColor
+        var color = NCBrandColor.shared.iconColor
         let permissions = NCPermissions()
 
         if selectedMetadatas.count > 1 {
@@ -166,8 +167,8 @@ extension NCMenuAction {
     /// Open "share view" (activity VC) to open files in another app
     static func share(selectedMetadatas: [tableMetadata], controller: NCMainTabBarController?, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
-            title: NSLocalizedString("_share_", comment: ""),
-            icon: NCUtility().loadImage(named: "square.and.arrow.up", colors: [NCBrandColor.shared.iconImageColor]),
+            title: NSLocalizedString("_open_in_", comment: ""),
+            icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconColor]),
             order: order,
             sender: sender,
             action: { _ in
@@ -181,7 +182,7 @@ extension NCMenuAction {
     static func setAvailableOfflineAction(selectedMetadatas: [tableMetadata], isAnyOffline: Bool, viewController: UIViewController, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: isAnyOffline ? NSLocalizedString("_remove_available_offline_", comment: "") : NSLocalizedString("_set_available_offline_", comment: ""),
-            icon: NCUtility().loadImage(named: "icloud.and.arrow.down", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "offlineMenu", colors: [NCBrandColor.shared.iconColor]),
             order: order,
             sender: sender,
             action: { _ in
@@ -203,33 +204,50 @@ extension NCMenuAction {
             }
         )
     }
+    
+    /// Copy files to pasteboard
+    static func copyAction(fileSelect: [String], controller: NCMainTabBarController?, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
+        NCMenuAction(
+            title: NSLocalizedString("_copy_file_", comment: ""),
+            icon: NCUtility().loadImage(named: "copy", colors: [NCBrandColor.shared.iconColor]),
+            order: order,
+            action: { _ in
+                NCActionCenter.shared.copyPasteboard(pasteboardOcIds: selectOcId, viewController: viewController)
+                completion?()
+            }
+        )
+    }
+
+    
     /// Open view that lets the user move or copy the files within Nextcloud
-    static func moveOrCopyAction(selectedMetadatas: [tableMetadata], viewController: UIViewController, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
+    static func moveOrCopyAction(selectedMetadatas: [tableMetadata], controller: NCMainTabBarController?, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_move_or_copy_", comment: ""),
-            icon: NCUtility().loadImage(named: "rectangle.portrait.and.arrow.right", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconColor]),
             order: order,
             sender: sender,
             action: { _ in
-                var fileNameError: NKError?
-
-                for metadata in selectedMetadatas {
-                    if let sceneIdentifier = metadata.sceneIdentifier,
-                       let controller = SceneManager.shared.getController(sceneIdentifier: sceneIdentifier),
-                       let checkError = FileNameValidator.checkFileName(metadata.fileNameView, account: controller.account) {
-
-                        fileNameError = checkError
-                        break
-                    }
-                }
-
-                if let fileNameError {
-                    viewController.present(UIAlertController.warning(message: "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true, completion: nil)
-                } else {
-                    let controller = viewController.tabBarController as? NCMainTabBarController
-                    NCDownloadAction.shared.openSelectView(items: selectedMetadatas, controller: controller)
-                    completion?()
-                }
+//                var fileNameError: NKError?
+//
+//                for metadata in selectedMetadatas {
+//                    if let sceneIdentifier = metadata.sceneIdentifier,
+//                       let controller = SceneManager.shared.getController(sceneIdentifier: sceneIdentifier),
+//                       let checkError = FileNameValidator.checkFileName(metadata.fileNameView, account: controller.account) {
+//
+//                        fileNameError = checkError
+//                        break
+//                    }
+//                }
+//
+//                if let fileNameError {
+//                    viewController.present(UIAlertController.warning(message: "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true, completion: nil)
+//                } else {
+//                    let controller = viewController.tabBarController as? NCMainTabBarController
+//                    NCActionCenter.shared.openSelectView(items: selectedMetadatas, controller: controller)
+//                    completion?()
+//                }
+                NCActionCenter.shared.openSelectView(items: selectedMetadatas, controller: controller)
+                completion?()
             }
         )
     }
@@ -245,7 +263,7 @@ extension NCMenuAction {
         let imageName = !shouldLock ? "lock_open" : "lock"
         return NCMenuAction(
             title: NSLocalizedString(titleKey, comment: ""),
-            icon: NCUtility().loadImage(named: imageName, colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: imageName, colors: [NCBrandColor.shared.iconColor]),
             order: order,
             sender: sender,
             action: { _ in
@@ -255,5 +273,104 @@ extension NCMenuAction {
                 completion?()
             }
         )
+    }
+    
+    /// Open "share view" (activity VC) to open files in another app
+    static func openInAction(selectedMetadatas: [tableMetadata], controller: NCMainTabBarController?, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
+        NCMenuAction(
+            title: NSLocalizedString("_open_in_", comment: ""),
+            icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconColor]),
+            order: order,
+            action: { _ in
+                NCActionCenter.shared.openActivityViewController(selectedMetadata: selectedMetadatas, controller: controller)
+                completion?()
+            }
+        )
+    }
+
+    /// Save selected files to user's photo library
+    static func saveMediaAction(selectedMediaMetadatas: [tableMetadata], controller: NCMainTabBarController?, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
+        var title: String = NSLocalizedString("_save_selected_files_", comment: "")
+        var icon = NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconColor])
+        if selectedMediaMetadatas.allSatisfy({ NCManageDatabase.shared.getMetadataLivePhoto(metadata: $0) != nil }) {
+            title = NSLocalizedString("_livephoto_save_", comment: "")
+            icon = NCUtility().loadImage(named: "livephoto")
+        }
+
+        return NCMenuAction(
+            title: title,
+            icon: icon,
+            order: order,
+            action: { _ in
+                for metadata in selectedMediaMetadatas {
+                    if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
+                        NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV, hudView: controller?.view ?? UIView()))
+                    } else {
+                        if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
+                            NCActionCenter.shared.saveAlbum(metadata: metadata, controller: controller)
+                        } else {
+                            if NCNetworking.shared.downloadQueue.operations.filter({ ($0 as? NCOperationDownload)?.metadata.ocId == metadata.ocId }).isEmpty {
+                                NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum))
+                            }
+                        }
+                    }
+                }
+                completion?()
+            }
+        )
+    }
+    
+    /// Open AirPrint view to print a single file
+    static func printAction(metadata: tableMetadata, order: Int = 0) -> NCMenuAction {
+        NCMenuAction(
+            title: NSLocalizedString("_print_", comment: ""),
+            icon: NCUtility().loadImage(named: "printer", colors: [NCBrandColor.shared.iconColor]),
+            order: order,
+            action: { _ in
+                if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
+                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorPrint, "error": NKError(), "account": metadata.account, "ocIdTransfer": metadata.ocIdTransfer])
+                } else {
+                    NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint))
+                }
+           }
+        )
+    }
+    
+    // MARK: - Print
+
+    static func printDocument(metadata: tableMetadata) {
+
+        let fileNameURL = URL(fileURLWithPath: NCUtilityFileSystem().getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
+        let printController = UIPrintInteractionController.shared
+        let printInfo = UIPrintInfo(dictionary: nil)
+
+        printInfo.jobName = fileNameURL.lastPathComponent
+        printInfo.outputType = metadata.isImage ? .photo : .general
+        printController.printInfo = printInfo
+        printController.showsNumberOfCopies = true
+
+        guard !UIPrintInteractionController.canPrint(fileNameURL) else {
+            printController.printingItem = fileNameURL
+            printController.present(animated: true)
+            return
+        }
+
+        // can't print without data
+        guard let data = try? Data(contentsOf: fileNameURL) else { return }
+
+        if let svg = SVGKImage(data: data) {
+            printController.printingItem = svg.uiImage
+            printController.present(animated: true)
+            return
+        }
+
+        guard let text = String(data: data, encoding: .utf8) else { return }
+        let formatter = UISimpleTextPrintFormatter(text: text)
+        formatter.perPageContentInsets.top = 72
+        formatter.perPageContentInsets.bottom = 72
+        formatter.perPageContentInsets.left = 72
+        formatter.perPageContentInsets.right = 72
+        printController.printFormatter = formatter
+        printController.present(animated: true)
     }
 }
