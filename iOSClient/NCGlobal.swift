@@ -386,6 +386,8 @@ final class NCGlobal: Sendable {
     let notificationCenterStatusEditing                         = "statusEditing"
     let notificationCenterStatusFileDrop                        = "statusFileDrop"
     
+
+
     let notificationCenterPlayerIsPlaying                       = "playerIsPlaying"
     let notificationCenterPlayerStoppedPlaying                  = "playerStoppedPlaying"
 
