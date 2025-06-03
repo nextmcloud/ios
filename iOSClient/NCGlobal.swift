@@ -338,6 +338,32 @@ final class NCGlobal: Sendable {
     let notificationCenterClearCache                            = "clearCache"
     let notificationCenterCheckUserDelaultErrorDone             = "checkUserDelaultErrorDone"       // userInfo: account, controller
     let notificationCenterUpdateNotification                    = "updateNotification"
+    let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
+    let notificationCenterGetServerData                         = "getServerData"                   // userInfo: serverUrl?
+
+    let notificationCenterChangeStatusFolderE2EE                = "changeStatusFolderE2EE"          // userInfo: serverUrl
+
+    let notificationCenterDownloadStartFile                     = "downloadStartFile"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    let notificationCenterDownloadedFile                        = "downloadedFile"                  // userInfo: ocId, ocIdTransfer, session, session, serverUrl, account, selector, error
+    let notificationCenterDownloadCancelFile                    = "downloadCancelFile"              // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+
+    let notificationCenterUploadStartFile                       = "uploadStartFile"                 // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, sessionSelector
+    let notificationCenterUploadedFile                          = "uploadedFile"                    // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadedLivePhoto                     = "uploadedLivePhoto"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadCancelFile                      = "uploadCancelFile"                // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+
+    let notificationCenterProgressTask                          = "progressTask"                    // userInfo: account, ocId, ocIdTransfer, session, serverUrl, status, chunk, e2eEncrypted, progress, totalBytes, totalBytesExpected
+
+    let notificationCenterUpdateBadgeNumber                     = "updateBadgeNumber"               // userInfo: counterDownload, counterUpload
+
+    let notificationCenterCreateFolder                          = "createFolder"                    // userInfo: ocId, serverUrl, account, withPush, sceneIdentifier
+    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
+    let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
+    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
+    let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
 
     let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
     
