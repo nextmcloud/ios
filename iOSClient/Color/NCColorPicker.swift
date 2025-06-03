@@ -50,7 +50,6 @@ class NCColorPicker: UIViewController {
     var metadata: tableMetadata?
     var tapAction: UITapGestureRecognizer?
     var selectedColor: UIColor?
-    var collectionViewCommon: NCCollectionViewCommon?
 
     // MARK: - View Life Cycle
 
@@ -214,14 +213,15 @@ class NCColorPicker: UIViewController {
         if let metadata = metadata {
             let serverUrl = metadata.serverUrl + "/" + metadata.fileName
             NCManageDatabase.shared.updateDirectoryColorFolder(hexColor, metadata: metadata, serverUrl: serverUrl)
-            self.collectionViewCommon?.collectionView.reloadData()
             self.dismiss(animated: true)
+            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": metadata.serverUrl, "clearDataSource": true])
         }
         self.dismiss(animated: true)
     }
 }
 
 extension NCColorPicker: UIColorPickerViewControllerDelegate {
+
     func colorPickerViewControllerDidFinish(_ viewController: UIColorPickerViewController) {
         let hexColor = viewController.selectedColor.hexString
         updateColor(hexColor: hexColor)

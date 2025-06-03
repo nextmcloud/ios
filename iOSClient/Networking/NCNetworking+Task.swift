@@ -24,6 +24,7 @@
 import Foundation
 import UIKit
 import NextcloudKit
+import Alamofire
 import RealmSwift
 
 extension NCNetworking {
@@ -58,10 +59,7 @@ extension NCNetworking {
         if metadata.status == global.metadataStatusWaitFavorite {
             let favorite = (metadata.storeFlag as? NSString)?.boolValue ?? false
             database.setMetadataFavorite(ocId: metadata.ocId, favorite: favorite, saveOldFavorite: nil, status: global.metadataStatusNormal)
-
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: metadata.serverUrl)
-            }
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterReloadDataSource)
             return
         }
 
@@ -69,10 +67,7 @@ extension NCNetworking {
         ///
         if metadata.status == global.metadataStatusWaitCopy {
             database.setMetadataCopyMove(ocId: metadata.ocId, serverUrlTo: "", overwrite: nil, status: global.metadataStatusNormal)
-
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: metadata.serverUrl)
-            }
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterReloadDataSource)
             return
         }
 
@@ -80,22 +75,15 @@ extension NCNetworking {
         ///
         if metadata.status == global.metadataStatusWaitMove {
             database.setMetadataCopyMove(ocId: metadata.ocId, serverUrlTo: "", overwrite: nil, status: global.metadataStatusNormal)
-
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: metadata.serverUrl)
-            }
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterReloadDataSource)
             return
         }
 
         /// DELETE
         ///
         if metadata.status == global.metadataStatusWaitDelete {
-            let metadata = database.setMetadataStatus(metadata: metadata,
-                                                      status: global.metadataStatusNormal)
-
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: metadata.serverUrl)
-            }
+            database.setMetadataStatus(ocId: metadata.ocId, status: global.metadataStatusNormal)
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterReloadDataSource)
             return
         }
 
@@ -103,10 +91,7 @@ extension NCNetworking {
         ///
         if metadata.status == global.metadataStatusWaitRename {
             database.restoreMetadataFileName(ocId: metadata.ocId)
-
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: metadata.serverUrl)
-            }
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterReloadDataSource)
             return
         }
 
@@ -118,10 +103,7 @@ extension NCNetworking {
                 database.deleteMetadataOcId(metadata.ocId)
                 utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId))
             }
-
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: metadata.serverUrl)
-            }
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterReloadDataSource)
             return
         }
 
@@ -130,10 +112,7 @@ extension NCNetworking {
         if metadata.session.isEmpty {
             self.database.deleteMetadataOcId(metadata.ocId)
             utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId))
-
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: metadata.serverUrl)
-            }
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterReloadDataSource)
             return
         }
 
@@ -147,11 +126,14 @@ extension NCNetworking {
                 cancelDownloadBackgroundTask(metadata: metadata)
             }
 
-            self.notifyAllDelegates { delegate in
-                delegate.transferChange(status: self.global.networkingStatusDownloadCancel,
-                                        metadata: tableMetadata(value: metadata),
-                                        error: .success)
-            }
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterDownloadCancelFile,
+                                                        object: nil,
+                                                        userInfo: ["ocId": metadata.ocId,
+                                                                   "ocIdTransfer": metadata.ocIdTransfer,
+                                                                   "session": metadata.session,
+                                                                   "serverUrl": metadata.serverUrl,
+                                                                   "account": metadata.account],
+                                                        second: 0.5)
         }
 
         /// UPLOAD
@@ -163,11 +145,15 @@ extension NCNetworking {
                 cancelUploadBackgroundTask(metadata: metadata)
             }
             utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId))
-            self.notifyAllDelegates { delegate in
-                delegate.transferChange(status: self.global.networkingStatusUploadCancel,
-                                        metadata: tableMetadata(value: metadata),
-                                        error: .success)
-            }
+
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadCancelFile,
+                                                        object: nil,
+                                                        userInfo: ["ocId": metadata.ocId,
+                                                                   "ocIdTransfer": metadata.ocIdTransfer,
+                                                                   "session": metadata.session,
+                                                                   "serverUrl": metadata.serverUrl,
+                                                                   "account": metadata.account],
+                                                        second: 0.5)
         }
     }
 
@@ -176,10 +162,7 @@ extension NCNetworking {
         for metadata in metadatas {
             cancelTask(metadata: metadata)
         }
-
-        NCNetworking.shared.notifyAllDelegates { delegate in
-            delegate.transferReloadData(serverUrl: nil)
-        }
+        NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterReloadDataSource)
     }
 
     func cancelAllDataTask() {
@@ -352,7 +335,7 @@ extension NCNetworking {
 
             if !foundTask {
                 if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
-                    self.database.setMetadataSession(metadata: metadata,
+                    self.database.setMetadataSession(ocId: metadata.ocId,
                                                      sessionError: "",
                                                      status: self.global.metadataStatusWaitUpload)
                 } else {
@@ -400,7 +383,7 @@ extension NCNetworking {
 
             if !foundTask {
                 if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
-                    self.database.setMetadataSession(metadata: metadata,
+                    self.database.setMetadataSession(ocId: metadata.ocId,
                                                      sessionError: "",
                                                      status: self.global.metadataStatusWaitUpload)
                 } else {
@@ -431,7 +414,7 @@ extension NCNetworking {
             }
 
             if !foundTask {
-                self.database.setMetadataSession(metadata: metadata,
+                self.database.setMetadataSession(ocId: metadata.ocId,
                                                  session: "",
                                                  sessionError: "",
                                                  selector: "",
@@ -460,7 +443,7 @@ extension NCNetworking {
             }
 
             if !foundTask {
-                self.database.setMetadataSession(metadata: metadata,
+                self.database.setMetadataSession(ocId: metadata.ocId,
                                                  session: "",
                                                  sessionError: "",
                                                  selector: "",

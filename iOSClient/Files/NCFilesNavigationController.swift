@@ -35,19 +35,12 @@ class NCFilesNavigationController: NCMainNavigationController {
         }
 
         if collectionViewCommon.serverUrl == utilityFileSystem.getHomeServer(session: session) {
-            let fileSettings = UIMenu(title: "", options: .displayInline, children: [items.personalFilesOnly, items.favoriteOnTop, items.directoryOnTop, items.hiddenFiles])
-            var children: [UIMenuElement] = [items.showDescription]
-            if let showRecommendedFiles = items.showRecommendedFiles {
-                children.insert(showRecommendedFiles, at: 0)
-            }
-            let additionalSettings = UIMenu(title: "", options: .displayInline, children: children)
+            let additionalSubmenu = UIMenu(title: "", options: .displayInline, children: [items.personalFilesOnlyAction, items.showDescription, items.showRecommendedFiles])
+            return UIMenu(children: [items.select, items.viewStyleSubmenu, items.sortSubmenu, additionalSubmenu])
 
-            return UIMenu(children: [items.select, items.viewStyleSubmenu, items.sortSubmenu, fileSettings, additionalSettings])
         } else {
-            let fileSettings = UIMenu(title: "", options: .displayInline, children: [items.favoriteOnTop, items.directoryOnTop, items.hiddenFiles, items.showDescription])
-            let additionalSettings = UIMenu(title: "", options: .displayInline, children: [items.showDescription])
-
-            return UIMenu(children: [items.select, items.viewStyleSubmenu, items.sortSubmenu, fileSettings, additionalSettings])
+            let additionalSubmenu = UIMenu(title: "", options: .displayInline, children: [items.showDescription])
+            return UIMenu(children: [items.select, items.viewStyleSubmenu, items.sortSubmenu, additionalSubmenu])
         }
     }
 
@@ -140,10 +133,6 @@ class NCFilesNavigationController: NCMainNavigationController {
             return menu
         }
 
-        if self.topViewController != self.viewControllers.first {
-            return
-        }
-
         if self.collectionViewCommon?.navigationItem.leftBarButtonItems == nil {
             let accountButton = AccountSwitcherButton(type: .custom)
 
@@ -159,6 +148,7 @@ class NCFilesNavigationController: NCMainNavigationController {
                 self.collectionViewCommon?.dismissTip()
             }
 
+            self.collectionViewCommon?.navigationItem.leftItemsSupplementBackButton = true
             self.collectionViewCommon?.navigationItem.setLeftBarButtonItems([UIBarButtonItem(customView: accountButton)], animated: true)
 
         } else {

@@ -60,39 +60,23 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
 
         guard let controller, let hostingController else { return }
 
-        setFrame()
+        controller.view.addSubview(hostingController.view)
 
+        hostingController.view.frame = controller.tabBar.frame
         hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         hostingController.view.backgroundColor = .clear
         hostingController.view.isHidden = true
-
-        controller.view.addSubview(hostingController.view)
-    }
-
-    func setFrame() {
-        guard let controller,
-              let hostingController
-        else {
-            return
-        }
-        let bottomAreaInsets: CGFloat = controller.tabBar.safeAreaInsets.bottom == 0 ? 34 : 0
-
-        hostingController.view.frame = CGRect(x: controller.tabBar.frame.origin.x,
-                                              y: controller.tabBar.frame.origin.y - bottomAreaInsets,
-                                              width: controller.tabBar.frame.width,
-                                              height: controller.tabBar.frame.height + bottomAreaInsets)
     }
 
     func show() {
         guard let controller, let hostingController else { return }
 
-        controller.hide()
-
+        controller.tabBar.isHidden = true
         if hostingController.view.isHidden {
             hostingController.view.isHidden = false
             hostingController.view.transform = .init(translationX: 0, y: hostingController.view.frame.height)
-            UIView.animate(withDuration: 0.3) {
-                hostingController.view.transform = .identity
+            UIView.animate(withDuration: 0.2) {
+                hostingController.view.transform = .init(translationX: 0, y: 0)
             }
         }
     }
@@ -101,7 +85,7 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
         guard let controller, let hostingController else { return }
 
         hostingController.view.isHidden = true
-        controller.show()
+        controller.tabBar.isHidden = false
     }
 
     func isHidden() -> Bool {

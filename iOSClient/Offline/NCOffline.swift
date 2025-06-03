@@ -56,6 +56,7 @@ class NCOffline: NCCollectionViewCommon {
 
     override func reloadDataSource() {
         var ocIds: [String] = []
+        var metadatas: [tableMetadata] = []
 
         if self.serverUrl.isEmpty {
             if let directories = self.database.getTablesDirectory(predicate: NSPredicate(format: "account == %@ AND offline == true", session.account), sorted: "serverUrl", ascending: true) {
@@ -67,26 +68,16 @@ class NCOffline: NCCollectionViewCommon {
             for file in files {
                 ocIds.append(file.ocId)
             }
-            let predicate = NSPredicate(format: "account == %@ AND ocId IN %@ AND NOT (status IN %@)", session.account, ocIds, global.metadataStatusHideInView)
-
-            self.database.getMetadatas(predicate: predicate,
-                                       layoutForView: layoutForView,
-                                       account: session.account) { metadatas, layoutForView, account in
-                self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView, account: account)
-                self.dataSource.caching(metadatas: metadatas) {
-                    super.reloadDataSource()
-                }
+            if let results = self.database.getResultsMetadatas(predicate: NSPredicate(format: "account == %@ AND ocId IN %@ AND NOT (status IN %@)", session.account, ocIds, global.metadataStatusHideInView)) {
+                metadatas = Array(results.freeze())
             }
         } else {
-            self.database.getMetadatas(predicate: defaultPredicate,
-                                       layoutForView: layoutForView,
-                                       account: session.account) { metadatas, layoutForView, account in
-                self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView, account: account)
-                self.dataSource.caching(metadatas: metadatas) {
-                    super.reloadDataSource()
-                }
-            }
+            metadatas = self.database.getResultsMetadatasPredicate(self.defaultPredicate, layoutForView: layoutForView)
         }
+
+        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView)
+
+        super.reloadDataSource()
     }
 
     override func getServerData() {

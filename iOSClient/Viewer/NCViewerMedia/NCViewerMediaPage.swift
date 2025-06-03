@@ -24,6 +24,7 @@
 import UIKit
 import NextcloudKit
 import MediaPlayer
+import Alamofire
 
 enum ScreenMode {
     case full, normal
@@ -53,7 +54,6 @@ class NCViewerMediaPage: UIViewController {
     var nextTrackCommand: Any?
     var previousTrackCommand: Any?
     let utilityFileSystem = NCUtilityFileSystem()
-    let global = NCGlobal.shared
     let database = NCManageDatabase.shared
     var prefersLargeTitles: Bool?
 
@@ -64,8 +64,8 @@ class NCViewerMediaPage: UIViewController {
     var timerAutoHide: Timer?
     private var timerAutoHideSeconds: Double = 4
 
-    private lazy var moreNavigationItem = UIBarButtonItem(image: NCImageCache.shared.getImageButtonMore(), style: .plain, target: self, action: #selector(openMenuMore(_:)))
-    private lazy var imageDetailNavigationItem = UIBarButtonItem(image: NCUtility().loadImage(named: "info.circle", colors: [NCBrandColor.shared.iconImageColor]), style: .plain, target: self, action: #selector(toggleDetail(_:)))
+    private lazy var moreNavigationItem = UIBarButtonItem(image: NCImageCache.shared.getImageButtonMore(), style: .plain, target: self, action: #selector(openMenuMore))
+    private lazy var imageDetailNavigationItem = UIBarButtonItem(image: NCUtility().loadImage(named: "info.circle", colors: [NCBrandColor.shared.iconImageColor]), style: .plain, target: self, action: #selector(toggleDetail))
 
     // swiftlint:disable force_cast
     var pageViewController: UIPageViewController {
@@ -81,10 +81,6 @@ class NCViewerMediaPage: UIViewController {
         didSet {
             setNeedsStatusBarAppearanceUpdate()
         }
-    }
-
-    var sceneIdentifier: String {
-        (self.tabBarController as? NCMainTabBarController)?.sceneIdentifier ?? ""
     }
 
     // MARK: - View Life Cycle
@@ -135,6 +131,15 @@ class NCViewerMediaPage: UIViewController {
 
         NotificationCenter.default.addObserver(self, selector: #selector(pageViewController.enableSwipeGesture), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterEnableSwipeGesture), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(pageViewController.disableSwipeGesture), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDisableSwipeGesture), object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(deleteFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDeleteFile), object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(downloadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(triggerProgressTask(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterProgressTask), object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(uploadStartFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadStartFile), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(uploadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadedFile), object: nil)
+
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: UIApplication.didBecomeActiveNotification, object: nil)
 
         if NCNetworking.shared.isOnline {
@@ -159,13 +164,19 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterEnableSwipeGesture), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDisableSwipeGesture), object: nil)
 
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDeleteFile), object: nil)
+
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterProgressTask), object: nil)
+
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadStartFile), object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadedFile), object: nil)
+
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
-        NCNetworking.shared.addDelegate(self)
 
         startTimerAutoHide()
     }
@@ -181,8 +192,6 @@ class NCViewerMediaPage: UIViewController {
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-
-        NCNetworking.shared.removeDelegate(self)
 
         currentViewController.ncplayer?.playerStop()
         timerAutoHide?.invalidate()
@@ -224,13 +233,13 @@ class NCViewerMediaPage: UIViewController {
         navigationController?.popViewController(animated: true)
     }
 
-    @objc private func openMenuMore(_ sender: Any?) {
+    @objc private func openMenuMore() {
         let imageIcon = NCUtility().getImage(ocId: currentViewController.metadata.ocId, etag: currentViewController.metadata.etag, ext: NCGlobal.shared.previewExt512)
 
-        NCViewer().toggleMenu(controller: self.tabBarController as? NCMainTabBarController, metadata: currentViewController.metadata, webView: false, imageIcon: imageIcon, sender: sender)
+        NCViewer().toggleMenu(controller: self.tabBarController as? NCMainTabBarController, metadata: currentViewController.metadata, webView: false, imageIcon: imageIcon)
     }
 
-    @objc private func toggleDetail(_ sender: Any?) {
+    @objc private func toggleDetail() {
         currentViewController.toggleDetail()
     }
 
@@ -325,6 +334,83 @@ class NCViewerMediaPage: UIViewController {
     }
 
     // MARK: - NotificationCenter
+
+    @objc func downloadedFile(_ notification: NSNotification) {
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let ocId = userInfo["ocId"] as? String
+        else {
+            return
+        }
+
+        self.progressView.progress = 0
+        let metadata = self.currentViewController.metadata
+
+        guard !metadata.isInvalidated,
+              metadata.ocId == ocId,
+              self.utilityFileSystem.fileProviderStorageExists(metadata)
+        else {
+            return
+        }
+
+        if metadata.isAudioOrVideo, let ncplayer = self.currentViewController.ncplayer {
+            let url = URL(fileURLWithPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
+            if ncplayer.isPlaying() {
+                ncplayer.playerPause()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    ncplayer.openAVPlayer(url: url)
+                    ncplayer.playerPlay()
+                }
+            } else {
+                ncplayer.openAVPlayer(url: url)
+            }
+        } else if metadata.isImage {
+            self.currentViewController.loadImage()
+        }
+    }
+
+    @objc func triggerProgressTask(_ notification: NSNotification) {
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let progressNumber = userInfo["progress"] as? NSNumber
+        else { return }
+
+        let progress = progressNumber.floatValue
+        if progress == 1 {
+            self.progressView.progress = 0
+        } else {
+            self.progressView.progress = progress
+        }
+    }
+
+    @objc func uploadStartFile(_ notification: NSNotification) { }
+
+    @objc func uploadedFile(_ notification: NSNotification) {
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let ocId = userInfo["ocId"] as? String,
+              let error = userInfo["error"] as? NKError,
+              error == .success
+        else { return }
+
+        if self.currentViewController.metadata.ocId == ocId {
+            self.currentViewController.loadImage()
+        } else {
+            self.modifiedOcId.append(ocId)
+        }
+    }
+
+    @objc func deleteFile(_ notification: NSNotification) {
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let error = userInfo["error"] as? NKError else { return }
+
+        if error != .success {
+            NCContentPresenter().showError(error: error)
+        }
+
+        if let ncplayer = currentViewController.ncplayer, ncplayer.isPlaying() {
+            ncplayer.playerPause()
+        }
+
+        self.viewUnload()
+    }
 
     @objc func applicationDidBecomeActive(_ notification: NSNotification) {
         progressView.progress = 0
@@ -597,75 +683,5 @@ extension NCViewerMediaPage: UIScrollViewDelegate {
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         preventScrollOnDragAndDrop = true
-    }
-}
-
-extension NCViewerMediaPage: NCTransferDelegate {
-    func transferChange(status: String, metadata: tableMetadata, error: NKError) {
-        DispatchQueue.main.async {
-            switch status {
-                /// DOWNLOAD
-            case self.global.networkingStatusDownloaded:
-                guard metadata.ocId == self.currentViewController.metadata.ocId else {
-                    return
-                }
-                self.progressView.progress = 0
-
-                if metadata.isAudioOrVideo, let ncplayer = self.currentViewController.ncplayer {
-                    let url = URL(fileURLWithPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
-                    if ncplayer.isPlaying() {
-                        ncplayer.playerPause()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            ncplayer.openAVPlayer(url: url)
-                            ncplayer.playerPlay()
-                        }
-                    } else {
-                        ncplayer.openAVPlayer(url: url)
-                    }
-                } else if metadata.isImage {
-                    self.currentViewController.loadImage()
-                }
-                /// UPLOAD
-            case self.global.networkingStatusUploaded:
-                guard error == .success else { return }
-                if self.currentViewController.metadata.ocId == metadata.ocId {
-                    self.currentViewController.loadImage()
-                } else {
-                    self.modifiedOcId.append(metadata.ocId)
-                }
-            default:
-                break
-            }
-        }
-    }
-
-    func transferChange(status: String, metadatasError: [tableMetadata: NKError]) {
-        DispatchQueue.main.async {
-            switch status {
-                /// DELETE
-            case NCGlobal.shared.networkingStatusDelete:
-                let hasAtLeastOneSuccess = metadatasError.contains { key, value in
-                    self.ocIds.contains(key.ocId) && value == .success
-                }
-                if hasAtLeastOneSuccess {
-                    if let ncplayer = self.currentViewController.ncplayer, ncplayer.isPlaying() {
-                        ncplayer.playerPause()
-                    }
-                    self.viewUnload()
-                }
-            default:
-                break
-            }
-        }
-    }
-
-    func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) {
-        DispatchQueue.main.async {
-            if progress == 1 {
-                self.progressView.progress = 0
-            } else {
-                self.progressView.progress = progress
-            }
-        }
     }
 }

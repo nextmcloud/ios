@@ -51,8 +51,6 @@ class NCSharePaging: UIViewController {
         title = NSLocalizedString("_details_", comment: "")
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
-        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_close_", comment: ""), style: .done, target: self, action: #selector(exitTapped(_:)))
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(notification:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationDidEnterBackground), object: nil)
@@ -118,9 +116,7 @@ class NCSharePaging: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        NCNetworking.shared.notifyAllDelegates { delegate in
-            delegate.transferReloadData(serverUrl: metadata.serverUrl)
-        }
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": metadata.serverUrl])
     }
 
     deinit {
@@ -160,7 +156,7 @@ class NCSharePaging: UIViewController {
         view.frame.origin.y = 0
     }
 
-    @objc func exitTapped(_ sender: Any?) {
+    @objc func exitTapped() {
         self.dismiss(animated: true, completion: nil)
     }
 
@@ -230,8 +226,13 @@ extension NCSharePaging: PagingViewControllerDataSource {
 // MARK: - Header
 
 class NCShareHeaderViewController: PagingViewController {
+
     public var image: UIImage?
     public var metadata = tableMetadata()
+
+    public var activityEnabled = true
+    public var commentsEnabled = true
+    public var sharingEnabled = true
 
     override func loadView() {
         view = NCSharePagingView(
@@ -283,8 +284,6 @@ class NCShareHeaderView: UIView {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap(_:)))
-        path.addGestureRecognizer(longGesture)
         setupUI()
     }
 
@@ -334,16 +333,5 @@ class NCShareHeaderView: UIView {
                 NCContentPresenter().showError(error: error)
             }
         }
-    }
-
-    @IBAction func touchUpInsideDetails(_ sender: UIButton) {
-        creation.isHidden = !creation.isHidden
-        upload.isHidden = !upload.isHidden
-    }
-
-    @objc func longTap(_ sender: UIGestureRecognizer) {
-        UIPasteboard.general.string = path.text
-        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_copied_path_")
-        NCContentPresenter().showInfo(error: error)
     }
 }

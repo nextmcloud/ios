@@ -30,39 +30,24 @@ protocol NCMediaSelectTabBarDelegate: AnyObject {
 
 class NCMediaSelectTabBar: ObservableObject {
     var hostingController: UIViewController!
-    var controller: UITabBarController?
+    var mediaTabBarController: UITabBarController?
     open weak var delegate: NCMediaSelectTabBarDelegate?
     @Published var selectCount: Int = 0
 
-    init(controller: UITabBarController? = nil, delegate: NCMediaSelectTabBarDelegate? = nil) {
-        guard let controller else { return }
+    init(tabBarController: UITabBarController? = nil, delegate: NCMediaSelectTabBarDelegate? = nil) {
+        guard let tabBarController else { return }
         let mediaTabBarSelectView = MediaTabBarSelectView(tabBarSelect: self)
         hostingController = UIHostingController(rootView: mediaTabBarSelectView)
 
-        self.controller = controller
+        self.mediaTabBarController = tabBarController
         self.delegate = delegate
 
-        setFrame()
+        tabBarController.view.addSubview(hostingController.view)
 
+        hostingController.view.frame = tabBarController.tabBar.frame
         hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         hostingController.view.backgroundColor = .clear
         hostingController.view.isHidden = true
-
-        controller.view.addSubview(hostingController.view)
-    }
-
-    func setFrame() {
-        guard let controller,
-              let hostingController
-        else {
-            return
-        }
-        let bottomAreaInsets: CGFloat = controller.tabBar.safeAreaInsets.bottom == 0 ? 34 : 0
-
-        hostingController.view.frame = CGRect(x: controller.tabBar.frame.origin.x,
-                                              y: controller.tabBar.frame.origin.y - bottomAreaInsets,
-                                              width: controller.tabBar.frame.width,
-                                              height: controller.tabBar.frame.height + bottomAreaInsets)
     }
 
     func show() {
@@ -71,11 +56,11 @@ class NCMediaSelectTabBar: ObservableObject {
         UIView.animate(withDuration: 0.2) {
             self.hostingController.view.transform = .init(translationX: 0, y: 0)
         }
-        controller?.tabBar.isHidden = true
+        mediaTabBarController?.tabBar.isHidden = true
     }
 
     func hide() {
-        controller?.tabBar.isHidden = false
+        mediaTabBarController?.tabBar.isHidden = false
         hostingController.view.isHidden = true
     }
 }

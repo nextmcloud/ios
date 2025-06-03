@@ -128,8 +128,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        initCell()
-    }
 
     func initCell() {
         
@@ -228,10 +226,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
-        listCellDelegate?.tapMoreListItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
-    }
-
-    @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
         listCellDelegate?.longPressListItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, gestureRecognizer: gestureRecognizer)
     }
     
@@ -245,11 +239,11 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             UIAccessibilityCustomAction(
                 name: NSLocalizedString("_share_", comment: ""),
                 target: self,
-                selector: #selector(touchUpInsideShare(_:))),
+                selector: #selector(touchUpInsideShare)),
             UIAccessibilityCustomAction(
                 name: NSLocalizedString(moreName, comment: ""),
                 target: self,
-                selector: #selector(touchUpInsideMore(_:)))
+                selector: #selector(touchUpInsideMore))
         ]
     }
 

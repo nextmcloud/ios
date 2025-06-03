@@ -38,71 +38,31 @@ class NCMainTabBarController: UITabBarController {
     var documentPickerViewController: NCDocumentPickerViewController?
     let navigationCollectionViewCommon = ThreadSafeArray<NavigationCollectionViewCommon>()
     private var previousIndex: Int?
+    private let groupDefaults = UserDefaults(suiteName: NCBrandOptions.shared.capabilitiesGroup)
     private var checkUserDelaultErrorInProgress: Bool = false
     private var timer: Timer?
-    private let global = NCGlobal.shared
-
-    var window: UIWindow? {
-        return SceneManager.shared.getWindow(controller: self)
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
 
-        NCDownloadAction.shared.setup(sceneIdentifier: sceneIdentifier)
-
-        tabBar.tintColor = NCBrandColor.shared.getElement(account: account)
-
-        // File
-        if let item = tabBar.items?[0] {
-            item.title = NSLocalizedString("_home_", comment: "")
-            item.image = UIImage(systemName: "folder.fill")
-            item.selectedImage = item.image
-            item.tag = 100
+        if #available(iOS 17.0, *) {
+            traitOverrides.horizontalSizeClass = .compact
         }
 
-        // Favorite
-        if let item = tabBar.items?[1] {
-            item.title = NSLocalizedString("_favorites_", comment: "")
-            item.image = UIImage(systemName: "star.fill")
-            item.selectedImage = item.image
-            item.tag = 101
-        }
-
-        // Media
-        if let item = tabBar.items?[2] {
-            item.title = NSLocalizedString("_media_", comment: "")
-            item.image = UIImage(systemName: "photo")
-            item.selectedImage = item.image
-            item.tag = 102
-        }
-
-        // Activity
-        if let item = tabBar.items?[3] {
-            item.title = NSLocalizedString("_activity_", comment: "")
-            item.image = UIImage(systemName: "bolt")
-            item.selectedImage = item.image
-            item.tag = 103
-        }
-
-        // More
-        if let item = tabBar.items?[4] {
-            item.title = NSLocalizedString("_more_", comment: "")
-            item.image = UIImage(systemName: "ellipsis")
-            item.selectedImage = item.image
-            item.tag = 104
-        }
-
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: self.global.notificationCenterChangeTheming), object: nil, queue: .main) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil, queue: .main) { [weak self] notification in
             if let userInfo = notification.userInfo as? NSDictionary,
                let account = userInfo["account"] as? String,
+               let tabBar = self?.tabBar as? NCMainTabBar,
                self?.account == account {
-                self?.tabBar.tintColor = NCBrandColor.shared.getElement(account: account)
+                let color = NCBrandColor.shared.getElement(account: account)
+                tabBar.color = color
+                tabBar.tintColor = color
+                tabBar.setNeedsDisplay()
             }
         }
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: self.global.notificationCenterCheckUserDelaultErrorDone), object: nil, queue: nil) { notification in
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterCheckUserDelaultErrorDone), object: nil, queue: nil) { notification in
             if let userInfo = notification.userInfo,
                let account = userInfo["account"] as? String,
                let controller = userInfo["controller"] as? NCMainTabBarController,
@@ -118,9 +78,9 @@ class NCMainTabBarController: UITabBarController {
         }
 
         NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                if !isAppInBackground {
-                    self.timerCheck()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if UIApplication.shared.applicationState == .active {
+                    self.timerCheckServerError()
                 }
             }
         }
@@ -138,21 +98,10 @@ class NCMainTabBarController: UITabBarController {
         }
     }
 
-    private func timerCheck() {
+    private func timerCheckServerError() {
         self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { _ in
-            /// Check error
             NCNetworking.shared.checkServerError(account: self.account, controller: self) {
-                /// Update right bar button item
-                if let navigationController = self.selectedViewController as? NCMainNavigationController {
-                    navigationController.updateRightBarButtonItems(self.tabBar.items?[0])
-                }
-                /// Update Activity tab bar
-                if let item = self.tabBar.items?[3] {
-                    let capabilities = NCCapabilities.shared.getCapabilities(account: self.account)
-                    item.isEnabled = capabilities.capabilityActivityEnabled
-                }
-
-                self.timerCheck()
+                self.timerCheckServerError()
             }
         })
     }
@@ -171,22 +120,6 @@ class NCMainTabBarController: UITabBarController {
             }
         }
         return serverUrl
-    }
-
-    func hide() {
-        if #available(iOS 18.0, *) {
-            setTabBarHidden(true, animated: true)
-        } else {
-            tabBar.isHidden = true
-        }
-    }
-
-    func show() {
-        if #available(iOS 18.0, *) {
-            setTabBarHidden(false, animated: true)
-        } else {
-            tabBar.isHidden = false
-        }
     }
 }
 

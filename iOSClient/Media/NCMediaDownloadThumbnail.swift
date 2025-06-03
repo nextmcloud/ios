@@ -24,6 +24,7 @@
 import UIKit
 import NextcloudKit
 import Queuer
+import Alamofire
 
 class NCMediaDownloadThumbnail: ConcurrentOperation, @unchecked Sendable {
     var metadata: NCMediaDataSource.Metadata
@@ -40,10 +41,7 @@ class NCMediaDownloadThumbnail: ConcurrentOperation, @unchecked Sendable {
 
     override func start() {
         guard !isCancelled,
-              let tblMetadata = NCManageDatabase.shared.getResultFreezeMetadataFromOcId(self.metadata.ocId)
-        else {
-            return self.finish()
-        }
+              let tblMetadata = NCManageDatabase.shared.getResultMetadataFromOcId(self.metadata.ocId)?.freeze() else { return self.finish() }
         var etagResource: String?
         var image: UIImage?
 

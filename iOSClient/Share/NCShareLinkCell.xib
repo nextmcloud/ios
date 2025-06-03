@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
@@ -19,8 +18,6 @@
                 <subviews>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" image="circle" translatesAutoresizingMaskIntoConstraints="NO" id="Qka-NN-0oy" userLabel="ImageItem">
                         <rect key="frame" x="11" y="16" width="30" height="30"/>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" translatesAutoresizingMaskIntoConstraints="NO" id="qDs-UG-Mn7" userLabel="ImageItem">
-                        <rect key="frame" x="6" y="12" width="40" height="40"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="30" id="ALd-pc-lNM"/>
                             <constraint firstAttribute="height" constant="30" id="ige-ab-Lng"/>
@@ -86,84 +83,6 @@
                             <action selector="quickStatusClicked:" destination="GXf-kv-Qzo" eventType="touchUpInside" id="fBg-Z9-Qre"/>
                         </connections>
                     </button>
-                    <stackView opaque="NO" contentMode="scaleToFill" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="OQv-Vf-bvD">
-                        <rect key="frame" x="242" y="22" width="70" height="20"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xaz-vY-Jzu" userLabel="ButtonCopy">
-                                <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="20" id="0JR-eM-oir"/>
-                                    <constraint firstAttribute="height" constant="20" id="HVo-ht-9m6"/>
-                                </constraints>
-                                <state key="normal">
-                                    <imageReference key="image" image="document.on.document" catalog="system" renderingMode="hierarchical">
-                                        <hierarchicalColors>
-                                            <color systemColor="labelColor"/>
-                                            <color systemColor="secondaryLabelColor"/>
-                                            <color systemColor="tertiaryLabelColor"/>
-                                        </hierarchicalColors>
-                                    </imageReference>
-                                </state>
-                                <connections>
-                                    <action selector="touchUpCopy:" destination="qJF-Yc-gKE" eventType="touchUpInside" id="s3f-6n-cKF"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J1z-RG-U4A" userLabel="ButtonMenu">
-                                <rect key="frame" x="50" y="0.0" width="20" height="20"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="G48-LB-BsD"/>
-                                    <constraint firstAttribute="width" constant="20" id="vLI-cJ-Jqx"/>
-                                </constraints>
-                                <state key="normal">
-                                    <imageReference key="image" image="ellipsis" catalog="system" renderingMode="hierarchical">
-                                        <hierarchicalColors>
-                                            <color systemColor="labelColor"/>
-                                            <color systemColor="secondaryLabelColor"/>
-                                            <color systemColor="tertiaryLabelColor"/>
-                                        </hierarchicalColors>
-                                    </imageReference>
-                                </state>
-                                <connections>
-                                    <action selector="touchUpMenu:" destination="qJF-Yc-gKE" eventType="touchUpInside" id="hFx-Ib-xay"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                    </stackView>
-                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="Wxr-1B-Czy">
-                        <rect key="frame" x="54" y="12" width="173" height="40"/>
-                        <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" tag="101" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Share link" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="otH-mT-7Z4" userLabel="labelTitle">
-                                <rect key="frame" x="0.0" y="0.0" width="173" height="18"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="center" verticalCompressionResistancePriority="245" text="Only works for users with access to this file/folder" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WJj-9P-3bn">
-                                <rect key="frame" x="0.0" y="20" width="173" height="0.0"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="11"/>
-                                <color key="textColor" systemColor="secondaryLabelColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <stackView opaque="NO" contentMode="scaleToFill" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="ggt-WQ-HTl">
-                                <rect key="frame" x="0.0" y="22" width="173" height="18"/>
-                                <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" tag="101" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="252" horizontalCompressionResistancePriority="752" verticalCompressionResistancePriority="752" text="label quick status" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jPw-cb-4gO">
-                                        <rect key="frame" x="0.0" y="0.0" width="106" height="18"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" image="arrowtriangle.down.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="AuV-M5-NJl">
-                                        <rect key="frame" x="107" y="0.0" width="66" height="17.5"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="15" id="Aha-lq-v22"/>
-                                        </constraints>
-                                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="12"/>
-                                    </imageView>
-                                </subviews>
-                            </stackView>
-                        </subviews>
-                    </stackView>
                 </subviews>
                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
@@ -184,14 +103,6 @@
                     <constraint firstItem="pwI-xS-kU9" firstAttribute="leading" secondItem="fiJ-J9-DNQ" secondAttribute="leading" id="v1Y-gS-pEM"/>
                     <constraint firstAttribute="trailing" secondItem="LqM-DX-oHg" secondAttribute="trailing" constant="11" id="wLC-bu-LL8"/>
                     <constraint firstItem="Qka-NN-0oy" firstAttribute="leading" secondItem="reg-E6-H23" secondAttribute="leading" constant="11" id="xJ3-F3-qzI"/>
-                    <constraint firstItem="OQv-Vf-bvD" firstAttribute="leading" secondItem="Wxr-1B-Czy" secondAttribute="trailing" constant="15" id="8QW-n0-4lO"/>
-                    <constraint firstItem="qDs-UG-Mn7" firstAttribute="leading" secondItem="3Oe-gU-3Nk" secondAttribute="leading" constant="6" id="KOm-wo-CBa"/>
-                    <constraint firstAttribute="bottom" secondItem="Wxr-1B-Czy" secondAttribute="bottom" constant="12" id="MM0-9i-BpF"/>
-                    <constraint firstAttribute="trailing" secondItem="OQv-Vf-bvD" secondAttribute="trailing" constant="10" id="W3b-ww-vbQ"/>
-                    <constraint firstItem="qDs-UG-Mn7" firstAttribute="centerY" secondItem="3Oe-gU-3Nk" secondAttribute="centerY" id="ZrD-Aw-xkx"/>
-                    <constraint firstItem="OQv-Vf-bvD" firstAttribute="centerY" secondItem="3Oe-gU-3Nk" secondAttribute="centerY" id="eLc-gk-xAr"/>
-                    <constraint firstItem="Wxr-1B-Czy" firstAttribute="leading" secondItem="qDs-UG-Mn7" secondAttribute="trailing" constant="8" id="nXI-b3-EJM"/>
-                    <constraint firstItem="Wxr-1B-Czy" firstAttribute="top" secondItem="3Oe-gU-3Nk" secondAttribute="top" constant="12" id="vxe-9X-O1f"/>
                 </constraints>
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -204,14 +115,6 @@
                 <outlet property="labelQuickStatus" destination="q8K-as-nnN" id="tuv-8Y-QF0"/>
                 <outlet property="labelTitle" destination="fiJ-J9-DNQ" id="tr5-LH-ctZ"/>
                 <outlet property="status" destination="q8K-as-nnN" id="j9C-Ku-TZ8"/>
-                <outlet property="copyButton" destination="xaz-vY-Jzu" id="pMt-Zu-ORX"/>
-                <outlet property="descriptionLabel" destination="WJj-9P-3bn" id="QC7-SX-O3M"/>
-                <outlet property="imageDownArrow" destination="AuV-M5-NJl" id="LzO-Sj-euf"/>
-                <outlet property="imageItem" destination="qDs-UG-Mn7" id="jxL-r7-BVs"/>
-                <outlet property="labelQuickStatus" destination="jPw-cb-4gO" id="d04-3F-WYS"/>
-                <outlet property="labelTitle" destination="otH-mT-7Z4" id="f9z-Oa-OiR"/>
-                <outlet property="menuButton" destination="J1z-RG-U4A" id="VCC-y1-LRK"/>
-                <outlet property="statusStackView" destination="ggt-WQ-HTl" id="MwF-B6-5r0"/>
             </connections>
             <point key="canvasLocation" x="97.599999999999994" y="276.1619190404798"/>
         </tableViewCell>
@@ -220,18 +123,5 @@
         <image name="circle" width="300" height="300"/>
         <image name="shareCopy" width="329" height="329"/>
         <image name="shareMenu" width="329" height="329"/>
-        <image name="arrowtriangle.down.circle" catalog="system" width="128" height="123"/>
-        <image name="document.on.document" catalog="system" width="116" height="128"/>
-        <image name="ellipsis" catalog="system" width="128" height="37"/>
-        <image name="link.circle.fill" catalog="system" width="128" height="123"/>
-        <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="tertiaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.29803921568627451" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
     </resources>
 </document>

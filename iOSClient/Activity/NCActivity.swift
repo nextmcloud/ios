@@ -233,8 +233,8 @@ extension NCActivity: UITableViewDataSource {
             cell.fileAvatarImageView?.image = results.image
         }
 
-        if let tblAvatar = results.tblAvatar,
-           !tblAvatar.loaded,
+        if let tableAvatar = results.tableAvatar,
+           !tableAvatar.loaded,
            NCNetworking.shared.downloadAvatarQueue.operations.filter({ ($0 as? NCOperationDownloadAvatar)?.fileName == fileName }).isEmpty {
             NCNetworking.shared.downloadAvatarQueue.addOperation(NCOperationDownloadAvatar(user: comment.actorId, fileName: fileName, account: account, view: tableView))
         }
@@ -314,7 +314,7 @@ extension NCActivity: UITableViewDataSource {
                 cell.fileAvatarImageView?.image = results.image
             }
 
-            if !(results.tblAvatar?.loaded ?? false),
+            if !(results.tableAvatar?.loaded ?? false),
                NCNetworking.shared.downloadAvatarQueue.operations.filter({ ($0 as? NCOperationDownloadAvatar)?.fileName == fileName }).isEmpty {
                 NCNetworking.shared.downloadAvatarQueue.addOperation(NCOperationDownloadAvatar(user: activity.user, fileName: fileName, account: session.account, view: tableView))
             }
@@ -377,8 +377,12 @@ extension NCActivity {
     func fetchAll(isInitial: Bool) {
         guard !isFetchingActivity else { return }
         self.isFetchingActivity = true
+        var bottom: CGFloat = 0
 
-        NCActivityIndicator.shared.start(backgroundView: self.view, style: .medium)
+        if let mainTabBar = self.tabBarController?.tabBar as? NCMainTabBar {
+           bottom = -mainTabBar.getHeight()
+        }
+        NCActivityIndicator.shared.start(backgroundView: self.view, bottom: bottom - 35, style: .medium)
 
         let dispatchGroup = DispatchGroup()
         loadComments(disptachGroup: dispatchGroup)
@@ -514,21 +518,20 @@ extension NCActivity: NCShareCommentsCellDelegate {
         guard let tableComment = tableComment else {
             return
         }
-        self.showProfileMenu(userId: tableComment.actorId, session: session, sender: sender)
+        self.showProfileMenu(userId: tableComment.actorId, session: session)
     }
 
     func tapMenu(with tableComments: tableComments?, sender: Any) {
-        toggleMenu(with: tableComments, sender: sender)
+        toggleMenu(with: tableComments)
     }
 
-    func toggleMenu(with tableComments: tableComments?, sender: Any) {
+    func toggleMenu(with tableComments: tableComments?) {
         var actions = [NCMenuAction]()
 
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_edit_comment_", comment: ""),
                 icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
-                sender: sender,
                 action: { _ in
                     guard let metadata = self.metadata, let tableComments = tableComments else { return }
 
@@ -561,7 +564,6 @@ extension NCActivity: NCShareCommentsCellDelegate {
                 title: NSLocalizedString("_delete_comment_", comment: ""),
                 destructive: true,
                 icon: utility.loadImage(named: "trash", colors: [.red]),
-                sender: sender,
                 action: { _ in
                     guard let metadata = self.metadata, let tableComments = tableComments else { return }
 
@@ -576,6 +578,6 @@ extension NCActivity: NCShareCommentsCellDelegate {
             )
         )
 
-        presentMenu(with: actions, sender: sender)
+        presentMenu(with: actions)
     }
 }

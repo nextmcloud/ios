@@ -35,7 +35,7 @@ class NCScanCell: UICollectionViewCell, UIGestureRecognizerDelegate {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(imageTapped(_:)))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(imageTapped))
         customImageView.addGestureRecognizer(tapGesture)
     }
 

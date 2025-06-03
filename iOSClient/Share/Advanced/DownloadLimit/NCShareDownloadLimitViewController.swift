@@ -36,7 +36,7 @@ class NCShareDownloadLimitViewController: UIViewController, NCShareNavigationTit
 
         // End editing of inputs when the user taps anywhere else.
 
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard(_:)))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
     }
 
@@ -51,7 +51,7 @@ class NCShareDownloadLimitViewController: UIViewController, NCShareNavigationTit
         tableViewController.share = share
     }
 
-    @objc private func dismissKeyboard(_ sender: Any?) {
+    @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
 }

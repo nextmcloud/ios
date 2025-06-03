@@ -256,18 +256,13 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
     // MARK: -
 
     func getFileSize(filePath: String) -> Int64 {
-        guard FileManager.default.fileExists(atPath: filePath)
-        else {
-            return 0
-        }
-
         do {
             let attributes = try fileManager.attributesOfItem(atPath: filePath)
             return attributes[FileAttributeKey.size] as? Int64 ?? 0
         } catch {
             print(error)
-            return 0
         }
+        return 0
     }
 
     func getFileModificationDate(filePath: String) -> NSDate? {
@@ -684,7 +679,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         }
     }
 
-    func createGranularityPath(asset: PHAsset? = nil, serverUrlBase: String? = nil) -> String {
+    func createGranularityPath(asset: PHAsset? = nil, serverUrl: String? = nil) -> String {
         let autoUploadSubfolderGranularity = NCManageDatabase.shared.getAccountAutoUploadSubfolderGranularity()
         let dateFormatter = DateFormatter()
         let date = asset?.creationDate ?? Date()
@@ -704,8 +699,8 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
             path = "\(year)/\(month)"
         }
 
-        if let serverUrlBase {
-            return serverUrlBase + "/" + path
+        if let serverUrl {
+            return serverUrl + "/" + path
         } else {
             return path
         }

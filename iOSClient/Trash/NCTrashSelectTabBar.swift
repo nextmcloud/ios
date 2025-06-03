@@ -30,49 +30,33 @@ protocol NCTrashSelectTabBarDelegate: AnyObject {
 }
 
 class NCTrashSelectTabBar: ObservableObject {
-    var controller: UITabBarController?
+    var tabBarController: UITabBarController?
     var hostingController: UIViewController?
     open weak var delegate: NCTrashSelectTabBarDelegate?
 
     @Published var isSelectedEmpty = true
 
-    init(controller: UITabBarController? = nil, delegate: NCTrashSelectTabBarDelegate? = nil) {
+    init(tabBarController: UITabBarController? = nil, delegate: NCTrashSelectTabBarDelegate? = nil) {
         let rootView = NCTrashSelectTabBarView(tabBarSelect: self)
         hostingController = UIHostingController(rootView: rootView)
 
-        self.controller = controller
+        self.tabBarController = tabBarController
         self.delegate = delegate
 
-        guard let controller, let hostingController else { return }
+        guard let tabBarController, let hostingController else { return }
 
-        setFrame()
+        tabBarController.view.addSubview(hostingController.view)
 
+        hostingController.view.frame = tabBarController.tabBar.frame
         hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         hostingController.view.backgroundColor = .clear
         hostingController.view.isHidden = true
-
-        controller.view.addSubview(hostingController.view)
-    }
-
-    func setFrame() {
-        guard let controller,
-              let hostingController
-        else {
-            return
-        }
-        let bottomAreaInsets: CGFloat = controller.tabBar.safeAreaInsets.bottom == 0 ? 34 : 0
-
-        hostingController.view.frame = CGRect(x: controller.tabBar.frame.origin.x,
-                                              y: controller.tabBar.frame.origin.y - bottomAreaInsets,
-                                              width: controller.tabBar.frame.width,
-                                              height: controller.tabBar.frame.height + bottomAreaInsets)
     }
 
     func show() {
-        guard let controller,
-              let hostingController else { return }
+        guard let tabBarController, let hostingController else { return }
 
-        controller.tabBar.isHidden = true
+        tabBarController.tabBar.isHidden = true
 
         if hostingController.view.isHidden {
             hostingController.view.isHidden = false
@@ -86,14 +70,10 @@ class NCTrashSelectTabBar: ObservableObject {
     }
 
     func hide() {
-        guard let controller,
-              let hostingController
-        else {
-            return
-        }
+        guard let tabBarController, let hostingController else { return }
 
         hostingController.view.isHidden = true
-        controller.tabBar.isHidden = false
+        tabBarController.tabBar.isHidden = false
     }
 
     func update(selectOcId: [String]) {

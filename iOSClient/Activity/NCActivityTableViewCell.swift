@@ -26,6 +26,7 @@ import UIKit
 import NextcloudKit
 import FloatingPanel
 import Queuer
+import Alamofire
 
 class NCActivityCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
@@ -66,13 +67,13 @@ class NCActivityTableViewCell: UITableViewCell, NCCellProtocol {
     override func awakeFromNib() {
         super.awakeFromNib()
 
-        let avatarRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapAvatarImage(_:)))
+        let avatarRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapAvatarImage))
         avatar.addGestureRecognizer(avatarRecognizer)
     }
 
-    @objc func tapAvatarImage(_ sender: Any?) {
+    @objc func tapAvatarImage() {
         guard let fileUser = fileUser else { return }
-        viewController.showProfileMenu(userId: fileUser, session: NCSession.shared.getSession(account: account), sender: sender)
+        viewController.showProfileMenu(userId: fileUser, session: NCSession.shared.getSession(account: account))
     }
 }
 
@@ -97,9 +98,9 @@ extension NCActivityTableViewCell: UICollectionViewDelegate {
             }
             if (responder as? UIViewController)!.navigationController != nil {
                 if let viewController = UIStoryboard(name: "NCTrash", bundle: nil).instantiateInitialViewController() as? NCTrash {
-                    if let result = NCManageDatabase.shared.getResultTrash(fileId: String(activityPreview.fileId), account: activityPreview.account) {
-                        viewController.blinkFileId = result.fileId
-                        viewController.filePath = result.filePath
+                    if let resultTableTrash = NCManageDatabase.shared.getResultTrashItem(fileId: String(activityPreview.fileId), account: activityPreview.account) {
+                        viewController.blinkFileId = resultTableTrash.fileId
+                        viewController.filePath = resultTableTrash.filePath
                         (responder as? UIViewController)!.navigationController?.pushViewController(viewController, animated: true)
                     } else {
                         let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_trash_file_not_found_")
@@ -114,7 +115,7 @@ extension NCActivityTableViewCell: UICollectionViewDelegate {
             guard let activitySubjectRich = NCManageDatabase.shared.getActivitySubjectRich(account: activityPreview.account, idActivity: activityPreview.idActivity, id: String(activityPreview.fileId)) else {
                 return
             }
-            NCDownloadAction.shared.viewerFile(account: account, fileId: activitySubjectRich.id, viewController: viewController)
+            NCActionCenter.shared.viewerFile(account: account, fileId: activitySubjectRich.id, viewController: viewController)
         }
     }
 }
@@ -229,5 +230,5 @@ class NCOperationDownloadThumbnailActivity: ConcurrentOperation, @unchecked Send
             }
             self.finish()
         }
-    }
+            }
 }

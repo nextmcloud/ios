@@ -25,14 +25,6 @@ import UIKit
 import NextcloudKit
 import Alamofire
 
-protocol UploadProgressDelegate: AnyObject {
-    func uploadProgressDidUpdate(progress: Float,
-                                 totalBytes: Int64,
-                                 totalBytesExpected: Int64,
-                                 fileName: String,
-                                 serverUrl: String)
-}
-
 extension NCNetworking {
     func upload(metadata: tableMetadata,
                 uploadE2EEDelegate: uploadE2EEDelegate? = nil,
@@ -45,9 +37,24 @@ extension NCNetworking {
         var numChunks: Int = 0
         var hud: NCHud?
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Upload file \(metadata.fileNameView) with Identifier \(metadata.assetLocalIdentifier) with size \(metadata.size) [CHUNK \(metadata.chunk), E2EE \(metadata.isDirectoryE2EE)]")
+        let transfer = NCTransferProgress.Transfer(ocId: metadata.ocId, ocIdTransfer: metadata.ocIdTransfer, session: metadata.session, chunk: metadata.chunk, e2eEncrypted: metadata.e2eEncrypted, progressNumber: 0, totalBytes: 0, totalBytesExpected: 0)
+        NCTransferProgress.shared.append(transfer)
 
         func tapOperation() {
             NotificationCenter.default.postOnMainThread(name: NextcloudKit.shared.nkCommonInstance.notificationCenterChunkedFileStop.rawValue)
+        }
+
+        let metadataCreationDate = metadata.creationDate as Date
+
+        // Update last uploaded date for auto uploaded photos
+        if database.getTableAccount(account: metadata.account)?.autoUploadLastUploadedDate == nil {
+            self.database.updateAccountProperty(\.autoUploadLastUploadedDate, value: metadataCreationDate, account: metadata.account)
+        } else if metadata.sessionSelector == NCGlobal.shared.selectorUploadAutoUpload,
+           let autoUploadLastUploadedDate = database.getTableAccount(account: metadata.account)?.autoUploadLastUploadedDate {
+
+            if autoUploadLastUploadedDate < metadataCreationDate {
+                self.database.updateAccountProperty(\.autoUploadLastUploadedDate, value: metadataCreationDate, account: metadata.account)
+            }
         }
 
         if metadata.isDirectoryE2EE {
@@ -122,27 +129,37 @@ extension NCNetworking {
         let options = NKRequestOptions(customHeader: customHeaders, queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)
 
         NextcloudKit.shared.upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, dateCreationFile: metadata.creationDate as Date, dateModificationFile: metadata.date as Date, account: metadata.account, options: options, requestHandler: { request in
+
+            self.database.setMetadataSession(ocId: metadata.ocId,
+                                             status: self.global.metadataStatusUploading)
             requestHandler(request)
         }, taskHandler: { task in
-            let metadata = self.database.setMetadataSession(metadata: metadata,
-                                                            sessionTaskIdentifier: task.taskIdentifier,
-                                                            status: self.global.metadataStatusUploading)
+            self.database.setMetadataSession(ocId: metadata.ocId,
+                                             sessionTaskIdentifier: task.taskIdentifier)
 
-            self.notifyAllDelegates { delegate in
-                delegate.transferChange(status: self.global.networkingStatusUploading,
-                                        metadata: metadata,
-                                        error: .success)
-            }
-
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadStartFile,
+                                                        object: nil,
+                                                        userInfo: ["ocId": metadata.ocId,
+                                                                   "ocIdTransfer": metadata.ocIdTransfer,
+                                                                   "session": metadata.session,
+                                                                   "serverUrl": metadata.serverUrl,
+                                                                   "account": metadata.account,
+                                                                   "fileName": metadata.fileName,
+                                                                   "sessionSelector": metadata.sessionSelector])
             start()
         }, progressHandler: { progress in
-            self.notifyAllDelegates { delegate in
-                delegate.transferProgressDidUpdate(progress: Float(progress.fractionCompleted),
-                                                   totalBytes: progress.totalUnitCount,
-                                                   totalBytesExpected: progress.completedUnitCount,
-                                                   fileName: metadata.fileName,
-                                                   serverUrl: metadata.serverUrl)
-            }
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterProgressTask,
+                                                        object: nil,
+                                                        userInfo: ["account": metadata.account,
+                                                                   "ocId": metadata.ocId,
+                                                                   "ocIdTransfer": metadata.ocIdTransfer,
+                                                                   "session": metadata.session,
+                                                                   "fileName": metadata.fileName,
+                                                                   "serverUrl": metadata.serverUrl,
+                                                                   "status": NSNumber(value: self.global.metadataStatusUploading),
+                                                                   "progress": NSNumber(value: progress.fractionCompleted),
+                                                                   "totalBytes": NSNumber(value: progress.totalUnitCount),
+                                                                   "totalBytesExpected": NSNumber(value: progress.completedUnitCount)])
             progressHandler(progress.completedUnitCount, progress.totalUnitCount, progress.fractionCompleted)
         }) { account, ocId, etag, date, size, responseData, afError, error in
             var error = error
@@ -183,24 +200,38 @@ extension NCNetworking {
                                     ocId: metadata.ocId,
                                     chunkFolder: chunkFolder,
                                     filesChunk: filesChunk)
-            self.notifyAllDelegates { delegate in
-                delegate.transferChange(status: self.global.networkingStatusUploading,
-                                        metadata: tableMetadata(value: metadata),
-                                        error: .success)
-            }
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadStartFile,
+                                                        object: nil,
+                                                        userInfo: ["ocId": metadata.ocId,
+                                                                   "ocIdTransfer": metadata.ocIdTransfer,
+                                                                   "session": metadata.session,
+                                                                   "serverUrl": metadata.serverUrl,
+                                                                   "account": metadata.account,
+                                                                   "fileName": metadata.fileName,
+                                                                   "sessionSelector": metadata.sessionSelector],
+                                                        second: 0.2)
         } requestHandler: { _ in
-        } taskHandler: { task in
-            self.database.setMetadataSession(metadata: metadata,
-                                             sessionTaskIdentifier: task.taskIdentifier,
+            self.database.setMetadataSession(ocId: metadata.ocId,
                                              status: self.global.metadataStatusUploading)
+        } taskHandler: { task in
+            self.database.setMetadataSession(ocId: metadata.ocId,
+                                             sessionTaskIdentifier: task.taskIdentifier)
         } progressHandler: { totalBytesExpected, totalBytes, fractionCompleted in
-            self.notifyAllDelegates { delegate in
-                delegate.transferProgressDidUpdate(progress: Float(fractionCompleted),
-                                                   totalBytes: totalBytes,
-                                                   totalBytesExpected: totalBytesExpected,
-                                                   fileName: metadata.fileName,
-                                                   serverUrl: metadata.serverUrl)
-            }
+            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterProgressTask,
+                                                        object: nil,
+                                                        userInfo: ["account": metadata.account,
+                                                                   "ocId": metadata.ocId,
+                                                                   "ocIdTransfer": metadata.ocIdTransfer,
+                                                                   "session": metadata.session,
+                                                                   "fileName": metadata.fileName,
+                                                                   "serverUrl": metadata.serverUrl,
+                                                                   "status": NSNumber(value: self.global.metadataStatusUploading),
+                                                                   "chunk": metadata.chunk,
+                                                                   "e2eEncrypted": metadata.e2eEncrypted,
+                                                                   "progress": NSNumber(value: fractionCompleted),
+                                                                   "totalBytes": NSNumber(value: totalBytes),
+                                                                   "totalBytesExpected": NSNumber(value: totalBytesExpected)])
+
             progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
         } uploaded: { fileChunk in
             self.database.deleteChunk(account: metadata.account,
@@ -232,23 +263,26 @@ extension NCNetworking {
 
         // Check file dim > 0
         if utilityFileSystem.getFileSize(filePath: fileNameLocalPath) == 0 && metadata.size != 0 {
-            self.database.deleteMetadataOcId(metadata.ocId, sync: false)
+            self.database.deleteMetadataOcId(metadata.ocId)
             completion(NKError(errorCode: self.global.errorResourceNotFound, errorDescription: NSLocalizedString("_error_not_found_", value: "The requested resource could not be found", comment: "")))
         } else {
             let (task, error) = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance).upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, dateCreationFile: metadata.creationDate as Date, dateModificationFile: metadata.date as Date, account: metadata.account, sessionIdentifier: metadata.session)
             if let task, error == .success {
                 NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Upload file \(metadata.fileNameView) with task with taskIdentifier \(task.taskIdentifier)")
-                let metadata = self.database.setMetadataSession(metadata: metadata,
-                                                                sessionTaskIdentifier: task.taskIdentifier,
-                                                                status: self.global.metadataStatusUploading)
-
-                self.notifyAllDelegates { delegate in
-                    delegate.transferChange(status: self.global.networkingStatusUploading,
-                                            metadata: metadata,
-                                            error: .success)
-                }
+                self.database.setMetadataSession(ocId: metadata.ocId,
+                                                 sessionTaskIdentifier: task.taskIdentifier,
+                                                 status: self.global.metadataStatusUploading)
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadStartFile,
+                                                            object: nil,
+                                                            userInfo: ["ocId": metadata.ocId,
+                                                                       "ocIdTransfer": metadata.ocIdTransfer,
+                                                                       "session": metadata.session,
+                                                                       "serverUrl": metadata.serverUrl,
+                                                                       "account": metadata.account,
+                                                                       "fileName": metadata.fileName,
+                                                                       "sessionSelector": metadata.sessionSelector])
             } else {
-                self.database.deleteMetadataOcId(metadata.ocId, sync: false)
+                self.database.deleteMetadataOcId(metadata.ocId)
             }
 
             completion(error)
@@ -263,7 +297,6 @@ extension NCNetworking {
                         size: Int64,
                         task: URLSessionTask,
                         error: NKError) {
-        isAppSuspending = false
 
 #if EXTENSION_FILE_PROVIDER_EXTENSION
 
@@ -328,156 +361,176 @@ extension NCNetworking {
                         date: Date?,
                         size: Int64,
                         error: NKError) {
-        NextcloudKit.shared.nkCommonInstance.appendServerErrorAccount(metadata.account, errorCode: error.errorCode)
-
-        let selector = metadata.sessionSelector
-
-        if error == .success, let ocId = ocId, size == metadata.size {
-
-            var metadata = tableMetadata(value: metadata)
-            metadata.uploadDate = (date as? NSDate) ?? NSDate()
-            metadata.etag = etag ?? ""
-            metadata.ocId = ocId
-            metadata.chunk = 0
-
-            if let fileId = self.utility.ocIdToFileId(ocId: ocId) {
-                metadata.fileId = fileId
-            }
-
-            metadata.session = ""
-            metadata.sessionError = ""
-            metadata.sessionTaskIdentifier = 0
-            metadata.status = self.global.metadataStatusNormal
-
-            self.database.deleteMetadata(predicate: NSPredicate(format: "ocIdTransfer == %@", metadata.ocIdTransfer), sync: false)
-            metadata = self.database.addMetadata(metadata)
-
-            if selector == self.global.selectorUploadFileNODelete {
-#if EXTENSION
-                self.utilityFileSystem.moveFile(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocIdTransfer),
-                                                toPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(ocId))
-#else
-                moveFileSafely(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocIdTransfer),
-                               toPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(ocId))
-#endif
-                self.database.addLocalFile(metadata: metadata, sync: false)
-            } else {
-#if EXTENSION
-                self.utilityFileSystem.removeFile(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocIdTransfer))
-#else
-                removeFileInBackgroundSafe(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocIdTransfer))
-#endif
-
-            }
-
-            /// Update the auto upload data
-            if selector == self.global.selectorUploadAutoUpload,
-               let serverUrlBase = metadata.autoUploadServerUrlBase {
-                self.database.addAutoUploadTransfer(account: metadata.account,
-                                                    serverUrlBase: serverUrlBase,
-                                                    fileName: metadata.fileNameView,
-                                                    assetLocalIdentifier: metadata.assetLocalIdentifier,
-                                                    date: metadata.creationDate as Date,
-                                                    sync: false)
-            }
-
-            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Upload complete " + metadata.serverUrl + "/" + metadata.fileName + ", result: success(\(size) bytes)")
-
-            let userInfo: [String: Any] = ["ocId": metadata.ocId,
-                                           "ocIdTransfer": metadata.ocIdTransfer,
-                                           "session": metadata.session,
-                                           "serverUrl": metadata.serverUrl,
-                                           "account": metadata.account,
-                                           "fileName": metadata.fileName,
-                                           "error": error]
-            if metadata.isLivePhoto,
-               NCCapabilities.shared.getCapabilities(account: metadata.account).isLivePhotoServerAvailable {
-                DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
-                    self.createLivePhoto(metadata: metadata, userInfo: userInfo)
-                }
-            } else {
-                self.notifyAllDelegates { delegate in
-                    delegate.transferChange(status: self.global.networkingStatusUploaded,
-                                            metadata: tableMetadata(value: metadata),
-                                            error: error)
-                }
-            }
-        } else {
-            if error.errorCode == NSURLErrorCancelled || error.errorCode == self.global.errorRequestExplicityCancelled {
-                self.uploadCancelFile(metadata: metadata)
-            } else if error.errorCode == self.global.errorBadRequest || error.errorCode == self.global.errorUnsupportedMediaType {
-                self.uploadCancelFile(metadata: metadata)
-                NCContentPresenter().showError(error: NKError(errorCode: error.errorCode, errorDescription: "_virus_detect_"))
-
-                // Client Diagnostic
-                self.database.addDiagnostic(account: metadata.account, issue: self.global.diagnosticIssueVirusDetected, sync: false)
-            } else if error.errorCode == self.global.errorForbidden && !isAppInBackground {
+        DispatchQueue.main.async {
+            var isApplicationStateActive = false
 #if !EXTENSION
-                NextcloudKit.shared.getTermsOfService(account: metadata.account, options: NKRequestOptions(checkInterceptor: false)) { _, tos, _, error in
-                    if error == .success, let tos, !tos.hasUserSigned() {
-                        self.uploadCancelFile(metadata: metadata)
-                    } else {
-                        let newFileName = self.utilityFileSystem.createFileName(metadata.fileName, serverUrl: metadata.serverUrl, account: metadata.account)
-                        let alertController = UIAlertController(title: error.errorDescription, message: NSLocalizedString("_change_upload_filename_", comment: ""), preferredStyle: .alert)
-                        alertController.addAction(UIAlertAction(title: String(format: NSLocalizedString("_save_file_as_", comment: ""), newFileName), style: .default, handler: { _ in
-                            let atpath = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId) + "/" + metadata.fileName
-                            let toPath = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId) + "/" + newFileName
-                            self.utilityFileSystem.moveFile(atPath: atpath, toPath: toPath)
-                            self.database.setMetadataSession(metadata: metadata,
-                                                             newFileName: newFileName,
-                                                             sessionTaskIdentifier: 0,
-                                                             sessionError: "",
-                                                             status: self.global.metadataStatusWaitUpload,
-                                                             errorCode: error.errorCode)
-                        }))
-                        alertController.addAction(UIAlertAction(title: NSLocalizedString("_discard_changes_", comment: ""), style: .destructive, handler: { _ in
-                            self.uploadCancelFile(metadata: metadata)
-                        }))
+            isApplicationStateActive = UIApplication.shared.applicationState == .active
+#endif
+            DispatchQueue.global().async {
+                NextcloudKit.shared.nkCommonInstance.appendServerErrorAccount(metadata.account, errorCode: error.errorCode)
 
-                        // Select UIWindowScene active in serverUrl
-                        var controller = UIApplication.shared.firstWindow?.rootViewController
-                        let windowScenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-                        for windowScene in windowScenes {
-                            if let rootViewController = windowScene.keyWindow?.rootViewController as? NCMainTabBarController,
-                               rootViewController.currentServerUrl() == metadata.serverUrl {
-                                controller = rootViewController
-                                break
-                            }
+                let selector = metadata.sessionSelector
+
+                if error == .success, let ocId = ocId, size == metadata.size {
+                    NCTransferProgress.shared.clearCountError(ocIdTransfer: metadata.ocIdTransfer)
+
+                    let metadata = tableMetadata.init(value: metadata)
+                    metadata.uploadDate = (date as? NSDate) ?? NSDate()
+                    metadata.etag = etag ?? ""
+                    metadata.ocId = ocId
+                    metadata.chunk = 0
+
+                    if let fileId = self.utility.ocIdToFileId(ocId: ocId) {
+                        metadata.fileId = fileId
+                    }
+
+                    metadata.session = ""
+                    metadata.sessionError = ""
+                    metadata.sessionTaskIdentifier = 0
+                    metadata.status = self.global.metadataStatusNormal
+
+                    self.database.deleteMetadata(predicate: NSPredicate(format: "ocIdTransfer == %@", metadata.ocIdTransfer))
+                    self.database.addMetadata(metadata)
+
+                    if selector == self.global.selectorUploadFileNODelete {
+                        self.utilityFileSystem.moveFile(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocIdTransfer), toPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(ocId))
+                        self.database.addLocalFile(metadata: metadata)
+                    } else {
+                        self.utilityFileSystem.removeFile(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocIdTransfer))
+                    }
+
+                    NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Upload complete " + metadata.serverUrl + "/" + metadata.fileName + ", result: success(\(size) bytes)")
+
+                    let userInfo: [String: Any] = ["ocId": metadata.ocId,
+                                                   "ocIdTransfer": metadata.ocIdTransfer,
+                                                   "session": metadata.session,
+                                                   "serverUrl": metadata.serverUrl,
+                                                   "account": metadata.account,
+                                                   "fileName": metadata.fileName,
+                                                   "error": error]
+                    if metadata.isLivePhoto,
+                       NCCapabilities.shared.getCapabilities(account: metadata.account).isLivePhotoServerAvailable {
+                        DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+                            self.createLivePhoto(metadata: metadata, userInfo: userInfo)
                         }
-                        controller?.present(alertController, animated: true)
+                    } else {
+                        NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadedFile,
+                                                                    object: nil,
+                                                                    userInfo: userInfo,
+                                                                    second: 0.5)
+                    }
+                } else {
+                    if error.errorCode == NSURLErrorCancelled || error.errorCode == self.global.errorRequestExplicityCancelled {
+                        NCTransferProgress.shared.clearCountError(ocIdTransfer: metadata.ocIdTransfer)
+                        self.utilityFileSystem.removeFile(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId))
+                        self.database.deleteMetadataOcId(metadata.ocId)
+                        NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadCancelFile,
+                                                                    object: nil,
+                                                                    userInfo: ["ocId": metadata.ocId,
+                                                                               "ocIdTransfer": metadata.ocIdTransfer,
+                                                                               "session": metadata.session,
+                                                                               "serverUrl": metadata.serverUrl,
+                                                                               "account": metadata.account],
+                                                                    second: 0.5)
+                    } else if error.errorCode == self.global.errorBadRequest || error.errorCode == self.global.errorUnsupportedMediaType {
+                        NCTransferProgress.shared.clearCountError(ocIdTransfer: metadata.ocIdTransfer)
+                        self.utilityFileSystem.removeFile(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId))
+                        self.database.deleteMetadataOcId(metadata.ocId)
+                        NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadCancelFile,
+                                                                    object: nil,
+                                                                    userInfo: ["ocId": metadata.ocId,
+                                                                               "ocIdTransfer": metadata.ocIdTransfer,
+                                                                               "session": metadata.session,
+                                                                               "serverUrl": metadata.serverUrl,
+                                                                               "account": metadata.account],
+                                                                    second: 0.5)
+                        if isApplicationStateActive {
+                            NCContentPresenter().showError(error: NKError(errorCode: error.errorCode, errorDescription: "_virus_detect_"))
+                        }
 
                         // Client Diagnostic
-                        self.database.addDiagnostic(account: metadata.account,
-                                                    issue: self.global.diagnosticIssueProblems,
-                                                    error: self.global.diagnosticProblemsForbidden,
-                                                    sync: false)
-                    }
-                }
+                        self.database.addDiagnostic(account: metadata.account, issue: self.global.diagnosticIssueVirusDetected)
+                    } else if error.errorCode == self.global.errorForbidden && isApplicationStateActive {
+                        NCTransferProgress.shared.clearCountError(ocIdTransfer: metadata.ocIdTransfer)
+#if !EXTENSION
+                        NextcloudKit.shared.getTermsOfService(account: metadata.account, options: NKRequestOptions(checkInterceptor: false)) { _, tos, _, error in
+                            if error == .success, let tos, !tos.hasUserSigned() {
+                                // it's a ToS not signed
+                            } else {
+                                let newFileName = self.utilityFileSystem.createFileName(metadata.fileName, serverUrl: metadata.serverUrl, account: metadata.account)
+                                let alertController = UIAlertController(title: error.errorDescription, message: NSLocalizedString("_change_upload_filename_", comment: ""), preferredStyle: .alert)
+                                alertController.addAction(UIAlertAction(title: String(format: NSLocalizedString("_save_file_as_", comment: ""), newFileName), style: .default, handler: { _ in
+                                    let atpath = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId) + "/" + metadata.fileName
+                                    let toPath = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId) + "/" + newFileName
+                                    self.utilityFileSystem.moveFile(atPath: atpath, toPath: toPath)
+                                    self.database.setMetadataSession(ocId: metadata.ocId,
+                                                                     newFileName: newFileName,
+                                                                     sessionTaskIdentifier: 0,
+                                                                     sessionError: "",
+                                                                     status: self.global.metadataStatusWaitUpload,
+                                                                     errorCode: error.errorCode)
+                                }))
+                                alertController.addAction(UIAlertAction(title: NSLocalizedString("_discard_changes_", comment: ""), style: .destructive, handler: { _ in
+                                    self.utilityFileSystem.removeFile(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId))
+                                    self.database.deleteMetadataOcId(metadata.ocId)
+                                    NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadCancelFile,
+                                                                                object: nil,
+                                                                                userInfo: ["ocId": metadata.ocId,
+                                                                                           "ocIdTransfer": metadata.ocIdTransfer,
+                                                                                           "session": metadata.session,
+                                                                                           "serverUrl": metadata.serverUrl,
+                                                                                           "account": metadata.account],
+                                                                                second: 0.5)
+                                }))
+
+                                // Select UIWindowScene active in serverUrl
+                                var controller = UIApplication.shared.firstWindow?.rootViewController
+                                let windowScenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+                                for windowScene in windowScenes {
+                                    if let rootViewController = windowScene.keyWindow?.rootViewController as? NCMainTabBarController,
+                                       rootViewController.currentServerUrl() == metadata.serverUrl {
+                                        controller = rootViewController
+                                        break
+                                    }
+                                }
+                                controller?.present(alertController, animated: true)
+
+                                // Client Diagnostic
+                                self.database.addDiagnostic(account: metadata.account,
+                                                            issue: self.global.diagnosticIssueProblems,
+                                                            error: self.global.diagnosticProblemsForbidden)
+                            }
+                        }
 #endif
-            } else {
-                let metadata = self.database.setMetadataSession(metadata: metadata,
-                                                                sessionTaskIdentifier: 0,
-                                                                sessionError: error.errorDescription,
-                                                                status: self.global.metadataStatusUploadError,
-                                                                errorCode: error.errorCode)
+                    } else {
+                        NCTransferProgress.shared.clearCountError(ocIdTransfer: metadata.ocIdTransfer)
 
-                self.notifyAllDelegates { delegate in
-                    delegate.transferChange(status: self.global.networkingStatusUploaded,
-                                            metadata: metadata,
-                                            error: error)
-                }
-
-                // Client Diagnostic
-                if error.errorCode == self.global.errorInternalServerError {
-                    self.database.addDiagnostic(account: metadata.account,
-                                                issue: self.global.diagnosticIssueProblems,
-                                                error: self.global.diagnosticProblemsBadResponse,
-                                                sync: false)
-                } else {
-                    self.database.addDiagnostic(account: metadata.account,
-                                                issue: self.global.diagnosticIssueProblems,
-                                                error: self.global.diagnosticProblemsUploadServerError,
-                                                sync: false)
+                        self.database.setMetadataSession(ocId: metadata.ocId,
+                                                         sessionTaskIdentifier: 0,
+                                                         sessionError: error.errorDescription,
+                                                         status: self.global.metadataStatusUploadError,
+                                                         errorCode: error.errorCode)
+                        NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadedFile,
+                                                                    object: nil,
+                                                                    userInfo: ["ocId": metadata.ocId,
+                                                                               "ocIdTransfer": metadata.ocIdTransfer,
+                                                                               "session": metadata.session,
+                                                                               "serverUrl": metadata.serverUrl,
+                                                                               "account": metadata.account,
+                                                                               "fileName": metadata.fileName,
+                                                                               "error": error],
+                                                                    second: 0.5)
+                        // Client Diagnostic
+                        if error.errorCode == self.global.errorInternalServerError {
+                            self.database.addDiagnostic(account: metadata.account,
+                                                        issue: self.global.diagnosticIssueProblems,
+                                                        error: self.global.diagnosticProblemsBadResponse)
+                        } else {
+                            self.database.addDiagnostic(account: metadata.account,
+                                                        issue: self.global.diagnosticIssueProblems,
+                                                        error: self.global.diagnosticProblemsUploadServerError)
+                        }
+                    }
                 }
             }
         }
@@ -490,26 +543,28 @@ extension NCNetworking {
                         serverUrl: String,
                         session: URLSession,
                         task: URLSessionTask) {
-        self.notifyAllDelegates { delegate in
-            delegate.transferProgressDidUpdate(progress: progress,
-                                               totalBytes: totalBytes,
-                                               totalBytesExpected: totalBytesExpected,
-                                               fileName: fileName,
-                                               serverUrl: serverUrl)
-        }
-    }
 
-    func uploadCancelFile(metadata: tableMetadata) {
-#if EXTENSION
-                self.utilityFileSystem.removeFile(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocIdTransfer))
-#else
-                removeFileInBackgroundSafe(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocIdTransfer))
+#if EXTENSION_FILE_PROVIDER_EXTENSION
+        return
 #endif
-        self.database.deleteMetadataOcId(metadata.ocIdTransfer, sync: false)
-        self.notifyAllDelegates { delegate in
-            delegate.transferChange(status: self.global.networkingStatusUploadCancel,
-                                    metadata: tableMetadata(value: metadata),
-                                    error: .success)
+
+        DispatchQueue.global().async {
+            if let metadata = self.database.getResultMetadataFromFileName(fileName, serverUrl: serverUrl, sessionTaskIdentifier: task.taskIdentifier) {
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterProgressTask,
+                                                            object: nil,
+                                                            userInfo: ["account": metadata.account,
+                                                                       "ocId": metadata.ocId,
+                                                                       "ocIdTransfer": metadata.ocIdTransfer,
+                                                                       "session": metadata.session,
+                                                                       "fileName": metadata.fileName,
+                                                                       "serverUrl": serverUrl,
+                                                                       "status": NSNumber(value: self.global.metadataStatusUploading),
+                                                                       "chunk": metadata.chunk,
+                                                                       "e2eEncrypted": metadata.e2eEncrypted,
+                                                                       "progress": NSNumber(value: progress),
+                                                                       "totalBytes": NSNumber(value: totalBytes),
+                                                                       "totalBytesExpected": NSNumber(value: totalBytesExpected)])
+            }
         }
     }
 }

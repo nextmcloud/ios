@@ -130,7 +130,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
             UIAccessibilityCustomAction(
                 name: NSLocalizedString(moreName, comment: ""),
                 target: self,
-                selector: #selector(touchUpInsideMore(_:)))
+                selector: #selector(touchUpInsideMore))
         ]
     }
     

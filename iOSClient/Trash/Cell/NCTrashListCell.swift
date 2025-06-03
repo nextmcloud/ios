@@ -66,11 +66,11 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
             UIAccessibilityCustomAction(
                 name: NSLocalizedString("_restore_", comment: ""),
                 target: self,
-                selector: #selector(touchUpInsideRestore(_:))),
+                selector: #selector(touchUpInsideRestore)),
             UIAccessibilityCustomAction(
                 name: NSLocalizedString("_delete_", comment: ""),
                 target: self,
-                selector: #selector(touchUpInsideMore(_:)))
+                selector: #selector(touchUpInsideMore))
 
         ]
 

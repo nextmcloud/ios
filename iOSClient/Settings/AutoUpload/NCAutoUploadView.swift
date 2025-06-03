@@ -47,9 +47,6 @@ struct NCAutoUploadView: View {
         .onAppear {
             model.onViewAppear()
         }
-        .onDisappear {
-            model.onViewDisappear()
-        }
         .alert(model.error, isPresented: $model.showErrorAlert) {
             Button(NSLocalizedString("_ok_", comment: ""), role: .cancel) { }
         }
@@ -57,30 +54,18 @@ struct NCAutoUploadView: View {
             SelectView(serverUrl: $model.serverUrl, session: model.session)
                 .onDisappear {
                     model.setAutoUploadDirectory(serverUrl: model.serverUrl)
+                    model.resetAutoUploadLastUploadedDate()
                 }
         }
         .sheet(isPresented: $showSelectAlbums) {
             SelectAlbumView(model: albumModel)
         }
         .alert(NSLocalizedString("_auto_upload_all_photos_warning_title_", comment: ""), isPresented: $showUploadAllPhotosWarning, actions: {
-            if model.existsAutoUpload() {
-                Button("_confirm_continue_") {
-                    model.autoUploadStart = true
-                }
-                Button("_confirm_resetting_") {
-                    model.deleteAutoUploadTransfer()
-                    model.autoUploadStart = true
-                }
-                Button("_cancel_", role: .cancel) {
-                    model.autoUploadStart = false
-                }
-            } else {
-                Button("_confirm_") {
-                    model.autoUploadStart = true
-                }
-                Button("_cancel_", role: .cancel) {
-                    model.autoUploadStart = false
-                }
+            Button("_confirm_") {
+                model.autoUploadStart = true
+            }
+            Button("_cancel_", role: .cancel) {
+                model.autoUploadStart = false
             }
         }, message: {
             Text("_auto_upload_all_photos_warning_message_")
@@ -131,15 +116,15 @@ struct NCAutoUploadView: View {
                         })
                     }
 
-                    Toggle(NSLocalizedString("_back_up_new_photos_only_", comment: ""), isOn: $model.autoUploadOnlyNew)
+                    Toggle(NSLocalizedString("_back_up_new_photos_only_", comment: ""), isOn: $model.autoUploadNewPhotosOnly)
                         .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                         .opacity(model.autoUploadStart ? 0.15 : 1)
-                        .onChange(of: model.autoUploadOnlyNew) { newValue in
-                            model.handleAutoUploadOnlyNew(newValue: newValue)
+                        .onChange(of: model.autoUploadNewPhotosOnly) { newValue in
+                            model.handleAutoUploadNewPhotosOnly(newValue: newValue)
                         }
                         .accessibilityIdentifier("NewPhotosToggle")
                 }, footer: {
-                    if model.autoUploadOnlyNew == true, let date = model.autoUploadOnlyNewSinceDate {
+                    if model.autoUploadNewPhotosOnly == true, let date = model.autoUploadSinceDate {
                         Text(String(format: NSLocalizedString("_new_photos_starting_", comment: ""), NCUtility().longDate(date)))
                     }
                 })
@@ -212,7 +197,13 @@ struct NCAutoUploadView: View {
 
             /// Auto Upload Full
             Section(content: {
-                Toggle(isOn: model.autoUploadOnlyNew || model.autoUploadStart ? $model.autoUploadStart : $showUploadAllPhotosWarning) {
+#if DEBUG
+                Button("[DEBUG] Reset last uploaded date") {
+                    model.resetAutoUploadLastUploadedDate()
+                }.buttonStyle(.borderedProminent)
+#endif
+
+                Toggle(isOn: model.autoUploadNewPhotosOnly || model.autoUploadStart ? $model.autoUploadStart : $showUploadAllPhotosWarning) {
                     Text(model.autoUploadStart ? "_stop_autoupload_" : "_start_autoupload_")
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)

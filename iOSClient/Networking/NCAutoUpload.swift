@@ -1,6 +1,25 @@
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2021 Marino Faggiana
-// SPDX-License-Identifier: GPL-3.0-or-later
+//
+//  NCAutoUpload.swift
+//  Nextcloud
+//
+//  Created by Marino Faggiana on 27/01/21.
+//  Copyright © 2021 Marino Faggiana. All rights reserved.
+//
+//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 import UIKit
 import CoreLocation
@@ -13,6 +32,10 @@ class NCAutoUpload: NSObject {
 
     private let database = NCManageDatabase.shared
     private var endForAssetToUpload: Bool = false
+    private var applicationState = UIApplication.shared.applicationState
+    private let hud = NCHud()
+
+    // MARK: -
 
     @objc func initAutoUpload(viewController: UIViewController?, completion: @escaping (_ items: Int) -> Void) {
         if(NCManageDatabase.shared.getAccountAutoUploadFileName() == "Kamera-Medien" || NCManageDatabase.shared.getAccountAutoUploadFileName() == "Camera-Media"){
@@ -29,187 +52,233 @@ class NCAutoUpload: NSObject {
             return
         }
     func initAutoUpload(controller: NCMainTabBarController?, account: String, completion: @escaping (_ num: Int) -> Void) {
-        guard NCNetworking.shared.isOnline,
-              let tblAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", account)),
-              tblAccount.autoUploadStart
-        else {
-            return completion(0)
-        }
-        let albumIds = NCKeychain().getAutoUploadAlbumIds(account: account)
-        let selectedAlbums = PHAssetCollection.allAlbums.filter({albumIds.contains($0.localIdentifier)})
-
-        self.getCameraRollAssets(controller: controller, assetCollections: selectedAlbums, tblAccount: tableAccount(value: tblAccount)) { assets, fileNames in
-            guard let assets,
-                  !assets.isEmpty,
-                  let fileNames else {
+        applicationState = UIApplication.shared.applicationState
+        DispatchQueue.global().async {
+            guard NCNetworking.shared.isOnline,
+                  let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", account)),
+                  tableAccount.autoUploadStart else {
                 return completion(0)
             }
-            self.uploadAssets(controller: controller, tblAccount: tableAccount(value: tblAccount), assets: assets, fileNames: fileNames) { num in
-                completion(num)
+
+            NCAskAuthorization().askAuthorizationPhotoLibrary(controller: controller) { [self] hasPermission in
+                guard hasPermission else {
+                    self.database.setAccountAutoUploadProperty("autoUpload", state: false)
+                    return completion(0)
+                }
+                let albumIds = NCKeychain().getAutoUploadAlbumIds(account: account)
+                let selectedAlbums = PHAssetCollection.allAlbums.filter({albumIds.contains($0.localIdentifier)})
+
+                self.uploadAssets(controller: controller, assetCollections: selectedAlbums, log: "Init Auto Upload", account: account) { num in
+                    completion(num)
+                }
             }
         }
+    }
+
+    func initAutoUpload(controller: NCMainTabBarController? = nil, account: String) async -> Int {
+        await withUnsafeContinuation({ continuation in
+            initAutoUpload(controller: controller, account: account) { num in
+                continuation.resume(returning: num)
+            }
+        })
     }
 
     func autoUploadSelectedAlbums(controller: NCMainTabBarController?, assetCollections: [PHAssetCollection], log: String, account: String) {
-        guard let tblAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", account))
-        else {
-            return
-        }
-        self.getCameraRollAssets(controller: controller, assetCollections: assetCollections, tblAccount: tableAccount(value: tblAccount)) { assets, fileNames in
-            guard let assets,
-                  !assets.isEmpty,
-                  let fileNames else {
-                return
+        applicationState = UIApplication.shared.applicationState
+        hud.initHudRing(view: controller?.view, text: nil, detailText: nil, tapToCancelDetailText: false)
+
+        NCAskAuthorization().askAuthorizationPhotoLibrary(controller: controller) { hasPermission in
+            guard hasPermission else { return }
+            DispatchQueue.global().async {
+                self.uploadAssets(controller: controller, assetCollections: assetCollections, log: log, account: account) { _ in
+                    self.hud.dismiss()
+                }
             }
-            self.uploadAssets(controller: controller, tblAccount: tblAccount, assets: assets, fileNames: fileNames)
         }
     }
 
-    private func uploadAssets(controller: NCMainTabBarController?, tblAccount: tableAccount, assets: [PHAsset], fileNames: [String], completion: @escaping (_ num: Int) -> Void = { _ in }) {
-        let session = NCSession.shared.getSession(account: tblAccount.account)
-        let autoUploadServerUrlBase = self.database.getAccountAutoUploadServerUrlBase(account: tblAccount.account, urlBase: tblAccount.urlBase, userId: tblAccount.userId)
+    private func uploadAssets(controller: NCMainTabBarController?, assetCollections: [PHAssetCollection] = [], log: String, account: String, completion: @escaping (_ num: Int) -> Void) {
+        guard let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", account)) else {
+            return completion(0)
+        }
+        let session = NCSession.shared.getSession(account: account)
+        let autoUploadPath = self.database.getAccountAutoUploadPath(session: session)
         var metadatas: [tableMetadata] = []
-        let formatCompatibility = NCKeychain().formatCompatibility
-        let keychainLivePhoto = NCKeychain().livePhoto
-        let fileSystem = NCUtilityFileSystem()
-        let skipFileNames = self.database.fetchSkipFileNames(account: tblAccount.account, autoUploadServerUrlBase: autoUploadServerUrlBase)
 
-        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Automatic upload, new \(assets.count) assets found")
-
-        for (index, asset) in assets.enumerated() {
-            let fileName = fileNames[index]
-
-            // Convert HEIC if compatibility mode is on
-            let fileNameCompatible = formatCompatibility && (fileName as NSString).pathExtension.lowercased() == "heic" ? (fileName as NSString).deletingPathExtension + ".jpg" : fileName
-
-            if skipFileNames.contains(fileNameCompatible) || skipFileNames.contains(fileName) {
-                continue
+        self.getCameraRollAssets(controller: controller, assetCollections: assetCollections, account: account) { assets in
+            guard let assets, !assets.isEmpty else {
+                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Automatic upload, no new assets found [" + log + "]")
+                return completion(0)
             }
+            var num: Float = 0
 
-            let mediaType = asset.mediaType
-            let isLivePhoto = asset.mediaSubtypes.contains(.photoLive) && keychainLivePhoto
-            let serverUrl = tblAccount.autoUploadCreateSubfolder ? fileSystem.createGranularityPath(asset: asset, serverUrlBase: autoUploadServerUrlBase) : autoUploadServerUrlBase
-            let onWWAN = (mediaType == .image && tblAccount.autoUploadWWAnPhoto) || (mediaType == .video && tblAccount.autoUploadWWAnVideo)
-            let uploadSession = onWWAN ? NCNetworking.shared.sessionUploadBackgroundWWan : NCNetworking.shared.sessionUploadBackground
+            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Automatic upload, new \(assets.count) assets found [" + log + "]")
 
-            let metadata = self.database.createMetadata(
-                fileName: fileName,
-                fileNameView: fileName,
-                ocId: UUID().uuidString,
-                serverUrl: serverUrl,
-                url: "",
-                contentType: "",
-                session: session,
-                sceneIdentifier: controller?.sceneIdentifier
-            )
+            NCNetworking.shared.createFolder(assets: assets, useSubFolder: tableAccount.autoUploadCreateSubfolder, session: session)
 
-            if isLivePhoto {
-                metadata.livePhotoFile = (metadata.fileName as NSString).deletingPathExtension + ".mov"
-            }
+            self.hud.setText(text: NSLocalizedString("_creating_db_photo_progress", comment: ""))
+            self.hud.progress(0.0)
+            self.endForAssetToUpload = false
 
-            metadata.assetLocalIdentifier = asset.localIdentifier
-            metadata.autoUploadServerUrlBase = autoUploadServerUrlBase
-            metadata.session = uploadSession
-            metadata.sessionSelector = NCGlobal.shared.selectorUploadAutoUpload
-            metadata.status = NCGlobal.shared.metadataStatusWaitUpload
-            metadata.sessionDate = Date()
+            var lastUploadDate = Date()
 
-            metadata.classFile = {
-                switch mediaType {
-                case .video: return NKCommon.TypeClassFile.video.rawValue
-                case .image: return NKCommon.TypeClassFile.image.rawValue
-                default: return ""
+            for asset in assets {
+                var isLivePhoto = false
+                var uploadSession: String = ""
+                let assetDate = asset.creationDate ?? Date()
+                let assetMediaType = asset.mediaType
+                var serverUrl: String = ""
+                let fileName = NCUtilityFileSystem().createFileName(asset.originalFilename as String, fileDate: assetDate, fileType: assetMediaType)
+
+                if tableAccount.autoUploadCreateSubfolder {
+                    serverUrl = NCUtilityFileSystem().createGranularityPath(asset: asset, serverUrl: autoUploadPath)
+                } else {
+                    serverUrl = autoUploadPath
                 }
-            }()
 
-            metadatas.append(metadata)
-        }
+                if asset.mediaSubtypes.contains(.photoLive), NCKeychain().livePhoto {
+                    isLivePhoto = true
+                }
 
-        /// Set last date in autoUploadOnlyNewSinceDate
-        if let metadata = metadatas.last {
-            let date = metadata.creationDate as Date
-            self.database.updateAccountProperty(\.autoUploadOnlyNewSinceDate, value: date, account: session.account)
-        }
+                if assetMediaType == PHAssetMediaType.image && tableAccount.autoUploadWWAnPhoto == false {
+                    uploadSession = NCNetworking.shared.sessionUploadBackground
+                } else if assetMediaType == PHAssetMediaType.video && tableAccount.autoUploadWWAnVideo == false {
+                    uploadSession = NCNetworking.shared.sessionUploadBackground
+                } else if assetMediaType == PHAssetMediaType.image && tableAccount.autoUploadWWAnPhoto {
+                    uploadSession = NCNetworking.shared.sessionUploadBackgroundWWan
+                } else if assetMediaType == PHAssetMediaType.video && tableAccount.autoUploadWWAnVideo {
+                    uploadSession = NCNetworking.shared.sessionUploadBackgroundWWan
+                } else {
+                    uploadSession = NCNetworking.shared.sessionUploadBackground
+                }
 
-        if !metadatas.isEmpty {
-            self.database.createMetadatasFolder(assets: assets, useSubFolder: tblAccount.autoUploadCreateSubfolder, session: session) { metadatasFolder in
-                self.database.addMetadatas(metadatasFolder + metadatas, sync: false)
-                completion(metadatas.count)
+                // MOST COMPATIBLE SEARCH --> HEIC --> JPG
+                var fileNameSearchMetadata = fileName
+                let ext = (fileNameSearchMetadata as NSString).pathExtension.lowercased()
+
+                if ext == "heic", NCKeychain().formatCompatibility {
+                    fileNameSearchMetadata = (fileNameSearchMetadata as NSString).deletingPathExtension + ".jpg"
+                }
+
+                if self.database.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView == %@", session.account, serverUrl, fileNameSearchMetadata)) == nil {
+                    let metadata = self.database.createMetadata(fileName: fileName,
+                                                                fileNameView: fileName,
+                                                                ocId: NSUUID().uuidString,
+                                                                serverUrl: serverUrl,
+                                                                url: "",
+                                                                contentType: "",
+                                                                session: session,
+                                                                sceneIdentifier: controller?.sceneIdentifier)
+
+                    if isLivePhoto {
+                        metadata.livePhotoFile = (metadata.fileName as NSString).deletingPathExtension + ".mov"
+                    }
+                    metadata.assetLocalIdentifier = asset.localIdentifier
+                    metadata.session = uploadSession
+                    metadata.sessionSelector = NCGlobal.shared.selectorUploadAutoUpload
+                    metadata.status = NCGlobal.shared.metadataStatusWaitUpload
+                    metadata.sessionDate = Date()
+                    if assetMediaType == PHAssetMediaType.video {
+                        metadata.classFile = NKCommon.TypeClassFile.video.rawValue
+                    } else if assetMediaType == PHAssetMediaType.image {
+                        metadata.classFile = NKCommon.TypeClassFile.image.rawValue
+                    }
+
+                    let metadataCreationDate = metadata.creationDate as Date
+
+                    if lastUploadDate < metadataCreationDate {
+                        lastUploadDate = metadataCreationDate
+                    }
+
+                    metadatas.append(metadata)
+                }
+
+                num += 1
+                self.hud.progress(num: num, total: Float(assets.count))
             }
-        } else {
-            completion(metadatas.count)
+
+            self.endForAssetToUpload = true
+
+            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start createProcessUploads")
+            NCNetworkingProcess.shared.createProcessUploads(metadatas: metadatas, completion: completion)
         }
     }
 
     // MARK: -
 
-    private func getCameraRollAssets(controller: NCMainTabBarController?, assetCollections: [PHAssetCollection] = [], tblAccount: tableAccount, completion: @escaping (_ assets: [PHAsset]?, _ fileNames: [String]?) -> Void) {
+    func processAssets(_ assetCollection: PHAssetCollection, _ fetchOptions: PHFetchOptions, _ tableAccount: tableAccount, _ account: String) -> [PHAsset] {
+        let assets: PHFetchResult<PHAsset> = PHAsset.fetchAssets(in: assetCollection, options: fetchOptions)
+        var assetResult: [PHAsset] = []
+
+        assets.enumerateObjects { asset, _, _ in
+            assetResult.append(asset)
+        }
+
+        return assetResult
+    }
+
+    private func getCameraRollAssets(controller: NCMainTabBarController?, assetCollections: [PHAssetCollection] = [], account: String, completion: @escaping (_ assets: [PHAsset]?) -> Void) {
         NCAskAuthorization().askAuthorizationPhotoLibrary(controller: controller) { [self] hasPermission in
-            guard hasPermission else {
-                return completion(nil, nil)
+            guard hasPermission,
+                  let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", account)) else {
+                return completion(nil)
             }
-            DispatchQueue.global().async {
-                let autoUploadServerUrlBase = self.database.getAccountAutoUploadServerUrlBase(account: tblAccount.account, urlBase: tblAccount.urlBase, userId: tblAccount.userId)
-                var mediaPredicates: [NSPredicate] = []
-                var datePredicates: [NSPredicate] = []
-                let fetchOptions = PHFetchOptions()
+            var newAssets: OrderedSet<PHAsset> = []
+            let fetchOptions = PHFetchOptions()
+            var mediaPredicates: [NSPredicate] = []
 
-                if tblAccount.autoUploadImage {
-                    mediaPredicates.append(NSPredicate(format: "mediaType == %i", PHAssetMediaType.image.rawValue))
-                }
-
-                if tblAccount.autoUploadVideo {
-                    mediaPredicates.append(NSPredicate(format: "mediaType == %i", PHAssetMediaType.video.rawValue))
-                }
-
-                if tblAccount.autoUploadOnlyNew {
-                    datePredicates.append(NSPredicate(format: "creationDate > %@", tblAccount.autoUploadOnlyNewSinceDate as NSDate))
-                } else if let lastDate = self.database.fetchLastAutoUploadedDate(account: tblAccount.account, autoUploadServerUrlBase: autoUploadServerUrlBase) {
-                    datePredicates.append(NSPredicate(format: "creationDate > %@", lastDate as NSDate))
-                }
-
-                fetchOptions.predicate = {
-                    switch (mediaPredicates.isEmpty, datePredicates.isEmpty) {
-                    case (false, false):
-                        return NSCompoundPredicate(andPredicateWithSubpredicates: [
-                            NSCompoundPredicate(orPredicateWithSubpredicates: mediaPredicates),
-                            NSCompoundPredicate(andPredicateWithSubpredicates: datePredicates)
-                        ])
-                    case (false, true):
-                        return NSCompoundPredicate(orPredicateWithSubpredicates: mediaPredicates)
-                    case (true, false):
-                        return NSCompoundPredicate(andPredicateWithSubpredicates: datePredicates)
-                    default:
-                        return nil
-                    }
-                }()
-                fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
-
-                let collections: [PHAssetCollection] = {
-                    if assetCollections.isEmpty {
-                        let fetched = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .smartAlbumUserLibrary, options: nil)
-                        return fetched.firstObject.map { [$0] } ?? []
-                    } else {
-                        return assetCollections
-                    }
-                }()
-
-                guard !collections.isEmpty else {
-                    return completion(nil, nil)
-                }
-
-                let allAssets = collections.flatMap { collection in
-                    let result = PHAsset.fetchAssets(in: collection, options: fetchOptions)
-                    return result.objects(at: IndexSet(0..<result.count))
-                }
-                let newAssets = OrderedSet(allAssets)
-                let fileNames = newAssets.compactMap { asset -> String? in
-                    let date = asset.creationDate ?? Date()
-                    return NCUtilityFileSystem().createFileName(asset.originalFilename, fileDate: date, fileType: asset.mediaType)
-                }
-
-                completion(Array(newAssets), fileNames)
+            if tableAccount.autoUploadImage {
+                mediaPredicates.append(NSPredicate(format: "mediaType == %i", PHAssetMediaType.image.rawValue))
             }
+
+            if tableAccount.autoUploadVideo {
+                mediaPredicates.append(NSPredicate(format: "mediaType == %i", PHAssetMediaType.video.rawValue))
+            }
+
+            var datePredicates: [NSPredicate] = []
+
+            if let autoUploadSinceDate = tableAccount.autoUploadSinceDate {
+                datePredicates.append(NSPredicate(format: "creationDate > %@", autoUploadSinceDate as NSDate))
+            }
+
+            if let autoUploadLastUploadedDate = tableAccount.autoUploadLastUploadedDate {
+                datePredicates.append(NSPredicate(format: "creationDate > %@", autoUploadLastUploadedDate as NSDate))
+            }
+
+            // Combine media type predicates with OR (if any exist)
+            let finalMediaPredicate = mediaPredicates.isEmpty ? nil : NSCompoundPredicate(orPredicateWithSubpredicates: mediaPredicates)
+            let finalDatePredicate = datePredicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: datePredicates)
+
+            var finalPredicate: NSPredicate?
+
+            if let finalMediaPredicate, let finalDatePredicate {
+                finalPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [finalMediaPredicate, finalDatePredicate])
+            } else if let finalMediaPredicate {
+                finalPredicate = finalMediaPredicate
+            } else if let finalDatePredicate {
+                finalPredicate = finalDatePredicate
+            }
+
+            fetchOptions.predicate = finalPredicate
+
+            // Add assets into a set to avoid duplicate photos (same photo in multiple albums)
+            if assetCollections.isEmpty {
+                let assetCollection = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: PHAssetCollectionSubtype.smartAlbumUserLibrary, options: nil)
+                guard let assetCollection = assetCollection.firstObject else { return completion(nil) }
+                let allAssets = processAssets(assetCollection, fetchOptions, tableAccount, account)
+                print(allAssets)
+                newAssets = OrderedSet(allAssets)
+                print(newAssets)
+            } else {
+                var allAssets: [PHAsset] = []
+                for assetCollection in assetCollections {
+                    allAssets += processAssets(assetCollection, fetchOptions, tableAccount, account)
+                }
+
+                newAssets = OrderedSet(allAssets)
+            }
+
+            completion(Array(newAssets))
         }
     }
 }

@@ -34,7 +34,6 @@ class NCPhotosPickerViewController: NSObject {
     var controller: NCMainTabBarController
     var maxSelectedAssets = 1
     var singleSelectedMode = false
-    let global = NCGlobal.shared
 
     @discardableResult
     init(controller: NCMainTabBarController, maxSelectedAssets: Int, singleSelectedMode: Bool) {
@@ -75,15 +74,15 @@ class NCPhotosPickerViewController: NSObject {
             completition(assets)
         }, didCancel: nil)
         viewController.didExceedMaximumNumberOfSelection = { _ in
-            let error = NKError(errorCode: self.global.errorInternalError, errorDescription: "_limited_dimension_")
+            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_limited_dimension_")
             NCContentPresenter().showError(error: error)
         }
         viewController.handleNoAlbumPermissions = { _ in
-            let error = NKError(errorCode: self.global.errorInternalError, errorDescription: "_denied_album_")
+            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_denied_album_")
             NCContentPresenter().showError(error: error)
         }
         viewController.handleNoCameraPermissions = { _ in
-            let error = NKError(errorCode: self.global.errorInternalError, errorDescription: "_denied_camera_")
+            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_denied_camera_")
             NCContentPresenter().showError(error: error)
         }
         viewController.configure = configure
@@ -157,7 +156,7 @@ class NCDocumentPickerViewController: NSObject, UIDocumentPickerDelegate {
             if let fileNameError = FileNameValidator.checkFileName(metadata.fileNameView, account: self.controller.account) {
                 self.controller.present(UIAlertController.warning(message: "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
             } else {
-                let metadata = database.addMetadata(metadata)
+                database.addMetadata(metadata)
                 NCViewer().view(viewController: viewController, metadata: metadata)
             }
 

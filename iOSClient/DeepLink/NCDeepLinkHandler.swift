@@ -126,7 +126,7 @@ class NCDeepLinkHandler {
                 return
             }
 
-            appDelegate.toggleMenu(controller: controller, sender: nil)
+            appDelegate.toggleMenu(controller: controller)
         }
     }
 

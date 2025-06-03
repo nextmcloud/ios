@@ -171,8 +171,6 @@
 "_retry_"                   = "Retry";
 "_images_"                  = "Images";
 "_confirm_"                 = "Confirm";
-"_confirm_continue_"        = "Confirm by continuing the previous uploading";
-"_confirm_resetting_"       = "confirm ignoring previous uploading ";
 
 /* MARK: Files lock */
 
@@ -401,7 +399,6 @@
 "_select_offline_warning_"      = "Making multiple files and folders available offline may take a while and use a lot of memory while doing so.";
 "_advanced_"                    = "Advanced";
 "_permissions_"                 = "Permissions";
-"_custom_permissions_"          = "Custom permissions";
 "_disable_files_app_"           = "Disable Files App integration";
 "_disable_files_app_footer_"    = "Do not permit the access of files via the iOS Files application.";
 "_trial_"                       = "Trial";
@@ -613,14 +610,6 @@
 "_directory_on_top_no_"         = "Folders on top";
 "_show_description_"            = "Show description";
 "_show_recommended_files_"      = "Show recommended files";
-"_favorite_on_top_"             = "Sort favorite first";
-"_directory_on_top_"            = "Sort folders before files";
-"_show_description_"            = "Show folder description";
-"_show_recommended_files_"      = "Show recommendations";
-"_directory_on_top_yes_"        = "✓ Folders on top";
-"_directory_on_top_no_"         = "Folders on top";
-"_show_description_"            = "Show description";
-//"_show_recommended_files_"      = "Show recommended files";
 "_no_description_available_"    = "No description available for this folder";
 "_folder_automatic_upload_"     = "Folder for \"Auto upload\"";
 "_search_no_record_found_"      = "No result";
@@ -741,7 +730,6 @@
 "_share_read_only_"             = "Read only";
 "_share_editing_"               = "Can edit";
 "_share_file_drop_"             = "Filedrop only";
-//"_share_file_drop_"             = "File request";
 "_share_hide_download_"         = "Prevent download";
 "_share_note_recipient_"        = "YOUR MESSAGE";
 "_shareLinksearch_placeholder_" = "Contact name or email address";
@@ -774,25 +762,6 @@
 "_share_reshare_disabled_"      = "You are not allowed to reshare this file/folder";
 "_share_reshare_restricted_"    = "Note: You only have limited permission to reshare this file/folder";
 "_share_can_download_"          = "Allow download";
-"_share_can_read_"              = "Read";
-"_share_can_reshare_"           = "Share";
-"_share_can_create_"            = "Create";
-"_share_can_change_"            = "Edit";
-"_share_can_delete_"            = "Delete";
-"_share_can_download_"          = "Allow download and sync";
-"_share_unshare_"               = "Delete share";
-"_share_internal_link_"         = "Internal link";
-"_share_internal_link_des_"     = "Only works for users with access to this file/folder.";
-"_share_reshare_disabled_"      = "You are not allowed to reshare this file/folder.";
-"_share_reshare_restricted_"    = "Note: You only have limited permission to reshare this file/folder.";
-"_remote_"                      = "Remote";
-"_conversation_"                = "Conversation";
-//"_share_can_reshare_"           = "Allow resharing";
-//"_share_can_create_"            = "Allow creating";
-//"_share_can_change_"            = "Allow editing";
-//"_share_can_delete_"            = "Allow deleting";
-//"_share_unshare_"               = "Unshare";
-//"_share_can_download_"          = "Allow download";
 
 "_no_transfer_"                     = "No transfers yet";
 "_no_transfer_sub_"                 = "Uploads and downloads from this device will show up here";
@@ -1209,8 +1178,7 @@
 "_tip_accountrequest_"      = "Touch here to change account or to add a new one";
 "_tip_addcopyimage_"        = "Long press to paste a copied image";
 "_tip_open_mediadetail_"    = "Swipe up to show the details";
-"_tip_autoupload_button_"   = "Configure the options as you prefer (folder, Wi-Fi, new content, subfolders) and tap ‘Turn on auto uploading’.
-You can stop it at any time, adjust the settings, and enable it again.";
+"_tip_autoupload_"          = "You can now Auto Upload specific Albums from your Photos. You can enable Auto Upload here";
 
 // MARK: Accessibility
 

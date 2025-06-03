@@ -49,7 +49,6 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     var layoutType = NCGlobal.shared.layoutList
     let refreshControl = UIRefreshControl()
     var filename: String?
-
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: tabBarController)
     }
@@ -58,10 +57,6 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     var selectableDataSource: [RealmSwiftObject] { datasource }
     private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     var emptyDataSet: NCEmptyDataSet?
-
-    var controller: NCMainTabBarController? {
-        self.tabBarController as? NCMainTabBarController
-    }
 
     // MARK: - View Life Cycle
 
@@ -117,7 +112,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         }
 
         isEditMode = false
-        (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
+        setNavigationRightItems()
 
         reloadDataSource()
         loadListingTrash()
@@ -194,7 +189,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
 
     func tapMoreListItem(with objectId: String, image: UIImage?, sender: Any) {
         if !isEditMode {
-            toggleMenuMore(with: objectId, image: image, isGridCell: false, sender: sender)
+            toggleMenuMore(with: objectId, image: image, isGridCell: false)
         } else if let button = sender as? UIView {
             let buttonPosition = button.convert(CGPoint.zero, to: collectionView)
             let indexPath = collectionView.indexPathForItem(at: buttonPosition)
@@ -204,7 +199,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
 
     func tapMoreGridItem(with objectId: String, image: UIImage?, sender: Any) {
         if !isEditMode {
-            toggleMenuMore(with: objectId, image: image, isGridCell: true, sender: sender)
+            toggleMenuMore(with: objectId, image: image, isGridCell: true)
         } else if let button = sender as? UIView {
             let buttonPosition = button.convert(CGPoint.zero, to: collectionView)
             let indexPath = collectionView.indexPathForItem(at: buttonPosition)
@@ -245,7 +240,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         }
         datasource = trashItems
         collectionView.reloadData()
-        (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
+        setNavigationRightItems()
 
         guard let blinkFileId = blinkFileId else { return }
         for itemIx in 0..<datasource.count where datasource[itemIx].fileId.contains(blinkFileId) {

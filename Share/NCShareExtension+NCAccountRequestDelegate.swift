@@ -90,7 +90,7 @@ extension NCShareExtension: NCAccountRequestDelegate {
         NCSession.shared.appendSession(account: tableAccount.account, urlBase: tableAccount.urlBase, user: tableAccount.user, userId: tableAccount.userId)
 
         // get auto upload folder
-        autoUploadFileName = self.database.getAccountAutoUploadFileName(account: account)
+        autoUploadFileName = self.database.getAccountAutoUploadFileName()
         autoUploadDirectory = self.database.getAccountAutoUploadDirectory(session: session)
 
         serverUrl = utilityFileSystem.getHomeServer(session: session)

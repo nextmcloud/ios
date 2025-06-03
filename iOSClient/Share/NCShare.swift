@@ -39,13 +39,12 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     weak var appDelegate = UIApplication.shared.delegate as? AppDelegate
 
     public var metadata: tableMetadata!
+    public var sharingEnabled = true
     public var height: CGFloat = 0
     let shareCommon = NCShareCommon()
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
     let database = NCManageDatabase.shared
-
-    var shareLinksCount = 0
 
     var canReshare: Bool {
         guard let metadata = metadata else { return true }
@@ -90,15 +89,6 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
             let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing
             networking?.readShare(showLoadingIndicator: isVisible)
         }
-        let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing
-        networking?.readShare(showLoadingIndicator: isVisible)
-
-//        searchField.searchTextField.font = .systemFont(ofSize: 14)
-//        searchField.delegate = self
-//        if sharingEnabled {
-//            let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing
-//            networking?.readShare(showLoadingIndicator: isVisible)
-//        }
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
         navigationItem.largeTitleDisplayMode = .never
     }
@@ -129,58 +119,6 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
     @objc func openShareProfile() {
         guard let metadata = metadata else { return }
         self.showProfileMenu(userId: metadata.ownerId, session: session)
-    // Shared with you by ...
-    func checkSharedWithYou() {
-        guard !metadata.ownerId.isEmpty, metadata.ownerId != session.userId else { return }
-
-        if !canReshare {
-            searchField.isUserInteractionEnabled = false
-            searchField.alpha = 0.5
-            searchField.placeholder = NSLocalizedString("_share_reshare_disabled_", comment: "")
-            btnContact.isEnabled = false
-        }
-
-        searchFieldTopConstraint.constant = 45
-        sharedWithYouByView.isHidden = false
-        sharedWithYouByLabel.text = NSLocalizedString("_shared_with_you_by_", comment: "") + " " + metadata.ownerDisplayName
-        sharedWithYouByImage.image = utility.loadUserImage(for: metadata.ownerId, displayName: metadata.ownerDisplayName, urlBase: session.urlBase)
-        sharedWithYouByLabel.accessibilityHint = NSLocalizedString("_show_profile_", comment: "")
-
-        let shareAction = UITapGestureRecognizer(target: self, action: #selector(openShareProfile(_:)))
-        sharedWithYouByImage.addGestureRecognizer(shareAction)
-        let shareLabelAction = UITapGestureRecognizer(target: self, action: #selector(openShareProfile(_:)))
-        sharedWithYouByLabel.addGestureRecognizer(shareLabelAction)
-
-        let fileName = NCSession.shared.getFileName(urlBase: session.urlBase, user: metadata.ownerId)
-        let results = NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName)
-
-        if results.image == nil {
-            let etag = self.database.getTableAvatar(fileName: fileName)?.etag
-
-            NextcloudKit.shared.downloadAvatar(
-                user: metadata.ownerId,
-                fileNameLocalPath: utilityFileSystem.directoryUserData + "/" + fileName,
-                sizeImage: NCGlobal.shared.avatarSize,
-                avatarSizeRounded: NCGlobal.shared.avatarSizeRounded,
-                etag: etag,
-                account: metadata.account) { _, imageAvatar, _, etag, _, error in
-                    if error == .success, let etag = etag, let imageAvatar = imageAvatar {
-                        self.database.addAvatar(fileName: fileName, etag: etag)
-                        self.sharedWithYouByImage.image = imageAvatar
-                        self.reloadData()
-                    } else if error.errorCode == NCGlobal.shared.errorNotModified, let imageAvatar = self.database.setAvatarLoaded(fileName: fileName) {
-                        self.sharedWithYouByImage.image = imageAvatar
-                    }
-                }
-        }
-
-        reloadData()
-    }
-
-    // MARK: - Notification Center
-
-    @objc func openShareProfile(_ sender: UITapGestureRecognizer) {
-        self.showProfileMenu(userId: metadata.ownerId, session: session, sender: sender.view)
     }
     
     @objc func keyboardWillShow(notification: Notification) {
@@ -257,49 +195,6 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
             self.view.frame.origin.y = 0
         }
         textField?.layer.borderColor = NCBrandColor.shared.label.cgColor
-    }
-    
-    @objc func keyboardWillShow(notification: Notification) {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-           if (UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape) {
-                if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-                    if view.frame.origin.y == 0 {
-                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                        self.view.frame.origin.y -= keyboardSize.height
-                    }
-                }
-            } else if UIScreen.main.bounds.height < 850 {
-                if view.frame.origin.y == 0 {
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                    self.view.frame.origin.y -= 70
-                }
-            } else {
-                if view.frame.origin.y == 0 {
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                    self.view.frame.origin.y -= 40
-                }
-            }
-        }
-        
-        if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
-            if view.frame.origin.y == 0 {
-                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                self.view.frame.origin.y -= 230
-            }
-        }
-        textField?.layer.borderColor = NCBrandColor.shared.brand.cgColor
-    }
-    
-    @objc func keyboardWillHide(notification: Notification) {
-        if view.frame.origin.y != 0 {
-            self.view.frame.origin.y = 0
-        }
-        textField?.layer.borderColor = NCBrandColor.shared.label.cgColor
-    }
-
-    @objc func openShareProfile() {
-        guard let metadata = metadata else { return }
-        self.showProfileMenu(userId: metadata.ownerId, session: session)
     }
     
     @objc func keyboardWillShow(notification: Notification) {
@@ -349,11 +244,6 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
         if let metadata = metadata {
             shares = self.database.getTableShares(metadata: metadata)
         }
-        shares = self.database.getTableShares(metadata: metadata)
-        shareLinksCount = 0
-//        if let metadata = metadata {
-//            shares = self.database.getTableShares(metadata: metadata)
-//        }
         tableView.reloadData()
     }
 
@@ -403,52 +293,6 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
         appDelegate?.adjust.trackEvent(TriggerEvent(CreateLink.rawValue))
         TealiumHelper.shared.trackEvent(title: "magentacloud-app.sharing.create", data: ["": ""])
         self.touchUpInsideButtonMenu(sender)
-    }
-    
-    @IBAction func touchUpInsideButtonMenu(_ sender: Any) {
-        
-        guard let metadata = metadata else { return }
-        let isFilesSharingPublicPasswordEnforced = NCCapabilities.Capabilities().capabilityFileSharingPubPasswdEnforced
-        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
-        
-        if isFilesSharingPublicPasswordEnforced && shares.firstShareLink == nil {
-            let alertController = UIAlertController(title: NSLocalizedString("_enforce_password_protection_", comment: ""), message: "", preferredStyle: .alert)
-            alertController.addTextField { (textField) in
-                textField.isSecureTextEntry = true
-            }
-            alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .default) { (action:UIAlertAction) in })
-            let okAction = UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default) {[weak self] (action:UIAlertAction) in
-                let password = alertController.textFields?.first?.text
-                self?.networking?.createShareLink(password: password ?? "")
-            }
-            
-            alertController.addAction(okAction)
-            
-            present(alertController, animated: true, completion:nil)
-        } else if shares.firstShareLink == nil {
-            networking?.createShareLink(password: "")
-        } else {
-            networking?.createShareLink(password: "")
-        }
-        
-    }
-    
-    @IBAction func selectContactClicked(_ sender: Any) {
-        let cnPicker = CNContactPickerViewController()
-        cnPicker.delegate = self
-        cnPicker.displayedPropertyKeys = [CNContactEmailAddressesKey]
-        cnPicker.predicateForEnablingContact = NSPredicate(format: "emailAddresses.@count > 0")
-        cnPicker.predicateForSelectionOfProperty = NSPredicate(format: "emailAddresses.@count > 0")
-        
-        self.present(cnPicker, animated: true)
-    }
-    
-    func checkEnforcedPassword(shareType: Int, completion: @escaping (String?) -> Void) {
-        guard NCCapabilities.Capabilities().capabilityFileSharingPubPasswdEnforced,
-              shareType == shareCommon.SHARE_TYPE_LINK || shareType == shareCommon.SHARE_TYPE_EMAIL
-        else { return completion(nil) }
-
-        self.present(UIAlertController.password(titleKey: "_enforce_password_protection_", completion: completion), animated: true)
     }
     
     @IBAction func touchUpInsideButtonMenu(_ sender: Any) {
@@ -555,7 +399,6 @@ class NCShare: UIViewController, NCShareNetworkingDelegate, NCSharePagingContent
 extension NCShare: NCShareNetworkingDelegate {
     func readShareCompleted() {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
-        reloadData()
     }
 
     func shareCompleted() {
@@ -565,19 +408,11 @@ extension NCShare: NCShareNetworkingDelegate {
 
     func unShareCompleted() {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
-        reloadData()
-    }
-
-    func unShareCompleted() {
-//        reloadData()
-//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
         self.reloadData()
     }
 
     func updateShareWithError(idShare: Int) {
-        reloadData()
+        self.reloadData()
     }
 
     func getSharees(sharees: [NKSharee]?) {
@@ -595,18 +430,11 @@ extension NCShare: NCShareNetworkingDelegate {
         appearance.textColor = .darkGray
         appearance.setupMaskedCorners([.layerMaxXMaxYCorner, .layerMinXMaxYCorner])
 
-        let account = NCManageDatabase.shared.getTableAccount(account: metadata.account)
-        let existingShares = NCManageDatabase.shared.getTableShares(metadata: metadata)
-
         for sharee in sharees {
-            if sharee.shareWith == account?.user { continue } // do not show your own account
-            if let shares = existingShares.share, shares.contains(where: {$0.shareWith == sharee.shareWith}) { continue } // do not show already existing sharees
-            if metadata.ownerDisplayName == sharee.shareWith { continue } // do not show owner of the share 
             var label = sharee.label
             if sharee.shareType == shareCommon.SHARE_TYPE_CIRCLE {
                 label += " (\(sharee.circleInfo), \(sharee.circleOwner))"
             }
-
             dropDown.dataSource.append(label)
         }
 
@@ -675,7 +503,6 @@ extension NCShare: NCShareNetworkingDelegate {
 extension NCShare: UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        return 60
         return indexPath.row == 0 ? UITableView.automaticDimension : 60
     }
 }
@@ -704,7 +531,6 @@ extension NCShare: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         if indexPath.row == 0 {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "NCShareEmailFieldCell", for: indexPath) as? NCShareEmailFieldCell  else { return UITableViewCell() }
             cell.searchField.addTarget(self, action: #selector(searchFieldDidEndOnExit(textField:)), for: .editingDidEndOnExit)
@@ -758,83 +584,10 @@ extension NCShare: UITableViewDataSource {
                     cell.labelQuickStatus.textColor = NCBrandColor.shared.optionItem
                     cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.optionItem)
                 }
-        // Setup default share cells
-        guard indexPath.section != 0 else {
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell
-            else { return UITableViewCell() }
-            cell.delegate = self
-            if metadata.e2eEncrypted, NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityE2EEApiVersion == NCGlobal.shared.e2eeVersionV12 {
-                cell.tableShare = shares.firstShareLink
-            } else {
-                if indexPath.row == 0 {
-                    cell.isInternalLink = true
-                } else if shares.firstShareLink?.isInvalidated != true {
-                    cell.tableShare = shares.firstShareLink
-                }
-            }
-            cell.isDirectory = metadata.directory
-            cell.setupCellUI()
-            shareLinksCount += 1
-            
-            let directory = self.metadata?.directory ?? false
-            guard let appDelegate = appDelegate, let tableShare = shares.share?[indexPath.row - 1] else { return UITableViewCell() }
-            
-            //        // LINK, EMAIL
-            //        if tableShare.shareType == shareCommon.SHARE_TYPE_LINK || tableShare.shareType == shareCommon.SHARE_TYPE_EMAIL {
-            //            if let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell {
-            //                cell.indexPath = indexPath
-            //                cell.tableShare = tableShare
-            //                cell.isDirectory = metadata.directory
-            //                cell.delegate = self
-            //                cell.setupCellUI(titleAppendString: String(shareLinksCount))
-            //                if tableShare.shareType == shareCommon.SHARE_TYPE_LINK { shareLinksCount += 1 }
-            //                return cell
-            
-            // LINK
-            if tableShare.shareType == shareCommon.SHARE_TYPE_LINK {
-                guard let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell
-                else { return UITableViewCell() }
-                cell.tableShare = tableShare
-                cell.delegate = self
-                cell.setupCellUI()
-                if !tableShare.label.isEmpty {
-                    cell.labelTitle.text = String(format: NSLocalizedString("_share_linklabel_", comment: ""), tableShare.label)
-                } else {
-                    cell.labelTitle.text = directory ? NSLocalizedString("_share_link_folder_", comment: "") : NSLocalizedString("_share_link_file_", comment: "")
-                }
-//                cell.setupCellUI(userId: session.userId)
-                let isEditingAllowed = shareCommon.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.fileExtension ?? "", shareType: tableShare.shareType)
-                if isEditingAllowed || directory || checkIsCollaboraFile() {
-                    cell.btnQuickStatus.isEnabled = true
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.brand
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.brand)
-                } else {
-                    cell.btnQuickStatus.isEnabled = false
-                    cell.labelQuickStatus.textColor = NCBrandColor.shared.optionItem
-                    cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.optionItem)
-                }
-                
                 return cell
-            } else {
-                // USER / GROUP etc.
-                if let cell = tableView.dequeueReusableCell(withIdentifier: "cellUser", for: indexPath) as? NCShareUserCell {
-                    cell.tableShare = tableShare
-                    cell.isDirectory = metadata.directory
-                    cell.delegate = self
-                    cell.setupCellUI(userId: session.userId, session: session, metadata: metadata)
-                    //                cell.setupCellUI(userId: appDelegate.userId)
-                    let isEditingAllowed = shareCommon.isEditingEnabled(isDirectory: directory, fileExtension: metadata?.fileExtension ?? "", shareType: tableShare.shareType)
-                    if isEditingAllowed || checkIsCollaboraFile() {
-                        cell.btnQuickStatus.isEnabled = true
-                    } else {
-                        cell.btnQuickStatus.isEnabled = false
-                        cell.labelQuickStatus.textColor = NCBrandColor.shared.optionItem
-                        cell.imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.optionItem)
-                    }
-                    return cell
-                }
             }
         }
+
         return UITableViewCell()
     }
     
@@ -907,7 +660,7 @@ extension NCShare: UITableViewDataSource {
 extension NCShare: CNContactPickerDelegate {
     func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
         if  contact.emailAddresses.count > 1 {
-            showEmailList(arrEmail: contact.emailAddresses.map({$0.value as String}), sender: picker)
+            showEmailList(arrEmail: contact.emailAddresses.map({$0.value as String}))
         } else if let email = contact.emailAddresses.first?.value as? String {
             textField?.text = email
             networking?.getSharees(searchString: email)
@@ -927,7 +680,6 @@ extension NCShare: CNContactPickerDelegate {
                     icon: utility.loadImage(named: "email").imageColor(NCBrandColor.shared.brandElement),
                     selected: false,
                     on: false,
-                    sender: sender,
                     action: { _ in
                         self.textField?.text = email
                         self.networking?.getSharees(searchString: email)
@@ -936,7 +688,7 @@ extension NCShare: CNContactPickerDelegate {
             )
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.presentMenu(with: actions, sender: sender)
+            self.presentMenu(with: actions)
         }
     }
 }
@@ -945,16 +697,16 @@ extension NCShare: CNContactPickerDelegate {
 
 extension NCShare: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(searchSharees(_:)), object: nil)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(searchSharees), object: nil)
 
         if searchText.isEmpty {
             dropDown.hide()
         } else {
-            perform(#selector(searchSharees(_:)), with: nil, afterDelay: 0.5)
+            perform(#selector(searchSharees), with: nil, afterDelay: 0.5)
         }
     }
 
-    @objc private func searchSharees(_ sender: Any?) {
+    @objc private func searchSharees() {
         // https://stackoverflow.com/questions/25471114/how-to-validate-an-e-mail-address-in-swift
         func isValidEmail(_ email: String) -> Bool {
 
@@ -967,5 +719,3 @@ extension NCShare: UISearchBarDelegate {
         networking?.getSharees(searchString: searchString)
     }
 }
-
-

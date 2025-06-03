@@ -27,6 +27,7 @@ import PDFKit
 import Accelerate
 import CoreMedia
 import Photos
+import Alamofire
 
 final class NCUtility: NSObject, Sendable {
     let utilityFileSystem = NCUtilityFileSystem()
