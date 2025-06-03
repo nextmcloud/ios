@@ -253,6 +253,9 @@
 		B52FAECF2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B52FAEBE2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.xib */; };
 		B52FAED02DA8EF84001AB1BD /* JPGImageSaveSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B52FAEB02DA8EF84001AB1BD /* JPGImageSaveSwitchView.xib */; };
 		B52FAED12DA8EF84001AB1BD /* PdfWithoutOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B52FAEB62DA8EF84001AB1BD /* PdfWithoutOcrSwitchView.xib */; };
+		B52FAEA12DA8ED40001AB1BD /* AudioUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA02DA8ED40001AB1BD /* AudioUploadTests.swift */; };
+		B52FAEA42DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA32DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift */; };
+		B52FAEA82DA8EE99001AB1BD /* CCManageAutoUpload.m in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA72DA8EE99001AB1BD /* CCManageAutoUpload.m */; };
 		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
@@ -1635,6 +1638,10 @@
 		B52FAEBC2DA8EF84001AB1BD /* SetPDFPasswordSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SetPDFPasswordSwitchView.xib; sourceTree = "<group>"; };
 		B52FAEBD2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFileWithOcrSwitchView.swift; sourceTree = "<group>"; };
 		B52FAEBE2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFileWithOcrSwitchView.xib; sourceTree = "<group>"; };
+		B52FAEA02DA8ED40001AB1BD /* AudioUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUploadTests.swift; sourceTree = "<group>"; };
+		B52FAEA32DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCManageAutoUploadFileName.swift; sourceTree = "<group>"; };
+		B52FAEA62DA8EE99001AB1BD /* CCManageAutoUpload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCManageAutoUpload.h; sourceTree = "<group>"; };
+		B52FAEA72DA8EE99001AB1BD /* CCManageAutoUpload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCManageAutoUpload.m; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -2450,6 +2457,7 @@
 				B5E2E6D32DAE52B500AB2EDD /* SharingTest.swift */,
 				B52FAED22DA8F22F001AB1BD /* MoveAndCopyTests.swift */,
 				B52FAEA92DA8EF0C001AB1BD /* ScanTests.swift */,
+				B52FAEA02DA8ED40001AB1BD /* AudioUploadTests.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = Helper;
@@ -3096,6 +3104,9 @@
 				B5E2E70A2DAE86DC00AB2EDD /* RequiredDataCollectionSwitch.xib */,
 				B5E2E70B2DAE86DC00AB2EDD /* SaveSettingsCustomButtonCell.swift */,
 				B5E2E70C2DAE86DC00AB2EDD /* SaveSettingsCustomButtonCell.xib */,
+				B52FAEA62DA8EE99001AB1BD /* CCManageAutoUpload.h */,
+				B52FAEA72DA8EE99001AB1BD /* CCManageAutoUpload.m */,
+				B52FAEA32DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift */,
 				F768820B2C0DD1E7001CF441 /* Settings */,
 				F76882162C0DD1E7001CF441 /* AutoUpload */,
 				F389C9F32CEE381E00049762 /* SelectAlbum */,
@@ -4748,6 +4759,8 @@
 				B5877EB72DAFDDC60096BD3A /* Placeholder.swift in Sources */,
 				B5877EB82DAFDDC60096BD3A /* NCNotificationText.swift in Sources */,
 				566EB7C62B3D59B900FB7CAD /* MoveAndCopyTests.swift in Sources */,
+				F372087D2BAB4C0F006B5430 /* TestConstants.swift in Sources */,
+				B52FAEA12DA8ED40001AB1BD /* AudioUploadTests.swift in Sources */,
 				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
 				566FCF4D2B3EB78F00168DEA /* OnboardingTestCase.swift in Sources */,
 				566EB81E2B3D8C5500FB7CAD /* SettingsTestCases.swift in Sources */,
@@ -5294,6 +5307,7 @@
 				F72D1007210B6882009C96B7 /* NCPushNotificationEncryption.m in Sources */,
 				F76882362C0DD1E7001CF441 /* NCAcknowledgementsView.swift in Sources */,
 				566EB80A2B3D7B5F00FB7CAD /* TextFileWithOcrSwitchView.swift in Sources */,
+				B52FAEA82DA8EE99001AB1BD /* CCManageAutoUpload.m in Sources */,
 				F785EE9D246196DF00B3F945 /* NCNetworkingE2EE.swift in Sources */,
 				F724377B2C10B83E00C7C68D /* NCPermissions.swift in Sources */,
 				F794E13D2BBBFF2E003693D7 /* NCMainTabBarController.swift in Sources */,
@@ -5515,6 +5529,7 @@
 				AA8E041D2D300FDE00E7E89C /* NCShareNetworkingDelegate.swift in Sources */,
 				F78E2D6529AF02DB0024D4F3 /* Database.swift in Sources */,
 				F70CEF5623E9C7E50007035B /* UIColor+Extension.swift in Sources */,
+				B52FAEA42DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift in Sources */,
 				F76882242C0DD1E7001CF441 /* NCSettingsAdvancedView.swift in Sources */,
 				F785129C2D7989B30087DDD0 /* NCNetworking+TermsOfService.swift in Sources */,
 				F77C3F5B2D9BF8CD00F3C471 /* UITabBar+Extension.swift in Sources */,
