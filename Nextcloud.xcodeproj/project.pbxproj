@@ -256,6 +256,13 @@
 		B52FAEA12DA8ED40001AB1BD /* AudioUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA02DA8ED40001AB1BD /* AudioUploadTests.swift */; };
 		B52FAEA42DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA32DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift */; };
 		B52FAEA82DA8EE99001AB1BD /* CCManageAutoUpload.m in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA72DA8EE99001AB1BD /* CCManageAutoUpload.m */; };
+		B52FAE902DA8D9E1001AB1BD /* CollaboraTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAE8F2DA8D9E1001AB1BD /* CollaboraTestCase.swift */; };
+		B52FAE932DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B52FAE912DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.storyboard */; };
+		B52FAE942DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAE922DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift */; };
+		B52FAE9C2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B52FAE9A2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib */; };
+		B52FAE9D2DA8DED9001AB1BD /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B52FAE982DA8DED9001AB1BD /* FolderPathCustomCell.xib */; };
+		B52FAE9E2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAE992DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.swift */; };
+		B52FAE9F2DA8DED9001AB1BD /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAE972DA8DED9001AB1BD /* FolderPathCustomCell.swift */; };
 		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
@@ -1642,6 +1649,13 @@
 		B52FAEA32DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCManageAutoUploadFileName.swift; sourceTree = "<group>"; };
 		B52FAEA62DA8EE99001AB1BD /* CCManageAutoUpload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCManageAutoUpload.h; sourceTree = "<group>"; };
 		B52FAEA72DA8EE99001AB1BD /* CCManageAutoUpload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCManageAutoUpload.m; sourceTree = "<group>"; };
+		B52FAE8F2DA8D9E1001AB1BD /* CollaboraTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaboraTestCase.swift; sourceTree = "<group>"; };
+		B52FAE912DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCCreateFormUploadDocuments.storyboard; sourceTree = "<group>"; };
+		B52FAE922DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadDocuments.swift; sourceTree = "<group>"; };
+		B52FAE972DA8DED9001AB1BD /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
+		B52FAE982DA8DED9001AB1BD /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
+		B52FAE992DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
+		B52FAE9A2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -2458,6 +2472,7 @@
 				B52FAED22DA8F22F001AB1BD /* MoveAndCopyTests.swift */,
 				B52FAEA92DA8EF0C001AB1BD /* ScanTests.swift */,
 				B52FAEA02DA8ED40001AB1BD /* AudioUploadTests.swift */,
+				B52FAE8F2DA8D9E1001AB1BD /* CollaboraTestCase.swift */,
 				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = Helper;
@@ -2639,6 +2654,15 @@
 				B52FAEBE2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.xib */,
 			);
 			path = "NMC Views";
+		B52FAE9B2DA8DED9001AB1BD /* NMC Custom Views */ = {
+			isa = PBXGroup;
+			children = (
+				B52FAE972DA8DED9001AB1BD /* FolderPathCustomCell.swift */,
+				B52FAE982DA8DED9001AB1BD /* FolderPathCustomCell.xib */,
+				B52FAE992DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.swift */,
+				B52FAE9A2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib */,
+			);
+			path = "NMC Custom Views";
 			sourceTree = "<group>";
 		};
 		C0046CDB2A17B98400D87C9D /* NextcloudUITests */ = {
@@ -3718,6 +3742,8 @@
 				B5E2E7252DAE880700AB2EDD /* NCCreateFormUploadDocuments.swift */,
 				B5E2E7262DAE880700AB2EDD /* NCCreateFormUploadVoiceNote.storyboard */,
 				B5E2E7272DAE880700AB2EDD /* NCCreateFormUploadVoiceNote.swift */,
+				B52FAE912DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.storyboard */,
+				B52FAE922DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift */,
 				F7FA7FFD2C0F4F3B0072FC60 /* Upload Assets */,
 				F7A509242C26BD5D00326106 /* NCCreateDocument.swift */,
 				566FCF2A2B3EAD4700168DEA /* TextTableViewCell.swift */,
@@ -3835,6 +3861,8 @@
 				566FCF4E2B3EB84F00168DEA /* AppUtility.swift */,
 				566FCF562B3ECD3400168DEA /* Helper */,
 				56A32E6F2CE4B75C0020EFF5 /* Analytics */,
+				AA517BB42D66149900F8D37C /* .tx */,
+				B52FAE9B2DA8DED9001AB1BD /* NMC Custom Views */,
 				F702F2CC25EE5B4F008F8E80 /* AppDelegate.swift */,
 				F794E13E2BBC0F70003693D7 /* SceneDelegate.swift */,
 				F77DD6A72C5CC093009448FB /* NCSession.swift */,
@@ -4575,6 +4603,8 @@
 				F717402D24F699A5000C87D5 /* NCFavorite.storyboard in Resources */,
 				F723B3DD22FC6D1D00301EFE /* NCShareCommentsCell.xib in Resources */,
 				F78ACD4B21903F850088454D /* NCTrashListCell.xib in Resources */,
+				B52FAE9C2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib in Resources */,
+				B52FAE9D2DA8DED9001AB1BD /* FolderPathCustomCell.xib in Resources */,
 				AF93471927E2361E002537EE /* NCShareAdvancePermissionFooter.xib in Resources */,
 				B5E2E6E22DAE59CD00AB2EDD /* NCShareAdvancePermissionHeader.xib in Resources */,
 				F7725A61251F33BB00D125E0 /* NCFiles.storyboard in Resources */,
@@ -4607,6 +4637,7 @@
 				F78ACD54219047D40088454D /* NCSectionFooter.xib in Resources */,
 				F751247E2C42919C00E63DB8 /* NCPhotoCell.xib in Resources */,
 				F704B5E32430AA6F00632F5F /* NCCreateFormUploadConflict.storyboard in Resources */,
+				B52FAE932DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.storyboard in Resources */,
 				F7EDE509262DA9D600414FE6 /* NCSelectCommandViewSelect.xib in Resources */,
 				F732D23327CF8AED000B0F1B /* NCPlayerToolBar.xib in Resources */,
 				F73D11FA253C5F4800DF9BEC /* NCViewerNextcloudText.storyboard in Resources */,
@@ -5196,6 +5227,7 @@
 				B52FAEC62DA8EF84001AB1BD /* JPGImageSaveSwitchView.swift in Sources */,
 				B52FAEC72DA8EF84001AB1BD /* PdfWithoutOcrSwitchView.swift in Sources */,
 				B52FAEC82DA8EF84001AB1BD /* TextFileWithOcrSwitchView.swift in Sources */,
+				B52FAE942DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift in Sources */,
 				F39170AD2CB82024006127BC /* FileAutoRenamer+Extensions.swift in Sources */,
 				F799DF882C4B83CC003410B5 /* NCCollectionViewCommon+EasyTipView.swift in Sources */,
 				F7AE00F8230E81CB007ACF8A /* NCBrowserWeb.swift in Sources */,
@@ -5341,6 +5373,8 @@
 				566FCF2C2B3EAD4700168DEA /* TextTableViewCell.swift in Sources */,
 				F757CC8D29E82D0500F31428 /* NCGroupfolders.swift in Sources */,
 				F760329F252F0F8E0015A421 /* NCTransferCell.swift in Sources */,
+				B52FAE9E2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.swift in Sources */,
+				B52FAE9F2DA8DED9001AB1BD /* FolderPathCustomCell.swift in Sources */,
 				F3BB46542A3A1E9D00461F6E /* CCCellMore.swift in Sources */,
 				566FCF5A2B3ECD3400168DEA /* TealiumHelper.swift in Sources */,
 				AF68326A27BE65A90010BF0B /* NCMenuAction.swift in Sources */,

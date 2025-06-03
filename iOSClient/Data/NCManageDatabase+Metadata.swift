@@ -147,6 +147,16 @@ extension tableMetadata {
         }
         return true
     }
+    
+    var isPrintable: Bool {
+        if isDocumentViewableOnly {
+            return false
+        }
+        if ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/") || classFile == NKCommon.TypeClassFile.image.rawValue {
+            return true
+        }
+        return false
+    }
 
     var isPrintable: Bool {
         if isDocumentViewableOnly {
@@ -162,6 +172,7 @@ extension tableMetadata {
         return (classFile == NKCommon.TypeClassFile.image.rawValue && contentType != "image/svg+xml") || classFile == NKCommon.TypeClassFile.video.rawValue
     }
     
+
     var isDocumentViewableOnly: Bool {
         sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKCommon.TypeClassFile.document.rawValue
     }
@@ -215,6 +226,7 @@ extension tableMetadata {
     var canSetAsAvailableOffline: Bool {
 //        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
         return session.isEmpty && !isDocumentViewableOnly
+        return session.isEmpty && !isDocumentViewableOnly //!isDirectoryE2EE && !e2eEncrypted
     }
 
     var canShare: Bool {
@@ -390,7 +402,14 @@ extension NCManageDatabase {
         metadata.fileNameView = file.fileName
         metadata.hasPreview = file.hasPreview
         metadata.hidden = file.hidden
-        metadata.iconName = file.iconName
+        switch (file.fileName as NSString).pathExtension {
+        case "odg":
+            metadata.iconName = "diagram"
+        case "csv", "xlsm" :
+            metadata.iconName = "file_xls"
+        default:
+            metadata.iconName = file.iconName
+        }
         metadata.mountType = file.mountType
         metadata.name = file.name
         metadata.note = file.note
@@ -483,6 +502,42 @@ extension NCManageDatabase {
             counter += 1
         }
         completion(tableMetadata(value: metadataFolder), metadatas)
+    }
+    
+    func convertFilesToMetadatas(_ files: [NKFile], useMetadataFolder: Bool, completion: @escaping (_ metadataFolder: tableMetadata, _ metadatasFolder: [tableMetadata], _ metadatas: [tableMetadata]) -> Void) {
+
+        var counter: Int = 0
+        var isDirectoryE2EE: Bool = false
+        let listServerUrl = ThreadSafeDictionary<String, Bool>()
+
+        var metadataFolder = tableMetadata()
+        var metadataFolders: [tableMetadata] = []
+        var metadatas: [tableMetadata] = []
+
+        for file in files {
+
+            if let key = listServerUrl[file.serverUrl] {
+                isDirectoryE2EE = key
+            } else {
+                isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(file: file)
+                listServerUrl[file.serverUrl] = isDirectoryE2EE
+            }
+
+            let metadata = convertFileToMetadata(file, isDirectoryE2EE: isDirectoryE2EE)
+
+            if counter == 0 && useMetadataFolder {
+                metadataFolder = tableMetadata.init(value: metadata)
+            } else {
+                metadatas.append(metadata)
+                if metadata.directory {
+                    metadataFolders.append(metadata)
+                }
+            }
+
+            counter += 1
+        }
+
+        completion(metadataFolder, metadataFolders, metadatas)
     }
 
     func convertFilesToMetadatasAsync(_ files: [NKFile], useFirstAsMetadataFolder: Bool) async -> (metadataFolder: tableMetadata, metadatas: [tableMetadata]) {
