@@ -231,6 +231,7 @@
 		B5C980202DAD201A0041B146 /* NCSortMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C9801F2DAD201A0041B146 /* NCSortMenu.swift */; };
 		B5C980182DACD51C0041B146 /* NCMediaCommandView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5C980172DACD51C0041B146 /* NCMediaCommandView.xib */; };
 		B5C9801A2DACD56C0041B146 /* NCMedia+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */; };
+		B52FAED52DA8F616001AB1BD /* NCSelectableNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAED42DA8F616001AB1BD /* NCSelectableNavigationView.swift */; };
 		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
@@ -1591,6 +1592,7 @@
 		B5C9801F2DAD201A0041B146 /* NCSortMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSortMenu.swift; sourceTree = "<group>"; };
 		B5C980172DACD51C0041B146 /* NCMediaCommandView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCMediaCommandView.xib; sourceTree = "<group>"; };
 		B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCMedia+Menu.swift"; sourceTree = "<group>"; };
+		B52FAED42DA8F616001AB1BD /* NCSelectableNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSelectableNavigationView.swift; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -2947,6 +2949,7 @@
 			isa = PBXGroup;
 			children = (
 				B5C9801D2DACEB5A0041B146 /* NCCollectionViewCommon+SwipeCollectionViewCellDelegate.swift */,
+				B52FAED42DA8F616001AB1BD /* NCSelectableNavigationView.swift */,
 				F75FE06B2BB01D0D00A0EFEF /* Cell */,
 				F78ACD50219046AC0088454D /* Section Header Footer */,
 				F70D7C3525FFBF81002B9E34 /* NCCollectionViewCommon.swift */,
@@ -5418,6 +5421,7 @@
 				F76882232C0DD1E7001CF441 /* NCCapabilitiesModel.swift in Sources */,
 				F7E2B64F2DDCC5C30075B4D0 /* NCMedia+TransferDelegate.swift in Sources */,
 				F7D68FCC28CB9051009139F3 /* NCManageDatabase+DashboardWidget.swift in Sources */,
+				B52FAED52DA8F616001AB1BD /* NCSelectableNavigationView.swift in Sources */,
 				F76882292C0DD1E7001CF441 /* NCManageE2EEModel.swift in Sources */,
 				F799DF8B2C4B84EB003410B5 /* NCCollectionViewCommon+EndToEndInitialize.swift in Sources */,
 				AA8E041D2D300FDE00E7E89C /* NCShareNetworkingDelegate.swift in Sources */,
