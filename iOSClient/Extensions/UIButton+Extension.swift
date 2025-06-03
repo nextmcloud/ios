@@ -29,12 +29,21 @@ extension UIButton {
     }
 
     func hideSpinnerAndShowButton() {
-           let spinnerTag = Int(bitPattern: Unmanaged.passUnretained(self).toOpaque())
-           let spinner = self.superview?.subviews.first(where: { view -> Bool in
-               return view.isKind(of: UIActivityIndicatorView.self) && view.tag == spinnerTag
-           })
+       let spinnerTag = Int(bitPattern: Unmanaged.passUnretained(self).toOpaque())
+       let spinner = self.superview?.subviews.first(where: { view -> Bool in
+           return view.isKind(of: UIActivityIndicatorView.self) && view.tag == spinnerTag
+       })
 
-           spinner?.removeFromSuperview()
-           self.isHidden = false
-       }
+       spinner?.removeFromSuperview()
+       self.isHidden = false
+    }
+    
+    func setBackgroundColor(_ color: UIColor, for forState: UIControl.State) {
+        UIGraphicsBeginImageContext(CGSize(width: 1, height: 1))
+        UIGraphicsGetCurrentContext()!.setFillColor(color.cgColor)
+        UIGraphicsGetCurrentContext()!.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        let colorImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        self.setBackgroundImage(colorImage, for: forState)
+    }
 }

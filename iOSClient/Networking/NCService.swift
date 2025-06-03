@@ -142,10 +142,95 @@ class NCService: NSObject {
         }
     }
 
-    private func requestServerCapabilities(account: String, controller: NCMainTabBarController?) async {
-        let resultsCapabilities = await NextcloudKit.shared.getCapabilitiesAsync(account: account)
-        guard resultsCapabilities.error == .success, let data = resultsCapabilities.responseData?.data else {
-            return
+    private func requestServerCapabilities(account: String, controller: NCMainTabBarController?) {
+        let session = NCSession.shared.getSession(account: account)
+        NextcloudKit.shared.getCapabilities(account: account, options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { account, presponseData, error in
+            guard error == .success, let data = presponseData?.data else {
+                NCBrandColor.shared.settingThemingColor(account: account)
+                NCImageCache.shared.createImagesBrandCache()
+                return
+            }
+
+            data.printJson()
+
+            self.database.addCapabilitiesJSon(data, account: account, sync: false)
+
+            guard let capability = self.database.setCapabilities(account: account, data: data) else {
+                return
+            }
+
+            // Recommendations
+            if !NCCapabilities.shared.getCapabilities(account: account).capabilityRecommendations {
+                self.database.deleteAllRecommendedFiles(account: account, sync: false)
+            }
+
+            // Theming
+            if NCBrandColor.shared.settingThemingColor(account: account) {
+                NCImageCache.shared.createImagesBrandCache()
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming, userInfo: ["account": account])
+            }
+            
+            // File Sharing
+            if NCGlobal.shared.capabilityFileSharingApiEnabled {
+                let home = self.utilityFileSystem.getHomeServer(session: session)
+                NextcloudKit.shared.readShares(parameters: NKShareParameter()) { account, shares, data, error in
+                    if error == .success {
+                        NCManageDatabase.shared.deleteTableShare(account: account)
+                        if let shares = shares, !shares.isEmpty {
+                            NCManageDatabase.shared.addShare(account: account, home: home, shares: shares)
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
+                        }
+                    }
+                }
+            }
+
+            // Text direct editor detail
+            if capability.capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 {
+                let options = NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)
+                NextcloudKit.shared.textObtainEditorDetails(account: account, options: options) { account, editors, creators, _, error in
+                    if error == .success {
+                        self.database.addDirectEditing(account: account, editors: editors, creators: creators, sync: false)
+                    }
+                }
+            }
+
+            // External file Server
+            if capability.capabilityExternalSites {
+                NextcloudKit.shared.getExternalSite(account: account, options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { account, externalSites, _, error in
+                    if error == .success {
+                        self.database.deleteExternalSites(account: account, sync: false)
+                        for externalSite in externalSites {
+                            self.database.addExternalSites(externalSite, account: account, sync: false)
+                        }
+                    }
+                }
+            } else {
+                self.database.deleteExternalSites(account: account, sync: false)
+            }
+
+            // User Status
+            if capability.capabilityUserStatusEnabled {
+                NextcloudKit.shared.getUserStatus(account: account, options: NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)) { account, clearAt, icon, message, messageId, messageIsPredefined, status, statusIsUserDefined, _, _, error in
+                    if error == .success {
+                        self.database.setAccountUserStatus(userStatusClearAt: clearAt, userStatusIcon: icon, userStatusMessage: message, userStatusMessageId: messageId, userStatusMessageIsPredefined: messageIsPredefined, userStatusStatus: status, userStatusStatusIsUserDefined: statusIsUserDefined, account: account, sync: false)
+                    }
+                }
+            }
+
+            // Added UTI for Collabora
+            capability.capabilityRichDocumentsMimetypes.forEach { mimeType in
+                NextcloudKit.shared.nkCommonInstance.addInternalTypeIdentifier(typeIdentifier: mimeType, classFile: NKCommon.TypeClassFile.document.rawValue, editor: NCGlobal.shared.editorCollabora, iconName: NKCommon.TypeIconFile.document.rawValue, name: "document", account: account)
+            }
+
+            // Added UTI for ONLYOFFICE & Text
+            self.database.getDirectEditingCreators(account: account,
+                                                   dispatchOnMainQueue: false) { tblDirectEditingCreators in
+                for directEditing in tblDirectEditingCreators {
+                    NextcloudKit.shared.nkCommonInstance.addInternalTypeIdentifier(typeIdentifier: directEditing.mimetype, classFile: NKCommon.TypeClassFile.document.rawValue, editor: directEditing.editor, iconName: NKCommon.TypeIconFile.document.rawValue, name: "document", account: account)
+                }
+            }
+
+            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateNotification)
         }
 
         data.printJson()
