@@ -1,8 +1,8 @@
 //
-//  BaseNCMoreCell.swift
+//  NCMoreUserCell.swift
 //  Nextcloud
 //
-//  Created by Milen on 15.06.23.
+//  Created by Milen on 14.06.23.
 //  Copyright © 2023 Marino Faggiana. All rights reserved.
 //
 //  Author Marino Faggiana <marino.faggiana@nextcloud.com>
@@ -22,25 +22,23 @@
 //
 
 import Foundation
-import UIKit
+import MarqueeLabel
 
-class BaseNCMoreCell: UITableViewCell {
-    let selectionColor: UIView = UIView()
-    let defaultCornerRadius: CGFloat = 10.0
+class NCMoreUserCell: BaseNCMoreCell {
+    @IBOutlet weak var displayName: UILabel!
+    @IBOutlet weak var avatar: UIImageView!
+    @IBOutlet weak var icon: UIImageView!
+    @IBOutlet weak var status: MarqueeLabel!
+
+    static let reuseIdentifier = "NCMoreUserCell"
+
+    static func fromNib() -> UINib {
+        return UINib(nibName: "NCMoreUserCell", bundle: nil)
+    }
 
     override func awakeFromNib() {
         super.awakeFromNib()
 
-        selectedBackgroundView = selectionColor
-        backgroundColor = .secondarySystemGroupedBackground
-        applyCornerRadius()
-    }
-
-    func applyCornerRadius() {
-        layer.cornerRadius = defaultCornerRadius
-    }
-
-    func removeCornerRadius() {
-        layer.cornerRadius = 0
+        icon.makeCircularBackground(withColor: .systemBackground)
     }
 }
