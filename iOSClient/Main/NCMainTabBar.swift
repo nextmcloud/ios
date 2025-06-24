@@ -44,9 +44,17 @@ class NCMainTabBar: UITabBar {
 
         NotificationCenter.default.addObserver(self, selector: #selector(updateBadgeNumber(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUpdateBadgeNumber), object: nil)
 
-        if let activeTableAccount = NCManageDatabase.shared.getActiveTableAccount() {
-            self.color = NCBrandColor.shared.getElement(account: activeTableAccount.account)
-            tintColor = color
+//        if let activeTableAccount = NCManageDatabase.shared.getActiveTableAccount() {
+//            self.color = NCBrandColor.shared.getElement(account: activeTableAccount.account)
+//            tintColor = color
+//        }
+        changeTheming()
+    }
+    
+    @objc func changeTheming() {
+        tintColor = NCBrandColor.shared.brandElement
+        if let centerButton = self.viewWithTag(105) {
+            centerButton.backgroundColor = NCBrandColor.shared.brandElement
         }
     }
 
@@ -121,7 +129,7 @@ class NCMainTabBar: UITabBar {
         // File
         if let item = items?[0] {
             item.title = NSLocalizedString("_home_", comment: "")
-            item.image = UIImage(systemName: "folder.fill")
+            item.image = UIImage(named: "tabBarFiles")?.image(color: NCBrandColor.shared.brandElement, size: 25)
             item.selectedImage = item.image
             item.tag = 100
         }
@@ -129,13 +137,13 @@ class NCMainTabBar: UITabBar {
         // Favorite
         if let item = items?[1] {
             item.title = NSLocalizedString("_favorites_", comment: "")
-            item.image = UIImage(systemName: "star.fill")
+            item.image = UIImage(named: "star.fill")?.image(color: NCBrandColor.shared.brandElement, size: 25)
             item.selectedImage = item.image
             item.tag = 101
         }
 
         // +
-        let imagePlus = UIImage(systemName: "plus", withConfiguration: UIImage.SymbolConfiguration(scale: .large))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [.white]))
+        let imagePlus = UIImage(named: "tabBarPlus")?.image(color: .white, size: 100)
         if let item = items?[2] {
             item.title = ""
             item.image = nil
@@ -146,7 +154,7 @@ class NCMainTabBar: UITabBar {
         // Media
         if let item = items?[3] {
             item.title = NSLocalizedString("_media_", comment: "")
-            item.image = UIImage(systemName: "photo")
+            item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.brandElement, size: 25)
             item.selectedImage = item.image
             item.tag = 103
         }
@@ -154,8 +162,7 @@ class NCMainTabBar: UITabBar {
         // More
         if let item = items?[4] {
             item.title = NSLocalizedString("_more_", comment: "")
-            item.image = UIImage(systemName: "line.3.horizontal")
-            item.image = UIImage(systemName: "ellipsis")
+            item.image = UIImage(named: "tabBarMore")?.image(color: NCBrandColor.shared.brandElement, size: 25)
             item.selectedImage = item.image
             item.tag = 104
         }
@@ -171,7 +178,7 @@ class NCMainTabBar: UITabBar {
 
         centerButton.setTitle("", for: .normal)
         centerButton.setImage(imagePlus, for: .normal)
-        centerButton.backgroundColor = color
+        centerButton.backgroundColor = NCBrandColor.shared.brandElement
         centerButton.tintColor = UIColor.white
         centerButton.tag = 105
         centerButton.accessibilityLabel = NSLocalizedString("_accessibility_add_upload_", comment: "")

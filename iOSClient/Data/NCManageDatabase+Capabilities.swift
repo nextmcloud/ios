@@ -47,16 +47,19 @@ extension NCManageDatabase {
             }
         } catch let error {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func getCapabilities(account: String) -> Data? {
         do {
             let realm = try Realm()
+            realm.refresh()
             guard let result = realm.objects(tableCapabilities.self).filter("account == %@", account).first else { return nil }
             return result.jsondata
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
 
         return nil
@@ -310,7 +313,8 @@ extension NCManageDatabase {
                 }
                 jsonData = data
             } catch let error as NSError {
-                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
+                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+//                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
                 return nil
             }
         }
@@ -327,7 +331,7 @@ extension NCManageDatabase {
             capabilities.capabilityServerVersionMajor = data.version.major
 
             if capabilities.capabilityServerVersionMajor > 0 {
-                NextcloudKit.shared.updateSession(account: account, nextcloudVersion: capabilities.capabilityServerVersionMajor)
+                NextcloudKit.shared.updateSession(account: account)//, nextcloudVersion: capabilities.capabilityServerVersionMajor)
             }
 
             capabilities.capabilityFileSharingApiEnabled = data.capabilities.filessharing?.apienabled ?? false
@@ -341,6 +345,8 @@ extension NCManageDatabase {
             capabilities.capabilityFileSharingRemoteExpireDateDays = data.capabilities.filessharing?.ncpublic?.expiredateremote?.days ?? 0
             capabilities.capabilityFileSharingDownloadLimit = data.capabilities.downloadLimit?.enabled ?? false
             capabilities.capabilityFileSharingDownloadLimitDefaultLimit = data.capabilities.downloadLimit?.defaultLimit ?? 1
+            NCGlobal.shared.capabilityE2EEEnabled = data.capabilities.endtoendencryption?.enabled ?? false
+            NCGlobal.shared.capabilityE2EEApiVersion = data.capabilities.endtoendencryption?.apiversion ?? ""
 
             capabilities.capabilityThemingColor = data.capabilities.theming?.color ?? ""
             capabilities.capabilityThemingColorElement = data.capabilities.theming?.colorelement ?? ""
@@ -405,7 +411,8 @@ extension NCManageDatabase {
 
             return capabilities
         } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
             return nil
         }
     }

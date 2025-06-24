@@ -48,6 +48,10 @@ extension UIAlertController {
                         let error = await NCNetworkingE2EEMarkFolder().markFolderE2ee(account: session.account, fileName: fileNameFolder, serverUrl: serverUrl, userId: session.userId)
                         if error != .success {
                             NCContentPresenter().showError(error: error)
+                        }else {
+#if !EXTENSION
+                            AnalyticsHelper.shared.trackCreateFolder(isEncrypted: true, creationDate: Date())
+#endif
                         }
                     } else {
                         NCContentPresenter().showError(error: createFolderResults.error)
@@ -110,9 +114,11 @@ extension UIAlertController {
                 let folderName = text.trimmingCharacters(in: .whitespaces)
                 let isFileHidden = FileNameValidator.isFileHidden(text)
                 let textCheck = FileNameValidator.checkFileName(folderName, account: session.account)
-
-                okAction.isEnabled = !text.isEmpty && textCheck?.error == nil
-
+                let alreadyExists = NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView == %@", session.account, serverUrl, folderName)) != nil
+                
+//                okAction.isEnabled = !text.isEmpty && textCheck?.error == nil
+//                okAction.isEnabled = !folderName.isEmpty && folderName != "." && folderName != ".."
+                okAction.isEnabled = !text.isEmpty && textCheck?.error == nil && alreadyExists == false
                 var message = ""
                 var messageColor = UIColor.label
 
@@ -121,6 +127,9 @@ extension UIAlertController {
                     messageColor = .red
                 } else if isFileHidden {
                     message = NSLocalizedString("hidden_file_name_warning", comment: "")
+                } else if alreadyExists {
+                    message = NSLocalizedString("_item_with_same_name_already_exists_", comment: "")
+                    messageColor = .red
                 }
 
                 let attributedString = NSAttributedString(string: message, attributes: [

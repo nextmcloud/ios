@@ -30,6 +30,7 @@ import WidgetKit
 import Queuer
 import EasyTipView
 import SwiftUI
+import MoEngageInApps
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -59,7 +60,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     @objc var userId: String = ""
     @objc var password: String = ""
     var timerErrorNetworking: Timer?
-    
+    var tipView: EasyTipView?
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if isUiTestingEnabled {
             NCAccount().deleteAllAccounts()
@@ -129,24 +131,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         _ = NCActionCenter.shared
         _ = NCNetworkingProcess.shared
 
-        if account.isEmpty {
-            if NCBrandOptions.shared.disable_intro {
-                openLogin(viewController: nil, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
-            } else {
-                if let viewController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() {
-                    let navigationController = NCLoginNavigationController(rootViewController: viewController)
-                    window?.rootViewController = navigationController
-                    window?.makeKeyAndVisible()
-                }
-            }
-        } else {
-            NCPasscode.shared.presentPasscode(delegate: self) {
-                NCPasscode.shared.enableTouchFaceID()
-            }
-        }
-        adjust.configAdjust()
-        adjust.subsessionStart()
-        TealiumHelper.shared.start()
 //        if account.isEmpty {
 //            if NCBrandOptions.shared.disable_intro {
 //                openLogin(viewController: nil, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
@@ -586,27 +570,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         UIApplication.shared.firstWindow?.rootViewController?.present(alertController, animated: true)
     }
     
-    // MARK: - Account
-
-    @objc func changeAccount(_ account: String, userProfile: NKUserProfile?) {
-//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeUser)
-    }
-
-    @objc func deleteAccount(_ account: String, wipe: Bool) {
-        NCAccount().deleteAccount(account, wipe: wipe)
-    }
-
-    func deleteAllAccounts() {
-        let accounts = NCManageDatabase.shared.getAccounts()
-        accounts?.forEach({ account in
-            deleteAccount(account, wipe: true)
-        })
-    }
-
-    func updateShareAccounts() -> Error? {
-        return NCAccount().updateAppsShareAccounts()
-    }
-
     // MARK: - Account
 
     @objc func changeAccount(_ account: String, userProfile: NKUserProfile?) {

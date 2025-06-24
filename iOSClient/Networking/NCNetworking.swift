@@ -32,13 +32,25 @@ import SwiftUI
 @objc protocol uploadE2EEDelegate: AnyObject { }
 #endif
 
+protocol NCNetworkingDelegate {
+    func downloadProgress(_ progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask)
+    func uploadProgress(_ progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String, session: URLSession, task: URLSessionTask)
+    func downloadComplete(fileName: String, serverUrl: String, etag: String?, date: Date?, dateLastModified: Date?, length: Int64, task: URLSessionTask, error: NKError)
+    func uploadComplete(fileName: String, serverUrl: String, ocId: String?, etag: String?, date: Date?, size: Int64, task: URLSessionTask, error: NKError)
+}
+
 @objc protocol ClientCertificateDelegate {
     func onIncorrectPassword()
     func didAskForClientCertificate()
 }
 
-class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
-    static let shared = NCNetworking()
+@objcMembers
+class NCNetworking: NSObject, NextcloudKitDelegate, @unchecked Sendable {
+    public static let shared: NCNetworking = {
+        let instance = NCNetworking()
+        NotificationCenter.default.addObserver(instance, selector: #selector(applicationDidEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        return instance
+    }()
 
     struct FileNameServerUrl: Hashable {
         var fileName: String
@@ -78,11 +90,80 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     let unifiedSearchQueue = Queuer(name: "unifiedSearchQueue", maxConcurrentOperationCount: 1, qualityOfService: .default)
     let saveLivePhotoQueue = Queuer(name: "saveLivePhotoQueue", maxConcurrentOperationCount: 1, qualityOfService: .default)
     let downloadAvatarQueue = Queuer(name: "downloadAvatarQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let downloadQueue = Queuer(name: "downloadQueue", maxConcurrentOperationCount: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload, qualityOfService: .default)
     let fileExistsQueue = Queuer(name: "fileExistsQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let deleteFileOrFolderQueue = Queuer(name: "deleteFileOrFolderQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let convertLivePhotoQueue = Queuer(name: "convertLivePhotoQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
 
+    public let sessionMaximumConnectionsPerHost = 5
+    public let sessionUploadBackgroundExtension: String = "com.nextcloud.session.upload.extension"
+
+    public lazy var sessionManagerDownloadBackground: URLSession = {
+        let configuration = URLSessionConfiguration.background(withIdentifier: sessionDownloadBackground)
+        configuration.allowsCellularAccess = true
+        configuration.sessionSendsLaunchEvents = true
+        configuration.isDiscretionary = false
+        configuration.httpMaximumConnectionsPerHost = sessionMaximumConnectionsPerHost
+        configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        let session = URLSession(configuration: configuration, delegate: nkBackground, delegateQueue: OperationQueue.main)
+        return session
+    }()
+
+    public lazy var sessionManagerUploadBackground: URLSession = {
+        let configuration = URLSessionConfiguration.background(withIdentifier: sessionUploadBackground)
+        configuration.allowsCellularAccess = true
+        configuration.sessionSendsLaunchEvents = true
+        configuration.isDiscretionary = false
+        configuration.httpMaximumConnectionsPerHost = sessionMaximumConnectionsPerHost
+        configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        let session = URLSession(configuration: configuration, delegate: nkBackground, delegateQueue: OperationQueue.main)
+        return session
+    }()
+
+    public lazy var sessionManagerUploadBackgroundWWan: URLSession = {
+        let configuration = URLSessionConfiguration.background(withIdentifier: sessionUploadBackgroundWWan)
+        configuration.allowsCellularAccess = false
+        configuration.sessionSendsLaunchEvents = true
+        configuration.isDiscretionary = false
+        configuration.httpMaximumConnectionsPerHost = sessionMaximumConnectionsPerHost
+        configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        let session = URLSession(configuration: configuration, delegate: nkBackground, delegateQueue: OperationQueue.main)
+        return session
+    }()
+
+#if EXTENSION
+    public lazy var sessionManagerUploadBackgroundExtension: URLSession = {
+        let configuration = URLSessionConfiguration.background(withIdentifier: sessionUploadBackgroundExtension)
+        configuration.allowsCellularAccess = true
+        configuration.sessionSendsLaunchEvents = true
+        configuration.isDiscretionary = false
+        configuration.httpMaximumConnectionsPerHost = sessionMaximumConnectionsPerHost
+        configuration.requestCachePolicy = NSURLRequest.CachePolicy.reloadIgnoringLocalCacheData
+        configuration.sharedContainerIdentifier = NCBrandOptions.shared.capabilitiesGroup
+        let session = URLSession(configuration: configuration, delegate: nkBackground, delegateQueue: OperationQueue.main)
+        return session
+    }()
+#endif
+
+    public struct TransferInForegorund {
+        var ocId: String
+        var progress: Float
+    }
+    
+    var transferInForegorund: TransferInForegorund?
+    let downloadRequest = ThreadSafeDictionary<String, DownloadRequest>()
+    let uploadRequest = ThreadSafeDictionary<String, UploadRequest>()
+    let uploadMetadataInBackground = ThreadSafeDictionary<FileNameServerUrl, tableMetadata>()
+    let downloadMetadataInBackground = ThreadSafeDictionary<FileNameServerUrl, tableMetadata>()
+    lazy var nkBackground: NKBackground = {
+        let nckb = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)
+        return nckb
+    }()
     // MARK: - init
 
-    init() {
+    override init() {
+        super.init()
+
         if let account = database.getActiveTableAccount()?.account {
             getActiveAccountCertificate(account: account)
         }
@@ -100,6 +181,12 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
         }
     }
 
+    // MARK: - NotificationCenter
+
+    func applicationDidEnterBackground() {
+        NCTransferProgress.shared.clearAllCountError()
+    }
+    
     // MARK: - Communication Delegate
 
     func networkReachabilityObserver(_ typeReachability: NKCommon.TypeReachability) {
@@ -138,18 +225,32 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
 #if !EXTENSION
         if let appDelegate = UIApplication.shared.delegate as? AppDelegate, let completionHandler = appDelegate.backgroundSessionCompletionHandler {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Called urlSessionDidFinishEvents for Background URLSession")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Called urlSessionDidFinishEvents for Background URLSession")
             appDelegate.backgroundSessionCompletionHandler = nil
             completionHandler()
         }
 #endif
     }
 
-    func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) { }
+    func request<Value>(_ request: DataRequest, didParseResponse response: AFDataResponse<Value>) {
+        /// GLOBAL RESPONSE ERROR
+        if let statusCode = response.response?.statusCode {
+            switch statusCode {
+            case NCGlobal.shared.errorMaintenance:
+                if let errorDescription = NKError.getErrorDescription(for: statusCode) {
+                    let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: errorDescription)
+                    NCContentPresenter().showWarning(error: error, priority: .max)
+                }
+            default:
+                break
+            }
+        }
+    }
 
     // MARK: -
 
     func cancelAllQueue() {
+        downloadQueue.cancelAll()
         downloadThumbnailQueue.cancelAll()
         downloadThumbnailActivityQueue.cancelAll()
         downloadThumbnailTrashQueue.cancelAll()

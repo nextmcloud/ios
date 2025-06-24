@@ -35,10 +35,17 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
     @IBOutlet weak var btnSendShare: UIButton!
     @IBOutlet weak var buttonContainerView: UIView!
     let contentInsets: CGFloat = 16
-    public var share: NCTableShareable!
+    public var share: Shareable!
     public var metadata: tableMetadata!
-    var isNewShare: Bool { share is NCTableShareOptions }
+    var isNewShare: Bool { share is TransientShare }
     var networking: NCShareNetworking?
+
+    ///
+    /// The possible download limit associated with this share.
+    ///
+    /// This can only be created after the share has been actually created due to its requirement of the share token provided by the server.
+    ///
+    var downloadLimit: DownloadLimitViewModel = .unlimited
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,9 +106,9 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
     @IBAction func sendShareClicked(_ sender: Any) {
         share.note = commentTextView.text
         if isNewShare {
-            networking?.createShare(option: share)
+            networking?.createShare(share, downloadLimit: downloadLimit)
         } else {
-            networking?.updateShare(option: share)
+            networking?.updateShare(share, downloadLimit: downloadLimit)
         }
         self.navigationController?.popToRootViewController(animated: true)
     }

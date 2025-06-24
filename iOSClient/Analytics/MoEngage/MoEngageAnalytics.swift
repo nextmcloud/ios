@@ -8,6 +8,7 @@
 
 import Foundation
 import MoEngageSDK
+import MoEngageInApps
 
 class MoEngageAnalytics {
     
@@ -27,11 +28,18 @@ class MoEngageAnalytics {
 #else
         MoEngage.sharedInstance.initializeDefaultLiveInstance(sdkConfig)
 #endif
+        setupMoEngageInAppMessaging()
     }
     
     // Method to track the App ID
     func trackAppId() {
         MoEngageSDKAnalytics.sharedInstance.trackLocale(forAppID: "312838242")
+    }
+    
+    func setupMoEngageInAppMessaging() {
+        //MARK: MoEngage In-App messages
+        MoEngageSDKInApp.sharedInstance.showInApp()
+        MoEngageSDKInApp.sharedInstance.showNudge()
     }
 }
 
@@ -136,7 +144,11 @@ extension MoEngageAnalytics: AnalyticsService {
         MoEngageSDKAnalytics.sharedInstance.trackEvent(AnalyticEvents.EVENT__CREATE_VOICE_MEMO.rawValue, withProperties: properties)
     }
     
-    
+    func displayInAppNotification() {
+        MoEngageSDKInApp.sharedInstance.showInApp()
+        //For showing nudges at any mentioned position
+        MoEngageSDKInApp.sharedInstance.showNudge()
+    }
 }
 
 // Functions

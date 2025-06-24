@@ -47,7 +47,7 @@ extension UINavigationController {
         scrollEdgeAppearance.shadowImage = UIImage()
 
         navigationBar.scrollEdgeAppearance = scrollEdgeAppearance
-        navigationBar.tintColor = NCBrandColor.shared.iconImageColor
+        navigationBar.tintColor = NCBrandColor.shared.brand
     }
 
     func setGroupAppearance() {
@@ -67,7 +67,7 @@ extension UINavigationController {
         scrollEdgeAppearance.shadowImage = UIImage()
 
         navigationBar.scrollEdgeAppearance = scrollEdgeAppearance
-        navigationBar.tintColor = NCBrandColor.shared.iconImageColor
+        navigationBar.tintColor = NCBrandColor.shared.brand
     }
 
     func setMediaAppreance() {

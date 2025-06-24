@@ -186,7 +186,7 @@ func getFilesDataEntry(configuration: AccountIntent?, isPreview: Bool, displaySi
 
     NextcloudKit.shared.nkCommonInstance.levelLog = levelLog
     NextcloudKit.shared.nkCommonInstance.pathLog = utilityFileSystem.directoryGroup
-    NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start \(NCBrandOptions.shared.brand) widget session with level \(levelLog) " + versionNextcloudiOS)
+    NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Start \(NCBrandOptions.shared.brand) widget session with level \(levelLog) " + versionNextcloudiOS)
 
     let options = NKRequestOptions(timeout: 30, queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)
     NextcloudKit.shared.searchBodyRequest(serverUrl: activeTableAccount.urlBase, requestBody: requestBody, showHiddenFiles: NCKeychain().showHiddenFiles, account: activeTableAccount.account, options: options) { _, files, data, error in

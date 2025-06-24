@@ -30,6 +30,8 @@ extension NCMedia: UICollectionViewDelegate {
         guard let metadata = dataSource.getMetadata(indexPath: indexPath),
               let cell = collectionView.cellForItem(at: indexPath) as? NCMediaCell else { return }
 
+        cell.imageSelect.isHidden = !isEditMode ? true : false
+
         if isEditMode {
             if let index = fileSelect.firstIndex(of: metadata.ocId) {
                 fileSelect.remove(at: index)
@@ -38,12 +40,15 @@ extension NCMedia: UICollectionViewDelegate {
                 fileSelect.append(metadata.ocId)
                 cell.selected(true)
             }
+            collectionView.reloadItems(at: [indexPath])
             tabBarSelect.selectCount = fileSelect.count
         } else if let metadata = database.getMetadataFromOcId(metadata.ocId) {
             let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024)
             let ocIds = dataSource.metadatas.map { $0.ocId }
-
-            NCViewer().view(viewController: self, metadata: metadata, ocIds: ocIds, image: image)
+            if let metadatas = self.metadatas?.getArray() {
+                NCViewer().view(viewController: self, metadata: metadata, ocIds: ocIds, image: image, metadatas: metadatas)
+                
+            }
         }
     }
 

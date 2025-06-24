@@ -30,62 +30,110 @@ import Photos
 import SVGKit
 
 extension NCUtility {
-    func loadImage(named imageName: String, colors: [UIColor]? = nil, size: CGFloat? = nil, useTypeIconFile: Bool = false, account: String? = nil) -> UIImage {
+    func loadImage(named imageName: String, colors: [UIColor]? = nil, size: CGFloat? = nil, useTypeIconFile: Bool = false, account: String? = nil, symbolConfiguration: Any? = nil) -> UIImage {
         var image: UIImage?
 
         if useTypeIconFile {
             switch imageName {
-            case NKCommon.TypeIconFile.audio.rawValue: image = UIImage(systemName: "waveform", withConfiguration: UIImage.SymbolConfiguration(weight: .thin))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [NCBrandColor.shared.iconImageColor2]))
-            case NKCommon.TypeIconFile.code.rawValue: image = UIImage(systemName: "ellipsis.curlybraces", withConfiguration: UIImage.SymbolConfiguration(weight: .thin))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [NCBrandColor.shared.iconImageColor2]))
-            case NKCommon.TypeIconFile.compress.rawValue: image = UIImage(systemName: "doc.zipper", withConfiguration: UIImage.SymbolConfiguration(weight: .thin))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [NCBrandColor.shared.iconImageColor2]))
-            case NKCommon.TypeIconFile.directory.rawValue: image = UIImage(named: "folder")! .image(color: NCBrandColor.shared.getElement(account: account), size: UIScreen.main.bounds.width / 2)
-            case NKCommon.TypeIconFile.document.rawValue: image = UIImage(systemName: "doc.richtext", withConfiguration: UIImage.SymbolConfiguration(weight: .thin))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [NCBrandColor.shared.documentIconColor]))
-            case NKCommon.TypeIconFile.image.rawValue: image = UIImage(systemName: "photo", withConfiguration: UIImage.SymbolConfiguration(weight: .thin))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [NCBrandColor.shared.iconImageColor2]))
-            case NKCommon.TypeIconFile.movie.rawValue: image = UIImage(systemName: "video", withConfiguration: UIImage.SymbolConfiguration(weight: .thin))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [NCBrandColor.shared.iconImageColor2]))
-            case NKCommon.TypeIconFile.pdf.rawValue: image = UIImage(named: "file_pdf")!
-            case NKCommon.TypeIconFile.ppt.rawValue: image = UIImage(systemName: "play.rectangle", withConfiguration: UIImage.SymbolConfiguration(weight: .thin))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [NCBrandColor.shared.presentationIconColor]))
-            case NKCommon.TypeIconFile.txt.rawValue: image = UIImage(systemName: "doc.text", withConfiguration: UIImage.SymbolConfiguration(weight: .thin))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [NCBrandColor.shared.iconImageColor2]))
-            case NKCommon.TypeIconFile.url.rawValue: image = UIImage(systemName: "network", withConfiguration: UIImage.SymbolConfiguration(weight: .thin))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [NCBrandColor.shared.iconImageColor2]))
-            case NKCommon.TypeIconFile.xls.rawValue: image = UIImage(systemName: "tablecells", withConfiguration: UIImage.SymbolConfiguration(weight: .thin))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [NCBrandColor.shared.spreadsheetIconColor]))
-            default: image = UIImage(systemName: "doc", withConfiguration: UIImage.SymbolConfiguration(weight: .thin))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [NCBrandColor.shared.iconImageColor2]))
+            case NKCommon.TypeIconFile.audio.rawValue: image = UIImage(named: "file_audio")
+            case NKCommon.TypeIconFile.code.rawValue: image = UIImage(named: "file_code")
+            case NKCommon.TypeIconFile.compress.rawValue: image = UIImage(named: "file_compress")
+            case NKCommon.TypeIconFile.directory.rawValue: image = NCImageCache.shared.getFolder()
+            case NKCommon.TypeIconFile.document.rawValue: image = UIImage(named: "document")
+            case NKCommon.TypeIconFile.image.rawValue: image = UIImage(named: "file_photo")
+            case NKCommon.TypeIconFile.movie.rawValue: image = UIImage(named: "file_movie")
+            case NKCommon.TypeIconFile.xls.rawValue: image = UIImage(named: "file_xls")
+            case NKCommon.TypeIconFile.pdf.rawValue: image = UIImage(named: "file_pdf")
+            case NKCommon.TypeIconFile.ppt.rawValue: image = UIImage(named: "file_ppt")
+            case NKCommon.TypeIconFile.txt.rawValue: image = UIImage(named: "file_txt")
+            default: image = (imageName as NSString).pathExtension == "odg" ? UIImage(named: "file_odg") : NCImageCache.shared.getImageFile()
             }
         }
 
         if let image { return image }
+        // see https://stackoverflow.com/questions/71764255
+        let sfSymbolName = imageName.replacingOccurrences(of: "_", with: ".")
+        let color = colors?.first ?? UIColor.systemGray
 
-        // SF IMAGE
-        if let colors {
-            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: .light))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
+//        // SF IMAGE
+//        if let colors {
+//            image = UIImage(systemName: sfSymbolName, withConfiguration: UIImage.SymbolConfiguration(weight: .light))?.withTintColor(color, renderingMode: .alwaysOriginal)//?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
+//        } else {
+////            image = UIImage(systemName: sfSymbolName, withConfiguration: UIImage.SymbolConfiguration(weight: .light))
+//            image = UIImage(systemName: sfSymbolName)?.withTintColor(color, renderingMode: .alwaysOriginal)
+//        }
+        
+        if let symbolConfiguration {
+            image = UIImage(systemName: sfSymbolName, withConfiguration: symbolConfiguration as? UIImage.Configuration)?.withTintColor(color, renderingMode: .alwaysOriginal)
         } else {
-            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: .light))
+            image = UIImage(systemName: sfSymbolName)?.withTintColor(color, renderingMode: .alwaysOriginal)
+        }
+        if image == nil {
+            image = UIImage(named: imageName)?.image(color: color, size: size ?? 50)
         }
 
-        if let image { return image }
+//        if let image { return image }
 
         // IMAGES
-        if let color = colors?.first, let size {
-            image = UIImage(named: imageName)?.image(color: color, size: size)
-        } else if let color = colors?.first, size == nil {
-            image = UIImage(named: imageName)?.image(color: color, size: 50)
-        } else if colors == nil, size == nil {
-            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: 50, height: 50))
-        } else if colors == nil, let size {
-            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: size, height: size))
-        }
+//        if let color = colors?.first, let size {
+//            image = UIImage(named: imageName)?.image(color: color, size: size)
+//        } else if let color = colors?.first, size == nil {
+//            image = UIImage(named: imageName)?.image(color: color, size: 50)
+//        } else if colors == nil, size == nil {
+//            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: 50, height: 50))
+//        } else if colors == nil, let size {
+//            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: size, height: size))
+//        }
+        
+//        // see https://stackoverflow.com/questions/71764255
+//        let sfSymbolName = imageName.replacingOccurrences(of: "_", with: ".")
+//        let color = colors?.first ?? UIColor.systemGray
+//        if let symbolConfiguration {
+//            image = UIImage(systemName: sfSymbolName, withConfiguration: symbolConfiguration as? UIImage.Configuration)?.withTintColor(color, renderingMode: .alwaysOriginal)
+//        } else {
+//            image = UIImage(systemName: sfSymbolName)?.withTintColor(color, renderingMode: .alwaysOriginal)
+//        }
+//        if image == nil {
+//            image = UIImage(named: imageName)?.image(color: color, size: size)
+//        }
+        
         if let image { return image }
 
         // NO IMAGES FOUND
         if let color = colors?.first, let size {
-            return UIImage(systemName: "doc")!.image(color: color, size: size)
+            return NCImageCache.shared.getImageFile().image(color: color, size: size)
         } else {
-            return UIImage(systemName: "doc")!
+            return NCImageCache.shared.getImageFile()
         }
     }
+    
+    func loadImage1(named imageName: String, colors: [UIColor]? = [UIColor.systemGray], size: CGFloat = 50, symbolConfiguration: Any? = nil, renderingMode: UIImage.RenderingMode = .alwaysOriginal) -> UIImage {
 
-    func loadUserImage(for user: String, displayName: String?, urlBase: String) -> UIImage {
-        let fileName = NCSession.shared.getFileName(urlBase: urlBase, user: user)
+        var image: UIImage?
+
+        // see https://stackoverflow.com/questions/71764255
+        let sfSymbolName = imageName.replacingOccurrences(of: "_", with: ".")
+        let color = colors?.first ?? UIColor.systemGray
+        if let symbolConfiguration {
+            image = UIImage(systemName: sfSymbolName, withConfiguration: symbolConfiguration as? UIImage.Configuration)?.withTintColor(color, renderingMode: renderingMode)
+        } else {
+            image = UIImage(systemName: sfSymbolName)?.withTintColor(color, renderingMode: renderingMode)
+        }
+        if image == nil {
+            image = UIImage(named: imageName)?.image(color: color, size: size)
+        }
+        if let image {
+            return image
+        }
+
+        return  UIImage(named: "file")!.image(color: color, size: size)
+    }
+
+    @objc func loadUserImage(for user: String, displayName: String?, urlBase: String) -> UIImage {
+//        let fileName = NCSession.shared.getFileName(urlBase: urlBase, user: user)
+        let fileName = urlBase + "-" + user + ".png"
         let localFilePath = utilityFileSystem.directoryUserData + "/" + fileName
-
+        
         if var localImage = UIImage(contentsOfFile: localFilePath) {
             let rect = CGRect(x: 0, y: 0, width: 30, height: 30)
             UIGraphicsBeginImageContextWithOptions(rect.size, false, 3.0)
@@ -381,5 +429,131 @@ extension NCUtility {
     func memorySizeOfImage(_ image: UIImage) -> Int {
         guard let imageData = image.pngData() else { return 0 }
         return imageData.count
+    }
+    
+    func createFilePreviewImage(ocId: String, etag: String, fileNameView: String, classFile: String, status: Int, createPreviewMedia: Bool) -> UIImage? {
+
+        var imagePreview: UIImage?
+        let filePath = utilityFileSystem.getDirectoryProviderStorageOcId(ocId, fileNameView: fileNameView)
+        let iconImagePath = utilityFileSystem.getDirectoryProviderStorageIconOcId(ocId, etag: etag)
+
+        if FileManager.default.fileExists(atPath: iconImagePath) {
+            imagePreview = UIImage(contentsOfFile: iconImagePath)
+        } else if !createPreviewMedia {
+            return nil
+        } else if createPreviewMedia && status >= global.metadataStatusNormal && classFile == NKCommon.TypeClassFile.image.rawValue && FileManager().fileExists(atPath: filePath) {
+            if let image = UIImage(contentsOfFile: filePath), let image = image.resizeImage(size: global.size512), let data = image.jpegData(compressionQuality: 0.5) {
+                do {
+                    try data.write(to: URL(fileURLWithPath: iconImagePath), options: .atomic)
+                    imagePreview = image
+                } catch { }
+            }
+        } else if createPreviewMedia && status >= global.metadataStatusNormal && classFile == NKCommon.TypeClassFile.video.rawValue && FileManager().fileExists(atPath: filePath) {
+            if let image = imageFromVideo(url: URL(fileURLWithPath: filePath), at: 0), let image = image.resizeImage(size: global.size512), let data = image.jpegData(compressionQuality: 0.5) {
+                do {
+                    try data.write(to: URL(fileURLWithPath: iconImagePath), options: .atomic)
+                    imagePreview = image
+                } catch { }
+            }
+        }
+
+        return imagePreview
+    }
+    
+    func getImageMetadata(_ metadata: tableMetadata, for size: CGFloat) -> UIImage? {
+
+        if let image = getImage(metadata: metadata) {
+            return image
+        }
+
+        if metadata.isVideo && !metadata.hasPreview {
+            createImageFrom(fileNameView: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
+        }
+
+        if utilityFileSystem.fileProviderStoragePreviewIconExists(metadata.ocId, etag: metadata.etag) {
+            return UIImage(contentsOfFile: utilityFileSystem.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag))
+        }
+
+        if metadata.isVideo {
+            return UIImage(named: "noPreviewVideo")?.image(color: .gray, size: size)
+        } else if metadata.isAudio {
+            return UIImage(named: "noPreviewAudio")?.image(color: .gray, size: size)
+        } else {
+            return UIImage(named: "noPreview")?.image(color: .gray, size: size)
+        }
+    }
+    
+    func getImage(metadata: tableMetadata) -> UIImage? {
+
+        let ext = (metadata.fileNameView as NSString).pathExtension.uppercased()
+        var image: UIImage?
+
+        if utilityFileSystem.fileProviderStorageExists(metadata) && metadata.isImage {
+
+            let previewPath = utilityFileSystem.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag)
+            let iconPath = utilityFileSystem.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)
+            let imagePath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)
+
+            if ext == "GIF" {
+                if !FileManager().fileExists(atPath: previewPath) {
+                    createImageFrom(fileNameView: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
+                }
+                image = UIImage.animatedImage(withAnimatedGIFURL: URL(fileURLWithPath: imagePath))
+            } else if ext == "SVG" {
+                if let svgImage = SVGKImage(contentsOfFile: imagePath) {
+                    svgImage.size = global.size1024
+                    if let image = svgImage.uiImage {
+                        if !FileManager().fileExists(atPath: previewPath) {
+                            do {
+                                try image.pngData()?.write(to: URL(fileURLWithPath: previewPath), options: .atomic)
+                                try image.pngData()?.write(to: URL(fileURLWithPath: iconPath), options: .atomic)
+                            } catch { }
+                        }
+                        return image
+                    } else {
+                        return nil
+                    }
+                } else {
+                    return nil
+                }
+            } else {
+                createImageFrom(fileNameView: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
+                image = UIImage(contentsOfFile: imagePath)
+            }
+        }
+        return image
+    }
+    
+    func createImageFrom(fileNameView: String, ocId: String, etag: String, classFile: String) {
+
+        var originalImage, scaleImagePreview, scaleImageIcon: UIImage?
+
+        let fileNamePath = utilityFileSystem.getDirectoryProviderStorageOcId(ocId, fileNameView: fileNameView)
+        let fileNamePathPreview = utilityFileSystem.getDirectoryProviderStoragePreviewOcId(ocId, etag: etag)
+        let fileNamePathIcon = utilityFileSystem.getDirectoryProviderStorageIconOcId(ocId, etag: etag)
+
+        if utilityFileSystem.fileProviderStorageSize(ocId, fileNameView: fileNameView) > 0 && FileManager().fileExists(atPath: fileNamePathPreview) && FileManager().fileExists(atPath: fileNamePathIcon) { return }
+        if classFile != NKCommon.TypeClassFile.image.rawValue && classFile != NKCommon.TypeClassFile.video.rawValue { return }
+
+        if classFile == NKCommon.TypeClassFile.image.rawValue {
+
+            originalImage = UIImage(contentsOfFile: fileNamePath)
+
+            scaleImagePreview = originalImage?.resizeImage(size: global.size1024)
+            scaleImageIcon = originalImage?.resizeImage(size: global.size512)
+
+            try? scaleImagePreview?.jpegData(compressionQuality: 0.7)?.write(to: URL(fileURLWithPath: fileNamePathPreview))
+            try? scaleImageIcon?.jpegData(compressionQuality: 0.7)?.write(to: URL(fileURLWithPath: fileNamePathIcon))
+
+        } else if classFile == NKCommon.TypeClassFile.video.rawValue {
+
+            let videoPath = NSTemporaryDirectory() + "tempvideo.mp4"
+            utilityFileSystem.linkItem(atPath: fileNamePath, toPath: videoPath)
+
+            originalImage = imageFromVideo(url: URL(fileURLWithPath: videoPath), at: 0)
+
+            try? originalImage?.jpegData(compressionQuality: 0.7)?.write(to: URL(fileURLWithPath: fileNamePathPreview))
+            try? originalImage?.jpegData(compressionQuality: 0.7)?.write(to: URL(fileURLWithPath: fileNamePathIcon))
+        }
     }
 }

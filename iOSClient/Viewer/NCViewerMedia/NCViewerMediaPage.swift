@@ -39,6 +39,7 @@ class NCViewerMediaPage: UIViewController {
     var ocIds: [String] = []
     var currentIndex: Int = 0
     var delegateViewController: UIViewController?
+    var metadatas: [tableMetadata] = []
 
     ///
     var modifiedOcId: [String] = []
@@ -64,8 +65,8 @@ class NCViewerMediaPage: UIViewController {
     var timerAutoHide: Timer?
     private var timerAutoHideSeconds: Double = 4
 
-    private lazy var moreNavigationItem = UIBarButtonItem(image: NCImageCache.shared.getImageButtonMore(), style: .plain, target: self, action: #selector(openMenuMore))
-    private lazy var imageDetailNavigationItem = UIBarButtonItem(image: NCUtility().loadImage(named: "info.circle", colors: [NCBrandColor.shared.iconImageColor]), style: .plain, target: self, action: #selector(toggleDetail))
+    private lazy var moreNavigationItem = UIBarButtonItem(image: UIImage(named: "more")!.image(color: NCBrandColor.shared.textColor, size: 25), style: .plain, target: self, action: #selector(openMenuMore))
+    private lazy var imageDetailNavigationItem = UIBarButtonItem(image: UIImage(systemName: "info.circle")!.image(color: NCBrandColor.shared.textColor, size: 22), style: .plain, target: self, action: #selector(toggleDetail))
 
     // swiftlint:disable force_cast
     var pageViewController: UIPageViewController {
@@ -102,8 +103,9 @@ class NCViewerMediaPage: UIViewController {
 
         prefersLargeTitles = navigationController?.navigationBar.prefersLargeTitles
 
-        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
-        let metadata = database.getMetadataFromOcId(ocIds[currentIndex])!
+//        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
+//        let metadata = database.getMetadataFromOcId(ocIds[currentIndex])!
+        let metadata = metadatas[currentIndex]
 
         singleTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didSingleTapWith(gestureRecognizer:)))
         panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPanWith(gestureRecognizer:)))
@@ -119,7 +121,7 @@ class NCViewerMediaPage: UIViewController {
         pageViewController.view.addGestureRecognizer(singleTapGestureRecognizer)
         pageViewController.view.addGestureRecognizer(longtapGestureRecognizer)
 
-        progressView.tintColor = NCBrandColor.shared.getElement(account: metadata.account)
+        progressView.tintColor = NCBrandColor.shared.brand
         progressView.trackTintColor = .clear
         progressView.progress = 0
 
@@ -141,6 +143,8 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(uploadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadedFile), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: UIApplication.didBecomeActiveNotification, object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(renameFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterRenameFile), object: nil)
 
         if NCNetworking.shared.isOnline {
             if currentViewController.metadata.isImage {
@@ -173,6 +177,8 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterUploadedFile), object: nil)
 
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
+        
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterRenameFile), object: nil)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -339,6 +345,19 @@ class NCViewerMediaPage: UIViewController {
         guard let userInfo = notification.userInfo as NSDictionary?,
               let ocId = userInfo["ocId"] as? String
         else {
+            if let userInfo = notification.userInfo as NSDictionary?,
+               let selector = userInfo["selector"] as? String {
+                
+                if selector == NCGlobal.shared.selectorPrint {
+                    // waiting close menu
+                    // https://github.com/nextcloud/ios/issues/2278
+                    //            DispatchQueue.main.async {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        let metadata = self.currentViewController.metadata
+                        NCActionCenter.shared.printDocument(metadata: metadata)
+                    }
+                }
+            }
             return
         }
 
@@ -410,6 +429,27 @@ class NCViewerMediaPage: UIViewController {
         }
 
         self.viewUnload()
+    }
+    
+    @objc func renameFile(_ notification: NSNotification) {
+
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let ocId = userInfo["ocId"] as? String,
+              let index = metadatas.firstIndex(where: {$0.ocId == ocId}),
+              let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+        else { return }
+
+        // Stop media
+        if let ncplayer = currentViewController.ncplayer, ncplayer.isPlaying() {
+            ncplayer.playerPause()
+        }
+
+        metadatas[index] = metadata
+        if index == currentIndex {
+            navigationItem.title = metadata.fileNameView
+            currentViewController.metadata = metadata
+            self.currentViewController.metadata = metadata
+        }
     }
 
     @objc func applicationDidBecomeActive(_ notification: NSNotification) {
@@ -655,11 +695,11 @@ extension UIPageViewController {
 extension NCViewerMediaPage: NCViewerMediaViewDelegate {
     func didOpenDetail() {
         changeScreenMode(mode: .normal)
-        imageDetailNavigationItem.image = NCUtility().loadImage(named: "info.circle.fill")
+        imageDetailNavigationItem.image = UIImage(systemName: "info.circle.fill")
     }
 
     func didCloseDetail() {
-        imageDetailNavigationItem.image = NCUtility().loadImage(named: "info.circle")
+        imageDetailNavigationItem.image = UIImage(systemName: "info.circle")
     }
 }
 

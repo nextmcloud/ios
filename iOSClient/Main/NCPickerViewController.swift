@@ -66,7 +66,7 @@ class NCPhotosPickerViewController: NSObject {
         if maxSelectedAssets > 0 {
             configure.maxSelectedAssets = maxSelectedAssets
         }
-        configure.selectedColor = NCBrandColor.shared.getElement(account: controller.account)
+        configure.selectedColor = NCBrandColor.shared.brandElement
         configure.singleSelectedMode = singleSelectedMode
         configure.allowedAlbumCloudShared = true
 
@@ -99,8 +99,9 @@ class customPhotoPickerViewController: TLPhotosPickerViewController {
     override func makeUI() {
         super.makeUI()
 
-        self.customNavItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.iconImageColor
-        self.customNavItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.iconImageColor
+        self.customNavItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.customer
+        self.customNavItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.customer
+        self.albumPopView.tintColor = NCBrandColor.shared.customer
     }
 }
 
@@ -157,7 +158,7 @@ class NCDocumentPickerViewController: NSObject, UIDocumentPickerDelegate {
                 self.controller.present(UIAlertController.warning(message: "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
             } else {
                 database.addMetadata(metadata)
-                NCViewer().view(viewController: viewController, metadata: metadata)
+                NCViewer().view(viewController: viewController, metadata: metadata, metadatas: [metadata])
             }
 
         } else {

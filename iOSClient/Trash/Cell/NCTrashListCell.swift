@@ -74,7 +74,6 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
 
         ]
 
-        imageRestore.image = utility.loadImage(named: "restore", color: NCBrandColor.shared.iconColor)
         imageRestore.image = utility.loadImage(named: "restore", colors: [NCBrandColor.shared.iconColor])
 
         imageMore.image = UIImage(systemName: "trash")

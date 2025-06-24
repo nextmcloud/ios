@@ -118,23 +118,6 @@ extension NCViewer {
                     title: NSLocalizedString("_rename_", comment: ""),
                     icon: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.iconColor]),
                     action: { _ in
-                        if self.utilityFileSystem.fileProviderStorageExists(metadata) {
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorPrint, "error": NKError(), "account": metadata.account])
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile,
-                                                                        object: nil,
-                                                                        userInfo: ["ocId": metadata.ocId,
-                                                                                   "ocIdTransfer": metadata.ocIdTransfer,
-                                                                                   "session": metadata.session,
-                                                                                   "selector": NCGlobal.shared.selectorSaveAsScan,
-                                                                                   "error": NKError(),
-                                                                                   "account": metadata.account],
-                                                                        second: 0.5)
-                        } else {
-                            guard let metadata = self.database.setMetadatasSessionInWaitDownload(metadatas: [metadata],
-                                                                                                 session: NCNetworking.shared.sessionDownload,
-                                                                                                 selector: NCGlobal.shared.selectorSaveAsScan,
-                                                                                                 sceneIdentifier: controller.sceneIdentifier) else { return }
-                            NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
 
                         if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
 
@@ -153,80 +136,6 @@ extension NCViewer {
         }
         
         //
-        // SAVE CAMERA ROLL
-        //
-        if !webView, metadata.isSavebleInCameraRoll {
-            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata]))
-        }
-
-
-        //
-        // RENAME
-        //
-        if !webView, metadata.isRenameable, !metadata.isDirectoryE2EE {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_rename_", comment: ""),
-                    icon: utility.loadImage(named: "text.cursor", colors: [NCBrandColor.shared.iconImageColor]),
-                    action: { _ in
-
-                        if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
-
-                            vcRename.metadata = metadata
-                            vcRename.disableChangeExt = true
-                            vcRename.imagePreview = imageIcon
-                            vcRename.indexPath = indexPath
-
-                            let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
-
-                            viewController.present(popup, animated: true)
-                        }
-                    }
-                )
-            )
-        }
-
-        //
-        // COPY - MOVE
-        //
-        if !webView, metadata.isCopyableMovable {
-            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], viewController: viewController, indexPath: []))
-        }
-
-        //
-        // RENAME
-        //
-        if !webView, metadata.isRenameable, !metadata.isDirectoryE2EE {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_rename_", comment: ""),
-                    icon: utility.loadImage(named: "text.cursor", colors: [NCBrandColor.shared.iconImageColor]),
-                    action: { _ in
-
-                        if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
-
-                            vcRename.metadata = metadata
-                            vcRename.disableChangeExt = true
-                            vcRename.imagePreview = imageIcon
-                            vcRename.indexPath = indexPath
-
-                            let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
-
-                            viewController.present(popup, animated: true)
-                        }
-                    }
-                )
-            )
-        }
-
-        //
-        // COPY - MOVE
-        //
-        if !webView, metadata.isCopyableMovable {
-            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], viewController: viewController, indexPath: []))
-        }
-
-        //
         // COPY - MOVE
         //
         if !webView, metadata.isCopyableMovable {
@@ -237,11 +146,6 @@ extension NCViewer {
         //
         if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
             actions.append(.copyAction(fileSelect: [metadata.ocId], controller: controller))
-        }
-        // COPY IN PASTEBOARD
-        //
-        if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
-            actions.append(.copyAction(selectOcId: [metadata.ocId]))
         }
 
         //
@@ -304,7 +208,6 @@ extension NCViewer {
         // DELETE
         //
         if !webView, metadata.isDeletable {
-            actions.append(.deleteAction(selectedMetadatas: [metadata], indexPath: [], metadataFolder: nil, viewController: viewController))
             actions.append(.deleteAction(selectedMetadatas: [metadata], metadataFolder: nil, controller: controller))
         }
 

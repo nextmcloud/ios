@@ -31,7 +31,7 @@
 import Foundation
 import UIKit
 
-final public class NCCapabilities: Sendable {
+final public class NCCapabilities : @unchecked Sendable {
     static let shared = NCCapabilities()
 
     public class Capabilities {

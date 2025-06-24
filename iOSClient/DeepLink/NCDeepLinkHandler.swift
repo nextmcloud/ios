@@ -48,6 +48,7 @@ enum ControllerConstants {
     static let shares = "segueShares"
     static let offline = "segueOffline"
     static let delete = "segueTrash"
+    static let settings = "segueSettings"
 }
 
 class NCDeepLinkHandler {

@@ -37,7 +37,7 @@ protocol NCMediaLayoutDelegate: UICollectionViewDelegate {
 }
 
 public class NCMediaLayout: UICollectionViewLayout {
-
+    
     // MARK: - Private constants
     /// How many items to be union into a single rectangle
     private let unionSize = 20
@@ -107,6 +107,9 @@ public class NCMediaLayout: UICollectionViewLayout {
     private var footersAttribute = [Int: UICollectionViewLayoutAttributes]()
     private var unionRects = [CGRect]()
 
+    var mediaViewController: NCMedia?
+    var mediaLayout = ""
+
     // MARK: - UICollectionViewLayout Methods
     public override func prepare() {
         super.prepare()
@@ -115,8 +118,16 @@ public class NCMediaLayout: UICollectionViewLayout {
               let collectionView = collectionView,
               let delegate = delegate else { return }
 
-        columnCount = delegate.getColumnCount()
-        (delegate as? NCMedia)?.buildMediaPhotoVideo(columnCount: columnCount)
+//        columnCount = delegate.getColumnCount()
+//        (delegate as? NCMedia)?.buildMediaPhotoVideo(columnCount: columnCount)
+        mediaLayout = NCKeychain().mediaTypeLayout
+        columnCount = NCKeychain().mediaColumnCount
+        mediaViewController?.buildMediaPhotoVideo(columnCount: columnCount)
+
+        if UIDevice.current.userInterfaceIdiom == .phone,
+           (UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight) {
+            columnCount += 2
+        }
 
         // Initialize variables
         headersAttribute.removeAll(keepingCapacity: false)

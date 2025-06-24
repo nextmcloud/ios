@@ -141,6 +141,7 @@ class tableMetadata: Object {
     @objc dynamic var width: Int = 0
     @objc dynamic var errorCode: Int = 0
     @objc dynamic var nativeFormat: Bool = false
+    @objc dynamic var autoUploadServerUrlBase: String?
 
     override static func primaryKey() -> String {
         return "ocId"
@@ -166,16 +167,6 @@ extension tableMetadata {
         return true
     }
     
-    var isPrintable: Bool {
-        if isDocumentViewableOnly {
-            return false
-        }
-        if ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/") || classFile == NKCommon.TypeClassFile.image.rawValue {
-            return true
-        }
-        return false
-    }
-
     var isPrintable: Bool {
         if isDocumentViewableOnly {
             return false
@@ -242,8 +233,6 @@ extension tableMetadata {
     }
 
     var canSetAsAvailableOffline: Bool {
-//        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
-        return session.isEmpty && !isDocumentViewableOnly
         return session.isEmpty && !isDocumentViewableOnly //!isDirectoryE2EE && !e2eEncrypted
     }
 
@@ -372,7 +361,6 @@ extension tableMetadata {
 
     // Return if is sharable
     func isSharable() -> Bool {
-        guard NCGlobal.shared.capabilityE2EEEnabled, !isDirectoryE2EE, !e2eEncrypted else { return false }
         if !NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingApiEnabled || (NCCapabilities.shared.getCapabilities(account: account).capabilityE2EEEnabled && isDirectoryE2EE), !e2eEncrypted {
             return false
         }
@@ -558,41 +546,41 @@ extension NCManageDatabase {
         completion(metadataFolder, metadataFolders, metadatas)
     }
 
-    func convertFilesToMetadatas(_ files: [NKFile], useMetadataFolder: Bool, completion: @escaping (_ metadataFolder: tableMetadata, _ metadatasFolder: [tableMetadata], _ metadatas: [tableMetadata]) -> Void) {
-
-        var counter: Int = 0
-        var isDirectoryE2EE: Bool = false
-        let listServerUrl = ThreadSafeDictionary<String, Bool>()
-
-        var metadataFolder = tableMetadata()
-        var metadataFolders: [tableMetadata] = []
-        var metadatas: [tableMetadata] = []
-
-        for file in files {
-
-            if let key = listServerUrl[file.serverUrl] {
-                isDirectoryE2EE = key
-            } else {
-                isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(file: file)
-                listServerUrl[file.serverUrl] = isDirectoryE2EE
-            }
-
-            let metadata = convertFileToMetadata(file, isDirectoryE2EE: isDirectoryE2EE)
-
-            if counter == 0 && useMetadataFolder {
-                metadataFolder = tableMetadata.init(value: metadata)
-            } else {
-                metadatas.append(metadata)
-                if metadata.directory {
-                    metadataFolders.append(metadata)
-                }
-            }
-
-            counter += 1
-        }
-
-        completion(metadataFolder, metadataFolders, metadatas)
-    }
+//    func convertFilesToMetadatas(_ files: [NKFile], useMetadataFolder: Bool, completion: @escaping (_ metadataFolder: tableMetadata, _ metadatasFolder: [tableMetadata], _ metadatas: [tableMetadata]) -> Void) {
+//
+//        var counter: Int = 0
+//        var isDirectoryE2EE: Bool = false
+//        let listServerUrl = ThreadSafeDictionary<String, Bool>()
+//
+//        var metadataFolder = tableMetadata()
+//        var metadataFolders: [tableMetadata] = []
+//        var metadatas: [tableMetadata] = []
+//
+//        for file in files {
+//
+//            if let key = listServerUrl[file.serverUrl] {
+//                isDirectoryE2EE = key
+//            } else {
+//                isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(file: file)
+//                listServerUrl[file.serverUrl] = isDirectoryE2EE
+//            }
+//
+//            let metadata = convertFileToMetadata(file, isDirectoryE2EE: isDirectoryE2EE)
+//
+//            if counter == 0 && useMetadataFolder {
+//                metadataFolder = tableMetadata.init(value: metadata)
+//            } else {
+//                metadatas.append(metadata)
+//                if metadata.directory {
+//                    metadataFolders.append(metadata)
+//                }
+//            }
+//
+//            counter += 1
+//        }
+//
+//        completion(metadataFolder, metadataFolders, metadatas)
+//    }
     
     func getMetadataDirectoryFrom(files: [NKFile]) -> tableMetadata? {
         guard let file = files.first else { return nil }
@@ -1364,6 +1352,7 @@ extension NCManageDatabase {
     func getResultsMetadatas(predicate: NSPredicate, sortedByKeyPath: String? = nil, ascending: Bool = false, freeze: Bool = false) -> Results<tableMetadata>? {
         do {
             let realm = try Realm()
+            realm.refresh()
             if let sortedByKeyPath {
                 let results = realm.objects(tableMetadata.self).filter(predicate).sorted(byKeyPath: sortedByKeyPath, ascending: ascending)
                 if freeze {
@@ -1456,5 +1445,17 @@ extension NCManageDatabase {
         }
 
         return metadatas
+    }
+    
+    func getResultMetadataFromFileId(_ fileId: String?) -> tableMetadata? {
+        guard let fileId else { return nil }
+
+        do {
+            let realm = try Realm()
+            return realm.objects(tableMetadata.self).filter("fileId == %@", fileId).first
+        } catch let error as NSError {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
+        }
+        return nil
     }
 }

@@ -38,11 +38,6 @@ protocol NCSectionFirstHeaderDelegate: AnyObject {
 extension NCSectionFirstHeaderDelegate {
     func tapButtonSwitch(_ sender: Any) {}
     func tapButtonOrder(_ sender: Any) {}
-}
-
-extension NCSectionFirstHeaderDelegate {
-    func tapButtonSwitch(_ sender: Any) {}
-    func tapButtonOrder(_ sender: Any) {}
     func tapButtonMore(_ sender: Any) {}
 }
 
@@ -96,10 +91,6 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         backgroundColor = .clear
         
         //Button
-        buttonSwitch.setImage(UIImage(systemName: "list.bullet"), for: .normal)//!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
-
-        buttonOrder.setTitle("", for: .normal)
-        buttonOrder.setTitleColor(NCBrandColor.shared.brand, for: .normal)
         buttonSwitch.setImage(UIImage(systemName: "list.bullet")!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
 
         buttonOrder.setTitle("", for: .normal)
@@ -145,12 +136,6 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
         buttonTransfer.setImage(nil, for: .normal)
         buttonTransfer.layer.cornerRadius = 6
         buttonTransfer.layer.masksToBounds = true
-        imageButtonTransfer.image = NCUtility().loadImage(named: "stop.circle")
-        imageButtonTransfer.tintColor = .white
-        labelTransfer.text = ""
-        progressTransfer.progress = 0
-        progressTransfer.tintColor = NCBrandColor.shared.brandElement
-        progressTransfer.trackTintColor = NCBrandColor.shared.brandElement.withAlphaComponent(0.2)
         imageButtonTransfer.image = UIImage(systemName: "stop.circle")
         imageButtonTransfer.tintColor = .white
         labelTransfer.text = ""
@@ -180,50 +165,6 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
 
         buttonSwitch.isEnabled = enable
         buttonOrder.isEnabled = enable
-    }
-
-    func setImageSwitchList() {
-
-        buttonSwitch.setImage(UIImage(systemName: "list.bullet"), for: .normal)//!.image(color: NCBrandColor.shared.iconColor, width: 20, height: 15), for: .normal)
-    }
-
-    func setImageSwitchGrid() {
-
-        buttonSwitch.setImage(UIImage(systemName: "square.grid.2x2")!.image(color: NCBrandColor.shared.iconImageColor, size: 20), for: .normal)
-    }
-
-    func setButtonsView(height: CGFloat) {
-
-        viewButtonsViewHeightConstraint.constant = height
-        if height == 0 {
-            viewButtonsView.isHidden = true
-        } else {
-            viewButtonsView.isHidden = false
-        }
-    }
-
-    func setSortedTitle(_ title: String) {
-
-        let title = NSLocalizedString(title, comment: "")
-        buttonOrder.setTitle(title, for: .normal)
-    }
-
-    // MARK: - View
-
-    func setStatusButtonsView(enable: Bool) {
-
-        buttonSwitch.isEnabled = enable
-        buttonOrder.isEnabled = enable
-    }
-
-    func setImageSwitchList() {
-
-        buttonSwitch.setImage(UIImage(systemName: "list.bullet"), for: .normal)//!.image(color: NCBrandColor.shared.iconColor, width: 20, height: 15), for: .normal)
-    }
-
-    func setImageSwitchGrid() {
-
-        buttonSwitch.setImage(UIImage(systemName: "square.grid.2x2")!.image(color: NCBrandColor.shared.iconImageColor, size: 20), for: .normal)
         buttonMore.isEnabled = enable
     }
 
@@ -307,9 +248,9 @@ class NCSectionFirstHeader: UICollectionReusableView, UIGestureRecognizerDelegat
             var image: UIImage?
             if let ocId,
                let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                image = utility.getIcon(metadata: metadata)?.darken()
-                if image == nil {
-                    image = utility.loadImage(named: metadata.iconName, useTypeIconFile: true)
+//                image = utility.getIcon(metadata: metadata)?.darken()
+//                if image == nil {
+//                    image = utility.loadImage(named: metadata.iconName, useTypeIconFile: true)
                 image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt256)?.darken()
                 if image == nil {
                     image = UIImage(named: metadata.iconName)

@@ -27,13 +27,10 @@ import Foundation
 
 // MARK: UICollectionViewDelegate
 extension NCTrash: UICollectionViewDelegate {
-
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 
-        let tableTrash = datasource[indexPath.item]
-
         guard let resultTableTrash = datasource?[indexPath.item] else { return }
-        let resultTableTrash = datasource[indexPath.item]
 
         guard !isEditMode else {
             if let index = fileSelect.firstIndex(of: resultTableTrash.fileId) {
@@ -49,8 +46,6 @@ extension NCTrash: UICollectionViewDelegate {
 
         if resultTableTrash.directory,
            let ncTrash: NCTrash = UIStoryboard(name: "NCTrash", bundle: nil).instantiateInitialViewController() as? NCTrash {
-            ncTrash.trashPath = tableTrash.filePath + tableTrash.fileName
-            ncTrash.titleCurrentFolder = tableTrash.trashbinFileName
             ncTrash.filePath = resultTableTrash.filePath + resultTableTrash.fileName
             ncTrash.titleCurrentFolder = resultTableTrash.trashbinFileName
             ncTrash.filename = resultTableTrash.fileName
@@ -63,26 +58,9 @@ extension NCTrash: UICollectionViewDelegate {
 extension NCTrash: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        emptyDataSet?.numberOfItemsInSection(datasource.count, section: section)
-        setNavigationRightItems()
-        return datasource.count
-    }
-
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-
-        let tableTrash = datasource[indexPath.item]
-        var image: UIImage?
-
-        if tableTrash.iconName.isEmpty {
-            image = UIImage(named: "file")
-        } else {
-            image = UIImage(named: tableTrash.iconName)
+        emptyDataSet?.numberOfItemsInSection(datasource?.count ?? 0, section: section)
         setNavigationRightItems()
         return datasource?.count ?? 0
-        let numberOfItems = datasource.count
-        emptyDataSet?.numberOfItemsInSection(numberOfItems, section: section)
-        setNavigationRightItems()
-        return numberOfItems
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -100,7 +78,8 @@ extension NCTrash: UICollectionViewDataSource {
             cell = gridCell
         }
         
-        let resultTableTrash = datasource[indexPath.item]
+        guard let resultTableTrash = datasource?[indexPath.item] else { return cell }
+
         cell.imageItem.contentMode = .scaleAspectFit
 
         if resultTableTrash.iconName.isEmpty {
@@ -120,33 +99,10 @@ extension NCTrash: UICollectionViewDataSource {
             }
         }
 
-        var cell: NCTrashCellProtocol & UICollectionViewCell
-
-        if layoutForView?.layout == NCGlobal.shared.layoutList {
-            guard let listCell = collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as? NCTrashListCell else { return UICollectionViewCell() }
-            listCell.delegate = self
-            cell = listCell
-        } else {
-            // GRID
-            guard let gridCell = collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as? NCTrashGridCell else { return UICollectionViewCell() }
-            gridCell.setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCImageCache.images.buttonMore)
-            gridCell.delegate = self
-            cell = gridCell
-        }
-
-        cell.indexPath = indexPath
-        cell.setupCellUI(tableTrash: tableTrash, image: image)
-        cell.selected(selectOcId.contains(tableTrash.fileId), isEditMode: isEditMode)
-
-        return cell
-    }
-
-    func setTextFooter(datasource: [tableTrash]) -> String {
-
         cell.account = resultTableTrash.account
         cell.objectId = resultTableTrash.fileId
         cell.setupCellUI(tableTrash: resultTableTrash, image: image)
-        cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, account: resultTableTrash.account)
+        cell.selected(fileSelect.contains(resultTableTrash.fileId), isEditMode: isEditMode, account: resultTableTrash.account)
         return cell
     }
 
@@ -203,7 +159,6 @@ extension NCTrash: UICollectionViewDataSource {
             }
             
             header.delegate = self
-            header.setStatusButtonsView(enable: !datasource.isEmpty)
             header.setStatusButtonsView(enable: !(datasource?.isEmpty ?? false))
             header.setSortedTitle(layoutForView?.titleButtonHeader ?? "")
             header.setButtonsView(height: NCGlobal.shared.heightButtonsView)
@@ -216,11 +171,10 @@ extension NCTrash: UICollectionViewDataSource {
         } else {
             guard let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFooter", for: indexPath) as? NCSectionFooter
             else { return UICollectionReusableView() }
-            
-            guard let datasource else { return footer }
-            footer.setTitleLabel(setTextFooter(datasource: datasource))
-            footer.separatorIsHidden(true)
-            
+            if let datasource {
+                footer.setTitleLabel(setTextFooter(datasource: datasource))
+                footer.separatorIsHidden(true)
+            }
             return footer
         }
     }
@@ -230,7 +184,7 @@ extension NCTrash: UICollectionViewDataSource {
 extension NCTrash: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        if datasource.isEmpty {
+        if let datasource, datasource.isEmpty {
             let height = utility.getHeightHeaderEmptyData(view: view, portraitOffset: 0, landscapeOffset: -20)
             return CGSize(width: collectionView.frame.width, height: height)
         }

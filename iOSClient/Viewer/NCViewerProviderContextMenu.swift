@@ -48,11 +48,11 @@ class NCViewerProviderContextMenu: UIViewController {
         self.image = image
 
         if metadata.directory {
-            imageView.image = NCImageCache.shared.getFolder(account: metadata.account)
+            imageView.image = NCImageCache.shared.getFolder()
             imageView.frame = resize(CGSize(width: sizeIcon, height: sizeIcon))
         } else {
             // ICON
-            let image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+            let image = UIImage(named: metadata.iconName)?.resizeImage(size: CGSize(width: sizeIcon * 2, height: sizeIcon * 2)) // NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
             imageView.image = image
             imageView.frame = resize(CGSize(width: sizeIcon, height: sizeIcon))
             // PREVIEW

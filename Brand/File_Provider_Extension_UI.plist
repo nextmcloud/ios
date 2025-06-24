@@ -29,10 +29,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>25246</string>
-	<string>26881</string>
-	<string>28804</string>
-	<string>30156</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleDevelopmentRegion</key>

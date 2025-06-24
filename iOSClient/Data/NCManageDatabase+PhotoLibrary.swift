@@ -83,6 +83,7 @@ extension NCManageDatabase {
 
         do {
             let realm = try Realm()
+            realm.refresh()
             let results = realm.objects(tablePhotoLibrary.self).filter(predicate)
             let idsAsset = results.map { $0.idAsset }
             return Array(idsAsset)

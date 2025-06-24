@@ -56,6 +56,8 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
         NCSession.shared.getSession(controller: controller)
     }
 
+    private var tipView: EasyTipView?
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {

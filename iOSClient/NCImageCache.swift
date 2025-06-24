@@ -27,7 +27,6 @@ import LRUCache
 import NextcloudKit
 import RealmSwift
 
-@objc class NCImageCache: NSObject {
 @objc class NCImageCache: NSObject, @unchecked Sendable {
     @objc static let shared = NCImageCache()
 
@@ -162,6 +161,7 @@ import RealmSwift
     @objc func createMediaCache(account: String, withCacheSize: Bool) {
         if createMediaCacheInProgress {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] ThumbnailLRUCache image process already in progress")
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] ThumbnailLRUCache image process already in progress")
             return
         }
         createMediaCacheInProgress = true
@@ -264,9 +264,6 @@ import RealmSwift
     }
     
     func getMediaMetadatas(account: String, predicate: NSPredicate? = nil) -> ThreadSafeArray<tableMetadata>? {
-        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")    }
-        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
-    }
         guard let tableAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", account)) else { return nil }
         let startServerUrl = NCUtilityFileSystem().getHomeServer(urlBase: tableAccount.urlBase, userId: tableAccount.userId) + tableAccount.mediaPath
         let predicateBoth = NSPredicate(format: showBothPredicateMediaString, account, startServerUrl)
@@ -375,45 +372,6 @@ import RealmSwift
         static var iconFile = UIImage()
     }
 
-    func getImageShared(account: String) -> UIImage {
-        return UIImage(named: "share")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getImageCanShare() -> UIImage {
-        return UIImage(named: "share")!.imageColor(.systemGray)
-    }
-    func createImagesCache() {
-        let utility = NCUtility()
-
-        images.file = utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor2])
-
-        images.shared = UIImage(named: "share")!.image(color: .systemGray, size: 50)
-        images.canShare = UIImage(named: "share")!.image(color: .systemGray, size: 50)
-        images.shareByLink = UIImage(named: "sharebylink")!.image(color: .systemGray, size: 50)
-        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 50)
-        
-        images.favorite = utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
-        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
-        images.offlineFlag = UIImage(named: "offlineFlag")!
-        images.local = utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen])
-
-        images.checkedYes = UIImage(named: "checkedYes")!
-        images.checkedNo = UIImage(named: "local")!
-
-        images.buttonMore = utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor])
-        images.buttonStop = utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor])
-        images.buttonMoreLock = utility.loadImage(named: "lock.fill", colors: [NCBrandColor.shared.iconImageColor])
-
-        createImagesBrandCache()
-    }
-
-    func createImagesBrandCache() {
-
-        let brandElement = NCBrandColor.shared.brandElement
-        guard brandElement != self.brandElementColor else { return }
-        self.brandElementColor = brandElement
-        let utility = NCUtility()
-
     func createImagesCache() {
         let utility = NCUtility()
 
@@ -478,10 +436,6 @@ import RealmSwift
     func getImageShared() -> UIImage {
         return NCImageCache.images.shared
     }
-    
-    func getImageShared(account: String) -> UIImage {
-        return NCImageCache.images.shared
-    }
 
     func getImageCanShare() -> UIImage {
         return NCImageCache.images.canShare
@@ -512,7 +466,6 @@ import RealmSwift
     }
 
     func getImageButtonMore() -> UIImage {
-        return UIImage(named: "more")!.imageColor(.systemGray)
         return NCImageCache.images.buttonMore
     }
 
@@ -527,29 +480,9 @@ import RealmSwift
     func getImageLivePhoto() -> UIImage {
         return NCImageCache.images.livePhoto
     }
-    
-    func getFolder(account: String) -> UIImage {
-        return NCImageCache.images.folder
-    }
 
     func getAddFolder() -> UIImage {
         return UIImage(named: "addFolder")!
-    }
-
-    func getAddFolderInfo() -> UIImage {
-        return UIImage(named: "addFolderInfo")!.imageColor(NCBrandColor.shared.iconImageColor)
-    }
-
-    func getFolderEncrypted(account: String) -> UIImage {
-        return UIImage(named: "folderEncrypted")!.image(color: NCBrandColor.shared.getElement(account: account))
-    }
-
-    func getEncryptedFolder() -> UIImage {
-        return UIImage(named: "encryptedfolder")!.imageColor(NCBrandColor.shared.iconImageColor)
-    }
-
-    func getFolderSharedWithMe(account: String) -> UIImage {
-        return UIImage(named: "folder_shared_with_me")!.image(color: NCBrandColor.shared.getElement(account: account))
     }
 
     func getAddFolderInfo() -> UIImage {
@@ -567,25 +500,7 @@ import RealmSwift
     func getFolderSharedWithMe() -> UIImage {
         return NCImageCache.images.folderSharedWithMe
     }
-
-    func getFolderAutomaticUpload(account: String) -> UIImage {
-        return UIImage(named: "folderAutomaticUpload")!.image(color: NCBrandColor.shared.getElement(account: account))
-        images.folderEncrypted = UIImage(named: "folderEncrypted")!
-        images.folderSharedWithMe = UIImage(named: "folder_shared_with_me")!
-        images.folderPublic = UIImage(named: "folder_public")!
-        images.folderGroup = UIImage(named: "folder_group")!
-        images.folderExternal = UIImage(named: "folder_external")!
-        images.folderAutomaticUpload = UIImage(named: "folderAutomaticUpload")!
-        images.folder = UIImage(named: "folder")!
-        images.iconContacts = utility.loadImage(named: "person.crop.rectangle.stack", colors: [NCBrandColor.shared.iconImageColor])
-        images.iconTalk = UIImage(named: "talk-template")!.image(color: brandElement)
-        images.iconCalendar = utility.loadImage(named: "calendar", colors: [NCBrandColor.shared.iconImageColor])
-        images.iconDeck = utility.loadImage(named: "square.stack.fill", colors: [NCBrandColor.shared.iconImageColor])
-        images.iconMail = utility.loadImage(named: "mail", colors: [NCBrandColor.shared.iconImageColor])
-        images.iconConfirm = utility.loadImage(named: "arrow.right", colors: [NCBrandColor.shared.iconImageColor])
-        images.iconPages = utility.loadImage(named: "doc.richtext", colors: [NCBrandColor.shared.iconImageColor])
-        images.iconFile = utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor])
-    
+        
     func getFolderPublic() -> UIImage {
         return NCImageCache.images.folderPublic
     }

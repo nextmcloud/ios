@@ -30,10 +30,15 @@ class NCViewer: NSObject {
     let utility = NCUtility()
     let database = NCManageDatabase.shared
     private var viewerQuickLook: NCViewerQuickLook?
+    private var metadata = tableMetadata()
+    private var metadatas: [tableMetadata] = []
 
-    func view(viewController: UIViewController, metadata: tableMetadata, ocIds: [String]? = nil, image: UIImage? = nil) {
+    func view(viewController: UIViewController, metadata: tableMetadata, ocIds: [String]? = nil, image: UIImage? = nil, metadatas: [tableMetadata]? = []) {
         let session = NCSession.shared.getSession(account: metadata.account)
 
+        self.metadata = metadata
+        self.metadatas = metadatas ?? []
+        
         // URL
         if metadata.classFile == NKCommon.TypeClassFile.url.rawValue {
             // nextcloudtalk://open-conversation?server={serverURL}&user={userId}&withRoomToken={roomToken}
@@ -70,7 +75,7 @@ class NCViewer: NSObject {
                     viewerMediaPageContainer.currentIndex = 0
                     viewerMediaPageContainer.ocIds = [metadata.ocId]
                 }
-
+                viewerMediaPageContainer.metadatas = self.metadatas
                 navigationController.pushViewController(viewerMediaPageContainer, animated: true)
             }
             return
@@ -135,7 +140,7 @@ class NCViewer: NSObject {
                 if metadata.url.isEmpty {
                     let fileNamePath = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
                     NCActivityIndicator.shared.start(backgroundView: viewController.view)
-                    NextcloudKit.shared.NCTextOpenFile(fileNamePath: fileNamePath, editor: editor, account: metadata.account, options: options) { _, url, _, error in
+                    NextcloudKit.shared.textOpenFile(fileNamePath: fileNamePath, editor: editor, account: metadata.account, options: options) { _, url, _, error in
                         NCActivityIndicator.shared.stop()
                         if error == .success, url != nil {
                             if let navigationController = viewController.navigationController,

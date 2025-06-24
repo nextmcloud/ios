@@ -215,6 +215,11 @@ extension NCNetworking {
                       session: NCSession.Session,
                       options: NKRequestOptions = NKRequestOptions()) async -> NKError {
         var fileNameFolder = utility.removeForbiddenCharacters(fileName.trimmingCharacters(in: .whitespacesAndNewlines))
+        if fileName != fileNameFolder {
+            let errorDescription = String(format: NSLocalizedString("_forbidden_characters_", comment: ""), NCGlobal.shared.forbiddenCharacters.joined(separator: " "))
+            let error = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: errorDescription)
+            return error
+        }
         if !overwrite {
             fileNameFolder = utilityFileSystem.createFileName(fileNameFolder, serverUrl: serverUrl, account: session.account)
         }
@@ -328,6 +333,9 @@ extension NCNetworking {
 
     func createFolder(assets: [PHAsset],
                       useSubFolder: Bool,
+                      withPush: Bool,
+                      sceneIdentifier: String? = nil,
+                      hud: NCHud? = nil,
                       session: NCSession.Session) async -> (Bool) {
         let serverUrlFileName = self.database.getAccountAutoUploadDirectory(session: session) + "/" + self.database.getAccountAutoUploadFileName()
 
@@ -520,6 +528,97 @@ extension NCNetworking {
             self.database.renameMetadata(fileNameNew: fileNameNew, ocId: metadata.ocId, status: NCGlobal.shared.metadataStatusWaitRename)
         }
     }
+    
+    func renameMetadata(_ metadata: tableMetadata,
+                        fileNameNew: String,
+                        indexPath: IndexPath,
+                        viewController: UIViewController?,
+                        completion: @escaping (_ error: NKError) -> Void) {
+
+        let metadataLive = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
+        let fileNameNew = fileNameNew.trimmingCharacters(in: .whitespacesAndNewlines)
+        let fileNameNewLive = (fileNameNew as NSString).deletingPathExtension + ".mov"
+
+        if metadata.isDirectoryE2EE {
+#if !EXTENSION
+            Task {
+                if let metadataLive = metadataLive {
+                    let error = await NCNetworkingE2EERename().rename(metadata: metadataLive, fileNameNew: fileNameNew)
+                    if error == .success {
+                        let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
+                        DispatchQueue.main.async { completion(error) }
+                    } else {
+                        DispatchQueue.main.async { completion(error) }
+                    }
+                } else {
+                    let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
+                    DispatchQueue.main.async { completion(error) }
+                }
+            }
+#endif
+        } else {
+            if let metadataLive, metadata.isNotFlaggedAsLivePhotoByServer {
+                renameMetadataPlain(metadataLive, fileNameNew: fileNameNewLive, indexPath: indexPath) { error in
+                    if error == .success {
+                        self.renameMetadataPlain(metadata, fileNameNew: fileNameNew, indexPath: indexPath, completion: completion)
+                    } else {
+                        completion(error)
+                    }
+                }
+            } else {
+                renameMetadataPlain(metadata, fileNameNew: fileNameNew, indexPath: indexPath, completion: completion)
+            }
+        }
+    }
+
+    private func renameMetadataPlain(_ metadata: tableMetadata,
+                                     fileNameNew: String,
+                                     indexPath: IndexPath,
+                                     completion: @escaping (_ error: NKError) -> Void) {
+
+        let permission = utility.permissionsContainsString(metadata.permissions, permissions: NCPermissions().permissionCanRename)
+        if !metadata.permissions.isEmpty && !permission {
+            return completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
+        }
+        let fileName = utility.removeForbiddenCharacters(fileNameNew)
+        if fileName != fileNameNew {
+            let errorDescription = String(format: NSLocalizedString("_forbidden_characters_", comment: ""), NCGlobal.shared.forbiddenCharacters.joined(separator: " "))
+            let error = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: errorDescription)
+            return completion(error)
+        }
+        let fileNameNew = fileName
+        if fileNameNew.isEmpty || fileNameNew == metadata.fileNameView {
+            return completion(NKError())
+        }
+        let fileNamePath = metadata.serverUrl + "/" + metadata.fileName
+        let fileNameToPath = metadata.serverUrl + "/" + fileNameNew
+        
+        NextcloudKit.shared.moveFileOrFolder(serverUrlFileNameSource: fileNamePath, serverUrlFileNameDestination: fileNameToPath, overwrite: false, account: metadata.account) { _, _, error in
+            if error == .success {
+                NCManageDatabase.shared.renameMetadata(fileNameNew: fileNameNew, ocId: metadata.ocId)
+                if metadata.directory {
+                    let serverUrl = self.utilityFileSystem.stringAppendServerUrl(metadata.serverUrl, addFileName: metadata.fileName)
+                    let serverUrlTo = self.utilityFileSystem.stringAppendServerUrl(metadata.serverUrl, addFileName: fileNameNew)
+                    if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", metadata.account, metadata.serverUrl)) {
+                        NCManageDatabase.shared.setDirectory(serverUrl: serverUrl, serverUrlTo: serverUrlTo, etag: "", encrypted: directory.e2eEncrypted, account: metadata.account)
+                    }
+                } else {
+                    if (metadata.fileName as NSString).pathExtension != (fileNameNew as NSString).pathExtension {
+                        let path = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId)
+                        self.utilityFileSystem.removeFile(atPath: path)
+                    } else {
+                        NCManageDatabase.shared.setLocalFile(ocId: metadata.ocId, fileName: fileNameNew)
+                        let atPath = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId) + "/" + metadata.fileName
+                        let toPath = self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId) + "/" + fileNameNew
+                        self.utilityFileSystem.moveFile(atPath: atPath, toPath: toPath)
+                    }
+                }
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["serverUrl": metadata.serverUrl, "account": metadata.account, "error": error, "ocId": metadata.ocId, "indexPath": indexPath])
+
+            }
+            completion(error)
+        }
+    }
 
     // MARK: - Move
 
@@ -551,6 +650,44 @@ extension NCNetworking {
 
     func favoriteMetadata(_ metadata: tableMetadata,
                           completion: @escaping (_ error: NKError) -> Void) {
+
+        if let metadataLive = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
+            favoriteMetadataPlain(metadataLive) { error in
+                if error == .success {
+                    self.favoriteMetadataPlain(metadata, completion: completion)
+                } else {
+                    completion(error)
+                }
+            }
+        } else {
+            favoriteMetadataPlain(metadata, completion: completion)
+        }
+    }
+
+    private func favoriteMetadataPlain(_ metadata: tableMetadata,
+                                       completion: @escaping (_ error: NKError) -> Void) {
+
+        let fileName = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, urlBase: metadata.urlBase, userId: metadata.userId)
+        let favorite = !metadata.favorite
+        let ocId = metadata.ocId
+
+        NextcloudKit.shared.setFavorite(fileName: fileName, favorite: favorite, account: metadata.account) { account, _, error in
+            if error == .success && metadata.account == account {
+                metadata.favorite = favorite
+                NCManageDatabase.shared.addMetadata(metadata)
+#if !EXTENSION
+                if favorite, !metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__ADD_FAVORITE ,metadata: metadata)
+                }
+#endif
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterFavoriteFile, userInfo: ["ocId": ocId, "serverUrl": metadata.serverUrl])
+            }
+            completion(error)
+        }
+    }
+    
+    func favoriteMetadatas(_ metadata: tableMetadata,
+                          completion: @escaping (_ error: NKError) -> Void) {
         if metadata.status != global.metadataStatusNormal && metadata.status != global.metadataStatusWaitFavorite {
             return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_favorite_file_"))
         }
@@ -559,6 +696,7 @@ extension NCNetworking {
 
         NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterFavoriteFile, userInfo: ["ocId": metadata.ocId, "serverUrl": metadata.serverUrl])
     }
+
 
     // MARK: - Lock Files
 
@@ -895,3 +1033,55 @@ class NCOperationFileExists: ConcurrentOperation, @unchecked Sendable {
         }
     }
 }
+
+class NCOperationDeleteFileOrFolder: ConcurrentOperation, @unchecked Sendable {
+    let database = NCManageDatabase.shared
+    let global = NCGlobal.shared
+    let utility = NCUtility()
+    let utilityFileSystem = NCUtilityFileSystem()
+
+    var metadata: tableMetadata
+    var ocId: String
+
+    init(metadata: tableMetadata) {
+        self.metadata = metadata
+        self.ocId = metadata.ocId
+    }
+
+    override func start() {
+        guard !isCancelled else { return self.finish() }
+
+        let options = NKRequestOptions(taskDescription: global.taskDescriptionDeleteFileOrFolder,
+                                       queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)
+
+        NextcloudKit.shared.deleteFileOrFolder(serverUrlFileName: self.metadata.serverUrl + "/" + self.metadata.fileName,
+                                               account: self.metadata.account,
+                                               options: options) { _, _, error in
+
+            if error == .success || error.errorCode == NCGlobal.shared.errorResourceNotFound {
+                do {
+                    try FileManager.default.removeItem(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(self.metadata.ocId))
+                } catch { }
+
+#if !EXTENSION
+                NCImageCache.shared.removeImageCache(ocIdPlusEtag: self.metadata.ocId + self.metadata.etag)
+#endif
+
+                self.database.deleteVideo(metadata: self.metadata)
+                self.database.deleteMetadataOcId(self.metadata.ocId)
+                self.database.deleteLocalFileOcId(self.metadata.ocId)
+
+                if self.metadata.directory {
+                    self.database.deleteDirectoryAndSubDirectory(serverUrl: NCUtilityFileSystem().stringAppendServerUrl(self.metadata.serverUrl, addFileName: self.metadata.fileName), account: self.metadata.account)
+                }
+            } else {
+                self.database.setMetadataStatus(ocId: self.ocId, status: self.global.metadataStatusNormal)
+            }
+
+            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDeleteFile, userInfo: ["ocId": [self.ocId], "error": error])
+
+            self.finish()
+        }
+    }
+}
+

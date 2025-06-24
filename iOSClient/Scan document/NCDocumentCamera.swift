@@ -108,7 +108,6 @@ class NCDocumentCamera: NSObject, VNDocumentCameraViewControllerDelegate {
         if imagesDestination.count > 0 {
 
             var images: [UIImage] = []
-            var serverUrl = appDelegate?.activeServerUrl ?? ""
 
             let controller = self.viewController as? NCMainTabBarController
             let serverUrl = controller?.currentServerUrl() ?? ""

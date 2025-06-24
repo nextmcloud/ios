@@ -20,3 +20,4 @@
 //
 
 #import "NCPushNotificationEncryption.h"
+#import "CCUtility.h"

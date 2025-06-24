@@ -53,13 +53,17 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                                                $0.classFile == NKCommon.TypeClassFile.video.rawValue ||
                                                $0.classFile == NKCommon.TypeClassFile.audio.rawValue }.map(\.ocId)
 
-                return NCViewer().view(viewController: self, metadata: metadata, ocIds: withOcIds ? ocIds : nil, image: image)
+                let metadataInfo = metadatas.filter{ $0.classFile == NKCommon.TypeClassFile.image.rawValue ||
+                    $0.classFile == NKCommon.TypeClassFile.video.rawValue ||
+                    $0.classFile == NKCommon.TypeClassFile.audio.rawValue }
+                
+                return NCViewer().view(viewController: self, metadata: metadata, ocIds: ocIds, image: image, metadatas: metadataInfo)
 
             } else if metadata.isAvailableEditorView ||
                       utilityFileSystem.fileProviderStorageExists(metadata) ||
                       metadata.name == NCGlobal.shared.talkName {
 
-                NCViewer().view(viewController: self, metadata: metadata, image: image)
+                NCViewer().view(viewController: self, metadata: metadata, image: image, metadatas: [metadata])
 
             } else if NextcloudKit.shared.isNetworkReachable(),
                       let metadata = database.setMetadatasSessionInWaitDownload(metadatas: [metadata],
@@ -106,14 +110,19 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
             return
         }
 
+        let metadataSourceForAllSections = dataSource.getMetadataSourceForAllSections()
+
         if isEditMode {
-            if let index = fileSelect.firstIndex(of: metadata.ocId) {
-                fileSelect.remove(at: index)
-            } else {
-                fileSelect.append(metadata.ocId)
+            if !metadata.e2eEncrypted {
+                if let index = fileSelect.firstIndex(of: metadata.ocId) {
+                    fileSelect.remove(at: index)
+                } else {
+                    fileSelect.append(metadata.ocId)
+                }
+                collectionView.reloadItems(at: [indexPath])
+                tabBarSelect?.update(fileSelect: fileSelect, metadatas: getSelectedMetadatas(), userId: metadata.userId)
             }
-            collectionView.reloadItems(at: [indexPath])
-            tabBarSelect?.update(fileSelect: fileSelect, metadatas: getSelectedMetadatas(), userId: metadata.userId)
+            self.setNavigationRightItems()
             return
         }
 
@@ -128,17 +137,14 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
             return nil
         }
         let identifier = indexPath as NSCopying
-        var image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024)
-
-        if image == nil {
-            let cell = collectionView.cellForItem(at: indexPath)
-            if cell is NCListCell {
-                image = (cell as? NCListCell)?.imageItem.image
-            } else if cell is NCGridCell {
-                image = (cell as? NCGridCell)?.imageItem.image
-            } else if cell is NCPhotoCell {
-                image = (cell as? NCPhotoCell)?.imageItem.image
-            }
+        var image: UIImage?
+        let cell = collectionView.cellForItem(at: indexPath)
+        if cell is NCListCell {
+            image = (cell as? NCListCell)?.imageItem.image
+        } else if cell is NCGridCell {
+            image = (cell as? NCGridCell)?.imageItem.image
+        } else if cell is NCPhotoCell {
+            image = (cell as? NCPhotoCell)?.imageItem.image
         }
 
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {

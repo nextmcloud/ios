@@ -37,6 +37,7 @@ class NCNetworkingProcess {
     private let lockQueue = DispatchQueue(label: "com.nextcloud.networkingprocess.lockqueue")
     private var timer: Timer?
     private var enableControllingScreenAwake = true
+    private var notificationToken: NotificationToken?
 
     private init() {
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterPlayerIsPlaying), object: nil, queue: nil) { _ in
@@ -61,6 +62,38 @@ class NCNetworkingProcess {
         }
     }
 
+    private func startObserveTableMetadata() {
+        do {
+            let realm = try Realm()
+            let results = realm.objects(tableMetadata.self).filter(NSPredicate(format: "status IN %@", global.metadataStatusObserveNetworkingProcess))
+            notificationToken = results.observe { [weak self] (changes: RealmCollectionChange) in
+                switch changes {
+                case .initial:
+                    print("Initial")
+                case .update(_, _, let insertions, let modifications):
+                    if insertions.count > 0 || modifications.count > 0 {
+                        guard let self else { return }
+                        self.startTimer()
+                        self.lockQueue.async {
+                            guard !self.hasRun, self.networking.isOnline else { return }
+                            self.hasRun = true
+
+                            Task { [weak self] in
+                                guard let self else { return }
+                                await self.start()
+                                self.hasRun = false
+                            }
+                        }
+                    }
+                case .error(let error):
+                    print("Error: \(error.localizedDescription)")
+                }
+            }
+        } catch let error {
+            print("Error: \(error.localizedDescription)")
+        }
+    }
+    
     private func startTimer() {
         self.timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true, block: { _ in
             let applicationState = UIApplication.shared.applicationState
@@ -124,7 +157,7 @@ class NCNetworkingProcess {
         let applicationState = await checkApplicationState()
         let httpMaximumConnectionsPerHostInDownload = NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload
         var httpMaximumConnectionsPerHostInUpload = NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload
-        let sessionUploadSelectors = [global.selectorUploadFileNODelete, global.selectorUploadFile, global.selectorUploadAutoUpload]
+        let sessionUploadSelectors = [global.selectorUploadFileNODelete, global.selectorUploadFile, global.selectorUploadAutoUpload, global.selectorUploadAutoUploadAll]
         let metadatasDownloading = self.database.getMetadatas(predicate: NSPredicate(format: "status == %d", global.metadataStatusDownloading))
         let metadatasUploading = self.database.getMetadatas(predicate: NSPredicate(format: "status == %d", global.metadataStatusUploading))
         let metadatasUploadError: [tableMetadata] = self.database.getMetadatas(predicate: NSPredicate(format: "status == %d", global.metadataStatusUploadError), sortedByKeyPath: "sessionDate", ascending: true) ?? []
@@ -196,7 +229,7 @@ class NCNetworkingProcess {
             let metadatasWaitUpload = self.database.getMetadatas(predicate: NSPredicate(format: "sessionSelector == %@ AND status == %d", sessionSelector, global.metadataStatusWaitUpload), numItems: limitUpload, sorted: "sessionDate", ascending: true)
 
             if !metadatasWaitUpload.isEmpty {
-                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] PROCESS (UPLOAD) find \(metadatasWaitUpload.count) items")
+                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  PROCESS (UPLOAD) find \(metadatasWaitUpload.count) items")
             }
 
             for metadata in metadatasWaitUpload where counterUploading < httpMaximumConnectionsPerHostInUpload {
@@ -206,7 +239,7 @@ class NCNetworkingProcess {
                 }
 
                 if NCTransferProgress.shared.get(ocIdTransfer: metadata.ocIdTransfer) != nil {
-                    NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Process auto upload skipped file: \(metadata.serverUrl)/\(metadata.fileNameView), because is already in session.")
+                    NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Process auto upload skipped file: \(metadata.serverUrl)/\(metadata.fileNameView), because is already in session.")
                     continue
                 }
 
@@ -493,6 +526,18 @@ class NCNetworkingProcess {
 
     // MARK: - Public
 
+    func startProcess() {
+        startTimer()
+        startObserveTableMetadata()
+    }
+
+    func stopProcess() {
+        timer?.invalidate()
+        timer = nil
+        notificationToken?.invalidate()
+        notificationToken = nil
+    }
+    
     func refreshProcessingTask() async -> (counterDownloading: Int, counterUploading: Int) {
         await withCheckedContinuation { continuation in
             self.lockQueue.sync {

@@ -24,6 +24,7 @@
 import UIKit
 import Photos
 import NextcloudKit
+import XLForm
 
 class NCManageAutoUploadFileName: XLFormViewController {
 

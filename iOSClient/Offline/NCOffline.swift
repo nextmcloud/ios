@@ -34,8 +34,6 @@ class NCOffline: NCCollectionViewCommon {
         layoutKey = NCGlobal.shared.layoutViewOffline
         enableSearchBar = false
         headerRichWorkspaceDisable = true
-        emptyImageName = "icloud.and.arrow.down"
-        emptyImage = UIImage(named: "folder")
         emptyImageName = "folder_nmcloud"
         emptyImage = UIImage(named: "folder_nmcloud")
         emptyTitle = "_files_no_files_"
@@ -50,6 +48,7 @@ class NCOffline: NCCollectionViewCommon {
         super.viewWillAppear(animated)
 
         reloadDataSource()
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__OFFLINE_FILES)
     }
 
     // MARK: - DataSource

@@ -201,8 +201,8 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        timer?.invalidate()
-        timer = nil
+        timerAutoScroll?.invalidate()
+        timerAutoScroll = nil
     }
 
     // MARK: - Action
@@ -212,15 +212,11 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func login(_ sender: Any) {
-        if NCBrandOptions.shared.use_AppConfig == true {
         if NCBrandOptions.shared.use_AppConfig {
             let loginViewPage = UIStoryboard(name: "NCLogin", bundle: Bundle.main).instantiateViewController(identifier: "NCLogin")
             navigationController?.pushViewController(loginViewPage, animated: true)
         } else {
             if NextcloudKit.shared.isNetworkReachable() {
-                appDelegate.openLogin(selector: NCGlobal.shared.introLogin, openLoginWeb: false)
-                appDelegate.openLogin(selector: NCGlobal.shared.introLogin)
-//                appDelegate.openLogin(selector: NCGlobal.shared.introLogin)
                 appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
             } else {
                 showNoInternetAlert()
@@ -235,11 +231,11 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func signupWithProvider(_ sender: Any) {
-        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
-            viewController.controller = self.controller
-            viewController.urlBase = NCBrandOptions.shared.linkloginPreferredProviders
-            self.navigationController?.pushViewController(viewController, animated: true)
-        }
+        appDelegate.openLogin(selector: NCGlobal.shared.introSignup)
+    }
+    
+    @IBAction func signup(_ sender: Any) {
+        appDelegate.openLogin(selector: NCGlobal.shared.introSignup)
     }
 
     @IBAction func host(_ sender: Any) {

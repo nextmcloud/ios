@@ -37,6 +37,7 @@ class NCCollectionViewDataSource: NSObject {
     private var layoutForView: NCDBLayoutForView?
     private var metadataIndexPath = ThreadSafeDictionary<IndexPath, tableMetadata>()
     private var directoryOnTop: Bool = true
+    var groupByField: String = ""
 
     override init() { super.init() }
 
@@ -46,7 +47,11 @@ class NCCollectionViewDataSource: NSObject {
          searchResults: [NKSearchResult]? = nil,
          directoryOnTop: Bool = true) {
         super.init()
-        removeAll()
+//        removeAll()
+        
+        self.metadatas = metadatas.filter({
+            !(NCGlobal.shared.includeHiddenFiles.contains($0.fileNameView) || $0.isTransferInForeground)
+        })
 
         self.metadatas = metadatas
         self.layoutForView = layoutForView
@@ -55,13 +60,24 @@ class NCCollectionViewDataSource: NSObject {
         self.providers = providers
         self.searchResults = searchResults
 
-        if let providers, !providers.isEmpty || (layoutForView?.groupBy != "none") {
+//        if let providers, !providers.isEmpty || (layoutForView?.groupBy != "none") {
             createSections()
-        }
+//        }
     }
 
     // MARK: -
 
+    func changeGroupByField(_ groupByField: String) {
+
+        self.groupByField = groupByField
+        print("DATASOURCE: set group by filed " + groupByField)
+        self.metadatasForSection.removeAll()
+        self.sectionsValue.removeAll()
+        print("DATASOURCE: remove  all sections")
+
+        createSections()
+    }
+    
     func removeAll() {
         self.metadatas.removeAll()
         self.metadataIndexPath.removeAll()
@@ -85,7 +101,7 @@ class NCCollectionViewDataSource: NSObject {
     internal func createSections() {
         for metadata in self.metadatas {
             /// skipped livePhoto VIDEO part
-            if metadata.isLivePhoto, metadata.classFile == NKCommon.TypeClassFile.video.rawValue {
+            if metadata.isLivePhoto, metadata.classFile == NKCommon.TypeClassFile.video.rawValue && metadata.status <= NCGlobal.shared.metadataStatusNormal {
                 continue
             }
             let section = NSLocalizedString(self.getSectionValue(metadata: metadata), comment: "")
@@ -151,6 +167,15 @@ class NCCollectionViewDataSource: NSObject {
                                                       directoryOnTop: self.directoryOnTop)
         metadatasForSection.append(metadataForSection)
     }
+    
+    func getMetadataSourceForAllSections() -> [tableMetadata] {
+
+        var metadatas: [tableMetadata] = []
+        for section in metadatasForSection {
+            metadatas.append(contentsOf: section.metadatas)
+        }
+        return metadatas
+    }
 
     // MARK: -
 
@@ -191,6 +216,13 @@ class NCCollectionViewDataSource: NSObject {
         return nil
     }
 
+    func getIndexPathMetadata(ocId: String) -> (indexPath: IndexPath?, metadataForSection: NCMetadataForSection?) {
+        guard let metadata = self.metadatas.filter({ $0.ocId == ocId}).first else { return (nil, nil) }
+        let sectionValue = getSectionValue(metadata: metadata)
+        guard let sectionIndex = getSectionIndex(sectionValue), let metadataForSection = getMetadataForSection(sectionValue), let rowIndex = metadataForSection.metadatas.firstIndex(where: {$0.ocId == ocId}) else { return (nil, nil) }
+        return (IndexPath(row: rowIndex, section: sectionIndex), metadataForSection)
+    }
+    
     func numberOfSections() -> Int {
         guard !self.sectionsValue.isEmpty else { return 1 }
 
@@ -263,6 +295,11 @@ class NCCollectionViewDataSource: NSObject {
         return nil
     }
 
+    func cellForItemAt(indexPath: IndexPath) -> tableMetadata? {
+        guard !metadatasForSection.isEmpty && indexPath.section < metadatasForSection.count, let metadataForSection = getMetadataForSection(indexPath.section), indexPath.row < metadataForSection.metadatas.count else { return nil }
+        return metadataForSection.metadatas[indexPath.row]
+    }
+    
     func caching(metadatas: [tableMetadata], dataSourceMetadatas: [tableMetadata], completion: @escaping () -> Void) {
         var counter: Int = 0
 

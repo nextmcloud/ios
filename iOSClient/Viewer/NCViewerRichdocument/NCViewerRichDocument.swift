@@ -38,6 +38,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
     var session: NCSession.Session {
         NCSession.shared.getSession(account: metadata.account)
     }
+    private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
 
     // MARK: - View Life Cycle
 
@@ -87,6 +88,8 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        appDelegate.activeViewController = self
+
         NotificationCenter.default.addObserver(self, selector: #selector(favoriteFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(viewUnload), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeUser), object: nil)
@@ -94,6 +97,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ONLINE_OFFICE_USED)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -156,7 +160,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
     // MARK: - Action
 
     @objc func openMenuMore() {
-        if imageIcon == nil { imageIcon = NCUtility().loadImage(named: "doc.text", colors: [NCBrandColor.shared.iconImageColor]) }
+        if imageIcon == nil { imageIcon = UIImage(named: "file_txt") }
         NCViewer().toggleMenu(controller: self.tabBarController as? NCMainTabBarController, metadata: metadata, webView: true, imageIcon: imageIcon)
     }
 
@@ -297,7 +301,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
     // MARK: -
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
         if let serverUrl, let metadata {
             let path = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: serverUrl, session: session)
 

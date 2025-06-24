@@ -89,31 +89,6 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
-    }
-
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//
-//        if self.notifications.count > 0 {
-//            controller?.availableNotifications = true
-//        } else {
-//            controller?.availableNotifications = false
-//        }
-//
-//        // Cancel Queue & Retrieves Properties
-//        dataSourceTask?.cancel()
-//    }
-
     @objc func viewClose() {
         self.dismiss(animated: true, completion: nil)
     }
@@ -147,13 +122,6 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
-        let notification = notifications[indexPath.row]
-
-        if notification.app == "files_sharing" {
-            NCActionCenter.shared.viewerFile(account: appDelegate.account, fileId: notification.objectId, viewController: self)
-        } else {
-            NCApplicationHandle().didSelectNotification(notification, viewController: self)
-        
         let notification = notifications[indexPath.row]
 
         if notification.app == "files_sharing" {
@@ -195,10 +163,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
 
         if let image = image {
             cell.icon.image = image.withTintColor(NCBrandColor.shared.brandElement, renderingMode: .alwaysOriginal)
-            cell.icon.image = image.withTintColor(NCBrandColor.shared.getElement(account: session.account), renderingMode: .alwaysOriginal)
-        } else {
-            cell.icon.image = utility.loadImage(named: "bell", color: NCBrandColor.shared.iconColor)
-            cell.icon.image = image.withTintColor(NCBrandColor.shared.iconColor, renderingMode: .alwaysOriginal)
+//            cell.icon.image = image.withTintColor(NCBrandColor.shared.getElement(account: session.account), renderingMode: .alwaysOriginal)
         } else {
             cell.icon.image = utility.loadImage(named: "bell", colors: [NCBrandColor.shared.iconColor])
         }
@@ -208,7 +173,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         cell.avatarLeadingMargin.constant = 10
         cell.date.text = DateFormatter.localizedString(from: notification.date as Date, dateStyle: .medium, timeStyle: .medium)
         cell.notification = notification
-        cell.date.text = utility.dateDiff(notification.date as Date)
+        cell.date.text = utility.getRelativeDateTitle(notification.date as Date)
         cell.date.textColor = .gray
         cell.subject.text = notification.subject
         cell.subject.textColor = NCBrandColor.shared.textColor

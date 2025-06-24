@@ -30,7 +30,8 @@ enum NCShareExtensionError: Error {
     case cancel, fileUpload, noAccount, noFiles
 }
 
-class NCShareExtension: UIViewController {
+class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
+    
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
@@ -127,12 +128,15 @@ class NCShareExtension: UIViewController {
         NextcloudKit.shared.nkCommonInstance.levelLog = levelLog
         NextcloudKit.shared.nkCommonInstance.pathLog = utilityFileSystem.directoryGroup
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start Share session with level \(levelLog) " + versionNextcloudiOS)
+//        NKLogFileManager.shared.logLevel = NKLogLevel(rawValue: levelLog) ?? .normal
+//        NKLogFileManager.shared.logDirectory = URL(fileURLWithPath: utilityFileSystem.directoryGroup)
+//        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Start Share session with level \(levelLog) " + versionNextcloudiOS)
 
-        hud.indicatorView = JGProgressHUDRingIndicatorView()
-        if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
-            indicatorView.ringWidth = 1.5
-            indicatorView.ringColor = NCBrandColor.shared.brandElement
-        }
+//        hud.indicatorView = JGProgressHUDRingIndicatorView()
+//        if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
+//            indicatorView.ringWidth = 1.5
+//            indicatorView.ringColor = NCBrandColor.shared.brandElement
+//        }
         NCBrandColor.shared.createUserColors()
         NCImageCache.shared.createImagesCache()
 
@@ -174,6 +178,21 @@ class NCShareExtension: UIViewController {
         super.traitCollectionDidChange(previousTraitCollection)
         collectionView.reloadData()
         tableView.reloadData()
+    }
+    
+    // MARK: - Empty
+
+    func emptyDataSetView(_ view: NCEmptyView) {
+
+        if self.dataSourceTask?.state == .running {
+            view.emptyImage.image = UIImage(named: "networkInProgress")?.image(color: .gray, size: UIScreen.main.bounds.width)
+            view.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
+            view.emptyDescription.text = ""
+        } else {
+            view.emptyImage.image = UIImage(named: "folder_nmcloud")
+            view.emptyTitle.text = NSLocalizedString("_files_no_folders_", comment: "")
+            view.emptyDescription.text = ""
+        }
     }
 
     // MARK: -
@@ -218,7 +237,6 @@ class NCShareExtension: UIViewController {
             }
         }
         
-        if serverUrl != utilityFileSystem.getHomeServer(urlBase: activeAccount.urlBase, userId: activeAccount.userId) {
         if serverUrl != utilityFileSystem.getHomeServer(session: self.session) {
             navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         } else {

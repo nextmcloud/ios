@@ -52,7 +52,7 @@ extension NCShareExtension: UICollectionViewDelegate {
                 header.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
                 header.emptyDescription.text = ""
             } else {
-                header.emptyImage.image = NCImageCache.shared.getFolder(account: self.session.account)
+                header.emptyImage.image = NCImageCache.shared.getFolder()
                 header.emptyTitle.text = NSLocalizedString("_files_no_folders_", comment: "")
                 header.emptyDescription.text = ""
             }
@@ -83,7 +83,7 @@ extension NCShareExtension: UICollectionViewDataSource {
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = (collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as? NCListCell)!
+        var cell = (collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as? NCListCell)!
         guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
             return cell
         }
@@ -137,21 +137,21 @@ extension NCShareExtension: UICollectionViewDataSource {
         }
 
         if metadata.e2eEncrypted {
-            cell.imageItem.image = NCImageCache.shared.getFolderEncrypted(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolderEncrypted()
         } else if isShare {
-            cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe()
         } else if !metadata.shareType.isEmpty {
             metadata.shareType.contains(3) ?
-            (cell.imageItem.image = NCImageCache.shared.getFolderPublic(account: metadata.account)) :
-            (cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account))
+            (cell.imageItem.image = NCImageCache.shared.getFolderPublic()) :
+            (cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe())
         } else if metadata.mountType == "group" {
-            cell.imageItem.image = NCImageCache.shared.getFolderGroup(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolderGroup()
         } else if isMounted {
-            cell.imageItem.image = NCImageCache.shared.getFolderExternal(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolderExternal()
         } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
-            cell.imageItem.image = NCImageCache.shared.getFolderAutomaticUpload(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolderAutomaticUpload()
         } else {
-            cell.imageItem.image = NCImageCache.shared.getFolder(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolder()
         }
 
         cell.labelInfo.text = utility.getRelativeDateTitle(metadata.date as Date)

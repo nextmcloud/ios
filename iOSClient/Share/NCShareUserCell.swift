@@ -106,7 +106,6 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
     override func awakeFromNib() {
         super.awakeFromNib()
         buttonMenu.contentMode = .scaleAspectFill
-        buttonMenu.setImage(NCImageCache.images.buttonMore.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         labelQuickStatus.textColor = NCBrandColor.shared.customer
         imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
@@ -158,7 +157,6 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
         set { user = newValue ?? "" }
     }
 
-    func setupCell(sharee: NKSharee, baseUrl: NCUserBaseUrl) {
     func setupCell(sharee: NKSharee, session: NCSession.Session) {
         let utility = NCUtility()
         imageShareeType.image = NCShareCommon().getImageShareType(shareType: sharee.shareType, isDropDown: true)

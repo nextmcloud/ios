@@ -29,9 +29,37 @@ class NCMediaCell: UICollectionViewCell {
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!
+    @IBOutlet weak var label: UILabel!
 
     var ocId: String = ""
     var datePhotosOriginal: Date?
+    private var objectId: String = ""
+    private var user: String = ""
+    
+    var filePreviewImageView: UIImageView? {
+        get { return imageItem }
+        set {}
+    }
+
+    var fileObjectId: String? {
+        get { return objectId }
+        set { objectId = newValue ?? "" }
+    }
+
+    var fileUser: String? {
+        get { return user }
+        set { user = newValue ?? "" }
+    }
+
+    var fileDate: Date? {
+        get { return datePhotosOriginal }
+        set {
+            datePhotosOriginal = newValue
+            if let datePhotosOriginal {
+                label.text = NCUtility().getTitleFromDate(datePhotosOriginal)
+            }
+        }
+    }
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -48,15 +76,19 @@ class NCMediaCell: UICollectionViewCell {
         imageItem.image = nil
         imageVisualEffect.alpha = 0.4
         imageSelect.image = NCImageCache.shared.getImageCheckedYes()
+        imageVisualEffect.isHidden = true
+        imageSelect.isHidden = true
     }
 
     func selected(_ status: Bool) {
         if status {
-            imageSelect.isHidden = false
+//            imageSelect.isHidden = false
             imageVisualEffect.isHidden = false
+            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
         } else {
-            imageSelect.isHidden = true
+//            imageSelect.isHidden = true
             imageVisualEffect.isHidden = true
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
         }
     }
 }

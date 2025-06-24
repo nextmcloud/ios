@@ -38,20 +38,18 @@ class NCShareAdvancePermissionHeader: UIView {
         fileName.textColor = NCBrandColor.shared.label
         info.textColor = NCBrandColor.shared.textInfo
         backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        if FileManager.default.fileExists(atPath: utilityFileSystem.getDirectoryProviderStorageIconOcId(metadata.ocId, etag: metadata.etag)) {
-            fullWidthImageView.image = utility.getImageMetadata(metadata, for: frame.height)
+
         if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024) {
             fullWidthImageView.image = image
             fullWidthImageView.contentMode = .scaleAspectFill
             imageView.isHidden = true
         } else {
             if metadata.directory {
-                imageView.image = UIImage.init(named: "folder")
                 imageView.image = metadata.e2eEncrypted ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
             } else if !metadata.iconName.isEmpty {
-                imageView.image = UIImage.init(named: metadata.iconName)
+                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
             } else {
-                imageView.image = UIImage.init(named: "file")
+                imageView.image = NCImageCache.shared.getImageFile()
             }
         }
         favorite.setNeedsUpdateConstraints()
@@ -64,7 +62,7 @@ class NCShareAdvancePermissionHeader: UIView {
             favorite.setImage(utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.textInfo], size: 24), for: .normal)
         }
         info.textColor = NCBrandColor.shared.optionItem
-        info.text = utilityFileSystem.transformedSize(metadata.size) + ", " + utility.dateDiff(metadata.date as Date)
+        info.text = utilityFileSystem.transformedSize(metadata.size) + ", " + utility.getRelativeDateTitle(metadata.date as Date)
     }
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {

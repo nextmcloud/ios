@@ -101,7 +101,7 @@ struct NCTrashSelectTabBarView: View {
                         .font(Font.system(.body).weight(.light))
                         .imageScale(sizeClass == .compact ? .medium : .large)
                 }
-                .tint(Color(NCBrandColor.shared.iconImageColor))
+//                .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)
                 .disabled(tabBarSelect.isSelectedEmpty)
 
@@ -112,7 +112,7 @@ struct NCTrashSelectTabBarView: View {
                         .font(Font.system(.body).weight(.light))
                         .imageScale(sizeClass == .compact ? .medium : .large)
                 }
-                .tint(.red)
+//                .tint(.red)
                 .frame(maxWidth: .infinity)
                 .disabled(tabBarSelect.isSelectedEmpty)
 
@@ -123,7 +123,7 @@ struct NCTrashSelectTabBarView: View {
                         .font(Font.system(.body).weight(.light))
                         .imageScale(sizeClass == .compact ? .medium : .large)
                 }
-                .tint(Color(NCBrandColor.shared.iconImageColor))
+//                .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)
             }
         }

@@ -25,9 +25,9 @@
 
 import UIKit
 import NextcloudKit
+import Realm
 import RealmSwift
 
-class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegate, NCSectionHeaderMenuDelegate {
 class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegate, NCSectionHeaderMenuDelegate, NCEmptyDataSetDelegate {
     @IBOutlet weak var collectionView: UICollectionView!
 
@@ -41,7 +41,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     var isEditMode = false
     var fileSelect: [String] = []
     var tabBarSelect: NCTrashSelectTabBar!
-    var datasource: [tableTrash] = []
+    var datasource: [tableTrash]?
     var layoutForView: NCDBLayoutForView?
     var listLayout: NCListLayout!
     var gridLayout: NCGridLayout!
@@ -53,8 +53,12 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         NCSession.shared.getSession(controller: tabBarController)
     }
     
+    var controller: NCMainTabBarController? {
+        self.tabBarController as? NCMainTabBarController
+    }
+
     var serverUrl = ""
-    var selectableDataSource: [RealmSwiftObject] { datasource }
+    var selectableDataSource: [RealmSwiftObject] { datasource ?? [] }
     private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     var emptyDataSet: NCEmptyDataSet?
 
@@ -72,7 +76,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         collectionView.register(UINib(nibName: "NCTrashListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
         collectionView.register(UINib(nibName: "NCTrashGridCell", bundle: nil), forCellWithReuseIdentifier: "gridCell")
 
-        collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
+//        collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
         collectionView.register(UINib(nibName: "NCSectionHeaderMenu", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionHeaderMenu")
         collectionView.register(UINib(nibName: "NCSectionFooter", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "sectionFooter")
 
@@ -115,7 +119,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         setNavigationRightItems()
 
         reloadDataSource()
-        loadListingTrash()
+        loadListingTrash(nil)
         
         AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__DELETED_FILES)
 
@@ -189,7 +193,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
 
     func tapMoreListItem(with objectId: String, image: UIImage?, sender: Any) {
         if !isEditMode {
-            toggleMenuMore(with: objectId, image: image, isGridCell: false)
+            toggleMenuMore(with: objectId, image: image, isGridCell: false, sender: sender)
         } else if let button = sender as? UIView {
             let buttonPosition = button.convert(CGPoint.zero, to: collectionView)
             let indexPath = collectionView.indexPathForItem(at: buttonPosition)
@@ -199,7 +203,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
 
     func tapMoreGridItem(with objectId: String, image: UIImage?, sender: Any) {
         if !isEditMode {
-            toggleMenuMore(with: objectId, image: image, isGridCell: true)
+            toggleMenuMore(with: objectId, image: image, isGridCell: true, sender: sender)
         } else if let button = sender as? UIView {
             let buttonPosition = button.convert(CGPoint.zero, to: collectionView)
             let indexPath = collectionView.indexPathForItem(at: buttonPosition)
@@ -229,31 +233,32 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     // MARK: - DataSource
 
     @objc func reloadDataSource(withQueryDB: Bool = true) {
-        datasource.removeAll()
-        guard var trashItems = NCManageDatabase.shared.getTrash(filePath: getFilePath(), sort: layoutForView?.sort, ascending: layoutForView?.ascending, account: session.account) else {
-            return
-        }
-        if layoutForView?.directoryOnTop ?? true {
-            trashItems = trashItems.sorted {
-                return $0.directory && !$1.directory
-            }
-        }
-        datasource = trashItems
-        collectionView.reloadData()
-        setNavigationRightItems()
+        Task {
+            // Await async DB call off the main thread
+            let results = await self.database.getTableTrashAsync(filePath: getFilePath(), account: session.account)
 
-        guard let blinkFileId = blinkFileId else { return }
-        for itemIx in 0..<datasource.count where datasource[itemIx].fileId.contains(blinkFileId) {
-            let indexPath = IndexPath(item: itemIx, section: 0)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                UIView.animate(withDuration: 0.3) {
-                    self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
-                } completion: { _ in
-                    guard let cell = self.collectionView.cellForItem(at: indexPath) else { return }
-                    cell.backgroundColor = .darkGray
-                    UIView.animate(withDuration: 2) {
-                        cell.backgroundColor = .clear
-                        self.blinkFileId = nil
+            // Switch back to main thread for UI updates
+            await MainActor.run {
+                self.datasource = results
+                self.collectionView.reloadData()
+                setNavigationRightItems()
+//                (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
+
+                guard let blinkFileId = self.blinkFileId else { return }
+
+                for itemIx in 0..<results.count where results[itemIx].fileId.contains(blinkFileId) {
+                    let indexPath = IndexPath(item: itemIx, section: 0)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        UIView.animate(withDuration: 0.3) {
+                            self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+                        } completion: { _ in
+                            guard let cell = self.collectionView.cellForItem(at: indexPath) else { return }
+                            cell.backgroundColor = .darkGray
+                            UIView.animate(withDuration: 2) {
+                                cell.backgroundColor = .clear
+                                self.blinkFileId = nil
+                            }
+                        }
                     }
                 }
             }

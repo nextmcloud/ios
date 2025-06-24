@@ -89,7 +89,7 @@ struct NCViewerQuickLookView: UIViewControllerRepresentable {
             parent.model.stopTimer()
             parent.isPresentedQuickLook = false
             if let imageData = image,
-               let image = image?.resizeImage(size: CGSize(width: 240, height: 240), isAspectRation: true) {
+               let image = image?.resizeImage(size: CGSize(width: 300, height: 300), isAspectRation: true) {
                 parent.model.previewStore[parent.index].image = image
                 parent.model.previewStore[parent.index].data = imageData.jpegData(compressionQuality: 0.9)
             }

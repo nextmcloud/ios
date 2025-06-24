@@ -129,6 +129,7 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProt
         } else {
             imageSelect.isHidden = true
             imageVisualEffect.isHidden = true
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
         }
     }
 

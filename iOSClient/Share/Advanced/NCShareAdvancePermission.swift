@@ -27,7 +27,7 @@ import SVGKit
 import CloudKit
 import XLForm
 
-class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelegate, NCShareDetail {
+class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelegate, NCShareNavigationTitleSetting {
     func dismissShareAdvanceView(shouldSave: Bool) {
         if shouldSave {
             self.oldTableShare?.permissions = self.permission ?? (self.oldTableShare?.permissions ?? 0)
@@ -59,7 +59,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                     }
                 }
                 
-                networking?.updateShare(option: share)
+                networking?.updateShare(share, downloadLimit: downloadLimitModel)
                 navigationController?.popViewController(animated: true)
             }
         } else {
@@ -91,7 +91,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
     ///
     /// This can only be created after the share has been actually created due to its requirement of the share token provided by the server.
     ///
-    var downloadLimit: DownloadLimitViewModel = .unlimited
+    var downloadLimitModel: DownloadLimitViewModel = .unlimited
 
     var shareConfig: NCShareConfig!
     var networking: NCShareNetworking?
@@ -113,7 +113,10 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         self.permission = oldTableShare?.permissions
         initializeForm()
         changeTheming()
-        getDownloadLimit()
+//        getDownloadLimit()
+        Task {
+                await getDownloadLimit() // Call the async function inside Task
+            }
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         
@@ -796,23 +799,48 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         }
     }
     
-    func getDownloadLimit() {
+    func getDownloadLimit() async {
         NCActivityIndicator.shared.start(backgroundView: view)
-        NMCCommunication.shared.getDownloadLimit(token: oldTableShare?.token ?? "") { [weak self] (downloadLimit: DownloadLimit?, error: String) in
-            DispatchQueue.main.async {
-                NCActivityIndicator.shared.stop()
-                if let downloadLimit = downloadLimit {
-                    self?.downloadLimit = downloadLimit
+//        NMCCommunication.shared.getDownloadLimit(token: oldTableShare?.token ?? "") { [weak self] (downloadLimit: DownloadLimit?, error: String) in
+//            DispatchQueue.main.async {
+//                NCActivityIndicator.shared.stop()
+//                if let downloadLimit = downloadLimit {
+//                    self?.downloadLimit = downloadLimit
+//                }
+//                self?.updateDownloadLimitUI()
+//            }
+//        }
+
+        do {
+                // Use readDownloadLimits to fetch the limits
+                try await networking?.readDownloadLimits(account: metadata.account, tokens: [oldTableShare?.token ?? ""])
+
+                // Get the limit for this specific token using readDownloadLimit
+                if let token = oldTableShare?.token {
+                    if let tableDownloadLimit = try await database.getDownloadLimit(byAccount: metadata.account, shareToken: token) {
+                        // If we have a download limit, update the UI
+                        DispatchQueue.main.async {
+                            let downloadLimit = DownloadLimit(limit: tableDownloadLimit.limit, count: tableDownloadLimit.count)
+                            self.downloadLimit = downloadLimit
+                            self.updateDownloadLimitUI()
+                            NCActivityIndicator.shared.stop() // Stop the activity indicator
+                        }
+                    }
                 }
-                self?.updateDownloadLimitUI()
+            } catch {
+                DispatchQueue.main.async {
+                    // Handle the error
+                    print("Error fetching download limit: \(error)")
+                    NCActivityIndicator.shared.stop() // Stop the activity indicator
+                }
             }
-        }
     }
     
     func setDownloadLimit(deleteLimit: Bool, limit: String) {
-        NMCCommunication.shared.setDownloadLimit(deleteLimit: deleteLimit, limit: limit, token: oldTableShare?.token ?? "") { (success, errorMessage) in
-            print(success)
-        }
+//        NMCCommunication.shared.setDownloadLimit(deleteLimit: deleteLimit, limit: limit, token: oldTableShare?.token ?? "") { (success, errorMessage) in
+//            print(success)
+//        }
+        networking?.setShareDownloadLimit(Int(limit) ?? 0, token: oldTableShare?.token ?? "")
     }
     
     func showDownloadLimitError(message: String) {
@@ -826,6 +854,6 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
 
 extension NCShareAdvancePermission: NCShareDownloadLimitTableViewControllerDelegate {
     func didSetDownloadLimit(_ downloadLimit: DownloadLimitViewModel) {
-        self.downloadLimit = downloadLimit
+        self.downloadLimitModel = downloadLimit
     }
 }

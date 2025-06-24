@@ -23,8 +23,26 @@
 
 import UIKit
 
+/// Used for read/write in Realm
+var isAppSuspending: Bool = false
+/// Used for know if the app in in Background mode
+var isAppInBackground: Bool = false
+
 class NCGlobal: NSObject, @unchecked Sendable  {
     @objc static let shared = NCGlobal()
+    
+    override init() {
+        super.init()
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { _ in
+            isAppSuspending = true
+            isAppInBackground = true
+        }
+
+        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
+            isAppSuspending = false
+            isAppInBackground = false
+        }
+    }
     
     // ENUM
     //
@@ -59,6 +77,7 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     
     // Nextcloud version
     //
+    let nextcloudVersion12: Int                     = 12
     let nextcloudVersion18: Int                     = 18
     let nextcloudVersion20: Int                     = 20
     let nextcloudVersion23: Int                     = 23
@@ -256,6 +275,7 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let selectorLoadFileQuickLook               = "loadFileQuickLook"
     let selectorOpenIn                          = "openIn"
     let selectorUploadAutoUpload                = "uploadAutoUpload"
+    let selectorUploadAutoUploadAll             = "uploadAutoUploadAll"
     let selectorUploadFile                      = "uploadFile"
     let selectorUploadFileNODelete              = "UploadFileNODelete"
     let selectorUploadFileShareExtension        = "uploadFileShareExtension"
@@ -290,12 +310,16 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let metadataStatusWaitCopy: Int             = 14
     let metadataStatusWaitMove: Int             = 15
     
+    let metadataStatusUploadingAllMode          = [1,2,3]
     let metadataStatusInTransfer                = [-1, -2, 1, 2]
     let metadataStatusFileDown                  = [-1, -2, -3]
     let metadataStatusHideInView                = [1, 2, 3, 11]
     let metadataStatusHideInFileExtension       = [1, 2, 3, 10, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
     
+    let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
+
     //  Hidden files included in the read
     //
     let includeHiddenFiles: [String] = [".LivePhoto"]
@@ -308,8 +332,7 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     
     // Notification Center
     //
-    let notificationCenterChangeUser                            = "changeUser"
-    @objc let notificationCenterChangeUser                            = "changeUser"
+    @objc let notificationCenterChangeUser                      = "changeUser"
     let notificationCenterChangeTheming                         = "changeTheming"
     @objc let notificationCenterApplicationDidEnterBackground   = "applicationDidEnterBackground"
     @objc let notificationCenterApplicationDidBecomeActive      = "applicationDidBecomeActive"
@@ -327,7 +350,8 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let notificationCenterChangeLayout                          = "changeLayout"                    // userInfo: account, serverUrl, layoutForView
     let notificationCenterCheckUserDelaultErrorDone             = "checkUserDelaultErrorDone"       // userInfo: account, controller
     let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
-    
+    let notificationCenterUpdateNotification                    = "updateNotification"
+
     let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
     let notificationCenterGetServerData                         = "getServerData"                   // userInfo: serverUrl?
     

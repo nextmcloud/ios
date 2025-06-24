@@ -27,7 +27,6 @@
 #import "CCManageAutoUpload.h"
 #import "NCBridgeSwift.h"
 #import <LocalAuthentication/LocalAuthentication.h>
-#import <TOPasscodeViewController/TOPasscodeViewController.h>
 //#import <TOPasscodeViewController/TOPasscodeViewController.h>
 
 #define alertViewEsci 1

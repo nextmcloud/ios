@@ -65,58 +65,58 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         super.viewDidLoad()
         self.delegate = self
 
-        menuButton.setImage(UIImage(systemName: "ellipsis.circle"), for: .normal)
-        menuButton.tintColor = NCBrandColor.shared.iconImageColor
-        menuButton.menu = createRightMenu()
-        menuButton.showsMenuAsPrimaryAction = true
-
-        assistantButton.setImage(UIImage(systemName: "sparkles"), for: .normal)
-        assistantButton.tintColor = NCBrandColor.shared.iconImageColor
-        assistantButton.addAction(UIAction(handler: { _ in
-            let assistant = NCAssistant()
-                .environmentObject(NCAssistantModel(controller: self.controller))
-            let hostingController = UIHostingController(rootView: assistant)
-            self.present(hostingController, animated: true, completion: nil)
-        }), for: .touchUpInside)
-
-        notificationsButton.setImage(UIImage(systemName: "bell.fill"), for: .normal)
-        notificationsButton.tintColor = NCBrandColor.shared.iconImageColor
-        notificationsButton.addAction(UIAction(handler: { _ in
-            if let navigationController = UIStoryboard(name: "NCNotification", bundle: nil).instantiateInitialViewController() as? UINavigationController,
-               let viewController = navigationController.topViewController as? NCNotification {
-                viewController.modalPresentationStyle = .pageSheet
-                viewController.session = self.session
-                self.present(navigationController, animated: true, completion: nil)
-            }
-        }), for: .touchUpInside)
-
-        transfersButton.setImage(UIImage(systemName: "arrow.left.arrow.right.circle.fill"), for: .normal)
-        transfersButton.tintColor = NCBrandColor.shared.iconImageColor
-        transfersButton.addAction(UIAction(handler: { _ in
-            if let navigationController = UIStoryboard(name: "NCTransfers", bundle: nil).instantiateInitialViewController() as? UINavigationController,
-               let viewController = navigationController.topViewController as? NCTransfers {
-                viewController.modalPresentationStyle = .pageSheet
-                self.present(navigationController, animated: true, completion: nil)
-            }
-        }), for: .touchUpInside)
+//        menuButton.setImage(UIImage(systemName: "ellipsis.circle"), for: .normal)
+//        menuButton.tintColor = NCBrandColor.shared.iconImageColor
+//        menuButton.menu = createRightMenu()
+//        menuButton.showsMenuAsPrimaryAction = true
+//
+//        assistantButton.setImage(UIImage(systemName: "sparkles"), for: .normal)
+//        assistantButton.tintColor = NCBrandColor.shared.iconImageColor
+//        assistantButton.addAction(UIAction(handler: { _ in
+//            let assistant = NCAssistant()
+//                .environmentObject(NCAssistantModel(controller: self.controller))
+//            let hostingController = UIHostingController(rootView: assistant)
+//            self.present(hostingController, animated: true, completion: nil)
+//        }), for: .touchUpInside)
+//
+//        notificationsButton.setImage(UIImage(systemName: "bell.fill"), for: .normal)
+//        notificationsButton.tintColor = NCBrandColor.shared.iconImageColor
+//        notificationsButton.addAction(UIAction(handler: { _ in
+//            if let navigationController = UIStoryboard(name: "NCNotification", bundle: nil).instantiateInitialViewController() as? UINavigationController,
+//               let viewController = navigationController.topViewController as? NCNotification {
+//                viewController.modalPresentationStyle = .pageSheet
+//                viewController.session = self.session
+//                self.present(navigationController, animated: true, completion: nil)
+//            }
+//        }), for: .touchUpInside)
+//
+//        transfersButton.setImage(UIImage(systemName: "arrow.left.arrow.right.circle.fill"), for: .normal)
+//        transfersButton.tintColor = NCBrandColor.shared.iconImageColor
+//        transfersButton.addAction(UIAction(handler: { _ in
+//            if let navigationController = UIStoryboard(name: "NCTransfers", bundle: nil).instantiateInitialViewController() as? UINavigationController,
+//               let viewController = navigationController.topViewController as? NCTransfers {
+//                viewController.modalPresentationStyle = .pageSheet
+//                self.present(navigationController, animated: true, completion: nil)
+//            }
+//        }), for: .touchUpInside)
 
         navigationBar.prefersLargeTitles = true
         setNavigationBarHidden(false, animated: true)
 
-        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
-            self.timer?.invalidate()
-            self.timer = nil
-        }
-
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                if UIApplication.shared.applicationState == .active {
-                    self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
-                        self.updateRightBarButtonItems()
-                    })
-                }
-            }
-        }
+//        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
+//            self.timer?.invalidate()
+//            self.timer = nil
+//        }
+//
+//        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { _ in
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+//                if UIApplication.shared.applicationState == .active {
+//                    self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
+//                        self.updateRightBarButtonItems()
+//                    })
+//                }
+//            }
+//        }
     }
 
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
@@ -137,7 +137,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             collectionViewCommon.tabBarSelect?.show()
 
             let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done) {
-                collectionViewCommon.setEditMode(false)
+//                collectionViewCommon.setEditMode(false)
                 collectionViewCommon.collectionView.reloadData()
             }
 

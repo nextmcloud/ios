@@ -41,7 +41,14 @@ class NCMainTabBarController: UITabBarController {
     private let groupDefaults = UserDefaults(suiteName: NCBrandOptions.shared.capabilitiesGroup)
     private var checkUserDelaultErrorInProgress: Bool = false
     private var timer: Timer?
+    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
 
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(changeTheming(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
@@ -49,6 +56,8 @@ class NCMainTabBarController: UITabBarController {
         if #available(iOS 17.0, *) {
             traitOverrides.horizontalSizeClass = .compact
         }
+
+        appDelegate.sceneIdentifier = self.sceneIdentifier
 
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil, queue: .main) { [weak self] notification in
             if let userInfo = notification.userInfo as? NSDictionary,
@@ -95,6 +104,20 @@ class NCMainTabBarController: UITabBarController {
             vc.isModalInPresentation = true
 
             present(vc, animated: true)
+        }
+    }
+    
+    @objc func changeTheming(_ notification: NSNotification) {
+        guard let userInfo = notification.userInfo as? NSDictionary else { return }
+        let account = userInfo["account"] as? String
+
+        if let tabBar = self.tabBar as? NCMainTabBar,
+           self.account == account {
+            let color = NCBrandColor.shared.getElement(account: account)
+            tabBar.color = color
+            tabBar.tintColor = color
+
+            tabBar.setNeedsDisplay()
         }
     }
 

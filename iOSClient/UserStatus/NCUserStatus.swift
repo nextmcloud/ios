@@ -29,7 +29,7 @@ import NextcloudKit
 import DropDown
 
 class NCUserStatus: UIViewController {
-
+    
     @IBOutlet weak var buttonCancel: UIBarButtonItem!
 
     @IBOutlet weak var onlineButton: UIButton!
@@ -67,7 +67,7 @@ class NCUserStatus: UIViewController {
     private let utility = NCUtility()
     private var clearAtTimestamp: Double = 0     // Unix Timestamp representing the time to clear the status
     private let borderWidthButton: CGFloat = 1.5
-    private var borderColorButton: CGColor = NCBrandColor.shared.customer.cgColor
+    private var borderColorButton: CGColor = NCBrandColor.shared.brand.cgColor
 
     public var account: String = ""
 
@@ -76,14 +76,14 @@ class NCUserStatus: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
+//        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconColor
         navigationItem.title = NSLocalizedString("_online_status_", comment: "")
 
         view.backgroundColor = .systemBackground
         tableView.backgroundColor = .systemBackground
 
-        borderColorButton = NCBrandColor.shared.getElement(account: account).cgColor
-        buttonCancel.image = utility.loadImage(named: "xmark", colors: [NCBrandColor.shared.iconImageColor])
+//        borderColorButton = NCBrandColor.shared.getElement(account: account).cgColor
+//        buttonCancel.image = utility.loadImage(named: "xmark", colors: [NCBrandColor.shared.iconColor])
 
         onlineButton.layer.cornerRadius = 10
         onlineButton.layer.masksToBounds = true
@@ -164,9 +164,9 @@ class NCUserStatus: UIViewController {
 
         setStatusMessageButton.layer.cornerRadius = 20
         setStatusMessageButton.layer.masksToBounds = true
-        setStatusMessageButton.backgroundColor = NCBrandColor.shared.getElement(account: account)
+        setStatusMessageButton.backgroundColor = NCBrandColor.shared.brand
         setStatusMessageButton.setTitle(NSLocalizedString("_set_status_message_", comment: ""), for: .normal)
-        setStatusMessageButton.setTitleColor(NCBrandColor.shared.getText(account: account), for: .normal)
+        setStatusMessageButton.setTitleColor(NCBrandColor.shared.brandText, for: .normal)
 
         getStatus()
     }
