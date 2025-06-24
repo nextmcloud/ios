@@ -68,9 +68,6 @@ extension AppDelegate {
                         viewController.editorId = NCGlobal.shared.editorText
                         viewController.creatorId = directEditingCreator.identifier
                         viewController.typeTemplate = NCGlobal.shared.editorText
-                        viewController.serverUrl = appDelegate.activeServerUrl
-                        viewController.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
-                        appDelegate.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
                         viewController.serverUrl = serverUrl
                         viewController.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
                         controller.present(navigationController, animated: true, completion: nil)
@@ -120,7 +117,6 @@ extension AppDelegate {
         )
 
         // Folder encrypted (ONLY ROOT)
-        if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: appDelegate.account) && (NCUtilityFileSystem().getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) == appDelegate.activeServerUrl) {
         if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: session.account) && (NCUtilityFileSystem().getHomeServer(session: session) == serverUrl) {
             actions.append(
                 NCMenuAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),

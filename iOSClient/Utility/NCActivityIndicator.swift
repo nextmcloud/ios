@@ -24,7 +24,7 @@
 import Foundation
 import UIKit
 
-class NCActivityIndicator: NSObject {
+class NCActivityIndicator: NSObject, @unchecked Sendable {
     @objc static let shared: NCActivityIndicator = {
         let instance = NCActivityIndicator()
         return instance

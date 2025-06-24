@@ -72,7 +72,8 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
         }
     }
 
@@ -172,6 +173,7 @@ extension NCManageDatabase {
     func getTableDirectory(predicate: NSPredicate) -> tableDirectory? {
         do {
             let realm = try Realm()
+            realm.refresh()
             guard let result = realm.objects(tableDirectory.self).filter(predicate).first
             else {
                 return nil
@@ -196,6 +198,7 @@ extension NCManageDatabase {
     func getTableDirectory(ocId: String) -> tableDirectory? {
         do {
             let realm = try Realm()
+            realm.refresh()
             if let result = realm.objects(tableDirectory.self).filter("ocId == %@", ocId).first {
                 return tableDirectory(value: result)
             } else {
@@ -210,6 +213,7 @@ extension NCManageDatabase {
     func getTablesDirectory(predicate: NSPredicate, sorted: String, ascending: Bool) -> [tableDirectory]? {
         do {
             let realm = try Realm()
+            realm.refresh()
             let results = realm.objects(tableDirectory.self).filter(predicate).sorted(byKeyPath: sorted, ascending: ascending)
             if results.isEmpty {
                 return nil

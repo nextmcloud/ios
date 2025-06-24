@@ -44,11 +44,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     private var tabAccount: tableAccount?
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
-    private let utilityFileSystem = NCUtilityFileSystem()
-    private let utility = NCUtility()
     private let database = NCManageDatabase.shared
     private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    private var tabAccount: tableAccount?
 
     private struct Section {
         var items: [NKExternalSite]
@@ -228,12 +225,6 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         // Display Name user & Quota
 
-        if let activeAccount = NCManageDatabase.shared.getActiveAccount() {
-
-            self.tabAccount = activeAccount
-
-
-        if tableAccount.quotaRelative > 0 {
         if let activeAccount = NCManageDatabase.shared.getActiveTableAccount() {
             
             self.tabAccount = activeAccount
@@ -260,11 +251,6 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             let quota2: String = utilityFileSystem.transformedSize(activeAccount.quotaTotal)
             let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
 
-            
-            let quotaUsed: String = utilityFileSystem.transformedSize(tableAccount.quotaUsed)
-            let quota2: String = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
-            let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
-            
             labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
             
             quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
@@ -272,11 +258,6 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         }
 
-        // ITEM : External
-        if NCBrandOptions.shared.disable_more_external_site == false {
-            if let externalSites = NCManageDatabase.shared.getAllExternalSites(account: appDelegate.account) {
-        }
-        
         // ITEM : External
         if NCBrandOptions.shared.disable_more_external_site == false {
             if let externalSites = NCManageDatabase.shared.getAllExternalSites(account: session.account) {
@@ -294,27 +275,26 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                 }
             }
         }
-            }
-
-            switch tableAccount.quotaTotal {
-            case -1:
-                quota = "0"
-            case -2:
-                quota = NSLocalizedString("_quota_space_unknown_", comment: "")
-            case -3:
-                quota = NSLocalizedString("_quota_space_unlimited_", comment: "")
-            default:
-                quota = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
-            }
-
-            let quotaUsed: String = utilityFileSystem.transformedSize(tableAccount.quotaUsed)
-            let quota2: String = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
-            let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
-
-            labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
             
-            quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
-            quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
+        switch tableAccount.quotaTotal {
+        case -1:
+            quota = "0"
+        case -2:
+            quota = NSLocalizedString("_quota_space_unknown_", comment: "")
+        case -3:
+            quota = NSLocalizedString("_quota_space_unlimited_", comment: "")
+        default:
+            quota = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
+        }
+
+        let quotaUsed: String = utilityFileSystem.transformedSize(tableAccount.quotaUsed)
+        let quota2: String = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
+        let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
+
+        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
+        
+        quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
+        quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
 
         loadSections()
     }
@@ -419,7 +399,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         } else if section.type == .moreApps {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: NCMoreAppSuggestionsCell.reuseIdentifier, for: indexPath) as? NCMoreAppSuggestionsCell else { return UITableViewCell() }
 
-            cell.setupCell(account: session.account)
+//            cell.setupCell(account: session.account)
             cell.controller = self.controller
             return cell
         } else {
@@ -466,11 +446,6 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
             let actionYes = UIAlertAction(title: NSLocalizedString("_yes_delete_", comment: ""), style: .default) { (_: UIAlertAction) in
                 let manageAccount = CCManageAccount()
-                manageAccount.delete(self.appDelegate.account)
-
-                self.appDelegate.openLogin(viewController: self, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
-                let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-                appDelegate.openLogin(selector: NCGlobal.shared.introLogin)
                 manageAccount.delete(self.session.account)
                 self.appDelegate.openLogin(viewController: self, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
             }

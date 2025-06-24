@@ -54,7 +54,7 @@ extension NCCollectionViewCommon {
             iconHeader = image
         } else {
             if metadata.directory {
-                iconHeader = imageCache.getFolder(account: metadata.account)
+                iconHeader = imageCache.getFolder()
             } else {
                 iconHeader = imageCache.getImageFile()
             }
@@ -76,11 +76,11 @@ extension NCCollectionViewCommon {
         // DETAILS
         //
         if NCNetworking.shared.isOnline,
-           !NCCapabilities.shared.disableSharesView(account: metadata.account) {
+           !NCCapabilities.shared.disableSharesView(account: metadata.account), !metadata.isDirectoryE2EE, !metadata.e2eEncrypted {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_details_", comment: ""),
-                    icon: utility.loadImage(named: "info.circle", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "info.circle", colors: [NCBrandColor.shared.iconColor]),
                     order: 10,
                     action: { _ in
                         NCActionCenter.shared.openShare(viewController: self, metadata: metadata, page: .activity)
@@ -130,7 +130,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_view_in_folder_", comment: ""),
-                    icon: utility.loadImage(named: "questionmark.folder", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "arrow.forward.square", colors: [NCBrandColor.shared.iconColor]),
                     order: 21,
                     action: { _ in
                         NCActionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileNameBlink: metadata.fileName, fileNameOpen: nil, sceneIdentifier: sceneIdentifier)
@@ -152,12 +152,14 @@ extension NCCollectionViewCommon {
         //
         // SET FOLDER E2EE
         //
+//        if metadata.canSetDirectoryAsE2EE && (NCUtilityFileSystem().getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) == appDelegate.activeServerUrl) {
+
         if NCNetworking.shared.isOnline,
-           metadata.canSetDirectoryAsE2EE {
+           metadata.canSetDirectoryAsE2EE {//}&& (NCUtilityFileSystem().getHomeServer(session: session) == metadata.serverUrl){
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_e2e_set_folder_encrypted_", comment: ""),
-                    icon: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconColor]),
                     order: 30,
                     action: { _ in
                         Task {
@@ -179,7 +181,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_e2e_remove_folder_encrypted_", comment: ""),
-                    icon: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconColor]),
                     order: 30,
                     action: { _ in
                         NextcloudKit.shared.markE2EEFolder(fileId: metadata.fileId, delete: true, account: metadata.account) { _, _, error in
@@ -200,11 +202,13 @@ extension NCCollectionViewCommon {
 
         //
         // FAVORITE
-        if !metadata.lock {
+        // FIXME: PROPPATCH doesn't work
+        // https://github.com/nextcloud/files_lock/issues/68
+        if !metadata.lock, !metadata.isDirectoryE2EE, !metadata.e2eEncrypted {
             actions.append(
                 NCMenuAction(
                     title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
-                    icon: utility.loadImage(named: metadata.favorite ? "star.slash" : "star", colors: [NCBrandColor.shared.yellowFavorite]),
+                    icon: utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite]),
                     order: 50,
                     action: { _ in
                         NCNetworking.shared.favoriteMetadata(metadata) { error in
@@ -233,24 +237,38 @@ extension NCCollectionViewCommon {
         if (NCNetworking.shared.isOnline || (tableLocalFile != nil && fileExists)) && metadata.canShare {
             actions.append(.share(selectedMetadatas: [metadata], controller: self.controller, order: 80))
         }
+        
+        //
+        // PRINT
+        //
+        if metadata.isPrintable {
+            actions.append(.printAction(metadata: metadata, order: 90))
+        }
+        
+        //
+        // SAVE CAMERA ROLL
+        //
+        if metadata.isSavebleInCameraRoll {
+            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller, order: 100))
+        }
 
         //
         // SAVE LIVE PHOTO
         //
-        if NCNetworking.shared.isOnline,
-           let metadataMOV = database.getMetadataLivePhoto(metadata: metadata),
-           let hudView = self.tabBarController?.view {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_livephoto_save_", comment: ""),
-                    icon: NCUtility().loadImage(named: "livephoto", colors: [NCBrandColor.shared.iconImageColor]),
-                    order: 100,
-                    action: { _ in
-                        NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV, hudView: hudView))
-                    }
-                )
-            )
-        }
+//        if NCNetworking.shared.isOnline,
+//           let metadataMOV = database.getMetadataLivePhoto(metadata: metadata),
+//           let hudView = self.tabBarController?.view {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_livephoto_save_", comment: ""),
+//                    icon: NCUtility().loadImage(named: "livephoto", colors: [NCBrandColor.shared.iconColor]),
+//                    order: 100,
+//                    action: { _ in
+//                        NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV, hudView: hudView))
+//                    }
+//                )
+//            )
+//        }
 
         //
         // SET LIVE PHOTO NO
@@ -261,7 +279,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_livephoto_no_", comment: ""),
-                    icon: NCUtility().loadImage(named: "livephoto.slash", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: NCUtility().loadImage(named: "livephoto.slash", colors: [NCBrandColor.shared.iconColor]),
                     order: 105,
                     action: { _ in
                         Task {
@@ -278,35 +296,35 @@ extension NCCollectionViewCommon {
         //
         // SAVE AS SCAN
         //
-        if NCNetworking.shared.isOnline,
-           metadata.isSavebleAsImage {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_save_as_scan_", comment: ""),
-                    icon: utility.loadImage(named: "doc.viewfinder", colors: [NCBrandColor.shared.iconImageColor]),
-                    order: 110,
-                    action: { _ in
-                        if self.utilityFileSystem.fileProviderStorageExists(metadata) {
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile,
-                                                                        object: nil,
-                                                                        userInfo: ["ocId": metadata.ocId,
-                                                                                   "ocIdTransfer": metadata.ocIdTransfer,
-                                                                                   "session": metadata.session,
-                                                                                   "selector": NCGlobal.shared.selectorSaveAsScan,
-                                                                                   "error": NKError(),
-                                                                                   "account": metadata.account],
-                                                                        second: 0.5)
-                        } else {
-                            guard let metadata = self.database.setMetadatasSessionInWaitDownload(metadatas: [metadata],
-                                                                                                 session: NCNetworking.shared.sessionDownload,
-                                                                                                 selector: NCGlobal.shared.selectorSaveAsScan,
-                                                                                                 sceneIdentifier: sceneIdentifier) else { return }
-                            NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
-                        }
-                    }
-                )
-            )
-        }
+//        if NCNetworking.shared.isOnline,
+//           metadata.isSavebleAsImage {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_save_as_scan_", comment: ""),
+//                    icon: utility.loadImage(named: "doc.viewfinder", colors: [NCBrandColor.shared.iconColor]),
+//                    order: 110,
+//                    action: { _ in
+//                        if self.utilityFileSystem.fileProviderStorageExists(metadata) {
+//                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile,
+//                                                                        object: nil,
+//                                                                        userInfo: ["ocId": metadata.ocId,
+//                                                                                   "ocIdTransfer": metadata.ocIdTransfer,
+//                                                                                   "session": metadata.session,
+//                                                                                   "selector": NCGlobal.shared.selectorSaveAsScan,
+//                                                                                   "error": NKError(),
+//                                                                                   "account": metadata.account],
+//                                                                        second: 0.5)
+//                        } else {
+//                            guard let metadata = self.database.setMetadatasSessionInWaitDownload(metadatas: [metadata],
+//                                                                                                 session: NCNetworking.shared.sessionDownload,
+//                                                                                                 selector: NCGlobal.shared.selectorSaveAsScan,
+//                                                                                                 sceneIdentifier: sceneIdentifier) else { return }
+//                            NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
+//                        }
+//                    }
+//                )
+//            )
+//        }
 
         //
         // RENAME
@@ -315,10 +333,16 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
-                    icon: utility.loadImage(named: "text.cursor", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.iconColor]),
                     order: 120,
                     action: { _ in
-                        self.present(UIAlertController.renameFile(metadata: metadata), animated: true)
+//                        self.present(UIAlertController.renameFile(metadata: metadata), animated: true)
+                        if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
+                            vcRename.metadata = metadata
+                            vcRename.imagePreview = image
+                            let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
+                            self.present(popup, animated: true)
+                        }
                     }
                 )
             )
@@ -328,9 +352,16 @@ extension NCCollectionViewCommon {
         // COPY - MOVE
         //
         if metadata.isCopyableMovable {
-            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], viewController: self, order: 130))
+            actions.append( .moveOrCopyAction(selectedMetadatas: [metadata], controller: self.controller, order: 130))
         }
 
+        //
+        // COPY IN PASTEBOARD
+        //
+        if metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE  {
+            actions.append(.copyAction(fileSelect: [metadata.ocId], controller: self.controller, order: 140))
+        }
+        
         //
         // MODIFY WITH QUICK LOOK
         //
@@ -339,7 +370,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_modify_", comment: ""),
-                    icon: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconColor]),
                     order: 150,
                     action: { _ in
                         if self.utilityFileSystem.fileProviderStorageExists(metadata) {
@@ -367,24 +398,24 @@ extension NCCollectionViewCommon {
         //
         // COLOR FOLDER
         //
-        if self is NCFiles,
-           metadata.directory {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_change_color_", comment: ""),
-                    icon: utility.loadImage(named: "paintpalette", colors: [NCBrandColor.shared.iconImageColor]),
-                    order: 160,
-                    action: { _ in
-                        if let picker = UIStoryboard(name: "NCColorPicker", bundle: nil).instantiateInitialViewController() as? NCColorPicker {
-                            picker.metadata = metadata
-                            let popup = NCPopupViewController(contentController: picker, popupWidth: 200, popupHeight: 320)
-                            popup.backgroundAlpha = 0
-                            self.present(popup, animated: true)
-                        }
-                    }
-                )
-            )
-        }
+//        if self is NCFiles,
+//           metadata.directory {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_change_color_", comment: ""),
+//                    icon: utility.loadImage(named: "paintpalette", colors: [NCBrandColor.shared.iconImageColor]),
+//                    order: 160,
+//                    action: { _ in
+//                        if let picker = UIStoryboard(name: "NCColorPicker", bundle: nil).instantiateInitialViewController() as? NCColorPicker {
+//                            picker.metadata = metadata
+//                            let popup = NCPopupViewController(contentController: picker, popupWidth: 200, popupHeight: 320)
+//                            popup.backgroundAlpha = 0
+//                            self.present(popup, animated: true)
+//                        }
+//                    }
+//                )
+//            )
+//        }
 
         //
         // DELETE

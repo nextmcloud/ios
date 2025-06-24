@@ -117,6 +117,7 @@ extension NCNetworking {
                     if let header = responseData?.response?.allHeaderFields,
                        let dateString = header["Last-Modified"] as? String {
                         dateLastModified = NextcloudKit.shared.nkCommonInstance.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
+//                        dateLastModified = NKLogFileManager.shared.convertDate(dateString, format: "EEE, dd MMM y HH:mm:ss zzz")
                     }
                     if afError?.isExplicitlyCancelledError ?? false {
                         error = NKError(errorCode: self.global.errorRequestExplicityCancelled, errorDescription: "error request explicity cancelled")
@@ -279,6 +280,33 @@ extension NCNetworking {
                                                                        "totalBytes": NSNumber(value: totalBytes),
                                                                        "totalBytesExpected": NSNumber(value: totalBytesExpected)])
             }
+        }
+    }
+}
+
+class NCOperationDownload: ConcurrentOperation, @unchecked Sendable {
+    var metadata: tableMetadata
+    var selector: String
+
+    init(metadata: tableMetadata, selector: String) {
+        self.metadata = tableMetadata.init(value: metadata)
+        self.selector = selector
+    }
+
+    override func start() {
+        guard !isCancelled else { return self.finish() }
+
+        metadata.session = NCNetworking.shared.sessionDownload
+        metadata.sessionError = ""
+        metadata.sessionSelector = selector
+        metadata.sessionTaskIdentifier = 0
+        metadata.status = NCGlobal.shared.metadataStatusWaitDownload
+
+        let metadata = NCManageDatabase.shared.addMetadata(metadata)
+
+        NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true) {
+        } completion: { _, _ in
+            self.finish()
         }
     }
 }

@@ -36,6 +36,10 @@ class NCRecent: NCCollectionViewCommon {
         emptyImageName = "clock.arrow.circlepath"
         emptyTitle = "_files_no_files_"
         emptyDescription = ""
+        layoutForView?.sort = "date"
+        layoutForView?.ascending = false
+        layoutForView?.directoryOnTop = true
+        layoutForView?.groupBy = self.groupByField
     }
 
     // MARK: - View Life Cycle
@@ -120,7 +124,7 @@ class NCRecent: NCCollectionViewCommon {
         <d:orderby>
             <d:order>
                 <d:prop>
-        /Users/marinofaggiana/Developer/ios/iOSClient/Assistant                 <d:getlastmodified/>
+                    <d:getlastmodified/>
                 </d:prop>
                 <d:descending/>
             </d:order>

@@ -7,9 +7,29 @@ import SwiftUI
 import NextcloudKit
 
 class NCFilesNavigationController: NCMainNavigationController {
+    
+    private var timerProcess: Timer?
+
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        transfersButton.setImage(UIImage(systemName: "arrow.left.arrow.right.circle.fill"), for: .normal)
+        transfersButton.tintColor = NCBrandColor.shared.iconImageColor
+        transfersButton.addAction(UIAction(handler: { _ in
+            if let navigationController = UIStoryboard(name: "NCTransfers", bundle: nil).instantiateInitialViewController() as? UINavigationController,
+               let viewController = navigationController.topViewController as? NCTransfers {
+                viewController.modalPresentationStyle = .pageSheet
+                self.present(navigationController, animated: true, completion: nil)
+            }
+        }), for: .touchUpInside)
+
+        self.timerProcess = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
+//            self.updateRightBarButtonItems()
+        })
+        
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadAvatar), object: nil, queue: nil) { notification in
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 self.collectionViewCommon?.showTipAccounts()
@@ -26,6 +46,36 @@ class NCFilesNavigationController: NCMainNavigationController {
     }
 
     // MARK: - Right
+
+    override func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+        super.navigationController(navigationController, willShow: viewController, animated: animated)
+        self.updateRightBarButtonItems()
+    }
+
+    // MARK: -
+
+    override func updateRightBarButtonItems() {
+        guard let collectionViewCommon,
+              !collectionViewCommon.isEditMode
+        else {
+            return
+        }
+        let resultsCount = self.database.getResultsMetadatas(predicate: NSPredicate(format: "status != %i", NCGlobal.shared.metadataStatusNormal))?.count ?? 0
+        var tempRightBarButtonItems : [UIBarButtonItem] = [] //[self.menuBarButtonItem]
+        
+
+//        if controller?.availableNotifications ?? false {
+//            tempRightBarButtonItems.append(self.notificationsButtonItem)
+//        }
+
+        if resultsCount > 0 {
+            tempRightBarButtonItems.append(self.transfersButtonItem)
+        }
+
+        if collectionViewCommon.navigationItem.rightBarButtonItems?.count != tempRightBarButtonItems.count {
+            collectionViewCommon.navigationItem.rightBarButtonItems = tempRightBarButtonItems
+        }
+    }
 
     override func createRightMenu() -> UIMenu? {
         guard let items = self.createRightMenuActions(),
@@ -96,22 +146,24 @@ class NCFilesNavigationController: NCMainNavigationController {
             }
 
             let addAccountAction = UIAction(title: NSLocalizedString("_add_account_", comment: ""), image: utility.loadImage(named: "person.crop.circle.badge.plus", colors: NCBrandColor.shared.iconImageMultiColors)) { _ in
-                if NCBrandOptions.shared.disable_intro {
-                    if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
-                        viewController.controller = self.controller
-                        let navigationController = UINavigationController(rootViewController: viewController)
-                        navigationController.modalPresentationStyle = .fullScreen
-                        self.present(navigationController, animated: true)
-                    }
-                } else {
-                    if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
-                        if let viewController = navigationController.topViewController as? NCIntroViewController {
-                            viewController.controller = nil
-                        }
-                        navigationController.modalPresentationStyle = .fullScreen
-                        self.present(navigationController, animated: true)
-                    }
-                }
+                self.appDelegate.openLogin(selector: self.global.introLogin)
+
+//                if NCBrandOptions.shared.disable_intro {
+//                    if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
+//                        viewController.controller = self.controller
+//                        let navigationController = UINavigationController(rootViewController: viewController)
+//                        navigationController.modalPresentationStyle = .fullScreen
+//                        self.present(navigationController, animated: true)
+//                    }
+//                } else {
+//                    if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+//                        if let viewController = navigationController.topViewController as? NCIntroViewController {
+//                            viewController.controller = nil
+//                        }
+//                        navigationController.modalPresentationStyle = .fullScreen
+//                        self.present(navigationController, animated: true)
+//                    }
+//                }
             }
 
             let settingsAccountAction = UIAction(title: NSLocalizedString("_account_settings_", comment: ""), image: utility.loadImage(named: "gear", colors: [NCBrandColor.shared.iconImageColor])) { _ in
@@ -156,6 +208,45 @@ class NCFilesNavigationController: NCMainNavigationController {
             let accountButton = self.collectionViewCommon?.navigationItem.leftBarButtonItems?.first?.customView as? UIButton
             accountButton?.setImage(image, for: .normal)
             accountButton?.menu = createLeftMenu()
+        }
+    }
+    
+    override func setNavigationRightItems() {
+        guard let collectionViewCommon else {
+            self.collectionViewCommon?.navigationItem.rightBarButtonItems = nil
+            return
+        }
+
+        if collectionViewCommon.isEditMode {
+            collectionViewCommon.tabBarSelect?.update(fileSelect: collectionViewCommon.fileSelect, metadatas: collectionViewCommon.getSelectedMetadatas(), userId: session.userId)
+            collectionViewCommon.tabBarSelect?.show()
+
+            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done) {
+                collectionViewCommon.setEditMode(false)
+                collectionViewCommon.collectionView.reloadData()
+                collectionViewCommon.navigationItem.rightBarButtonItems = [self.menuBarButtonItem]
+            }
+
+            self.collectionViewCommon?.navigationItem.rightBarButtonItems = [select]
+
+        } else if self.collectionViewCommon?.navigationItem.rightBarButtonItems == nil || (!collectionViewCommon.isEditMode && !(collectionViewCommon.tabBarSelect?.isHidden() ?? true)) {
+            collectionViewCommon.tabBarSelect?.hide()
+
+            self.updateRightBarButtonItems()
+
+        } else {
+
+            if let rightBarButtonItems = self.collectionViewCommon?.navigationItem.rightBarButtonItems,
+               let menuBarButtonItem = rightBarButtonItems.first(where: { $0.tag == menuButtonTag }),
+               let menuButton = menuBarButtonItem.customView as? UIButton {
+                menuButton.menu = createRightMenu()
+            }
+        }
+
+        // fix, if the tabbar was hidden before the update, set it in hidden
+        if self.tabBarController?.tabBar.isHidden ?? true,
+           collectionViewCommon.tabBarSelect?.isHidden() ?? true {
+            self.tabBarController?.tabBar.isHidden = true
         }
     }
 }

@@ -41,6 +41,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     var user = ""
 
     weak var gridCellDelegate: NCGridCellDelegate?
+    var namedButtonMore = ""
 
     var fileOcId: String? {
         get { return ocId }
@@ -69,6 +70,10 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     var fileSubinfoLabel: UILabel? {
         get { return labelSubinfo }
         set { labelSubinfo = newValue }
+    }
+    var fileSelectImage: UIImageView? {
+        get { return imageSelect }
+        set { imageSelect = newValue }
     }
     var fileStatusImage: UIImageView? {
         get { return imageStatus }
@@ -119,6 +124,12 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         longPressedGesture.delegate = self
         longPressedGesture.delaysTouchesBegan = true
         self.addGestureRecognizer(longPressedGesture)
+        
+        let longPressedGestureMore = UILongPressGestureRecognizer(target: self, action: #selector(longPressInsideMore(gestureRecognizer:)))
+        longPressedGestureMore.minimumPressDuration = 0.5
+        longPressedGestureMore.delegate = self
+        longPressedGestureMore.delaysTouchesBegan = true
+        buttonMore.addGestureRecognizer(longPressedGestureMore)
     }
 
     override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
@@ -126,23 +137,29 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        gridCellDelegate?.tapMoreGridItem(with: ocId, ocIdTransfer: ocIdTransfer, image: imageItem.image, sender: sender)
+        gridCellDelegate?.tapMoreGridItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
     }
 
     @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
-        gridCellDelegate?.longPressGridItem(with: ocId, ocIdTransfer: ocIdTransfer, gestureRecognizer: gestureRecognizer)
+        gridCellDelegate?.longPressGridItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, gestureRecognizer: gestureRecognizer)
+    }
+
+    @objc func longPressInsideMore(gestureRecognizer: UILongPressGestureRecognizer) {
+        gridCellDelegate?.longPressMoreGridItem(with: ocId, namedButtonMore: namedButtonMore, gestureRecognizer: gestureRecognizer)
     }
 
     fileprivate func setA11yActions() {
+        let moreName = namedButtonMore == NCGlobal.shared.buttonMoreStop ? "_cancel_" : "_more_"
         self.accessibilityCustomActions = [
             UIAccessibilityCustomAction(
-                name: NSLocalizedString("_more_", comment: ""),
+                name: NSLocalizedString(moreName, comment: ""),
                 target: self,
                 selector: #selector(touchUpInsideMore))
         ]
     }
 
-    func setButtonMore(image: UIImage) {
+    func setButtonMore(named: String, image: UIImage) {
+        namedButtonMore = named
         buttonMore.setImage(image, for: .normal)
         setA11yActions()
     }
@@ -179,7 +196,27 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         buttonMore.isHidden = status
     }
 
+    func selectMode(_ status: Bool) {
+        if status {
+            imageSelect.isHidden = false
+            buttonMore.isHidden = true
+            accessibilityCustomActions = nil
+        } else {
+            imageSelect.isHidden = true
+            imageVisualEffect.isHidden = true
+            buttonMore.isHidden = false
+            setA11yActions()
+        }
+    }
+    
     func selected(_ status: Bool, isEditMode: Bool) {
+        // NMC-1190 - iOS - Files - Deleting files while files are still uploading won't delete properly : to fix this issue remove check for !metadata.isInTransfer in below line
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.isInTransfer, !metadata.e2eEncrypted else {
+//        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
+            imageSelect.isHidden = true
+            imageVisualEffect.isHidden = true
+            return
+        }
         if isEditMode {
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
@@ -188,11 +225,17 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             setA11yActions()
         }
         if status {
-            imageSelect.isHidden = false
-            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
+            if traitCollection.userInterfaceStyle == .dark {
+                imageVisualEffect.effect = UIBlurEffect(style: .dark)
+                imageVisualEffect.backgroundColor = .black
+            } else {
+                imageVisualEffect.effect = UIBlurEffect(style: .extraLight)
+                imageVisualEffect.backgroundColor = .lightGray
+            }
+            imageSelect.image = NCImageCache.images.checkedYes
             imageVisualEffect.isHidden = false
         } else {
-            imageSelect.isHidden = true
+            imageSelect.image = NCImageCache.images.checkedNo
             imageVisualEffect.isHidden = true
         }
     }
@@ -222,8 +265,16 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 }
 
 protocol NCGridCellDelegate: AnyObject {
-    func tapMoreGridItem(with ocId: String, ocIdTransfer: String, image: UIImage?, sender: Any)
-    func longPressGridItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer)
+    func tapMoreGridItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any)
+    func longPressMoreGridItem(with ocId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
+    func longPressGridItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
+}
+
+// optional func
+extension NCGridCellDelegate {
+    func tapMoreGridItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any) {}
+    func longPressMoreGridItem(with ocId: String, namedButtonMore: String, indexPath: IndexPath, gestureRecognizer: UILongPressGestureRecognizer) {}
+    func longPressGridItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer) {}
 }
 
 // MARK: - Grid Layout

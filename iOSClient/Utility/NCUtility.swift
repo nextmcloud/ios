@@ -301,10 +301,84 @@ final class NCUtility: NSObject, Sendable {
         return height
     }
     
+//    func isValidEmail(_ email: String) -> Bool {
+//        
+//        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+//        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+//        return emailPred.evaluate(with: email)
+//    }
+    
+    // E-mail validations
+    // 1. Basic Email Validator (ASCII only)
     func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}$"
+        let predicate = NSPredicate(format: "SELF MATCHES[c] %@", emailRegex)
+        return predicate.evaluate(with: email)
+    }
+
+    // 2. Manually Convert Unicode Domain to Punycode with German Char Support
+    func convertToPunycode(email: String) -> String? {
+        guard let atIndex = email.firstIndex(of: "@") else { return nil }
         
-        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-        return emailPred.evaluate(with: email)
+        let localPart = String(email[..<atIndex])
+        var domainPart = String(email[email.index(after: atIndex)...])
+        
+        // Normalize the domain part before converting to Punycode
+        let normalizedDomainPart = domainPart.precomposedStringWithCanonicalMapping
+        
+        // Attempt to convert Unicode to Punycode using a custom conversion function
+        if let punycodeDomain = punycodeEncode(normalizedDomainPart) {
+            return "\(localPart)@\(punycodeDomain)"
+        }
+        
+        return nil
+    }
+
+    // 3. Convert Unicode String to Punycode (Manually Handling German Characters)
+    func punycodeEncode(_ domain: String) -> String? {
+        // Mapping of common German characters to their corresponding Punycode equivalents
+        var punycodeDomain = domain.lowercased()
+        
+        let germanCharToPunycode: [String: String] = [
+            "ü": "xn--u-1fa",  // ü → xn--u-1fa
+            "ä": "xn--a-1fa",  // ä → xn--a-1fa
+            "ö": "xn--o-1fa",  // ö → xn--o-1fa
+            "ß": "xn--ss-1fa", // ß → xn--ss-1fa
+            "é": "xn--e-1fa",  // é → xn--e-1fa
+            "è": "xn--e-1f",   // è → xn--e-1f
+            "à": "xn--a-1f",   // à → xn--a-1f
+        ]
+        
+        // Replace each German character with the corresponding Punycode equivalent
+        for (char, punycode) in germanCharToPunycode {
+            punycodeDomain = punycodeDomain.replacingOccurrences(of: char, with: punycode)
+        }
+        
+        // If no change occurred, return the domain as it is (i.e., no Punycode needed)
+        return punycodeDomain
+    }
+
+    // 4. IDN Email Validator (handles Unicode domain by converting to Punycode)
+    func isValidIDNEmail(_ email: String) -> Bool {
+        // Convert domain part to Punycode and validate using basic email regex
+        guard let punycodeEmail = convertToPunycode(email: email) else {
+            return false
+        }
+        
+        return isValidEmail(punycodeEmail)
+    }
+
+    // 5. Unified Email Validation - Check for both basic and IDN emails
+    func validateEmail(_ email: String) -> Bool {
+        if isValidEmail(email) {
+            print("Valid ASCII email: \(email)")
+            return true
+        } else if isValidIDNEmail(email) {
+            print("Valid IDN email: \(email)")
+            return true
+        } else {
+            print("Invalid email: \(email)")
+            return false
+        }
     }
 }

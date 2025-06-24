@@ -13,7 +13,6 @@ protocol NCTrashGridCellDelegate: AnyObject {
 }
 
 class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
-
     
     @IBOutlet weak var imageItem: UIImageView!
     @IBOutlet weak var imageSelect: UIImageView!
@@ -25,12 +24,6 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
     @IBOutlet weak var progressView: UIProgressView!
-
-    internal var objectId = ""
-    var indexPath = IndexPath()
-    private var user = ""
-
-    weak var delegate: NCGridCellDelegate?
 
     internal var objectId = ""
     var indexPath = IndexPath()
@@ -164,9 +157,7 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
             imageVisualEffect.isHidden = false
         } else {
             imageSelect.image = NCImageCache.images.checkedNo
-            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
-            imageVisualEffect.isHidden = true
-            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
+//            imageVisualEffect.isHidden = true
         }
     }
 

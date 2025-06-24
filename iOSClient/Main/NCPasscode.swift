@@ -50,6 +50,10 @@ class NCPasscode: NSObject, TOPasscodeViewControllerDelegate {
         let passcodeCounterFail = NCKeychain().passcodeCounterFail
         return passcodeCounterFail > 0 && passcodeCounterFail.isMultiple(of: 3)
     }
+    var isPasscodePresented: Bool {
+        return privacyProtectionWindow?.rootViewController?.presentedViewController is TOPasscodeViewController
+    }
+    var privacyProtectionWindow: UIWindow?
     var passcodeViewController: TOPasscodeViewController!
     var delegate: NCPasscodeDelegate?
     var viewController: UIViewController?
@@ -94,6 +98,7 @@ class NCPasscode: NSObject, TOPasscodeViewControllerDelegate {
                         passcodeViewController.dismiss(animated: true) {
                             NCKeychain().passcodeCounterFail = 0
                             NCKeychain().passcodeCounterFailReset = 0
+                            self.hidePrivacyProtectionWindow()
                             self.delegate?.evaluatePolicy(passcodeViewController, isCorrectCode: true)
                             if NCKeychain().accountRequest {
                                 self.delegate?.requestedAccount(controller: self.viewController)
@@ -138,6 +143,7 @@ class NCPasscode: NSObject, TOPasscodeViewControllerDelegate {
             passcodeViewController.dismiss(animated: true) {
                 NCKeychain().passcodeCounterFail = 0
                 NCKeychain().passcodeCounterFailReset = 0
+                self.hidePrivacyProtectionWindow()
                 if NCKeychain().accountRequest {
                     self.delegate?.requestedAccount(controller: self.viewController)
                 }
@@ -192,6 +198,16 @@ class NCPasscode: NSObject, TOPasscodeViewControllerDelegate {
                     }
                 }
             }
+        }
+    }
+    
+    func hidePrivacyProtectionWindow() {
+        guard !(privacyProtectionWindow?.rootViewController?.presentedViewController is TOPasscodeViewController) else { return }
+        UIWindow.animate(withDuration: 0.25) {
+            self.privacyProtectionWindow?.alpha = 0
+        } completion: { _ in
+            self.privacyProtectionWindow?.isHidden = true
+            self.privacyProtectionWindow = nil
         }
     }
 }

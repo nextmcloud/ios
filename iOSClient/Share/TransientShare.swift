@@ -42,6 +42,7 @@ class TransientShare: Shareable {
     convenience init(sharee: NKSharee, metadata: tableMetadata, password: String?) {
         self.init(shareType: sharee.shareType, metadata: metadata, password: password)
         self.shareWith = sharee.shareWith
+        self.shareWithDisplayname = sharee.label
     }
 
     static func shareLink(metadata: tableMetadata, password: String?) -> TransientShare {

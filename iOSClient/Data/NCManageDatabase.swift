@@ -33,17 +33,37 @@ protocol DateCompareable {
     var dateKey: Date { get }
 }
 
-final class NCManageDatabase: Sendable {
-    static let shared = NCManageDatabase()
+//final class NCManageDatabase: Sendable {
+class NCManageDatabase: NSObject, @unchecked Sendable  {
+    @objc static let shared: NCManageDatabase = {
+        let instance = NCManageDatabase()
+        return instance
+    }()
+    
+    private let realmQueue = DispatchQueue(label: "com.nextcloud.realmQueue")
+    private let realmQueueKey = DispatchSpecificKey<Bool>()
 
     let utilityFileSystem = NCUtilityFileSystem()
 
-    init() {
+    override init() {
+        super.init()
+        realmQueue.setSpecific(key: realmQueueKey, value: true)
+
         func migrationSchema(_ migration: Migration, _ oldSchemaVersion: UInt64) {
             if oldSchemaVersion < 365 {
                 migration.deleteData(forType: tableMetadata.className())
                 migration.enumerateObjects(ofType: tableDirectory.className()) { _, newObject in
                     newObject?["etag"] = ""
+                }
+            }
+            if oldSchemaVersion < 383 {
+                migration.enumerateObjects(ofType: tableAccount.className()) { oldObject, newObject in
+                    if let oldDate = oldObject?["autoUploadSinceDate"] as? Date {
+                        newObject?["autoUploadOnlyNewSinceDate"] = oldDate
+                    } else {
+                        newObject?["autoUploadOnlyNewSinceDate"] = Date()
+                    }
+                    newObject?["autoUploadOnlyNew"] = true
                 }
             }
             if oldSchemaVersion < databaseSchemaVersion {
@@ -125,6 +145,7 @@ final class NCManageDatabase: Sendable {
                 }
             } catch let error {
                 NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] DATABASE: \(error.localizedDescription)")
+//                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] DATABASE: \(error.localizedDescription)")
             }
         } else {
             Realm.Configuration.defaultConfiguration =
@@ -145,6 +166,7 @@ final class NCManageDatabase: Sendable {
 
             } catch let error {
                 NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] DATABASE: \(error.localizedDescription)")
+//                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] DATABASE: \(error.localizedDescription)")
 
                 if let realmURL = databaseFileUrlPath {
                     let filesToDelete = [
@@ -168,35 +190,162 @@ final class NCManageDatabase: Sendable {
 
                 } catch let error {
                     NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Account restoration: \(error.localizedDescription)")
+//                    NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Account restoration: \(error.localizedDescription)")
                 }
             }
         }
     }
 
     // MARK: -
-    // MARK: Utility Database
 
-    func clearTable(_ table: Object.Type, account: String? = nil) {
-        do {
-            let realm = try Realm()
-            try realm.write {
-                var results: Results<Object>
-                if let account = account {
-                    results = realm.objects(table).filter("account == %@", account)
+    @discardableResult
+    func performRealmRead<T>(_ block: @escaping (Realm) throws -> T?, sync: Bool = true, completion: ((T?) -> Void)? = nil) -> T? {
+        guard !isAppSuspending else {
+            completion?(nil)
+            return nil // Return nil because the result is handled asynchronously
+        }
+
+        if DispatchQueue.getSpecific(key: realmQueueKey) == true {
+            // Already on realmQueue: execute directly to avoid deadlocks
+            do {
+                let realm = try Realm()
+                let result = try block(realm)
+                if sync {
+                    return result
                 } else {
-                    results = realm.objects(table)
+                    completion?(result)
+                    return nil // Return nil because the result is handled asynchronously
                 }
-
-                realm.delete(results)
+            } catch {
+//                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Realm read error: \(error)")
+                completion?(nil)
+                return nil // Return nil because the result is handled asynchronously
             }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        } else {
+            if sync {
+                // Synchronous execution
+                return realmQueue.sync {
+                    do {
+                        let realm = try Realm()
+                        return try block(realm)
+                    } catch {
+//                        NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Realm read error: \(error)")
+                        return nil
+                    }
+                }
+            } else {
+                // Asynchronous execution
+                realmQueue.async {
+                    do {
+                        let realm = try Realm()
+                        let result = try block(realm)
+                        completion?(result)
+                    } catch {
+//                        NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Realm read error: \(error)")
+                        completion?(nil)
+                    }
+                }
+                return nil // Return nil because the result will be handled asynchronously
+            }
         }
     }
 
-    func clearDatabase(account: String? = nil, removeAccount: Bool = false) {
+    func performRealmWrite(sync: Bool = true, _ block: @escaping (Realm) throws -> Void) {
+        guard !isAppSuspending
+        else {
+            return
+        }
+
+        let executionBlock: @Sendable () -> Void = {
+            autoreleasepool {
+                do {
+                    let realm = try Realm()
+                    try realm.write {
+                        try block(realm)
+                    }
+                } catch {
+//                    NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Realm write error: \(error)")
+                }
+            }
+        }
+
+        if isAppInBackground || !sync {
+            realmQueue.async(execute: executionBlock)
+        } else {
+            realmQueue.sync(execute: executionBlock)
+        }
+    }
+    
+    // MARK: - performRealmRead async/await, performRealmWrite async/await
+
+    func performRealmReadAsync<T>(_ block: @escaping (Realm) throws -> T?) async -> T? {
+        await withCheckedContinuation { continuation in
+            realmQueue.async {
+                if isAppSuspending {
+                    // App is suspending — don't execute the block
+                    continuation.resume(returning: nil)
+                    return
+                }
+
+                autoreleasepool {
+                    do {
+                        let realm = try Realm()
+                        let result = try block(realm)
+                        continuation.resume(returning: result)
+                    } catch {
+//                        NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Realm read error: \(error)")
+                        continuation.resume(returning: nil)
+                    }
+                }
+            }
+        }
+    }
+
+    func performRealmWriteAsync(_ block: @escaping (Realm) throws -> Void) async {
+        await withCheckedContinuation { continuation in
+            realmQueue.async {
+                if isAppSuspending {
+                    // App is suspending — don't execute the block
+                    continuation.resume()
+                    return
+                }
+
+                autoreleasepool {
+                    do {
+                        let realm = try Realm()
+                        try realm.write {
+                            try block(realm)
+                        }
+                    } catch {
+//                        NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Realm write error: \(error)")
+                    }
+                    continuation.resume()
+                }
+            }
+        }
+    }
+
+    // MARK: -
+
+    @objc func clearTable(_ table: Object.Type, account: String? = nil) {
+        performRealmWrite { realm in
+            var results: Results<Object>
+            if let account = account {
+                results = realm.objects(table).filter("account == %@", account)
+            } else {
+                results = realm.objects(table)
+            }
+
+            realm.delete(results)
+        }
+    }
+
+    @objc func clearDatabase(account: String? = nil, removeAccount: Bool = false, removeAutoUpload: Bool = false) {
         if removeAccount {
             self.clearTable(tableAccount.self, account: account)
+        }
+        if removeAutoUpload {
+            self.clearTable(tableAutoUploadTransfer.self, account: account)
         }
 
         self.clearTable(tableActivity.self, account: account)
@@ -223,7 +372,6 @@ final class NCManageDatabase: Sendable {
         self.clearTable(TableSecurityGuardDiagnostics.self, account: account)
         self.clearTable(tableTag.self, account: account)
         self.clearTable(tableTrash.self, account: account)
-        self.clearTable(tableUserStatus.self, account: account)
         self.clearTable(tableVideo.self, account: account)
         self.clearTable(TableDownloadLimit.self, account: account)
         self.clearTable(tableRecommendedFiles.self, account: account)
@@ -252,16 +400,21 @@ final class NCManageDatabase: Sendable {
             return realm.resolve(tableRef)
         } catch let error as NSError {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
         return nil
     }
 
     func realmRefresh() {
-        do {
-            let realm = try Realm()
-            realm.refresh()
-        } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not refresh database: \(error)")
+        realmQueue.sync {
+            do {
+                let realm = try Realm()
+                realm.refresh()
+            } catch let error as NSError {
+                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not refresh database: \(error)")
+//                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not refresh database: \(error)")
+
+            }
         }
     }
 

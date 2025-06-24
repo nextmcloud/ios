@@ -14,7 +14,7 @@ import NextcloudKit
 import UniformTypeIdentifiers
 import Alamofire
 
-class NCLivePhoto {
+class NCLivePhoto: @unchecked Sendable {
 
     var livePhotoFile = ""
     var livePhotoFile2 = ""

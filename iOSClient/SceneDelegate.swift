@@ -46,10 +46,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         if let activeTableAccount = self.database.getActiveTableAccount() {
             NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Account active \(activeTableAccount.account)")
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Account active \(activeTableAccount.account)")
 
             let capability = self.database.setCapabilities(account: activeTableAccount.account)
-            NCBrandColor.shared.settingThemingColor(account: activeTableAccount.account)
-
+            DispatchQueue.global().async {
+                NCBrandColor.shared.settingThemingColor(account: activeTableAccount.account)
+                NCImageCache.shared.createMediaCache(account: activeTableAccount.account, withCacheSize: true)
+            }
             for tableAccount in self.database.getAllTableAccount() {
                 NextcloudKit.shared.appendSession(account: tableAccount.account,
                                                   urlBase: tableAccount.urlBase,
@@ -84,13 +87,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 }
             }
             if NCBrandOptions.shared.disable_intro {
-                if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
-                    let navigationController = UINavigationController(rootViewController: viewController)
-                    window?.rootViewController = navigationController
-                    window?.makeKeyAndVisible()
-                }
+                appDelegate.openLogin(selector: NCGlobal.shared.introLogin, window: window)
             } else {
-                if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+                if let viewController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? NCIntroViewController {
+                    let navigationController = NCLoginNavigationController(rootViewController: viewController)
                     window?.rootViewController = navigationController
                     window?.makeKeyAndVisible()
                 }
@@ -104,6 +104,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneWillEnterForeground(_ scene: UIScene) {
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene will enter in foreground")
+//        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Scene will enter in foreground")
         let session = SceneManager.shared.getSession(scene: scene)
         guard !session.account.isEmpty else { return }
 
@@ -118,7 +119,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 requestedAccount(controller: controller)
             }
         }
-        AppUpdater().checkForUpdate()
 //        AppUpdater().checkForUpdate()
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
     }
@@ -127,6 +127,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let session = SceneManager.shared.getSession(scene: scene)
         let controller = SceneManager.shared.getController(scene: scene)
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene did become active")
+//        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Scene did become active")
 
         let oldVersion = UserDefaults.standard.value(forKey: NCSettingsBundleHelper.SettingsBundleKeys.BuildVersionKey) as? String
         AppUpdater().checkForUpdate()
@@ -145,7 +146,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         hidePrivacyProtectionWindow()
 
         NCAutoUpload.shared.initAutoUpload(controller: nil, account: session.account) { num in
-            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Initialize Auto upload with \(num) uploads")
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Initialize Auto upload with \(num) uploads")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Initialize Auto upload with \(num) uploads")
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -161,6 +163,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneWillResignActive(_ scene: UIScene) {
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene will resign active")
+//        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Scene will resign active")
 
         NSFileProviderManager.removeAllDomains { _ in
             /*
@@ -171,7 +174,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             */
         }
 
-        WidgetCenter.shared.reloadAllTimelines()
+//        WidgetCenter.shared.reloadAllTimelines()
 
         let session = SceneManager.shared.getSession(scene: scene)
         guard !session.account.isEmpty else { return }
@@ -189,6 +192,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidEnterBackground(_ scene: UIScene) {
         NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene did enter in background")
+//        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Scene did enter in background")
         database.backupTableAccountToFile()
         let session = SceneManager.shared.getSession(scene: scene)
         guard let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)) else {
@@ -209,6 +213,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if let error = NCAccount().updateAppsShareAccounts() {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Create Apps share accounts \(error.localizedDescription)")
         }
+        
+//        if tableAccount.autoUploadStart {
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Auto upload: true")
+//            if UIApplication.shared.backgroundRefreshStatus == .available {
+//                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Auto upload in background: true")
+//            } else {
+//                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Auto upload in background: false")
+//            }
+//        } else {
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Auto upload: false")
+//        }
+//
+//        if let error = NCAccount().updateAppsShareAccounts() {
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Create Apps share accounts \(error.localizedDescription)")
+//        }
 
         appDelegate?.scheduleAppRefresh()
         appDelegate?.scheduleAppProcessing()
@@ -382,6 +401,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     private func showPrivacyProtectionWindow() {
+        guard privacyProtectionWindow == nil else {
+            privacyProtectionWindow?.isHidden = false
+            return
+        }
+        
         guard let windowScene = self.window?.windowScene else {
             return
         }

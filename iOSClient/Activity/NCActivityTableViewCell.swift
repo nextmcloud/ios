@@ -98,7 +98,7 @@ extension NCActivityTableViewCell: UICollectionViewDelegate {
             }
             if (responder as? UIViewController)!.navigationController != nil {
                 if let viewController = UIStoryboard(name: "NCTrash", bundle: nil).instantiateInitialViewController() as? NCTrash {
-                    if let resultTableTrash = NCManageDatabase.shared.getResultTrashItem(fileId: String(activityPreview.fileId), account: activityPreview.account) {
+                    if let resultTableTrash = NCManageDatabase.shared.getTableTrash(fileId: String(activityPreview.fileId), account: activityPreview.account) {
                         viewController.blinkFileId = resultTableTrash.fileId
                         viewController.filePath = resultTableTrash.filePath
                         (responder as? UIViewController)!.navigationController?.pushViewController(viewController, animated: true)
@@ -169,7 +169,7 @@ extension NCActivityTableViewCell: UICollectionViewDataSource {
                         cell.imageView.image = image
                         cell.imageView?.contentMode = .scaleAspectFill
                     } else {
-                        cell.imageView?.image = utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor])
+                        cell.imageView?.image = UIImage(named: "file_photo")
                         cell.imageView?.contentMode = .scaleAspectFit
                         cell.fileId = fileId
                         if !FileManager.default.fileExists(atPath: fileNamePath) {

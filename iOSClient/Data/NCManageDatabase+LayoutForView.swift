@@ -37,6 +37,7 @@ class NCDBLayoutForView: Object {
     @Persisted var titleButtonHeader: String = "_sorted_by_name_a_z_"
     @Persisted var columnGrid: Int = 3
     @Persisted var columnPhoto: Int = 3
+    @Persisted var directoryOnTop: Bool = true
 }
 
 extension NCManageDatabase {
@@ -50,7 +51,8 @@ extension NCManageDatabase {
                           groupBy: String? = nil,
                           titleButtonHeader: String? = nil,
                           columnGrid: Int? = nil,
-                          columnPhoto: Int? = nil) -> NCDBLayoutForView? {
+                          columnPhoto: Int? = nil,
+                          directoryOnTop: Bool? = nil) -> NCDBLayoutForView? {
         var keyStore = key
         if !serverUrl.isEmpty { keyStore = serverUrl}
         let index = account + " " + keyStore
@@ -90,6 +92,9 @@ extension NCManageDatabase {
                 if let columnPhoto {
                     addObject.columnPhoto = columnPhoto
                 }
+                if let directoryOnTop {
+                    addObject.directoryOnTop = directoryOnTop
+                }
                 realm.add(addObject, update: .all)
             }
         } catch let error {
@@ -121,6 +126,7 @@ extension NCManageDatabase {
 
         do {
             let realm = try Realm()
+            realm.refresh()
             if let result = realm.objects(NCDBLayoutForView.self).filter("index == %@", index).first {
                 return NCDBLayoutForView(value: result)
             } else {

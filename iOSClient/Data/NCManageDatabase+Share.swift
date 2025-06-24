@@ -147,6 +147,7 @@ extension NCManageDatabase {
     func getTableShares(account: String) -> [tableShare] {
         do {
             let realm = try Realm()
+            realm.refresh()
             let sortProperties = [SortDescriptor(keyPath: "shareType", ascending: false), SortDescriptor(keyPath: "idShare", ascending: false)]
             let results = realm.objects(tableShare.self).filter("account == %@", account).sorted(by: sortProperties)
             return Array(results.map { tableShare.init(value: $0) })
@@ -159,6 +160,7 @@ extension NCManageDatabase {
     func getTableShares(metadata: tableMetadata) -> (firstShareLink: tableShare?, share: [tableShare]?) {
         do {
             let realm = try Realm()
+            realm.refresh()
             let sortProperties = [SortDescriptor(keyPath: "shareType", ascending: false), SortDescriptor(keyPath: "idShare", ascending: false)]
             let firstShareLink = realm.objects(tableShare.self).filter("account == %@ AND serverUrl == %@ AND fileName == %@ AND shareType == 3", metadata.account, metadata.serverUrl, metadata.fileName).first
             if let firstShareLink = firstShareLink {
@@ -177,6 +179,7 @@ extension NCManageDatabase {
     func getTableShare(account: String, idShare: Int) -> tableShare? {
         do {
             let realm = try Realm()
+            realm.refresh()
             guard let result = realm.objects(tableShare.self).filter("account = %@ AND idShare = %d", account, idShare).first else { return nil }
             return tableShare.init(value: result)
         } catch let error as NSError {
@@ -188,6 +191,7 @@ extension NCManageDatabase {
     func getTableShares(account: String, serverUrl: String) -> [tableShare] {
         do {
             let realm = try Realm()
+            realm.refresh()
             let sortProperties = [SortDescriptor(keyPath: "shareType", ascending: false), SortDescriptor(keyPath: "idShare", ascending: false)]
             let results = realm.objects(tableShare.self).filter("account == %@ AND serverUrl == %@", account, serverUrl).sorted(by: sortProperties)
             return Array(results.map { tableShare.init(value: $0) })
@@ -203,6 +207,7 @@ extension NCManageDatabase {
     func getTableShares(account: String, serverUrl: String, fileName: String) -> [tableShare] {
         do {
             let realm = try Realm()
+            realm.refresh()
             let sortProperties = [SortDescriptor(keyPath: "shareType", ascending: false), SortDescriptor(keyPath: "idShare", ascending: false)]
             let results = realm.objects(tableShare.self).filter("account == %@ AND serverUrl == %@ AND fileName == %@", account, serverUrl, fileName).sorted(by: sortProperties)
             return Array(results.map { tableShare.init(value: $0) })

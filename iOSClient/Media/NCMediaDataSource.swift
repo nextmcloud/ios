@@ -29,9 +29,12 @@ extension NCMedia {
     func loadDataSource(completion: @escaping () -> Void = {}) {
         let session = self.session
         DispatchQueue.global().async {
-            if let metadatas = self.database.getResultsMetadatas(predicate: self.imageCache.getMediaPredicate(filterLivePhotoFile: true, session: session, showOnlyImages: self.showOnlyImages, showOnlyVideos: self.showOnlyVideos), sortedByKeyPath: "datePhotosOriginal") {
+            let mediaPredicate = self.imageCache.getMediaPredicate(filterLivePhotoFile: true, session: session, showOnlyImages: self.showOnlyImages, showOnlyVideos: self.showOnlyVideos)
+            if let metadatas = self.database.getResultsMetadatas(predicate: mediaPredicate, sortedByKeyPath: "datePhotosOriginal") { //NCKeychain().mediaSortDate) {
                 self.dataSource = NCMediaDataSource(metadatas: metadatas)
             }
+            self.metadatas = self.imageCache.getMediaMetadatas(account: self.activeAccount.account, predicate: mediaPredicate)
+            
             self.collectionViewReloadData()
             completion()
         }
@@ -123,6 +126,7 @@ extension NCMedia {
                                             greaterDate: greaterDateAny,
                                             elementDate: elementDate,
                                             limit: limit,
+//                                            showHiddenFiles: NCKeychain().showHiddenFiles,
                                             account: self.session.account,
                                             options: options) { account, files, _, error in
 

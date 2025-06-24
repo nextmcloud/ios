@@ -24,7 +24,7 @@
 import UIKit
 import NextcloudKit
 
-class fileProviderData: NSObject {
+class fileProviderData: NSObject, @unchecked Sendable {
     static let shared: fileProviderData = {
         let instance = fileProviderData()
         return instance
@@ -83,8 +83,11 @@ class fileProviderData: NSObject {
         NextcloudKit.shared.nkCommonInstance.pathLog = utilityFileSystem.directoryGroup
         let levelLog = NCKeychain().logLevel
         NextcloudKit.shared.nkCommonInstance.levelLog = levelLog
+//        NKLogFileManager.shared.logDirectory = URL(fileURLWithPath: utilityFileSystem.directoryGroup)
+//        let levelLog = NCKeychain().logLevel
+//        NKLogFileManager.shared.logLevel = NKLogLevel(rawValue: levelLog) ?? .normal
         let version = NSString(format: NCBrandOptions.shared.textCopyrightNextcloudiOS as NSString, NCUtility().getVersionApp()) as String
-        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start File Provider session with level \(levelLog) " + version + " (File Provider Extension)")
+        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Start File Provider session with level \(levelLog) " + version + " (File Provider Extension)")
 
         var tblAccount = self.database.getActiveTableAccount()
         if let domain {

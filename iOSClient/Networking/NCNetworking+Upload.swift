@@ -36,7 +36,7 @@ extension NCNetworking {
         let metadata = tableMetadata.init(value: metadata)
         var numChunks: Int = 0
         var hud: NCHud?
-        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Upload file \(metadata.fileNameView) with Identifier \(metadata.assetLocalIdentifier) with size \(metadata.size) [CHUNK \(metadata.chunk), E2EE \(metadata.isDirectoryE2EE)]")
+        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Upload file \(metadata.fileNameView) with Identifier \(metadata.assetLocalIdentifier) with size \(metadata.size) [CHUNK \(metadata.chunk), E2EE \(metadata.isDirectoryE2EE)]")
         let transfer = NCTransferProgress.Transfer(ocId: metadata.ocId, ocIdTransfer: metadata.ocIdTransfer, session: metadata.session, chunk: metadata.chunk, e2eEncrypted: metadata.e2eEncrypted, progressNumber: 0, totalBytes: 0, totalBytesExpected: 0)
         NCTransferProgress.shared.append(transfer)
 
@@ -85,14 +85,17 @@ extension NCNetworking {
                     sessionTaskFailedCode = error.code
                 }
                 switch error.errorCode {
+//                case NKError.errorChunkNoEnoughMemory.errorCode, NKError.errorChunkCreateFolder.errorCode, NKError.errorChunkFilesEmpty.errorCode, NKError.errorChunkFileNull.errorCode:
                 case NKError.chunkNoEnoughMemory, NKError.chunkCreateFolder, NKError.chunkFilesNull, NKError.chunkFileNull:
                     self.database.deleteMetadataOcId(metadata.ocId)
                     self.database.deleteChunks(account: account, ocId: metadata.ocId, directory: directory)
                     NCContentPresenter().messageNotification("_error_files_upload_", error: error, delay: self.global.dismissAfterSecond, type: .error, afterDelay: 0.5)
+//                case NKError.errorChunkFileUpload.errorCode:
                 case NKError.chunkFileUpload:
                     if let afError, afError.isExplicitlyCancelledError || sessionTaskFailedCode == self.global.errorExplicitlyCancelled {
                         self.database.deleteChunks(account: account, ocId: metadata.ocId, directory: directory)
                     }
+//                case NKError.errorChunkMoveFile.errorCode:
                 case NKError.chunkMoveFile:
                     self.database.deleteChunks(account: account, ocId: metadata.ocId, directory: directory)
                     NCContentPresenter().messageNotification("_chunk_move_", error: error, delay: self.global.dismissAfterSecond, type: .error, afterDelay: 0.5)
@@ -268,7 +271,7 @@ extension NCNetworking {
         } else {
             let (task, error) = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance).upload(serverUrlFileName: serverUrlFileName, fileNameLocalPath: fileNameLocalPath, dateCreationFile: metadata.creationDate as Date, dateModificationFile: metadata.date as Date, account: metadata.account, sessionIdentifier: metadata.session)
             if let task, error == .success {
-                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Upload file \(metadata.fileNameView) with task with taskIdentifier \(task.taskIdentifier)")
+                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Upload file \(metadata.fileNameView) with task with taskIdentifier \(task.taskIdentifier)")
                 self.database.setMetadataSession(ocId: metadata.ocId,
                                                  sessionTaskIdentifier: task.taskIdentifier,
                                                  status: self.global.metadataStatusUploading)
@@ -399,7 +402,7 @@ extension NCNetworking {
                         self.utilityFileSystem.removeFile(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocIdTransfer))
                     }
 
-                    NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Upload complete " + metadata.serverUrl + "/" + metadata.fileName + ", result: success(\(size) bytes)")
+                    NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Upload complete " + metadata.serverUrl + "/" + metadata.fileName + ", result: success(\(size) bytes)")
 
                     let userInfo: [String: Any] = ["ocId": metadata.ocId,
                                                    "ocIdTransfer": metadata.ocIdTransfer,
@@ -414,6 +417,9 @@ extension NCNetworking {
                             self.createLivePhoto(metadata: metadata, userInfo: userInfo)
                         }
                     } else {
+#if !EXTENSION
+                        AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__UPLOAD_FILE ,metadata: metadata)
+#endif
                         NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadedFile,
                                                                     object: nil,
                                                                     userInfo: userInfo,

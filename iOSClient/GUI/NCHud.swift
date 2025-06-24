@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import JGProgressHUD
 
-class NCHud: NSObject {
+class NCHud: NSObject, @unchecked Sendable {
     private let hud = JGProgressHUD()
     private var view: UIView?
 

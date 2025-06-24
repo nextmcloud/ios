@@ -708,6 +708,16 @@ import KeychainAccess
 
         return (data, password)
     }
+    
+    @objc func setAccountName(account: String) {
+        let key = "AccountName"
+        keychain[key] = account
+    }
+
+    @objc func getAccountName() -> String? {
+        let key = "AccountName"
+        return try? keychain.get(key)
+    }
 
     // MARK: - Albums
 

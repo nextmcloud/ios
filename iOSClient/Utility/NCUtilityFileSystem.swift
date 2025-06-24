@@ -63,7 +63,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         }
         return path
     }
-    var directoryProviderStorage: String {
+    @objc var directoryProviderStorage: String {
         guard let directoryGroup = fileManager.containerURL(forSecurityApplicationGroupIdentifier: NCBrandOptions.shared.capabilitiesGroup) else { return "" }
         let path = directoryGroup.appendingPathComponent(NCGlobal.shared.directoryProviderStorage).path
         if !fileManager.fileExists(atPath: path) {
@@ -76,7 +76,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
 
     // MARK: -
 
-    func getDirectoryProviderStorageOcId(_ ocId: String) -> String {
+    @objc func getDirectoryProviderStorageOcId(_ ocId: String) -> String {
         let path = directoryProviderStorage + "/" + ocId
         if !fileManager.fileExists(atPath: path) {
             do {
@@ -94,6 +94,14 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         return path
     }
 
+    func getDirectoryProviderStorageIconOcId(_ ocId: String, etag: String) -> String {
+        return getDirectoryProviderStorageOcId(ocId) + "/" + etag + ".small.ico"
+    }
+
+    func getDirectoryProviderStoragePreviewOcId(_ ocId: String, etag: String) -> String {
+        return getDirectoryProviderStorageOcId(ocId) + "/" + etag + ".preview.ico"
+    }
+    
     func getDirectoryProviderStorageImageOcId(_ ocId: String, etag: String, ext: String) -> String {
         return getDirectoryProviderStorageOcId(ocId) + "/" + etag + ext
     }
@@ -151,8 +159,25 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         }
         return false
     }
+    
+    func fileProviderStoragePreviewIconExists(_ ocId: String, etag: String) -> Bool {
+        let fileNamePathPreview = getDirectoryProviderStoragePreviewOcId(ocId, etag: etag)
+        let fileNamePathIcon = getDirectoryProviderStorageIconOcId(ocId, etag: etag)
+        do {
+            let fileNamePathPreviewAttribute = try fileManager.attributesOfItem(atPath: fileNamePathPreview)
+            let fileSizePreview: UInt64 = fileNamePathPreviewAttribute[FileAttributeKey.size] as? UInt64 ?? 0
+            let fileNamePathIconAttribute = try fileManager.attributesOfItem(atPath: fileNamePathIcon)
+            let fileSizeIcon: UInt64 = fileNamePathIconAttribute[FileAttributeKey.size] as? UInt64 ?? 0
+            if fileSizePreview > 0 && fileSizeIcon > 0 {
+                return true
+            } else {
+                return false
+            }
+        } catch { print("Error: \(error)") }
+        return false
+    }
 
-    func createDirectoryStandard() {
+    @objc func createDirectoryStandard() {
         guard let directoryGroup = fileManager.containerURL(forSecurityApplicationGroupIdentifier: NCBrandOptions.shared.capabilitiesGroup)?.path else { return }
         if !fileManager.fileExists(atPath: directoryDocuments) { try? fileManager.createDirectory(atPath: directoryDocuments, withIntermediateDirectories: true) }
         let appDatabaseNextcloud = directoryGroup + "/" + NCGlobal.shared.appDatabaseNextcloud
@@ -171,29 +196,29 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         }
     }
 
-    func removeGroupApplicationSupport() {
+    @objc func removeGroupApplicationSupport() {
         let path = directoryGroup + "/" + NCGlobal.shared.appApplicationSupport
         try? fileManager.removeItem(atPath: path)
     }
 
-    func removeGroupLibraryDirectory() {
+    @objc func removeGroupLibraryDirectory() {
         try? fileManager.removeItem(atPath: directoryScan)
         try? fileManager.removeItem(atPath: directoryUserData)
     }
 
-    func removeGroupDirectoryProviderStorage() {
+    @objc func removeGroupDirectoryProviderStorage() {
         try? fileManager.removeItem(atPath: directoryProviderStorage)
     }
 
-    func removeDocumentsDirectory() {
+    @objc func removeDocumentsDirectory() {
         try? fileManager.removeItem(atPath: directoryDocuments)
     }
 
-    func removeTemporaryDirectory() {
+    @objc func removeTemporaryDirectory() {
         try? fileManager.removeItem(atPath: NSTemporaryDirectory())
     }
 
-    func emptyTemporaryDirectory() {
+    @objc func emptyTemporaryDirectory() {
         do {
             let files = try fileManager.contentsOfDirectory(atPath: NSTemporaryDirectory())
             for file in files {
@@ -255,7 +280,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
 
     // MARK: -
 
-    func getFileSize(filePath: String) -> Int64 {
+    @objc func getFileSize(filePath: String) -> Int64 {
         do {
             let attributes = try fileManager.attributesOfItem(atPath: filePath)
             return attributes[FileAttributeKey.size] as? Int64 ?? 0
@@ -265,7 +290,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         return 0
     }
 
-    func getFileModificationDate(filePath: String) -> NSDate? {
+    @objc func getFileModificationDate(filePath: String) -> NSDate? {
         do {
             let attributes = try fileManager.attributesOfItem(atPath: filePath)
             return attributes[FileAttributeKey.modificationDate] as? NSDate
@@ -275,7 +300,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         return nil
     }
 
-    func getFileCreationDate(filePath: String) -> NSDate? {
+    @objc func getFileCreationDate(filePath: String) -> NSDate? {
         do {
             let attributes = try fileManager.attributesOfItem(atPath: filePath)
             return attributes[FileAttributeKey.creationDate] as? NSDate
@@ -285,7 +310,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         return nil
     }
 
-    func writeFile(fileURL: URL, text: String) -> Bool {
+    @objc func writeFile(fileURL: URL, text: String) -> Bool {
         do {
             try FileManager.default.removeItem(at: fileURL)
         } catch {
@@ -301,7 +326,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         }
     }
 
-    func removeFile(atPath: String) {
+    @objc func removeFile(atPath: String) {
         do {
             try FileManager.default.removeItem(atPath: atPath)
         } catch {
@@ -310,7 +335,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
     }
 
     @discardableResult
-    func moveFile(atPath: String, toPath: String) -> Bool {
+    @objc func moveFile(atPath: String, toPath: String) -> Bool {
         if atPath == toPath { return true }
 
         do {
@@ -330,7 +355,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
     }
 
     @discardableResult
-    func copyFile(atPath: String, toPath: String) -> Bool {
+    @objc func copyFile(atPath: String, toPath: String) -> Bool {
         if atPath == toPath { return true }
 
         do {
@@ -349,7 +374,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
     }
 
     @discardableResult
-    func copyFile(at: URL, to: URL) -> Bool {
+    @objc func copyFile(at: URL, to: URL) -> Bool {
         if at == to { return true }
 
         do {
@@ -367,7 +392,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         }
     }
 
-    func moveFileInBackground(atPath: String, toPath: String) {
+    @objc func moveFileInBackground(atPath: String, toPath: String) {
         if atPath == toPath { return }
         DispatchQueue.global().async {
             try? FileManager.default.removeItem(atPath: toPath)
@@ -376,22 +401,22 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         }
     }
 
-    func linkItem(atPath: String, toPath: String) {
+    @objc func linkItem(atPath: String, toPath: String) {
         try? FileManager.default.removeItem(atPath: toPath)
         try? FileManager.default.linkItem(atPath: atPath, toPath: toPath)
     }
 
-    // MARK: - 
+    // MARK: -
 
     func getHomeServer(session: NCSession.Session) -> String {
         return getHomeServer(urlBase: session.urlBase, userId: session.userId)
     }
 
-    func getHomeServer(urlBase: String, userId: String) -> String {
+    @objc func getHomeServer(urlBase: String, userId: String) -> String {
         return urlBase + "/remote.php/dav/files/" + userId
     }
 
-    func getPath(path: String, user: String, fileName: String? = nil) -> String {
+    @objc func getPath(path: String, user: String, fileName: String? = nil) -> String {
         var path = path.replacingOccurrences(of: "/remote.php/dav/files/" + user, with: "")
         if let fileName = fileName {
             path += fileName
@@ -399,7 +424,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         return path
     }
 
-    func deleteLastPath(serverUrlPath: String, home: String? = nil) -> String? {
+    @objc func deleteLastPath(serverUrlPath: String, home: String? = nil) -> String? {
         var returnString: String?
         if home == serverUrlPath { return serverUrlPath }
 
@@ -434,6 +459,16 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         return fileNamePath
     }
 
+    @objc func getFileNamePath(_ fileName: String, serverUrl: String, urlBase: String, userId: String) -> String {
+
+        let home = getHomeServer(urlBase: urlBase, userId: userId)
+        var fileNamePath = serverUrl.replacingOccurrences(of: home, with: "") + "/" + fileName
+        if fileNamePath.first == "/" {
+            fileNamePath.removeFirst()
+        }
+        return fileNamePath
+    }
+    
     func createFileName(_ fileName: String, fileDate: Date, fileType: PHAssetMediaType, notUseMask: Bool = false) -> String {
         var fileName = fileName
         let keychain = NCKeychain()
@@ -530,7 +565,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         return fileName
     }
 
-    func createFileName(_ fileName: String, serverUrl: String, account: String) -> String {
+    @objc func createFileName(_ fileName: String, serverUrl: String, account: String) -> String {
         var resultFileName = fileName
         var exitLoop = false
 
@@ -590,7 +625,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         }
     }
 
-    func getDirectorySize(directory: String) -> Int64 {
+    @objc func getDirectorySize(directory: String) -> Int64 {
         let url = URL(fileURLWithPath: directory)
         let manager = FileManager.default
         var totalSize: Int64 = 0
@@ -608,7 +643,7 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
         return totalSize
     }
 
-    func transformedSize(_ bytes: Int64) -> String {
+    @objc func transformedSize(_ bytes: Int64) -> String {
         let formatter: ByteCountFormatter = ByteCountFormatter()
         formatter.countStyle = .binary
         return formatter.string(fromByteCount: bytes)
@@ -703,6 +738,14 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
             return serverUrl + "/" + path
         } else {
             return path
+        }
+    }
+    
+    func getTextServerUrl(session: NCSession.Session, serverUrl: String) -> String {
+        if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl)), let metadata = NCManageDatabase.shared.getMetadataFromOcId(directory.ocId) {
+            return (metadata.fileNameView)
+        } else {
+            return (serverUrl as NSString).lastPathComponent
         }
     }
 }

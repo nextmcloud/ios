@@ -45,7 +45,7 @@ class NCCreateDocument: NSObject {
                 options = NKRequestOptions(customUserAgent: NCUtility().getCustomUserAgentNCText())
             }
 
-            NextcloudKit.shared.NCTextCreateFile(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateId, account: account, options: options) { returnedAccount, url, _, error in
+            NextcloudKit.shared.textCreateFile(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateId, account: account, options: options) { returnedAccount, url, _, error in
                 guard error == .success, let url else {
                     return NCContentPresenter().showError(error: error)
                 }
@@ -60,7 +60,7 @@ class NCCreateDocument: NSObject {
                                                                 session: session,
                                                                 sceneIdentifier: controller.sceneIdentifier)
 
-                    NCViewer().view(viewController: viewController, metadata: metadata)
+                    NCViewer().view(viewController: viewController, metadata: metadata, metadatas: [metadata])
                 }
             }
 
@@ -81,7 +81,7 @@ class NCCreateDocument: NSObject {
                                                                 session: session,
                                                                 sceneIdentifier: controller.sceneIdentifier)
 
-                    NCViewer().view(viewController: viewController, metadata: metadata)
+                    NCViewer().view(viewController: viewController, metadata: metadata, metadatas: [metadata])
                 }
             }
         }
@@ -165,7 +165,7 @@ class NCCreateDocument: NSObject {
 
     func textGetListOfTemplates(account: String, options: NKRequestOptions = NKRequestOptions()) async -> (account: String, templates: [NKEditorTemplates]?, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.NCTextGetListOfTemplates(account: account) { account, templates, responseData, error in
+            NextcloudKit.shared.textGetListOfTemplates(account: account) { account, templates, responseData, error in
                 continuation.resume(returning: (account: account, templates: templates, responseData: responseData, error: error))
             }
         })

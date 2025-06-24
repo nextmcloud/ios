@@ -9,7 +9,7 @@ enum AppInstallState {
     case updated(from: String)
 }
 
-class NCAppVersionManager {
+class NCAppVersionManager: @unchecked Sendable {
     static let shared = NCAppVersionManager()
 
     private let versionKey = "lastAppVersion"

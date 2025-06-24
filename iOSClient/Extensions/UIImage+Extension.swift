@@ -25,7 +25,7 @@ import Foundation
 import UIKit
 import Accelerate
 
-extension UIImage {
+extension UIImage: @unchecked Sendable  {
     func resizeImage(size: CGSize, isAspectRation: Bool = true) -> UIImage? {
         let originRatio = self.size.width / self.size.height
         let newRatio = size.width / size.height
@@ -171,6 +171,7 @@ extension UIImage {
     ///   - pointSize: The target point size
     ///   - scale: The point to pixel scale (Pixeld per point)
     /// - Returns: The downsampled image, if successful
+    @MainActor
     static func downsample(imageAt imageURL: URL, to pointSize: CGSize, scale: CGFloat = UIScreen.main.scale) -> UIImage? {
 
         // Create an CGImageSource that represent an image

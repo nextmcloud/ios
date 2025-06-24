@@ -44,6 +44,10 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
     private var p12Data: Data?
     private var p12Password: String?
 
+    var pollTimer: DispatchSourceTimer?
+    var ncLoginPollModel = NCLoginPollModel()
+    var loginFlowInProgress = false
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -196,6 +200,15 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
             }
         }
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        if navigationController?.isBeingDismissed == true {
+            pollTimer?.cancel()
+            pollTimer = nil
+        }
+    }
 
     private func handleLoginWithAppConfig() {
         let accountCount = NCManageDatabase.shared.getAccounts()?.count ?? 0
@@ -323,23 +336,31 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
 
         NextcloudKit.shared.getServerStatus(serverUrl: url) { [self] _, serverInfoResult in
             switch serverInfoResult {
-            case .success:
+            case .success(let serverInfo):
                 if let host = URL(string: url)?.host {
                     NCNetworking.shared.writeCertificate(host: host)
                 }
                 NextcloudKit.shared.getLoginFlowV2(serverUrl: url) { [self] token, endpoint, login, _, error in                    
                     // Login Flow V2
                     if error == .success && NCBrandOptions.shared.use_loginflowv2 && token != nil && endpoint != nil && login != nil {
-
+                        
                         if let loginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb {
-
+                            
                             loginWeb.urlBase = url
                             loginWeb.user = user
                             loginWeb.loginFlowV2Available = true
                             loginWeb.loginFlowV2Token = token!
                             loginWeb.loginFlowV2Endpoint = endpoint!
                             loginWeb.loginFlowV2Login = login!
-
+                            
+                            self.navigationController?.pushViewController(loginWeb, animated: true)
+                        }
+                    } else if serverInfo.versionMajor >= NCGlobal.shared.nextcloudVersion12 {
+                        
+                        if let loginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb {
+                            
+                            loginWeb.urlBase = url
+                            loginWeb.user = user
                             self.navigationController?.pushViewController(loginWeb, animated: true)
                         }
                     } else if serverInfo.versionMajor < NCGlobal.shared.nextcloudVersion12 { // No login flow available
@@ -476,6 +497,67 @@ extension NCLogin: ClientCertificateDelegate, UIDocumentPickerDelegate {
             self.present(alertWrongPassword, animated: true)
         }
     }
+    
+    func poll(loginFlowV2Token: String, loginFlowV2Endpoint: String, loginFlowV2Login: String) {
+        let queue = DispatchQueue.global(qos: .background)
+        pollTimer = DispatchSource.makeTimerSource(queue: queue)
+
+        guard let timer = pollTimer else { return }
+
+        timer.schedule(deadline: .now(), repeating: .seconds(1), leeway: .seconds(1))
+        timer.setEventHandler(handler: {
+            DispatchQueue.main.async {
+                let controller = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
+                NextcloudKit.shared.getLoginFlowV2Poll(token: loginFlowV2Token, endpoint: loginFlowV2Endpoint) { [self] server, loginName, appPassword, _, error in
+                    if error == .success, let urlBase = server, let user = loginName, let appPassword {
+                        loginFlowInProgress = true
+                        ncLoginPollModel.isLoading = true
+
+                        NCAccount().createAccount(urlBase: urlBase, user: user, password: appPassword, controller: controller) { account, error in
+
+                            if error == .success {
+                                let window = UIApplication.shared.firstWindow
+                                if let controller = window?.rootViewController as? NCMainTabBarController {
+                                    controller.account = account
+                                    controller.dismiss(animated: true, completion: nil)
+                                } else {
+                                    if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as? NCMainTabBarController {
+                                        controller.account = account
+                                        controller.modalPresentationStyle = .fullScreen
+                                        controller.view.alpha = 0
+
+                                        window?.rootViewController = controller
+                                        window?.makeKeyAndVisible()
+
+                                        if let scene = window?.windowScene {
+                                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
+                                        }
+
+                                        UIView.animate(withDuration: 0.5) {
+                                            controller.view.alpha = 1
+                                        }
+                                    }
+                                }
+
+                                timer.cancel()
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        timer.resume()
+    }
+}
+
+extension NCLogin: SFSafariViewControllerDelegate {
+    func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+        if !loginFlowInProgress {
+            loginButton.isEnabled = true
+            loginButton.hideSpinnerAndShowButton()
+        }
+    }
 }
 
 extension NCLogin: NCLoginProviderDelegate {
@@ -483,4 +565,8 @@ extension NCLogin: NCLoginProviderDelegate {
         loginButton.isEnabled = true
         loginButton.hideSpinnerAndShowButton()
     }
+}
+
+protocol NCLoginProviderDelegate: AnyObject {
+    func onBack()
 }

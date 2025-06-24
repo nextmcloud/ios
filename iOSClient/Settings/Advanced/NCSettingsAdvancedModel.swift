@@ -122,6 +122,8 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
     func updateSelectedLogLevel() {
         keychain.logLevel = selectedLogLevel.rawValue
         NextcloudKit.shared.nkCommonInstance.levelLog = selectedLogLevel.rawValue
+        // with Nextcloudkit latest version will uncomment below line once updated to latest Nextcloudkit version
+//        NKLogFileManager.shared.logLevel = NKLogLevel(rawValue: selectedLogLevel.rawValue) ?? .normal
         exit(0)
     }
 
@@ -191,6 +193,7 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
     func viewLogFile() {
         // Instantiate NCViewerQuickLook with the log file URL, editing disabled, and no metadata
         let viewerQuickLook = NCViewerQuickLook(with: NSURL(fileURLWithPath: NextcloudKit.shared.nkCommonInstance.filenamePathLog) as URL, isEditingEnabled: false, metadata: nil)
+//        let viewerQuickLook = NCViewerQuickLook(with: NSURL(fileURLWithPath: NKLogFileManager.shared.logDirectory.path) as URL, isEditingEnabled: false, metadata: nil)
         // Present the NCViewerQuickLook view controller
         controller?.present(viewerQuickLook, animated: true, completion: nil)
     }
@@ -199,6 +202,7 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
     func clearLogFile() {
         // Clear the log file using NextcloudKit
         NextcloudKit.shared.nkCommonInstance.clearFileLog()
+//        NKLogFileManager.shared.clearLogFiles()
         // Fetch the log level from the keychain
         let logLevel = keychain.logLevel
         // Get the app's version and copyright information

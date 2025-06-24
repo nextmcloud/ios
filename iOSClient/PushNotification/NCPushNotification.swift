@@ -14,6 +14,21 @@ import NextcloudKit
 class NCPushNotification {
     static let shared = NCPushNotification()
     let keychain = NCKeychain()
+    var pushKitToken: String = ""
+
+    func pushNotification() {
+        if pushKitToken.isEmpty { return }
+        for tblAccount in NCManageDatabase.shared.getAllTableAccount() {
+            let token = keychain.getPushNotificationToken(account: tblAccount.account)
+            if token != pushKitToken {
+                if token != nil {
+                    unsubscribingNextcloudServerPushNotification(account: tblAccount.account, urlBase: tblAccount.urlBase, user: tblAccount.user)
+                } else {
+                    subscribingNextcloudServerPushNotification(account: tblAccount.account, urlBase: tblAccount.urlBase, user: tblAccount.user, pushKitToken: pushKitToken)
+                }
+            }
+        }
+    }
 
     func applicationdidReceiveRemoteNotification(userInfo: [AnyHashable: Any], completion: @escaping (_ result: UIBackgroundFetchResult) -> Void) {
         if let message = userInfo["subject"] as? String {
@@ -59,11 +74,11 @@ class NCPushNotification {
                 let userAgent = String(format: "%@  (Strict VoIP)", NCBrandOptions.shared.getUserAgent())
                 let options = NKRequestOptions(customUserAgent: userAgent)
 
-                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Subscribed to Push Notification Server")
+                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Subscribed to Push Notification Server")
 
                 NextcloudKit.shared.subscribingPushProxy(proxyServerUrl: proxyServerPath, pushToken: pushKitToken, deviceIdentifier: deviceIdentifier, signature: signature, publicKey: publicKey, account: account, options: options) { account, _, error in
                     if error == .success {
-                        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Subscribed to Push Notification Server Proxy")
+                        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Subscribed to Push Notification Server Proxy")
 
                         self.keychain.setPushNotificationToken(account: account, token: pushKitToken)
                         self.keychain.setPushNotificationDeviceIdentifier(account: account, deviceIdentifier: deviceIdentifier)
@@ -82,14 +97,24 @@ class NCPushNotification {
 
         NextcloudKit.shared.unsubscribingPushNotification(serverUrl: urlBase, account: account) { _, _, error in
             if error == .success {
-                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Unsubscribed to Push Notification Server")
+                NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Unsubscribed to Push Notification Server")
 
                 let userAgent = String(format: "%@  (Strict VoIP)", NCBrandOptions.shared.getUserAgent())
                 let options = NKRequestOptions(customUserAgent: userAgent)
 
                 NextcloudKit.shared.unsubscribingPushProxy(proxyServerUrl: NCBrandOptions.shared.pushNotificationServerProxy, deviceIdentifier: deviceIdentifier, signature: signature, publicKey: publicKey, account: account, options: options) { _, _, error in
                     if error == .success {
-                        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Unsubscribed to Push Notification Server Proxy")
+                        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Unsubscribed to Push Notification Server Proxy")
+                        self.keychain.setPushNotificationPublicKey(account: account, data: nil)
+                        self.keychain.setPushNotificationSubscribingPublicKey(account: account, publicKey: nil)
+                        self.keychain.setPushNotificationPrivateKey(account: account, data: nil)
+                        self.keychain.setPushNotificationToken(account: account, token: nil)
+                        self.keychain.setPushNotificationDeviceIdentifier(account: account, deviceIdentifier: nil)
+                        self.keychain.setPushNotificationDeviceIdentifierSignature(account: account, deviceIdentifierSignature: nil)
+
+                        if !self.pushKitToken.isEmpty {//}&& subscribing {
+                            self.subscribingNextcloudServerPushNotification(account: account, urlBase: urlBase, user: user, pushKitToken: self.pushKitToken)
+                        }
                     }
                 }
             }
@@ -139,6 +164,11 @@ class NCPushNotification {
                 }
             }
         }
+    }
+    
+    func registerForRemoteNotificationsWithDeviceToken(_ deviceToken: Data) {
+        self.pushKitToken = NCPushNotificationEncryption.shared().string(withDeviceToken: deviceToken)
+        pushNotification()
     }
 
     func cleanAllNotifications() {

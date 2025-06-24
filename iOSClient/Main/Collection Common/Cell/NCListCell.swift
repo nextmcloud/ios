@@ -42,15 +42,11 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var labelShared: UILabel!
     @IBOutlet weak var tag0: UILabel!
     @IBOutlet weak var tag1: UILabel!
-    @IBOutlet weak var progressView: UIProgressView!
 
     @IBOutlet weak var imageItemLeftConstraint: NSLayoutConstraint!
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var subInfoTrailingConstraint: NSLayoutConstraint!
 
-    private var objectId = ""
-    private var user = ""
-    var indexPath = IndexPath()
     private var ocId = ""
     private var ocIdTransfer = ""
     private var user = ""
@@ -61,12 +57,14 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     var fileAvatarImageView: UIImageView? {
         return imageShared
     }
-    var fileObjectId: String? {
-        get { return objectId }
-        set { objectId = newValue ?? "" }
+    
     var fileOcId: String? {
         get { return ocId }
         set { ocId = newValue ?? "" }
+    }
+    var fileOcIdTransfer: String? {
+        get { return ocIdTransfer }
+        set { ocIdTransfer = newValue ?? "" }
     }
     var filePreviewImageView: UIImageView? {
         get { return imageItem }
@@ -128,7 +126,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
     override func awakeFromNib() {
         super.awakeFromNib()
-
+        initCell()
+    }
+    
     func initCell() {
         
         imageItem.layer.cornerRadius = 6
@@ -141,29 +141,12 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         accessibilityValue = nil
         isAccessibilityElement = true
 
-        progressView.tintColor = NCBrandColor.shared.brandElement
-        progressView.transform = CGAffineTransform(scaleX: 1.0, y: 0.5)
-        progressView.trackTintColor = .clear
         progressView.tintColor = NCBrandColor.shared.brand
         progressView.transform = CGAffineTransform(scaleX: 1.0, y: 0.5)
         progressView.trackTintColor = .clear
         imageSelect.isHidden = true
         
-//        imageItem.image = nil
-//        imageItem.layer.cornerRadius = 6
-//        imageItem.layer.masksToBounds = true
-//        imageStatus.image = nil
-//        imageFavorite.image = nil
-//        imageFavoriteBackground.isHidden = true
-//        imageLocal.image = nil
-//        labelTitle.text = ""
-//        labelInfo.text = ""
-//        labelSubinfo.text = ""
-//        imageShared.image = nil
-//        imageMore.image = nil
         separatorHeightConstraint.constant = 0.5
-//        tag0.text = ""
-//        tag1.text = ""
         titleInfoTrailingDefault()
 
         let longPressedGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gestureRecognizer:)))
@@ -174,22 +157,11 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
         separator.backgroundColor = .separator
         separatorHeightConstraint.constant = 0.5
-
-        labelTitle.text = ""
-        labelInfo.text = ""
-        labelTitle.textColor = .label
-        labelInfo.textColor = .systemGray
-        labelSubinfo.textColor = .systemGray
         titleInfoTrailingDefault()
 
         labelTitle.text = ""
         labelInfo.text = ""
         
-        separator.backgroundColor = .separator
-        separatorHeightConstraint.constant = 0.5
-
-        labelTitle.text = ""
-        labelInfo.text = ""
         labelSubinfo.text = ""
         labelTitle.textColor = .label
         labelInfo.textColor = .systemGray
@@ -201,10 +173,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        imageItem.backgroundColor = nil
-        accessibilityHint = nil
-        accessibilityLabel = nil
-        accessibilityValue = nil
         initCell()
     }
 
@@ -213,15 +181,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     @IBAction func touchUpInsideShare(_ sender: Any) {
-        listCellDelegate?.tapShareListItem(with: objectId, indexPath: indexPath, sender: sender)
+        listCellDelegate?.tapShareListItem(with: ocId, ocIdTransfer: ocIdTransfer, sender: sender)
     }
 
     @IBAction func touchUpInsideMore(_ sender: Any) {
-        listCellDelegate?.tapMoreListItem(with: objectId, namedButtonMore: namedButtonMore, image: imageItem.image, indexPath: indexPath, sender: sender)
-    }
-
-    @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
-        listCellDelegate?.longPressListItem(with: objectId, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
         listCellDelegate?.tapMoreListItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
     }
 
@@ -276,8 +239,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         separator.isHidden = status
     }
 
-    func selected(_ status: Bool, isEditMode: Bool) {
-        if isEditMode {
     func selectMode(_ status: Bool) {
         if status {
             imageItemLeftConstraint.constant = 45
@@ -334,13 +295,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
-        labelInfo.text = NCUtility().dateDiff(date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
-        labelInfo.text = NCUtility().dateDiff(date as Date)
-        labelSubinfo.text = ""
-        labelSubinfo.text = ""
-        labelInfo.text = NCUtility().dateDiff(date as Date)
-        labelSubinfo.text = NCUtilityFileSystem().transformedSize(size)
-//        labelSubinfo.text = ""
+        labelInfo.text = NCUtility().getRelativeDateTitle(date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
         labelSubinfo.text = ""
     }
 
@@ -351,9 +306,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 }
 
 protocol NCListCellDelegate: AnyObject {
-    func tapShareListItem(with objectId: String, indexPath: IndexPath, sender: Any)
-    func tapMoreListItem(with objectId: String, namedButtonMore: String, image: UIImage?, indexPath: IndexPath, sender: Any)
-    func longPressListItem(with objectId: String, indexPath: IndexPath, gestureRecognizer: UILongPressGestureRecognizer)
     func tapShareListItem(with ocId: String, ocIdTransfer: String, sender: Any)
     func tapMoreListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any)
     func longPressMoreListItem(with ocId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)

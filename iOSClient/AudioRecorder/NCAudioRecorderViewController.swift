@@ -31,11 +31,6 @@ import NextcloudKit
 
 class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
 
-    var recording: NCAudioRecorder!
-    var startDate: Date = Date()
-    var fileName: String = ""
-    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-
     @IBOutlet weak var contentContainerView: UIView!
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var startStopLabel: UILabel!
@@ -92,8 +87,6 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
                 guard let navigationController = UIStoryboard(name: "NCCreateFormUploadVoiceNote", bundle: nil).instantiateInitialViewController() as? UINavigationController,
                       let viewController = navigationController.topViewController as? NCCreateFormUploadVoiceNote else { return }
                 navigationController.modalPresentationStyle = .formSheet
-                viewController.setup(serverUrl: self.appDelegate.activeServerUrl, fileNamePath: NSTemporaryDirectory() + self.fileName, fileName: self.fileName)
-                self.appDelegate.window?.rootViewController?.present(navigationController, animated: true)
                 viewController.setup(serverUrl: controller.currentServerUrl(), fileNamePath: NSTemporaryDirectory() + self.fileName, fileName: self.fileName)
                 UIApplication.shared.firstWindow?.rootViewController?.present(navigationController, animated: true)
             }
@@ -110,7 +103,6 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
 
     func uploadMetadata() {
         let fileNamePath = NSTemporaryDirectory() + self.fileName
-        let metadata = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: fileName, fileNameView: fileName, ocId: UUID().uuidString, serverUrl: appDelegate.activeServerUrl, urlBase: appDelegate.urlBase, url: "", contentType: "")
         let metadata = NCManageDatabase.shared.createMetadata(fileName: fileName,
                                                               fileNameView: fileName,
                                                               ocId: UUID().uuidString,

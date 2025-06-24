@@ -34,7 +34,12 @@ class NCCollectionViewUnifiedSearch: ConcurrentOperation, @unchecked Sendable {
 
     init(collectionViewCommon: NCCollectionViewCommon, metadatas: [tableMetadata], searchResult: NKSearchResult) {
         self.collectionViewCommon = collectionViewCommon
-        self.metadatas = metadatas
+//        self.metadatas = metadatas
+        if NCUtilityFileSystem().getHomeServer(session: collectionViewCommon.session) == collectionViewCommon.serverUrl {
+            self.metadatas = metadatas
+        } else {
+            self.metadatas = metadatas.filter({$0.serverUrl == collectionViewCommon.serverUrl})
+        }
         self.searchResult = searchResult
     }
 

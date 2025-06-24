@@ -211,6 +211,7 @@ struct NCAutoUploadView: View {
                 .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                 .onChange(of: model.autoUploadStart) { newValue in
                     albumModel.populateSelectedAlbums()
+                    model.handleAutoUploadChange(newValue: newValue)
                     model.handleAutoUploadChange(newValue: newValue, assetCollections: albumModel.selectedAlbums)
                 }
                 .font(.headline)

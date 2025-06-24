@@ -8,3 +8,5 @@
 #import "NCPushNotificationEncryption.h"
 #import "TOPasscodeViewController.h"
 #import "AdjustHelper.h"
+#import "CCManageAccount.h"
+#import "CCUtility.h"

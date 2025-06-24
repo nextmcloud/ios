@@ -448,12 +448,6 @@ class NCActionCenter: NSObject, UIDocumentInteractionControllerDelegate, NCSelec
         }
     }
     
-    // MARK: - Copy & Paste
-
-    func copyPasteboard(pasteboardOcIds: [String], viewController: UIViewController) {
-        var items = [[String: Any]]()
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        let hudView = viewController.view
     // MARK: - Print
 
     func printDocument(metadata: tableMetadata) {
@@ -513,20 +507,17 @@ class NCActionCenter: NSObject, UIDocumentInteractionControllerDelegate, NCSelec
             }
 
             // do 5 downloads in parallel to optimize efficiency
-            let processor = ParallelWorker(n: 5, titleKey: "_downloading_", totalTasks: downloadMetadatas.count, hudView: hudView)
             let processor = ParallelWorker(n: 5, titleKey: "_downloading_", totalTasks: downloadMetadatas.count, controller: hudView)
 
             for metadata in downloadMetadatas {
                 processor.execute { completion in
                     guard let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
-                                                                                                   session: NextcloudKit.shared.nkCommonInstance.sessionIdentifierDownload,
                                                                                                    session: NextcloudKit.shared.nkCommonInstance.identifierSessionDownload,
                                                                                                    selector: "") else { return completion() }
                     NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: false) {
                     } requestHandler: { _ in
                     } progressHandler: { progress in
                         if Float(progress.fractionCompleted) > fractionCompleted || fractionCompleted == 0 {
-                            processor.hud?.progress = Float(progress.fractionCompleted)
                             processor.hud.progress(progress.fractionCompleted)
                             fractionCompleted = Float(progress.fractionCompleted)
                         }

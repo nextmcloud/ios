@@ -24,7 +24,7 @@
 import Foundation
 import NextcloudKit
 
-public class NCTransferProgress: NSObject {
+public class NCTransferProgress: NSObject, @unchecked Sendable  {
     static let shared = NCTransferProgress()
 
     public class Transfer {

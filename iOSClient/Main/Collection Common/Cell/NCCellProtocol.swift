@@ -39,8 +39,6 @@ protocol NCCellProtocol {
     var fileSharedImage: UIImageView? { get set }
     var fileMoreImage: UIImageView? { get set }
     var cellSeparatorView: UIView? { get set }
-    var indexPath: IndexPath { get set }
-    var fileSharedLabel: UILabel? { get set }
     var fileSharedLabel: UILabel? { get set }
     var fileProgressView: UIProgressView? { get set }
 

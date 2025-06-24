@@ -28,6 +28,7 @@ import NextcloudKit
 class NCDragDrop: NSObject {
     let utilityFileSystem = NCUtilityFileSystem()
     let database = NCManageDatabase.shared
+    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
 
     func performDrag(metadata: tableMetadata? = nil, fileSelect: [String]? = nil) -> [UIDragItem] {
         var metadatas: [tableMetadata] = []
@@ -144,7 +145,7 @@ class NCDragDrop: NSObject {
                                                                       url: "",
                                                                       contentType: "",
                                                                       session: session,
-                                                                      sceneIdentifier: controller?.sceneIdentifier)
+                                                                      sceneIdentifier: self.appDelegate.sceneIdentifier)
 
                 metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
                 metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile

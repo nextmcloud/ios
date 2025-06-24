@@ -31,6 +31,7 @@ class NCFiles: NCCollectionViewCommon {
     internal var fileNameOpen: String?
     internal var matadatasHash: String = ""
     internal var semaphoreReloadDataSource = DispatchSemaphore(value: 1)
+    private var timerProcess: Timer?
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -73,6 +74,7 @@ class NCFiles: NCCollectionViewCommon {
                 self.isEditMode = false
                 self.fileSelect.removeAll()
                 self.layoutForView = self.database.getLayoutForView(account: self.session.account, key: self.layoutKey, serverUrl: self.serverUrl)
+                self.gridLayout.column = CGFloat(self.layoutForView?.columnGrid ?? 3)
 
                 if self.isLayoutList {
                     self.collectionView?.collectionViewLayout = self.listLayout
@@ -91,6 +93,9 @@ class NCFiles: NCCollectionViewCommon {
                 self.getServerData()
             }
         }
+        self.timerProcess = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
+            self.setNavigationRightItems(enableMenu: false)
+        })
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -149,7 +154,6 @@ class NCFiles: NCCollectionViewCommon {
         self.richWorkspaceText = database.getTableDirectory(predicate: predicateDirectory)?.richWorkspace
 
         let metadatas = self.database.getResultsMetadatasPredicate(predicate, layoutForView: layoutForView)
-
         self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView)
 
         if metadatas.isEmpty {
@@ -312,7 +316,7 @@ class NCFiles: NCCollectionViewCommon {
 
     func blinkCell(fileName: String?) {
         if let fileName = fileName, let metadata = database.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", session.account, self.serverUrl, fileName)) {
-            let indexPath = self.dataSource.getIndexPathMetadata(ocId: metadata.ocId)
+            let indexPath = self.dataSource.getIndexPathMetadata(ocId: metadata.ocId).indexPath
             if let indexPath = indexPath {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     UIView.animate(withDuration: 0.3) {
@@ -332,7 +336,7 @@ class NCFiles: NCCollectionViewCommon {
 
     func openFile(fileName: String?) {
         if let fileName = fileName, let metadata = database.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", session.account, self.serverUrl, fileName)) {
-            let indexPath = self.dataSource.getIndexPathMetadata(ocId: metadata.ocId)
+            let indexPath = self.dataSource.getIndexPathMetadata(ocId: metadata.ocId).indexPath
             if let indexPath = indexPath {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     self.collectionView(self.collectionView, didSelectItemAt: indexPath)
@@ -358,6 +362,6 @@ class NCFiles: NCCollectionViewCommon {
             navigationItem.title = self.titleCurrentFolder
         }
 
-        (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+//        (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
     }
 }

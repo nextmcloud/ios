@@ -125,7 +125,7 @@ class NCService: NSObject {
             self.database.convertFilesToMetadatas(files, useFirstAsMetadataFolder: false) { _, metadatas in
                 self.database.updateMetadatasFavorite(account: account, metadatas: metadatas)
             }
-            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Synchronize Favorite")
+            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Synchronize Favorite")
             self.synchronizeOffline(account: account)
         }
     }
@@ -189,38 +189,9 @@ class NCService: NSObject {
             }
             
             // File Sharing
-            if NCGlobal.shared.capabilityFileSharingApiEnabled {
-                let home = self.utilityFileSystem.getHomeServer(urlBase: self.appDelegate.urlBase, userId: self.appDelegate.userId)
-                NextcloudKit.shared.readShares(parameters: NKShareParameter()) { account, shares, data, error in
-                    if error == .success {
-                        NCManageDatabase.shared.deleteTableShare(account: account)
-                        if let shares = shares, !shares.isEmpty {
-                            NCManageDatabase.shared.addShare(account: account, home: home, shares: shares)
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
-                        }
-                    }
-                }
-            }
-            
-            // File Sharing
-            if NCGlobal.shared.capabilityFileSharingApiEnabled {
-                let home = self.utilityFileSystem.getHomeServer(urlBase: self.appDelegate.urlBase, userId: self.appDelegate.userId)
-                NextcloudKit.shared.readShares(parameters: NKShareParameter()) { account, shares, data, error in
-                    if error == .success {
-                        NCManageDatabase.shared.deleteTableShare(account: account)
-                        if let shares = shares, !shares.isEmpty {
-                            NCManageDatabase.shared.addShare(account: account, home: home, shares: shares)
-                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
-                        }
-                    }
-                }
-            }
-            
-            // File Sharing
-            if NCGlobal.shared.capabilityFileSharingApiEnabled {
-                let home = self.utilityFileSystem.getHomeServer(urlBase: self.appDelegate.urlBase, userId: self.appDelegate.userId)
+            if capability.capabilityFileSharingApiEnabled {
                 let home = self.utilityFileSystem.getHomeServer(session: session)
-                NextcloudKit.shared.readShares(parameters: NKShareParameter()) { account, shares, data, error in
+                NextcloudKit.shared.readShares(parameters: NKShareParameter(), account: account) { account, shares, data, error in
                     if error == .success {
                         NCManageDatabase.shared.deleteTableShare(account: account)
                         if let shares = shares, !shares.isEmpty {
@@ -234,7 +205,7 @@ class NCService: NSObject {
             // Text direct editor detail
             if capability.capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 {
                 let options = NKRequestOptions(queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)
-                NextcloudKit.shared.NCTextObtainEditorDetails(account: account, options: options) { account, editors, creators, _, error in
+                NextcloudKit.shared.textObtainEditorDetails(account: account, options: options) { account, editors, creators, _, error in
                     if error == .success {
                         self.database.addDirectEditing(account: account, editors: editors, creators: creators)
                     }

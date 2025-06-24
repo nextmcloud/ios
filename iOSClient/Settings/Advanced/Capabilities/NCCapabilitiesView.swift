@@ -24,6 +24,17 @@
 import SwiftUI
 import NextcloudKit
 
+@objc class NCHostingCapabilitiesView: NSObject {
+
+    @objc func makeShipDetailsUI() -> UIViewController {
+
+        let view = NCCapabilitiesView(model: NCCapabilitiesModel(controller: nil))
+        let vc = UIHostingController(rootView: view)
+        vc.title = NSLocalizedString("_capabilities_", comment: "")
+        return vc
+    }
+}
+
 struct NCCapabilitiesView: View {
     @ObservedObject var model: NCCapabilitiesModel
 

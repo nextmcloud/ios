@@ -8,6 +8,7 @@ import NextcloudKit
 import FloatingPanel
 
 class NCLoginProvider: UIViewController {
+    var logger = NextcloudKit.shared.nkCommonInstance
     var webView: WKWebView?
     let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     let utility = NCUtility()
@@ -73,12 +74,7 @@ class NCLoginProvider: UIViewController {
             }
         }
         self.navigationController?.navigationBar.backgroundColor = NCBrandColor.shared.customer
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         // Stop timer error network
-        appDelegate.timerErrorNetworkingDisabled = true
 //        appDelegate.timerErrorNetworkingDisabled = true
         if let account = NCManageDatabase.shared.getActiveTableAccount(), NCKeychain().getPassword(account: account.account).isEmpty {
 
@@ -92,7 +88,6 @@ class NCLoginProvider: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         NCActivityIndicator.shared.stop()
-        appDelegate.timerErrorNetworkingDisabled = false
 //        appDelegate.timerErrorNetworkingDisabled = false
     }
 
@@ -113,6 +108,10 @@ class NCLoginProvider: UIViewController {
         webView.load(request)
     }
 
+    @objc func closeView(sender: UIBarButtonItem) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     @objc func goBack() {
         delegate?.onBack()
 
@@ -238,7 +237,6 @@ extension NCLoginProvider: WKNavigationDelegate {
         let account: String = "\(username) \(urlBase)"
         let user = username
 
-        NextcloudKit.shared.setup(account: account, user: user, userId: user, password: password, urlBase: urlBase)
 //        NextcloudKit.shared.setup(account: account, user: user, userId: user, password: password, urlBase: urlBase)
         NextcloudKit.shared.getUserProfile(account: account) { _, userProfile, _, error in
             if error == .success, let userProfile {
@@ -254,9 +252,6 @@ extension NCLoginProvider: WKNavigationDelegate {
                                                   httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
                                                   groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
                 NCSession.shared.appendSession(account: account, urlBase: urlBase, user: user, userId: userProfile.userId)
-                NCManageDatabase.shared.deleteAccount(account)
-                NCManageDatabase.shared.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
-                self.appDelegate.changeAccount(account, userProfile: userProfile) { }
                 NCAccount().deleteAccount(account)
                 NCManageDatabase.shared.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
                 NCAccount().changeAccount(account, userProfile: userProfile, controller: nil) { }

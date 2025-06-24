@@ -33,7 +33,7 @@ class NCShares: NCCollectionViewCommon {
         layoutKey = NCGlobal.shared.layoutViewShares
         enableSearchBar = false
         headerRichWorkspaceDisable = true
-        emptyImageName = "person.fill.badge.plus"
+        emptyImageName = "share"
         emptyTitle = "_list_shares_no_files_"
         emptyDescription = "_tutorial_list_shares_view_"
     }
@@ -44,6 +44,7 @@ class NCShares: NCCollectionViewCommon {
         super.viewWillAppear(animated)
 
         reloadDataSource()
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__SHARED)
     }
 
     override func viewDidAppear(_ animated: Bool) {

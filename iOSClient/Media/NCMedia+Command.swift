@@ -45,32 +45,24 @@ extension NCMedia {
     }
 
     func setSelectcancelButton() {
-        let assistantEnabled = NCCapabilities.shared.getCapabilities(account: session.account).capabilityAssistantEnabled
-
-        assistantButton.isHidden = true
+//        let assistantEnabled = NCCapabilities.shared.getCapabilities(account: session.account).capabilityAssistantEnabled
+//        assistantButton.isHidden = true
         fileSelect.removeAll()
         tabBarSelect.selectCount = fileSelect.count
 
         if let visibleCells = self.collectionView?.indexPathsForVisibleItems.compactMap({ self.collectionView?.cellForItem(at: $0) }) {
             for case let cell as NCMediaCell in visibleCells {
+                cell.imageSelect.isHidden = !isEditMode ? true : false
                 cell.selected(false)
             }
         }
 
         if isEditMode {
-            selectOrCancelButton.setTitle( NSLocalizedString("_cancel_", comment: ""), for: .normal)
-            selectOrCancelButton.isHidden = false
-            menuButton.isHidden = true
             tabBarSelect.show()
         } else {
-            selectOrCancelButton.setTitle( NSLocalizedString("_select_", comment: ""), for: .normal)
-            selectOrCancelButton.isHidden = false
-            menuButton.isHidden = false
-            if assistantEnabled {
-                assistantButton.isHidden = false
-            }
             tabBarSelect.hide()
         }
+        activityIndicatorTrailing.constant = 150
     }
 
     func setTitleDate() {
@@ -79,6 +71,7 @@ extension NCMedia {
 
             if let firstAttribute = sortedAttributes.first, let metadata = dataSource.getMetadata(indexPath: firstAttribute.indexPath) {
                 titleDate?.text = utility.getTitleFromDate(metadata.datePhotosOriginal as Date)
+                mediaCommandView?.title.text = utility.getTitleFromDate(metadata.datePhotosOriginal as Date)
                 return
             }
         }
@@ -89,26 +82,25 @@ extension NCMedia {
     func setColor() {
         if isTop {
             UIView.animate(withDuration: 0.3) { [self] in
-                gradientView.alpha = 0
-                titleDate?.textColor = NCBrandColor.shared.textColor
+//                gradientView.alpha = 0
+//                titleDate?.textColor = NCBrandColor.shared.textColor
                 activityIndicator.color = NCBrandColor.shared.textColor
-                selectOrCancelButton.setTitleColor(NCBrandColor.shared.textColor, for: .normal)
-                menuButton.setImage(NCUtility().loadImage(named: "ellipsis", colors: [NCBrandColor.shared.textColor]), for: .normal)
-                assistantButton.setImage(NCUtility().loadImage(named: "sparkles", colors: [NCBrandColor.shared.textColor]), for: .normal)
+                mediaCommandView?.title?.textColor = NCBrandColor.shared.textColor
+                gradientView.isHidden = true
             }
         } else {
             UIView.animate(withDuration: 0.3) { [self] in
-                gradientView.alpha = 1
-                titleDate?.textColor = .white
+//                gradientView.alpha = 1
+//                titleDate?.textColor = .white
+                mediaCommandView?.title?.textColor = .white
                 activityIndicator.color = .white
-                selectOrCancelButton.setTitleColor(.white, for: .normal)
-                menuButton.setImage(NCUtility().loadImage(named: "ellipsis", colors: [.white]), for: .normal)
-                assistantButton.setImage(NCUtility().loadImage(named: "sparkles", colors: [.white]), for: .normal)
+                gradientView.isHidden = false
             }
         }
     }
 
     func createMenu() {
+        var columnCount = NCKeychain().mediaColumnCount
         let layoutForView = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "")
         var layout = layoutForView?.layout ?? global.mediaLayoutRatio
         /// Overwrite default value
@@ -117,20 +109,36 @@ extension NCMedia {
         let layoutTitle = (layout == global.mediaLayoutRatio) ? NSLocalizedString("_media_square_", comment: "") : NSLocalizedString("_media_ratio_", comment: "")
         let layoutImage = (layout == global.mediaLayoutRatio) ? utility.loadImage(named: "square.grid.3x3") : utility.loadImage(named: "rectangle.grid.3x2")
 
+        if UIDevice.current.userInterfaceIdiom == .phone,
+           (UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight) {
+            columnCount += 2
+        }
+
+        if CGFloat(columnCount) >= maxImageGrid - 1 {
+            self.attributesZoomIn = []
+            self.attributesZoomOut = .disabled
+        } else if columnCount <= 1 {
+            self.attributesZoomIn = .disabled
+            self.attributesZoomOut = []
+        } else {
+            self.attributesZoomIn = []
+            self.attributesZoomOut = []
+        }
+
         let viewFilterMenu = UIMenu(title: "", options: .displayInline, children: [
-            UIAction(title: NSLocalizedString("_media_viewimage_show_", comment: ""), image: utility.loadImage(named: "photo")) { _ in
+            UIAction(title: NSLocalizedString("_media_viewimage_show_", comment: ""), image: UIImage(systemName: "photo")) { _ in
                 self.showOnlyImages = true
                 self.showOnlyVideos = false
                 self.loadDataSource()
                 self.networkRemoveAll()
             },
-            UIAction(title: NSLocalizedString("_media_viewvideo_show_", comment: ""), image: utility.loadImage(named: "video")) { _ in
+            UIAction(title: NSLocalizedString("_media_viewvideo_show_", comment: ""), image: UIImage(systemName: "video")) { _ in
                 self.showOnlyImages = false
                 self.showOnlyVideos = true
                 self.loadDataSource()
                 self.networkRemoveAll()
             },
-            UIAction(title: NSLocalizedString("_media_show_all_", comment: ""), image: utility.loadImage(named: "photo.on.rectangle")) { _ in
+            UIAction(title: NSLocalizedString("_media_show_all_", comment: ""), image: UIImage(systemName: "photo.on.rectangle")) { _ in
                 self.showOnlyImages = false
                 self.showOnlyVideos = false
                 self.loadDataSource()
@@ -147,6 +155,7 @@ extension NCMedia {
                     self.database.setLayoutForView(account: self.session.account, key: self.global.layoutViewMedia, serverUrl: "", layout: self.global.mediaLayoutRatio)
                     self.layoutType = self.global.mediaLayoutRatio
                 }
+                NCKeychain().mediaTypeLayout = self.layoutType
                 self.createMenu()
                 self.collectionViewReloadData()
             }
@@ -160,6 +169,34 @@ extension NCMedia {
                 viewController.typeOfCommandView = .select
                 viewController.type = "mediaFolder"
                 viewController.session = self.session
+                self.present(navigationController, animated: true)
+            })
+        ])
+
+        let zoomViewMediaFolder = UIMenu(title: "", options: .displayInline, children: [
+            UIMenu(title: NSLocalizedString("_zoom_", comment: ""), children: [
+                UIAction(title: NSLocalizedString("_zoom_out_", comment: ""), image: UIImage(systemName: "minus.magnifyingglass"), attributes: self.attributesZoomOut) { _ in
+                    UIView.animate(withDuration: 0.0, animations: {
+                        NCKeychain().mediaColumnCount = columnCount + 1
+                        self.createMenu()
+                        self.collectionViewReloadData()
+                    })
+                },
+                UIAction(title: NSLocalizedString("_zoom_in_", comment: ""), image: UIImage(systemName: "plus.magnifyingglass"), attributes: self.attributesZoomIn) { _ in
+                    UIView.animate(withDuration: 0.0, animations: {
+                        NCKeychain().mediaColumnCount = columnCount - 1
+                        self.createMenu()
+                        self.collectionViewReloadData()
+                    })
+                }
+            ]),
+            UIMenu(title: NSLocalizedString("_media_view_options_", comment: ""), children: [viewFilterMenu, viewLayoutMenu]),
+            UIAction(title: NSLocalizedString("_select_media_folder_", comment: ""), image: UIImage(systemName: "folder"), handler: { _ in
+                guard let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as? UINavigationController,
+                      let viewController = navigationController.topViewController as? NCSelect else { return }
+                viewController.delegate = self
+                viewController.typeOfCommandView = .select
+                viewController.type = "mediaFolder"
                 self.present(navigationController, animated: true)
             })
         ])
@@ -185,14 +222,14 @@ extension NCMedia {
                                                             url: stringUrl,
                                                             contentType: "",
                                                             session: self.session,
-                                                            sceneIdentifier: self.controller?.sceneIdentifier)
+                                                            sceneIdentifier: self.appDelegate.sceneIdentifier)
                 self.database.addMetadata(metadata)
-                NCViewer().view(viewController: self, metadata: metadata)
+                NCViewer().view(viewController: self, metadata: metadata, metadatas: [metadata])
             }))
             self.present(alert, animated: true)
         }
 
-        menuButton.menu = UIMenu(title: "", children: [viewFilterMenu, viewLayoutMenu, viewFolderMedia, playFile, playURL])
+//        menuButton.menu = UIMenu(title: "", children: [viewFilterMenu, viewLayoutMenu, viewFolderMedia, playFile, playURL])
     }
 }
 
@@ -219,7 +256,7 @@ extension NCMedia: NCMediaSelectTabBarDelegate {
                     }
                 }
 
-                NCNetworking.shared.deleteMetadatas(metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
+                NCNetworking.shared.deleteMetadatas(metadatas, sceneIdentifier: self.appDelegate.sceneIdentifier)
 
                 for index in indices {
                     let indexPath = IndexPath(row: index, section: 0)

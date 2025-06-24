@@ -48,89 +48,137 @@ class tableTrash: Object {
 }
 
 extension NCManageDatabase {
+
+    // MARK: - Realm write
+
     func addTrash(account: String, items: [NKTrash]) {
-        do {
-            let realm = try Realm()
-            try realm.write {
-                for trash in items {
-                    let object = tableTrash()
-                    object.account = account
-                    object.contentType = trash.contentType
-                    object.date = trash.date as NSDate
-                    object.directory = trash.directory
-                    object.fileId = trash.fileId
-                    object.fileName = trash.fileName
-                    object.filePath = trash.filePath
-                    object.hasPreview = trash.hasPreview
+        performRealmWrite { realm in
+            items.forEach { trash in
+                let object = tableTrash()
+                object.account = account
+                object.contentType = trash.contentType
+                object.date = trash.date as NSDate
+                object.directory = trash.directory
+                object.fileId = trash.fileId
+                object.fileName = trash.fileName
+                object.filePath = trash.filePath
+                object.hasPreview = trash.hasPreview
+//                object.iconName = trash.iconName
+                switch (trash.trashbinFileName as NSString).pathExtension {
+                case "odg":
+                    object.iconName = "diagram"
+                case "csv", "xlsm" :
+                    object.iconName = "file_xls"
+                default:
                     object.iconName = trash.iconName
-                    object.size = trash.size
-                    object.trashbinDeletionTime = trash.trashbinDeletionTime as NSDate
-                    object.trashbinFileName = trash.trashbinFileName
-                    object.trashbinOriginalLocation = trash.trashbinOriginalLocation
-                    object.classFile = trash.classFile
-                    realm.add(object, update: .all)
                 }
+                object.size = trash.size
+                object.trashbinDeletionTime = trash.trashbinDeletionTime as NSDate
+                object.trashbinFileName = trash.trashbinFileName
+                object.trashbinOriginalLocation = trash.trashbinOriginalLocation
+                object.classFile = trash.classFile
+                realm.add(object, update: .all)
             }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
 
     func deleteTrash(filePath: String?, account: String) {
-        var predicate = NSPredicate()
+        let predicate: NSPredicate
+        if let filePath {
+            predicate = NSPredicate(format: "account == %@ AND filePath == %@", account, filePath)
+        } else {
+            predicate = NSPredicate(format: "account == %@", account)
+        }
 
-        do {
-            let realm = try Realm()
-            try realm.write {
-                if filePath == nil {
-                    predicate = NSPredicate(format: "account == %@", account)
-                } else {
-                    predicate = NSPredicate(format: "account == %@ AND filePath == %@", account, filePath!)
-                }
-                let result = realm.objects(tableTrash.self).filter(predicate)
-                realm.delete(result)
-            }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        performRealmWrite { realm in
+            let results = realm.objects(tableTrash.self).filter(predicate)
+            realm.delete(results)
         }
     }
 
     func deleteTrash(fileId: String?, account: String) {
-        var predicate = NSPredicate()
+        let predicate: NSPredicate
+        if let fileId {
+            predicate = NSPredicate(format: "account == %@ AND fileId == %@", account, fileId)
+        } else {
+            predicate = NSPredicate(format: "account == %@", account)
+        }
 
-        do {
-            let realm = try Realm()
-            try realm.write {
-                if fileId == nil {
-                    predicate = NSPredicate(format: "account == %@", account)
-                } else {
-                    predicate = NSPredicate(format: "account == %@ AND fileId == %@", account, fileId!)
-                }
-                let result = realm.objects(tableTrash.self).filter(predicate)
-                realm.delete(result)
-            }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        performRealmWrite { realm in
+            let results = realm.objects(tableTrash.self).filter(predicate)
+            realm.delete(results)
         }
     }
 
-    func getResultsTrash(filePath: String, account: String) -> Results<tableTrash>? {
-        do {
-            let realm = try Realm()
-            return realm.objects(tableTrash.self).filter("account == %@ AND filePath == %@", account, filePath).sorted(byKeyPath: "trashbinDeletionTime", ascending: false)
-        } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access to database: \(error)")
+    /// Asynchronously deletes `tableTrash` objects matching the given `fileId` and `account`.
+    /// - Parameters:
+    ///   - fileId: Optional file ID to filter the trash entries. If `nil`, all entries for the account will be deleted.
+    ///   - account: The account associated with the trash entries.
+    func deleteTrashAsync(fileId: String?, account: String) async {
+        let predicate: NSPredicate
+        if let fileId {
+            predicate = NSPredicate(format: "account == %@ AND fileId == %@", account, fileId)
+        } else {
+            predicate = NSPredicate(format: "account == %@", account)
         }
-        return nil
+
+        await performRealmWriteAsync { realm in
+            let results = realm.objects(tableTrash.self).filter(predicate)
+            realm.delete(results)
+        }
     }
 
-    func getResultTrashItem(fileId: String, account: String) -> tableTrash? {
-        do {
-            let realm = try Realm()
-            return realm.objects(tableTrash.self).filter("account == %@ AND fileId == %@", account, fileId).first
-        } catch let error as NSError {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access to database: \(error)")
+    // MARK: - Realm read
+
+    func getTableTrash(fileId: String, account: String) -> tableTrash? {
+        performRealmRead { realm in
+            realm.objects(tableTrash.self)
+                .filter("account == %@ AND fileId == %@", account, fileId)
+                .first
+                .map { tableTrash(value: $0) }
         }
-        return nil
     }
+
+    /// Asynchronously retrieves sorted trash results by filePath and account.
+    /// - Returns: A `Results<tableTrash>` collection, or `nil` if Realm fails to open.
+    func getTableTrashAsync(filePath: String, account: String) async -> [tableTrash] {
+        await performRealmReadAsync { realm in
+            let results = realm.objects(tableTrash.self)
+                .filter("account == %@ AND filePath == %@", account, filePath)
+                .sorted(byKeyPath: "trashbinDeletionTime", ascending: false)
+            return results.map { tableTrash(value: $0) }
+        } ?? []
+    }
+
+    /// Asynchronously retrieves the first `tableTrash` object matching the given `fileId` and `account`.
+    /// - Parameters:
+    ///   - fileId: The ID of the file to search for.
+    ///   - account: The account associated with the file.
+    /// - Returns: The matching `tableTrash` object, or `nil` if not found.
+    func getTableTrashAsync(fileId: String, account: String) async -> tableTrash? {
+        await performRealmReadAsync { realm in
+            return realm.objects(tableTrash.self)
+                .filter("account == %@ AND fileId == %@", account, fileId)
+                .first
+                .map { tableTrash(value: $0) }
+        }
+    }
+    
+//    func getTrash(filePath: String, sort: String?, ascending: Bool?, account: String) -> [tableTrash]? {
+//
+//        // Fix for NMC-3818 : iOS>9.1.6(7)> File - Deleted tab- file/folder list shows incorrect timestamp
+//        let sort = (sort != "date" ? sort : "trashbinDeletionTime")!
+//        let ascending = ascending ?? false
+//
+//        do {
+//            let realm = try Realm()
+//            realm.refresh()
+//            let results = realm.objects(tableTrash.self).filter("account == %@ AND filePath == %@", account, filePath).sorted(byKeyPath: sort, ascending: ascending)
+//            return Array(results.map { tableTrash.init(value: $0) })
+//        } catch let error as NSError {
+//            NextcloudKit.shared.nkCommonInstance.writeLog("Could not write to database: \(error)")
+//        }
+//
+//        return nil
+//    }
 }

@@ -111,8 +111,8 @@ class NCContentPresenter: NSObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + afterDelay) {
             switch error.errorCode {
             case Int(CFNetworkErrors.cfurlErrorNotConnectedToInternet.rawValue):
-                let image = UIImage(named: "InfoNetwork")?.image(color: .white, size: 20)
-                self.noteTop(text: NSLocalizedString("_network_not_available_", comment: ""), image: image, color: .lightGray, delay: delay, priority: .max)
+                let image = UIImage(named: "networkInProgress")!.image(color: .white, size: 20)
+                self.noteTop(text: NSLocalizedString(title, comment: ""), image: image, color: .lightGray, delay: delay, priority: .max)
             default:
                 var responseMessage = ""
                 if let data = error.responseData {
@@ -291,7 +291,7 @@ class NCContentPresenter: NSObject {
     private func getBackgroundColorFromType(_ type: messageType) -> UIColor {
         switch type {
         case .info:
-            return NCBrandColor.shared.customer
+            return NCBrandColor.shared.brand
         case .error:
             return UIColor(red: 1, green: 0, blue: 0, alpha: 0.9)
         case .success:

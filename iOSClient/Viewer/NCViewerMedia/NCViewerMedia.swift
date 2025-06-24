@@ -93,7 +93,7 @@ class NCViewerMedia: UIViewController {
         view.addGestureRecognizer(doubleTapGestureRecognizer)
 
         if self.database.getMetadataLivePhoto(metadata: metadata) != nil {
-            statusViewImage.image = utility.loadImage(named: "livephoto", colors: [NCBrandColor.shared.iconImageColor2])
+            statusViewImage.image = utility.loadImage(named: "livephoto", colors: [.gray])
             statusLabel.text = "LIVE"
         } else {
             statusViewImage.image = nil
@@ -274,7 +274,7 @@ class NCViewerMedia: UIViewController {
             self.imageVideoContainer.image = self.image
             return
         } else if metadata.isAudio {
-            let image = utility.loadImage(named: "waveform", colors: [NCBrandColor.shared.iconImageColor2])
+            let image = utility.loadImage(named: "noPreviewAudio", colors: [NCBrandColor.shared.iconImageColor])
             self.image = image
             self.imageVideoContainer.image = self.image
             return
@@ -287,7 +287,7 @@ class NCViewerMedia: UIViewController {
                     self.image = image
                     self.imageVideoContainer.image = self.image
                 } else {
-                    self.image = self.utility.loadImage(named: "photo.badge.arrow.down", colors: [NCBrandColor.shared.iconImageColor2])
+                    self.image = self.utility.loadImage(named: "photo.badge.arrow.down", colors: [NCBrandColor.shared.iconImageColor])
                     self.imageVideoContainer.image = self.image
                 }
                 return
@@ -303,7 +303,7 @@ class NCViewerMedia: UIViewController {
                         return
                     }
                 }
-                self.image = self.utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor2])
+                self.image = self.utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor])
                 self.imageVideoContainer.image = self.image
                 return
             } else if let image = UIImage(contentsOfFile: fileNamePath) {
@@ -324,7 +324,7 @@ class NCViewerMedia: UIViewController {
                     self.image = image
                     self.imageVideoContainer.image = self.image
                 } else {
-                    self.image = self.utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor2])
+                    self.image = self.utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor])
                     self.imageVideoContainer.image = self.image
                 }
             }
@@ -337,10 +337,38 @@ class NCViewerMedia: UIViewController {
         } requestHandler: { _ in
             self.allowOpeningDetails = false
         } completion: { _, _ in
-            self.allowOpeningDetails = true
+            DispatchQueue.main.async {
+                let image = self.getImageMetadata(self.metadata)
+                self.image = image
+                self.imageVideoContainer.image = image
+                self.allowOpeningDetails = true
+            }
         }
     }
 
+    func getImageMetadata(_ metadata: tableMetadata) -> UIImage? {
+
+        if let image = utility.getImage(metadata: metadata) {
+            return image
+        }
+
+        if metadata.isVideo && !metadata.hasPreview {
+            utility.createImageFrom(fileNameView: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
+        }
+
+        if utilityFileSystem.fileProviderStoragePreviewIconExists(metadata.ocId, etag: metadata.etag) {
+            return UIImage(contentsOfFile: utilityFileSystem.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag))
+        }
+
+        if metadata.isAudio {
+            return UIImage(named: "noPreviewAudio")!.image(color: .gray, size: view.frame.width)
+        } else if metadata.isImage {
+            return UIImage(named: "noPreview")!.image(color: .gray, size: view.frame.width)
+        } else {
+            return nil
+        }
+    }
+    
     // MARK: - Live Photo
 
     func playLivePhoto(filePath: String) {
@@ -561,7 +589,7 @@ extension NCViewerMedia: EasyTipViewDelegate {
         if !self.database.tipExists(NCGlobal.shared.tipMediaDetailView) {
             var preferences = EasyTipView.Preferences()
             preferences.drawing.foregroundColor = .white
-            preferences.drawing.backgroundColor = .lightGray
+            preferences.drawing.backgroundColor = NCBrandColor.shared.customer
             preferences.drawing.textAlignment = .left
             preferences.drawing.arrowPosition = .bottom
             preferences.drawing.cornerRadius = 10
