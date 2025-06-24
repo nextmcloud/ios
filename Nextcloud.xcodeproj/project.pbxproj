@@ -209,6 +209,7 @@
 		B5D45E6D2DA510E000773929 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */; };
 		B5D45E6E2DA510E000773929 /* NCRenameFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E6B2DA510E000773929 /* NCRenameFile.swift */; };
 		B5D45E732DA5172900773929 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E712DA5172900773929 /* AppUpdater.swift */; };
+		B5D7D0C92E0AC0FE008EBB48 /* NCTrashGridCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7CEE5FE2BA9A5C9003EFD89 /* NCTrashGridCell.xib */; };
 		B5E2E6DD2DAE573B00AB2EDD /* NCFilePermissionEditCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6DC2DAE573B00AB2EDD /* NCFilePermissionEditCell.xib */; };
 		B5E2E6DE2DAE573B00AB2EDD /* NCFilePermissionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6DA2DAE573B00AB2EDD /* NCFilePermissionCell.xib */; };
 		B5E2E6DF2DAE573B00AB2EDD /* NCFilePermissionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6D92DAE573B00AB2EDD /* NCFilePermissionCell.swift */; };
@@ -4208,6 +4209,7 @@
 				566FCF2D2B3EAD4700168DEA /* TextTableViewCell.xib in Resources */,
 				F7D1612023CF19E30039EBBF /* NCViewerRichWorkspace.storyboard in Resources */,
 				F77B0F631D118A16002130FE /* Localizable.strings in Resources */,
+				B5D7D0C92E0AC0FE008EBB48 /* NCTrashGridCell.xib in Resources */,
 				566EB80D2B3D7B5F00FB7CAD /* PdfWithoutOcrSwitchView.xib in Resources */,
 				F7FF2CB12842159500EBB7A1 /* NCSectionHeader.xib in Resources */,
 				566FCF2D2B3EAD4700168DEA /* TextTableViewCell.xib in Resources */,
