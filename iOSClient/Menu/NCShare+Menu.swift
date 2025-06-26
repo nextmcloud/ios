@@ -60,7 +60,7 @@ extension NCShare {
                     advancePermission.metadata = self.metadata
 
                     if let downloadLimit = try? self.database.getDownloadLimit(byAccount: self.metadata.account, shareToken: share.token) {
-                        advancePermission.downloadLimitModel = .limited(limit: downloadLimit.limit, count: downloadLimit.count)
+                        advancePermission.downloadLimit = .limited(limit: downloadLimit.limit, count: downloadLimit.count)
                     }
 
                     navigationController.pushViewController(advancePermission, animated: true)

@@ -221,7 +221,6 @@
 		B5E2E6EA2DAE59F000AB2EDD /* NCShareHeaderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6E32DAE59F000AB2EDD /* NCShareHeaderCustomCell.swift */; };
 		B5E2E6ED2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6EC2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib */; };
 		B5E2E6EE2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6EB2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift */; };
-		B5E2E6F02DAE6E3F00AB2EDD /* ShareDownloadLimitNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6EF2DAE6E3F00AB2EDD /* ShareDownloadLimitNetwork.swift */; };
 		B5E2E6F12DAE854D00AB2EDD /* TealiumLifecycle in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB289A2B8351720089D373 /* TealiumLifecycle */; };
 		B5E2E6F22DAE854D00AB2EDD /* TealiumTagManagement in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28A02B8351730089D373 /* TealiumTagManagement */; };
 		B5E2E70D2DAE86DC00AB2EDD /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6FC2DAE86DC00AB2EDD /* HelpViewController.swift */; };
@@ -1354,7 +1353,6 @@
 		B5E2E6E62DAE59F000AB2EDD /* NCShareTextInputCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareTextInputCell.xib; sourceTree = "<group>"; };
 		B5E2E6EB2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareEmailFieldCell.swift; sourceTree = "<group>"; };
 		B5E2E6EC2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareEmailFieldCell.xib; sourceTree = "<group>"; };
-		B5E2E6EF2DAE6E3F00AB2EDD /* ShareDownloadLimitNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareDownloadLimitNetwork.swift; sourceTree = "<group>"; };
 		B5E2E6F62DAE86DC00AB2EDD /* CCAdvanced.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCAdvanced.h; sourceTree = "<group>"; };
 		B5E2E6F72DAE86DC00AB2EDD /* CCAdvanced.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCAdvanced.m; sourceTree = "<group>"; };
 		B5E2E6F82DAE86DC00AB2EDD /* CCManageAccount.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCManageAccount.h; sourceTree = "<group>"; };
@@ -2515,7 +2513,6 @@
 				B5F545A02DF1C68F008137AB /* Shareable.swift */,
 				566EB7DC2B3D72CA00FB7CAD /* NCShareEmailFieldCell.swift */,
 				566EB7DB2B3D72CA00FB7CAD /* NCShareEmailFieldCell.xib */,
-				B5E2E6EF2DAE6E3F00AB2EDD /* ShareDownloadLimitNetwork.swift */,
 				B5E2E6EB2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift */,
 				B5E2E6EC2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib */,
 				AF93471327E235EB002537EE /* Advanced */,
@@ -4911,7 +4908,6 @@
 				F702F30125EE5D2C008F8E80 /* NYMnemonic.m in Sources */,
 				AF93474E27E3F212002537EE /* NCShareNewUserAddComment.swift in Sources */,
 				F7C30DFD291BD0B80017149B /* NCNetworkingE2EEDelete.swift in Sources */,
-				B5E2E6F02DAE6E3F00AB2EDD /* ShareDownloadLimitNetwork.swift in Sources */,
 				F76882302C0DD1E7001CF441 /* NCFileNameModel.swift in Sources */,
 				F72FD3B5297ED49A00075D28 /* NCManageDatabase+E2EE.swift in Sources */,
 				F73EF7CF2B0225BA0087E6E9 /* NCManageDatabase+Tag.swift in Sources */,
