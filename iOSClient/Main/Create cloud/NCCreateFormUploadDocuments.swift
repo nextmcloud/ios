@@ -315,21 +315,25 @@ import XLForm
             fileNameForm = (fileNameForm as NSString).deletingPathExtension + "." + fileNameExtension
         }
 
-        if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: String(describing: fileNameForm), nativeFormat: false) != nil {
-
-//            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate.account, user: appDelegate.user, userId: appDelegate.userId, fileName: String(describing: fileNameForm), fileNameView: String(describing: fileNameForm), ocId: "", serverUrl: serverUrl, urlBase: appDelegate.urlBase, url: "", contentType: "")
-
-            let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: String(describing: fileNameForm), fileNameView: String(describing: fileNameForm), ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate.sceneIdentifier)
-
-            guard let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
-
-            conflict.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
-            conflict.alwaysNewFileNameNumber = true
-            conflict.serverUrl = serverUrl
-            conflict.metadatasUploadInConflict = [metadataForUpload]
-            conflict.delegate = self
-
-            self.present(conflict, animated: true, completion: nil)
+        // verify if already exists
+        if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView == %@", session.account, self.serverUrl, fileNameForm)) != nil {
+            NCContentPresenter().showError(error: NKError(errorCode: 0, errorDescription: "_rename_already_exists_"))
+            return
+//        }
+//        
+//        if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: String(describing: fileNameForm), nativeFormat: false) != nil {
+//
+//            let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: String(describing: fileNameForm), fileNameView: String(describing: fileNameForm), ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate.sceneIdentifier)
+//
+//            guard let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
+//
+//            conflict.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
+//            conflict.alwaysNewFileNameNumber = true
+//            conflict.serverUrl = serverUrl
+//            conflict.metadatasUploadInConflict = [metadataForUpload]
+//            conflict.delegate = self
+//
+//            self.present(conflict, animated: true, completion: nil)
 
         } else {
 
