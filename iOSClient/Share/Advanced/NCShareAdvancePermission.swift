@@ -742,7 +742,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                         let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionCell
                         cell?.seperatorBelowFull.isHidden = true
                         cell?.seperatorBelow.isHidden = true
-                        cell?.titleLabel.text = String(defaultLimit)
+                        cell?.titleLabel.text = "" //String(defaultLimit)
                     }
                 }
             }
