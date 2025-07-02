@@ -283,14 +283,6 @@ final class NCUtility: NSObject, Sendable {
         return (usedmegabytes, totalmegabytes)
     }
 
-    func removeForbiddenCharacters(_ fileName: String) -> String {
-        var fileName = fileName
-        for character in global.forbiddenCharacters {
-            fileName = fileName.replacingOccurrences(of: character, with: "")
-        }
-        return fileName
-    }
-
     func getHeightHeaderEmptyData(view: UIView, portraitOffset: CGFloat, landscapeOffset: CGFloat, isHeaderMenuTransferViewEnabled: Bool = false) -> CGFloat {
         var height: CGFloat = 0
         if UIDevice.current.orientation.isPortrait {
@@ -300,14 +292,7 @@ final class NCUtility: NSObject, Sendable {
         }
         return height
     }
-    
-//    func isValidEmail(_ email: String) -> Bool {
-//        
-//        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-//        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-//        return emailPred.evaluate(with: email)
-//    }
-    
+        
     // E-mail validations
     // 1. Basic Email Validator (ASCII only)
     func isValidEmail(_ email: String) -> Bool {

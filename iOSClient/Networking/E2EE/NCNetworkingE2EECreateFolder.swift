@@ -32,12 +32,7 @@ class NCNetworkingE2EECreateFolder: NSObject {
     let database = NCManageDatabase.shared
 
     func createFolder(fileName: String, serverUrl: String, withPush: Bool, sceneIdentifier: String?, session: NCSession.Session) async -> NKError {
-        var fileNameFolder = utility.removeForbiddenCharacters(fileName)
-        if fileName != fileNameFolder {
-            let errorDescription = String(format: NSLocalizedString("_forbidden_characters_", comment: ""), NCGlobal.shared.forbiddenCharacters.joined(separator: " "))
-            let error = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: errorDescription)
-            return error
-        }
+        var fileNameFolder = FileAutoRenamer.rename(fileName, isFolderPath: true, account: session.account)
         let fileNameIdentifier = networkingE2EE.generateRandomIdentifier()
         let serverUrlFileName = serverUrl + "/" + fileNameIdentifier
         fileNameFolder = utilityFileSystem.createFileName(fileNameFolder, serverUrl: serverUrl, account: session.account)

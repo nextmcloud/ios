@@ -294,20 +294,8 @@ import XLForm
 
         // Trim whitespaces and newlines
         fileNameForm = fileNameForm.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        // Check for forbidden characters
-        fileName = utility.removeForbiddenCharacters(fileNameForm)
-
-        if fileName != fileNameForm {
-            // If the fileName has been altered (due to forbidden characters), show an error
-            let errorDescription = String(format: NSLocalizedString("_forbidden_characters_", comment: ""), NCGlobal.shared.forbiddenCharacters.joined(separator: " "))
-            let error = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: errorDescription)
-            NCContentPresenter().showError(error: error)
-            return
-        }
         
-        // Trim whitespaces after checks above
-//        fileNameForm = fileNameForm.trimmingCharacters(in: .whitespacesAndNewlines)
+        fileName = FileAutoRenamer.rename(fileNameForm, account: session.account)
 
         let result = NextcloudKit.shared.nkCommonInstance.getInternalType(fileName: fileNameForm, mimeType: "", directory: false, account: session.account
         )

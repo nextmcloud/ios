@@ -479,10 +479,10 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     //
     let defaultSnapshotConfiguration = "DefaultPreviewConfiguration"
     
-    // FORBIDDEN CHARACTERS
-    //
-    // TODO: Remove this
-    let forbiddenCharacters = ["/", "\\", ":", "\"", "|", "?", "*", "<", ">"]
+//    // FORBIDDEN CHARACTERS
+//    //
+//    // TODO: Remove this
+//    let forbiddenCharacters = ["/", "\\", ":", "\"", "|", "?", "*", "<", ">"]
     
     // DIAGNOSTICS CLIENTS
     //

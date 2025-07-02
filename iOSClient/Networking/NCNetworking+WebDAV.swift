@@ -214,12 +214,7 @@ extension NCNetworking {
                       sceneIdentifier: String?,
                       session: NCSession.Session,
                       options: NKRequestOptions = NKRequestOptions()) async -> NKError {
-        var fileNameFolder = utility.removeForbiddenCharacters(fileName.trimmingCharacters(in: .whitespacesAndNewlines))
-        if fileName != fileNameFolder {
-            let errorDescription = String(format: NSLocalizedString("_forbidden_characters_", comment: ""), NCGlobal.shared.forbiddenCharacters.joined(separator: " "))
-            let error = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: errorDescription)
-            return error
-        }
+        var fileNameFolder = FileAutoRenamer.rename(fileName, isFolderPath: true, account: session.account)
         if !overwrite {
             fileNameFolder = utilityFileSystem.createFileName(fileNameFolder, serverUrl: serverUrl, account: session.account)
         }
@@ -580,12 +575,8 @@ extension NCNetworking {
         if !metadata.permissions.isEmpty && !permission {
             return completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
         }
-        let fileName = utility.removeForbiddenCharacters(fileNameNew)
-        if fileName != fileNameNew {
-            let errorDescription = String(format: NSLocalizedString("_forbidden_characters_", comment: ""), NCGlobal.shared.forbiddenCharacters.joined(separator: " "))
-            let error = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: errorDescription)
-            return completion(error)
-        }
+
+        let fileName = FileAutoRenamer.rename(fileNameNew, account: metadata.account)
         let fileNameNew = fileName
         if fileNameNew.isEmpty || fileNameNew == metadata.fileNameView {
             return completion(NKError())

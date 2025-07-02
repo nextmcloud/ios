@@ -105,7 +105,6 @@ extension UIAlertController {
             textField.autocapitalizationType = .words
         }
 
-        // only allow saving if folder name exists
         NotificationCenter.default.addObserver(
             forName: UITextField.textDidChangeNotification,
             object: alertController.textFields?.first,
@@ -116,8 +115,6 @@ extension UIAlertController {
                 let textCheck = FileNameValidator.checkFileName(folderName, account: session.account)
                 let alreadyExists = NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView == %@", session.account, serverUrl, folderName)) != nil
                 
-//                okAction.isEnabled = !text.isEmpty && textCheck?.error == nil
-//                okAction.isEnabled = !folderName.isEmpty && folderName != "." && folderName != ".."
                 okAction.isEnabled = !text.isEmpty && textCheck?.error == nil && alreadyExists == false
                 var message = ""
                 var messageColor = UIColor.label

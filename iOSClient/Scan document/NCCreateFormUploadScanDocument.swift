@@ -309,7 +309,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             let fileNameNew = newValue as? String
 
             if let fileNameNew = newValue as? String {
-                self.fileName = utility.removeForbiddenCharacters(fileNameNew)
+                self.fileName = FileAutoRenamer.rename(fileNameNew, account: session.account)
             } else {
                 self.fileName = ""
             }
