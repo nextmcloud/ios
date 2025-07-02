@@ -44,23 +44,23 @@ extension NCShareExtension: UICollectionViewDelegate {
         setNavigationBar(navigationTitle: metadata.fileNameView)
     }
 
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        if kind == UICollectionView.elementKindSectionHeader {
-            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFirstHeaderEmptyData", for: indexPath) as? NCSectionFirstHeaderEmptyData else { return NCSectionFirstHeaderEmptyData() }
-            if self.dataSourceTask?.state == .running {
-                header.emptyImage.image = utility.loadImage(named: "wifi", colors: [NCBrandColor.shared.getElement(account: session.account)])
-                header.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
-                header.emptyDescription.text = ""
-            } else {
-                header.emptyImage.image = NCImageCache.shared.getFolder()
-                header.emptyTitle.text = NSLocalizedString("_files_no_folders_", comment: "")
-                header.emptyDescription.text = ""
-            }
-            return header
-        } else {
-            return UICollectionReusableView()
-        }
-    }
+//    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+//        if kind == UICollectionView.elementKindSectionHeader {
+//            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFirstHeaderEmptyData", for: indexPath) as? NCSectionFirstHeaderEmptyData else { return NCSectionFirstHeaderEmptyData() }
+//            if self.dataSourceTask?.state == .running {
+//                header.emptyImage.image = utility.loadImage(named: "wifi", colors: [NCBrandColor.shared.getElement(account: session.account)])
+//                header.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
+//                header.emptyDescription.text = ""
+//            } else {
+//                header.emptyImage.image = NCImageCache.shared.getFolder()
+//                header.emptyTitle.text = NSLocalizedString("_files_no_folders_", comment: "")
+//                header.emptyDescription.text = ""
+//            }
+//            return header
+//        } else {
+//            return UICollectionReusableView()
+//        }
+//    }
 }
 
 extension NCShareExtension: UICollectionViewDelegateFlowLayout {

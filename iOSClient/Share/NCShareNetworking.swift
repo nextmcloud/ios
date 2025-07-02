@@ -130,13 +130,16 @@ class NCShareNetworking: NSObject {
                 template.idShare = share.idShare
                 let home = self.utilityFileSystem.getHomeServer(session: self.session)
                 self.database.addShare(account: self.metadata.account, home: home, shares: [share])
+                let directory = self.metadata.directory
 
                 if template.hasChanges(comparedTo: share) {
                     self.updateShare(template, downloadLimit: downloadLimit)
                     // Download limit update should happen implicitly on share update.
                 } else {
-                    if case let .limited(limit, _) = downloadLimit, NCCapabilities.shared.getCapabilities(account: self.metadata.account).capabilityFileSharingDownloadLimit {
-                        self.setShareDownloadLimit(limit, token: share.token)
+                    if share.shareType == NCShareCommon().SHARE_TYPE_LINK && !directory {
+                        if case let .limited(limit, _) = downloadLimit, NCCapabilities.shared.getCapabilities(account: self.metadata.account).capabilityFileSharingDownloadLimit {
+                            self.setShareDownloadLimit(limit, token: share.token)
+                        }
                     }
                 }
 
@@ -178,14 +181,18 @@ class NCShareNetworking: NSObject {
                 let home = self.utilityFileSystem.getHomeServer(session: self.session)
                 self.database.addShare(account: self.metadata.account, home: home, shares: [share])
                 self.delegate?.readShareCompleted()
+                let directory = self.metadata.directory
 
-                if NCCapabilities.shared.getCapabilities(account: self.metadata.account).capabilityFileSharingDownloadLimit {
-                    if case let .limited(limit, _) = downloadLimit {
-                        self.setShareDownloadLimit(limit, token: share.token)
-                    } else {
-                        self.removeShareDownloadLimit(token: share.token)
+                if share.shareType == NCShareCommon().SHARE_TYPE_LINK && !directory{
+                    if NCCapabilities.shared.getCapabilities(account: self.metadata.account).capabilityFileSharingDownloadLimit {
+                        if case let .limited(limit, _) = downloadLimit {
+                            self.setShareDownloadLimit(limit, token: share.token)
+                        } else {
+                            self.removeShareDownloadLimit(token: share.token)
+                        }
                     }
                 }
+                
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateShare, userInfo: ["account": self.metadata.account, "serverUrl": self.metadata.serverUrl])
             } else {
                 NCContentPresenter().showError(error: error)

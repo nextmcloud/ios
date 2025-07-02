@@ -34,7 +34,7 @@ class NCSectionFirstHeaderEmptyData: UICollectionReusableView {
     @IBOutlet weak var emptyDescription: UILabel!
 
     @IBOutlet weak var viewTransfer: UIView!
-    @IBOutlet weak var viewTransferHeightConstraint: NSLayoutConstraint!
+//    @IBOutlet weak var viewTransferHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var imageTransfer: UIImageView!
     @IBOutlet weak var labelTransfer: UILabel!
     @IBOutlet weak var progressTransfer: UIProgressView!
@@ -58,7 +58,7 @@ class NCSectionFirstHeaderEmptyData: UICollectionReusableView {
         emptyTitle.text = ""
         emptyDescription.text = ""
         
-        viewTransferHeightConstraint.constant = 0
+//        viewTransferHeightConstraint.constant = 0
         viewTransfer.isHidden = true
 
         imageTransfer.tintColor = NCBrandColor.shared.iconImageColor
@@ -90,10 +90,10 @@ class NCSectionFirstHeaderEmptyData: UICollectionReusableView {
         viewTransfer.isHidden = isHidden
 
         if isHidden {
-            viewTransferHeightConstraint.constant = 0
+//            viewTransferHeightConstraint.constant = 0
             progressTransfer.progress = 0
         } else {
-            viewTransferHeightConstraint.constant = NCGlobal.shared.heightHeaderTransfer
+//            viewTransferHeightConstraint.constant = NCGlobal.shared.heightHeaderTransfer
             if NCTransferProgress.shared.haveUploadInForeground() {
                 labelTransfer.text = String(format: NSLocalizedString("_upload_foreground_msg_", comment: ""), NCBrandOptions.shared.brand)
                 if let progress {

@@ -233,7 +233,8 @@ extension tableMetadata {
     }
 
     var canSetAsAvailableOffline: Bool {
-        return session.isEmpty && !isDocumentViewableOnly //!isDirectoryE2EE && !e2eEncrypted
+//        return session.isEmpty && !isDocumentViewableOnly //!isDirectoryE2EE && !e2eEncrypted
+        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
     }
 
     var canShare: Bool {

@@ -33,8 +33,6 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             self.oldTableShare?.permissions = self.permission ?? (self.oldTableShare?.permissions ?? 0)
             self.share.permissions = self.permission ?? (self.oldTableShare?.permissions ?? 0)
             if isNewShare {
-                networking?.createShare(share, downloadLimit: self.downloadLimit)
-
                 let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
                 guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
                 viewNewUserComment.metadata = self.metadata
@@ -45,7 +43,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                 if let downloadSwitchCell = getDownloadLimitSwitchCell() {
                     let isDownloadLimitOn = downloadSwitchCell.switchControl.isOn
                     if !isDownloadLimitOn {
-                        setDownloadLimit(deleteLimit: true, limit: "")
+                        setDownloadLimit(deleteLimit: true, limit: String(defaultLimit))
                     } else {
                         let downloadLimitInputCell = getDownloadLimitInputCell()
                         let enteredDownloadLimit = downloadLimitInputCell?.cellTextField.text ?? ""
@@ -57,8 +55,10 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                             showDownloadLimitError(message: NSLocalizedString("_share_download_limit_alert_zero_", comment: ""))
                             return
                         }
-                        self.downloadLimit = .limited(limit: Int(enteredDownloadLimit)!, count: 0)
+                        
+                        self.downloadLimit = .limited(limit: Int(enteredDownloadLimit)!, count: downloadLimit.count ?? 0)
                         setDownloadLimit(deleteLimit: false, limit: enteredDownloadLimit)
+                        updateDownloadLimitUI()
                     }
                 }
                 
@@ -105,6 +105,13 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
     static let displayDateFormat = "dd. MMM. yyyy"
     var permission: Int?
     
+    ///
+    /// Default value for limits as possibly provided by the server capabilities.
+    ///
+    var defaultLimit: Int {
+        NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityFileSharingDownloadLimitDefaultLimit
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.shareConfig = NCShareConfig(parentMetadata: metadata, share: share)
@@ -113,23 +120,33 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         isModalInPresentation = true
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         self.permission = oldTableShare?.permissions
-        initializeForm()
-        changeTheming()
-        
-        // Only persisted shares have tokens which are provided by the server.
-        // A download limit requires a token to exist.
-        // Hence it can only be looked up if the share is already persisted at this point.
-        if isNewShare == false {
-            if let persistedShare = share as? tableShare {
-                do {
-                    if let limit = try database.getDownloadLimit(byAccount: metadata.account, shareToken: persistedShare.token) {
-                        self.downloadLimit = .limited(limit: limit.limit, count: limit.count)
-                    }
-                } catch {
-                    NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] There was an error while fetching the download limit for share with token \(persistedShare.token)!")
-                }
+        if !isNewShare {
+            Task {
+                await getDownloadLimit()
             }
         }
+        initializeForm()
+        changeTheming()
+//        getDownloadLimit()
+//        Task {
+//            await getDownloadLimit()
+//        }
+        
+//        // Only persisted shares have tokens which are provided by the server.
+//        // A download limit requires a token to exist.
+//        // Hence it can only be looked up if the share is already persisted at this point.
+//        if isNewShare == false {
+//            if let persistedShare = share as? tableShare {
+//                do {
+//                    if let limit = try database.getDownloadLimit(byAccount: metadata.account, shareToken: persistedShare.token) {
+//                        self.downloadLimit = .limited(limit: limit.limit, count: limit.count)
+//                        self.updateDownloadLimitUI()
+//                    }
+//                } catch {
+//                    NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] There was an error while fetching the download limit for share with token \(persistedShare.token)!")
+//                }
+//            }
+//        }
 
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -708,18 +725,14 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
 
         case "kNMCFilePermissionEditCellDownloadLimit":
             if let value = newValue as? Bool {
-                if value {
-                    // Limit enabled with 0 used
-                    self.downloadLimit = .limited(limit: 0, count: 0)
-                } else {
-                    // Limit disabled
-                    self.downloadLimit = .unlimited
-                }
+
+                self.downloadLimit = value ? .limited(limit: 0, count: 0) : .unlimited
+
                 if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellDownloadLimit") {
                     inputField.hidden = !value
                     if let indexPath = self.form.indexPath(ofFormRow: inputField) {
                         let cell = tableView.cellForRow(at: indexPath) as? NCShareTextInputCell
-                        cell?.cellTextField.text = ""
+                        cell?.cellTextField.text = "\(downloadLimit.limit ?? 0)"
                     }
                 }
 
@@ -729,7 +742,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                         let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionCell
                         cell?.seperatorBelowFull.isHidden = true
                         cell?.seperatorBelow.isHidden = true
-                        cell?.titleLabel.text = ""
+                        cell?.titleLabel.text = String(defaultLimit)
                     }
                 }
             }
@@ -824,31 +837,39 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
     
     func getDownloadLimit() async {
         NCActivityIndicator.shared.start(backgroundView: view)
-        do {
-                // Use readDownloadLimits to fetch the limits
-                try await networking?.readDownloadLimits(account: metadata.account, tokens: [oldTableShare?.token ?? ""])
 
-                // Get the limit for this specific token using readDownloadLimit
-                if let token = oldTableShare?.token {
-                    if let tableDownloadLimit = try database.getDownloadLimit(byAccount: metadata.account, shareToken: token) {
-//                    if let tableDownloadLimit = try await database.getDownloadLimit(byAccount: metadata.account, shareToken: token) {
-                        // If we have a download limit, update the UI
+        do {
+            // First, try to fetch download limits from the server.
+            try await networking?.readDownloadLimits(account: metadata.account, tokens: [oldTableShare?.token ?? ""])
+            NCActivityIndicator.shared.stop() // Stop the activity indicator
+
+            if !isNewShare, let persistedShare = share as? tableShare {
+                // If not a new share and share exists, fetch the limit for that persisted share
+                do {
+                    if let limit = try database.getDownloadLimit(byAccount: metadata.account, shareToken: persistedShare.token) {
                         DispatchQueue.main.async {
                             NCActivityIndicator.shared.stop() // Stop the activity indicator
-                            self.downloadLimit = .limited(limit: tableDownloadLimit.limit, count: tableDownloadLimit.count)
+                            self.downloadLimit = .limited(limit: limit.limit, count: limit.count)
                             self.updateDownloadLimitUI()
                         }
                     }
+                } catch {
+                    // Handle the error for the persisted share token lookup
+                    DispatchQueue.main.async {
+                        NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Error fetching the download limit for share with token \(persistedShare.token).")
+                        NCActivityIndicator.shared.stop() // Stop the activity indicator
+                    }
                 }
+            }
         } catch {
+            // Handle error for fetching download limits from the server
             DispatchQueue.main.async {
-                // Handle the error
                 print("Error fetching download limit: \(error)")
                 NCActivityIndicator.shared.stop() // Stop the activity indicator
             }
         }
     }
-    
+
     func setDownloadLimit(deleteLimit: Bool, limit: String) {
         networking?.setShareDownloadLimit(Int(limit) ?? 0, token: oldTableShare?.token ?? "")
     }
