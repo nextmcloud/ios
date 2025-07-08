@@ -286,6 +286,10 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         
         appDelegate.activeViewController = self
         appDelegate.account = session.account
+        appDelegate.urlBase = session.urlBase
+        appDelegate.userId = session.userId
+        appDelegate.user = session.user
+
         NCKeychain().setAccountName(account: session.account)
         isEditMode = false
 
