@@ -33,7 +33,11 @@ struct NavigationCollectionViewCommon {
 
 class NCMainTabBarController: UITabBarController {
     var sceneIdentifier: String = UUID().uuidString
-    var account = ""
+    var account: String = "" {
+        didSet {
+            NCImageCache.shared.controller = self
+        }
+    }
     var availableNotifications: Bool = false
     var documentPickerViewController: NCDocumentPickerViewController?
     let navigationCollectionViewCommon = ThreadSafeArray<NavigationCollectionViewCommon>()
@@ -148,8 +152,8 @@ class NCMainTabBarController: UITabBarController {
                 }
                 /// Update Activity tab bar
                 if let item = self.tabBar.items?[3] {
-                    let capabilities = NCCapabilities.shared.getCapabilities(account: self.account)
-                    item.isEnabled = capabilities.capabilityActivityEnabled
+                    let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: self.account)
+                    item.isEnabled = capabilities.activityEnabled
                 }
 
                 self.timerCheck()

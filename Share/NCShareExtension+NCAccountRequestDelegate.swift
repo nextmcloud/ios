@@ -1,25 +1,7 @@
-//
-//  NCShareExtension.swift
-//  Share
-//
-//  Created by Marino Faggiana on 04.01.2022.
-//  Copyright © 2022 Henrik Storch. All rights reserved.
-//
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2021 Marino Faggiana
+// SPDX-FileCopyrightText: 2021 Henrik Storch
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import NextcloudKit
 import UIKit
@@ -29,74 +11,74 @@ extension NCShareExtension: NCAccountRequestDelegate {
     // MARK: - Account
 
     func showAccountPicker() {
-        let accounts = self.database.getAllAccountOrderAlias()
-        guard accounts.count > 1,
-              let vcAccountRequest = UIStoryboard(name: "NCAccountRequest", bundle: nil).instantiateInitialViewController() as? NCAccountRequest else { return }
+        Task {
+            let accounts = await self.database.getAllAccountOrderAliasAsync()
+            let session = self.extensionData.getSession()
 
-        // Only here change the active account
-        for account in accounts {
-            account.active = account.account == session.account
+            guard accounts.count > 1,
+                  let vcAccountRequest = UIStoryboard(name: "NCAccountRequest", bundle: nil).instantiateInitialViewController() as? NCAccountRequest else {
+                return
+            }
+
+            // Only here change the active account
+            for account in accounts {
+                account.active = account.account == session.account
+            }
+
+            vcAccountRequest.activeAccount = session.account
+            vcAccountRequest.accounts = accounts.sorted { sorg, dest -> Bool in
+                return sorg.active && !dest.active
+            }
+            vcAccountRequest.enableTimerProgress = false
+            vcAccountRequest.enableAddAccount = false
+            vcAccountRequest.delegate = self
+            vcAccountRequest.dismissDidEnterBackground = true
+
+            let screenHeighMax = UIScreen.main.bounds.height - (UIScreen.main.bounds.height / 5)
+            let height = min(CGFloat(accounts.count * Int(vcAccountRequest.heightCell) + 45), screenHeighMax)
+
+            let popup = NCPopupViewController(contentController: vcAccountRequest, popupWidth: 300, popupHeight: height + 20)
+
+            self.present(popup, animated: true)
+
         }
-
-        vcAccountRequest.activeAccount = self.session.account
-        vcAccountRequest.accounts = accounts.sorted { sorg, dest -> Bool in
-            return sorg.active && !dest.active
-        }
-        vcAccountRequest.enableTimerProgress = false
-        vcAccountRequest.enableAddAccount = false
-        vcAccountRequest.delegate = self
-        vcAccountRequest.dismissDidEnterBackground = true
-
-        let screenHeighMax = UIScreen.main.bounds.height - (UIScreen.main.bounds.height / 5)
-        let height = min(CGFloat(accounts.count * Int(vcAccountRequest.heightCell) + 45), screenHeighMax)
-
-        let popup = NCPopupViewController(contentController: vcAccountRequest, popupWidth: 300, popupHeight: height + 20)
-
-        self.present(popup, animated: true)
     }
 
     func accountRequestAddAccount() { }
 
     func accountRequestChangeAccount(account: String, controller: UIViewController?) {
-        guard let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", account)),
-              let capabilities = self.database.setCapabilities(account: account) else {
-            cancel(with: NCShareExtensionError.noAccount)
-            return
+        Task {
+            let session = await self.extensionData.setSessionAccount(account)
+            guard let tblAccount = self.extensionData.getTblAccoun() else {
+                cancel(with: NCShareExtensionError.noAccount)
+                return
+            }
+            await self.database.applyCachedCapabilitiesAsync(account: account)
+
+            NCBrandColor.shared.settingThemingColor(account: account)
+
+            NextcloudKit.shared.setup(groupIdentifier: NCBrandOptions.shared.capabilitiesGroup, delegate: NCNetworking.shared)
+            NextcloudKit.shared.appendSession(account: tblAccount.account,
+                                              urlBase: tblAccount.urlBase,
+                                              user: tblAccount.user,
+                                              userId: tblAccount.userId,
+                                              password: NCKeychain().getPassword(account: tblAccount.account),
+                                              userAgent: userAgent,
+                                              httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
+                                              httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
+                                              httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
+                                              groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
+
+            autoUploadFileName = self.database.getAccountAutoUploadFileName(account: account)
+            autoUploadDirectory = self.database.getAccountAutoUploadDirectory(session: session)
+
+            serverUrl = utilityFileSystem.getHomeServer(session: session)
+
+            setNavigationBar(navigationTitle: NCBrandOptions.shared.brand)
+
+            await reloadData()
+            await loadFolder()
         }
-        self.account = account
-
-        // CAPABILITIES
-        database.setCapabilities(account: account)
-
-        // COLORS
-        NCBrandColor.shared.settingThemingColor(account: account)
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming, userInfo: ["account": account])
-
-        // NETWORKING
-        NextcloudKit.shared.setup(groupIdentifier: NCBrandOptions.shared.capabilitiesGroup, delegate: NCNetworking.shared)
-        NextcloudKit.shared.appendSession(account: tableAccount.account,
-                                          urlBase: tableAccount.urlBase,
-                                          user: tableAccount.user,
-                                          userId: tableAccount.userId,
-                                          password: NCKeychain().getPassword(account: tableAccount.account),
-                                          userAgent: userAgent,
-                                          nextcloudVersion: capabilities.capabilityServerVersionMajor,
-                                          httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
-                                          httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
-                                          httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
-                                          groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
-
-        // SESSION
-        NCSession.shared.appendSession(account: tableAccount.account, urlBase: tableAccount.urlBase, user: tableAccount.user, userId: tableAccount.userId)
-
-        // get auto upload folder
-        autoUploadFileName = self.database.getAccountAutoUploadFileName(account: account)
-        autoUploadDirectory = self.database.getAccountAutoUploadDirectory(session: session)
-
-        serverUrl = utilityFileSystem.getHomeServer(session: session)
-
-        reloadDatasource(withLoadFolder: true)
-        setNavigationBar(navigationTitle: NCBrandOptions.shared.brand)
     }
 }
 

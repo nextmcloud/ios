@@ -70,7 +70,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
                         self.downloadLimit = .limited(limit: limit.limit, count: limit.count)
                     }
                 } catch {
-                    NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] There was an error while fetching the download limit for share with token \(persistedShare.token)!")
+                    nkLog(error: "There was an error while fetching the download limit for share with token \(persistedShare.token)!")
                 }
             }
         }
@@ -241,17 +241,17 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
             }
 
             if isNewShare {
-                let serverUrl = metadata.serverUrl + "/" + metadata.fileName
+                let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: metadata.account)
 
                 if share.shareType != NCShareCommon().SHARE_TYPE_LINK, metadata.e2eEncrypted,
-                   NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityE2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+                   capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
 
-                    if NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: serverUrl) {
+                    if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
                         let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
                         return NCContentPresenter().showInfo(error: error)
                     }
 
-                    let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: serverUrl, addUserId: share.shareWith, removeUserId: nil, account: metadata.account)
+                    let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: metadata.serverUrlFileName, addUserId: share.shareWith, removeUserId: nil, account: metadata.account)
 
                     if error != .success {
                         return NCContentPresenter().showError(error: error)

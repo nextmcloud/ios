@@ -27,7 +27,7 @@ import NextcloudKit
 
 extension NCShare {
     func toggleShareMenu(for share: tableShare, sender: Any?) {
-        let capabilities = NCCapabilities.shared.getCapabilities(account: self.metadata.account)
+        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: self.metadata.account)
         var actions = [NCMenuAction]()
 
         if share.shareType == NCShareCommon().SHARE_TYPE_LINK, canReshare {
@@ -75,13 +75,12 @@ extension NCShare {
                 sender: sender,
                 action: { _ in
                     Task {
-                        if share.shareType != NCShareCommon().SHARE_TYPE_LINK, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.capabilityE2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
-                            let serverUrl = metadata.serverUrl + "/" + metadata.fileName
-                            if NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: serverUrl) {
+                        if share.shareType != NCShareCommon().SHARE_TYPE_LINK, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+                            if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
                                 let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
                                 return NCContentPresenter().showInfo(error: error)
                             }
-                            let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: serverUrl, addUserId: nil, removeUserId: share.shareWith, account: metadata.account)
+                            let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: metadata.serverUrlFileName, addUserId: nil, removeUserId: share.shareWith, account: metadata.account)
                             if error != .success {
                                 return NCContentPresenter().showError(error: error)
                             }
@@ -185,7 +184,7 @@ extension NCShare {
                 downloadLimit = .limited(limit: model.limit, count: model.count)
             }
         } catch {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Failed to get download limit from database!")
+            nkLog(error: "Failed to get download limit from database!")
             return
         }
 

@@ -15,7 +15,7 @@ extension NCNetworking {
 
         let showHiddenFiles = NCKeychain().getShowHiddenFiles(account: session.account)
         var recommendationsToInsert: [NKRecommendation] = []
-        let results = await NextcloudKit.shared.getRecommendedFiles(account: session.account)
+        let results = await NextcloudKit.shared.getRecommendedFilesAsync(account: session.account)
         var serverUrlFileName = ""
 
         if results.error == .success, let recommendations = results.recommendations {
@@ -26,12 +26,12 @@ extension NCNetworking {
                     serverUrlFileName = homeServer + recommendation.directory + "/" + recommendation.name
                 }
 
-                let results = await NextcloudKit.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", showHiddenFiles: showHiddenFiles, account: session.account)
+                let results = await NextcloudKit.shared.readFileOrFolderAsync(serverUrlFileName: serverUrlFileName, depth: "0", showHiddenFiles: showHiddenFiles, account: session.account)
 
                 if results.error == .success, let file = results.files?.first {
                     let isDirectoryE2EE = self.utilityFileSystem.isDirectoryE2EE(file: file)
-                    let metadata = self.database.convertFileToMetadata(file, isDirectoryE2EE: isDirectoryE2EE)
-                    self.database.addMetadataIfNeeded(metadata, sync: false)
+                    let metadata = await self.database.convertFileToMetadataAsync(file, isDirectoryE2EE: isDirectoryE2EE)
+                    self.database.addMetadataIfNeededAsync(metadata, sync: false)
 
                     if metadata.isLivePhoto, metadata.isVideo {
                         continue
@@ -40,8 +40,8 @@ extension NCNetworking {
                     }
                 }
             }
-            self.database.createRecommendedFiles(account: session.account, recommendations: recommendationsToInsert, sync: false)
 
+            await self.database.createRecommendedFilesAsync(account: session.account, recommendations: recommendationsToInsert)
             await collectionView.reloadData()
         }
     }

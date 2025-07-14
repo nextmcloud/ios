@@ -123,7 +123,7 @@ struct NCUploadAssetsView: View {
                                             }
                                     }
                                     .onChange(of: renameFileName) { newValue in
-                                        if let error = FileNameValidator.checkFileName(newValue, account: model.controller?.account) {
+                                        if let error = FileNameValidator.checkFileName(newValue, account: model.controller?.account, capabilities: model.capabilities) {
                                             renameError = error.errorDescription
                                         } else {
                                             renameError = ""
@@ -167,11 +167,9 @@ struct NCUploadAssetsView: View {
                                             .frame(maxWidth: .infinity, alignment: .trailing)
                                     }
                                 } icon: {
-                                    Image("folder")
-                                        .renderingMode(.template)
+                                    Image(uiImage: NCImageCache.shared.getFolder(account: model.session.account))
                                         .resizable()
                                         .scaledToFit()
-                                        .foregroundColor(Color(NCBrandColor.shared.getElement(account: metadata?.account)))
                                 }
                             }
                             .contentShape(Rectangle())
@@ -220,7 +218,7 @@ struct NCUploadAssetsView: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .sheet(isPresented: $showSelect) {
-            SelectView(serverUrl: $model.serverUrl, session: model.session)
+            SelectView(serverUrl: $model.serverUrl, includeDirectoryE2EEncryption: true, session: model.session)
         }
         .sheet(isPresented: $showUploadConflict) {
             UploadConflictView(delegate: model, serverUrl: model.serverUrl, metadatasUploadInConflict: model.metadatasUploadInConflict, metadatasNOConflict: model.metadatasNOConflict)

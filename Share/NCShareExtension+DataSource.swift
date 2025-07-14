@@ -1,25 +1,7 @@
-//
-//  NCShareExtension+DataSource.swift
-//  Share
-//
-//  Created by Henrik Storch on 29.12.21.
-//  Copyright © 2021 Henrik Storch. All rights reserved.
-//
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2021 Marino Faggiana
+// SPDX-FileCopyrightText: 2021 Henrik Storch
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import NextcloudKit
@@ -28,33 +10,41 @@ import NextcloudKit
 
 extension NCShareExtension: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.dataSource.getMetadata(indexPath: indexPath) { metadata in
-            guard let metadata else { return self.showAlert(description: "_invalid_url_") }
+        Task {
+            guard let tblAccount = self.extensionData.getTblAccoun(),
+                  let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
+                return self.showAlert(description: "_invalid_url_")
+            }
             let serverUrl = self.utilityFileSystem.stringAppendServerUrl(metadata.serverUrl, addFileName: metadata.fileName)
-            if metadata.e2eEncrypted && !NCKeychain().isEndToEndEnabled(account: self.session.account) {
+
+            if metadata.e2eEncrypted && !NCKeychain().isEndToEndEnabled(account: tblAccount.account) {
                 self.showAlert(title: "_info_", description: "_e2e_goto_settings_for_enable_")
             }
+            let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: tblAccount.account)
 
-            if let fileNameError = FileNameValidator.checkFileName(metadata.fileNameView, account: self.session.account) {
+            if let fileNameError = FileNameValidator.checkFileName(metadata.fileNameView, account: tblAccount.account, capabilities: capabilities) {
                 self.present(UIAlertController.warning(message: "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
                 return
             }
 
             self.serverUrl = serverUrl
-            self.reloadDatasource(withLoadFolder: true)
             self.setNavigationBar(navigationTitle: metadata.fileNameView)
+
+            await self.reloadData()
+            await self.loadFolder()
         }
     }
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
+            let session = self.extensionData.getSession()
             guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFirstHeaderEmptyData", for: indexPath) as? NCSectionFirstHeaderEmptyData else { return NCSectionFirstHeaderEmptyData() }
             if self.dataSourceTask?.state == .running {
                 header.emptyImage.image = utility.loadImage(named: "wifi", colors: [NCBrandColor.shared.getElement(account: session.account)])
                 header.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
                 header.emptyDescription.text = ""
             } else {
-                header.emptyImage.image = NCImageCache.shared.getFolder(account: self.session.account)
+                header.emptyImage.image = NCImageCache.shared.getFolder(account: session.account)
                 header.emptyTitle.text = NSLocalizedString("_files_no_folders_", comment: "")
                 header.emptyDescription.text = ""
             }
@@ -133,6 +123,8 @@ extension NCShareExtension: UICollectionViewDataSource {
         var isShare = false
         var isMounted = false
         let permissions = NCPermissions()
+        let session = self.extensionData.getSession()
+
         if let metadataFolder = metadataFolder {
             isShare = metadata.permissions.contains(permissions.permissionShared) && !metadataFolder.permissions.contains(permissions.permissionShared)
             isMounted = metadata.permissions.contains(permissions.permissionMounted) && !metadataFolder.permissions.contains(permissions.permissionMounted)
@@ -176,8 +168,12 @@ extension NCShareExtension: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard !uploadStarted else { return }
+        guard !uploadStarted else {
+            return
+        }
         let fileName = filesName[indexPath.row]
+        let session = self.extensionData.getSession()
+
         showRenameFileDialog(named: fileName, account: session.account)
     }
 }
@@ -188,10 +184,16 @@ extension NCShareExtension: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as? NCShareCell else { return UITableViewCell() }
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as? NCShareCell else {
+            return UITableViewCell()
+        }
+
         let fileName = filesName[indexPath.row]
-        cell.setup(fileName: fileName, account: session.account)
+        let session = self.extensionData.getSession()
+
+        cell.setup(fileName: fileName, iconName: "", account: session.account)
         cell.delegate = self
+
         return cell
     }
 }

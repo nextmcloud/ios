@@ -45,9 +45,11 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
 
         if canDeleteServer {
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { _ in
-                NCNetworking.shared.setStatusWaitDelete(metadatas: metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
+                self.networking.setStatusWaitDelete(metadatas: metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
                 self.setEditMode(false)
-                self.reloadDataSource()
+                Task {
+                    await self.reloadDataSource()
+                }
             })
         }
 
@@ -57,7 +59,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
             Task {
                 var error = NKError()
                 for metadata in copyMetadatas where error == .success {
-                    error = await NCNetworking.shared.deleteCache(metadata, sceneIdentifier: self.controller?.sceneIdentifier)
+                    error = await self.networking.deleteCache(metadata, sceneIdentifier: self.controller?.sceneIdentifier)
                 }
             }
             self.setEditMode(false)
@@ -88,13 +90,21 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
                 message: NSLocalizedString("_select_offline_warning_", comment: ""),
                 preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { _ in
-                metadatas.forEach { NCDownloadAction.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
+                Task {
+                    for metadata in metadatas {
+                        await NCDownloadAction.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
+                    }
+                }
                 self.setEditMode(false)
             }))
             alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
             self.present(alert, animated: true)
         } else {
-            metadatas.forEach { NCDownloadAction.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
+            Task {
+                for metadata in metadatas {
+                    await NCDownloadAction.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
+                }
+            }
             setEditMode(false)
         }
     }
@@ -102,7 +112,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
     func lock(isAnyLocked: Bool) {
         let metadatas = getSelectedMetadatas()
         for metadata in metadatas where metadata.lock == isAnyLocked {
-            NCNetworking.shared.lockUnlockFile(metadata, shoulLock: !isAnyLocked)
+            self.networking.lockUnlockFile(metadata, shoulLock: !isAnyLocked)
         }
         setEditMode(false)
     }
@@ -138,10 +148,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
     func convertLivePhoto(metadataFirst: tableMetadata?, metadataLast: tableMetadata?) {
         if let metadataFirst, let metadataLast {
             Task {
-                let userInfo: [String: Any] = ["serverUrl": metadataFirst.serverUrl,
-                                               "account": metadataFirst.account]
-
-                await NCNetworking.shared.setLivePhoto(metadataFirst: metadataFirst, metadataLast: metadataLast, userInfo: userInfo)
+                await self.networking.setLivePhoto(metadataFirst: metadataFirst, metadataLast: metadataLast)
             }
         }
         setEditMode(false)

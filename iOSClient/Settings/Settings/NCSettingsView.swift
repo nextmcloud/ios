@@ -40,8 +40,11 @@ struct NCSettingsView: View {
     /// Object of ViewModel of this view
     @ObservedObject var model: NCSettingsModel
 
+    var capabilities: NKCapabilities.Capabilities {
+        NKCapabilities.shared.getCapabilitiesBlocking(for: model.controller?.account)
+    }
+
     var body: some View {
-        let capabilities = NCCapabilities.shared.getCapabilities(account: model.controller?.account)
         Form {
             /// `Auto Upload` Section
             Section(content: {
@@ -49,7 +52,7 @@ struct NCSettingsView: View {
                     NCAutoUploadView(model: NCAutoUploadModel(controller: model.controller), albumModel: AlbumModel(controller: model.controller))
                 }) {
                     HStack {
-                        Image(systemName: "photo.circle")
+                        Image(systemName: "photo.on.rectangle.angled")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 25, height: 25)
@@ -123,14 +126,16 @@ struct NCSettingsView: View {
                 .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
             }
 
-            Section {
-                /// Splash screen when app inactive
-                Toggle(NSLocalizedString("_privacy_screen_", comment: ""), isOn: $model.privacyScreen)
-                    .onChange(of: model.privacyScreen) { _ in
-                        model.updatePrivacyScreenSetting()
-                    }
+            if !NCBrandOptions.shared.enforce_privacyScreenEnabled {
+                Section {
+                    /// Splash screen when app inactive
+                    Toggle(NSLocalizedString("_privacy_screen_", comment: ""), isOn: $model.privacyScreen)
+                        .onChange(of: model.privacyScreen) { _ in
+                            model.updatePrivacyScreenSetting()
+                        }
+                }
+                .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
             }
-            .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
 
             /// Display
             Section(header: Text(NSLocalizedString("_display_", comment: "")), content: {
@@ -187,7 +192,7 @@ struct NCSettingsView: View {
                 Text(NSLocalizedString("_users_footer_", comment: ""))
             })
             /// E2EEncryption` Section
-            if capabilities.capabilityE2EEEnabled && NCGlobal.shared.e2eeVersions.contains(capabilities.capabilityE2EEApiVersion) {
+            if capabilities.e2EEEnabled && NCGlobal.shared.e2eeVersions.contains(capabilities.e2EEApiVersion) {
                 E2EESection(model: model)
             }
             /// `Advanced` Section
