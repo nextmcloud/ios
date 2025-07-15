@@ -47,6 +47,7 @@ extension NCCollectionViewCommon: SwipeCollectionViewCellDelegate {
 
         let shareAction = SwipeAction(style: .default, title: NSLocalizedString("_share_", comment: "")) { _, _ in
             NCActionCenter.shared.openActivityViewController(selectedMetadata: [metadata], controller: self.controller)
+            NCActionCenter.shared.openActivityViewController(selectedMetadata: [metadata])
         }
         shareAction.backgroundColor = .blue
         shareAction.image = .init(systemName: "square.and.arrow.up")
@@ -69,6 +70,11 @@ extension NCCollectionViewCommon: SwipeCollectionViewCellDelegate {
             self.viewController.present(alertController, animated: true, completion: nil)
         }
         deleteAction.image = UIImage.init(systemName: "trash")
+            let alertController = UIAlertController.deleteFileOrFolder(titleString: titleDelete + "?", message: message, canDeleteServer: !metadata.lock, selectedMetadatas: [metadata], indexPaths: self.selectIndexPaths) { _ in }
+
+            self.viewController.present(alertController, animated: true, completion: nil)
+        }
+        deleteAction.image = .init(systemName: "trash")
         deleteAction.style = .destructive
         deleteAction.transitionDelegate = scaleTransition
         deleteAction.hidesWhenSelected = true
