@@ -238,6 +238,7 @@ import RealmSwift
         return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
     }
     
+
     func allowExtensions(ext: String) -> Bool {
         return allowExtensions.contains(ext)
     }
