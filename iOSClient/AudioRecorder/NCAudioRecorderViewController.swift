@@ -30,6 +30,7 @@ import QuartzCore
 import NextcloudKit
 
 class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
+
     @IBOutlet weak var contentContainerView: UIView!
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var startStopLabel: UILabel!
@@ -43,6 +44,7 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: controller)
     }
+    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
 
     // MARK: - View Life Cycle
 
@@ -55,18 +57,16 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
 
         view.backgroundColor = .clear
         contentContainerView.backgroundColor = UIColor.lightGray
-        voiceRecordHUD.fillColor = UIColor.green
+        voiceRecordHUD.fillColor = NCBrandColor.shared.progressColorGreen60
 
-        Task {
-            self.fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + ".m4a", account: self.session.account, serverUrl: controller.currentServerUrl())
-            recording = NCAudioRecorder(to: self.fileName)
-            recording.delegate = self
-            do {
-                try self.recording.prepare()
-                startStopLabel.text = NSLocalizedString("_voice_memo_start_", comment: "")
-            } catch {
-                print(error)
-            }
+        self.fileName = NCUtilityFileSystem().createFileNameDate(NSLocalizedString("_voice_memo_filename_", comment: ""), ext: "m4a")
+        recording = NCAudioRecorder(to: self.fileName)
+        recording.delegate = self
+        do {
+            try self.recording.prepare()
+            startStopLabel.text = NSLocalizedString("_voice_memo_start_", comment: "")
+        } catch {
+            print(error)
         }
     }
 
@@ -84,8 +84,12 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
         if recording.state == .record {
             recording.stop()
             voiceRecordHUD.update(0.0)
-            dismiss(animated: true) {
-                self.uploadMetadata()
+            dismiss(animated: true) { [self] in
+                guard let navigationController = UIStoryboard(name: "NCCreateFormUploadVoiceNote", bundle: nil).instantiateInitialViewController() as? UINavigationController,
+                      let viewController = navigationController.topViewController as? NCCreateFormUploadVoiceNote else { return }
+                navigationController.modalPresentationStyle = .formSheet
+                viewController.setup(serverUrl: controller.currentServerUrl(), fileNamePath: NSTemporaryDirectory() + self.fileName, fileName: self.fileName)
+                UIApplication.shared.firstWindow?.rootViewController?.present(navigationController, animated: true)
             }
         } else {
             do {
@@ -104,7 +108,7 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
                                                               ocId: UUID().uuidString,
                                                               serverUrl: controller.currentServerUrl(),
                                                               session: self.session,
-                                                              sceneIdentifier: self.controller?.sceneIdentifier)
+                                                              sceneIdentifier: self.appDelegate.sceneIdentifier)
 
         metadata.session = NCNetworking.shared.sessionUploadBackground
         metadata.sessionSelector = NCGlobal.shared.selectorUploadFile
@@ -133,7 +137,7 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
         }
 
         voiceRecordHUD.update(CGFloat(rate))
-        voiceRecordHUD.fillColor = UIColor.green
+        voiceRecordHUD.fillColor = NCBrandColor.shared.progressColorGreen60
 
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.second]
@@ -147,7 +151,8 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
 }
 
 open class NCAudioRecorder: NSObject {
-    public enum State: Int {
+
+    @objc public enum State: Int {
         case none, record, play
     }
 
