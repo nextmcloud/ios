@@ -134,6 +134,7 @@
         
 //    if ([[NSFileManager defaultManager] fileExistsAtPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] && NCBrandOptions.shared.disable_log == false) {
     if ([[NSFileManager defaultManager] fileExistsAtPath:@""] && NCBrandOptions.shared.disable_log == false) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] && NCBrandOptions.shared.disable_log == false) {
         
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"log" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_view_log_", nil)];
         row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
@@ -146,6 +147,7 @@
             [self deselectFormRow:sender];
 //            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] fileNameSource:@"" isEditingEnabled:false metadata:nil];
             NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:@""] fileNameSource:@"" isEditingEnabled:false metadata:nil];
+            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] isEditingEnabled:false metadata:nil];
             [self presentViewController:viewerQuickLook animated:YES completion:nil];
         };
         [section addFormRow:row];
@@ -161,6 +163,7 @@
             [self deselectFormRow:sender];
 
 //            [[[NextcloudKit shared] nkCommonInstance] clearFileLog];
+            [[[NextcloudKit shared] nkCommonInstance] clearFileLog];
             
             NSInteger logLevel = [[NCKeychain alloc] init].logLevel;
             BOOL isSimulatorOrTestFlight = [[[NCUtility alloc] init] isSimulatorOrTestFlight];
@@ -170,6 +173,11 @@
 //            } else {
 //                [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@", (unsigned long)logLevel, versionNextcloudiOS]];
 //            }
+            if (isSimulatorOrTestFlight) {
+                [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@ (Simulator / TestFlight)", (unsigned long)logLevel, versionNextcloudiOS]];
+            } else {
+                [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@", (unsigned long)logLevel, versionNextcloudiOS]];
+            }
         };
         [section addFormRow:row];
         
@@ -354,6 +362,7 @@
         NSInteger levelLog = [[rowDescriptor.value valueData] intValue];
         [[NCKeychain alloc] init].logLevel = levelLog;
 //        [[[NextcloudKit shared] nkCommonInstance] setLevelLog:levelLog];
+        [[[NextcloudKit shared] nkCommonInstance] setLevelLog:levelLog];
     }
 
     if ([rowDescriptor.tag isEqualToString:@"deleteoldfiles"]) {
@@ -387,6 +396,7 @@
         [ufs createDirectoryStandard];
 
         [[NCAutoUpload shared] alignPhotoLibraryWithController:self account:appDelegate.account];
+        [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
 
         [[NCImageCache shared] createMediaCacheWithAccount:appDelegate.account withCacheSize:true];
 
