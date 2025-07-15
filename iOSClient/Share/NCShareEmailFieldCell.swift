@@ -67,6 +67,7 @@ class NCShareEmailFieldCell: UITableViewCell {
         btnContact.layer.borderColor = NCBrandColor.shared.label.cgColor
         btnContact.tintColor = NCBrandColor.shared.label
         btnContact.setImage(NCUtility().loadImage(named: "contact", colors: [NCBrandColor.shared.label], size: 24), for: .normal)
+        btnContact.setImage(NCUtility().loadImage(named: "contact").image(color: NCBrandColor.shared.label, size: 24), for: .normal)
         labelNoShare.textColor = NCBrandColor.shared.textInfo
         labelNoShare.numberOfLines = 0
         labelNoShare.font = UIFont.systemFont(ofSize: 17)
