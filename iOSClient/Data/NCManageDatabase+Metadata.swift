@@ -147,6 +147,16 @@ extension tableMetadata {
         }
         return true
     }
+    
+    var isPrintable: Bool {
+        if isDocumentViewableOnly {
+            return false
+        }
+        if ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/") || classFile == NKCommon.TypeClassFile.image.rawValue {
+            return true
+        }
+        return false
+    }
 
     var isPrintable: Bool {
         if isDocumentViewableOnly {
@@ -162,6 +172,10 @@ extension tableMetadata {
         return (classFile == NKTypeClassFile.image.rawValue && contentType != "image/svg+xml") || classFile == NKTypeClassFile.video.rawValue
     }
     
+    var isDocumentViewableOnly: Bool {
+        sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKCommon.TypeClassFile.document.rawValue
+    }
+
     var isDocumentViewableOnly: Bool {
         sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKCommon.TypeClassFile.document.rawValue
     }
@@ -215,6 +229,7 @@ extension tableMetadata {
     var canSetAsAvailableOffline: Bool {
 //        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
         return session.isEmpty && !isDocumentViewableOnly
+        return session.isEmpty && !isDocumentViewableOnly //!isDirectoryE2EE && !e2eEncrypted
     }
 
     var canShare: Bool {
@@ -344,6 +359,7 @@ extension tableMetadata {
     func isSharable() -> Bool {
         let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
         if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE) {
+//        if !NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingApiEnabled || (NCCapabilities.shared.getCapabilities(account: account).capabilityE2EEEnabled && isDirectoryE2EE), !e2eEncrypted {
             return false
         }
         return !e2eEncrypted
@@ -410,6 +426,14 @@ extension NCManageDatabase {
         metadata.hasPreview = file.hasPreview
         metadata.hidden = file.hidden
         metadata.iconName = file.iconName
+        switch (file.fileName as NSString).pathExtension {
+        case "odg":
+            metadata.iconName = "diagram"
+        case "csv", "xlsm" :
+            metadata.iconName = "file_xls"
+        default:
+            metadata.iconName = file.iconName
+        }
         metadata.mountType = file.mountType
         metadata.name = file.name
         metadata.note = file.note
@@ -512,6 +536,7 @@ extension NCManageDatabase {
         }
     }
 
+    
     func convertFilesToMetadatas(_ files: [NKFile], useMetadataFolder: Bool, completion: @escaping (_ metadataFolder: tableMetadata, _ metadatasFolder: [tableMetadata], _ metadatas: [tableMetadata]) -> Void) {
 
         var counter: Int = 0
@@ -548,6 +573,15 @@ extension NCManageDatabase {
         completion(metadataFolder, metadataFolders, metadatas)
     }
     
+
+    func convertFilesToMetadatasAsync(_ files: [NKFile], useFirstAsMetadataFolder: Bool) async -> (metadataFolder: tableMetadata, metadatas: [tableMetadata]) {
+        await withCheckedContinuation { continuation in
+            convertFilesToMetadatas(files, useFirstAsMetadataFolder: useFirstAsMetadataFolder) { metadataFolder, metadatas in
+                continuation.resume(returning: (metadataFolder, metadatas))
+            }
+        }
+    }
+
     func getMetadataDirectoryFrom(files: [NKFile]) -> tableMetadata? {
         guard let file = files.first else { return nil }
         let isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(file: file)
@@ -1513,6 +1547,18 @@ extension NCManageDatabase {
         }
     }
 
+    @objc func clearMetadatasUpload(account: String) {
+        do {
+            let realm = try Realm()
+            try realm.write {
+                let results = realm.objects(tableMetadata.self).filter("account == %@ AND (status == %d OR status == %d)", account, NCGlobal.shared.metadataStatusWaitUpload, NCGlobal.shared.metadataStatusUploadError)
+                realm.delete(results)
+            }
+        } catch let error {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+        }
+    }
+    
     func getMetadataFromFileId(_ fileId: String?) -> tableMetadata? {
         guard let fileId else {
             return nil
