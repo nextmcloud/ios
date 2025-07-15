@@ -175,6 +175,7 @@ final class NCGlobal: Sendable {
     let templateSpreadsheet                         = "spreadsheet"
     let templatePresentation                        = "presentation"
     
+
     // Rich Workspace
     //
     let fileNameRichWorkspace                       = "Readme.md"
