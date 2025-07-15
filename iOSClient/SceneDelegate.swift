@@ -68,7 +68,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         } else {
             NCKeychain().removeAll()
             if let bundleID = Bundle.main.bundleIdentifier {
+                let lastUpdateCheckDate = UserDefaults.standard.object(forKey: AppUpdaterKey.lastUpdateCheckDate)
                 UserDefaults.standard.removePersistentDomain(forName: bundleID)
+                if lastUpdateCheckDate != nil {
+                    UserDefaults.standard.setValue(lastUpdateCheckDate, forKey: AppUpdaterKey.lastUpdateCheckDate)
+                }
             }
             if NCBrandOptions.shared.disable_intro {
                 if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
@@ -115,6 +119,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 }
             }
         }
+        AppUpdater().checkForUpdate()
+
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
+    }
+
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        let session = SceneManager.shared.getSession(scene: scene)
+        let controller = SceneManager.shared.getController(scene: scene)
+        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene did become active")
+
+        let oldVersion = UserDefaults.standard.value(forKey: NCSettingsBundleHelper.SettingsBundleKeys.BuildVersionKey) as? String
+        AppUpdater().checkForUpdate()
+        AnalyticsHelper.shared.trackAppVersion(oldVersion: oldVersion)
+        if let userAccount = NCManageDatabase.shared.getActiveTableAccount() {
+            AnalyticsHelper.shared.trackUsedStorageData(quotaUsed: userAccount.quotaUsed)
+        }
+
+        NCSettingsBundleHelper.setVersionAndBuildNumber()
+        NCSettingsBundleHelper.checkAndExecuteSettings(delay: 0.5)
+        
+//        if !NCAskAuthorization().isRequesting {
+//            NCPasscode.shared.hidePrivacyProtectionWindow()
+//        }
+        
+        hidePrivacyProtectionWindow()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             NCService().startRequestServicesServer(account: session.account, controller: controller)
@@ -130,12 +159,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     }
 
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        let session = SceneManager.shared.getSession(scene: scene)
-        guard !session.account.isEmpty else { return }
-
-        hidePrivacyProtectionWindow()
-    }
+//    func sceneDidBecomeActive(_ scene: UIScene) {
+//        let session = SceneManager.shared.getSession(scene: scene)
+//        guard !session.account.isEmpty else { return }
+//
+//        hidePrivacyProtectionWindow()
+//    }
 
     func sceneWillResignActive(_ scene: UIScene) {
         nkLog(debug: "Scene will resign active")
