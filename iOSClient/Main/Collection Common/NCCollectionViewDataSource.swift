@@ -29,13 +29,14 @@ class NCCollectionViewDataSource: NSObject {
     private let utilityFileSystem = NCUtilityFileSystem()
     private let utility = NCUtility()
     private let global = NCGlobal.shared
+    private let database = NCManageDatabase.shared
+
     private var sectionsValue: [String] = []
     private var providers: [NKSearchProvider]?
     private var searchResults: [NKSearchResult]?
     private var metadatas: [tableMetadata] = []
     private var metadatasForSection: [NCMetadataForSection] = []
     private var layoutForView: NCDBLayoutForView?
-    private var metadataIndexPath = ThreadSafeDictionary<IndexPath, tableMetadata>()
     private var directoryOnTop: Bool = true
 
     override init() { super.init() }
@@ -85,7 +86,7 @@ class NCCollectionViewDataSource: NSObject {
     internal func createSections() {
         for metadata in self.metadatas {
             /// skipped livePhoto VIDEO part
-            if metadata.isLivePhoto, metadata.classFile == NKCommon.TypeClassFile.video.rawValue {
+            if metadata.isLivePhoto, metadata.classFile == NKTypeClassFile.video.rawValue {
                 continue
             }
             let section = NSLocalizedString(self.getSectionValue(metadata: metadata), comment: "")
@@ -183,6 +184,9 @@ class NCCollectionViewDataSource: NSObject {
     func getIndexPathMetadata(ocId: String) -> IndexPath? {
         guard self.sectionsValue.isEmpty else { return nil }
         let validMetadatas = self.metadatas.filter { !$0.isInvalidated }
+        guard self.sectionsValue.isEmpty else {
+            return nil
+        }
 
         if let rowIndex = validMetadatas.firstIndex(where: {$0.ocId == ocId}) {
             return IndexPath(row: rowIndex, section: 0)
@@ -192,7 +196,9 @@ class NCCollectionViewDataSource: NSObject {
     }
 
     func numberOfSections() -> Int {
-        guard !self.sectionsValue.isEmpty else { return 1 }
+        guard !self.sectionsValue.isEmpty else {
+            return 1
+        }
 
         return self.sectionsValue.count
     }
@@ -205,6 +211,9 @@ class NCCollectionViewDataSource: NSObject {
         guard !self.metadatas.isEmpty,
               let metadataForSection = getMetadataForSection(section)
         else { return 0}
+              let metadataForSection = getMetadataForSection(section) else {
+            return 0
+        }
 
         return metadataForSection.metadatas.count
     }
@@ -258,6 +267,12 @@ class NCCollectionViewDataSource: NSObject {
                 metadataIndexPath[indexPath] = metadata
                 return metadata
             }
+               indexPath.row < metadataForSection.metadatas.count {
+                return metadataForSection.metadatas[indexPath.row].detachedCopy()
+            }
+        } else if indexPath.row < self.metadatas.count {
+            let metadata = self.metadatas[indexPath.row]
+            return metadata
         }
 
         return nil
@@ -424,7 +439,7 @@ class NCMetadataForSection: NSObject {
 
             // skipped livePhoto VIDEO part
             if metadata.isLivePhoto,
-               metadata.classFile == NKCommon.TypeClassFile.video.rawValue {
+               metadata.classFile == NKTypeClassFile.video.rawValue {
                 continue
             }
 

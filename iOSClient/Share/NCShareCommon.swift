@@ -82,12 +82,20 @@ class NCShareCommon: NSObject {
             return UIImage(named: isDropDown ? "email" : "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_CONTACT:
             return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
+            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+        case self.SHARE_TYPE_FEDERATED:
+            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+//            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_REMOTE:
             return UIImage(named: isDropDown ? "shareTypeUser" : "shareTypeEmail")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_CIRCLE:
             return UIImage(named: "shareTypeCircles")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_GUEST:
             return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
+            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+        case self.SHARE_TYPE_FEDERATED_GROUP:
+            return UIImage(named: "shareTypeGroup")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+//            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_REMOTE_GROUP:
             return UIImage(named: "shareTypeGroup")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_ROOM:

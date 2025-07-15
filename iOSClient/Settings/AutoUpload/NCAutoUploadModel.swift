@@ -57,6 +57,8 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     @Published var showUploadAllPhotosWarning = false
     /// A state variable that indicates whether Photos permissions have been granted or not.
     @Published var photosPermissionsGranted = true
+    ///
+    @Published var permissionGranted: Bool = false
 
     /// A state variable that shows error in view in case of an error
     @Published var showErrorAlert: Bool = false
@@ -83,6 +85,7 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
 
     /// Triggered when the view appears.
     func onViewAppear() {
+        self.checkPermission()
         if let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)) {
             autoUploadImage = tableAccount.autoUploadImage
             autoUploadWWAnPhoto = tableAccount.autoUploadWWAnPhoto
@@ -146,7 +149,9 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
 
     /// Updates the auto-upload full content setting.
     func handleAutoUploadChange(newValue: Bool, assetCollections: [PHAssetCollection]) {
-        if let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)), tableAccount.autoUploadStart == newValue { return }
+        if let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)), tableAccount.autoUploadStart == newValue {
+            return
+        }
 
         database.updateAccountProperty(\.autoUploadStart, value: newValue, account: session.account)
 
@@ -154,7 +159,12 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
             if autoUploadNewPhotosOnly {
                 database.updateAccountProperty(\.autoUploadSinceDate, value: Date.now, account: session.account)
             }
-            NCAutoUpload.shared.autoUploadSelectedAlbums(controller: self.controller, assetCollections: assetCollections, log: "Auto upload selected albums", account: session.account)
+            Task {
+                _ = await NCAutoUpload.shared.startManualAutoUploadForAlbums(controller: self.controller,
+                                                                             model: self,
+                                                                             assetCollections: assetCollections,
+                                                                             account: session.account)
+            }
         } else {
             database.clearMetadatasUpload(account: session.account)
         }
@@ -193,16 +203,18 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     /// serverUrl: The server URL to set as the auto-upload directory.
     func setAutoUploadDirectory(serverUrl: String?) {
         guard let serverUrl else { return }
-        let home = NCUtilityFileSystem().getHomeServer(session: session)
-        if home != serverUrl {
-            let fileName = (serverUrl as NSString).lastPathComponent
-            self.database.setAccountAutoUploadFileName(fileName)
-            if let path = NCUtilityFileSystem().deleteLastPath(serverUrlPath: serverUrl, home: home) {
-                self.database.setAccountAutoUploadDirectory(path, session: session)
+        Task {
+            let home = NCUtilityFileSystem().getHomeServer(session: session)
+            if home != serverUrl {
+                let fileName = (serverUrl as NSString).lastPathComponent
+                await self.database.setAccountAutoUploadFileNameAsync(fileName)
+                if let path = NCUtilityFileSystem().deleteLastPath(serverUrlPath: serverUrl, home: home) {
+                    await self.database.setAccountAutoUploadDirectoryAsync(path, session: session)
+                }
             }
-        }
 
-        onViewAppear()
+            onViewAppear()
+        }
     }
 
     func createAlbumTitle(autoUploadAlbumIds: Set<String>) -> String {
@@ -212,6 +224,78 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
         } else {
             return NSLocalizedString("_multiple_albums_", comment: "")
         }
+    }
+
+    func existsAutoUpload() -> Bool {
+        let autoUploadServerUrlBase = NCManageDatabase.shared.getAccountAutoUploadServerUrlBase(session: session)
+        return NCManageDatabase.shared.existsAutoUpload(account: session.account, autoUploadServerUrlBase: autoUploadServerUrlBase)
+    }
+
+    func deleteAutoUploadTransfer() {
+        Task {
+            let autoUploadServerUrlBase = await NCManageDatabase.shared.getAccountAutoUploadServerUrlBaseAsync(session: session)
+            await NCManageDatabase.shared.deleteAutoUploadTransferAsync(account: session.account, autoUploadServerUrlBase: autoUploadServerUrlBase)
+        }
+    }
+
+    /// Updates the auto-upload create subfolder setting.
+    func handleLocationChange(newValue: Bool) {
+        if let controller = self.controller {
+            if newValue {
+                Task { @MainActor in
+                    let result = await NCBackgroundLocationUploadManager.shared.requestAuthorizationAlwaysAsync(from: controller)
+                    self.permissionGranted = result
+                    NCKeychain().location = result
+                }
+            } else {
+                self.permissionGranted = false
+                NCKeychain().location = false
+            }
+        }
+    }
+
+    func checkPermission() {
+        let status = CLLocationManager().authorizationStatus
+        permissionGranted = (status == .authorizedAlways && NCKeychain().location)
+    }
+}
+
+extension NCAutoUploadModel: EasyTipViewDelegate {
+    func showTip() {
+        guard !session.account.isEmpty,
+              !database.tipExists(NCGlobal.shared.tipAutoUploadButton)
+        else {
+            return
+        }
+
+        var preferences = EasyTipView.Preferences()
+
+        preferences.drawing.foregroundColor = .white
+        preferences.drawing.backgroundColor = .lightGray
+        preferences.drawing.textAlignment = .left
+        preferences.drawing.arrowPosition = .any
+        preferences.drawing.cornerRadius = 10
+
+        preferences.animating.dismissTransform = CGAffineTransform(translationX: 0, y: 100)
+        preferences.animating.showInitialTransform = CGAffineTransform(translationX: 0, y: -100)
+        preferences.animating.showInitialAlpha = 0
+        preferences.animating.showDuration = 0.5
+        preferences.animating.dismissDuration = 0.5
+
+        if tip == nil {
+            tip = EasyTipView(text: NSLocalizedString("_tip_autoupload_button_", comment: ""), preferences: preferences, delegate: self, tip: NCGlobal.shared.tipAutoUploadButton)
+            if let view = controller?.tabBar {
+                tip?.show(forView: view)
+            }
+        }
+    }
+
+    func easyTipViewDidTap(_ tipView: EasyTipView) {
+        database.addTip(NCGlobal.shared.tipAutoUploadButton)
+    }
+
+    func easyTipViewDidDismiss(_ tipView: EasyTipView) {
+        tip = nil
     }
 }
 

@@ -24,9 +24,9 @@
 import Foundation
 import UIKit
 import KeychainAccess
+import NextcloudKit
 
 @objc class NCKeychain: NSObject {
-
     let keychain = Keychain(service: "com.nextcloud.keychain")
 
     var showDescription: Bool {
@@ -232,15 +232,20 @@ import KeychainAccess
     }
 
     @objc var logLevel: Int {
+    /// Stores and retrieves the current log level from the keychain.
+    var log: NKLogLevel {
+//    @objc var logLevel: Int {
         get {
             migrate(key: "logLevel")
-            if let value = try? keychain.get("logLevel"), let result = Int(value) {
-                return result
+            if let value = try? keychain.get("logLevel"),
+               let intValue = Int(value),
+               let level = NKLogLevel(rawValue: intValue) {
+                return level
             }
-            return 1
+            return NKLogLevel.normal
         }
         set {
-            keychain["logLevel"] = String(newValue)
+            keychain["logLevel"] = String(newValue.rawValue)
         }
     }
 
@@ -273,6 +278,9 @@ import KeychainAccess
     @objc var privacyScreenEnabled: Bool {
         get {
             migrate(key: "privacyScreen")
+            if NCBrandOptions.shared.enforce_privacyScreenEnabled {
+                return true
+            }
             if let value = try? keychain.get("privacyScreen"), let result = Bool(value) {
                 return result
             }
@@ -464,9 +472,21 @@ import KeychainAccess
         }
     }
 
+    var location: Bool {
+        get {
+            if let value = try? keychain.get("location"), let result = Bool(value) {
+                return result
+            }
+            return false
+        }
+        set {
+            keychain["location"] = String(newValue)
+        }
+    }
+
     // MARK: -
 
-    @objc func getPassword(account: String) -> String {
+    func getPassword(account: String) -> String {
         let key = "password" + account
         migrate(key: key)
         return (try? keychain.get(key)) ?? ""
@@ -506,6 +526,50 @@ import KeychainAccess
         }
     }
     */
+
+    func setTitleButtonHeader(account: String, value: String?) {
+        let key = "titleButtonHeader" + account
+        keychain[key] = value
+    }
+
+    func getTitleButtonHeader(account: String) -> String? {
+        let key = "titleButtonHeader" + account
+        return (try? keychain.get(key)) ?? ""
+    }
+    
+    @objc func getOriginalFileName(key: String) -> Bool {
+        migrate(key: key)
+        if let value = try? keychain.get(key), let result = Bool(value) {
+            return result
+        }
+        return false
+    }
+
+    @objc func setOriginalFileName(key: String, value: Bool) {
+        keychain[key] = String(value)
+    }
+
+    @objc func getFileNameMask(key: String) -> String {
+        migrate(key: key)
+        if let value = try? keychain.get(key) {
+            return value
+        } else {
+            return ""
+        }
+    }
+
+    @objc func setFileNameMask(key: String, mask: String?) {
+        keychain[key] = mask
+    }
+
+    @objc func getFileNameType(key: String) -> Bool {
+        migrate(key: key)
+        if let value = try? keychain.get(key), let result = Bool(value) {
+            return result
+        } else {
+            return false
+        }
+    }
 
     func setTitleButtonHeader(account: String, value: String?) {
         let key = "titleButtonHeader" + account
@@ -602,12 +666,14 @@ import KeychainAccess
     }
 
     func isEndToEndEnabled(account: String) -> Bool {
-        let capabilities = NCCapabilities.shared.getCapabilities(account: account)
+        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
         guard let certificate = getEndToEndCertificate(account: account), !certificate.isEmpty,
               let publicKey = getEndToEndPublicKey(account: account), !publicKey.isEmpty,
               let privateKey = getEndToEndPrivateKey(account: account), !privateKey.isEmpty,
               let passphrase = getEndToEndPassphrase(account: account), !passphrase.isEmpty,
-              NCGlobal.shared.e2eeVersions.contains(capabilities.capabilityE2EEApiVersion) else { return false }
+              NCGlobal.shared.e2eeVersions.contains(capabilities.e2EEApiVersion) else {
+            return false
+        }
         return true
     }
 

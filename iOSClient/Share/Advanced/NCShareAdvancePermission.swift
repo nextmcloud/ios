@@ -67,6 +67,48 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         }
     }
 
+
+class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDelegate, NCShareNavigationTitleSetting {
+//class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelegate, NCShareDetail {
+    func dismissShareAdvanceView(shouldSave: Bool) {
+        if shouldSave {
+            self.oldTableShare?.permissions = self.permission ?? (self.oldTableShare?.permissions ?? 0)
+            self.share.permissions = self.permission ?? (self.oldTableShare?.permissions ?? 0)
+            if isNewShare {
+                let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+                guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
+                viewNewUserComment.metadata = self.metadata
+                viewNewUserComment.share = self.share
+                viewNewUserComment.networking = self.networking
+                self.navigationController?.pushViewController(viewNewUserComment, animated: true)
+            } else {
+                if let downloadSwitchCell = getDownloadLimitSwitchCell() {
+                    let isDownloadLimitOn = downloadSwitchCell.switchControl.isOn
+                    if !isDownloadLimitOn {
+                        setDownloadLimit(deleteLimit: true, limit: "")
+                    } else {
+                        let downloadLimitInputCell = getDownloadLimitInputCell()
+                        let enteredDownloadLimit = downloadLimitInputCell?.cellTextField.text ?? ""
+                        if enteredDownloadLimit.isEmpty {
+                            showDownloadLimitError(message: NSLocalizedString("_share_download_limit_alert_empty_", comment: ""))
+                            return
+                        }
+                        if let num = Int(enteredDownloadLimit), num < 1 {
+                            showDownloadLimitError(message: NSLocalizedString("_share_download_limit_alert_zero_", comment: ""))
+                            return
+                        }
+                        setDownloadLimit(deleteLimit: false, limit: enteredDownloadLimit)
+                    }
+                }
+                
+                networking?.updateShare(option: share)
+                navigationController?.popViewController(animated: true)
+            }
+        } else {
+            navigationController?.popViewController(animated: true)
+        }
+    }
+
     let database = NCManageDatabase.shared
 
     var oldTableShare: tableShare?
@@ -106,6 +148,25 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         self.shareConfig = NCShareConfig(parentMetadata: metadata, share: share)
+
+        // Only persisted shares have tokens which are provided by the server.
+        // A download limit requires a token to exist.
+        // Hence it can only be looked up if the share is already persisted at this point.
+        if isNewShare == false {
+            if let persistedShare = share as? tableShare {
+                do {
+                    if let limit = try database.getDownloadLimit(byAccount: metadata.account, shareToken: persistedShare.token) {
+                        self.downloadLimit = .limited(limit: limit.limit, count: limit.count)
+                    }
+                } catch {
+                    nkLog(error: "There was an error while fetching the download limit for share with token \(persistedShare.token)!")
+                }
+            }
+        }
+
+        tableView.estimatedRowHeight = tableView.rowHeight
+        tableView.rowHeight = UITableView.automaticDimension
+
         self.setNavigationTitle()
         // disbale pull to dimiss
         isModalInPresentation = true
@@ -213,6 +274,39 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         if let permission = self.permission, !permissions.isAnyPermissionToEdit(permission), permission !=  permissions.permissionCreateShare {
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
         }
+    }
+
+    func initializeForm() {
+        let form : XLFormDescriptor
+        var section : XLFormSectionDescriptor
+        var row : XLFormRowDescriptor
+        let permissions = NCPermissions()
+        form = XLFormDescriptor(title: "Other Cells")
+        
+        //Sharing
+        section = XLFormSectionDescriptor.formSection(withTitle: "")
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
+        row = XLFormRowDescriptor(tag: "NCFilePermissionCellSharing", rowType: "kNMCFilePermissionCell", title: "")
+        row.cellConfig["titleLabel.text"] = NSLocalizedString("_sharing_", comment: "")
+        row.height = 44
+        section.addFormRow(row)
+        
+        //PERMISSION
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCShareHeaderCustomCell"] = NCShareHeaderCustomCell.self
+        row = XLFormRowDescriptor(tag: "kNMCShareHeaderCustomCell", rowType: "kNMCShareHeaderCustomCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
+        row.height = 26
+        row.cellConfig["titleLabel.text"] = NSLocalizedString("_PERMISSIONS_", comment: "")
+        section.addFormRow(row)
+        
+        //read only
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
+        row = XLFormRowDescriptor(tag: "NCFilePermissionCellRead", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
+        row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_read_only_", comment: "")
+        row.height = 44
+        
+        if let permission = self.permission, !permissions.isAnyPermissionToEdit(permission), permission !=  permissions.permissionCreateShare {
+            row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+        }
         if isNewShare {
             row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
             self.permission = permissions.permissionReadShare
@@ -273,6 +367,37 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         
         //ADVANCE PERMISSION
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
+
+        row = XLFormRowDescriptor(tag: "NCFilePermissionCellAdvanceTxt", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
+        row.cellConfig["titleLabel.text"] = NSLocalizedString("_advance_permissions_", comment: "")
+        row.height = 52
+        section.addFormRow(row)
+
+        if isLinkShare() {
+            //link label section header
+            
+            // Custom Link label
+            XLFormViewController.cellClassesForRowDescriptorTypes()["kNCShareTextInputCell"] = NCShareTextInputCell.self
+            row = XLFormRowDescriptor(tag: "kNCShareTextInputCellCustomLinkField", rowType: "kNCShareTextInputCell", title: "")
+            row.cellConfig["cellTextField.placeholder"] = NSLocalizedString("_custom_link_label", comment: "")
+            row.cellConfig["cellTextField.text"] = oldTableShare?.label
+            row.cellConfig["cellTextField.textAlignment"] = NSTextAlignment.left.rawValue
+            row.cellConfig["cellTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+            row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.label
+            row.height = 44
+            section.addFormRow(row)
+        }
+
+        //can reshare
+        if isCanReshareOptionVisible() {
+            XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
+            
+            row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellEditingCanShare", rowType: "kNMCFilePermissionEditCell", title: "")
+            row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
+            row.cellClass = NCFilePermissionEditCell.self
+            row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_can_reshare_", comment: "")
+            row.height = 44
+            section.addFormRow(row)
 
         row = XLFormRowDescriptor(tag: "NCFilePermissionCellAdvanceTxt", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
         row.cellConfig["titleLabel.text"] = NSLocalizedString("_advance_permissions_", comment: "")
@@ -494,6 +619,568 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                     row2.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
                 }
             }
+
+            self.reloadForm()
+            break
+        case "kNMCFilePermissionCellEditing":
+            let value = permissions.getPermission(canEdit: true, canCreate: true, canChange: true, canDelete: true, canShare: canReshareTheShare(), isDirectory: metadata.directory)
+            self.permission = value
+//            self.permissions = "RGDNV"
+            metadata.permissions = "RGDNV"
+            if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
+                row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
+            }
+            if let row1 : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionCellEditing") {
+                row1.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+            }
+            if let row2 : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellFileDrop") {
+                row2.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
+            }
+            self.reloadForm()
+            break
+        case "NCFilePermissionCellFileDrop":
+            self.permission = permissions.permissionCreateShare
+//            self.permissions = "RGDNVCK"
+            metadata.permissions = "RGDNVCK"
+            if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
+                row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
+            }
+            if let row1 : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionCellEditing") {
+                row1.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
+            }
+            if let row2 : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellFileDrop") {
+                row2.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+            }
+            self.reloadForm()
+            break
+        default:
+            break
+        }
+    }
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        guard let cellConfig = shareConfig.config(for: indexPath) else { return }
+        guard let cellConfig = cellConfig as? NCAdvancedPermission else {
+            cellConfig.didSelect(for: share)
+            tableView.reloadData()
+        }
+    }
+            
+    func canReshareTheShare() -> Bool {
+        if let permissionValue = self.permission {
+            let canReshare = NCPermissions().isPermissionToCanShare(permissionValue)
+            return canReshare
+        } else {
+            return false
+        }
+    }
+
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let permissions = NCPermissions()
+        if let advancePermissionHeaderRow: XLFormRowDescriptor = self.form.formRow(withTag: "NCFilePermissionCellAdvanceTxt") {
+            if let advancePermissionHeaderRowIndexPath = form.indexPath(ofFormRow: advancePermissionHeaderRow), indexPath == advancePermissionHeaderRowIndexPath {
+                let cell = cell as? NCFilePermissionCell
+                cell?.seperatorBelowFull.isHidden = isLinkShare()
+            }
+        }
+
+        //can Reshare
+        if let canReshareRow: XLFormRowDescriptor = self.form.formRow(withTag: "kNMCFilePermissionEditCellEditingCanShare") {
+            if let canReShareRowIndexPath = form.indexPath(ofFormRow: canReshareRow), indexPath == canReShareRowIndexPath {
+                let cell = cell as? NCFilePermissionEditCell
+                // Can reshare (file)
+                if let permissionValue = self.permission {
+                    let canReshare = permissions.isPermissionToCanShare(permissionValue)
+                    cell?.switchControl.isOn = canReshare
+                } else {
+                    //new share
+                    cell?.switchControl.isOn = false
+                }
+            }
+        }
+        //hide download
+        if let hideDownloadRow: XLFormRowDescriptor = self.form.formRow(withTag: "kNMCFilePermissionEditCellHideDownload"){
+            if let hideDownloadRowIndexPath = form.indexPath(ofFormRow: hideDownloadRow), indexPath == hideDownloadRowIndexPath {
+                let cell = cell as? NCFilePermissionEditCell
+                cell?.switchControl.isOn = oldTableShare?.hideDownload ?? false
+                cell?.titleLabel.isEnabled = !(self.permission == permissions.permissionCreateShare)
+                cell?.switchControl.isEnabled = !(self.permission == permissions.permissionCreateShare)
+//                cell?.isUserInteractionEnabled = !(self.permission == permissions.permissionCreateShare)
+            }
+
+            // set password
+            if let setPassword : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionEditPasswordCellWithText") {
+                if let setPasswordIndexPath = self.form.indexPath(ofFormRow: setPassword), indexPath == setPasswordIndexPath {
+                    let passwordCell = cell as? NCFilePermissionEditCell
+                    if let password = oldTableShare?.password {
+                        passwordCell?.switchControl.isOn = !password.isEmpty
+                    } else {
+                        passwordCell?.switchControl.isOn = false
+                    }
+                }
+            }
+        }
+
+        //updateExpiryDateSwitch
+        if let expiryRow : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionEditCellExpiration") {
+            if let expiryIndexPath = self.form.indexPath(ofFormRow: expiryRow), indexPath == expiryIndexPath {
+                let cell = cell as? NCFilePermissionEditCell
+                if oldTableShare?.expirationDate != nil {
+                    cell?.switchControl.isOn = true
+                } else {
+                    //new share
+                    cell?.switchControl.isOn = false
+                }
+            }
+        }
+
+        //SetDownloadLimitSwitch
+        if let limitRow : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCFilePermissionEditCellDownloadLimit") {
+            if let expiryIndexPath = self.form.indexPath(ofFormRow: limitRow), indexPath == expiryIndexPath {
+                let cell = cell as? NCFilePermissionEditCell
+                cell?.switchControl.isOn = downloadLimit?.limit != nil
+            }
+        }
+
+        //SetDownloadLimitSwitch
+        if let downloadlimitFieldRow : XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellDownloadLimit") {
+            if let downloadlimitIndexPath = self.form.indexPath(ofFormRow: downloadlimitFieldRow), indexPath == downloadlimitIndexPath {
+                let cell = cell as? NCShareTextInputCell
+                cell?.cellTextField.text = "\(downloadLimit?.limit ?? 0)"
+            }
+        }
+
+        //SetDownloadLimitSwitch
+        if downloadLimit?.count != nil {
+            if let downloadlimitFieldRow : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
+                if let downloadlimitIndexPath = self.form.indexPath(ofFormRow: downloadlimitFieldRow), indexPath == downloadlimitIndexPath {
+                    let cell = cell as? NCFilePermissionCell
+                    cell?.titleLabel.text = NSLocalizedString("_share_remaining_download_", comment: "") + " \(downloadLimit?.count ?? 0)"
+                    cell?.seperatorBelowFull.isHidden = true
+                    cell?.seperatorBelow.isHidden = true
+                }
+            }
+        }
+    }
+
+    override func formRowDescriptorValueHasChanged(_ formRow: XLFormRowDescriptor!, oldValue: Any!, newValue: Any!) {
+        super.formRowDescriptorValueHasChanged(formRow, oldValue: oldValue, newValue: newValue)
+
+        switch formRow.tag {
+
+        case "kNMCFilePermissionEditCellEditingCanShare":
+            if let value = newValue as? Bool {
+                canReshareValueChanged(isOn: value)
+            }
+
+        case "kNMCFilePermissionEditCellHideDownload":
+            if let value = newValue as? Bool {
+                share.hideDownload = value
+            }
+
+        case "kNMCFilePermissionEditPasswordCellWithText":
+            if let value = newValue as? Bool {
+                if let setPasswordInputField : XLFormRowDescriptor  = self.form.formRow(withTag: "SetPasswordInputField") {
+                    if let indexPath = self.form.indexPath(ofFormRow: setPasswordInputField) {
+                        let cell = tableView.cellForRow(at: indexPath) as? PasswordInputField
+                        cell?.fileNameInputTextField.text = ""
+                    }
+                    share.password = ""
+                    setPasswordInputField.hidden = !value
+                }
+            }
+
+        case "kNCShareTextInputCellCustomLinkField":
+            if let label = formRow.value as? String {
+                self.form.delegate = nil
+                share.label = label
+                self.form.delegate = self
+            }
+
+        case "SetPasswordInputField":
+            if let pwd = formRow.value as? String {
+                self.form.delegate = nil
+                share.password = pwd
+                self.form.delegate = self
+            }
+
+        case "kNMCFilePermissionEditCellLinkLabel":
+            if let label = formRow.value as? String {
+                self.form.delegate = nil
+                share.label = label
+                self.form.delegate = self
+            }
+
+        case "kNMCFilePermissionEditCellExpiration":
+            if let value = newValue as? Bool {
+                if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellExpiry") {
+                    inputField.hidden = !value
+                }
+            }
+
+        case "kNMCFilePermissionEditCellDownloadLimit":
+            if let value = newValue as? Bool {
+                self.downloadLimit = DownloadLimit()
+                self.downloadLimit?.limit = value ? 0 : nil
+                if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellDownloadLimit") {
+                    inputField.hidden = !value
+                    if let indexPath = self.form.indexPath(ofFormRow: inputField) {
+                        let cell = tableView.cellForRow(at: indexPath) as? NCShareTextInputCell
+                        cell?.cellTextField.text = ""
+                    }
+                }
+
+                if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
+                    inputField.hidden = !value
+                    if let indexPath = self.form.indexPath(ofFormRow: inputField) {
+                        let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionCell
+                        cell?.seperatorBelowFull.isHidden = true
+                        cell?.seperatorBelow.isHidden = true
+                        cell?.titleLabel.text = ""
+                    }
+                }
+            }
+
+        case "NCShareTextInputCellExpiry":
+            if let exp = formRow.value as? Date {
+                self.form.delegate = nil
+                self.share.expirationDate = exp as NSDate
+                self.form.delegate = self
+            }
+
+        default:
+            break
+        }
+    }
+    //Check file type is collabora
+    func checkIsCollaboraFile() -> Bool {
+        guard let metadata = metadata else {
+            return false
+        }
+        
+        // EDITORS
+        let editors = NCUtility().editorsDirectEditing(account: metadata.account, contentType: metadata.contentType)
+        let availableRichDocument = NCUtility().isTypeFileRichDocument(metadata)
+        
+        // RichDocument: Collabora
+        return (availableRichDocument && editors.count == 0)
+    }
+    
+    func isFileDropOptionVisible() -> Bool {
+        return (metadata.directory && (isLinkShare() || isExternalUserShare()))
+    }
+    
+    func isLinkShare() -> Bool {
+        return NCShareCommon().isLinkShare(shareType: shareType)
+    }
+    
+    func isExternalUserShare() -> Bool {
+        return NCShareCommon().isExternalUserShare(shareType: shareType)
+    }
+    
+    func isInternalUser() -> Bool {
+        return NCShareCommon().isInternalUser(shareType: shareType)
+    }
+    
+    func isCanReshareOptionVisible() -> Bool {
+        return isInternalUser()
+    }
+    
+    func isHideDownloadOptionVisible() -> Bool {
+        return !isInternalUser()
+    }
+    
+    func isPasswordOptionsVisible() -> Bool {
+        return !isInternalUser()
+    }
+    
+    func isDownloadLimitVisible() -> Bool {
+        return isLinkShare() && !(metadata.directory)
+    }
+    
+    func canReshareValueChanged(isOn: Bool) {
+        let permissions = NCPermissions()
+        guard let oldTableShare = oldTableShare, let permission = self.permission else {
+            self.permission = isOn ? (self.permission ?? 0) + permissions.permissionShareShare : ((self.permission ?? 0) - permissions.permissionShareShare)
+            return
+        }
+
+        let canEdit = permissions.isAnyPermissionToEdit(permission)
+        let canCreate = permissions.isPermissionToCanCreate(permission)
+        let canChange = permissions.isPermissionToCanChange(permission)
+        let canDelete = permissions.isPermissionToCanDelete(permission)
+
+        if metadata.directory {
+            self.permission = permissions.getPermission(canEdit: canEdit, canCreate: canCreate, canChange: canChange, canDelete: canDelete, canShare: isOn, isDirectory: metadata.directory)
+        } else {
+            if isOn {
+                if canEdit {
+                    self.permission = permissions.getPermission(canEdit: true, canCreate: true, canChange: true, canDelete: true, canShare: isOn, isDirectory: metadata.directory)
+                } else {
+                    self.permission = permissions.getPermission(canEdit: false, canCreate: false, canChange: false, canDelete: false, canShare: isOn, isDirectory: metadata.directory)
+                }
+            } else {
+                if canEdit {
+                    self.permission = permissions.getPermission(canEdit: true, canCreate: true, canChange: true, canDelete: true, canShare: isOn, isDirectory: metadata.directory)
+                } else {
+                    self.permission = permissions.getPermission(canEdit: false, canCreate: false, canChange: false, canDelete: false, canShare: isOn, isDirectory: metadata.directory)
+                }
+            }
+            let alertController = UIAlertController.password(titleKey: "_share_password_") { password in
+                self.share.password = password ?? ""
+                tableView.reloadData()
+            }
+            self.present(alertController, animated: true)
+//        case .note:
+//            let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+//            guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
+//            viewNewUserComment.metadata = self.metadata
+//            viewNewUserComment.share = self.share
+//            viewNewUserComment.onDismiss = tableView.reloadData
+//            self.navigationController?.pushViewController(viewNewUserComment, animated: true)
+//        case .label:
+//            let alertController = UIAlertController.withTextField(titleKey: "_share_link_name_") { textField in
+//                textField.placeholder = cellConfig.title
+//                textField.text = self.share.label
+//            } completion: { newValue in
+//                self.share.label = newValue ?? ""
+//                self.setNavigationTitle()
+//                tableView.reloadData()
+//            }
+//            self.present(alertController, animated: true)
+//        case .downloadAndSync:
+//            share.downloadAndSync.toggle()
+//            tableView.reloadData()
+        }
+        
+        //hide download
+        if isHideDownloadOptionVisible() {
+            
+            XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
+            row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellHideDownload", rowType: "kNMCFilePermissionEditCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
+            row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_hide_download_", comment: "")
+            row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
+            row.cellClass = NCFilePermissionEditCell.self
+            row.height = 44
+            section.addFormRow(row)
+        }
+
+        //password
+        if isPasswordOptionsVisible() {
+            
+            // Set password
+            XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
+            row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditPasswordCellWithText", rowType: "kNMCFilePermissionEditCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
+            row.cellConfig["titleLabel.text"] = NSLocalizedString("_set_password_", comment: "")
+            row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
+            row.cellClass = NCFilePermissionEditCell.self
+            row.height = 44
+            section.addFormRow(row)
+            
+            // enter password input field
+            XLFormViewController.cellClassesForRowDescriptorTypes()["NMCSetPasswordCustomInputField"] = PasswordInputField.self
+            row = XLFormRowDescriptor(tag: "SetPasswordInputField", rowType: "NMCSetPasswordCustomInputField", title: NSLocalizedString("_filename_", comment: ""))
+            row.cellClass = PasswordInputField.self
+            row.cellConfig["fileNameInputTextField.placeholder"] = NSLocalizedString("_password_", comment: "")
+            row.cellConfig["fileNameInputTextField.textAlignment"] = NSTextAlignment.left.rawValue
+            row.cellConfig["fileNameInputTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+            row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.label
+            row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
+            row.height = 44
+            let hasPassword = oldTableShare?.password != nil && !oldTableShare!.password.isEmpty
+            row.hidden = NSNumber.init(booleanLiteral: !hasPassword)
+            section.addFormRow(row)
+        }
+
+        //expiration
+        
+        // expiry date switch
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
+        row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellExpiration", rowType: "kNMCFilePermissionEditCell", title: NSLocalizedString("_share_expiration_date_", comment: ""))
+        row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_expiration_date_", comment: "")
+        row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
+        row.cellClass = NCFilePermissionEditCell.self
+        row.height = 44
+        section.addFormRow(row)
+        
+        // set expiry date field
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNCShareTextInputCell"] = NCShareTextInputCell.self
+        row = XLFormRowDescriptor(tag: "NCShareTextInputCellExpiry", rowType: "kNCShareTextInputCell", title: "")
+        row.cellClass = NCShareTextInputCell.self
+        row.cellConfig["cellTextField.placeholder"] = NSLocalizedString("_share_expiration_date_placeholder_", comment: "")
+        if !isNewShare {
+            if let date = oldTableShare?.expirationDate {
+                row.cellConfig["cellTextField.text"] = DateFormatter.shareExpDate.string(from: date as Date)
+            }
+        }
+        row.cellConfig["cellTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["cellTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.label
+        if let date = oldTableShare?.expirationDate {
+            row.cellConfig["cellTextField.text"] = DateFormatter.shareExpDate.string(from: date as Date)
+        }
+        row.height = 44
+        let hasExpiry = oldTableShare?.expirationDate != nil
+        row.hidden = NSNumber.init(booleanLiteral: !hasExpiry)
+        section.addFormRow(row)
+        
+        if isDownloadLimitVisible() {
+            // DownloadLimit switch
+            XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionEditCell"] = NCFilePermissionEditCell.self
+            row = XLFormRowDescriptor(tag: "kNMCFilePermissionEditCellDownloadLimit", rowType: "kNMCFilePermissionEditCell", title: NSLocalizedString("_share_download_limit_", comment: ""))
+            row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_download_limit_", comment: "")
+            row.cellConfig["switchControl.onTintColor"] = NCBrandColor.shared.customer
+            row.cellClass = NCFilePermissionEditCell.self
+            row.height = 44
+            section.addFormRow(row)
+            
+            // set Download Limit field
+            XLFormViewController.cellClassesForRowDescriptorTypes()["kNCShareTextInputCell"] = NCShareTextInputCell.self
+            row = XLFormRowDescriptor(tag: "NCShareTextInputCellDownloadLimit", rowType: "kNCShareTextInputCell", title: "")
+            row.cellClass = NCShareTextInputCell.self
+            row.cellConfig["cellTextField.placeholder"] = NSLocalizedString("_share_download_limit_placeholder_", comment: "")
+            row.cellConfig["cellTextField.textAlignment"] = NSTextAlignment.left.rawValue
+            row.cellConfig["cellTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+            row.cellConfig["cellTextField.textColor"] = NCBrandColor.shared.label
+            row.height = 44
+            let downloadLimitSet = downloadLimit?.limit != nil
+            row.hidden = NSNumber.init(booleanLiteral: !downloadLimitSet)
+            if let value = downloadLimit?.limit {
+                row.cellConfig["cellTextField.text"] = "\(value)"
+            }
+            section.addFormRow(row)
+            
+            XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFilePermissionCell"] = NCFilePermissionCell.self
+            row = XLFormRowDescriptor(tag: "kNMCDownloadLimitCell", rowType: "kNMCFilePermissionCell", title: "")
+            row.cellClass = NCFilePermissionCell.self
+            row.height = 44
+            if downloadLimit?.limit != nil {
+                row.cellConfig["titleLabel.text"] = NSLocalizedString("_share_remaining_download_", comment: "") + " \(downloadLimit?.count ?? 0)"
+            }
+            row.cellConfig["titleLabel.textColor"] =  NCBrandColor.shared.systemGray
+            row.disabled = true
+            row.hidden = NSNumber.init(booleanLiteral: !downloadLimitSet)
+            section.addFormRow(row)
+        }
+        
+        form.addFormSection(section)
+        self.form = form
+    }
+    
+    func reloadForm() {
+        self.form.delegate = nil
+        self.tableView.reloadData()
+        self.form.delegate = self
+    }
+    
+    func updateDownloadLimitUI() {
+        if let value = downloadLimit?.limit {
+            if let downloadLimitSwitchField: XLFormRowDescriptor = self.form.formRow(withTag: "kNMCFilePermissionEditCellDownloadLimit") {
+                if let indexPath = self.form.indexPath(ofFormRow: downloadLimitSwitchField) {
+                    let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionEditCell
+                    cell?.switchControl.isOn = true
+                }
+                    
+                if let downloadLimitInputField: XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellDownloadLimit") {
+                    downloadLimitInputField.hidden = false
+                    if let indexPath = self.form.indexPath(ofFormRow: downloadLimitInputField) {
+                        let cell = tableView.cellForRow(at: indexPath) as? NCShareTextInputCell
+                        cell?.cellTextField.text = "\(value)"
+
+    func dismissShareAdvanceView(shouldSave: Bool) {
+        guard shouldSave else {
+            guard oldTableShare?.hasChanges(comparedTo: share) != false else {
+                navigationController?.popViewController(animated: true)
+                return
+            }
+
+            let alert = UIAlertController(
+                title: NSLocalizedString("_cancel_request_", comment: ""),
+                message: NSLocalizedString("_discard_changes_info_", comment: ""),
+                preferredStyle: .alert)
+
+            alert.addAction(UIAlertAction(
+                title: NSLocalizedString("_discard_changes_", comment: ""),
+                style: .destructive,
+                handler: { _ in self.navigationController?.popViewController(animated: true) }))
+
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_editing_", comment: ""), style: .default))
+            self.present(alert, animated: true)
+
+            return
+        }
+
+        Task {
+            if (share.shareType == NCShareCommon().SHARE_TYPE_LINK || share.shareType == NCShareCommon().SHARE_TYPE_EMAIL) && NCPermissions().isPermissionToCanShare(share.permissions) {
+                share.permissions = share.permissions - NCPermissions().permissionShareShare
+            }
+
+            if isNewShare {
+                let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: metadata.account)
+
+                if share.shareType != NCShareCommon().SHARE_TYPE_LINK, metadata.e2eEncrypted,
+                   capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+
+                    if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
+                        let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
+                        return NCContentPresenter().showInfo(error: error)
+                    }
+                }
+                
+                if let downloadLimitInputField: XLFormRowDescriptor = self.form.formRow(withTag: "kNMCDownloadLimitCell") {
+                    downloadLimitInputField.hidden = false
+                    if let indexPath = self.form.indexPath(ofFormRow: downloadLimitInputField) {
+                        let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionCell
+                        cell?.titleLabel.text = NSLocalizedString("_share_remaining_download_", comment: "") + " \(downloadLimit?.count ?? 0)"
+                    }
+                }
+            }
+        }
+    }
+    
+    func getDownloadLimitSwitchCell() -> NCFilePermissionEditCell? {
+        if let downloadLimitSwitchField: XLFormRowDescriptor = self.form.formRow(withTag: "kNMCFilePermissionEditCellDownloadLimit") {
+            if let indexPath = self.form.indexPath(ofFormRow: downloadLimitSwitchField) {
+                let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionEditCell
+                return cell
+            }
+        }
+        return nil
+    }
+    
+    func getDownloadLimitInputCell() -> NCShareTextInputCell? {
+        if let downloadLimitInputField: XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellDownloadLimit") {
+            if let indexPath = self.form.indexPath(ofFormRow: downloadLimitInputField) {
+                let cell = tableView.cellForRow(at: indexPath) as? NCShareTextInputCell
+                return cell
+            }
+        }
+        return nil
+    }
+    
+    // MARK: - Row Descriptor Value Changed
+    
+    override func didSelectFormRow(_ formRow: XLFormRowDescriptor!) {
+        guard let metadata = self.metadata else { return }
+        let permissions = NCPermissions()
+        switch formRow.tag {
+        case "NCFilePermissionCellRead":
+
+            let value = permissions.getPermission(canEdit: false, canCreate: false, canChange: false, canDelete: false, canShare: canReshareTheShare(), isDirectory: metadata.directory)
+            self.permission = value
+//            self.permissions = "RDNVCK"
+            metadata.permissions = "RDNVCK"
+            if let row : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellRead") {
+                row.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: NCBrandColor.shared.customer, size: 25.0)
+                if let row1 : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionCellEditing") {
+                    row1.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
+                }
+                if let row2 : XLFormRowDescriptor  = self.form.formRow(withTag: "NCFilePermissionCellFileDrop") {
+                    row2.cellConfig["imageCheck.image"] = UIImage(named: "success")!.image(color: .clear, size: 25.0)
+                }
+            }
+                    let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: metadata.serverUrlFileName, addUserId: share.shareWith, removeUserId: nil, account: metadata.account)
 
             self.reloadForm()
             break
@@ -794,6 +1481,31 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                 }
             }
         }
+    }
+    
+    func getDownloadLimit() {
+        NCActivityIndicator.shared.start(backgroundView: view)
+        NMCCommunication.shared.getDownloadLimit(token: oldTableShare?.token ?? "") { [weak self] (downloadLimit: DownloadLimit?, error: String) in
+            DispatchQueue.main.async {
+                NCActivityIndicator.shared.stop()
+                if let downloadLimit = downloadLimit {
+                    self?.downloadLimit = downloadLimit
+                }
+                self?.updateDownloadLimitUI()
+            }
+        }
+    }
+    
+    func setDownloadLimit(deleteLimit: Bool, limit: String) {
+        NMCCommunication.shared.setDownloadLimit(deleteLimit: deleteLimit, limit: limit, token: oldTableShare?.token ?? "") { (success, errorMessage) in
+            print(success)
+        }
+    }
+    
+    func showDownloadLimitError(message: String) {
+        let alertController = UIAlertController(title: "", message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { action in }))
+        self.present(alertController, animated: true)
     }
     
     func getDownloadLimit() {

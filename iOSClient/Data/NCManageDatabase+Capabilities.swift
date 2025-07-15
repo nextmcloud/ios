@@ -27,12 +27,9 @@ import RealmSwift
 import NextcloudKit
 
 class tableCapabilities: Object {
-    @objc dynamic var account = ""
-    @objc dynamic var jsondata: Data?
-
-    override static func primaryKey() -> String {
-        return "account"
-    }
+    @Persisted(primaryKey: true) var account = ""
+    @Persisted var capabilities: Data?
+    @Persisted var editors: Data?
 }
 
 extension NCManageDatabase {
@@ -66,238 +63,51 @@ extension NCManageDatabase {
     func setCapabilities(account: String, data: Data? = nil) -> NCCapabilities.Capabilities? {
         let jsonData: Data?
 
-        struct CapabilityNextcloud: Codable {
-            struct Ocs: Codable {
-                let meta: Meta
-                let data: Data
+    // MARK: - Realm write
 
-                struct Meta: Codable {
-                    let status: String?
-                    let message: String?
-                    let statuscode: Int?
-                }
+    /// Stores the raw JSON capabilities in Realm associated with an account.
+    /// - Parameters:
+    ///   - data: The raw JSON data returned from the capabilities endpoint.
+    ///   - account: The account identifier.
+    /// - Throws: Rethrows any error encountered during the Realm write operation.
+    func addCapabilitiesAsync(data: Data, account: String) async {
+        await performRealmWriteAsync { realm in
+            let object = realm.object(ofType: tableCapabilities.self, forPrimaryKey: account)
+            let addObject: tableCapabilities
 
-                struct Data: Codable {
-                    let version: Version
-                    let capabilities: Capabilities
-
-                    struct Version: Codable {
-                        let string: String
-                        let major: Int
-                    }
-
-                    struct Capabilities: Codable {
-                        let downloadLimit: DownloadLimit?
-                        let filessharing: FilesSharing?
-                        let theming: Theming?
-                        let endtoendencryption: EndToEndEncryption?
-                        let richdocuments: RichDocuments?
-                        let activity: Activity?
-                        let notifications: Notifications?
-                        let files: Files?
-                        let userstatus: UserStatus?
-                        let external: External?
-                        let groupfolders: GroupFolders?
-                        let securityguard: SecurityGuard?
-                        let assistant: Assistant?
-                        let recommendations: Recommendations?
-
-                        enum CodingKeys: String, CodingKey {
-                            case downloadLimit = "downloadlimit"
-                            case filessharing = "files_sharing"
-                            case theming
-                            case endtoendencryption = "end-to-end-encryption"
-                            case richdocuments, activity, notifications, files
-                            case userstatus = "user_status"
-                            case external, groupfolders
-                            case securityguard = "security_guard"
-                            case assistant
-                            case recommendations
-                        }
-
-                        struct DownloadLimit: Codable {
-                            let enabled: Bool?
-                            let defaultLimit: Int?
-                        }
-
-                        struct FilesSharing: Codable {
-                            let apienabled: Bool?
-                            let groupsharing: Bool?
-                            let resharing: Bool?
-                            let defaultpermissions: Int?
-                            let ncpublic: Public?
-
-                            enum CodingKeys: String, CodingKey {
-                                case apienabled = "api_enabled"
-                                case groupsharing = "group_sharing"
-                                case resharing
-                                case defaultpermissions = "default_permissions"
-                                case ncpublic = "public"
-                            }
-
-                            struct Public: Codable {
-                                let enabled: Bool
-                                let upload: Bool?
-                                let password: Password?
-                                let sendmail: Bool?
-                                let uploadfilesdrop: Bool?
-                                let multiplelinks: Bool?
-                                let expiredate: ExpireDate?
-                                let expiredateinternal: ExpireDate?
-                                let expiredateremote: ExpireDate?
-
-                                enum CodingKeys: String, CodingKey {
-                                    case upload, enabled, password
-                                    case sendmail = "send_mail"
-                                    case uploadfilesdrop = "upload_files_drop"
-                                    case multiplelinks = "multiple_links"
-                                    case expiredate = "expire_date"
-                                    case expiredateinternal = "expire_date_internal"
-                                    case expiredateremote = "expire_date_remote"
-                                }
-
-                                struct Password: Codable {
-                                    let enforced: Bool?
-                                    let askForOptionalPassword: Bool?
-                                }
-
-                                struct ExpireDate: Codable {
-                                    let enforced: Bool?
-                                    let days: Int?
-                                }
-                            }
-                        }
-
-                        struct Theming: Codable {
-                            let color: String?
-                            let colorelement: String?
-                            let colortext: String?
-                            let colorelementbright: String?
-                            let backgrounddefault: Bool?
-                            let backgroundplain: Bool?
-                            let colorelementdark: String?
-                            let name: String?
-                            let slogan: String?
-                            let url: String?
-                            let logo: String?
-                            let background: String?
-                            let logoheader: String?
-                            let favicon: String?
-
-                            enum CodingKeys: String, CodingKey {
-                                case color
-                                case colorelement = "color-element"
-                                case colortext = "color-text"
-                                case colorelementbright = "color-element-bright"
-                                case backgrounddefault = "background-default"
-                                case backgroundplain = "background-plain"
-                                case colorelementdark = "color-element-dark"
-                                case name, slogan, url, logo, background, logoheader, favicon
-                            }
-                        }
-
-                        struct EndToEndEncryption: Codable {
-                            let enabled: Bool?
-                            let apiversion: String?
-                            let keysexist: Bool?
-
-                            enum CodingKeys: String, CodingKey {
-                                case enabled
-                                case apiversion = "api-version"
-                                case keysexist = "keys-exist"
-                            }
-                        }
-
-                        struct RichDocuments: Codable {
-                            let mimetypes: [String]?
-                            let directediting: Bool?
-
-                            enum CodingKeys: String, CodingKey {
-                                case mimetypes
-                                case directediting = "direct_editing"
-                            }
-                        }
-
-                        struct Activity: Codable {
-                            let apiv2: [String]?
-                        }
-
-                        struct Notifications: Codable {
-                            let ocsendpoints: [String]?
-
-                            enum CodingKeys: String, CodingKey {
-                                case ocsendpoints = "ocs-endpoints"
-                            }
-                        }
-
-                        struct Files: Codable {
-                            let undelete: Bool?
-                            let locking: String?
-                            let comments: Bool?
-                            let versioning: Bool?
-                            let directEditing: DirectEditing?
-                            let bigfilechunking: Bool?
-                            let versiondeletion: Bool?
-                            let versionlabeling: Bool?
-                            let forbiddenFileNames: [String]?
-                            let forbiddenFileNameBasenames: [String]?
-                            let forbiddenFileNameCharacters: [String]?
-                            let forbiddenFileNameExtensions: [String]?
-
-                            enum CodingKeys: String, CodingKey {
-                                case undelete, locking, comments, versioning, directEditing, bigfilechunking
-                                case versiondeletion = "version_deletion"
-                                case versionlabeling = "version_labeling"
-                                case forbiddenFileNames = "forbidden_filenames"
-                                case forbiddenFileNameBasenames = "forbidden_filename_basenames"
-                                case forbiddenFileNameCharacters = "forbidden_filename_characters"
-                                case forbiddenFileNameExtensions = "forbidden_filename_extensions"
-                            }
-
-                            struct DirectEditing: Codable {
-                                let url: String?
-                                let etag: String?
-                                let supportsFileId: Bool?
-                            }
-                        }
-
-                        struct UserStatus: Codable {
-                            let enabled: Bool?
-                            let restore: Bool?
-                            let supportsemoji: Bool?
-
-                            enum CodingKeys: String, CodingKey {
-                                case enabled, restore
-                                case supportsemoji = "supports_emoji"
-                            }
-                        }
-
-                        struct External: Codable {
-                            let v1: [String]?
-                        }
-
-                        struct GroupFolders: Codable {
-                            let hasGroupFolders: Bool?
-                        }
-
-                        struct SecurityGuard: Codable {
-                            let diagnostics: Bool?
-                        }
-
-                        struct Assistant: Codable {
-                            let enabled: Bool?
-                            let version: String?
-                        }
-
-                        struct Recommendations: Codable {
-                            let enabled: Bool?
-                        }
-                    }
-                }
+            if let existing = object {
+                addObject = existing
+            } else {
+                let newObject = tableCapabilities()
+                newObject.account = account
+                addObject = newObject
             }
 
-            let ocs: Ocs
+            addObject.capabilities = data
+
+            realm.add(addObject, update: .all)
         }
+    }
+
+    /// Stores the raw JSON editors data in Realm associated with an account.
+    /// - Parameters:
+    ///   - data: The raw JSON data returned from the text editors endpoint.
+    ///   - account: The account identifier.
+    /// - Throws: Rethrows any error encountered during the Realm write operation.
+    func addCapabilitiesEditorsAsync(data: Data, account: String) async {
+        await performRealmWriteAsync { realm in
+            let object = realm.object(ofType: tableCapabilities.self, forPrimaryKey: account)
+            let addObject: tableCapabilities
+
+            if let existing = object {
+                addObject = existing
+            } else {
+                let newObject = tableCapabilities()
+                newObject.account = account
+                addObject = newObject
+            }
+
+            addObject.editors = data
 
         if let data {
             jsonData = data
@@ -407,6 +217,80 @@ extension NCManageDatabase {
         } catch let error as NSError {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
             return nil
+            realm.add(addObject, update: .all)
         }
+    }
+
+    /// Applies cached capabilities and editors from Realm for a given account.
+    ///
+    /// This function reads the cached `capabilities` and `editors` JSON `Data`
+    /// from the local Realm `tableCapabilities` object associated with the specified account.
+    ///
+    /// - If `capabilities` is found, it is applied using `NextcloudKit.shared.setCapabilitiesAsync`.
+    /// - If `editors` is found, the data is decoded via `NKEditorDetailsConverter` into
+    ///   `[NKEditorDetailsEditor]` and `[NKEditorDetailsCreator]`, then injected into the shared `NKCapabilities` object.
+    ///
+    /// The combined updated capabilities are then re-appended via `appendCapabilitiesAsync`.
+    /// Errors during decoding or async storage are caught and logged.
+    ///
+    /// - Parameter account: The identifier of the account whose cached capabilities should be applied.
+    func applyCachedCapabilitiesAsync(account: String) async {
+        let results = await performRealmReadAsync { realm in
+            realm.object(ofType: tableCapabilities.self, forPrimaryKey: account)
+                .map { tableCapabilities(value: $0) }
+        }
+        var capabilities: NKCapabilities.Capabilities?
+
+        do {
+            if let data = results?.capabilities {
+                capabilities = try await NextcloudKit.shared.setCapabilitiesAsync(account: account, data: data)
+            }
+            if let data = results?.editors {
+                let (editors, creators) = try NKEditorDetailsConverter.from(data: data)
+
+                if capabilities == nil {
+                    capabilities = await NKCapabilities.shared.getCapabilitiesAsync(for: account)
+                }
+
+                capabilities?.directEditingEditors = editors
+                capabilities?.directEditingCreators = creators
+
+                if let updatedCapabilities = capabilities {
+                    await NKCapabilities.shared.appendCapabilitiesAsync(for: account, capabilities: updatedCapabilities)
+                }
+            }
+        } catch {
+            nkLog(error: "Error reading capabilities JSON in Realm \(error)")
+        }
+
+    }
+
+    /// Synchronously retrieves and parses capabilities JSON from Realm for the given account.
+    /// - Important: This blocks the current thread. Do not call from an async context.
+    @discardableResult
+    public func applyCachedCapabilitiesBlocking(account: String) -> NKCapabilities.Capabilities? {
+        var result: NKCapabilities.Capabilities?
+        let group = DispatchGroup()
+
+        group.enter()
+        Task {
+            let data = await performRealmReadAsync { realm in
+                realm.object(ofType: tableCapabilities.self, forPrimaryKey: account)?.capabilities
+            }
+
+            if let data {
+                do {
+                    let capabilities = try await NextcloudKit.shared.setCapabilitiesAsync(account: account, data: data)
+                    result = capabilities
+                } catch {
+                    nkLog(debug: "Error decoding capabilities from JSON: \(error)")
+                }
+            }
+
+            group.leave()
+        }
+        group.wait()
+
+        return result
     }
 }

@@ -55,6 +55,16 @@ extension Shareable {
 // MARK: - tableShare Extension
 
 extension tableShare: Shareable {}
+extension tableShare: Shareable {
+    var downloadAndSync: Bool {
+        get {
+            NCManageDatabase.shared.isAttributeDownloadEnabled(attributes: attributes)
+        }
+        set {
+            attributes = NCManageDatabase.shared.setAttibuteDownload(state: newValue)
+        }
+    }
+}
 
 // MARK: - NKShare Extension
 

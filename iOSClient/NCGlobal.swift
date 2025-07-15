@@ -1,31 +1,23 @@
-//
-//  NCGlobal.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 22/02/21.
-//  Copyright © 2021 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2021 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 
 class NCGlobal: NSObject, @unchecked Sendable  {
     @objc static let shared = NCGlobal()
     
+/// Used for read/write in Realm
+var isAppSuspending: Bool = false
+/// Used for know if the app in in Background mode
+var isAppInBackground: Bool = false
+
+//class NCGlobal: NSObject, @unchecked Sendable  {
+final class NCGlobal: Sendable {
+    @objc static let shared = NCGlobal()
+
+    init() { }
+
     // ENUM
     //
     public enum TypeFilterScanDocument: String {
@@ -189,6 +181,7 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let templateSpreadsheet                         = "spreadsheet"
     let templatePresentation                        = "presentation"
     
+
     // Rich Workspace
     //
     let fileNameRichWorkspace                       = "Readme.md"
@@ -228,6 +221,8 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let errorUnauthorizedFilesPasscode: Int     = -99993
     let errorDisableFilesApp: Int               = -99992
     let errorUnexpectedResponseFromDB: Int      = -99991
+    let errorIncorrectFileName: Int             = -99990
+
     // E2EE
     let errorE2EENotEnabled: Int                = -98000
     let errorE2EEVersion: Int                   = -98001
@@ -292,6 +287,10 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     
     let metadataStatusInTransfer                = [-1, -2, 1, 2]
     let metadataStatusFileDown                  = [-1, -2, -3]
+
+    let metadataStatusUploadingAllMode          = [1,2,3]
+    let metadataStatusDownloadingAllMode        = [-1, -2, -3]
+    let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
     let metadataStatusHideInView                = [1, 2, 3, 11]
     let metadataStatusHideInFileExtension       = [1, 2, 3, 10, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
@@ -326,6 +325,34 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let notificationCenterClearCache                            = "clearCache"
     let notificationCenterChangeLayout                          = "changeLayout"                    // userInfo: account, serverUrl, layoutForView
     let notificationCenterCheckUserDelaultErrorDone             = "checkUserDelaultErrorDone"       // userInfo: account, controller
+    let notificationCenterUpdateNotification                    = "updateNotification"
+    let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
+    let notificationCenterGetServerData                         = "getServerData"                   // userInfo: serverUrl?
+
+    let notificationCenterChangeStatusFolderE2EE                = "changeStatusFolderE2EE"          // userInfo: serverUrl
+
+    let notificationCenterDownloadStartFile                     = "downloadStartFile"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    let notificationCenterDownloadedFile                        = "downloadedFile"                  // userInfo: ocId, ocIdTransfer, session, session, serverUrl, account, selector, error
+    let notificationCenterDownloadCancelFile                    = "downloadCancelFile"              // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+
+    let notificationCenterUploadStartFile                       = "uploadStartFile"                 // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, sessionSelector
+    let notificationCenterUploadedFile                          = "uploadedFile"                    // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadedLivePhoto                     = "uploadedLivePhoto"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadCancelFile                      = "uploadCancelFile"                // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+
+    let notificationCenterProgressTask                          = "progressTask"                    // userInfo: account, ocId, ocIdTransfer, session, serverUrl, status, chunk, e2eEncrypted, progress, totalBytes, totalBytesExpected
+
+    let notificationCenterUpdateBadgeNumber                     = "updateBadgeNumber"               // userInfo: counterDownload, counterUpload
+
+    let notificationCenterCreateFolder                          = "createFolder"                    // userInfo: ocId, serverUrl, account, withPush, sceneIdentifier
+    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
+    let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
+    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
+    let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
+
     let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
     
     let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
@@ -379,6 +406,24 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let notificationCenterPlayerIsPlaying                       = "playerIsPlaying"
     let notificationCenterPlayerStoppedPlaying                  = "playerStoppedPlaying"
     
+
+    // Networking Status
+    let networkingStatusCreateFolder                            = "statusCreateFolder"
+    let networkingStatusDelete                                  = "statusDelete"
+    let networkingStatusRename                                  = "statusRename"
+    let networkingStatusFavorite                                = "statusFavorite"
+
+    let networkingStatusDownloading                             = "statusDownloading"
+    let networkingStatusDownloaded                              = "statusDownloaded"
+    let networkingStatusDownloadCancel                          = "statusDownloadCancel"
+
+    let networkingStatusUploading                               = "statusUploading"
+    let networkingStatusUploaded                                = "statusUploaded"
+    let networkingStatusUploadedLivePhoto                       = "statusUploadedLivePhoto"
+    let networkingStatusUploadCancel                            = "statusUploadCancel"
+
+
+    let networkingStatusReloadAvatar                            = "statusReloadAvatar"
     let notificationCenterUpdateShare                           = "updateShare"
     
     // TIP
@@ -387,6 +432,7 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let tipAccountRequest                                       = "tipAccountRequest"
     let tipScanAddImage                                         = "tipScanAddImage"
     let tipMediaDetailView                                      = "tipMediaDetailView"
+    let tipAutoUploadButton                                     = "tipAutoUploadButton"
     let tipAutoUpload                                           = "tipAutoUpload"
     
     // ACTION
@@ -459,6 +505,10 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     //
     // TODO: Remove this
     let forbiddenCharacters = ["/", "\\", ":", "\"", "|", "?", "*", "<", ">"]
+//    // FORBIDDEN CHARACTERS
+//    //
+//    // TODO: Remove this
+//    let forbiddenCharacters = ["/", "\\", ":", "\"", "|", "?", "*", "<", ">"]
     
     // DIAGNOSTICS CLIENTS
     //
@@ -490,6 +540,16 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let taskDescriptionSynchronization      = "synchronization"
     let taskDescriptionDeleteFileOrFolder   = "deleteFileOrFolder"
     
+
+    // LOG TAG
+    let logTagTask                          = "BGT"
+    let logTagLocation                      = "LOCATION"
+    let logTagBgSync                        = "BGSYNC"
+    let logTagE2EE                          = "E2EE"
+    let logTagPN                            = "PUSH NOTIF"
+    let logTagSync                          = "SYNC"
+    let logTagServiceProficer               = "SERVICE PROVIDER"
+
     // MoEngage App Version
     //
     let moEngageAppVersion                  = 854

@@ -42,6 +42,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     var fileSelect: [String] = []
     var tabBarSelect: NCTrashSelectTabBar!
     var datasource: [tableTrash] = []
+    var datasource: [tableTrash]?
     var layoutForView: NCDBLayoutForView?
     var listLayout: NCListLayout!
     var gridLayout: NCGridLayout!
@@ -57,6 +58,10 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     var selectableDataSource: [RealmSwiftObject] { datasource }
     private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     var emptyDataSet: NCEmptyDataSet?
+
+    var controller: NCMainTabBarController? {
+        self.tabBarController as? NCMainTabBarController
+    }
 
     // MARK: - View Life Cycle
 
@@ -87,6 +92,12 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         refreshControl.tintColor = .gray
         refreshControl.addTarget(self, action: #selector(loadListingTrash), for: .valueChanged)
 
+        refreshControl.tintColor = .gray //NCBrandColor.shared.textColor2
+        refreshControl.action(for: .valueChanged) { _ in
+            Task {
+                await self.loadListingTrash()
+            }
+        }
         // Empty
         emptyDataSet = NCEmptyDataSet(view: collectionView, offset: NCGlobal.shared.heightButtonsView, delegate: self)
 
@@ -119,6 +130,11 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         
         AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__DELETED_FILES)
 
+        Task {
+            await self.reloadDataSource()
+            await loadListingTrash()
+        }
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__DELETED_FILES)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -177,9 +193,11 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
 
     // MARK: TAP EVENT
 
-    func tapRestoreListItem(with ocId: String, image: UIImage?, sender: Any) {
+    func tapRestoreListItem(with id: String, image: UIImage?, sender: Any) {
         if !isEditMode {
-            restoreItem(with: ocId)
+            Task {
+                await restoreItem(with: id)
+            }
         } else if let button = sender as? UIView {
             let buttonPosition = button.convert(CGPoint.zero, to: collectionView)
             let indexPath = collectionView.indexPathForItem(at: buttonPosition)
@@ -254,6 +272,28 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
                     UIView.animate(withDuration: 2) {
                         cell.backgroundColor = .clear
                         self.blinkFileId = nil
+    @objc func reloadDataSource(withQueryDB: Bool = true) async {
+        let results = await self.database.getTableTrashAsync(filePath: getFilePath(), account: session.account)
+
+        await MainActor.run {
+            self.datasource = results
+            self.collectionView.reloadData()
+            (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
+
+            guard let blinkFileId = self.blinkFileId else { return }
+
+            for itemIx in 0..<results.count where results[itemIx].fileId.contains(blinkFileId) {
+                let indexPath = IndexPath(item: itemIx, section: 0)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    UIView.animate(withDuration: 0.3) {
+                        self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+                    } completion: { _ in
+                        guard let cell = self.collectionView.cellForItem(at: indexPath) else { return }
+                        cell.backgroundColor = .darkGray
+                        UIView.animate(withDuration: 2) {
+                            cell.backgroundColor = .clear
+                            self.blinkFileId = nil
+                        }
                     }
                 }
             }

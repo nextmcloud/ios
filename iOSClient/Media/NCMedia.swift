@@ -36,7 +36,6 @@ class NCMedia: UIViewController {
     @IBOutlet weak var gradientView: UIView!
     @IBOutlet weak var stackView: UIStackView!
 
-    let semaphoreSearchMedia = DispatchSemaphore(value: 1)
     let semaphoreNotificationCenter = DispatchSemaphore(value: 1)
 
     let layout = NCMediaLayout()
@@ -48,13 +47,14 @@ class NCMedia: UIViewController {
     let utility = NCUtility()
     let database = NCManageDatabase.shared
     let imageCache = NCImageCache.shared
+    let networking = NCNetworking.shared
     var dataSource = NCMediaDataSource()
     let refreshControl = UIRefreshControl()
     var isTop: Bool = true
     var isEditMode = false
     var fileSelect: [String] = []
-    var filesExists: ThreadSafeArray<String> = ThreadSafeArray()
-    var ocIdDoNotExists: ThreadSafeArray<String> = ThreadSafeArray()
+    var ocIdVerified: [String] = []
+    var ocIdDeleted: [String] = []
     var searchMediaInProgress: Bool = false
     var attributesZoomIn: UIMenuElement.Attributes = []
     var attributesZoomOut: UIMenuElement.Attributes = []
@@ -119,7 +119,7 @@ class NCMedia: UIViewController {
 
         layout.sectionInset = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: 2)
         collectionView.collectionViewLayout = layout
-        layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "")?.layout ?? global.mediaLayoutRatio
+        layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layout: global.mediaLayoutRatio).layout
 
         tabBarSelect = NCMediaSelectTabBar(tabBarController: self.tabBarController, delegate: self)
 
@@ -153,24 +153,30 @@ class NCMedia: UIViewController {
 
         collectionView.refreshControl = refreshControl
         refreshControl.action(for: .valueChanged) { _ in
-            self.loadDataSource()
-            self.searchMediaUI(true)
+            Task {
+                await self.loadDataSource()
+                await self.searchMediaUI(true)
+            }
         }
 
         pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture(_:)))
         collectionView.addGestureRecognizer(pinchGesture)
 
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterChangeUser), object: nil, queue: nil) { _ in
-            self.layoutType = self.database.getLayoutForView(account: self.session.account, key: self.global.layoutViewMedia, serverUrl: "")?.layout ?? self.global.mediaLayoutRatio
-            self.imageCache.removeAll()
-            self.loadDataSource()
-            self.searchMediaUI(true)
+            Task { @MainActor in
+                self.layoutType = await self.database.getLayoutForViewAsync(account: self.session.account, key: self.global.layoutViewMedia, serverUrl: "").layout
+                self.imageCache.removeAll()
+                await self.loadDataSource()
+                await self.searchMediaUI(true)
+            }
         }
 
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterClearCache), object: nil, queue: nil) { _ in
-            self.dataSource.metadatas.removeAll()
-            self.imageCache.removeAll()
-            self.searchMediaUI(true)
+            Task {
+                await self.dataSource.metadatas.removeAll()
+                self.imageCache.removeAll()
+                await self.searchMediaUI(true)
+            }
         }
 
         NotificationCenter.default.addObserver(self, selector: #selector(fileExists(_:)), name: NSNotification.Name(rawValue: global.notificationCenterFileExists), object: nil)
@@ -180,6 +186,11 @@ class NCMedia: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(reloadDataSource(_:)), name: NSNotification.Name(rawValue: global.notificationCenterReloadDataSource), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(networkRemoveAll), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
+            Task {
+                await self.networkRemoveAll()
+            }
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -187,7 +198,9 @@ class NCMedia: UIViewController {
 
         navigationController?.setMediaAppreance()
         if dataSource.metadatas.isEmpty {
-            loadDataSource()
+            Task {
+                await loadDataSource()
+            }
         }
     }
 
@@ -195,6 +208,7 @@ class NCMedia: UIViewController {
         super.viewDidAppear(animated)
 
         NotificationCenter.default.addObserver(self, selector: #selector(copyMoveFile(_:)), name: NSNotification.Name(rawValue: global.notificationCenterCopyMoveFile), object: nil)
+        networking.addDelegate(self)
 
         NotificationCenter.default.addObserver(self, selector: #selector(enterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
 
@@ -210,6 +224,13 @@ class NCMedia: UIViewController {
         NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
 
         networkRemoveAll()
+        networking.removeDelegate(self)
+
+        NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
+
+        Task {
+            await networkRemoveAll()
+        }
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -233,24 +254,30 @@ class NCMedia: UIViewController {
 
     func searchNewMedia() {
         timerSearchNewMedia?.invalidate()
-        timerSearchNewMedia = Timer.scheduledTimer(timeInterval: timeIntervalSearchNewMedia, target: self, selector: #selector(searchMediaUI(_:)), userInfo: nil, repeats: false)
+        timerSearchNewMedia = Timer.scheduledTimer(withTimeInterval: timeIntervalSearchNewMedia, repeats: false) { [weak self] _ in
+            Task { [weak self] in
+                guard let self else { return }
+                await self.searchMediaUI()
+            }
+        }
     }
 
     // MARK: - NotificationCenter
 
     @objc func networkRemoveAll() {
+    func networkRemoveAll() async {
         timerSearchNewMedia?.invalidate()
         timerSearchNewMedia = nil
-        filesExists.removeAll()
 
-        NCNetworking.shared.fileExistsQueue.cancelAll()
-        NCNetworking.shared.downloadThumbnailQueue.cancelAll()
+        networking.fileExistsQueue.cancelAll()
+        networking.downloadThumbnailQueue.cancelAll()
 
-        Task {
-            let tasks = await NCNetworking.shared.getAllDataTask()
-            for task in tasks.filter({ $0.taskDescription == global.taskDescriptionRetrievesProperties }) {
-                task.cancel()
-            }
+        ocIdVerified.removeAll()
+        ocIdDeleted.removeAll()
+
+        let tasks = await networking.getAllDataTask()
+        for task in tasks.filter({ $0.taskDescription == global.taskDescriptionRetrievesProperties }) {
+            task.cancel()
         }
     }
 
@@ -386,13 +413,16 @@ extension NCMedia: UIScrollViewDelegate {
 extension NCMedia: NCSelectDelegate {
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
         guard let serverUrl else { return }
-        let home = utilityFileSystem.getHomeServer(session: session)
-        let mediaPath = serverUrl.replacingOccurrences(of: home, with: "")
 
-        database.setAccountMediaPath(mediaPath, account: session.account)
+        Task {
+            let home = utilityFileSystem.getHomeServer(session: session)
+            let mediaPath = serverUrl.replacingOccurrences(of: home, with: "")
 
-        imageCache.removeAll()
-        loadDataSource()
-        searchNewMedia()
+            await database.setAccountMediaPathAsync(mediaPath, account: session.account)
+
+            imageCache.removeAll()
+            await loadDataSource()
+            searchNewMedia()
+        }
     }
 }

@@ -57,6 +57,17 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         }
         contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         let permissions = NCPermissions()
+        labelTitle.text = (tableShare.shareWithDisplayname.isEmpty ? tableShare.shareWith : tableShare.shareWithDisplayname)
+
+        let type = getType(tableShare)
+        if !type.isEmpty {
+            labelTitle.text?.append(" (\(type))")
+        }
+
+        labelTitle.lineBreakMode = .byTruncatingMiddle
+        labelTitle.textColor = NCBrandColor.shared.textColor
+        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        let permissions = NCPermissions()
         labelTitle.text = tableShare.shareWithDisplayname
         labelTitle.textColor = NCBrandColor.shared.label
         isUserInteractionEnabled = true
@@ -101,6 +112,16 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
                 labelQuickStatus.text = NSLocalizedString("_share_read_only_", comment: "")
             }
         }
+        if tableShare.permissions == permissions.permissionCreateShare {
+            labelQuickStatus.text = NSLocalizedString("_share_file_drop_", comment: "")
+        } else {
+            // Read Only
+            if permissions.isAnyPermissionToEdit(tableShare.permissions) {
+                labelQuickStatus.text = NSLocalizedString("_share_editing_", comment: "")
+            } else {
+                labelQuickStatus.text = NSLocalizedString("_share_read_only_", comment: "")
+            }
+        }
     }
 
     override func awakeFromNib() {
@@ -108,6 +129,10 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         buttonMenu.contentMode = .scaleAspectFill
         buttonMenu.setImage(NCImageCache.images.buttonMore.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
         buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAvatarImage(_:)))
+        imageItem?.addGestureRecognizer(tapGesture)
+        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
+        buttonMenu.contentMode = .scaleAspectFill
         labelQuickStatus.textColor = NCBrandColor.shared.customer
         imageDownArrow.image = UIImage(named: "downArrow")?.imageColor(NCBrandColor.shared.customer)
         switchCanEdit.transform = CGAffineTransform(scaleX: 0.75, y: 0.75)
@@ -169,6 +194,30 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
             centerTitle.constant = -5
         } else {
             centerTitle.constant = 0
+        }
+
+        imageItem.image = utility.loadUserImage(for: sharee.shareWith, displayName: nil, urlBase: session.urlBase)
+
+        let fileName = NCSession.shared.getFileName(urlBase: session.urlBase, user: sharee.shareWith)
+        let results = NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName)
+
+        if results.image == nil {
+            let etag = NCManageDatabase.shared.getTableAvatar(fileName: fileName)?.etag
+
+            NextcloudKit.shared.downloadAvatar(
+                user: sharee.shareWith,
+                fileNameLocalPath: NCUtilityFileSystem().directoryUserData + "/" + fileName,
+                sizeImage: NCGlobal.shared.avatarSize,
+                avatarSizeRounded: NCGlobal.shared.avatarSizeRounded,
+                etagResource: etag,
+                account: session.account) { _, imageAvatar, _, etag, _, error in
+                    if error == .success, let etag = etag, let imageAvatar = imageAvatar {
+                        NCManageDatabase.shared.addAvatar(fileName: fileName, etag: etag)
+                        self.imageItem.image = imageAvatar
+                    } else if error.errorCode == NCGlobal.shared.errorNotModified, let imageAvatar = NCManageDatabase.shared.setAvatarLoaded(fileName: fileName) {
+                        self.imageItem.image = imageAvatar
+                    }
+                }
         }
     }
 }

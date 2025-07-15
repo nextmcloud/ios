@@ -60,6 +60,24 @@ extension NCManageDatabase {
                     let table = TableSecurityGuardDiagnostics(account: account, issue: issue, error: error, date: Date())
                     realm.add(table)
                 }
+
+    // MARK: - Realm write
+
+    func addDiagnosticAsync(account: String,
+                            issue: String,
+                            error: String? = nil) async {
+        await performRealmWriteAsync { realm in
+            let primaryKey = account + issue + (error ?? "")
+
+            if let result = realm.object(ofType: TableSecurityGuardDiagnostics.self, forPrimaryKey: primaryKey) {
+                result.counter += 1
+                result.oldest = Date().timeIntervalSince1970
+            } else {
+                let table = TableSecurityGuardDiagnostics(account: account,
+                                                          issue: issue,
+                                                          error: error,
+                                                          date: Date())
+                realm.add(table)
             }
         } catch let error {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
@@ -105,6 +123,33 @@ extension NCManageDatabase {
             }
         } catch let error {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+    func deleteDiagnosticsAsync(account: String, ids: [ObjectId]) async {
+        await performRealmWriteAsync { realm in
+            let results = realm.objects(TableSecurityGuardDiagnostics.self)
+                .filter("account == %@", account)
+
+            for result in results where ids.contains(result.id) {
+                realm.delete(result)
+            }
+        }
+    }
+
+    // MARK: - Realm read
+
+    func existsDiagnosticsAsync(account: String) async -> Bool {
+        let exists: Bool? = await performRealmReadAsync { realm in
+            let results = realm.objects(TableSecurityGuardDiagnostics.self)
+                .filter("account == %@", account)
+            return !results.isEmpty
+        }
+        return exists ?? false
+    }
+
+    func getDiagnosticsAsync(account: String) async -> [TableSecurityGuardDiagnostics]? {
+        await performRealmReadAsync { realm in
+            let results = realm.objects(TableSecurityGuardDiagnostics.self)
+                .filter("account == %@", account)
+            return results.map { TableSecurityGuardDiagnostics(value: $0) }
         }
     }
 }

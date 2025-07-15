@@ -32,6 +32,23 @@ extension NCViewer {
         var actions = [NCMenuAction]()
         let localFile = self.database.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
         let isOffline = localFile?.offline == true
+        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: metadata.account)
+
+        //
+        // DETAIL
+        //
+        if !(!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty) {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_details_", comment: ""),
+                    icon: utility.loadImage(named: "info.circle", colors: [NCBrandColor.shared.iconImageColor]),
+                    sender: sender,
+                    action: { _ in
+                        NCDownloadAction.shared.openShare(viewController: controller, metadata: metadata, page: .activity)
+                    }
+                )
+            )
+        }
 
         //
         // VIEW IN FOLDER
@@ -41,6 +58,9 @@ extension NCViewer {
                 NCMenuAction(
                     title: NSLocalizedString("_view_in_folder_", comment: ""),
                     icon: utility.loadImage(named: "arrow.forward.square", colors: [NCBrandColor.shared.iconColor]),
+                    icon: utility.loadImage(named: "questionmark.folder", colors: [NCBrandColor.shared.iconImageColor]),
+//                    icon: utility.loadImage(named: "arrow.forward.square", colors: [NCBrandColor.shared.iconColor]),
+                    sender: sender,
                     action: { _ in
                         NCActionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileNameBlink: metadata.fileName, fileNameOpen: nil, sceneIdentifier: controller.sceneIdentifier)
                     }
@@ -57,6 +77,7 @@ extension NCViewer {
                 NCMenuAction(
                     title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
                     icon: utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite]),
+                    sender: sender,
                     action: { _ in
                         NCNetworking.shared.favoriteMetadata(metadata) { error in
                             if error != .success {
@@ -180,10 +201,69 @@ extension NCViewer {
                             let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
 
                             viewController.present(popup, animated: true)
+                    action: { _ in
+                        if self.utilityFileSystem.fileProviderStorageExists(metadata) {
+                            NCNetworking.shared.notifyAllDelegates { delegate in
+                                let metadata = metadata.detachedCopy()
+                                metadata.sessionSelector = NCGlobal.shared.selectorSaveAsScan
+                                delegate.transferChange(status: NCGlobal.shared.networkingStatusDownloaded,
+                                                        metadata: metadata,
+                                                        error: .success)
+                            }
+                        } else {
+                            Task {
+                                if let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
+                                                                                                            session: NCNetworking.shared.sessionDownload,
+                                                                                                            selector: NCGlobal.shared.selectorSaveAsScan,
+                                                                                                            sceneIdentifier: controller.sceneIdentifier) {
+                                    NCNetworking.shared.download(metadata: metadata)
+                                }
+                            }
                         }
                     }
                 )
             )
+        }
+        
+        //
+        // SAVE CAMERA ROLL
+        //
+        if !webView, metadata.isSavebleInCameraRoll {
+            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller))
+        }
+
+
+        //
+        // RENAME
+        //
+        if !webView, metadata.isRenameable, !metadata.isDirectoryE2EE {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_rename_", comment: ""),
+                    icon: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.iconColor]),
+                    action: { _ in
+
+                        if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
+
+                            vcRename.metadata = metadata
+                            vcRename.disableChangeExt = true
+                            vcRename.imagePreview = imageIcon
+                            vcRename.indexPath = indexPath
+
+                            let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
+
+                            controller.present(popup, animated: true)
+                        }
+                    }
+                )
+            )
+        }
+
+        //
+        // COPY - MOVE
+        //
+        if !webView, metadata.isCopyableMovable {
+            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], viewController: viewController, indexPath: []))
         }
 
         //
@@ -213,10 +293,24 @@ extension NCViewer {
                             let popup = NCPopupViewController(contentController: vcRename, popupWidth: vcRename.width, popupHeight: vcRename.height)
 
                             viewController.present(popup, animated: true)
+                        Task {
+                            if let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
+                                                                                                        session: NCNetworking.shared.sessionDownload,
+                                                                                                        selector: "",
+                                                                                                        sceneIdentifier: controller.sceneIdentifier) {
+                                NCNetworking.shared.download(metadata: metadata)
+                            }
                         }
                     }
                 )
             )
+            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], controller: controller))
+        }
+        
+        // COPY IN PASTEBOARD
+        //
+        if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
+            actions.append(.copyAction(fileSelect: [metadata.ocId], controller: controller))
         }
 
         //
@@ -252,6 +346,7 @@ extension NCViewer {
                 NCMenuAction(
                     title: NSLocalizedString("_search_", comment: ""),
                     icon: utility.loadImage(named: "search", colors: [NCBrandColor.shared.iconColor]),
+                    sender: sender,
                     action: { _ in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuSearchTextPDF)
                     }
@@ -262,6 +357,7 @@ extension NCViewer {
                 NCMenuAction(
                     title: NSLocalizedString("_go_to_page_", comment: ""),
                     icon: utility.loadImage(named: "go-to-page", colors: [NCBrandColor.shared.iconColor]),
+                    sender: sender,
                     action: { _ in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuGotToPageInPDF)
                     }
@@ -294,6 +390,25 @@ extension NCViewer {
                                                                                                  selector: NCGlobal.shared.selectorLoadFileQuickLook,
                                                                                                  sceneIdentifier: controller.sceneIdentifier) else { return }
                             NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
+                    sender: sender,
+                    action: { _ in
+                        if self.utilityFileSystem.fileProviderStorageExists(metadata) {
+                            NCNetworking.shared.notifyAllDelegates { delegate in
+                                let metadata = metadata.detachedCopy()
+                                metadata.sessionSelector = NCGlobal.shared.selectorLoadFileQuickLook
+                                delegate.transferChange(status: NCGlobal.shared.networkingStatusDownloaded,
+                                                        metadata: metadata,
+                                                        error: .success)
+                            }
+                        } else {
+                            Task {
+                                if let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
+                                                                                                            session: NCNetworking.shared.sessionDownload,
+                                                                                                            selector: NCGlobal.shared.selectorLoadFileQuickLook,
+                                                                                                            sceneIdentifier: controller.sceneIdentifier) {
+                                    NCNetworking.shared.download(metadata: metadata)
+                                }
+                            }
                         }
                     }
                 )

@@ -119,6 +119,17 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 default:
                     cell.filePreviewImageView?.image = NCImageCache.images.iconFile
                 }
+        return numberItems
+    }
+
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if !collectionView.indexPathsForVisibleItems.contains(indexPath) {
+            guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
+                return
+            }
+
+            for case let operation as NCCollectionViewDownloadThumbnail in self.networking.downloadThumbnailQueue.operations where operation.metadata.ocId == metadata.ocId {
+                operation.cancel()
             }
         }
     }
@@ -141,7 +152,19 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
            !existsImagePreview,
            NCNetworking.shared.downloadThumbnailQueue.operations.filter({ ($0 as? NCMediaDownloadThumbnail)?.metadata.ocId == metadata.ocId }).isEmpty {
             NCNetworking.shared.downloadThumbnailQueue.addOperation(NCCollectionViewDownloadThumbnail(metadata: metadata, collectionView: collectionView, ext: ext))
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
+            return
         }
+        let existsImagePreview = self.utilityFileSystem.fileProviderStorageImageExists(metadata.ocId, etag: metadata.etag)
+        let ext = self.global.getSizeExtension(column: self.numberOfColumns)
+
+        if metadata.hasPreview,
+           !existsImagePreview,
+           self.networking.downloadThumbnailQueue.operations.filter({ ($0 as? NCMediaDownloadThumbnail)?.metadata.ocId == metadata.ocId }).isEmpty {
+            self.networking.downloadThumbnailQueue.addOperation(NCCollectionViewDownloadThumbnail(metadata: metadata, collectionView: collectionView, ext: ext))
+        }
+
     }
 
     private func photoCell(cell: NCPhotoCell, indexPath: IndexPath, metadata: tableMetadata, ext: String) -> NCPhotoCell {
@@ -242,7 +265,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         let ext = global.getSizeExtension(column: self.numberOfColumns)
 
         defer {
-            if !metadata.isSharable() || NCCapabilities.shared.disableSharesView(account: metadata.account) {
+            if !metadata.isSharable() || (!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty) {
                 cell.hideButtonShare(true)
             }
         }
@@ -304,6 +327,17 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                 cell.fileSubinfoLabel?.isHidden = false
                 cell.fileInfoLabel?.text = metadata.sessionError
             }
+            cell.fileTitleLabel?.text = metadata.fileNameView
+            cell.fileSubinfoLabel?.isHidden = false
+            cell.fileInfoLabel?.text = metadata.sessionError
+//            // Temporary issue fix for NMC-3771: iOS v9.1.6 > multiple uploads cause error messages
+//            if metadata.sessionError == "423: WebDAV Locked: Trying to access locked resource" || metadata.sessionError == "423: WebDAV gesperrt: Zugriffsversuch auf eine gesperrte Ressource" {
+//                cell.fileTitleLabel?.text = metadata.fileName
+//                cell.fileTitleLabel?.lineBreakMode = .byTruncatingMiddle
+//            } else {
+//                cell.fileSubinfoLabel?.isHidden = false
+//                cell.fileInfoLabel?.text = metadata.sessionError
+//            }
         } else {
             cell.fileSubinfoLabel?.isHidden = false
             cell.fileTitleLabel?.text = metadata.fileNameView
@@ -322,6 +356,8 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
         if metadata.directory {
             let tableDirectory = database.getTableDirectory(ocId: metadata.ocId)
+            let tblDirectory = database.getTableDirectory(ocId: metadata.ocId)
+
             if metadata.e2eEncrypted {
                 cell.filePreviewImageView?.image = imageCache.getFolderEncrypted()
             } else if isShare {
@@ -351,6 +387,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.filePreviewImageView?.image = cell.filePreviewImageView?.image?.colorizeFolder(metadata: metadata, tableDirectory: tableDirectory)
 
         } else {
+            let tableLocalFile = database.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
 
             if metadata.hasPreviewBorder {
                 cell.filePreviewImageView?.layer.borderWidth = 0.2
@@ -407,6 +444,17 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                         if !(results.tableAvatar?.loaded ?? false),
                            NCNetworking.shared.downloadAvatarQueue.operations.filter({ ($0 as? NCOperationDownloadAvatar)?.fileName == fileName }).isEmpty {
                             NCNetworking.shared.downloadAvatarQueue.addOperation(NCOperationDownloadAvatar(user: ownerId, fileName: fileName, account: metadata.account, view: collectionView, isPreviewImageView: true))
+                        self.database.getImageAvatarLoaded(fileName: fileName) { image, tblAvatar in
+                            if let image {
+                                cell.filePreviewImageView?.image = image
+                            } else {
+                                cell.filePreviewImageView?.image = self.utility.loadUserImage(for: ownerId, displayName: nil, urlBase: metadata.urlBase)
+                            }
+
+                            if !(tblAvatar?.loaded ?? false),
+                               self.networking.downloadAvatarQueue.operations.filter({ ($0 as? NCOperationDownloadAvatar)?.fileName == fileName }).isEmpty {
+                                self.networking.downloadAvatarQueue.addOperation(NCOperationDownloadAvatar(user: ownerId, fileName: fileName, account: metadata.account, view: collectionView, isPreviewImageView: true))
+                            }
                         }
                     }
                 }
@@ -445,6 +493,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.fileSharedImage?.image = cell.fileSharedImage?.image?.imageColor(NCBrandColor.shared.customer)
         } else {
             cell.fileSharedImage?.image = NCImageCache.images.canShare.image(color: NCBrandColor.shared.gray60, size: 50)
+            cell.fileSharedImage?.image = NCImageCache.images.canShare.image(color: NCBrandColor.shared.gray60)
             cell.fileSharedLabel?.text = ""
         }
         
@@ -518,7 +567,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         }
 
         // URL
-        if metadata.classFile == NKCommon.TypeClassFile.url.rawValue {
+        if metadata.classFile == NKTypeClassFile.url.rawValue {
             cell.fileLocalImage?.image = nil
             cell.hideButtonShare(true)
             cell.hideButtonMore(true)
@@ -600,6 +649,9 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             if let header = header as? NCSectionFirstHeader {
                 let recommendations = self.database.getRecommendedFiles(account: self.session.account)
                 var sectionText = NSLocalizedString("_all_files_", comment: "")
+            if indexPath.section == 0 {
+                guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionHeaderMenu", for: indexPath) as? NCSectionHeaderMenu else { return UICollectionReusableView() }
+                let (_, heightHeaderRichWorkspace, heightHeaderSection) = getHeaderHeight(section: indexPath.section)
 
             if indexPath.section == 0 {
                 guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionHeaderMenu", for: indexPath) as? NCSectionHeaderMenu else { return UICollectionReusableView() }
@@ -654,6 +706,8 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
                 self.sectionFirstHeader = header
 //                setContent(header: header, indexPath: indexPath)
+//                self.headerMenu = header
+//                self.headerMenu?.setViewTransfer(isHidden: true)
                 if layoutForView?.layout == NCGlobal.shared.layoutGrid {
                     header.setImageSwitchList()
                     header.buttonSwitch.accessibilityLabel = NSLocalizedString("_list_view_", comment: "")
@@ -665,12 +719,20 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
                 if !isSearchingMode, headerMenuTransferView, isHeaderMenuTransferViewEnabled() != nil {
                     header.setViewTransfer(isHidden: false)
+
+                header.delegate = self
+                
+                if !isSearchingMode, headerMenuTransferView, isHeaderMenuTransferViewEnabled() != nil, let ocId = NCNetworking.shared.transferInForegorund?.ocId {
+                    let text = String(format: NSLocalizedString("_upload_foreground_msg_", comment: ""), NCBrandOptions.shared.brand)
+//                    header.setViewTransfer(isHidden: false, text: text)
+                    header.setViewTransfer(isHidden: false, ocId: ocId, text: text, progress: NCNetworking.shared.transferInForegorund?.progress)
                 } else {
                     header.setViewTransfer(isHidden: true)
                 }
                 
                 if headerMenuButtonsView {
                     header.setStatusButtonsView(enable: !dataSource.getMetadataSourceForAllSections().isEmpty)
+                    header.setStatusButtonsView(enable: !dataSource.isEmpty())
                     header.setButtonsView(height: NCGlobal.shared.heightButtonsView)
                     header.setSortedTitle(layoutForView?.titleButtonHeader ?? "")
                 } else {
@@ -771,6 +833,32 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         }
         return ownerId
     }
+
+    /// Caches preview images asynchronously for the provided metadata entries.
+    /// - Parameters:
+    ///   - metadatas: The list of metadata entries to cache.
+    ///   - priority: The task priority to use (default is `.utility`).
+    func cachingAsync(metadatas: [tableMetadata], priority: TaskPriority = .utility) {
+        Task.detached(priority: priority) {
+            for (cost, metadata) in metadatas.enumerated() {
+                // Skip if not an image or video
+                guard metadata.isImageOrVideo else { continue }
+                // Check if image is already cached
+                let alreadyCached = NCImageCache.shared.getImageCache(ocId: metadata.ocId,
+                                                                      etag: metadata.etag,
+                                                                      ext: self.global.previewExt256) != nil
+                guard !alreadyCached else {
+                    continue
+                }
+
+                // caching preview
+                //
+                if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt256) {
+                    NCImageCache.shared.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: self.global.previewExt256, cost: cost)
+                }
+            }
+        }
+    }
     
     // MARK: - Cancel (Download Upload)
 
@@ -860,6 +948,14 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                                                                "serverUrl": metadata.serverUrl,
                                                                "account": metadata.account])
                 }
+            }
+        }
+    }
+
+    func removeImageCache(metadatas: [tableMetadata]) {
+        DispatchQueue.global().async {
+            for metadata in metadatas {
+                NCImageCache.shared.removeImageCache(ocIdPlusEtag: metadata.ocId + metadata.etag)
             }
         }
     }

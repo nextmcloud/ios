@@ -53,6 +53,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
         }
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.title = metadata.fileNameView
+        navigationItem.hidesBackButton = true
 
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
@@ -215,8 +216,13 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                                 self.database.setMetadataSession(ocId: self.metadata.ocId,
                                                                  sessionTaskIdentifier: task.taskIdentifier,
                                                                  status: self.global.metadataStatusDownloading)
+                                Task {
+                                    await self.database.setMetadataSessionAsync(ocId: self.metadata.ocId,
+                                                                                sessionTaskIdentifier: task.taskIdentifier,
+                                                                                status: self.global.metadataStatusDownloading)
+                                }
                             }, progressHandler: { _ in
-                            }, completionHandler: { account, etag, _, _, responseData, _, error in
+                            }, completionHandler: { account, etag, _, _, headers, _, error in
                                 NCActivityIndicator.shared.stop()
                                 self.database.setMetadataSession(ocId: self.metadata.ocId,
                                                                  session: "",
@@ -224,11 +230,19 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                                                                  sessionError: "",
                                                                  status: self.global.metadataStatusNormal,
                                                                  etag: etag)
+                                Task {
+                                    await self.database.setMetadataSessionAsync(ocId: self.metadata.ocId,
+                                                                                session: "",
+                                                                                sessionTaskIdentifier: 0,
+                                                                                sessionError: "",
+                                                                                status: self.global.metadataStatusNormal,
+                                                                                etag: etag)
+                                }
                                 if error == .success && account == self.metadata.account {
                                     var item = fileNameLocalPath
 
-                                    if let allHeaderFields = responseData?.response?.allHeaderFields {
-                                        if let disposition = allHeaderFields["Content-Disposition"] as? String {
+                                    if let headers {
+                                        if let disposition = headers["Content-Disposition"] as? String {
                                             let components = disposition.components(separatedBy: "filename=")
                                             if let filename = components.last?.replacingOccurrences(of: "\"", with: "") {
                                                 item = self.utilityFileSystem.directoryUserData + "/" + filename
@@ -356,6 +370,25 @@ extension NCViewerRichDocument: UINavigationControllerDelegate {
 
         if parent == nil {
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": self.metadata.serverUrl])
+            NCNetworking.shared.notifyAllDelegates { delegate in
+                delegate.transferReloadData(serverUrl: metadata.serverUrl, status: nil)
+            }
+        }
+    }
+}
+
+extension NCViewerRichDocument: NCTransferDelegate {
+    func transferChange(status: String, metadata: tableMetadata, error: NKError) {
+        DispatchQueue.main.async {
+            switch status {
+            /// FAVORITE
+            case NCGlobal.shared.networkingStatusFavorite:
+                if self.metadata.ocId == metadata.ocId {
+                    self.metadata = metadata
+                }
+            default:
+                break
+            }
         }
     }
 }

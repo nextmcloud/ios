@@ -96,7 +96,9 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         buttonSignUp.setTitleColor(textColor, for: .normal)
         buttonSignUp.backgroundColor = NCBrandColor.shared.customer
         buttonSignUp.titleLabel?.adjustsFontSizeToFitWidth = true
-        buttonSignUp.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        var configButtonSignUp = UIButton.Configuration.filled()
+        configButtonSignUp.titlePadding = 10
+        buttonSignUp.configuration = configButtonSignUp
         buttonSignUp.setTitle(NSLocalizedString("_sign_up_", comment: ""), for: .normal)
 
         buttonHost.layer.cornerRadius = 20
@@ -135,6 +137,32 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         if UIScreen.main.bounds.width < 350 || UIScreen.main.bounds.height > 800 {
             contstraintBottomLoginButton.constant = 15
         }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        if UIScreen.main.bounds.width < 350 || UIScreen.main.bounds.height > 800 {
+            contstraintBottomLoginButton.constant = 15
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        timerAutoScroll?.invalidate()
+        AppUtility.lockOrientation(UIInterfaceOrientationMask.all)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        let isEightPlusDevice = UIScreen.main.bounds.height == 736
+        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : (isEightPlusDevice ? imagesEightPortrait : imagesPortrait)
+        pageControl.currentPage = 0
+        introCollectionView.collectionViewLayout.invalidateLayout()
+        self.introCollectionView.reloadData()
+    }
+    
+    @objc func resetPageController(_ notification: NSNotification){
+        pageControl.currentPage = 0
+        introCollectionView.scrollToItem(at: IndexPath(row: pageControl.currentPage, section: 0), at: .centeredHorizontally, animated: true)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -237,7 +265,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     @IBAction func signupWithProvider(_ sender: Any) {
         if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
             viewController.controller = self.controller
-            viewController.urlBase = NCBrandOptions.shared.linkloginPreferredProviders
+            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
             self.navigationController?.pushViewController(viewController, animated: true)
         }
     }

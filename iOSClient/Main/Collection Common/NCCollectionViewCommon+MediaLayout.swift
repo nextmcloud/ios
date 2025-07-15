@@ -29,6 +29,8 @@ extension NCCollectionViewCommon: NCMediaLayoutDelegate {
     func getColumnCount() -> Int {
         if self.numberOfColumns == 0,
            let layoutForView = database.getLayoutForView(account: session.account, key: NCGlobal.shared.layoutViewFiles, serverUrl: self.serverUrl) {
+        if self.numberOfColumns == 0 {
+            let layoutForView = database.getLayoutForView(account: session.account, key: global.layoutViewFiles, serverUrl: self.serverUrl)
             if layoutForView.columnPhoto > 0 {
                 self.numberOfColumns = layoutForView.columnPhoto
             } else {
@@ -76,6 +78,8 @@ extension NCCollectionViewCommon: NCMediaLayoutDelegate {
                 return metadata.imageSize
             } else if metadata.classFile == NKCommon.TypeClassFile.document.rawValue {
                 let ext = NCGlobal.shared.getSizeExtension(column: self.numberOfColumns)
+            } else if metadata.classFile == NKTypeClassFile.document.rawValue {
+                let ext = global.getSizeExtension(column: self.numberOfColumns)
                 if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext) {
                     return image.size
                 }

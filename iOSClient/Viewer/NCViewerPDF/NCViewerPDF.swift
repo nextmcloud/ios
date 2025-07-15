@@ -77,6 +77,7 @@ class NCViewerPDF: UIViewController, NCViewerPDFSearchDelegate {
             if NCNetworking.shared.isOnline {
                 navigationItem.rightBarButtonItem = UIBarButtonItem(image: NCImageCache.shared.getImageButtonMore(), style: .plain, target: self, action: #selector(self.openMenuMore))
             }
+            navigationItem.rightBarButtonItem = UIBarButtonItem(image: NCImageCache.shared.getImageButtonMore(), style: .plain, target: self, action: #selector(openMenuMore(_:)))
         }
         defaultBackgroundColor = pdfView.backgroundColor
         view.backgroundColor = defaultBackgroundColor

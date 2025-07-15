@@ -45,6 +45,7 @@ struct NCManageE2EEView: View {
             if model.isEndToEndEnabled {
                 List {
                     Section(header: Text(""), footer: Text("End-to-End Encryption " + NCGlobal.shared.capabilityE2EEApiVersion)) {
+                    Section(header: Text(""), footer: Text(model.statusOfService + "\n\n" + "End-to-End Encryption " + model.capabilities.e2EEApiVersion)) {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_activated_", comment: ""))
                         } icon: {

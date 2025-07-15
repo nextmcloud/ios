@@ -53,6 +53,8 @@ extension NCCollectionViewCommon {
                     if let layoutForView = self.database.getLayoutForView(account: self.session.account, key: NCGlobal.shared.layoutViewFiles, serverUrl: self.serverUrl) {
                         layoutForView.columnPhoto = self.numberOfColumns
                         self.database.setLayoutForView(layoutForView: layoutForView)
+                    self.database.updateLayoutForView(account: self.session.account, key: self.global.layoutViewFiles, serverUrl: self.serverUrl) { layout in
+                        layout.columnPhoto = self.numberOfColumns
                     }
                 }
             }

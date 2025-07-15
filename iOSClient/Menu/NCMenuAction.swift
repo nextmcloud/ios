@@ -88,6 +88,7 @@ extension NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_select_all_", comment: ""),
             icon: NCUtility().loadImage(named: "checkmark.circle.fill", colors: [NCBrandColor.shared.iconColor]),
+            sender: sender,
             action: { _ in action() }
         )
     }
@@ -97,6 +98,7 @@ extension NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_cancel_", comment: ""),
             icon: NCUtility().loadImage(named: "xmark", colors: [NCBrandColor.shared.iconColor]),
+            sender: sender,
             action: { _ in action() }
         )
     }
@@ -186,12 +188,26 @@ extension NCMenuAction {
                     alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { _ in
                         selectedMetadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
                         completion?()
+                        Task {
+                            for metadata in selectedMetadatas {
+                                await NCDownloadAction.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
+
+                            }
+                            completion?()
+                        }
                     }))
                     alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
                     viewController.present(alert, animated: true)
                 } else {
                     selectedMetadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
                     completion?()
+                    Task {
+                        for metadata in selectedMetadatas {
+                            await NCDownloadAction.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
+
+                        }
+                        completion?()
+                    }
                 }
             }
         )
@@ -202,6 +218,10 @@ extension NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_copy_file_", comment: ""),
             icon: NCUtility().loadImage(named: "copy", colors: [NCBrandColor.shared.iconImageColor]),
+    static func copyAction(fileSelect: [String], controller: NCMainTabBarController?, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
+        NCMenuAction(
+            title: NSLocalizedString("_copy_file_", comment: ""),
+            icon: NCUtility().loadImage(named: "copy", colors: [NCBrandColor.shared.iconColor]),
             order: order,
             action: { _ in
                 NCActionCenter.shared.copyPasteboard(pasteboardOcIds: selectOcId, viewController: viewController)
@@ -227,6 +247,7 @@ extension NCMenuAction {
 
     
     /// Open view that lets the user move or copy the files within Nextcloud
+//    static func moveOrCopyAction(selectedMetadatas: [tableMetadata], account: String, viewController: UIViewController, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
     static func moveOrCopyAction(selectedMetadatas: [tableMetadata], controller: NCMainTabBarController?, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_move_or_copy_", comment: ""),
@@ -234,11 +255,13 @@ extension NCMenuAction {
             order: order,
             action: { _ in
 //                var fileNameError: NKError?
+//                let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
 //
 //                for metadata in selectedMetadatas {
 //                    if let sceneIdentifier = metadata.sceneIdentifier,
 //                       let controller = SceneManager.shared.getController(sceneIdentifier: sceneIdentifier),
 //                       let checkError = FileNameValidator.checkFileName(metadata.fileNameView, account: controller.account) {
+//                       let checkError = FileNameValidator.checkFileName(metadata.fileNameView, account: controller.account, capabilities: capabilities) {
 //
 //                        fileNameError = checkError
 //                        break
@@ -252,6 +275,10 @@ extension NCMenuAction {
 //                    NCActionCenter.shared.openSelectView(items: selectedMetadatas, controller: controller)
 //                    completion?()
 //                }
+//                    NCDownloadAction.shared.openSelectView(items: selectedMetadatas, controller: controller)
+//                    completion?()
+//                }
+
                 NCActionCenter.shared.openSelectView(items: selectedMetadatas, controller: controller)
                 completion?()
             }

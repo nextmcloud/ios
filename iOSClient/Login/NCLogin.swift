@@ -83,6 +83,9 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
         loginAddressDetail.textColor = textColor
         loginAddressDetail.text = String.localizedStringWithFormat(NSLocalizedString("_login_address_detail_", comment: ""), NCBrandOptions.shared.brand)
 
+        // QR code button
+        qrCode.tintColor = NCBrandColor.shared.customer.isTooLight() ? .black : .white
+
         // brand
         if NCBrandOptions.shared.disable_request_login_url {
             baseUrlTextField.isEnabled = false
@@ -113,7 +116,7 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
         if let dirGroupApps = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: NCBrandOptions.shared.capabilitiesGroupApps) {
             // Nextcloud update share accounts
             if let error = NCAccount().updateAppsShareAccounts() {
-                NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Create share accounts \(error.localizedDescription)")
+                nkLog(error: "Create share accounts \(error.localizedDescription)")
             }
             // Nextcloud get share accounts
             if let shareAccounts = NKShareAccounts().getShareAccount(at: dirGroupApps, application: UIApplication.shared) {
@@ -329,6 +332,14 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
                 }
                 NextcloudKit.shared.getLoginFlowV2(serverUrl: url) { [self] token, endpoint, login, _, error in                    
                     // Login Flow V2
+//                    if error == .success, let token, let endpoint, let login {
+//                        nkLog(debug: "Successfully received login flow information.")
+//                        let safariVC = NCLoginProvider()
+//                        safariVC.initialURLString = login
+//                        safariVC.uiColor = textColor
+//                        safariVC.delegate = self
+//                        safariVC.startPolling(loginFlowV2Token: token, loginFlowV2Endpoint: endpoint, loginFlowV2Login: login)
+//                        navigationController?.pushViewController(safariVC, animated: true)
                     if error == .success && NCBrandOptions.shared.use_loginflowv2 && token != nil && endpoint != nil && login != nil {
 
                         if let loginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb {
@@ -431,11 +442,15 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
     }
 }
 
+// MARK: - NCShareAccountsDelegate
+
 extension NCLogin: NCShareAccountsDelegate {
     func selected(url: String, user: String) {
         isUrlValid(url: url, user: user)
     }
 }
+
+// MARK: - UIDocumentPickerDelegate
 
 extension NCLogin: ClientCertificateDelegate, UIDocumentPickerDelegate {
     func didAskForClientCertificate() {
@@ -477,6 +492,8 @@ extension NCLogin: ClientCertificateDelegate, UIDocumentPickerDelegate {
         }
     }
 }
+
+// MARK: - NCLoginProviderDelegate
 
 extension NCLogin: NCLoginProviderDelegate {
     func onBack() {

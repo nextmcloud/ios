@@ -46,38 +46,40 @@ class NCCreateDocument: NSObject {
             }
 
             NextcloudKit.shared.NCTextCreateFile(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateId, account: account, options: options) { returnedAccount, url, _, error in
+        if let creatorId, editorId == "text" || editorId == "onlyoffice" {
+            if editorId == "onlyoffice" {
+                options = NKRequestOptions(customUserAgent: NCUtility().getCustomUserAgentOnlyOffice())
+            } else if editorId == "text" {
+                options = NKRequestOptions(customUserAgent: NCUtility().getCustomUserAgentNCText())
+            }
+
+            NextcloudKit.shared.textCreateFile(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateId, account: account, options: options) { _, url, _, error in
                 guard error == .success, let url else {
                     return NCContentPresenter().showError(error: error)
                 }
-                if account == returnedAccount {
-                    let contentType = NextcloudKit.shared.nkCommonInstance.getInternalType(fileName: fileName, mimeType: "", directory: false, account: session.account).mimeType
-                    let metadata = self.database.createMetadata(fileName: fileName,
-                                                                fileNameView: fileName,
-                                                                ocId: UUID,
-                                                                serverUrl: serverUrl,
-                                                                url: url,
-                                                                contentType: contentType,
-                                                                session: session,
-                                                                sceneIdentifier: controller.sceneIdentifier)
 
-                    NCViewer().view(viewController: viewController, metadata: metadata)
-                }
+                let metadata = self.database.createMetadata(fileName: fileName,
+                                                            ocId: UUID,
+                                                            serverUrl: serverUrl,
+                                                            url: url,
+                                                            session: session,
+                                                            sceneIdentifier: controller.sceneIdentifier)
+
+                NCViewer().view(viewController: viewController, metadata: metadata)
             }
 
         } else if editorId == NCGlobal.shared.editorCollabora {
+        } else if editorId == "collabora" {
 
             NextcloudKit.shared.createRichdocuments(path: fileNamePath, templateId: templateId, account: account) { returnedAccount, url, _, error in
                 guard error == .success, let url else {
                     return NCContentPresenter().showError(error: error)
                 }
                 if account == returnedAccount {
-                    let contentType = NextcloudKit.shared.nkCommonInstance.getInternalType(fileName: fileName, mimeType: "", directory: false, account: session.account).mimeType
                     let metadata = self.database.createMetadata(fileName: fileName,
-                                                                fileNameView: fileName,
                                                                 ocId: UUID,
                                                                 serverUrl: serverUrl,
                                                                 url: url,
-                                                                contentType: contentType,
                                                                 session: session,
                                                                 sceneIdentifier: controller.sceneIdentifier)
 
@@ -87,9 +89,9 @@ class NCCreateDocument: NSObject {
         }
     }
 
-    func getTemplate(editorId: String, templateId: String, account: String) async -> (templates: [NKEditorTemplates], selectedTemplate: NKEditorTemplates, ext: String) {
-        var templates: [NKEditorTemplates] = []
-        var selectedTemplate = NKEditorTemplates()
+    func getTemplate(editorId: String, templateId: String, account: String) async -> (templates: [NKEditorTemplate], selectedTemplate: NKEditorTemplate, ext: String) {
+        var templates: [NKEditorTemplate] = []
+        var selectedTemplate = NKEditorTemplate()
         var ext: String = ""
 
         if editorId == NCGlobal.shared.editorText || editorId == NCGlobal.shared.editorOnlyoffice {
@@ -97,13 +99,18 @@ class NCCreateDocument: NSObject {
             if editorId == NCGlobal.shared.editorOnlyoffice {
                 options = NKRequestOptions(customUserAgent: NCUtility().getCustomUserAgentOnlyOffice())
             } else if editorId == NCGlobal.shared.editorText {
+        if editorId == "text" || editorId == "onlyoffice" {
+            var options = NKRequestOptions()
+            if editorId == "onlyoffice" {
+                options = NKRequestOptions(customUserAgent: NCUtility().getCustomUserAgentOnlyOffice())
+            } else if editorId == "text" {
                 options = NKRequestOptions(customUserAgent: NCUtility().getCustomUserAgentNCText())
             }
 
             let results = await textGetListOfTemplates(account: account, options: options)
             if results.error == .success, let resultTemplates = results.templates {
                 for template in resultTemplates {
-                    let temp = NKEditorTemplates()
+                    var temp = NKEditorTemplate()
                     temp.identifier = template.identifier
                     temp.ext = template.ext
                     temp.name = template.name
@@ -118,7 +125,7 @@ class NCCreateDocument: NSObject {
             }
 
             if templates.isEmpty {
-                let temp = NKEditorTemplates()
+                var temp = NKEditorTemplate()
                 temp.identifier = ""
                 if editorId == NCGlobal.shared.editorText {
                     temp.ext = "md"
@@ -127,6 +134,13 @@ class NCCreateDocument: NSObject {
                 } else if editorId == NCGlobal.shared.editorOnlyoffice && templateId == NCGlobal.shared.templateSpreadsheet {
                     temp.ext = "xlsx"
                 } else if editorId == NCGlobal.shared.editorOnlyoffice && templateId == NCGlobal.shared.templatePresentation {
+                if editorId == "text" {
+                    temp.ext = "md"
+                } else if editorId == "onlyoffice" && templateId == "document" {
+                    temp.ext = "docx"
+                } else if editorId == "onlyoffice" && templateId == "spreadsheet" {
+                    temp.ext = "xlsx"
+                } else if editorId == "onlyoffice" && templateId == "presentation" {
                     temp.ext = "pptx"
                 }
                 temp.name = "Empty"
@@ -139,15 +153,15 @@ class NCCreateDocument: NSObject {
 
         if editorId == NCGlobal.shared.editorCollabora {
             let results = await getTemplatesRichdocuments(typeTemplate: templateId, account: account)
+        if editorId == "collabora" {
+            let results = await NextcloudKit.shared.getTemplatesRichdocumentsAsync(typeTemplate: templateId, account: account)
             if results.error == .success {
                 for template in results.templates! {
-                    let temp = NKEditorTemplates()
+                    var temp = NKEditorTemplate()
                     temp.identifier = "\(template.templateId)"
-                    temp.delete = template.delete
                     temp.ext = template.ext
                     temp.name = template.name
                     temp.preview = template.preview
-                    temp.type = template.type
                     templates.append(temp)
                     // default: template empty
                     if temp.preview.isEmpty {

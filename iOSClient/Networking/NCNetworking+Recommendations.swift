@@ -31,6 +31,8 @@ extension NCNetworking {
                     let isDirectoryE2EE = self.utilityFileSystem.isDirectoryE2EE(file: file)
                     let metadata = self.database.convertFileToMetadata(file, isDirectoryE2EE: isDirectoryE2EE)
                     self.database.addMetadata(metadata)
+                    let metadata = await self.database.convertFileToMetadataAsync(file, isDirectoryE2EE: isDirectoryE2EE)
+                    self.database.addMetadataIfNeededAsync(metadata, sync: false)
 
                     if metadata.isLivePhoto, metadata.isVideo {
                         continue
@@ -43,6 +45,9 @@ extension NCNetworking {
             self.database.realmRefresh()
 
             NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadHeader, userInfo: ["account": session.account])
+
+            await self.database.createRecommendedFilesAsync(account: session.account, recommendations: recommendationsToInsert)
+            await collectionView.reloadData()
         }
     }
 }

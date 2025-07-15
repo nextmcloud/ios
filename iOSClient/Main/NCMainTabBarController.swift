@@ -33,7 +33,11 @@ struct NavigationCollectionViewCommon {
 
 class NCMainTabBarController: UITabBarController {
     var sceneIdentifier: String = UUID().uuidString
-    var account = ""
+    var account: String = "" {
+        didSet {
+            NCImageCache.shared.controller = self
+        }
+    }
     var availableNotifications: Bool = false
     var documentPickerViewController: NCDocumentPickerViewController?
     let navigationCollectionViewCommon = ThreadSafeArray<NavigationCollectionViewCommon>()
@@ -102,6 +106,17 @@ class NCMainTabBarController: UITabBarController {
         self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { _ in
             NCNetworking.shared.checkServerError(account: self.account, controller: self) {
                 self.timerCheckServerError()
+                /// Update right bar button item
+                if let navigationController = self.selectedViewController as? NCMainNavigationController {
+                    navigationController.updateRightBarButtonItems(self.tabBar.items?[0])
+                }
+                /// Update Activity tab bar
+                if let item = self.tabBar.items?[3] {
+                    let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: self.account)
+                    item.isEnabled = capabilities.activityEnabled
+                }
+
+                self.timerCheck()
             }
         })
     }

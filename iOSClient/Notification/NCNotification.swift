@@ -80,6 +80,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         super.viewDidAppear(animated)
 
         getNetwokingNotification()
+        getNetwokingNotification(nil)
         NotificationCenter.default.addObserver(self, selector: #selector(initialize), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
     }
 
@@ -87,6 +88,10 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         super.viewWillDisappear(animated)
         
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateNotification)
+
+        // Cancel Queue & Retrieves Properties
+        dataSourceTask?.cancel()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -121,6 +126,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
     // MARK: - NotificationCenter
     @objc func initialize() {
         getNetwokingNotification()
+        getNetwokingNotification(nil)
     }
 
     // MARK: - Empty
@@ -170,6 +176,9 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
                file["type"] as? String == "file" {
                 if let id = file["id"] {
                     NCActionCenter.shared.viewerFile(account: session.account, fileId: ("\(id)"), viewController: self)
+                    Task {
+                        await NCDownloadAction.shared.viewerFile(account: session.account, fileId: ("\(id)"), viewController: self)
+                    }
                 }
             }
         } catch {
@@ -290,6 +299,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
 
     func tapRemove(with notification: NKNotifications) {
 
+    func tapRemove(with notification: NKNotifications, sender: Any?) {
         NextcloudKit.shared.setNotification(serverUrl: nil, idNotification: notification.idNotification, method: "DELETE", account: session.account) { _, _, error in
             if error == .success {
                 if let index = self.notifications

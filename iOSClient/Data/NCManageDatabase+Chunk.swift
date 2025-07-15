@@ -94,7 +94,19 @@ extension NCManageDatabase {
                 utilityFileSystem.removeFile(atPath: filePath)
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+            nkLog(error: "Could not write to database: \(error)")
+        }
+    }
+
+    /// Asynchronously deletes a chunk from Realm and its associated file from disk.
+    func deleteChunkAsync(account: String, ocId: String, fileChunk: (fileName: String, size: Int64), directory: String) async {
+        await performRealmWriteAsync { realm in
+            let predicate = NSPredicate(format: "account == %@ AND ocId == %@ AND fileName == %@", account, ocId, fileChunk.fileName)
+            let results = realm.objects(tableChunk.self).filter(predicate)
+            realm.delete(results)
+
+            let filePath = directory + "/\(fileChunk.fileName)"
+            self.utilityFileSystem.removeFile(atPath: filePath)
         }
     }
 

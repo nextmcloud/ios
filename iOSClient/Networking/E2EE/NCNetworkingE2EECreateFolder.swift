@@ -1,23 +1,6 @@
-//
-//  NCNetworkingE2EECreateFolder.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 09/11/22.
-//  Copyright © 2022 Marino Faggiana. All rights reserved.
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2022 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import NextcloudKit
@@ -38,6 +21,9 @@ class NCNetworkingE2EECreateFolder: NSObject {
             let error = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: errorDescription)
             return error
         }
+    func createFolder(fileName: String, serverUrl: String, sceneIdentifier: String?, session: NCSession.Session) async -> NKError {
+        var fileNameFolder = FileAutoRenamer.rename(fileName, isFolderPath: true, account: session.account)
+
         let fileNameIdentifier = networkingE2EE.generateRandomIdentifier()
         let serverUrlFileName = serverUrl + "/" + fileNameIdentifier
         fileNameFolder = utilityFileSystem.createFileName(fileNameFolder, serverUrl: serverUrl, account: session.account)
@@ -46,12 +32,16 @@ class NCNetworkingE2EECreateFolder: NSObject {
         }
         guard let directory = self.database.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl)) else {
             return NKError(errorCode: NCGlobal.shared.errorUnexpectedResponseFromDB, errorDescription: NSLocalizedString("_e2e_error_", comment: ""))
+        guard let directory = await self.database.getTableDirectoryAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl)) else {
+            return NKError(errorCode: global.errorUnexpectedResponseFromDB, errorDescription: NSLocalizedString("_e2e_error_", comment: ""))
         }
 
         // TEST UPLOAD IN PROGRESS
         //
         if networkingE2EE.isInUpload(account: session.account, serverUrl: serverUrl) {
             return NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
+        if await networkingE2EE.isInUpload(account: session.account, serverUrl: serverUrl) {
+            return NKError(errorCode: global.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
         }
 
         func sendE2ee(e2eToken: String, fileId: String, session: NCSession.Session) async -> NKError {
@@ -75,7 +65,7 @@ class NCNetworkingE2EECreateFolder: NSObject {
 
             let object = tableE2eEncryption.init(account: session.account, ocIdServerUrl: directory.ocId, fileNameIdentifier: fileNameIdentifier)
             object.blob = "folders"
-            if let results = self.database.getE2eEncryption(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl)) {
+            if let results = await self.database.getE2eEncryptionAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl)) {
                 object.metadataKey = results.metadataKey
                 object.metadataKeyIndex = results.metadataKeyIndex
             } else {
@@ -91,7 +81,7 @@ class NCNetworkingE2EECreateFolder: NSObject {
             object.initializationVector = initializationVector
             object.mimeType = "httpd/unix-directory"
             object.serverUrl = serverUrl
-            self.database.addE2eEncryption(object)
+            await self.database.addE2eEncryptionAsync(object)
 
             // UPLOAD METADATA
             //
@@ -153,6 +143,14 @@ class NCNetworkingE2EECreateFolder: NSObject {
         self.database.realmRefresh()
 
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCreateFolder, userInfo: ["ocId": ocId, "serverUrl": serverUrl, "account": session.account, "withPush": withPush, "sceneIdentifier": sceneIdentifier as Any])
+        await self.database.addMetadataAsync(metadata)
+        await self.database.addDirectoryAsync(e2eEncrypted: true, favorite: metadata.favorite, ocId: metadata.ocId, fileId: metadata.fileId, permissions: metadata.permissions, serverUrl: serverUrlFileName, account: metadata.account)
+
+        NCNetworking.shared.notifyAllDelegates { delegate in
+            delegate.transferChange(status: self.global.networkingStatusCreateFolder,
+                                    metadata: metadata.detachedCopy(),
+                                    error: .success)
+        }
 
         return NKError()
     }

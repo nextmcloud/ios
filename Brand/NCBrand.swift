@@ -22,6 +22,7 @@
 //
 
 import UIKit
+import NextcloudKit
 
 let userAgent: String = {
     let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
@@ -29,6 +30,19 @@ let userAgent: String = {
     return "Mozilla/5.0 (iOS) Magenta-iOS/\(appVersion)"
 }()
 
+@objc class NCBrandOptions: NSObject, @unchecked Sendable {
+    @objc static let shared: NCBrandOptions = {
+        let instance = NCBrandOptions()
+        return instance
+    }()
+
+ Matheria represents a pivotal step forward in the evolution of our software. This release delivers substantial architectural enhancements, increased performance, and a robust foundation for future innovations.
+
+ The codename embodies the concept of dynamic, living matter — reflecting our vision of a platform that is not only powerful and reliable, but also capable of continuous transformation and intelligent adaptation.
+ */
+
+//final class NCBrandOptions: @unchecked Sendable {
+//    static let shared = NCBrandOptions()
 @objc class NCBrandOptions: NSObject, @unchecked Sendable {
     @objc static let shared: NCBrandOptions = {
         let instance = NCBrandOptions()
@@ -44,6 +58,7 @@ let userAgent: String = {
     var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
     var webLoginAutenticationProtocol: String = "nc://"                                                // example "abc://"
     var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
+    var pushNotificationServerProxy: String = ""
     var linkLoginHost: String = "https://nextcloud.com/install"
     var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
     var webLoginAutenticationProtocol: String = "nc://"                                        // example "abc://"
@@ -105,6 +120,22 @@ let userAgent: String = {
 
     var disable_intro:       Bool = true
     var disable_request_login_url: Bool = false
+    var use_AppConfig: Bool = false
+    @objc public var capabilitiesGroup:              String = "group.de.telekom.Mediencenter"
+    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
+
+    // BRAND ONLY
+    // Set use_login_web_personalized to true for prod and false for configurable path
+    @objc public var use_login_web_personalized: Bool = true                               // Don't touch me !!
+    @objc public var use_AppConfig: Bool = false                                                // Don't touch me !!
+    @objc public var use_GroupApps: Bool = true                                                 // Don't touch me !!
+
+    // Options
+    // Use server theming color
+    var use_themingColor:                Bool = false
+
+    var disable_intro:       Bool = true
+    var disable_request_login_url:       Bool = true
     var disable_multiaccount:            Bool = true
     var disable_more_external_site: Bool = false
     var disable_openin_file: Bool = false                                          // Don't touch me !!
@@ -136,6 +167,22 @@ let userAgent: String = {
     @objc var disable_source_code_in_settings: Bool = false
     @objc var enforce_passcode_lock = false
     @objc var use_in_app_browser_for_login = false
+    var enforce_privacyScreenEnabled = false
+
+    @objc var disable_intro:       Bool = false//true
+    @objc var disable_request_login_url:       Bool = false//true
+    @objc public var disable_multiaccount:            Bool = true
+    @objc public var disable_manage_account:          Bool = false
+    @objc var disable_more_external_site: Bool = false
+    @objc var disable_openin_file: Bool = false                                          // Don't touch me !!
+    @objc var disable_crash_service:             Bool = true
+    @objc var disable_log: Bool = false
+    @objc var disable_mobileconfig: Bool = false
+    @objc var disable_show_more_nextcloud_apps_in_settings:         Bool = true
+    @objc var doNotAskPasscodeAtStartup: Bool = false
+    @objc var disable_source_code_in_settings: Bool = false
+    @objc var enforce_passcode_lock = false
+    @objc var use_in_app_browser_for_login = false
 
     // (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
     var enforce_servers: [(name: String, url: String)] = []
@@ -144,9 +191,9 @@ let userAgent: String = {
     @objc var cleanUpDay: Int = 0                                                                     // Set default "Delete all cached files older than" possible days value are: 0, 1, 7, 30, 90, 180, 365
 
     // Max request/download/upload concurrent
-    let httpMaximumConnectionsPerHost: Int = 6
-    let httpMaximumConnectionsPerHostInDownload: Int = 6
-    let httpMaximumConnectionsPerHostInUpload: Int = 6
+    let httpMaximumConnectionsPerHost: Int = 8
+    let httpMaximumConnectionsPerHostInDownload: Int = 8
+    let httpMaximumConnectionsPerHostInUpload: Int = 8
 
     // Number of failed attempts after reset app
     @objc let resetAppPasscodeAttempts: Int = 10
@@ -188,10 +235,14 @@ let userAgent: String = {
                 enforce_passcode_lock = (str as NSString).boolValue
             }
         }
-
-#if DEBUG
+        #if DEBUG
         pushNotificationServerProxy = "https://c0004.customerpush.nextcloud.com"
-#endif
+        #else
+        if pushNotificationServerProxy.isEmpty,
+            brand == "Nextcloud" {
+            pushNotificationServerProxy = "https://push-notifications.nextcloud.com"
+        }
+        #endif
     }
 
     @objc func getUserAgent() -> String {
@@ -325,9 +376,10 @@ class NCBrandColor: NSObject, @unchecked Sendable  {
         var colorThemingColorText: UIColor?
 
         if NCBrandOptions.shared.use_themingColor {
-            let themingColor = NCCapabilities.shared.getCapabilities(account: account).capabilityThemingColor
-            let themingColorElement = NCCapabilities.shared.getCapabilities(account: account).capabilityThemingColorElement
-            let themingColorText = NCCapabilities.shared.getCapabilities(account: account).capabilityThemingColorText
+            let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+            let themingColor = capabilities.themingColor
+            let themingColorElement = capabilities.themingColorElement
+            let themingColorText = capabilities.themingColorText
 
             // THEMING COLOR
             if themingColor.first == "#" {

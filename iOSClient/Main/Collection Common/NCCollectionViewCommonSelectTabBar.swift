@@ -24,6 +24,7 @@
 import Foundation
 import UIKit
 import SwiftUI
+import NextcloudKit
 
 protocol NCCollectionViewCommonSelectTabBarDelegate: AnyObject {
     func selectAll()
@@ -127,13 +128,14 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
                 if metadata.directory,
                    let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@",
                                                                                                     metadata.account,
-                                                                                                    metadata.serverUrl + "/" + metadata.fileName)) {
+                                                                                                    metadata.serverUrlFileName)) {
                     isAnyOffline = directory.offline
                 } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
                     isAnyOffline = localFile.offline
                 } // else: file is not offline, continue
             }
-            enableLock = !isAnyDirectory && canUnlock && !NCCapabilities.shared.getCapabilities(account: controller?.account).capabilityFilesLockVersion.isEmpty
+            let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: controller?.account ?? "")
+            enableLock = !isAnyDirectory && canUnlock && !capabilities.filesLockVersion.isEmpty
             // Convert Live Photo
             if metadatas.count == 2,
                let metadataFirst = metadatas.first,

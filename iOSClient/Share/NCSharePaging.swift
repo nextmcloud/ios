@@ -51,6 +51,8 @@ class NCSharePaging: UIViewController {
         title = NSLocalizedString("_details_", comment: "")
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
+        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_close_", comment: ""), style: .done, target: self, action: #selector(exitTapped(_:)))
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(notification:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterApplicationDidEnterBackground), object: nil)
@@ -105,7 +107,9 @@ class NCSharePaging: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if NCCapabilities.shared.disableSharesView(account: metadata.account) {
+        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: metadata.account)
+
+        if !capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty {
             self.dismiss(animated: false, completion: nil)
         }
 
@@ -117,6 +121,9 @@ class NCSharePaging: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": metadata.serverUrl])
+        NCNetworking.shared.notifyAllDelegates { delegate in
+            delegate.transferReloadData(serverUrl: metadata.serverUrl, status: nil)
+        }
     }
 
     deinit {
@@ -284,6 +291,8 @@ class NCShareHeaderView: UIView {
 
     override func awakeFromNib() {
         super.awakeFromNib()
+        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap(_:)))
+        path.addGestureRecognizer(longGesture)
         setupUI()
     }
 

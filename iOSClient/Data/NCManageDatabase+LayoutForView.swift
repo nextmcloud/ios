@@ -130,5 +130,90 @@ extension NCManageDatabase {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not access database: \(error)")
         }
         return setLayoutForView(account: account, key: key, serverUrl: serverUrl)
+    // MARK: - Realm read
+
+    func getLayoutForView(account: String, key: String, serverUrl: String, layout: String? = nil) -> NCDBLayoutForView {
+        let keyStore = serverUrl.isEmpty ? key : serverUrl
+        let index = account + " " + keyStore
+
+        if let layout = performRealmRead({
+            $0.objects(NCDBLayoutForView.self)
+                .filter("index == %@", index)
+                .first
+                .map { NCDBLayoutForView(value: $0) }
+        }) {
+            return layout
+        }
+
+        DispatchQueue.global(qos: .utility).async {
+            _ = self.setLayoutForView(account: account, key: key, serverUrl: serverUrl, layout: layout)
+        }
+
+        let placeholder = NCDBLayoutForView()
+        placeholder.index = index
+        placeholder.account = account
+        placeholder.keyStore = keyStore
+        if let layout {
+            placeholder.layout = layout
+        }
+        return placeholder
+    }
+
+    /// Returns the stored layout for a given account and key, or creates a placeholder.
+    /// If not found, triggers an async write to persist the layout.
+    func getLayoutForViewAsync(account: String, key: String, serverUrl: String, layout: String? = nil) async -> NCDBLayoutForView {
+        let keyStore = serverUrl.isEmpty ? key : serverUrl
+        let index = account + " " + keyStore
+
+        // Try to read from Realm
+        if let existing = await performRealmReadAsync({ realm in
+            realm.objects(NCDBLayoutForView.self)
+                .filter("index == %@", index)
+                .first
+                .map { NCDBLayoutForView(value: $0) }
+        }) {
+            return existing
+        }
+
+        // Return placeholder immediately
+        let placeholder = NCDBLayoutForView()
+        placeholder.index = index
+        placeholder.account = account
+        placeholder.keyStore = keyStore
+        if let layout {
+            placeholder.layout = layout
+        }
+        return placeholder
+    }
+
+    func updateLayoutForView(account: String,
+                             key: String,
+                             serverUrl: String,
+                             updateBlock: @escaping (inout NCDBLayoutForView) -> Void) {
+        DispatchQueue.global(qos: .utility).async {
+            let keyStore = serverUrl.isEmpty ? key : serverUrl
+            let index = account + " " + keyStore
+
+            var layout: NCDBLayoutForView
+
+            if let existing = self.performRealmRead({
+                $0.objects(NCDBLayoutForView.self)
+                    .filter("index == %@", index)
+                    .first
+            }) {
+                layout = existing
+            } else {
+                layout = NCDBLayoutForView()
+                layout.index = index
+                layout.account = account
+                layout.keyStore = keyStore
+            }
+
+            // Applica la modifica in modo sicuro
+            self.performRealmWrite { realm in
+                updateBlock(&layout)
+                realm.add(layout, update: .all)
+            }
+        }
     }
 }

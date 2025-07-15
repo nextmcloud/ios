@@ -122,7 +122,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         }
         var item = NKExternalSite()
         var quota: String = ""
-        let capabilities = NCCapabilities.shared.getCapabilities(account: tableAccount.account)
+        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: tableAccount.account)
 
         // Clear
         functionMenu.removeAll()
@@ -164,9 +164,30 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         item.url = "segueActivity"
         item.order = 40
 //        functionMenu.append(item)
+        /*
+        if capabilities.capabilityActivityEnabled {
+            // ITEM : Activity
+            item = NKExternalSite()
+            item.name = "_activity_"
+            item.icon = "bolt"
+            item.url = "segueActivity"
+            item.order = 30
+            functionMenu.append(item)
+        }
+        */
+
+        if capabilities.assistantEnabled, NCBrandOptions.shared.disable_show_more_nextcloud_apps_in_settings {
+            // ITEM : Assistant
+            item = NKExternalSite()
+            item.name = "_assistant_"
+            item.icon = "sparkles"
+            item.url = "openAssistant"
+            item.order = 40
+//            functionMenu.append(item)
+        }
 
         // ITEM : Shares
-        if capabilities.capabilityFileSharingApiEnabled {
+        if capabilities.fileSharingApiEnabled {
             item = NKExternalSite()
             item.name = "_list_shares_"
             item.icon = "shareFill"
@@ -184,7 +205,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         functionMenu.append(item)
 
         // ITEM : Groupfolders
-        if capabilities.capabilityGroupfoldersEnabled {
+        if capabilities.groupfoldersEnabled {
             item = NKExternalSite()
             item.name = "_group_folders_"
             item.icon = "person.2"
@@ -275,6 +296,10 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : External
         if NCBrandOptions.shared.disable_more_external_site == false {
             if let externalSites = NCManageDatabase.shared.getAllExternalSites(account: appDelegate.account) {
+        }
+        
+        // ITEM : External
+        if NCBrandOptions.shared.disable_more_external_site == false {
         }
         
         // ITEM : External

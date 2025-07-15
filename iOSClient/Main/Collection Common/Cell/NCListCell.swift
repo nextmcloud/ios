@@ -128,6 +128,8 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
     override func awakeFromNib() {
         super.awakeFromNib()
+        initCell()
+    }
 
     func initCell() {
         
@@ -222,6 +224,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
     @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
         listCellDelegate?.longPressListItem(with: objectId, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
+        listCellDelegate?.tapMoreListItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
+    }
+
+    @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
         listCellDelegate?.tapMoreListItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
     }
 

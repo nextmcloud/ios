@@ -138,6 +138,10 @@ extension NCTrash: UICollectionViewDataSource {
         cell.setupCellUI(tableTrash: tableTrash, image: image)
         cell.selected(selectOcId.contains(tableTrash.fileId), isEditMode: isEditMode)
 
+        cell.account = resultTableTrash.account
+        cell.objectId = resultTableTrash.fileId
+        cell.setupCellUI(tableTrash: resultTableTrash, image: image)
+        cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, account: resultTableTrash.account)
         return cell
     }
 
