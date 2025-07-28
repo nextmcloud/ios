@@ -34,7 +34,8 @@
                         <segue destination="bSZ-tE-FEj" kind="relationship" relationship="viewControllers" id="qbu-nX-qCk"/>
                         <segue destination="hwM-4d-Afb" kind="relationship" relationship="viewControllers" id="tds-0Q-7Zf"/>
                         <segue destination="Npr-vu-PSD" kind="relationship" relationship="viewControllers" id="XeU-GF-etm"/>
-                        <segue destination="1Z8-Bx-Dqo" kind="relationship" relationship="viewControllers" id="z6l-ei-IMY"/>
+                        <segue destination="Cc7-4O-z6Q" kind="relationship" relationship="viewControllers" id="7eP-Ie-n9h"/>
+                        <segue destination="1Z8-Bx-Dqo" kind="relationship" relationship="viewControllers" id="WHm-GJ-XkM"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="d2B-Yg-rp2" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -96,13 +97,13 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cZf-pk-3Bd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="7771" y="327"/>
+            <point key="canvasLocation" x="7099" y="327"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Album-->
         <scene sceneID="cip-AF-Ks2">
             <objects>
                 <navigationController extendedLayoutIncludesOpaqueBars="YES" automaticallyAdjustsScrollViewInsets="NO" id="Cc7-4O-z6Q" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" enabled="NO" title="" image="tabBarPlus" id="vIy-cM-ojV"/>
+                    <tabBarItem key="tabBarItem" enabled="NO" title="Album" id="vIy-cM-ojV"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="jCU-so-Np6">
                         <rect key="frame" x="0.0" y="48" width="414" height="96"/>
@@ -112,7 +113,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ohd-Sv-ssv" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="7072" y="327"/>
+            <point key="canvasLocation" x="7793" y="327"/>
         </scene>
         <!--More-->
         <scene sceneID="4RE-f1-SKU">
@@ -263,7 +264,4 @@
             <point key="canvasLocation" x="10201" y="204"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="tabBarPlus" width="80" height="80"/>
-    </resources>
 </document>

@@ -142,76 +142,30 @@ class NCMainTabBar: UITabBar {
             item.tag = 101
         }
 
-//        // +
-//        let imagePlus = UIImage(named: "tabBarPlus")?.image(color: .white, size: 100)
-//        if let item = items?[2] {
-//            item.title = ""
-//            item.image = nil
-//            item.isEnabled = false
-//            item.tag = 102
-//        }
-
         // Media
         if let item = items?[2] {
             item.title = NSLocalizedString("_media_", comment: "")
             item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.brandElement, size: 25)
             item.selectedImage = item.image
+            item.tag = 102
+        }
+
+        // Album
+        if let item = items?[3] {
+            item.title = NSLocalizedString("_albums_", comment: "")
+            item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+            item.isEnabled = false
             item.tag = 103
         }
 
         // More
-        if let item = items?[3] {
+        if let item = items?[4] {
             item.title = NSLocalizedString("_more_", comment: "")
             item.image = UIImage(named: "tabBarMore")?.image(color: NCBrandColor.shared.brandElement, size: 25)
             item.selectedImage = item.image
             item.tag = 104
         }
 
-//        // Center button
-//
-//        if let centerButton = self.viewWithTag(105) {
-//            centerButton.removeFromSuperview()
-//        }
-//
-//        let centerButtonHeight: CGFloat = 57
-//        let centerButton = UIButton(frame: CGRect(x: (self.bounds.width / 2) - (centerButtonHeight / 2), y: centerButtonY, width: centerButtonHeight, height: centerButtonHeight))
-//
-//        centerButton.setTitle("", for: .normal)
-//        centerButton.setImage(imagePlus, for: .normal)
-//        centerButton.backgroundColor = NCBrandColor.shared.brandElement
-//        centerButton.tintColor = UIColor.white
-//        centerButton.tag = 105
-//        centerButton.accessibilityLabel = NSLocalizedString("_accessibility_add_upload_", comment: "")
-//        centerButton.layer.cornerRadius = centerButton.frame.size.width / 2.0
-//        centerButton.layer.masksToBounds = false
-//        centerButton.layer.shadowOffset = CGSize(width: 0, height: 0)
-//        centerButton.layer.shadowRadius = 3.0
-//        centerButton.layer.shadowOpacity = 0.5
-//        centerButton.action(for: .touchUpInside) { _ in
-//            if let controller = self.window?.rootViewController as? NCMainTabBarController {
-//                let serverUrl = controller.currentServerUrl()
-//                if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", NCSession.shared.getSession(controller: controller).account, serverUrl)) {
-//                    if !directory.permissions.contains("CK") {
-//                        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_add_file_")
-//                        NCContentPresenter().showWarning(error: error)
-//                        return
-//                    }
-//                }
-//
-//                let fileFolderPath = NCUtilityFileSystem().getFileNamePath("", serverUrl: serverUrl, session: NCSession.shared.getSession(controller: controller))
-//                let fileFolderName = (serverUrl as NSString).lastPathComponent
-//
-//                if !FileNameValidator.checkFolderPath(fileFolderPath, account: controller.account) {
-//                    controller.present(UIAlertController.warning(message: "\(String(format: NSLocalizedString("_file_name_validator_error_reserved_name_", comment: ""), fileFolderName)) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
-//
-//                    return
-//                }
-//
-//                self.appDelegate.toggleMenu(controller: controller)
-//            }
-//        }
-//
-//        self.addSubview(centerButton)
     }
 
     @objc func updateBadgeNumber(_ notification: NSNotification) {
