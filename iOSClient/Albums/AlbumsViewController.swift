@@ -11,15 +11,17 @@ import SwiftUI
 
 class AlbumsViewController: UIViewController {
     
+    @Environment(\.localAccount) var localAccount: String
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         
-        let viewModel = AlbumsListViewModel(account: appDelegate.account)
-        let albumsView = AlbumsListScreen(viewModel: viewModel)
+        let albumsRootView = AlbumsRootView()
+            .environment(\.localAccount, appDelegate.account)
         
-        let hostingController = UIHostingController(rootView: albumsView)
+        let hostingController = UIHostingController(rootView: albumsRootView)
         
         addChild(hostingController)
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
@@ -33,5 +35,18 @@ class AlbumsViewController: UIViewController {
         ])
         
         hostingController.didMove(toParent: self)
+        
+        UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = NCBrandColor.shared.customer
+    }
+}
+
+struct AccountKey: EnvironmentKey {
+    static let defaultValue: String = ""
+}
+
+extension EnvironmentValues {
+    var localAccount: String {
+        get { self[AccountKey.self] }
+        set { self[AccountKey.self] = newValue }
     }
 }

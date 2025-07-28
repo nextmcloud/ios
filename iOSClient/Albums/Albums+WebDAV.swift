@@ -11,13 +11,13 @@ import Alamofire
 import SwiftyJSON
 import SwiftyXMLParser
 
-public struct Album {
-    let name: String
-    let lastPhotoId: String?
-    let itemCount: Int?
-    let location: String?
-    let dateRange: String?
-    let collaborators: String?
+fileprivate extension String {
+    var decodedAlbumName: String {
+        guard let lastComponent = self.split(separator: "/").last else {
+            return self
+        }
+        return lastComponent.removingPercentEncoding ?? String(lastComponent)
+    }
 }
 
 public extension NextcloudKit {
@@ -135,29 +135,18 @@ public extension NextcloudKit {
             let status = element["d:propstat"]["d:status"].element?.text ?? ""
             if status.contains("200") {
                 let album = Album(
-                    name: href,
-                    lastPhotoId: nil,
-                    itemCount: nil,
-                    location: nil,
-                    dateRange: nil,
-                    collaborators: nil
+                    name: href.decodedAlbumName,
+                    lastPhotoId: lastPhoto,
+                    itemCount: nbItems,
+                    location: location,
+                    dateRange: dateRange,
+                    collaborators: collaborators
                 )
                 albums.append(album)
             }
         }
         
         return albums
-        
-        //        return [
-        //            Album(
-        //                name: "Sample Album",
-        //                lastPhotoId: nil,
-        //                itemCount: nil,
-        //                location: nil,
-        //                dateRange: nil,
-        //                collaborators: nil
-        //            )
-        //        ]
     }
     
     func createNewAlbum(
