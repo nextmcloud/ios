@@ -28,6 +28,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!
     @IBOutlet weak var imageFavorite: UIImageView!
+    @IBOutlet weak var imageFavoriteBackground: UIImageView!
     @IBOutlet weak var imageLocal: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var labelInfo: UILabel!
@@ -46,7 +47,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var imageItemLeftConstraint: NSLayoutConstraint!
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var subInfoTrailingConstraint: NSLayoutConstraint!
-
+    @IBOutlet weak var iPadLabelTitleTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var iPhoneLabelTitleTrailingConstraint: NSLayoutConstraint!
+    
     private var ocId = ""
     private var ocIdTransfer = ""
     private var user = ""
@@ -133,6 +136,15 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         
         imageItem.layer.cornerRadius = 6
         imageItem.layer.masksToBounds = true
+        imageStatus.image = nil
+        imageFavorite.image = nil
+        imageFavoriteBackground.isHidden = true
+        imageLocal.image = nil
+        labelTitle.text = ""
+        labelInfo.text = ""
+        labelSubinfo.text = ""
+        imageShared.image = nil
+        imageMore.image = nil
 
         // use entire cell as accessibility element
         
@@ -159,16 +171,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         separatorHeightConstraint.constant = 0.5
         titleInfoTrailingDefault()
 
-        labelTitle.text = ""
-        labelInfo.text = ""
-        
-        labelSubinfo.text = ""
         labelTitle.textColor = .label
         labelInfo.textColor = .systemGray
         labelSubinfo.textColor = .systemGray
         setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCImageCache.images.buttonMore)
         imageMore.isHidden = false
         buttonMore.isHidden = false
+        updateConstraintsForCurrentDevice()
     }
 
     override func prepareForReuse() {
@@ -179,7 +188,17 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
         return nil
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateConstraintsForCurrentDevice()
+    }
 
+    func updateConstraintsForCurrentDevice() {
+        iPhoneLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? false : true
+        iPadLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? true : false
+    }
+    
     @IBAction func touchUpInsideShare(_ sender: Any) {
         listCellDelegate?.tapShareListItem(with: ocId, ocIdTransfer: ocIdTransfer, sender: sender)
     }
@@ -302,6 +321,22 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     func setAccessibility(label: String, value: String) {
         accessibilityLabel = label
         accessibilityValue = value
+    }
+    
+    func setIconOutlines() {
+        imageFavoriteBackground.isHidden = fileFavoriteImage?.image == nil
+
+        if imageStatus.image != nil {
+            imageStatus.makeCircularBackground(withColor: .systemBackground)
+        } else {
+            imageStatus.backgroundColor = .clear
+        }
+
+        if imageLocal.image != nil {
+            imageLocal.makeCircularBackground(withColor: .systemBackground)
+        } else {
+            imageLocal.backgroundColor = .clear
+        }
     }
 }
 

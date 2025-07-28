@@ -560,6 +560,33 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.cellSeparatorView?.isHidden = false
             cell.fileSharedLabel?.isHidden = false
         }
+        
+        // Layout photo
+        if isLayoutPhoto {
+            let width = UIScreen.main.bounds.width / CGFloat(self.numberOfColumns)
+
+            cell.hideImageFavorite(false)
+            cell.hideImageLocal(false)
+            cell.hideImageItem(false)
+            cell.hideButtonMore(false)
+            cell.hideLabelInfo(false)
+            cell.hideLabelSubinfo(false)
+            cell.hideImageStatus(false)
+            cell.fileTitleLabel?.font = UIFont.systemFont(ofSize: 15)
+
+            if width < 120 {
+                cell.hideImageFavorite(true)
+                cell.hideImageLocal(true)
+                cell.fileTitleLabel?.font = UIFont.systemFont(ofSize: 10)
+                if width < 100 {
+                    cell.hideImageItem(true)
+                    cell.hideButtonMore(true)
+                    cell.hideLabelInfo(true)
+                    cell.hideLabelSubinfo(true)
+                    cell.hideImageStatus(true)
+                }
+            }
+        }
 
         return cell
     }
