@@ -265,8 +265,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             }
         }
         let enabled = NCShareCommon().isEditingEnabled(isDirectory: metadata.directory, fileExtension: metadata.fileExtension, shareType: shareType) || checkIsCollaboraFile()
-        row.cellConfig["titleLabel.textColor"] = enabled ? NCBrandColor.shared.label : NCBrandColor.shared.systemGray
-        row.disabled = !enabled
+        row.cellConfig["titleLabel.textColor"] = NCBrandColor.shared.label
         section.addFormRow(row)
         
         if !enabled {
@@ -294,6 +293,7 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             row = XLFormRowDescriptor(tag: "kNMCFilePermissionCellFiledropMessage", rowType: "kNMCFilePermissionCell", title: NSLocalizedString("_PERMISSIONS_", comment: ""))
             row.cellConfig["titleLabel.text"] = NSLocalizedString("_file_drop_message_", comment: "")
             row.cellConfig["titleLabel.textColor"] = NCBrandColor.shared.gray60
+//            row.cellConfig["titleLabel.textColor"] = NCBrandColor.shared.label
             row.cellConfig["imageCheck.image"] = UIImage()
             row.height = 84
             section.addFormRow(row)

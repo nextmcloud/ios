@@ -231,6 +231,10 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
                     await NCNetworking.shared.createRecommendations(session: self.session)
                 }
             }
+            self.refreshControl.endRefreshing()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                self.resetPlusButtonAlpha()
+            }
         }
         
         // Empty
@@ -286,6 +290,10 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         
         appDelegate.activeViewController = self
         appDelegate.account = session.account
+        appDelegate.urlBase = session.urlBase
+        appDelegate.userId = session.userId
+        appDelegate.user = session.user
+
         NCKeychain().setAccountName(account: session.account)
         isEditMode = false
 
@@ -440,6 +448,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     // MARK: - NotificationCenter
 
     @objc func applicationWillResignActive(_ notification: NSNotification) {
+        self.resetPlusButtonAlpha()
         self.refreshControl.endRefreshing()
     }
 
@@ -840,6 +849,10 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     }
 
     func accountSettingsDidDismiss(tableAccount: tableAccount?, controller: NCMainTabBarController?) { }
+
+    func resetPlusButtonAlpha(animated: Bool = true) { }
+
+    func isHiddenPlusButton(_ isHidden: Bool) { }
 
     // MARK: - Empty
 

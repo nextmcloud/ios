@@ -216,8 +216,6 @@
 		B5E2E6E82DAE59F000AB2EDD /* NCShareTextInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6E62DAE59F000AB2EDD /* NCShareTextInputCell.xib */; };
 		B5E2E6E92DAE59F000AB2EDD /* NCShareTextInputCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6E52DAE59F000AB2EDD /* NCShareTextInputCell.swift */; };
 		B5E2E6EA2DAE59F000AB2EDD /* NCShareHeaderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6E32DAE59F000AB2EDD /* NCShareHeaderCustomCell.swift */; };
-		B5E2E6ED2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6EC2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib */; };
-		B5E2E6EE2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6EB2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift */; };
 		B5E2E6F12DAE854D00AB2EDD /* TealiumLifecycle in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB289A2B8351720089D373 /* TealiumLifecycle */; };
 		B5E2E6F22DAE854D00AB2EDD /* TealiumTagManagement in Frameworks */ = {isa = PBXBuildFile; productRef = 56AB28A02B8351730089D373 /* TealiumTagManagement */; };
 		B5E2E70D2DAE86DC00AB2EDD /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6FC2DAE86DC00AB2EDD /* HelpViewController.swift */; };
@@ -1356,8 +1354,6 @@
 		B5E2E6E42DAE59F000AB2EDD /* NCShareHeaderCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareHeaderCustomCell.xib; sourceTree = "<group>"; };
 		B5E2E6E52DAE59F000AB2EDD /* NCShareTextInputCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareTextInputCell.swift; sourceTree = "<group>"; };
 		B5E2E6E62DAE59F000AB2EDD /* NCShareTextInputCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareTextInputCell.xib; sourceTree = "<group>"; };
-		B5E2E6EB2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareEmailFieldCell.swift; sourceTree = "<group>"; };
-		B5E2E6EC2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareEmailFieldCell.xib; sourceTree = "<group>"; };
 		B5E2E6F62DAE86DC00AB2EDD /* CCAdvanced.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCAdvanced.h; sourceTree = "<group>"; };
 		B5E2E6F72DAE86DC00AB2EDD /* CCAdvanced.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCAdvanced.m; sourceTree = "<group>"; };
 		B5E2E6F82DAE86DC00AB2EDD /* CCManageAccount.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCManageAccount.h; sourceTree = "<group>"; };
@@ -1394,6 +1390,10 @@
 		B5F079ED2DF82AEC00EBD527 /* UIDevice+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
 		B5F079F62DF857D800EBD527 /* NCLoginNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCLoginNavigationController.swift; sourceTree = "<group>"; };
 		B5F545A02DF1C68F008137AB /* Shareable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shareable.swift; sourceTree = "<group>"; };
+		B5F738B92E17F3FD00704243 /* Notification Service ExtensionRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Notification Service ExtensionRelease.entitlements"; sourceTree = "<group>"; };
+		B5F738BA2E17F41700704243 /* File Provider ExtensionRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "File Provider ExtensionRelease.entitlements"; sourceTree = "<group>"; };
+		B5F738BB2E17F42600704243 /* ShareRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareRelease.entitlements; sourceTree = "<group>"; };
+		B5F738BC2E17F42D00704243 /* NextcloudRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NextcloudRelease.entitlements; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C010D98A2E324604007B86CD /* NoAlbumsEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoAlbumsEmptyView.swift; sourceTree = "<group>"; };
 		C010D98D2E325DA5007B86CD /* AlbumsRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsRootView.swift; sourceTree = "<group>"; };
@@ -2029,6 +2029,7 @@
 		2C33C48023E2C475005F963B /* Notification Service Extension */ = {
 			isa = PBXGroup;
 			children = (
+				B5F738B92E17F3FD00704243 /* Notification Service ExtensionRelease.entitlements */,
 				2C33C48123E2C475005F963B /* NotificationService.swift */,
 				2C33C48A23E2CC26005F963B /* Notification_Service_Extension-Bridging-Header.h */,
 			);
@@ -2565,8 +2566,6 @@
 				B5F545A02DF1C68F008137AB /* Shareable.swift */,
 				566EB7DC2B3D72CA00FB7CAD /* NCShareEmailFieldCell.swift */,
 				566EB7DB2B3D72CA00FB7CAD /* NCShareEmailFieldCell.xib */,
-				B5E2E6EB2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift */,
-				B5E2E6EC2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib */,
 				AF93471327E235EB002537EE /* Advanced */,
 				F724377A2C10B83E00C7C68D /* NCPermissions.swift */,
 				F700510022DF63AC003A3356 /* NCShare.storyboard */,
@@ -2945,6 +2944,7 @@
 		F771E3D120E2392D00AFB62D /* File Provider Extension */ = {
 			isa = PBXGroup;
 			children = (
+				B5F738BA2E17F41700704243 /* File Provider ExtensionRelease.entitlements */,
 				F771E3F220E239A600AFB62D /* FileProviderData.swift */,
 				F76673EC22C901F5007ED366 /* FileProviderDomain.swift */,
 				F771E3D620E2392D00AFB62D /* FileProviderEnumerator.swift */,
@@ -3249,6 +3249,7 @@
 		F7C0F46D1C8880540059EC54 /* Share */ = {
 			isa = PBXGroup;
 			children = (
+				B5F738BB2E17F42600704243 /* ShareRelease.entitlements */,
 				F714803A262EBE3900693E51 /* MainInterface.storyboard */,
 				F7148040262EBE4000693E51 /* NCShareExtension.swift */,
 				AF730AF927843E4C00B7520E /* NCShareExtension+NCAccountRequestDelegate.swift */,
@@ -3519,6 +3520,7 @@
 		F7F67B9F1A24D27800EE80DA = {
 			isa = PBXGroup;
 			children = (
+				B5F738BC2E17F42D00704243 /* NextcloudRelease.entitlements */,
 				B5BE9C902DFC088B0029534E /* NextcloudDebug.entitlements */,
 				AA8E041E2D3114E200E7E89C /* README.md */,
 				F7B8B82F25681C3400967775 /* GoogleService-Info.plist */,
@@ -4175,7 +4177,6 @@
 				F757CC8C29E82D0500F31428 /* NCGroupfolders.storyboard in Resources */,
 				F79A65C32191D90F00FF6DCC /* NCSelect.storyboard in Resources */,
 				B5E2E6DD2DAE573B00AB2EDD /* NCFilePermissionEditCell.xib in Resources */,
-				B5E2E6ED2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib in Resources */,
 				B5E2E6DE2DAE573B00AB2EDD /* NCFilePermissionCell.xib in Resources */,
 				F7226EDC1EE4089300EBECB1 /* Main.storyboard in Resources */,
 				566EB80C2B3D7B5F00FB7CAD /* PNGImageSaveSwitchView.xib in Resources */,
@@ -4718,7 +4719,6 @@
 				370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */,
 				F32FADA92D1176E3007035E2 /* UIButton+Extension.swift in Sources */,
 				F768822C2C0DD1E7001CF441 /* NCKeychain.swift in Sources */,
-				B5E2E6EE2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift in Sources */,
 				F7BFFD282C8846020029A201 /* NCHud.swift in Sources */,
 				F71CD6CA2930D7B1006C95C1 /* NCApplicationHandle.swift in Sources */,
 				F3754A7D2CF87D600009312E /* SetupPasscodeView.swift in Sources */,
@@ -5273,7 +5273,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Notification_Service_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5282,7 +5282,7 @@
 					EXTENSION_NOTIFICATION_SERVICE,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Notification_Service_Extension.plist";
-				MARKETING_VERSION = 9.6.3;
+				MARKETING_VERSION = 9.6.6;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5303,10 +5303,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Notification_Service_Extension.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Notification Service Extension/Notification Service ExtensionRelease.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5315,7 +5315,7 @@
 					EXTENSION_NOTIFICATION_SERVICE,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Notification_Service_Extension.plist";
-				MARKETING_VERSION = 9.6.3;
+				MARKETING_VERSION = 9.6.6;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5573,7 +5573,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Share.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5582,7 +5582,7 @@
 					EXTENSION_SHARE,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Share.plist";
-				MARKETING_VERSION = 9.6.3;
+				MARKETING_VERSION = 9.6.6;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5603,10 +5603,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Share.entitlements";
+				CODE_SIGN_ENTITLEMENTS = Share/ShareRelease.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5615,7 +5615,7 @@
 					EXTENSION_SHARE,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Share.plist";
-				MARKETING_VERSION = 9.6.3;
+				MARKETING_VERSION = 9.6.6;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5640,7 +5640,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/File_Provider_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5649,7 +5649,7 @@
 					EXTENSION_FILE_PROVIDER_EXTENSION,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/File_Provider_Extension.plist";
-				MARKETING_VERSION = 9.6.3;
+				MARKETING_VERSION = 9.6.6;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5672,10 +5672,10 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/File_Provider_Extension.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "File Provider Extension/File Provider ExtensionRelease.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5684,7 +5684,7 @@
 					EXTENSION_FILE_PROVIDER_EXTENSION,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/File_Provider_Extension.plist";
-				MARKETING_VERSION = 9.6.3;
+				MARKETING_VERSION = 9.6.6;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5709,13 +5709,13 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15;
-				MARKETING_VERSION = 9.6.3;
+				MARKETING_VERSION = 9.6.6;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5737,16 +5737,16 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
+				CODE_SIGN_ENTITLEMENTS = NextcloudRelease.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15;
-				MARKETING_VERSION = 9.6.3;
+				MARKETING_VERSION = 9.6.6;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";

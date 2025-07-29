@@ -430,4 +430,20 @@ class NCBrandColor: NSObject, @unchecked Sendable  {
     @objc public var seperatorRename: UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
     @objc public let gray: UIColor = UIColor(red: 104.0/255.0, green: 104.0/255.0, blue: 104.0/255.0, alpha: 1.0)
     @objc public var nmcIconSharedWithMe: UIColor = UIColor(displayP3Red: 0.0/255.0, green: 153.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+    
+    var shareBlueColor: UIColor{
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return UIColor(hex: "#7d94f9")!
+        }else {
+            return UIColor(hex: "#2238df")!
+        }
+    }
+    
+    var shareBlackColor: UIColor{
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return UIColor.white
+        }else {
+            return UIColor.black
+        }
+    }
 }

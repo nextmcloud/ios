@@ -701,7 +701,6 @@
 "_new_comment_"                 = "New comment …";
 "_edit_comment_"                = "Edit comment";
 "_delete_comment_"              = "Delete comment";
-"_share_read_only_"             = "View only";
 "_share_reshare_allowed_"       = "Resharing is allowed.";
 "_share_reshare_not_allowed_"   = "Resharing is not allowed.";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
@@ -727,7 +726,8 @@
 "_share_download_limit_alert_empty_" = "Download limit cannot be empty.";
 "_share_download_limit_alert_zero_"  = "Download limit should be greater than 0.";
 "_share_remaining_download_"    = "Downloads:";
-"_share_read_only_"             = "Read only";
+//"_share_read_only_"             = "Read only";
+"_share_read_only_"             = "View only";
 "_share_editing_"               = "Can edit";
 "_share_file_drop_"             = "Filedrop only";
 "_share_hide_download_"         = "Prevent download";
@@ -742,12 +742,10 @@
 "_share_allow_editing_"         = "Allow editing";
 "_share_allow_upload_"          = "Allow upload and editing";
 "_share_secure_file_drop_"      = "Secure file drop (upload only)";
-"_share_password_protect_"      = "Password protect";
 //"_share_hide_download_"         = "Hide download";
 "_share_limit_download_"        = "Limit downloads";
 "_remaining_"                   = "%d remaining";
 "_share_password_protect_"      = "Password protection";
-//"_share_password_protect_"      = "Password protect";
 "_share_expiration_date_"       = "Set expiration date";
 "_share_note_recipient_"        = "Note to recipient";
 "_share_delete_sharelink_"      = "Delete link";
@@ -762,6 +760,26 @@
 "_share_reshare_disabled_"      = "You are not allowed to reshare this file/folder";
 "_share_reshare_restricted_"    = "Note: You only have limited permission to reshare this file/folder";
 "_share_can_download_"          = "Allow download";
+"_create_new_link_"             = "Create new link";
+"_share_send_link_by_mail_"      = "Send link by mail";
+"_share_or_"                     = "or";
+"_share_copy_link_"              = "Copy link";
+"_share_shared_with_"            = "Shared with";
+"_share_quick_permission_everyone_can_just_upload_"  = "Everyone can just upload";
+"_share_quick_permission_everyone_can_edit_"         = "Everyone can edit";
+"_share_quick_permission_everyone_can_only_view_"    = "Everyone can only view";
+"_share_quick_permission_everyone_can_just_upload__short"  = "Just upload";
+"_share_quick_permission_everyone_can_edit__short"         = "Can edit";
+"_share_quick_permission_everyone_can_only_view__short"    = "Only view";
+"_share_received_shares_text_"      = "This file / folder was shared with you by";
+"_share_no_shares_text_"            = "You have not yet shared your file/folder. Share to give others access";
+"_share_size_"                      = "Size: ";
+"_share_modified_"                  = "Modified: ";
+"_share_created_"                   = "Created: ";
+"_share_uploaded_"                  = "Uploaded: ";
+"_share_via_link_menu_password_label_" = "Password protect (%1$s)";
+"_share_link_empty_exp_date_" = "You must select expiration date.";
+"_share_link_empty_note_message_" = "Please enter note.";
 
 "_no_transfer_"                     = "No transfers yet";
 "_no_transfer_sub_"                 = "Uploads and downloads from this device will show up here";

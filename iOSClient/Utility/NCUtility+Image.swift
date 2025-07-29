@@ -556,4 +556,27 @@ extension NCUtility {
             try? originalImage?.jpegData(compressionQuality: 0.7)?.write(to: URL(fileURLWithPath: fileNamePathIcon))
         }
     }
+    
+    func getImageMetadata(_ metadata: tableMetadata) -> UIImage? {
+
+        if let image = self.getImage(metadata: metadata) {
+            return image
+        }
+
+        if metadata.isVideo && !metadata.hasPreview {
+            self.createImageFrom(fileNameView: metadata.fileNameView, ocId: metadata.ocId, etag: metadata.etag, classFile: metadata.classFile)
+        }
+
+        if utilityFileSystem.fileProviderStoragePreviewIconExists(metadata.ocId, etag: metadata.etag) {
+            return UIImage(contentsOfFile: utilityFileSystem.getDirectoryProviderStoragePreviewOcId(metadata.ocId, etag: metadata.etag))
+        }
+
+        if metadata.isAudio {
+            return UIImage(named: "noPreviewAudio")!.image(color: .gray)
+        } else if metadata.isImage {
+            return UIImage(named: "noPreview")!.image(color: .gray)
+        } else {
+            return nil
+        }
+    }
 }

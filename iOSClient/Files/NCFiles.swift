@@ -27,11 +27,17 @@ import RealmSwift
 import SwiftUI
 
 class NCFiles: NCCollectionViewCommon {
+    @IBOutlet weak var plusButton: UIButton!
+
     internal var fileNameBlink: String?
     internal var fileNameOpen: String?
     internal var matadatasHash: String = ""
     internal var semaphoreReloadDataSource = DispatchSemaphore(value: 1)
     private var timerProcess: Timer?
+
+    internal var lastOffsetY: CGFloat = 0
+    internal var lastScrollTime: TimeInterval = 0
+    internal var accumulatedScrollDown: CGFloat = 0
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -49,6 +55,25 @@ class NCFiles: NCCollectionViewCommon {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        /// Plus Button
+        let image = UIImage(systemName: "plus", withConfiguration: UIImage.SymbolConfiguration(scale: .large))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: [.white]))
+
+        plusButton.setTitle("", for: .normal)
+        plusButton.setImage(image, for: .normal)
+        plusButton.backgroundColor = NCBrandColor.shared.getElement(account: session.account)
+        plusButton.accessibilityLabel = NSLocalizedString("_accessibility_add_upload_", comment: "")
+        plusButton.layer.cornerRadius = plusButton.frame.size.width / 2.0
+        plusButton.layer.masksToBounds = false
+        plusButton.layer.shadowOffset = CGSize(width: 0, height: 0)
+        plusButton.layer.shadowRadius = 3.0
+        plusButton.layer.shadowOpacity = 0.5
+
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil, queue: nil) { _ in
+            if let activeTableAccount = NCManageDatabase.shared.getActiveTableAccount() {
+                self.plusButton.backgroundColor = NCBrandColor.shared.getElement(account: activeTableAccount.account)
+            }
+        }
+        
         if self.serverUrl.isEmpty {
 
             ///
@@ -101,6 +126,7 @@ class NCFiles: NCCollectionViewCommon {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        resetPlusButtonAlpha()
         reloadDataSource()
     }
 
@@ -128,6 +154,34 @@ class NCFiles: NCCollectionViewCommon {
         fileNameOpen = nil
     }
 
+    // MARK: - Action
+
+    @IBAction func plusButtonAction(_ sender: UIButton) {
+        resetPlusButtonAlpha()        
+        if let controller = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController {
+            let serverUrl = controller.currentServerUrl()
+            if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", NCSession.shared.getSession(controller: controller).account, serverUrl)) {
+                if !directory.permissions.contains("CK") {
+                    let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_add_file_")
+                    NCContentPresenter().showWarning(error: error)
+                    return
+                }
+            }
+
+            let fileFolderPath = NCUtilityFileSystem().getFileNamePath("", serverUrl: serverUrl, session: NCSession.shared.getSession(controller: controller))
+            let fileFolderName = (serverUrl as NSString).lastPathComponent
+
+            if !FileNameValidator.checkFolderPath(fileFolderPath, account: controller.account) {
+                controller.present(UIAlertController.warning(message: "\(String(format: NSLocalizedString("_file_name_validator_error_reserved_name_", comment: ""), fileFolderName)) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
+
+                return
+            }
+
+            self.appDelegate.toggleMenu(controller: controller)
+        }
+        
+    }
+    
     // MARK: - DataSource
 
     override func reloadDataSource() {
@@ -342,6 +396,36 @@ class NCFiles: NCCollectionViewCommon {
                     self.collectionView(self.collectionView, didSelectItemAt: indexPath)
                 }
             }
+        }
+    }
+    
+    override func resetPlusButtonAlpha(animated: Bool = true) {
+        accumulatedScrollDown = 0
+        let update = {
+            self.plusButton.alpha = 1.0
+        }
+
+        if animated {
+            UIView.animate(withDuration: 0.3, animations: update)
+        } else {
+            update()
+        }
+    }
+
+    override func isHiddenPlusButton(_ isHidden: Bool) {
+        if isHidden {
+            UIView.animate(withDuration: 0.5, delay: 0.0, options: [], animations: {
+                self.plusButton.transform = CGAffineTransform(translationX: 100, y: 0)
+                self.plusButton.alpha = 0
+            })
+        } else {
+            plusButton.transform = CGAffineTransform(translationX: 100, y: 0)
+            plusButton.alpha = 0
+
+            UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
+                self.plusButton.transform = .identity
+                self.plusButton.alpha = 1
+            })
         }
     }
 

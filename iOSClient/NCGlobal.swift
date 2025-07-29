@@ -343,6 +343,8 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     @objc let notificationCenterInitialize                      = "initialize"
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
+    let notificationCenterDidCreateShareLink                    = "didCreateShareLink"
+    
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
     let notificationCenterReloadAvatar                          = "reloadAvatar"
     let notificationCenterReloadHeader                          = "reloadHeader"

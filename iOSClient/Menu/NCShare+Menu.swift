@@ -131,7 +131,8 @@ extension NCShare {
 
         actions.append(
             NCMenuAction(
-                title: isDirectory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
+//                title: isDirectory ? NSLocalizedString("_share_allow_upload_", comment: "") : NSLocalizedString("_share_editing_", comment: ""),
+                title: NSLocalizedString("_share_editing_", comment: ""),
                 icon: UIImage(),
                 selected: hasUploadPermission(tableShare: tableShare),
                 on: false,

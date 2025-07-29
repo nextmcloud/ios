@@ -109,6 +109,8 @@ class NCShareNetworking: NSObject {
                 if !metadata.contentType.contains("directory") {
                     AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__SHARE_FILE ,metadata: metadata)
                 }
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDidCreateShareLink)
+
             } else if error != .success{
                 NCContentPresenter().showError(error: error)
             }
@@ -194,6 +196,7 @@ class NCShareNetworking: NSObject {
                 }
                 
                 NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateShare, userInfo: ["account": self.metadata.account, "serverUrl": self.metadata.serverUrl])
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
             } else {
                 NCContentPresenter().showError(error: error)
                 self.delegate?.updateShareWithError(idShare: option.idShare)
