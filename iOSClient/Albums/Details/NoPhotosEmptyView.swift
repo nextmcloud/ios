@@ -1,16 +1,16 @@
 //
-//  NoAlbumsEmptyView.swift
+//  NoPhotosEmptyView.swift
 //  Nextcloud
 //
-//  Created by Dhanesh on 24/07/25.
+//  Created by Dhanesh on 29/07/25.
 //  Copyright © 2025 Marino Faggiana. All rights reserved.
 //
 
 import SwiftUI
 
-struct NoAlbumsEmptyView: View {
+struct NoPhotosEmptyView: View {
     
-    let onNewAlbumCreationIntent: () -> Void
+    let onAddPhotosIntent: () -> Void
     
     private let contentPadding: CGFloat = 56.0
     
@@ -23,7 +23,7 @@ struct NoAlbumsEmptyView: View {
                 ZStack(alignment: .top) {
                     
                     // Background image
-                    Image("noAlbum")
+                    Image("emptyAlbum")
                         .resizable()
                         .scaledToFill()
                         .frame(height: geometry.size.height * 0.5)
@@ -34,17 +34,17 @@ struct NoAlbumsEmptyView: View {
                         
                         Spacer().frame(height: geometry.size.height * 0.4)
                         
-                        Text("Create\nAlbums\nfor your\nPhotos")
+                        Text("All that's\nmissing are\nyour photos")
                             .font(.system(size: 48, weight: .bold))
                             .padding(.horizontal, contentPadding)
                         
-                        Text("You can organize all your photos in as many albums as you like. You haven't created an album yet.")
+                        Text("You can add as many photos as you like. A photo can also belong to more than one album.")
                             .font(.system(size: 15, weight: .regular))
                             .foregroundColor(.secondary)
                             .padding(.horizontal, contentPadding)
                         
-                        Button(action: onNewAlbumCreationIntent) {
-                            Label("Create album", systemImage: "plus")
+                        Button(action: onAddPhotosIntent) {
+                            Label("Add photos", systemImage: "plus")
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(Color(NCBrandColor.shared.customer))
                         }
@@ -58,13 +58,19 @@ struct NoAlbumsEmptyView: View {
                 .frame(width: geometry.size.width, height: geometry.size.height)
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Add", action: onAddPhotosIntent)
+                    .foregroundColor(Color(NCBrandColor.shared.customer))
+            }
+        }
     }
 }
 
 #if DEBUG
 #Preview {
     NavigationView {
-        NoAlbumsEmptyView(onNewAlbumCreationIntent: {})
+        NoPhotosEmptyView(onAddPhotosIntent: {})
             .navigationTitle("Album")
             .navigationBarTitleDisplayMode(.inline)
     }

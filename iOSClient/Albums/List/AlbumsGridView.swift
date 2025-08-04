@@ -10,6 +10,8 @@ import SwiftUI
 
 struct AlbumsGridView: View {
     
+    @Environment(\.localAccount) var localAccount: String
+    
     let albums: [Album]
     
     private let columns = [
@@ -29,68 +31,79 @@ struct AlbumsGridView: View {
                     
                     ForEach(albums, id: \.id) { album in
                         
-                        VStack(alignment: .leading, spacing: 8) {
-                            
-                            if album.lastPhotoId == "-1" || album.itemCount == 0 {
-                                Image("emptyAlbum")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 182, height: 140) // make flexible if needed
-                                    .clipped()
-                                    .cornerRadius(8)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                        NavigationLink(
+                            destination: {
+                                AlbumDetailsScreen(
+                                    viewModel: .init(
+                                        account: localAccount,
+                                        album: album
                                     )
-                            } else {
-                                Image(album.lastPhotoId ?? "")
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 182, height: 140) // make flexible if needed
-                                    .clipped()
-                                    .cornerRadius(8)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.gray.opacity(0.5), lineWidth: 1)
-                                    )
+                                )
                             }
-                            
-                            //                            if let image = NCUtility.createFilePreviewImage(
-                            //                                ocId: album.lastPhotoId,
-                            //                                etag: metadata.etag,
-                            //                                fileNameView: metadata.fileNameView,
-                            //                                classFile: metadata.classFile,
-                            //                                status: metadata.status,
-                            //                                createPreviewMedia: true
-                            //                            ) {
-                            //
-                            //
-                            //
-                            //                            }
-                            
-                            Text(album.name)
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(.primary)
-                                .lineLimit(1)
-                            
-                            let subtitle: String = {
-                                var parts: [String] = []
+                        ) {
+                            VStack(alignment: .leading, spacing: 8) {
                                 
-                                if let count = album.itemCount {
-                                    parts.append("\(count) Objects")
+                                if album.lastPhotoId == "-1" || album.itemCount == 0 {
+                                    Image("emptyAlbum")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 182, height: 140) // make flexible if needed
+                                        .clipped()
+                                        .cornerRadius(8)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                                        )
+                                } else {
+                                    Image(album.lastPhotoId ?? "")
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 182, height: 140) // make flexible if needed
+                                        .clipped()
+                                        .cornerRadius(8)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                                        )
                                 }
                                 
-                                if let date = album.dateRange {
-                                    parts.append(date)
-                                }
+                                //                            if let image = NCUtility.createFilePreviewImage(
+                                //                                ocId: album.lastPhotoId,
+                                //                                etag: metadata.etag,
+                                //                                fileNameView: metadata.fileNameView,
+                                //                                classFile: metadata.classFile,
+                                //                                status: metadata.status,
+                                //                                createPreviewMedia: true
+                                //                            ) {
+                                //
+                                //
+                                //
+                                //                            }
                                 
-                                return parts.joined(separator: " - ")
-                            }()
-                            
-                            if !subtitle.isEmpty {
-                                Text(subtitle)
-                                    .font(.system(size: 13))
-                                    .foregroundColor(Color(UIColor.systemGray))
+                                Text(album.name)
+                                    .font(.system(size: 15, weight: .medium))
+                                    .foregroundColor(.primary)
+                                    .lineLimit(1)
+                                
+                                let subtitle: String = {
+                                    var parts: [String] = []
+                                    
+                                    if let count = album.itemCount {
+                                        parts.append("\(count) Objects")
+                                    }
+                                    
+                                    if let date = album.dateRange {
+                                        parts.append(date)
+                                    }
+                                    
+                                    return parts.joined(separator: " - ")
+                                }()
+                                
+                                if !subtitle.isEmpty {
+                                    Text(subtitle)
+                                        .font(.system(size: 13))
+                                        .foregroundColor(Color(UIColor.systemGray))
+                                }
                             }
                         }
                     }
@@ -106,9 +119,30 @@ struct AlbumsGridView: View {
 #Preview {
     AlbumsGridView(
         albums: [
-            Album(name: "Geburtstagsalbum", lastPhotoId: "birthday", itemCount: 16, location: "Berlin", dateRange: "Feb 2022", collaborators: "Anna, John"),
-            Album(name: "Urlaub", lastPhotoId: "mountain", itemCount: 42, location: "Alps", dateRange: nil, collaborators: nil),
-            Album(name: "Office Party", lastPhotoId: "-1", itemCount: 0, location: nil, dateRange: "Dec 2023", collaborators: nil)
+            Album(
+                href: "/Geburtstagsalbum",
+                lastPhotoId: "birthday",
+                itemCount: 16,
+                location: "Berlin",
+                dateRange: "Feb 2022",
+                collaborators: "Anna, John"
+            ),
+            Album(
+                href: "/Urlaub",
+                lastPhotoId: "mountain",
+                itemCount: 42,
+                location: "Alps",
+                dateRange: nil,
+                collaborators: nil
+            ),
+            Album(
+                href: "/Office Party",
+                lastPhotoId: "-1",
+                itemCount: 0,
+                location: nil,
+                dateRange: "Dec 2023",
+                collaborators: nil
+            )
         ]
     )
 }

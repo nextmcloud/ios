@@ -9,7 +9,6 @@
 import Foundation
 import Combine
 import NextcloudKit
-import SVGKit
 
 class AlbumsListViewModel: ObservableObject {
     
