@@ -38,7 +38,7 @@ let userAgent: String = {
     @objc public var brand:                           String = "MagentaCLOUD"
     @objc public var textCopyrightNextcloudiOS:       String = "MagentaCLOUD for iOS %@"
     @objc public var textCopyrightNextcloudServer:    String = "MagentaCLOUD Server %@"
-    @objc public var loginBaseUrl:                    String = "https://pre1.next.magentacloud.de" //"https://magentacloud.de"
+    @objc public var loginBaseUrl:                    String = "https://magentacloud.de"
 
     @objc public var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost: String = "https://nextcloud.com/install"

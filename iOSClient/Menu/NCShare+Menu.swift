@@ -149,8 +149,8 @@ extension NCShare {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_share_file_drop_", comment: ""),
-                    icon: tableShare.permissions == permissions.permissionCreateShare ? UIImage(named: "success")?.image(color: NCBrandColor.shared.customer, size: 25.0) ?? UIImage() : UIImage(),
-                    selected: false,
+                    icon: UIImage(),
+                    selected: tableShare.permissions == permissions.permissionCreateShare,
                     on: false,
                     action: { menuAction in
                         self.updateSharePermissions(share: tableShare, permissions: permissions.permissionCreateShare)
