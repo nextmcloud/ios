@@ -87,7 +87,7 @@ class NCShareLinkCell: UITableViewCell {
             if !tableShare.label.isEmpty {
                 labelTitle.text? += " (\(tableShare.label))"
             } else {
-                labelTitle.text?.append(" (\(titleAppendString))")
+                labelTitle.text?.append(" \(titleAppendString)")
             }
         }
         updatePermissionUI()

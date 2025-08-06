@@ -828,7 +828,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         if isSearchingMode {
             networkSearch()
         } else {
-            self.dataSource.removeAll()
+//            self.dataSource.removeAll()
             getServerData()
         }
     }
