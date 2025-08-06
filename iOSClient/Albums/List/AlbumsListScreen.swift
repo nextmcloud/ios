@@ -7,9 +7,14 @@
 //
 
 import SwiftUI
-import SVGKit
 
 struct AlbumsListScreen: View {
+    
+    @Environment(\.localAccount) var localAccount: String
+    
+    enum NavigationDestination: Hashable {
+        case albumDetails(album: Album)
+    }
     
     @StateObject private var viewModel: AlbumsListViewModel
     
@@ -19,21 +24,16 @@ struct AlbumsListScreen: View {
     
     var body: some View {
         
-        Group {
-            if viewModel.isLoading {
-                ProgressView("Loading albums...")
-            } else if let error = viewModel.errorMessage {
-                Text(error)
-            } else if viewModel.albums.isEmpty {
-                NoAlbumsEmptyView(onNewAlbumCreationIntent: {
-                    viewModel.onNewAlbumClick()
-                })
-            } else {
-                AlbumsGridView(albums: viewModel.albums)
+        ZStack {
+            content()
+            
+            if viewModel.isLoadingPopupVisible {
+                NCLoadingAlert()
             }
         }
         .navigationTitle("Albums")
         .navigationBarTitleDisplayMode(.inline)
+        .background(setupNavigation)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("New") {
@@ -42,27 +42,62 @@ struct AlbumsListScreen: View {
                 .foregroundColor(Color(NCBrandColor.shared.customer))
             }
         }
-        .alert(
-            "Create new Album",
-            isPresented: $viewModel.isNewAlbumCreationPopupVisible
-        ) {
-            
-            TextField("Album's name", text: $viewModel.newAlbumName)
-            
-            Button("Cancel", role: .cancel) {
+        .inputAlbumNameAlert(
+            isPresented: $viewModel.isNewAlbumCreationPopupVisible,
+            albumName: $viewModel.newAlbumName,
+            error: viewModel.newAlbumNameError,
+            onCreate: {
+                viewModel.onNewAlbumPopupCreate()
+            },
+            onCancel: {
                 viewModel.onNewAlbumPopupCancel()
             }
-            
-            Button("Create") {
-                viewModel.onNewAlbumPopupCreate()
-            }
-            .disabled(viewModel.newAlbumNameError != nil)
-        } message: {
-            Text("Please enter an album name between 3 and 30 characters.")
-                .foregroundColor(.secondary)
-        }
+        )
         .onAppear {
             viewModel.loadAlbums()
+        }
+    }
+    
+    @ViewBuilder
+    private func content() -> some View {
+        if viewModel.isLoading {
+            ProgressView("Loading albums...")
+        } else if let error = viewModel.errorMessage {
+            Text(error)
+        } else if viewModel.albums.isEmpty {
+            NoAlbumsEmptyView(onNewAlbumCreationIntent: viewModel.onNewAlbumClick)
+        } else {
+            AlbumsGridView(albums: viewModel.albums)
+        }
+    }
+    
+    private var setupNavigation: some View {
+        
+        let binding = Binding<Bool> { [weak viewModel] in
+            viewModel?.navigationDestination != nil
+        } set: { [weak viewModel] value in
+            guard !value else { return }
+            viewModel?.navigationDestination = nil
+        }
+        
+        return NavigationLink(isActive: binding) {
+            switch viewModel.navigationDestination {
+            case .some(let value):
+                navigationDestination(value)
+                
+            case .none:
+                EmptyView()
+            }
+        } label: {
+            EmptyView()
+        }
+    }
+    
+    @ViewBuilder
+    private func navigationDestination(_ destination: NavigationDestination) -> some View {
+        switch destination {
+        case .albumDetails(let album):
+            AlbumDetailsScreen(viewModel: .init(account: localAccount, album: album))
         }
     }
 }

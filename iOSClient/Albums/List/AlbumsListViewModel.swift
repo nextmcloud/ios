@@ -18,9 +18,13 @@ class AlbumsListViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String? = nil
     
+    @Published var isLoadingPopupVisible: Bool = false
+    
     @Published var isNewAlbumCreationPopupVisible: Bool = false
     @Published var newAlbumName: String = ""
     @Published private(set) var newAlbumNameError: String? = nil
+    
+    @Published var navigationDestination: AlbumsListScreen.NavigationDestination? = nil
     
     private var cancellables: Set<AnyCancellable> = []
     
@@ -82,7 +86,9 @@ class AlbumsListViewModel: ObservableObject {
     }
     
     // MARK: - APIs
-    func loadAlbums() {
+    func loadAlbums(
+        doOnSuccess: (() -> Void)? = nil
+    ) {
         
         guard !isLoading else { return } // Prevent double calls
         
@@ -96,8 +102,11 @@ class AlbumsListViewModel: ObservableObject {
             switch result {
             case .success(let albums):
                 self.albums = albums
+                if let callback = doOnSuccess {
+                    callback()
+                }
             case .failure(let error):
-                //                self.errorMessage = error.localizedDescription
+                NCContentPresenter().showError(error: NKError(error: error))
                 self.errorMessage = "Unable to load albums. Please try again later!"
             }
         }
@@ -105,5 +114,24 @@ class AlbumsListViewModel: ObservableObject {
     
     private func createNewAlbum(for name: String) {
         
+        guard !isLoadingPopupVisible else { return } // Prevent double calls
+        
+        isLoadingPopupVisible = true
+        
+        NextcloudKit.shared.createNewAlbum(for: account, albumName: name) { [weak self] result in
+            
+            self?.isLoadingPopupVisible = false
+            
+            switch result {
+            case .success(_):
+                self?.loadAlbums {
+                    if let newAlbum = self?.albums.first(where: { $0.name == name }) {
+                        self?.navigationDestination = .albumDetails(album: newAlbum)
+                    }
+                }
+            case .failure(let error):
+                NCContentPresenter().showError(error: NKError(error: error))
+            }
+        }
     }
 }

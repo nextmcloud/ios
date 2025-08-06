@@ -22,6 +22,7 @@ fileprivate extension DateFormatter {
 
 public extension NextcloudKit {
     
+    // MARK: - Fetch all Albums
     func fetchAllAlbums(
         for account: String,
         options: NKRequestOptions = NKRequestOptions(),
@@ -148,6 +149,7 @@ public extension NextcloudKit {
         return albums
     }
     
+    // MARK: - Create new Album
     func createNewAlbum(
         for account: String,
         albumName: String,
@@ -157,9 +159,7 @@ public extension NextcloudKit {
     ) {
         
         let session = NCSession.shared.getSession(account: account)
-        
-        //options.contentType = "application/xml"
-        
+
         let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.user + "/albums/\(albumName)/"
         
         guard let nkSession = nkCommonInstance.getSession(account: account),
@@ -222,6 +222,7 @@ public extension NextcloudKit {
         }
     }
     
+    // MARK: - Fetch Album photos
     func fetchAlbumPhotos(
         for album: String,
         account: String,
@@ -382,5 +383,118 @@ public extension NextcloudKit {
         }
         
         return photos
+    }
+    
+    // MARK: - Delete Album
+    func deleteAlbum(
+        albumName: String,
+        account: String,
+        options: NKRequestOptions = NKRequestOptions(),
+        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        
+        let session = NCSession.shared.getSession(account: account)
+
+        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.user + "/albums/" + albumName
+        
+        guard let nkSession = nkCommonInstance.getSession(account: account),
+              let url = urlPath.encodedToUrl,
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(.failure(NKError.urlError)) }
+        }
+        
+        let method = HTTPMethod.delete
+        
+        var urlRequest: URLRequest
+        do {
+            try urlRequest = URLRequest(url: url, method: method, headers: headers)
+            urlRequest.timeoutInterval = options.timeout
+        } catch {
+            return options.queue.async { completion(.failure(NKError(error: error))) }
+        }
+        
+        nkSession.sessionData.request(urlRequest)
+            .validate(statusCode: 200..<300)
+            .onURLSessionTaskCreation { task in
+                task.taskDescription = options.taskDescription
+                taskHandler(task)
+            }
+            .response(queue: self.nkCommonInstance.backgroundQueue) { response in
+                
+                if self.nkCommonInstance.levelLog > 0 {
+                    debugPrint(response)
+                }
+                
+                switch response.result {
+                case .failure(let error):
+                    let error = NKError(error: error, afResponse: response, responseData: response.data)
+                    options.queue.async { completion(.failure(error)) }
+                    
+                case .success:
+                    options.queue.async { completion(.success(())) }
+                }
+            }
+    }
+    
+    // MARK: - Rename Album
+    func renameAlbum(
+        account: String,
+        from oldName: String,
+        to newName: String,
+        options: NKRequestOptions = NKRequestOptions(),
+        taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        let session = NCSession.shared.getSession(account: account)
+        
+        guard let nkSession = nkCommonInstance.getSession(account: account) else {
+            return options.queue.async { completion(.failure(NKError.urlError)) }
+        }
+        
+        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.user + "/albums/" + oldName + "/"
+        let destinationHeader = "/remote.php/dav/photos/" + session.user + "/albums/" + newName + "/"
+        
+        guard let url = urlPath.encodedToUrl,
+              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
+            return options.queue.async { completion(.failure(NKError.urlError)) }
+        }
+        
+        // Add the required MOVE header
+        headers.add(
+            name: "Destination",
+            value: destinationHeader.addingPercentEncoding(
+                withAllowedCharacters: CharacterSet.urlQueryAllowed.subtracting(["+", "?", "&"])
+            ) ?? destinationHeader
+        )
+        
+        var urlRequest: URLRequest
+        do {
+            try urlRequest = URLRequest(url: url, method: .init(rawValue: "MOVE"), headers: headers)
+            urlRequest.timeoutInterval = options.timeout
+        } catch {
+            return options.queue.async { completion(.failure(NKError(error: error))) }
+        }
+        
+        nkSession.sessionData.request(urlRequest)
+            .validate(statusCode: 200..<300)
+            .onURLSessionTaskCreation { task in
+                task.taskDescription = options.taskDescription
+                taskHandler(task)
+            }
+            .response(queue: self.nkCommonInstance.backgroundQueue) { response in
+                if self.nkCommonInstance.levelLog > 0 {
+                    debugPrint(response)
+                }
+                
+                switch response.result {
+                case .failure(let error):
+                    let error = NKError(error: error, afResponse: response, responseData: response.data)
+                    options.queue.async { completion(.failure(error)) }
+                    
+                case .success:
+                    options.queue.async { completion(.success(())) }
+                }
+            }
     }
 }

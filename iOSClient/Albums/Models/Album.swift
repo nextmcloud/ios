@@ -6,7 +6,7 @@
 //  Copyright © 2025 Marino Faggiana. All rights reserved.
 //
 
-public struct Album: Identifiable {
+public struct Album: Identifiable, Hashable {
     public let id: String
     let href: String
     let name: String

@@ -58,21 +58,17 @@ struct NoPhotosEmptyView: View {
                 .frame(width: geometry.size.width, height: geometry.size.height)
             }
         }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Add", action: onAddPhotosIntent)
-                    .foregroundColor(Color(NCBrandColor.shared.customer))
-            }
-        }
     }
 }
 
 #if DEBUG
 #Preview {
     NavigationView {
-        NoPhotosEmptyView(onAddPhotosIntent: {})
-            .navigationTitle("Album")
-            .navigationBarTitleDisplayMode(.inline)
+        NoPhotosEmptyView(
+            onAddPhotosIntent: {}
+        )
+        .navigationTitle("Album")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 #endif

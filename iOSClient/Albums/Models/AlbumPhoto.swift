@@ -6,7 +6,7 @@
 //  Copyright © 2025 Marino Faggiana. All rights reserved.
 //
 
-public struct AlbumPhoto: Identifiable {
+public struct AlbumPhoto: Identifiable, Hashable {
     public let id: String
     let fileName: String
     let contentType: String

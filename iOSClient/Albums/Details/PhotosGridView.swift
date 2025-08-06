@@ -12,46 +12,28 @@ struct PhotosGridView: View {
     
     let photos: [AlbumPhoto]
     
+    let onAddPhotosIntent: () -> Void
+    
+    private let gridItems = [
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1),
+        GridItem(.flexible(), spacing: 1)
+    ]
+    
     var body: some View {
-        content()
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    HStack {
-                        Button(action: {
-                            // Regular add action
-                        }) {
-                            Image(systemName: "plus")
+        ScrollView {
+            LazyVGrid(columns: gridItems, spacing: 1) {
+                ForEach(photos) { photo in
+                    NavigationLink(
+                        destination: {
+                            Color(.blue)
+                                .edgesIgnoringSafeArea(.all)
                         }
-                        
-                        // Overflow menu
-                        Menu {
-                            Button("Rename", action: {
-                                // Rename action
-                            })
-                            Button("Delete", role: .destructive, action: {
-                                // Delete action
-                            })
-                        } label: {
-                            Image(systemName: "ellipsis")
-                                .rotationEffect(.degrees(90))
-                        }
+                    ) {
+                        PhotoGridItemView(photo: photo)
                     }
                 }
             }
-    }
-    
-    @ViewBuilder
-    private func content() -> some View {
-        Color(.blue)
+        }
     }
 }
-
-#if DEBUG
-#Preview {
-    NavigationView {
-        PhotosGridView(photos: [])
-            .navigationTitle("Album 2")
-            .navigationBarTitleDisplayMode(.inline)
-    }
-}
-#endif

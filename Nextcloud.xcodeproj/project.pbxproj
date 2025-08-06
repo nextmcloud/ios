@@ -278,6 +278,9 @@
 		C005131B2E3CB1AC003E0D87 /* AlbumDetailsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C005131A2E3CB19C003E0D87 /* AlbumDetailsScreen.swift */; };
 		C005131D2E3CB2E1003E0D87 /* AlbumDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C005131C2E3CB2A8003E0D87 /* AlbumDetailsViewModel.swift */; };
 		C005131F2E3CB983003E0D87 /* PhotosGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C005131E2E3CB97C003E0D87 /* PhotosGridView.swift */; };
+		C00513232E40824F003E0D87 /* PhotoGridItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00513222E40824E003E0D87 /* PhotoGridItemView.swift */; };
+		C005132B2E42131E003E0D87 /* NCLoadingAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = C005132A2E421318003E0D87 /* NCLoadingAlert.swift */; };
+		C005132D2E4216FB003E0D87 /* NCInputAlbumNameAlertModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C005132C2E4216F4003E0D87 /* NCInputAlbumNameAlertModifier.swift */; };
 		C010D98B2E324606007B86CD /* NoAlbumsEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C010D98A2E324604007B86CD /* NoAlbumsEmptyView.swift */; };
 		C010D98E2E325DAC007B86CD /* AlbumsRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C010D98D2E325DA5007B86CD /* AlbumsRootView.swift */; };
 		C01E4B732E38D75D0099F5C4 /* NoPhotosEmptyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01E4B722E38D7520099F5C4 /* NoPhotosEmptyView.swift */; };
@@ -1405,6 +1408,9 @@
 		C005131A2E3CB19C003E0D87 /* AlbumDetailsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDetailsScreen.swift; sourceTree = "<group>"; };
 		C005131C2E3CB2A8003E0D87 /* AlbumDetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDetailsViewModel.swift; sourceTree = "<group>"; };
 		C005131E2E3CB97C003E0D87 /* PhotosGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosGridView.swift; sourceTree = "<group>"; };
+		C00513222E40824E003E0D87 /* PhotoGridItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGridItemView.swift; sourceTree = "<group>"; };
+		C005132A2E421318003E0D87 /* NCLoadingAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCLoadingAlert.swift; sourceTree = "<group>"; };
+		C005132C2E4216F4003E0D87 /* NCInputAlbumNameAlertModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCInputAlbumNameAlertModifier.swift; sourceTree = "<group>"; };
 		C010D98A2E324604007B86CD /* NoAlbumsEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoAlbumsEmptyView.swift; sourceTree = "<group>"; };
 		C010D98D2E325DA5007B86CD /* AlbumsRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsRootView.swift; sourceTree = "<group>"; };
 		C01E4B722E38D7520099F5C4 /* NoPhotosEmptyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoPhotosEmptyView.swift; sourceTree = "<group>"; };
@@ -2335,6 +2341,15 @@
 			path = NextcloudUITests;
 			sourceTree = "<group>";
 		};
+		C00513292E421313003E0D87 /* Alerts */ = {
+			isa = PBXGroup;
+			children = (
+				C005132C2E4216F4003E0D87 /* NCInputAlbumNameAlertModifier.swift */,
+				C005132A2E421318003E0D87 /* NCLoadingAlert.swift */,
+			);
+			path = Alerts;
+			sourceTree = "<group>";
+		};
 		C010D98C2E325DA0007B86CD /* Root */ = {
 			isa = PBXGroup;
 			children = (
@@ -2346,6 +2361,7 @@
 		C01E4B712E38D74A0099F5C4 /* Details */ = {
 			isa = PBXGroup;
 			children = (
+				C00513222E40824E003E0D87 /* PhotoGridItemView.swift */,
 				C005131E2E3CB97C003E0D87 /* PhotosGridView.swift */,
 				C005131C2E3CB2A8003E0D87 /* AlbumDetailsViewModel.swift */,
 				C005131A2E3CB19C003E0D87 /* AlbumDetailsScreen.swift */,
@@ -2366,6 +2382,7 @@
 		C0A0D4822E1BD6EA00476BFF /* Albums */ = {
 			isa = PBXGroup;
 			children = (
+				C00513292E421313003E0D87 /* Alerts */,
 				C01E4B712E38D74A0099F5C4 /* Details */,
 				C08DFB472E378E4F00731698 /* Models */,
 				C010D98C2E325DA0007B86CD /* Root */,
@@ -4759,6 +4776,7 @@
 				F78ACD4021903CC20088454D /* NCGridCell.swift in Sources */,
 				F7D890752BD25C570050B8A6 /* NCCollectionViewCommon+DragDrop.swift in Sources */,
 				F7BD0A042C4689E9003A4A6D /* NCMedia+MediaLayout.swift in Sources */,
+				C00513232E40824F003E0D87 /* PhotoGridItemView.swift in Sources */,
 				F761856B29E98543006EB3B0 /* NCIntroViewController.swift in Sources */,
 				F7743A142C33F13A0034F670 /* NCCollectionViewCommon+CollectionViewDataSource.swift in Sources */,
 				F75B0ABD244C4DBB00E58DCA /* NCActionCenter.swift in Sources */,
@@ -4800,6 +4818,7 @@
 				F77BB74A2899857B0090FC19 /* UINavigationController+Extension.swift in Sources */,
 				F7327E282B73A53400A462C7 /* NCNetworking+Upload.swift in Sources */,
 				F769454622E9F1B0000A798A /* NCShareCommon.swift in Sources */,
+				C005132D2E4216FB003E0D87 /* NCInputAlbumNameAlertModifier.swift in Sources */,
 				F70753F12542A9A200972D44 /* NCViewerMedia.swift in Sources */,
 				F799DF822C4B7DCC003410B5 /* NCSectionFooter.swift in Sources */,
 				F76B649C2ADFFAED00014640 /* NCImageCache.swift in Sources */,
@@ -4891,6 +4910,7 @@
 				F7682FE023C36B0500983A04 /* NCMainTabBar.swift in Sources */,
 				F7F3E58E2D3BB65600A32B14 /* NCNetworking+Recommendations.swift in Sources */,
 				F7A0D1352591FBC5008F8A13 /* String+Extension.swift in Sources */,
+				C005132B2E42131E003E0D87 /* NCLoadingAlert.swift in Sources */,
 				F7F9D1BB25397CE000D9BFF5 /* NCViewer.swift in Sources */,
 				F7E7AEA52BA32C6500512E52 /* NCCollectionViewDownloadThumbnail.swift in Sources */,
 				C08DFB462E378BD200731698 /* AlbumsGridView.swift in Sources */,
