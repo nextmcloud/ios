@@ -141,36 +141,46 @@ class NCShare: UIViewController, NCSharePagingContent {
         self.showProfileMenu(userId: metadata.ownerId, session: session)
     }
     
+    private func scrollToTopIfNeeded() {
+        if tableView.numberOfSections > 0 && tableView.numberOfRows(inSection: 0) > 0 {
+            self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+        }
+    }
+
     @objc func keyboardWillShow(notification: Notification) {
         if UIDevice.current.userInterfaceIdiom == .phone {
-           if (UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape) {
+            if UIScreen.main.bounds.width < 374 || UIDevice.current.orientation.isLandscape {
                 if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
                     if view.frame.origin.y == 0 {
-                        self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                        scrollToTopIfNeeded()
                         self.view.frame.origin.y -= keyboardSize.height
                     }
                 }
             } else if UIScreen.main.bounds.height < 850 {
                 if view.frame.origin.y == 0 {
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    scrollToTopIfNeeded()
                     self.view.frame.origin.y -= 70
                 }
             } else {
                 if view.frame.origin.y == 0 {
-                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    scrollToTopIfNeeded()
                     self.view.frame.origin.y -= 40
                 }
             }
         }
-        
+
         if UIDevice.current.userInterfaceIdiom == .pad, UIDevice.current.orientation.isLandscape {
             if view.frame.origin.y == 0 {
-                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                if tableView.numberOfSections > 0 && tableView.numberOfRows(inSection: 0) > 0 {
+                    self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                }
                 self.view.frame.origin.y -= 230
             }
         }
+
         textField?.layer.borderColor = NCBrandColor.shared.brand.cgColor
     }
+
     
     @objc func keyboardWillHide(notification: Notification) {
         if view.frame.origin.y != 0 {
@@ -276,32 +286,6 @@ class NCShare: UIViewController, NCSharePagingContent {
         }
         
     }
-    
-//    @IBAction func touchUpInsideButtonMenu(_ sender: Any) {
-//        guard let metadata = metadata else {
-//            return
-//        }
-//
-//        let isFilesSharingPublicPasswordEnforced = NCCapabilities.Capabilities().capabilityFileSharingPubPasswdEnforced
-//        let shares = NCManageDatabase.shared.getTableShares(metadata: metadata)
-//
-//        if isFilesSharingPublicPasswordEnforced && shares.firstShareLink == nil {
-//            let alertController = UIAlertController(title: NSLocalizedString("_enforce_password_protection_", comment: ""), message: "", preferredStyle: .alert)
-//            alertController.addTextField { $0.isSecureTextEntry = true }
-//
-//            alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .default))
-//            
-//            let okAction = UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default) { [weak self] _ in
-//                let password = alertController.textFields?.first?.text ?? ""
-//                self?.createShareAndReload(password: password)
-//            }
-//
-//            alertController.addAction(okAction)
-//            present(alertController, animated: true, completion: nil)
-//        } else {
-//            createShareAndReload(password: "")
-//        }
-//    }
 
     private func createShareAndReload(password: String) {
         networking?.createShareLink(password: password)

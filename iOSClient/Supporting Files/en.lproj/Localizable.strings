@@ -672,7 +672,8 @@
 
 // MARK: Share
 
-"_share_link_"                  = "Share link";
+//"_share_link_"                  = "Share link";
+"_share_link_"                  = "Link";
 "_share_link_button_"           = "Send link to …";
 "_share_link_name_"             = "Link name";
 "_password_"                    = "Password";
@@ -697,7 +698,7 @@
 "_enforce_password_protection_" = "Enforce password protection";
 "_password_obligatory_"         = "Enforce password protection enabled, password obligatory";
 "_shared_with_you_by_"          = "Shared with you by";
-"_shareLinksearch_placeholder_" = "Name, email";//, or Federated Cloud ID …";
+//"_shareLinksearch_placeholder_" = "Name, email";//, or Federated Cloud ID …";
 "_new_comment_"                 = "New comment …";
 "_edit_comment_"                = "Edit comment";
 "_delete_comment_"              = "Delete comment";
@@ -733,7 +734,7 @@
 "_share_hide_download_"         = "Prevent download";
 "_share_note_recipient_"        = "YOUR MESSAGE";
 "_shareLinksearch_placeholder_" = "Contact name or email address";
-"_shareLinksearch_placeholder_" = "Type a name and press Search";
+//"_shareLinksearch_placeholder_" = "Type a name and press Search";
 //"_shareLinksearch_placeholder_" = "Type a name and press Enter";
 "_shareLinksearch_mail_placeholder_" = "Type a name or an email and press Enter";
 "_new_comment_"                 = "New comment …";
@@ -768,9 +769,9 @@
 "_share_quick_permission_everyone_can_just_upload_"  = "Everyone can just upload";
 "_share_quick_permission_everyone_can_edit_"         = "Everyone can edit";
 "_share_quick_permission_everyone_can_only_view_"    = "Everyone can only view";
-"_share_quick_permission_everyone_can_just_upload__short"  = "Just upload";
-"_share_quick_permission_everyone_can_edit__short"         = "Can edit";
-"_share_quick_permission_everyone_can_only_view__short"    = "Only view";
+"_share_quick_permission_everyone_can_just_upload_short_"  = "Just upload";
+"_share_quick_permission_everyone_can_edit_short_"         = "Can edit";
+"_share_quick_permission_everyone_can_only_view_short_"    = "Only view";
 "_share_received_shares_text_"      = "This file / folder was shared with you by";
 "_share_no_shares_text_"            = "You have not yet shared your file/folder. Share to give others access";
 "_share_size_"                      = "Size: ";
