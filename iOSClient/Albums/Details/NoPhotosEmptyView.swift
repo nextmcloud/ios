@@ -23,7 +23,7 @@ struct NoPhotosEmptyView: View {
                 ZStack(alignment: .top) {
                     
                     // Background image
-                    Image("emptyAlbum")
+                    Image("EmptyAlbum")
                         .resizable()
                         .scaledToFill()
                         .frame(height: geometry.size.height * 0.5)

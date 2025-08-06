@@ -44,7 +44,7 @@ struct AlbumsGridView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 
                                 if album.lastPhotoId == "-1" || album.itemCount == 0 {
-                                    Image("emptyAlbum")
+                                    Image("EmptyAlbum")
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 182, height: 140) // make flexible if needed
