@@ -151,15 +151,17 @@ class NCMainTabBar: UITabBar {
         }
 
         // Album
-        if let item = items?[3] {
-            item.title = NSLocalizedString("_albums_", comment: "")
-            item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.brandElement, size: 25)
-            item.isEnabled = false
-            item.tag = 103
-        }
+        // Hide album temporary for version 9.6.6 which does'nt have album feature
+//        if let item = items?[3] {
+//            item.title = NSLocalizedString("_albums_", comment: "")
+//            item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+//            item.isEnabled = false
+//            item.tag = 103
+//        }
 
         // More
-        if let item = items?[4] {
+        if let item = items?[3] {
+//        if let item = items?[4] {
             item.title = NSLocalizedString("_more_", comment: "")
             item.image = UIImage(named: "tabBarMore")?.image(color: NCBrandColor.shared.brandElement, size: 25)
             item.selectedImage = item.image

@@ -60,7 +60,7 @@ class NCShare: UIViewController, NCSharePagingContent {
     private var dropDown = DropDown()
     var networking: NCShareNetworking?
 
-    var shareLinksCount = 0
+//    var shareLinksCount = 0
     var isCurrentUser: Bool {
         if let currentUser = NCManageDatabase.shared.getActiveTableAccount(), currentUser.userId == metadata?.ownerId {
             return true
@@ -70,6 +70,9 @@ class NCShare: UIViewController, NCSharePagingContent {
     var shareLinks: [tableShare] = []
     var shareEmails: [tableShare] = []
     var shareOthers: [tableShare] = []
+    private var cachedHeader: NCShareAdvancePermissionHeader?
+    var linkNumberMap: [Int: Int] = [:]
+    var nextLinkNumber = 1
 
     enum ShareSection: Int, CaseIterable {
         case header
@@ -93,6 +96,12 @@ class NCShare: UIViewController, NCSharePagingContent {
         tableView.register(UINib(nibName: "NCShareLinkCell", bundle: nil), forCellReuseIdentifier: "cellLink")
         tableView.register(UINib(nibName: "NCShareUserCell", bundle: nil), forCellReuseIdentifier: "cellUser")
         tableView.register(UINib(nibName: "NCShareEmailFieldCell", bundle: nil), forCellReuseIdentifier: "NCShareEmailFieldCell")
+        tableView.register(NCShareEmailLinkHeaderView.self,
+                           forHeaderFooterViewReuseIdentifier: NCShareEmailLinkHeaderView.reuseIdentifier)
+        tableView.register(CreateLinkFooterView.self, forHeaderFooterViewReuseIdentifier: CreateLinkFooterView.reuseIdentifier)
+        tableView.register(NoSharesFooterView.self, forHeaderFooterViewReuseIdentifier: NoSharesFooterView.reuseIdentifier)
+        tableView.register(UINib(nibName: "NCShareAdvancePermissionHeader", bundle: nil),
+                           forHeaderFooterViewReuseIdentifier: NCShareAdvancePermissionHeader.reuseIdentifier)
 
         NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadDataNCShare), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -199,7 +208,6 @@ class NCShare: UIViewController, NCSharePagingContent {
             return
         }
         shares = self.database.getTableShares(metadata: metadata)
-        shareLinksCount = 0
         updateShareArrays()
         tableView.reloadData()
     }
@@ -210,10 +218,14 @@ class NCShare: UIViewController, NCSharePagingContent {
         
         if let shareLink = shares.firstShareLink {
             shares.share?.insert(shareLink, at: 0)
-            shareLinksCount += 1
+//            shareLinksCount += 1
         }
         for item in shares.share ?? [] {
             if item.shareType == shareCommon.SHARE_TYPE_LINK {
+                if linkNumberMap[item.idShare] == nil {
+                    linkNumberMap[item.idShare] = nextLinkNumber
+                    nextLinkNumber += 1
+                }
                 shareLinks.append(item)
             } else {
                 shareEmails.append(item)
@@ -253,10 +265,11 @@ class NCShare: UIViewController, NCSharePagingContent {
 //        networking?.getSharees(searchString: searchString)
 //    }
     
-    @IBAction func createLinkClicked(_ sender: Any) {
+    @IBAction func createLinkClicked(_ sender: Any?) {
         appDelegate?.adjust.trackEvent(TriggerEvent(CreateLink.rawValue))
         TealiumHelper.shared.trackEvent(title: "magentacloud-app.sharing.create", data: ["": ""])
-        self.touchUpInsideButtonMenu(sender)
+//        self.touchUpInsideButtonMenu(sender)
+        self.touchUpInsideButtonMenu(sender as Any)
     }
     
     @IBAction func touchUpInsideButtonMenu(_ sender: Any) {
@@ -488,8 +501,12 @@ extension NCShare: UITableViewDataSource {
                 return UITableViewCell()
             }
             cell.delegate = self
+            let shareLinksCount = indexPath.row + 1
+//            let link = shareLinks[indexPath.row]
+//            let shareLinksCount = linkNumberMap[link.idShare] ?? 0
+
             cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, shareLinksCount: shareLinksCount)
-            if tableShare.shareType == shareCommon.SHARE_TYPE_LINK { shareLinksCount += 1 }
+//            if tableShare.shareType == shareCommon.SHARE_TYPE_LINK { shareLinksCount += 1 }
             return cell
 
         case .emails:
@@ -507,125 +524,146 @@ extension NCShare: UITableViewDataSource {
         return tableView(tableView, numberOfRowsInSection: section)
     }
     
-    func viewForHeaderInSection(for section: Int) -> UIView? {
-        guard let sectionType = ShareSection(rawValue: section), sectionType == .links || sectionType == .emails else { return nil }
+//    func viewForHeaderInSection(for section: Int) -> UIView? {
+//        guard let sectionType = ShareSection(rawValue: section), sectionType == .links || sectionType == .emails else { return nil }
+//
+//        let headerView = UIView()
+//        headerView.backgroundColor = .clear
+//
+//        let label = UILabel()
+//        label.translatesAutoresizingMaskIntoConstraints = false
+//        label.font = .systemFont(ofSize: 17, weight: .semibold)
+//        label.textColor = NCBrandColor.shared.textColor
+//        label.text = (sectionType == .emails) ? NSLocalizedString("_share_shared_with_", comment: "") : NSLocalizedString("_share_copy_link_", comment: "")
+//
+//        headerView.addSubview(label)
+//
+//        NSLayoutConstraint.activate([
+//            label.topAnchor.constraint(equalTo: headerView.topAnchor, constant: 20),
+//            label.heightAnchor.constraint(equalToConstant: 30),
+//            label.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 15),
+//            label.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -15),
+//        ])
+//
+//        return headerView
+//    }
 
-        let headerView = UIView()
-        headerView.backgroundColor = .clear
+//    func viewForFooterInSection(for section: Int) -> UIView? {
+//        guard ShareSection(rawValue: section) == .links else { return nil }
+//
+//        let footerView = UIView()
+//        footerView.backgroundColor = .clear
+//
+//        let button = UIButton(type: .system)
+//        button.setTitle(NSLocalizedString("_create_new_link_", comment: ""), for: .normal)
+//        button.setTitleColor(NCBrandColor.shared.shareBlackColor, for: .normal)
+//        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
+//        button.layer.cornerRadius = 7
+//        button.layer.borderWidth = 1
+//        button.layer.borderColor = NCBrandColor.shared.label.cgColor
+//        button.backgroundColor = .clear
+//        button.addTarget(self, action: #selector(createLinkClicked(_:)), for: .touchUpInside)
+//        button.translatesAutoresizingMaskIntoConstraints = false
+//
+//        let separator = UIView()
+//        separator.backgroundColor = .lightGray
+//        separator.translatesAutoresizingMaskIntoConstraints = false
+//
+//        footerView.addSubview(button)
+//        footerView.addSubview(separator)
+//
+//        NSLayoutConstraint.activate([
+//            button.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 20),
+//            button.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 15),
+//            button.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -15),
+//            button.heightAnchor.constraint(equalToConstant: 40),
+//            
+//            separator.topAnchor.constraint(equalTo: button.bottomAnchor, constant: 20),
+//            separator.leadingAnchor.constraint(equalTo: footerView.leadingAnchor),
+//            separator.trailingAnchor.constraint(equalTo: footerView.trailingAnchor),
+//            separator.heightAnchor.constraint(equalToConstant: 1)
+//        ])
+//
+//        return footerView
+//    }
 
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 17, weight: .semibold)
-        label.textColor = NCBrandColor.shared.textColor
-        label.text = (sectionType == .emails) ? NSLocalizedString("_share_shared_with_", comment: "") : NSLocalizedString("_share_copy_link_", comment: "")
-
-        headerView.addSubview(label)
-
-        NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: headerView.topAnchor, constant: 20),
-            label.heightAnchor.constraint(equalToConstant: 30),
-            label.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 15),
-            label.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -15),
-        ])
-
-        return headerView
-    }
-
-    func viewForFooterInSection(for section: Int) -> UIView? {
-        guard ShareSection(rawValue: section) == .links else { return nil }
-
-        let footerView = UIView()
-        footerView.backgroundColor = .clear
-
-        let button = UIButton(type: .system)
-        button.setTitle(NSLocalizedString("_create_new_link_", comment: ""), for: .normal)
-        button.setTitleColor(NCBrandColor.shared.shareBlackColor, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
-        button.layer.cornerRadius = 7
-        button.layer.borderWidth = 1
-        button.layer.borderColor = NCBrandColor.shared.label.cgColor
-        button.backgroundColor = .clear
-        button.addTarget(self, action: #selector(createLinkClicked(_:)), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-
-        let separator = UIView()
-        separator.backgroundColor = .lightGray
-        separator.translatesAutoresizingMaskIntoConstraints = false
-
-        footerView.addSubview(button)
-        footerView.addSubview(separator)
-
-        NSLayoutConstraint.activate([
-            button.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 20),
-            button.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 15),
-            button.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -15),
-            button.heightAnchor.constraint(equalToConstant: 40),
-            
-            separator.topAnchor.constraint(equalTo: button.bottomAnchor, constant: 20),
-            separator.leadingAnchor.constraint(equalTo: footerView.leadingAnchor),
-            separator.trailingAnchor.constraint(equalTo: footerView.trailingAnchor),
-            separator.heightAnchor.constraint(equalToConstant: 1)
-        ])
-
-        return footerView
-    }
-
-    func footerViewForNoShares() -> UIView? {
-        let footerView = UIView()
-        footerView.backgroundColor = .clear
-
-        let titleLabel = UILabel()
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
-        titleLabel.textColor = NCBrandColor.shared.textColor
-        titleLabel.text = NSLocalizedString("_share_shared_with_", comment: "")
-
-        let infoLabel = UILabel()
-        infoLabel.translatesAutoresizingMaskIntoConstraints = false
-        infoLabel.font = .systemFont(ofSize: 15, weight: .regular)
-        infoLabel.textColor = NCBrandColor.shared.textColor
-        infoLabel.text = NSLocalizedString("_share_no_shares_text_", comment: "")
-        infoLabel.numberOfLines = 0
-        infoLabel.lineBreakMode = .byWordWrapping
-
-        footerView.addSubview(titleLabel)
-        footerView.addSubview(infoLabel)
-
-        NSLayoutConstraint.activate([
-            titleLabel.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 20),
-            titleLabel.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 15),
-            titleLabel.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -15),
-            titleLabel.heightAnchor.constraint(equalToConstant: 25),
-
-            infoLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15),
-            infoLabel.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 15),
-            infoLabel.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -15)
-        ])
-
-        return footerView
-    }
+//    func footerViewForNoShares() -> UIView? {
+//        let footerView = UIView()
+//        footerView.backgroundColor = .clear
+//
+//        let titleLabel = UILabel()
+//        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+//        titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+//        titleLabel.textColor = NCBrandColor.shared.textColor
+//        titleLabel.text = NSLocalizedString("_share_shared_with_", comment: "")
+//
+//        let infoLabel = UILabel()
+//        infoLabel.translatesAutoresizingMaskIntoConstraints = false
+//        infoLabel.font = .systemFont(ofSize: 15, weight: .regular)
+//        infoLabel.textColor = NCBrandColor.shared.textColor
+//        infoLabel.text = NSLocalizedString("_share_no_shares_text_", comment: "")
+//        infoLabel.numberOfLines = 0
+//        infoLabel.lineBreakMode = .byWordWrapping
+//
+//        footerView.addSubview(titleLabel)
+//        footerView.addSubview(infoLabel)
+//
+//        NSLayoutConstraint.activate([
+//            titleLabel.topAnchor.constraint(equalTo: footerView.topAnchor, constant: 20),
+//            titleLabel.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 15),
+//            titleLabel.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -15),
+//            titleLabel.heightAnchor.constraint(equalToConstant: 25),
+//
+//            infoLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 15),
+//            infoLabel.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: 15),
+//            infoLabel.trailingAnchor.constraint(equalTo: footerView.trailingAnchor, constant: -15)
+//        ])
+//
+//        return footerView
+//    }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let sectionType = ShareSection(rawValue: section) else { return nil }
 
         switch sectionType {
+//        case .header:
+//            // Always return the header view
+////            guard let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "NCShareAdvancePermissionHeader") as? NCShareAdvancePermissionHeader else {
+////                        return nil
+////                    }
+//            guard let headerView = Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?.first as? NCShareAdvancePermissionHeader else {
+//                return nil
+//            }
+//            headerView.ocId = metadata.ocId
+//            headerView.setupUI(with: metadata)
+//            return headerView
+
         case .header:
-            // Always return the header view
-            guard let headerView = Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?.first as? NCShareAdvancePermissionHeader else {
-                return nil
-            }
+            let headerView = tableView.dequeueReusableHeaderFooterView(
+                withIdentifier: NCShareAdvancePermissionHeader.reuseIdentifier
+            ) as! NCShareAdvancePermissionHeader
             headerView.ocId = metadata.ocId
             headerView.setupUI(with: metadata)
             return headerView
 
         case .linkByEmail:
             return nil
-
+            
         case .links:
-            return isCurrentUser || canReshare ? viewForHeaderInSection(for: section) : nil
+            if isCurrentUser || canReshare {
+                let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "NCShareEmailLinkHeaderView") as! NCShareEmailLinkHeaderView
+                headerView.configure(text: NSLocalizedString("_share_copy_link_", comment: ""))
+                return headerView
+            }
+            return nil
 
         case .emails:
-            return (isCurrentUser || canReshare) && numberOfRows(in: section) > 0 ? viewForHeaderInSection(for: section) : nil
+            if (isCurrentUser || canReshare) && numberOfRows(in: section) > 0 {
+                let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "NCShareEmailLinkHeaderView") as! NCShareEmailLinkHeaderView
+                headerView.configure(text: NSLocalizedString("_share_shared_with_", comment: ""))
+                return headerView
+            }
+            return nil
         }
     }
 
@@ -651,10 +689,22 @@ extension NCShare: UITableViewDataSource {
         }
 
         switch sectionType {
+//        case .links:
+//            return viewForFooterInSection(for: section)
+//        case .emails:
+//            return numberOfRows(in: section) == 0 ? footerViewForNoShares() : viewForFooterInSection(for: section)
         case .links:
-            return viewForFooterInSection(for: section)
+            let footer = tableView.dequeueReusableHeaderFooterView(withIdentifier: CreateLinkFooterView.reuseIdentifier) as! CreateLinkFooterView
+            footer.createButtonAction = { [weak self] in
+                self?.createLinkClicked(nil)
+            }
+            return footer
+            
         case .emails:
-            return numberOfRows(in: section) == 0 ? footerViewForNoShares() : viewForFooterInSection(for: section)
+            if numberOfRows(in: section) == 0 {
+                return tableView.dequeueReusableHeaderFooterView(withIdentifier: NoSharesFooterView.reuseIdentifier)
+            }
+            return nil
         case .header, .linkByEmail:
             return nil
         }

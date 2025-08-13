@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="FkP-Lh-8zt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="FkP-Lh-8zt">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -34,7 +34,6 @@
                         <segue destination="bSZ-tE-FEj" kind="relationship" relationship="viewControllers" id="qbu-nX-qCk"/>
                         <segue destination="hwM-4d-Afb" kind="relationship" relationship="viewControllers" id="tds-0Q-7Zf"/>
                         <segue destination="Npr-vu-PSD" kind="relationship" relationship="viewControllers" id="XeU-GF-etm"/>
-                        <segue destination="Cc7-4O-z6Q" kind="relationship" relationship="viewControllers" id="7eP-Ie-n9h"/>
                         <segue destination="1Z8-Bx-Dqo" kind="relationship" relationship="viewControllers" id="WHm-GJ-XkM"/>
                     </connections>
                 </tabBarController>
@@ -49,7 +48,7 @@
                     <tabBarItem key="tabBarItem" title="File" id="Zxv-aS-HGF"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="cj6-rT-wnB">
-                        <rect key="frame" x="0.0" y="48" width="414" height="96"/>
+                        <rect key="frame" x="0.0" y="96" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -68,7 +67,7 @@
                     <tabBarItem key="tabBarItem" title="Favorites" id="o09-67-hwf"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="MJw-Bn-5le">
-                        <rect key="frame" x="0.0" y="48" width="414" height="96"/>
+                        <rect key="frame" x="0.0" y="96" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -87,7 +86,7 @@
                     <tabBarItem key="tabBarItem" title="Media" id="5cw-bP-7It"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="ixg-Pw-TNO">
-                        <rect key="frame" x="0.0" y="48" width="414" height="96"/>
+                        <rect key="frame" x="0.0" y="96" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -106,7 +105,7 @@
                     <tabBarItem key="tabBarItem" enabled="NO" title="Album" id="vIy-cM-ojV"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="jCU-so-Np6">
-                        <rect key="frame" x="0.0" y="48" width="414" height="96"/>
+                        <rect key="frame" x="0.0" y="96" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -122,7 +121,7 @@
                     <tabBarItem key="tabBarItem" title="More" id="U4f-qS-cgh"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="yVo-p8-ApS">
-                        <rect key="frame" x="0.0" y="48" width="414" height="96"/>
+                        <rect key="frame" x="0.0" y="96" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
