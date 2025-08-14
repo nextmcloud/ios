@@ -34,6 +34,7 @@ class NCShareLinkCell: UITableViewCell {
     @IBOutlet weak var imageAllowedPermission: UIImageView!
     @IBOutlet weak var imageRightArrow: UIImageView!
     @IBOutlet weak var labelQuickStatus: UILabel!
+    @IBOutlet weak var leadingContraintofImageRightArrow: NSLayoutConstraint!
 
     private let iconShareSize: CGFloat = 200
 
@@ -111,6 +112,8 @@ class NCShareLinkCell: UITableViewCell {
 
         imagePasswordSet.isHidden = tableShare.password.isEmpty
         imageExpiredDateSet.isHidden = (tableShare.expirationDate == nil)
+        
+        leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
     }
 
     // MARK: - Actions
