@@ -23,12 +23,15 @@
 
 import UIKit
 
-class NCShareAdvancePermissionHeader: UIView {
+class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var fileName: UILabel!
     @IBOutlet weak var info: UILabel!
     @IBOutlet weak var favorite: UIButton!
     @IBOutlet weak var fullWidthImageView: UIImageView!
+
+    static let reuseIdentifier = "NCShareAdvancePermissionHeader"
+
     var ocId = ""
     let utility = NCUtility()
     let utilityFileSystem = NCUtilityFileSystem()
@@ -37,32 +40,42 @@ class NCShareAdvancePermissionHeader: UIView {
         backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         fileName.textColor = NCBrandColor.shared.label
         info.textColor = NCBrandColor.shared.textInfo
-        backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+
+        var isShare = metadata.permissions.contains(NCPermissions().permissionShared)
 
         if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024) {
             fullWidthImageView.image = image
             fullWidthImageView.contentMode = .scaleAspectFill
             imageView.isHidden = true
         } else {
-            if metadata.directory {
-                imageView.image = metadata.e2eEncrypted ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
+            imageView.isHidden = false
+            if metadata.e2eEncrypted {
+                imageView.image = NCImageCache.shared.getFolderEncrypted()
+            } else if isShare {
+                imageView.image = NCImageCache.shared.getFolderSharedWithMe()
+            } else if !metadata.shareType.isEmpty {
+                imageView.image = metadata.shareType.contains(3)
+                    ? NCImageCache.shared.getFolderPublic()
+                    : NCImageCache.shared.getFolderSharedWithMe()
+            } else if metadata.directory {
+                imageView.image = NCImageCache.shared.getFolder()
             } else if !metadata.iconName.isEmpty {
                 imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
             } else {
                 imageView.image = NCImageCache.shared.getImageFile()
             }
         }
-        favorite.setNeedsUpdateConstraints()
-        favorite.layoutIfNeeded()
+
         fileName.text = metadata.fileNameView
         fileName.textColor = NCBrandColor.shared.fileFolderName
-        if metadata.favorite {
-            favorite.setImage(utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 24), for: .normal)
-        } else {
-            favorite.setImage(utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.textInfo], size: 24), for: .normal)
-        }
-        info.textColor = NCBrandColor.shared.optionItem
+
+        updateFavoriteIcon(isFavorite: metadata.favorite)
         info.text = utilityFileSystem.transformedSize(metadata.size) + ", " + utility.getRelativeDateTitle(metadata.date as Date)
+    }
+    
+    private func updateFavoriteIcon(isFavorite: Bool) {
+        let color = isFavorite ? NCBrandColor.shared.yellowFavorite : NCBrandColor.shared.textInfo
+        favorite.setImage(utility.loadImage(named: "star.fill", colors: [color], size: 24), for: .normal)
     }
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
@@ -70,14 +83,11 @@ class NCShareAdvancePermissionHeader: UIView {
         NCNetworking.shared.favoriteMetadata(metadata) { error in
             if error == .success {
                 guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-                if metadata.favorite {
-                    self.favorite.setImage(self.utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 24), for: .normal)
-                } else {
-                    self.favorite.setImage(self.utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.textInfo], size: 24), for: .normal)
-                }
+                self.updateFavoriteIcon(isFavorite: metadata.favorite)
             } else {
                 NCContentPresenter().showError(error: error)
             }
         }
     }
 }
+

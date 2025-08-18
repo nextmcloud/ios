@@ -195,8 +195,15 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func updateConstraintsForCurrentDevice() {
-        iPhoneLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? false : true
-        iPadLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? true : false
+        if labelShared?.isHidden == false {
+            iPhoneLabelTitleTrailingConstraint.isActive = false
+            iPadLabelTitleTrailingConstraint.isActive = true
+        } else {
+            iPhoneLabelTitleTrailingConstraint.isActive = true
+            iPadLabelTitleTrailingConstraint.isActive = false
+        }
+//        iPhoneLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? false : true
+//        iPadLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? true : false
     }
     
     @IBAction func touchUpInsideShare(_ sender: Any) {

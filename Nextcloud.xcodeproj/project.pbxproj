@@ -133,7 +133,6 @@
 		B52FAE942DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAE922DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift */; };
 		B52FAE9C2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B52FAE9A2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib */; };
 		B52FAE9E2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAE992DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.swift */; };
-		B52FAEAC2DA8EF2C001AB1BD /* NCCreateFormUploadScanDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEAB2DA8EF2C001AB1BD /* NCCreateFormUploadScanDocument.swift */; };
 		B52FAEC12DA8EF84001AB1BD /* ScanDocumentPathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEB92DA8EF84001AB1BD /* ScanDocumentPathView.swift */; };
 		B52FAEC22DA8EF84001AB1BD /* PNGImageSaveSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEB72DA8EF84001AB1BD /* PNGImageSaveSwitchView.swift */; };
 		B52FAEC32DA8EF84001AB1BD /* SetPDFPasswordSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEBB2DA8EF84001AB1BD /* SetPDFPasswordSwitchView.swift */; };
@@ -156,6 +155,7 @@
 		B54315442DA669C700981E7E /* AnalysisDataCollectionSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315372DA669C700981E7E /* AnalysisDataCollectionSwitch.swift */; };
 		B54315472DA669C700981E7E /* AnalysisDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = B54315382DA669C700981E7E /* AnalysisDataCollectionSwitch.xib */; };
 		B54315482DA669C700981E7E /* NCSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B543153A2DA669C700981E7E /* NCSettings.storyboard */; };
+		B55354B92E45CB1B0036C57C /* NCCreateFormUploadScanDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB7E72B3D7B3500FB7CAD /* NCCreateFormUploadScanDocument.swift */; };
 		B562CF9A2DF02E7B00136456 /* XLForm in Frameworks */ = {isa = PBXBuildFile; productRef = B562CF992DF02E7B00136456 /* XLForm */; };
 		B568C2B32DA7AAAE0072FCB4 /* NCMoreUserCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B568C2B22DA7AAAE0072FCB4 /* NCMoreUserCell.xib */; };
 		B568C2B52DA7AADD0072FCB4 /* NCMoreUserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2B42DA7AADD0072FCB4 /* NCMoreUserCell.swift */; };
@@ -200,6 +200,9 @@
 		B5C9801A2DACD56C0041B146 /* NCMedia+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */; };
 		B5C9801E2DACEB5A0041B146 /* NCCollectionViewCommon+SwipeCollectionViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C9801D2DACEB5A0041B146 /* NCCollectionViewCommon+SwipeCollectionViewCellDelegate.swift */; };
 		B5C980202DAD201A0041B146 /* NCSortMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C9801F2DAD201A0041B146 /* NCSortMenu.swift */; };
+		B5CE32F22E4B4836000269C7 /* NCShareEmailLinkHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CE32F12E4B4833000269C7 /* NCShareEmailLinkHeaderView.swift */; };
+		B5CE32F42E4B4B62000269C7 /* CreateLinkFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CE32F32E4B4B62000269C7 /* CreateLinkFooterView.swift */; };
+		B5CE32F62E4B4B78000269C7 /* NoSharesFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CE32F52E4B4B78000269C7 /* NoSharesFooterView.swift */; };
 		B5D389652DFAA75900767763 /* NCPushNotificationEncryption.m in Sources */ = {isa = PBXBuildFile; fileRef = F72D1005210B6882009C96B7 /* NCPushNotificationEncryption.m */; };
 		B5D45E5F2DA50C8500773929 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E5D2DA50C8500773929 /* TealiumHelper.swift */; };
 		B5D45E602DA50C8500773929 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E5C2DA50C8500773929 /* AdjustHelper.m */; };
@@ -1290,7 +1293,6 @@
 		B52FAE982DA8DED9001AB1BD /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
 		B52FAE992DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
 		B52FAE9A2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
-		B52FAEAB2DA8EF2C001AB1BD /* NCCreateFormUploadScanDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadScanDocument.swift; sourceTree = "<group>"; };
 		B52FAEAD2DA8EF84001AB1BD /* FileNameInputTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileNameInputTextField.swift; sourceTree = "<group>"; };
 		B52FAEAE2DA8EF84001AB1BD /* FileNameInputTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FileNameInputTextField.xib; sourceTree = "<group>"; };
 		B52FAEAF2DA8EF84001AB1BD /* JPGImageSaveSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JPGImageSaveSwitchView.swift; sourceTree = "<group>"; };
@@ -1343,11 +1345,13 @@
 		B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCMedia+Menu.swift"; sourceTree = "<group>"; };
 		B5C9801D2DACEB5A0041B146 /* NCCollectionViewCommon+SwipeCollectionViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCCollectionViewCommon+SwipeCollectionViewCellDelegate.swift"; sourceTree = "<group>"; };
 		B5C9801F2DAD201A0041B146 /* NCSortMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSortMenu.swift; sourceTree = "<group>"; };
+		B5CE32F12E4B4833000269C7 /* NCShareEmailLinkHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareEmailLinkHeaderView.swift; sourceTree = "<group>"; };
+		B5CE32F32E4B4B62000269C7 /* CreateLinkFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateLinkFooterView.swift; sourceTree = "<group>"; };
+		B5CE32F52E4B4B78000269C7 /* NoSharesFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoSharesFooterView.swift; sourceTree = "<group>"; };
 		B5D11CFA2DFABEA4006D5D68 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		B5D45E5B2DA50C8500773929 /* AdjustHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
 		B5D45E5C2DA50C8500773929 /* AdjustHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
 		B5D45E5D2DA50C8500773929 /* TealiumHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
-		B5D45E612DA50D6A00773929 /* CCAdvanced.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCAdvanced.m; sourceTree = "<group>"; };
 		B5D45E622DA50D6A00773929 /* CCManageAutoUpload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCManageAutoUpload.m; sourceTree = "<group>"; };
 		B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCRenameFile.storyboard; sourceTree = "<group>"; };
 		B5D45E6B2DA510E000773929 /* NCRenameFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCRenameFile.swift; sourceTree = "<group>"; };
@@ -2629,6 +2633,9 @@
 				AF2D7C7D2742559100ADF566 /* NCShareUserCell.swift */,
 				AF93471727E2361E002537EE /* NCShareHeader.xib */,
 				AF93471527E2361E002537EE /* NCShareHeader.swift */,
+				B5CE32F12E4B4833000269C7 /* NCShareEmailLinkHeaderView.swift */,
+				B5CE32F32E4B4B62000269C7 /* CreateLinkFooterView.swift */,
+				B5CE32F52E4B4B78000269C7 /* NoSharesFooterView.swift */,
 				AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */,
 				AA8E03D92D2ED83300E7E89C /* TransientShare.swift */,
 			);
@@ -2739,7 +2746,6 @@
 				B5E2E6D52DAE571200AB2EDD /* PasswordInputField.swift */,
 				B5E2E6D62DAE571200AB2EDD /* PasswordInputField.xib */,
 				B52FAEBF2DA8EF84001AB1BD /* NMC Views */,
-				B52FAEAB2DA8EF2C001AB1BD /* NCCreateFormUploadScanDocument.swift */,
 				F758B457212C564000515F55 /* NCScan.storyboard */,
 				F758B45D212C569C00515F55 /* NCScanCell.swift */,
 				F758B45F212C56A400515F55 /* NCScan.swift */,
@@ -2858,7 +2864,6 @@
 				B54315382DA669C700981E7E /* AnalysisDataCollectionSwitch.xib */,
 				B54315392DA669C700981E7E /* InitialPrivacySettingsViewController.swift */,
 				B543153A2DA669C700981E7E /* NCSettings.storyboard */,
-				B5D45E612DA50D6A00773929 /* CCAdvanced.m */,
 				B5D45E622DA50D6A00773929 /* CCManageAutoUpload.m */,
 				F768820B2C0DD1E7001CF441 /* Settings */,
 				F76882162C0DD1E7001CF441 /* AutoUpload */,
@@ -4766,6 +4771,7 @@
 				F7BFFD282C8846020029A201 /* NCHud.swift in Sources */,
 				F71CD6CA2930D7B1006C95C1 /* NCApplicationHandle.swift in Sources */,
 				F3754A7D2CF87D600009312E /* SetupPasscodeView.swift in Sources */,
+				B5CE32F62E4B4B78000269C7 /* NoSharesFooterView.swift in Sources */,
 				F73EF7D72B0226080087E6E9 /* NCManageDatabase+Tip.swift in Sources */,
 				F3374A842D64AC31002A38F9 /* AssistantLabelStyle.swift in Sources */,
 				F74BAE172C7E2F4E0028D4FA /* FileProviderDomain.swift in Sources */,
@@ -4889,6 +4895,7 @@
 				F7D4BF472CA2E8D800A5E746 /* TOSettingsKeypadImage.m in Sources */,
 				F7D4BF482CA2E8D800A5E746 /* TOPasscodeSettingsWarningLabel.m in Sources */,
 				F7D4BF492CA2E8D800A5E746 /* TOPasscodeVariableInputView.m in Sources */,
+				B5CE32F42E4B4B62000269C7 /* CreateLinkFooterView.swift in Sources */,
 				F7D4BF4A2CA2E8D800A5E746 /* TOPasscodeCircleView.m in Sources */,
 				B5F079F72DF857D800EBD527 /* NCLoginNavigationController.swift in Sources */,
 				F7D4BF4B2CA2E8D800A5E746 /* TOPasscodeViewContentLayout.m in Sources */,
@@ -5096,6 +5103,7 @@
 				F343A4BB2A1E734600DDA874 /* Optional+Extension.swift in Sources */,
 				B5BD60772DF9A69300C8D89F /* RequiredDataCollectionSwitch.swift in Sources */,
 				F76882232C0DD1E7001CF441 /* NCCapabilitiesModel.swift in Sources */,
+				B55354B92E45CB1B0036C57C /* NCCreateFormUploadScanDocument.swift in Sources */,
 				F7D68FCC28CB9051009139F3 /* NCManageDatabase+DashboardWidget.swift in Sources */,
 				B52FAED52DA8F616001AB1BD /* NCSelectableNavigationView.swift in Sources */,
 				B580F8212DF978E200CB7473 /* PasswordInputField.swift in Sources */,
@@ -5123,7 +5131,6 @@
 				B5D45E6E2DA510E000773929 /* NCRenameFile.swift in Sources */,
 				F758B45E212C569D00515F55 /* NCScanCell.swift in Sources */,
 				F78B87E72B62527100C65ADC /* NCMediaDataSource.swift in Sources */,
-				B52FAEAC2DA8EF2C001AB1BD /* NCCreateFormUploadScanDocument.swift in Sources */,
 				F76882272C0DD1E7001CF441 /* NCManageE2EEView.swift in Sources */,
 				B509EC652DF2D4AE008D55EF /* CCUtility.m in Sources */,
 				B5C9801A2DACD56C0041B146 /* NCMedia+Menu.swift in Sources */,
@@ -5144,6 +5151,7 @@
 				B5D389652DFAA75900767763 /* NCPushNotificationEncryption.m in Sources */,
 				F711A4DC2AF92CAE00095DD8 /* NCUtility+Date.swift in Sources */,
 				AF4BF61E27562B3F0081CEEF /* NCManageDatabase+Activity.swift in Sources */,
+				B5CE32F22E4B4836000269C7 /* NCShareEmailLinkHeaderView.swift in Sources */,
 				B5F5459C2DF1A7B1008137AB /* NCSectionFirstHeaderEmptyData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5325,7 +5333,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Notification_Service_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5358,7 +5366,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Service Extension/Notification Service ExtensionRelease.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5625,7 +5633,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Share.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5658,7 +5666,7 @@
 				CODE_SIGN_ENTITLEMENTS = Share/ShareRelease.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5692,7 +5700,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/File_Provider_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5727,7 +5735,7 @@
 				CODE_SIGN_ENTITLEMENTS = "File Provider Extension/File Provider ExtensionRelease.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5761,7 +5769,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
@@ -5792,7 +5800,7 @@
 				CODE_SIGN_ENTITLEMENTS = NextcloudRelease.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;

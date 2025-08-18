@@ -99,7 +99,8 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
         toolbar.sizeToFit()
         let doneButton = UIBarButtonItem(title: NSLocalizedString("_done_", comment: ""), style: .plain, target: self, action: #selector(doneDatePicker));
         let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
-        let cancelButton = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .plain, target: self, action: #selector(cancelDatePicker));
+//        let cancelButton = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .plain, target: self, action: #selector(cancelDatePicker));
+        let cancelButton = UIBarButtonItem(title: NSLocalizedString("_clear_", comment: ""), style: .plain, target: self, action: #selector(cancelDatePicker));
 
         toolbar.setItems([cancelButton, spaceButton, doneButton], animated: false)
 
@@ -124,6 +125,9 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
     }
 
     @objc func cancelDatePicker() {
+        self.expirationDate = nil
+        self.cellTextField.text = ""
+        self.rowDescriptor.value = self.expirationDate
         self.cellTextField.endEditing(true)
     }
     

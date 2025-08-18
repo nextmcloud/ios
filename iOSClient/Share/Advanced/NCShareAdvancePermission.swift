@@ -752,6 +752,11 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                 self.form.delegate = nil
                 self.share.expirationDate = exp as NSDate
                 self.form.delegate = self
+            } else {
+                // Only clear if the row value was *explicitly* set to nil by the user
+                if formRow.value == nil {
+                    self.share.expirationDate = nil
+                }
             }
 
         default:

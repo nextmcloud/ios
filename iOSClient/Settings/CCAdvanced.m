@@ -399,7 +399,7 @@
         
         NSInteger levelLog = [[rowDescriptor.value valueData] intValue];
         [[NCKeychain alloc] init].logLevel = levelLog;
-//        [[[NextcloudKit shared] nkCommonInstance] setLevelLog:levelLog];
+        [[[NextcloudKit shared] nkCommonInstance] setLevelLog:levelLog];
     }
 
     if ([rowDescriptor.tag isEqualToString:@"deleteoldfiles"]) {
