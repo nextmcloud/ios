@@ -41,7 +41,7 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
         fileName.textColor = NCBrandColor.shared.label
         info.textColor = NCBrandColor.shared.textInfo
 
-        var isShare = metadata.permissions.contains(NCPermissions().permissionShared)
+        let isShare = metadata.permissions.contains(NCPermissions().permissionShared)
 
         if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024) {
             fullWidthImageView.image = image
@@ -61,6 +61,48 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
                 imageView.image = NCImageCache.shared.getFolder()
             } else if !metadata.iconName.isEmpty {
                 imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
+            } else {
+                imageView.image = NCImageCache.shared.getImageFile()
+            }
+        }
+
+        fileName.text = metadata.fileNameView
+        fileName.textColor = NCBrandColor.shared.fileFolderName
+
+        updateFavoriteIcon(isFavorite: metadata.favorite)
+        info.text = utilityFileSystem.transformedSize(metadata.size) + ", " + utility.getRelativeDateTitle(metadata.date as Date)
+    }
+    
+    func setupUI(with metadata: tableMetadata, linkCount: Int, emailCount: Int) {
+        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        fileName.textColor = NCBrandColor.shared.label
+        info.textColor = NCBrandColor.shared.textInfo
+        
+//        let isShare = metadata.permissions.contains(NCPermissions().permissionShared)
+        let hasShares = (linkCount > 0 || emailCount > 0)
+
+        if let image = NCUtility().getImage(ocId: metadata.ocId,
+                                            etag: metadata.etag,
+                                            ext: NCGlobal.shared.previewExt1024) {
+            fullWidthImageView.image = image
+            fullWidthImageView.contentMode = .scaleAspectFill
+            imageView.isHidden = true
+        } else {
+            imageView.isHidden = false
+            if metadata.e2eEncrypted {
+                imageView.image = NCImageCache.shared.getFolderEncrypted()
+            } else if hasShares {
+                imageView.image = NCImageCache.shared.getFolderSharedWithMe()
+            } else if !metadata.shareType.isEmpty {
+                imageView.image = metadata.shareType.contains(3)
+                    ? NCImageCache.shared.getFolderPublic()
+                    : NCImageCache.shared.getFolderSharedWithMe()
+            } else if metadata.directory {
+                imageView.image = NCImageCache.shared.getFolder()
+            } else if !metadata.iconName.isEmpty {
+                imageView.image = NCUtility().loadImage(named: metadata.iconName,
+                                                              useTypeIconFile: true,
+                                                              account: metadata.account)
             } else {
                 imageView.image = NCImageCache.shared.getImageFile()
             }
