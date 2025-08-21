@@ -16,7 +16,8 @@ class CreateLinkFooterView: UITableViewHeaderFooterView {
     private let createButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle(NSLocalizedString("_create_new_link_", comment: ""), for: .normal)
-        button.setTitleColor(NCBrandColor.shared.shareBlackColor, for: .normal)
+        button.setTitleColor(UIColor.label, for: .normal)
+//        button.setTitleColor(NCBrandColor.shared.shareBlackColor, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .semibold)
         button.layer.cornerRadius = 7
         button.layer.borderWidth = 1
@@ -45,6 +46,11 @@ class CreateLinkFooterView: UITableViewHeaderFooterView {
         setupUI()
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        createButton.layer.borderColor = UIColor.label.cgColor
+    }
+
     private func setupUI() {
         contentView.backgroundColor = .clear
         
