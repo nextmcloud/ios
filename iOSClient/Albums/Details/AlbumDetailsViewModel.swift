@@ -37,6 +37,35 @@ class AlbumDetailsViewModel: ObservableObject {
         self.account = account
         self.album = album
         self.screenTitle = album.name
+        registerPublishers()
+    }
+    
+    // MARK: - Album name validation
+    private func registerPublishers() {
+        $newAlbumName
+            .removeDuplicates()
+            .sink { [weak self] name in
+                guard let self = self else { return }
+                self.newAlbumNameError = self.validateAlbumName(name).first
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func validateAlbumName(_ name: String) -> [String] {
+        
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if trimmed.isEmpty {
+            return ["Album name cannot be empty."]
+        } else if trimmed.count < 3 {
+            return ["Album name must be at least 3 characters."]
+        } else if trimmed.count > 30 {
+            return ["Album name cannot be more than 30 characters."]
+        } else if trimmed.contains("/") || trimmed.contains("\\") {
+            return ["Album name cannot contain slashes."]
+        }
+        
+        return []
     }
     
     // MARK: - Popups
