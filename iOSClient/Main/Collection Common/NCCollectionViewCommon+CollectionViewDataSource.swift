@@ -429,17 +429,26 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         // Share image
         if isShare || !metadata.shareType.isEmpty {
             cell.fileSharedImage?.image = NCImageCache.images.shared
+//            if metadata.directory {
+//                cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe()
+//            }
         } else {
             cell.fileSharedImage?.image = NCImageCache.images.canShare.image(color: NCBrandColor.shared.gray60)
             cell.fileSharedLabel?.text = ""
         }
         if session.account != metadata.account {
             cell.fileSharedImage?.image = NCImageCache.images.shared
+//            if metadata.directory {
+//                cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe()
+//            }
         }
         cell.fileSharedLabel?.text = NSLocalizedString("_shared_", comment: "")
         cell.fileSharedLabel?.textColor = NCBrandColor.shared.customer
         if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)){
             cell.fileSharedImage?.image = cell.fileSharedImage?.image?.imageColor(NCBrandColor.shared.customer)
+//            if metadata.directory {
+//                cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe()
+//            }
         } else {
             cell.fileSharedImage?.image = NCImageCache.images.canShare.image(color: NCBrandColor.shared.gray60)
             cell.fileSharedLabel?.text = ""
@@ -449,6 +458,9 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.fileSharedImage?.image = NCImageCache.images.sharedWithMe
             cell.fileSharedLabel?.text = NSLocalizedString("_recieved_", comment: "")
             cell.fileSharedLabel?.textColor = NCBrandColor.shared.notificationAction
+//            if metadata.directory {
+//                cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe()
+//            }
         }
 
         // Button More

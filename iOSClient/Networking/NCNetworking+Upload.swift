@@ -438,7 +438,9 @@ extension NCNetworking {
                                                                                "serverUrl": metadata.serverUrl,
                                                                                "account": metadata.account],
                                                                     second: 0.5)
-                    } else if error.errorCode == self.global.errorBadRequest || error.errorCode == self.global.errorUnsupportedMediaType {
+//                    } else if error.errorCode == self.global.errorBadRequest || error.errorCode == self.global.errorUnsupportedMediaType {
+                    } else if (error.errorCode == self.global.errorBadRequest || error.errorCode == self.global.errorUnsupportedMediaType) &&
+                                error.errorDescription.localizedCaseInsensitiveContains("virus") {
                         NCTransferProgress.shared.clearCountError(ocIdTransfer: metadata.ocIdTransfer)
                         self.utilityFileSystem.removeFile(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId))
                         self.database.deleteMetadataOcId(metadata.ocId)

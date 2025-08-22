@@ -47,7 +47,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="ouh-Hz-RNN">
-                        <rect key="frame" x="143" y="41.5" width="31" height="13"/>
+                        <rect key="frame" x="138" y="41.5" width="31" height="13"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="calenderNew" translatesAutoresizingMaskIntoConstraints="NO" id="udk-cn-nVB">
                                 <rect key="frame" x="0.0" y="0.0" width="13" height="13"/>
@@ -66,7 +66,7 @@
                         </subviews>
                     </stackView>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="rightArrow" translatesAutoresizingMaskIntoConstraints="NO" id="fgx-wr-hIv">
-                        <rect key="frame" x="179" y="41.5" width="13" height="13"/>
+                        <rect key="frame" x="174" y="41.5" width="13" height="13"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="13" id="CHU-r2-e6Z"/>
                             <constraint firstAttribute="height" constant="13" id="Egn-hc-gTt"/>
@@ -121,7 +121,7 @@
                     <constraint firstItem="pwI-xS-kU9" firstAttribute="top" secondItem="reg-E6-H23" secondAttribute="top" id="qLw-Vy-nNR"/>
                     <constraint firstItem="LqM-DX-oHg" firstAttribute="centerY" secondItem="stZ-8x-cD5" secondAttribute="centerY" id="rWl-xr-ljb"/>
                     <constraint firstItem="ouh-Hz-RNN" firstAttribute="centerY" secondItem="Oaj-Gt-DNg" secondAttribute="centerY" id="sfJ-sf-03j"/>
-                    <constraint firstItem="ouh-Hz-RNN" firstAttribute="leading" secondItem="q8K-as-nnN" secondAttribute="trailing" constant="10" id="tSS-lP-peZ"/>
+                    <constraint firstItem="ouh-Hz-RNN" firstAttribute="leading" secondItem="q8K-as-nnN" secondAttribute="trailing" constant="5" id="tSS-lP-peZ"/>
                     <constraint firstItem="pwI-xS-kU9" firstAttribute="leading" secondItem="fiJ-J9-DNQ" secondAttribute="leading" id="v1Y-gS-pEM"/>
                     <constraint firstAttribute="trailing" secondItem="LqM-DX-oHg" secondAttribute="trailing" constant="11" id="wLC-bu-LL8"/>
                     <constraint firstItem="LqM-DX-oHg" firstAttribute="top" secondItem="reg-E6-H23" secondAttribute="top" constant="20" id="weJ-HC-3BC"/>

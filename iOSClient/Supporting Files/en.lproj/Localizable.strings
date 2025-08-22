@@ -778,6 +778,7 @@
 "_share_modified_"                  = "Modified: ";
 "_share_created_"                   = "Created: ";
 "_share_uploaded_"                  = "Uploaded: ";
+"_share_details_"                   = "Details";
 "_share_via_link_menu_password_label_" = "Password protect (%1$s)";
 "_share_link_empty_exp_date_" = "You must select expiration date.";
 "_share_link_empty_note_message_" = "Please enter note.";

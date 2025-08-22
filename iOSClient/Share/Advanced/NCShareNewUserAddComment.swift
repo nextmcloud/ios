@@ -53,6 +53,8 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(handleShareCountsUpdate), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareCountsUpdated), object: nil)
+
         changeTheming()
         setupHeader()
     }
@@ -98,6 +100,50 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
         headerView.rightAnchor.constraint(equalTo: headerContainerView.rightAnchor).isActive = true
         headerView.setupUI(with: metadata)
     }
+    
+//    @objc private func handleShareCountsUpdate(notification: Notification) {
+//        guard let userInfo = notification.userInfo,
+//              let links = userInfo["links"] as? Int,
+//              let emails = userInfo["emails"] as? Int else {
+//            return
+//        }
+//
+//        updateHeader(linkCount: links, emailCount: emails)
+//    }
+//
+//    private func updateHeader(linkCount: Int, emailCount: Int) {
+//        // If header already exists, just update it
+//        if let header = headerContainerView.subviews.first(where: { $0 is NCShareAdvancePermissionHeader }) as? NCShareAdvancePermissionHeader {
+//            header.setupUI(with: metadata, linkCount: linkCount, emailCount: emailCount)
+//        } else {
+//            // Otherwise create and attach
+//            setupHeader(linkCount: linkCount, emailCount: emailCount)
+//        }
+//    }
+//
+//    private func setupHeader(linkCount: Int = 0, emailCount: Int = 0) {
+//        // Clear old header if any
+//        headerContainerView.subviews.forEach { $0.removeFromSuperview() }
+//
+//        guard let headerView = Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?
+//            .first as? NCShareAdvancePermissionHeader else {
+//            return
+//        }
+//
+//        headerView.ocId = metadata.ocId
+//        headerContainerView.addSubview(headerView)
+//
+//        headerView.translatesAutoresizingMaskIntoConstraints = false
+//        NSLayoutConstraint.activate([
+//            headerView.topAnchor.constraint(equalTo: headerContainerView.topAnchor),
+//            headerView.bottomAnchor.constraint(equalTo: headerContainerView.bottomAnchor),
+//            headerView.leadingAnchor.constraint(equalTo: headerContainerView.leadingAnchor),
+//            headerView.trailingAnchor.constraint(equalTo: headerContainerView.trailingAnchor)
+//        ])
+//
+//        // Initial setup
+//        headerView.setupUI(with: metadata, linkCount: linkCount, emailCount: emailCount)
+//    }
 
     @IBAction func cancelClicked(_ sender: Any) {
         self.navigationController?.popToRootViewController(animated: true)
