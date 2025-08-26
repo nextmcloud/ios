@@ -54,7 +54,9 @@ extension NCTrash {
                 NCContentPresenter().showError(error: error)
                 return
             }
+            // HD: This might be the cause to down server while restore as it should be async call
             self.database.deleteTrash(fileId: fileId, account: account)
+//            await self.database.deleteTrashAsync(fileId: fileId, account: session.account)
             self.reloadDataSource()
         }
     }
