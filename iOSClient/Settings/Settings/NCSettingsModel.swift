@@ -72,7 +72,8 @@ class NCSettingsModel: ObservableObject, ViewOnAppearHandling {
         accountRequest = keychain.accountRequest
         footerApp = String(format: NCBrandOptions.shared.textCopyrightNextcloudiOS, NCUtility().getVersionApp(withBuild: true)) + "\n\n"
         footerServer = String(format: NCBrandOptions.shared.textCopyrightNextcloudServer, capabilities.capabilityServerVersion) + "\n"
-        footerSlogan = capabilities.capabilityThemingName + " - " + capabilities.capabilityThemingSlogan + "\n\n"
+//        footerSlogan = capabilities.capabilityThemingName + " - " + capabilities.capabilityThemingSlogan + "\n\n"
+        footerSlogan = capabilities.capabilityThemingName + " - " + NSLocalizedString("_your_secure_cloud_storage_", comment: "") + "\n\n"
     }
 
     // MARK: - All functions

@@ -326,6 +326,7 @@
 "_service_"                     = "Service";
 "_imprint_"                     = "Imprint";
 "_magentacloud_version_"        = "MagentaCLOUD Version";
+"_your_secure_cloud_storage_"   = "Your secure cloud storage";
 "_url_"                         = "URL";
 "_username_"                    = "Username";
 "_change_credentials_"          = "Change your credentials";
