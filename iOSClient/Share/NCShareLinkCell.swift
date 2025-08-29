@@ -67,7 +67,9 @@ class NCShareLinkCell: UITableViewCell {
         self.tableShare = share
         self.indexPath = indexPath
         self.isDirectory = isDirectory
-        setupCellAppearance(titleAppendString: String(shareLinksCount))
+        let shareLinksCountString = shareLinksCount > 0 ? String(shareLinksCount) : ""
+        setupCellAppearance(titleAppendString: shareLinksCountString)
+//        setupCellAppearance(titleAppendString: String(shareLinksCount))
     }
 
     private func setupCellAppearance(titleAppendString: String? = nil) {
@@ -82,6 +84,7 @@ class NCShareLinkCell: UITableViewCell {
         imageExpiredDateSet.image = UIImage(named: "calenderNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
         imagePasswordSet.image = UIImage(named: "lockNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
 
+        buttonDetail.setTitle(NSLocalizedString("_share_details_", comment: ""), for: .normal)
         labelTitle.text = NSLocalizedString("_share_link_", comment: "")
 
         if let tableShare = tableShare, let titleAppendString {

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -46,11 +46,30 @@
                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bpo-w9-eew">
-                        <rect key="frame" x="108" y="41.5" width="13" height="13"/>
+                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="AhD-Do-qAx">
+                        <rect key="frame" x="108" y="41.5" width="31" height="13"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="calenderNew" translatesAutoresizingMaskIntoConstraints="NO" id="9ih-3l-y4Q">
+                                <rect key="frame" x="0.0" y="0.0" width="13" height="13"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="13" id="782-Z7-wd9"/>
+                                    <constraint firstAttribute="width" constant="13" id="uiz-tV-7kR"/>
+                                </constraints>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="lockNew" translatesAutoresizingMaskIntoConstraints="NO" id="bVQ-ff-vyD">
+                                <rect key="frame" x="18" y="0.0" width="13" height="13"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="13" id="ZiB-az-cCU"/>
+                                    <constraint firstAttribute="height" constant="13" id="aAp-d0-59D"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                    </stackView>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="rightArrow" translatesAutoresizingMaskIntoConstraints="NO" id="eHc-K1-Uo8">
+                        <rect key="frame" x="144" y="41.5" width="13" height="13"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="13" id="Pjj-bY-fhI"/>
-                            <constraint firstAttribute="width" constant="13" id="WkO-Fy-J9d"/>
+                            <constraint firstAttribute="height" constant="13" id="QHU-ys-0Wv"/>
+                            <constraint firstAttribute="width" constant="13" id="ak4-An-UtZ"/>
                         </constraints>
                     </imageView>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LQG-DC-Jy7" userLabel="ButtonMenu">
@@ -69,17 +88,19 @@
                     <constraint firstItem="LQG-DC-Jy7" firstAttribute="leading" secondItem="7R3-pU-pRv" secondAttribute="trailing" constant="15" id="08V-nw-EMz"/>
                     <constraint firstAttribute="trailing" secondItem="LQG-DC-Jy7" secondAttribute="trailing" constant="11" id="1O5-2S-kz7"/>
                     <constraint firstItem="eBS-7V-Cbu" firstAttribute="top" secondItem="GnA-Xt-iJw" secondAttribute="bottom" constant="5" id="345-mb-y5u"/>
-                    <constraint firstItem="bpo-w9-eew" firstAttribute="centerY" secondItem="wrw-TH-O7A" secondAttribute="centerY" id="6yu-WF-Q7n"/>
+                    <constraint firstItem="AhD-Do-qAx" firstAttribute="leading" secondItem="eBS-7V-Cbu" secondAttribute="trailing" constant="5" id="7DL-Wa-aqz"/>
                     <constraint firstItem="wrw-TH-O7A" firstAttribute="centerY" secondItem="eBS-7V-Cbu" secondAttribute="centerY" id="DAB-I2-7wJ"/>
                     <constraint firstItem="wrw-TH-O7A" firstAttribute="leading" secondItem="GnA-Xt-iJw" secondAttribute="leading" id="DP9-Ge-2jc"/>
                     <constraint firstItem="eBS-7V-Cbu" firstAttribute="height" secondItem="GnA-Xt-iJw" secondAttribute="height" id="Hg4-05-P4w"/>
                     <constraint firstAttribute="bottom" secondItem="7R3-pU-pRv" secondAttribute="bottom" id="JJM-YQ-C5d"/>
+                    <constraint firstItem="eHc-K1-Uo8" firstAttribute="centerY" secondItem="AhD-Do-qAx" secondAttribute="centerY" id="RUd-uj-7PL"/>
                     <constraint firstItem="GnA-Xt-iJw" firstAttribute="trailing" secondItem="7R3-pU-pRv" secondAttribute="trailing" id="SF4-HL-lSz"/>
                     <constraint firstItem="GnA-Xt-iJw" firstAttribute="top" secondItem="1f0-iN-Ymy" secondAttribute="top" constant="16" id="Uez-ag-Z5V"/>
-                    <constraint firstItem="bpo-w9-eew" firstAttribute="leading" secondItem="eBS-7V-Cbu" secondAttribute="trailing" constant="5" id="afy-OC-PKx"/>
                     <constraint firstItem="GnA-Xt-iJw" firstAttribute="leading" secondItem="1f0-iN-Ymy" secondAttribute="leading" constant="16" id="dfA-aa-2mX"/>
+                    <constraint firstItem="AhD-Do-qAx" firstAttribute="centerY" secondItem="wrw-TH-O7A" secondAttribute="centerY" id="gRY-bl-rl9"/>
                     <constraint firstItem="LQG-DC-Jy7" firstAttribute="top" secondItem="1f0-iN-Ymy" secondAttribute="top" constant="20" id="hko-TC-4gz"/>
                     <constraint firstItem="eBS-7V-Cbu" firstAttribute="leading" secondItem="wrw-TH-O7A" secondAttribute="trailing" constant="5" id="hox-eO-ZSZ"/>
+                    <constraint firstItem="eHc-K1-Uo8" firstAttribute="leading" secondItem="AhD-Do-qAx" secondAttribute="trailing" constant="5" id="ryM-m7-OPb"/>
                     <constraint firstItem="7R3-pU-pRv" firstAttribute="leading" secondItem="GnA-Xt-iJw" secondAttribute="leading" id="vbG-Sp-5rZ"/>
                     <constraint firstItem="7R3-pU-pRv" firstAttribute="top" secondItem="1f0-iN-Ymy" secondAttribute="top" id="yuf-q9-iJp"/>
                 </constraints>
@@ -88,12 +109,20 @@
             <connections>
                 <outlet property="btnQuickStatus" destination="7R3-pU-pRv" id="ebB-0u-7Np"/>
                 <outlet property="buttonMenu" destination="LQG-DC-Jy7" id="sfy-wf-kL2"/>
+                <outlet property="imageExpiredDateSet" destination="9ih-3l-y4Q" id="kFR-FB-pCh"/>
+                <outlet property="imagePasswordSet" destination="bVQ-ff-vyD" id="v59-Gr-ok7"/>
                 <outlet property="imagePermissionType" destination="wrw-TH-O7A" id="QSe-G2-vjE"/>
-                <outlet property="imageRightArrow" destination="bpo-w9-eew" id="eTx-m4-HJq"/>
+                <outlet property="imageRightArrow" destination="eHc-K1-Uo8" id="DCj-vv-Uel"/>
                 <outlet property="labelQuickStatus" destination="eBS-7V-Cbu" id="Mac-AI-yMh"/>
                 <outlet property="labelTitle" destination="GnA-Xt-iJw" id="ozV-MK-I7o"/>
+                <outlet property="leadingContraintofImageRightArrow" destination="ryM-m7-OPb" id="jA8-Gy-pQN"/>
             </connections>
             <point key="canvasLocation" x="97.599999999999994" y="276.1619190404798"/>
         </tableViewCell>
     </objects>
+    <resources>
+        <image name="calenderNew" width="24" height="24"/>
+        <image name="lockNew" width="24" height="24"/>
+        <image name="rightArrow" width="24" height="24"/>
+    </resources>
 </document>

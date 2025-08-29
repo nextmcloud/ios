@@ -33,6 +33,10 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
     @IBOutlet weak var labelQuickStatus: UILabel!
     @IBOutlet weak var imagePermissionType: UIImageView!
     @IBOutlet weak var imageRightArrow: UIImageView!
+    @IBOutlet weak var imageExpiredDateSet: UIImageView!
+    @IBOutlet weak var imagePasswordSet: UIImageView!
+    @IBOutlet weak var imageAllowedPermission: UIImageView!
+    @IBOutlet weak var leadingContraintofImageRightArrow: NSLayoutConstraint!
 
     // MARK: - Properties
     private var indexPathInternal = IndexPath()
@@ -79,7 +83,33 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         labelQuickStatus.textColor = NCBrandColor.shared.shareBlueColor
         labelTitle.textColor = NCBrandColor.shared.label
         imageRightArrow.image = UIImage(named: "rightArrow")?.imageColor(NCBrandColor.shared.shareBlueColor)
+        imageExpiredDateSet.image = UIImage(named: "calenderNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+        imagePasswordSet.image = UIImage(named: "lockNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+
         imagePermissionType.image = imagePermissionType.image?.imageColor(NCBrandColor.shared.shareBlueColor)
+        updatePermissionUI()
+    }
+
+    private func updatePermissionUI() {
+        guard let tableShare = tableShare else { return }
+
+        let permissions = NCPermissions()
+
+        if tableShare.permissions == permissions.permissionCreateShare {
+            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_just_upload_", comment: "")
+            imagePermissionType.image = UIImage(named: "upload")?.imageColor(NCBrandColor.shared.shareBlueColor)
+        } else if permissions.isAnyPermissionToEdit(tableShare.permissions) {
+            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_edit_", comment: "")
+            imagePermissionType.image = UIImage(named: "editNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+        } else {
+            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_only_view_", comment: "")
+            imagePermissionType.image = UIImage(named: "showPasswordNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+        }
+
+        imagePasswordSet.isHidden = tableShare.password.isEmpty
+        imageExpiredDateSet.isHidden = (tableShare.expirationDate == nil)
+        
+        leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
     }
 
     private func setupCellUI(userId: String) {
@@ -98,18 +128,19 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         btnQuickStatus.accessibilityHint = NSLocalizedString("_user_sharee_footer_", comment: "")
         btnQuickStatus.contentHorizontalAlignment = .left
 
-        let permissionValue = tableShare.permissions
-
-        if permissionValue == permissions.permissionCreateShare {
-            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_just_upload_", comment: "")
-            imagePermissionType.image = UIImage(named: "upload")?.imageColor(NCBrandColor.shared.shareBlueColor)
-        } else if permissions.isAnyPermissionToEdit(permissionValue) {
-            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_edit_", comment: "")
-            imagePermissionType.image = UIImage(named: "editNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
-        } else {
-            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_only_view_", comment: "")
-            imagePermissionType.image = UIImage(named: "showPasswordNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
-        }
+        setupCellUIAppearance()
+//        let permissionValue = tableShare.permissions
+//
+//        if permissionValue == permissions.permissionCreateShare {
+//            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_just_upload_", comment: "")
+//            imagePermissionType.image = UIImage(named: "upload")?.imageColor(NCBrandColor.shared.shareBlueColor)
+//        } else if permissions.isAnyPermissionToEdit(permissionValue) {
+//            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_edit_", comment: "")
+//            imagePermissionType.image = UIImage(named: "editNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+//        } else {
+//            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_only_view_", comment: "")
+//            imagePermissionType.image = UIImage(named: "showPasswordNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+//        }
     }
 
     // MARK: - Actions

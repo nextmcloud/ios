@@ -83,6 +83,8 @@ class NCShare: UIViewController, NCSharePagingContent {
     // Stores assigned numbers for each link (per share)
     var linkNumbersByShare: [String: [String: Int]] = [:]
 
+    var shareLinksCount = 0
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -110,7 +112,6 @@ class NCShare: UIViewController, NCSharePagingContent {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDidCreateShareLink), object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(handleShareCountsUpdate), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareCountsUpdated), object: nil)
 
         guard let metadata = metadata else { return }
         
@@ -132,6 +133,7 @@ class NCShare: UIViewController, NCSharePagingContent {
     }
 
     @objc func exitTapped() {
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateIcons)
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -205,6 +207,22 @@ class NCShare: UIViewController, NCSharePagingContent {
     @objc func appWillEnterForeground(notification: Notification) {
         reloadData()
     }
+    
+//    @objc private func handleShareCountsUpdate(notification: Notification) {
+//        guard let userInfo = notification.userInfo,
+//                  let links = userInfo["links"] as? Int,
+//                  let emails = userInfo["emails"] as? Int else { return }
+//
+//            if let header = tableView.headerView(forSection: ShareSection.header.rawValue) as? NCShareAdvancePermissionHeader {
+//                header.setupUI(with: metadata,
+//                                       linkCount: links,
+//                                       emailCount: emails)
+//            } else {
+//                let headerSection = IndexSet(integer: ShareSection.header.rawValue)
+//                tableView.reloadSections(headerSection, with: .none)
+//            }
+//    }
+
     // MARK: -
 
     @objc func reloadData() {
@@ -212,6 +230,7 @@ class NCShare: UIViewController, NCSharePagingContent {
             return
         }
         shares = self.database.getTableShares(metadata: metadata)
+        shareLinksCount = 0
         updateShareArrays()
         tableView.reloadData()
     }
@@ -266,6 +285,10 @@ class NCShare: UIViewController, NCSharePagingContent {
             nextLinkNumberByShare[shareId] = 1
             saveLinkNumberData()
         }
+        
+//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare,
+//                                                    userInfo: ["links": shareLinks.count,
+//                                                               "emails": shareEmails.count])
     }
 
     // MARK: - Persistence
@@ -592,7 +615,9 @@ extension NCShare: UITableViewDataSource {
             // Get or assign a number for this link
             let assignedNumber = assignLinkNumber(forShare: shareId, linkId: linkId)
 
-            cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, shareLinksCount: assignedNumber)
+//            cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, shareLinksCount: assignedNumber)
+            cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, shareLinksCount: shareLinksCount)
+            if tableShare.shareType == shareCommon.SHARE_TYPE_LINK { shareLinksCount += 1 }
             return cell
 
         case .emails:

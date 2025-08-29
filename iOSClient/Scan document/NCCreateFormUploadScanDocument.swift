@@ -141,82 +141,44 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
         var section: XLFormSectionDescriptor
         var row: XLFormRowDescriptor
-
+        
         // Section: Destination Folder
 
-        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: ""))
+        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
+        section.footerTitle = ""
         form.addFormSection(section)
-        
-//        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
-//        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: "")
-//        row.action.formSelector = #selector(changeDestinationFolder(_:))
-//        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.imageColor(NCBrandColor.shared.customer)
-//        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
-//        row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
-//        if(self.fileNameFolder == "/"){
-//            row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
-//        }else{
-//            row.cellConfig["photoLabel.text"] = self.fileNameFolder
-//        }
-//        row.cellConfig["textLabel.text"] = ""
-//
-//        section.addFormRow(row)
-//
-//        // Section: File Name
-//
-//        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
-//        form.addFormSection(section)
-//
-//        XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = NCCreateDocumentCustomTextField.self
-//        
-//        row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
-//        row.cellClass = NCCreateDocumentCustomTextField.self
-//        
-//        row.cellConfigAtConfigure["backgroundColor"] =  UIColor.secondarySystemGroupedBackground;
-//        row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
-//        row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-//        row.cellConfig["fileNameTextField.textColor"] = UIColor.label
-//        row.cellConfig["fileNameTextField.placeholder"] = self.fileName
-//
-//        section.addFormRow(row)
-        
-        XLFormViewController.cellClassesForRowDescriptorTypes()["NMCScamFileNameCustomInputField"] = FileNameInputTextField.self
-        row = XLFormRowDescriptor(tag: "fileName", rowType: "NMCScamFileNameCustomInputField", title: NSLocalizedString("_filename_", comment: ""))
-        row.cellClass = FileNameInputTextField.self
-        row.cellConfig["fileNameInputTextField.placeholder"] = self.fileName
-        
-        row.cellConfig["fileNameInputTextField.textAlignment"] = NSTextAlignment.left.rawValue
-        row.cellConfig["fileNameInputTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.label
-        
-        
-        section.addFormRow(row)
-        //FileName custom view END
-        
-//        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_location_", comment: ""))
-        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: ""))
-        form.addFormSection(section)
-        
-        //Scan documnet folder path
-        XLFormViewController.cellClassesForRowDescriptorTypes()["NMCScanFolderPathCustomCell"] = ScanDocumentPathView.self
-        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "NMCScanFolderPathCustomCell", title: self.titleServerUrl)
+
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
+        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
+        row.cellConfig["backgroundColor"] = UIColor.secondarySystemGroupedBackground
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["backgroundColor"] = cellBackgoundColor
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")?.imageColor(NCBrandColor.shared.customer)
-        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder_nmcloud")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label
+        row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
         if(self.titleServerUrl == "/"){
             row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         }else{
             row.cellConfig["photoLabel.text"] = self.titleServerUrl
         }
         row.cellConfig["textLabel.text"] = ""
-        
         section.addFormRow(row)
-        // END of Scan documnet folder path
+
+        // Section: File Name
+
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = TextTableViewCell.self
         
+        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
+        form.addFormSection(section)
+
+        row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = TextTableViewCell.self
+        row.cellConfigAtConfigure["backgroundColor"] = UIColor.secondarySystemGroupedBackground;
+        row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["fileNameTextField.textColor"] = UIColor.label
+        row.cellConfig["fileNameTextField.text"] = self.fileName
+        section.addFormRow(row)
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_with_text_recognition_", comment: ""))
         form.addFormSection(section)

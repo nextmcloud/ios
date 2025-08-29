@@ -62,6 +62,12 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                     }
                 }
                 
+                if let expiryDateSwitchCell = getExpiryDateSwitchCell() {
+                    let isExpiryDateOn = expiryDateSwitchCell.switchControl.isOn
+                    if !isExpiryDateOn {
+                        share.expirationDate = nil
+                    }
+                }
                 networking?.updateShare(share, downloadLimit: self.downloadLimit)
                 navigationController?.popViewController(animated: true)
             }
@@ -150,8 +156,8 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
 
         NotificationCenter.default.addObserver(self, selector: #selector(changeTheming), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeTheming), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-        
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(handleShareCountsUpdate), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareCountsUpdated), object: nil)
     }
 
     override func viewWillLayoutSubviews() {
@@ -161,6 +167,17 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         setupFooterView()
     }
     
+//    override func viewWillLayoutSubviews() {
+//        super.viewWillLayoutSubviews()
+//        
+//        if tableView.tableHeaderView == nil {
+//            setupHeaderView()
+//        }
+//        if tableView.tableFooterView == nil {
+//            setupFooterView()
+//        }
+//    }
+
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         if (UIDevice.current.userInterfaceIdiom == .phone), UIDevice().hasNotch {
             let isLandscape = UIDevice.current.orientation.isLandscape
@@ -216,6 +233,34 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         headerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
     }
 
+//    @objc private func handleShareCountsUpdate(notification: Notification) {
+//        guard let userInfo = notification.userInfo,
+//              let links = userInfo["links"] as? Int,
+//              let emails = userInfo["emails"] as? Int else {
+//            return
+//        }
+//        
+//        // Update existing header if possible
+//        if let header = tableView.tableHeaderView as? NCShareAdvancePermissionHeader {
+//            header.setupUI(with: metadata, linkCount: links, emailCount: emails)
+//        } else {
+//            // Fallback: re-create header if missing
+//            setupHeaderView(linkCount: links, emailCount: emails)
+//        }
+//    }
+//    
+//    func setupHeaderView(linkCount: Int = 0, emailCount: Int = 0) {
+//        guard let headerView = Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?.first as? NCShareAdvancePermissionHeader else {
+//            return
+//        }
+//        
+//        headerView.setupUI(with: metadata, linkCount: linkCount, emailCount: emailCount)
+//        headerView.ocId = metadata.ocId
+//        headerView.frame = CGRect(x: 0, y: 0, width: view.frame.size.width, height: 190)
+//        
+//        tableView.tableHeaderView = headerView
+//    }
+    
     func initializeForm() {
         let form : XLFormDescriptor
         var section : XLFormSectionDescriptor
@@ -505,6 +550,16 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         if let downloadLimitInputField: XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellDownloadLimit") {
             if let indexPath = self.form.indexPath(ofFormRow: downloadLimitInputField) {
                 let cell = tableView.cellForRow(at: indexPath) as? NCShareTextInputCell
+                return cell
+            }
+        }
+        return nil
+    }
+    
+    func getExpiryDateSwitchCell() -> NCFilePermissionEditCell? {
+        if let expiryRow : XLFormRowDescriptor  = self.form.formRow(withTag: "kNMCFilePermissionEditCellExpiration") {
+            if let indexPath = self.form.indexPath(ofFormRow: expiryRow) {
+                let cell = tableView.cellForRow(at: indexPath) as? NCFilePermissionEditCell
                 return cell
             }
         }

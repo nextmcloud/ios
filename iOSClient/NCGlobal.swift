@@ -406,6 +406,9 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let notificationCenterPlayerStoppedPlaying                  = "playerStoppedPlaying"
     
     let notificationCenterUpdateShare                           = "updateShare"
+    let notificationCenterShareCountsUpdated                    = "shareCountsUpdated"
+    let notificationCenterUpdateIcons                           = "updateIcons"
+
     
     // TIP
     //
