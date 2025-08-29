@@ -114,7 +114,7 @@ class AlbumDetailsViewModel: ObservableObject {
             
             switch result {
             case .success(let photos):
-                self?.photos = photos
+                self?.photos = photos.toAlbumPhotos()
                 if let callback = doOnSuccess {
                     callback()
                 }
@@ -169,24 +169,25 @@ class AlbumDetailsViewModel: ObservableObject {
     }
     
     private func reloadAlbumAfterRenaming(albumName: String) {
+        
         NextcloudKit.shared.fetchAllAlbums(for: account) { [weak self] result in
+            
+            self?.isLoadingPopupVisible = false
             
             switch result {
             case .success(let albums):
-                self?.isLoadingPopupVisible = false
-                if let newAlbum = albums.first(where: { $0.name == albumName }) {
+                
+                if let newAlbum = albums.toAlbums().first(where: { $0.name == albumName }) {
                     self?.album = newAlbum
                     self?.loadAlbumPhotos {
                         self?.screenTitle = self?.album.name ?? ""
                         self?.newAlbumName = ""
                     }
-                } else {
-                    NCContentPresenter().showError(error: NKError(error: NSError()))
                 }
                 
             case .failure(let error):
-                self?.isLoadingPopupVisible = false
                 NCContentPresenter().showError(error: NKError(error: error))
+                self?.isLoadingPopupVisible = false
             }
         }
     }

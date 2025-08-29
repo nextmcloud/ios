@@ -21,6 +21,10 @@ struct PhotosGridView: View {
     ]
     
     var body: some View {
+        
+        //            NCMediaViewRepresentable(photos: photos)
+        //                .edgesIgnoringSafeArea(.all)
+        
         ScrollView {
             LazyVGrid(columns: gridItems, spacing: 1) {
                 ForEach(photos) { photo in

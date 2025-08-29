@@ -79,6 +79,7 @@ struct AlbumDetailsScreen: View {
                     Button(action: handleAddPhotosIntent) {
                         Image(systemName: "plus")
                     }
+                    .foregroundColor(Color(NCBrandColor.shared.customer))
                 }
                 
                 Spacer()

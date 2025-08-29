@@ -1,5 +1,5 @@
 //
-//  AlbumsRootView.swift
+//  AlbumsListScreen.swift
 //  Nextcloud
 //
 //  Created by A200118228 on 07/07/25.
@@ -67,7 +67,9 @@ struct AlbumsListScreen: View {
         } else if viewModel.albums.isEmpty {
             NoAlbumsEmptyView(onNewAlbumCreationIntent: viewModel.onNewAlbumClick)
         } else {
-            AlbumsGridView(albums: viewModel.albums)
+            AlbumsGridView(
+                albums: viewModel.albums
+            )
         }
     }
     

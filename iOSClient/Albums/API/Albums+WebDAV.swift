@@ -27,7 +27,7 @@ public extension NextcloudKit {
         for account: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<[Album], Error>) -> Void
+        completion: @escaping (Result<[AlbumDTO], Error>) -> Void
     ) {
         
         let session = NCSession.shared.getSession(account: account)
@@ -112,10 +112,10 @@ public extension NextcloudKit {
         }
     }
     
-    private func parseAlbumsXML(data: Data) -> [Album] {
+    private func parseAlbumsXML(data: Data) -> [AlbumDTO] {
         
         let xml = XML.parse(data)
-        var albums: [Album] = []
+        var albums: [AlbumDTO] = []
         
         let elements = xml["d:multistatus", "d:response"]
         
@@ -134,7 +134,7 @@ public extension NextcloudKit {
             // Optionally skip entries with 404 status
             let status = element["d:propstat"]["d:status"].element?.text ?? ""
             if status.contains("200") {
-                let album = Album(
+                let album = AlbumDTO(
                     href: href,
                     lastPhotoId: lastPhoto,
                     itemCount: nbItems,
@@ -228,7 +228,7 @@ public extension NextcloudKit {
         account: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<[AlbumPhoto], Error>) -> Void
+        completion: @escaping (Result<[AlbumPhotoDTO], Error>) -> Void
     ) {
         
         let session = NCSession.shared.getSession(account: account)
@@ -319,10 +319,10 @@ public extension NextcloudKit {
         }
     }
     
-    private func parseAlbumPhotosXML(data: Data) -> [AlbumPhoto] {
+    private func parseAlbumPhotosXML(data: Data) -> [AlbumPhotoDTO] {
         
         let xml = XML.parse(data)
-        var photos: [AlbumPhoto] = []
+        var photos: [AlbumPhotoDTO] = []
         
         let elements = xml["d:multistatus", "d:response"]
         
@@ -363,7 +363,7 @@ public extension NextcloudKit {
                 let width = sizeNode["width"].element?.text.flatMap { Int($0) }
                 let height = sizeNode["height"].element?.text.flatMap { Int($0) }
                 
-                let photo = AlbumPhoto(
+                let photo = AlbumPhotoDTO(
                     fileId: fileId,
                     fileName: fileName,
                     contentType: contentType,

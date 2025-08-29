@@ -1,8 +1,8 @@
 //
-//  AlbumsController.swift
+//  AlbumsViewController.swift
 //  Nextcloud
 //
-//  Created by A200118228 on 07/07/25.
+//  Created by Dhanesh on 07/07/25.
 //  Copyright © 2025 Marino Faggiana. All rights reserved.
 //
 
@@ -37,6 +37,8 @@ class AlbumsViewController: UIViewController {
         hostingController.didMove(toParent: self)
         
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = NCBrandColor.shared.customer
+        UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.self])
+            .tintColor = NCBrandColor.shared.customer
     }
 }
 

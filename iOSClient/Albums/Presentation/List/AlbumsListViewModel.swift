@@ -18,6 +18,9 @@ class AlbumsListViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String? = nil
     
+    private var thumbnailsTask: Task<Void, Never>?
+    @Published private(set) var albumThumbnails: [String: UIImage] = [:]
+    
     @Published var isLoadingPopupVisible: Bool = false
     
     @Published var isNewAlbumCreationPopupVisible: Bool = false
@@ -101,7 +104,7 @@ class AlbumsListViewModel: ObservableObject {
             
             switch result {
             case .success(let albums):
-                self.albums = albums
+                self.albums = albums.toAlbums()
                 if let callback = doOnSuccess {
                     callback()
                 }
@@ -124,11 +127,21 @@ class AlbumsListViewModel: ObservableObject {
             
             switch result {
             case .success(_):
-                self?.loadAlbums {
-                    if let newAlbum = self?.albums.first(where: { $0.name == name }) {
-                        self?.navigationDestination = .albumDetails(album: newAlbum)
+                
+                NextcloudKit.shared.copyPhotoToAlbum(
+                    account: self?.account ?? "",
+                    sourcePath: "https://dev1.next.magentacloud.de/remote.php/dav/files/120049010000000000682377/Files___MagentaCLOUD.mp4",
+                    albumName: name,
+                    fileName: "Files___MagentaCLOUD.mp4"
+                ) { [weak self] result in
+                    
+                    self?.loadAlbums {
+                        if let newAlbum = self?.albums.first(where: { $0.name == name }) {
+                            self?.navigationDestination = .albumDetails(album: newAlbum)
+                        }
                     }
                 }
+                
             case .failure(let error):
                 NCContentPresenter().showError(error: NKError(error: error))
             }

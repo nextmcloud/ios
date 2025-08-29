@@ -12,7 +12,7 @@ struct NoPhotosEmptyView: View {
     
     let onAddPhotosIntent: () -> Void
     
-    private let contentPadding: CGFloat = 56.0
+    private let contentPadding: CGFloat = 32.0
     
     var body: some View {
         
