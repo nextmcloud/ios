@@ -9,11 +9,14 @@
 import Foundation
 import MoEngageSDK
 import MoEngageInApps
+import StoreKit
 
-class MoEngageAnalytics {
+class MoEngageAnalytics: NSObject {
     
     // Initializer for the MoEngageAnalytics class
-    init() {
+    override init() {
+        super.init()
+
         // Create a configuration object for MoEngage SDK with the given App ID and Data Center
         let sdkConfig = MoEngageSDKConfig(appId: "7KWWUKA6OKXGP8Q6DMCXLDX5", dataCenter: MoEngageDataCenter.data_center_02)
         
@@ -29,6 +32,9 @@ class MoEngageAnalytics {
         MoEngage.sharedInstance.initializeDefaultLiveInstance(sdkConfig)
 #endif
         setupMoEngageInAppMessaging()
+        
+        // Register delegate for In-App Native callbacks
+        MoEngageSDKInApp.sharedInstance.setInAppDelegate(self)
     }
     
     // Method to track the App ID
@@ -40,6 +46,16 @@ class MoEngageAnalytics {
         //MARK: MoEngage In-App messages
         MoEngageSDKInApp.sharedInstance.showInApp()
         MoEngageSDKInApp.sharedInstance.showNudge()
+    }
+    
+    // Handles triggering Apple's native review popup
+    private func requestAppStoreReview() {
+        DispatchQueue.main.async {
+            if let scene = UIApplication.shared.connectedScenes
+                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                SKStoreReviewController.requestReview(in: scene)
+            }
+        }
     }
 }
 
@@ -188,6 +204,44 @@ extension MoEngageAnalytics {
 
 }
 
-//    SCAN("scan"),
+// MARK: - MoEngage In-App Native Delegate
+extension MoEngageAnalytics: MoEngageInAppNativeDelegate {
 
+    // Called when user clicks an in-app with navigation action (e.g., deep link)
+    func inAppClicked(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
+                      andNavigationActionInfo navigationAction: MoEngageInAppNavigationAction,
+                      forAccountMeta accountMeta: MoEngageAccountMeta) {
+        // handle navigation actions if needed
+    }
 
+    // Called when user clicks an in-app with custom action (e.g., our rating trigger)
+    func inAppClicked(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
+                      andCustomActionInfo customAction: MoEngageInAppAction,
+                      forAccountMeta accountMeta: MoEngageAccountMeta) {
+
+        let kv = customAction.keyValuePairs
+
+        if let showRating = kv["show-native-rating"] as? String,
+           showRating.lowercased() == "true" {
+            requestAppStoreReview()
+        }
+    }
+
+    // Called when a "self-handled" in-app is triggered
+    func selfHandledInAppTriggered(withInfo inAppCampaign: MoEngageInAppSelfHandledCampaign,
+                                   forAccountMeta accountMeta: MoEngageAccountMeta) {
+        // no-op unless you use self-handled campaigns
+    }
+
+    // Optional — track impression
+    func inAppShown(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
+                    forAccountMeta accountMeta: MoEngageAccountMeta) {
+        // no-op
+    }
+
+    // Optional — track dismissal
+    func inAppDismissed(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
+                        forAccountMeta accountMeta: MoEngageAccountMeta) {
+        // no-op
+    }
+}
