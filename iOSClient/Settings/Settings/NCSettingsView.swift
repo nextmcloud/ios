@@ -1,55 +1,40 @@
-//
-//  NCSettingsView.swift
-//  Nextcloud
-//
-//  Created by Aditya Tyagi on 03/03/24.
-//  Created by Marino Faggiana on 30/05/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Aditya Tyagi <adityagi02@yahoo.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Aditya Tyagi
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import SwiftUI
 import NextcloudKit
 
 /// Settings view for Nextcloud
 struct NCSettingsView: View {
-    /// State to control the visibility of the acknowledgements view
+    // State to control the visibility of the acknowledgements view
     @State private var showAcknowledgements = false
-    /// State to control the visibility of the passcode view
+    // State to control the visibility of the passcode view
     @State private var showPasscode = false
-    /// State to contorl the visibility of the change passcode view
+    // State to contorl the visibility of the change passcode view
     @State private var showChangePasscode = false
-    /// State to control the visibility of the Policy view
+    // State to control the visibility of the Policy view
     @State private var showBrowser = false
-    /// State to control the visibility of the Source Code  view
+    // State to control the visibility of the Source Code  view
     @State private var showSourceCode = false
-    /// Object of ViewModel of this view
+    // Object of ViewModel of this view
     @ObservedObject var model: NCSettingsModel
+
+//    var capabilities: NKCapabilities.Capabilities {
+//        NCNetworking.shared.capabilities[model.controller?.account ?? ""] ?? NKCapabilities.Capabilities()
+//    }
 
     var body: some View {
         let capabilities = NCCapabilities.shared.getCapabilities(account: model.controller?.account)
         Form {
-            /// `Auto Upload` Section
+            // `Auto Upload` Section
             Section(content: {
                 NavigationLink(destination: LazyView {
                     NCAutoUploadView(model: NCAutoUploadModel(controller: model.controller), albumModel: AlbumModel(controller: model.controller))
                 }) {
                     HStack {
-                        Image(systemName: "photo.circle")
+                        Image(systemName: "photo.on.rectangle.angled")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 25, height: 25)
@@ -60,7 +45,7 @@ struct NCSettingsView: View {
             }, footer: {
                 Text(NSLocalizedString("_autoupload_description_", comment: ""))
             })
-            /// `Privacy` Section
+            // `Privacy` Section
             Section(content: {
                 Button(action: {
                     showPasscode.toggle()
@@ -97,21 +82,21 @@ struct NCSettingsView: View {
                                     .tint(Color(NCBrandColor.shared.textColor))
                             }
                         })
-                        /// Enable Touch ID
+                        // Enable Touch ID
                         Toggle(NSLocalizedString("_enable_touch_face_id_", comment: ""), isOn: $model.enableTouchID)
                             .onChange(of: model.enableTouchID) { _ in
                                 model.updateTouchIDSetting()
                             }
 
                         if !NCBrandOptions.shared.enforce_passcode_lock {
-                            /// Do not ask for passcode on startup
+                            // Do not ask for passcode on startup
                             Toggle(NSLocalizedString("_lock_protection_no_screen_", comment: ""), isOn: $model.lockScreen)
                                 .onChange(of: model.lockScreen) { _ in
                                     model.updateLockScreenSetting()
                                 }
                         }
 
-                        /// Reset app wrong attempts
+                        // Reset app wrong attempts
                         Toggle(NSLocalizedString("_reset_wrong_passcode_option_", comment: ""), isOn: $model.resetWrongAttempts)
                             .onChange(of: model.resetWrongAttempts) { _ in
                                 model.updateResetWrongAttemptsSetting()
@@ -123,16 +108,18 @@ struct NCSettingsView: View {
                 .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
             }
 
-            Section {
-                /// Splash screen when app inactive
-                Toggle(NSLocalizedString("_privacy_screen_", comment: ""), isOn: $model.privacyScreen)
-                    .onChange(of: model.privacyScreen) { _ in
-                        model.updatePrivacyScreenSetting()
-                    }
+            if !NCBrandOptions.shared.enforce_privacyScreenEnabled {
+                Section {
+                    // Splash screen when app inactive
+                    Toggle(NSLocalizedString("_privacy_screen_", comment: ""), isOn: $model.privacyScreen)
+                        .onChange(of: model.privacyScreen) { _ in
+                            model.updatePrivacyScreenSetting()
+                        }
+                }
+                .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
             }
-            .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
 
-            /// Display
+            // Display
             Section(header: Text(NSLocalizedString("_display_", comment: "")), content: {
                 NavigationLink(destination: LazyView {
                     NCDisplayView(model: NCDisplayModel(controller: model.controller))
@@ -149,7 +136,7 @@ struct NCSettingsView: View {
             })
             // NMC-4558 - The following sections will be hidden / removed from the settings
             /*
-            /// Calender & Contacts
+            // Calender & Contacts
             if !NCBrandOptions.shared.disable_mobileconfig {
                 Section(content: {
                     Button(action: {
@@ -176,13 +163,13 @@ struct NCSettingsView: View {
 
                 })
             }
-            /// Users
+            // Users
             Section(content: {
                 Toggle(NSLocalizedString("_settings_account_request_", comment: ""), isOn: $model.accountRequest)
                     .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
-                    .onChange(of: model.accountRequest, perform: { _ in
+                    .onChange(of: model.accountRequest) {
                         model.updateAccountRequest()
-                    })
+                    }
             }, header: {
                 Text(NSLocalizedString("_users_", comment: ""))
             }, footer: {
@@ -190,11 +177,11 @@ struct NCSettingsView: View {
             })
             */
             
-            /// E2EEncryption` Section
+            // E2EEncryption` Section
             if capabilities.capabilityE2EEEnabled && NCGlobal.shared.e2eeVersions.contains(capabilities.capabilityE2EEApiVersion) {
                 E2EESection(model: model)
             }
-            /// `Advanced` Section
+            // `Advanced` Section
             Section {
                 NavigationLink(destination: LazyView {
                     NCSettingsAdvancedView(model: NCSettingsAdvancedModel(controller: model.controller), showExitAlert: false, showCacheAlert: false)
@@ -268,7 +255,7 @@ struct NCSettingsView: View {
             
             // NMC-4558 - The following sections will be hidden / removed from the settings
             /*
-            /// `Information` Section
+            // `Information` Section
             Section(header: Text(NSLocalizedString("_information_", comment: "")), content: {
                 // Acknowledgements
                 Button(action: {
@@ -287,7 +274,7 @@ struct NCSettingsView: View {
                 .sheet(isPresented: $showAcknowledgements) {
                     NCAcknowledgementsView(browserTitle: NSLocalizedString("_acknowledgements_", comment: ""))
                 }
-                /// Terms & Privacy Conditions
+                // Terms & Privacy Conditions
                 Button(action: {
                     showBrowser.toggle()
                 }, label: {
@@ -304,7 +291,7 @@ struct NCSettingsView: View {
                 .sheet(isPresented: $showBrowser) {
                     NCBrowserWebView(urlBase: URL(string: NCBrandOptions.shared.privacy)!, browserTitle: NSLocalizedString("_privacy_legal_", comment: ""))
                 }
-                /// Source Code Nextcloud App
+                // Source Code Nextcloud App
                 if !NCBrandOptions.shared.disable_source_code_in_settings {
                     Button(action: {
                         showSourceCode.toggle()
@@ -326,7 +313,7 @@ struct NCSettingsView: View {
             })
              */
             
-            /// `Watermark` Section
+            // `Watermark` Section
             Section(content: {
             }, footer: {
                 Text(model.footerApp + model.footerServer + model.footerSlogan)
