@@ -135,13 +135,35 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     }
 
     /// Updates the auto-upload setting.
+//    func handleAutoUploadChange(newValue: Bool) {
+//        if newValue {
+//            requestAuthorization()
+//            self.autoUpload = photosPermissionsGranted
+//            database.updateAccountProperty(\.autoUpload, value: photosPermissionsGranted, account: session.account)
+//            self.database.setAccountAutoUploadFileName("")
+//            self.database.setAccountAutoUploadDirectory("", session: self.session)
+//            NCAutoUpload.shared.alignPhotoLibrary(controller: self.controller, account: self.session.account)
+//        } else {
+//            database.updateAccountProperty(\.autoUpload, value: photosPermissionsGranted, account: session.account)
+//            database.updateAccountProperty(\.autoUploadStart, value: photosPermissionsGranted, account: session.account)
+//            self.database.clearMetadatasUpload(account: session.account)
+//        }
+//    }
     func handleAutoUploadChange(newValue: Bool) {
         if newValue {
             requestAuthorization()
             self.autoUpload = photosPermissionsGranted
             database.updateAccountProperty(\.autoUpload, value: photosPermissionsGranted, account: session.account)
-            self.database.setAccountAutoUploadFileName("")
-            self.database.setAccountAutoUploadDirectory("", session: self.session)
+
+            // ✅ Don't reset folder path if already set
+            let currentPath = database.getAccountAutoUploadDirectory(session: session)
+            let currentFile = database.getAccountAutoUploadFileName()
+            if currentPath.isEmpty || currentFile.isEmpty {
+                // Set default only if not already set
+                self.database.setAccountAutoUploadFileName("default")
+                self.database.setAccountAutoUploadDirectory("/Uploads", session: self.session)
+            }
+
             NCAutoUpload.shared.alignPhotoLibrary(controller: self.controller, account: self.session.account)
         } else {
             database.updateAccountProperty(\.autoUpload, value: photosPermissionsGranted, account: session.account)
@@ -201,21 +223,63 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     }
 
     /// Updates the auto-upload full content setting.
+//    func handleAutoUploadChange(newValue: Bool, assetCollections: [PHAssetCollection]) {
+//        if let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)), tableAccount.autoUploadStart == newValue { return }
+//
+//        database.updateAccountProperty(\.autoUploadStart, value: newValue, account: session.account)
+//
+//        if newValue {
+//            if autoUploadNewPhotosOnly {
+//                database.updateAccountProperty(\.autoUploadSinceDate, value: Date.now, account: session.account)
+//            }
+//            NCAutoUpload.shared.autoUploadSelectedAlbums(controller: self.controller, assetCollections: assetCollections, log: "Auto upload selected albums", account: session.account)
+//            NCAutoUpload.shared.autoUploadFullPhotos(controller: self.controller, log: "Auto upload full", account: session.account)
+//        } else {
+//            database.clearMetadatasUpload(account: session.account)
+//        }
+//    }
     func handleAutoUploadChange(newValue: Bool, assetCollections: [PHAssetCollection]) {
-        if let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)), tableAccount.autoUploadStart == newValue { return }
+        if let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)),
+           tableAccount.autoUploadStart == newValue {
+            return
+        }
 
         database.updateAccountProperty(\.autoUploadStart, value: newValue, account: session.account)
 
         if newValue {
             if autoUploadNewPhotosOnly {
-                database.updateAccountProperty(\.autoUploadSinceDate, value: Date.now, account: session.account)
+                // ✅ Set the since date to now (only upload new)
+                let now = Date.now
+                autoUploadSinceDate = now
+                database.updateAccountProperty(\.autoUploadSinceDate, value: now, account: session.account)
+
+                NCAutoUpload.shared.autoUploadSelectedAlbums(
+                    controller: self.controller,
+                    assetCollections: assetCollections,
+                    log: "Auto upload selected albums (new only)",
+                    account: session.account
+                )
+
+                // ✅ Skip full upload
+            } else {
+                // 🔁 Upload everything
+                NCAutoUpload.shared.autoUploadSelectedAlbums(
+                    controller: self.controller,
+                    assetCollections: assetCollections,
+                    log: "Auto upload selected albums",
+                    account: session.account
+                )
+                NCAutoUpload.shared.autoUploadFullPhotos(
+                    controller: self.controller,
+                    log: "Auto upload full",
+                    account: session.account
+                )
             }
-            NCAutoUpload.shared.autoUploadSelectedAlbums(controller: self.controller, assetCollections: assetCollections, log: "Auto upload selected albums", account: session.account)
-            NCAutoUpload.shared.autoUploadFullPhotos(controller: self.controller, log: "Auto upload full", account: session.account)
         } else {
             database.clearMetadatasUpload(account: session.account)
         }
     }
+
 
     /// Updates the auto-upload create subfolder setting.
     func handleAutoUploadCreateSubfolderChange(newValue: Bool) {
