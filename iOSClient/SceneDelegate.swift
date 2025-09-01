@@ -150,7 +150,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Initialize Auto upload with \(num) uploads")
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        // The below code is getting called after 1 sec, which is causing the api "ocs/v2.php/cloud/user" to get called so many times. So commenting it
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//            NCService().startRequestServicesServer(account: session.account, controller: controller)
+//        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             NCService().startRequestServicesServer(account: session.account, controller: controller)
         }
 

@@ -655,7 +655,14 @@ extension NCSelect: UICollectionViewDataSource {
             } else {
                 cell.separator.isHidden = false
             }
-
+            // Hide lines on iPhone
+            if !UIDevice.current.orientation.isLandscape && UIDevice.current.model.hasPrefix("iPhone") {
+                cell.cellSeparatorView?.isHidden = true
+                cell.fileSharedLabel?.isHidden = true
+            }else{
+                cell.cellSeparatorView?.isHidden = false
+                cell.fileSharedLabel?.isHidden = false
+            }
             // Add TAGS
             cell.setTags(tags: Array(metadata.tags))
 

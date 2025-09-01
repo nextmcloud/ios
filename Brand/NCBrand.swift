@@ -95,6 +95,7 @@ let userAgent: String = {
     @objc var disable_source_code_in_settings: Bool = false
     @objc var enforce_passcode_lock = false
     @objc var use_in_app_browser_for_login = false
+    var enforce_privacyScreenEnabled = false
 
     // (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
     var enforce_servers: [(name: String, url: String)] = []

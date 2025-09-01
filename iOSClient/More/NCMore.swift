@@ -215,7 +215,9 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         item = NKExternalSite()
         item.name = "_settings_"
         item.icon = "settings"
-        item.url = "segueSettings"
+//        item.url = "segueSettings"
+        item.url = "openSettings"
+
         settingsMenu.append(item)
 
         if !quotaMenu.isEmpty {

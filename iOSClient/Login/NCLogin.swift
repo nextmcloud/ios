@@ -498,57 +498,57 @@ extension NCLogin: ClientCertificateDelegate, UIDocumentPickerDelegate {
         }
     }
     
-    func poll(loginFlowV2Token: String, loginFlowV2Endpoint: String, loginFlowV2Login: String) {
-        let queue = DispatchQueue.global(qos: .background)
-        pollTimer = DispatchSource.makeTimerSource(queue: queue)
-
-        guard let timer = pollTimer else { return }
-
-        timer.schedule(deadline: .now(), repeating: .seconds(1), leeway: .seconds(1))
-        timer.setEventHandler(handler: {
-            DispatchQueue.main.async {
-                let controller = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
-                NextcloudKit.shared.getLoginFlowV2Poll(token: loginFlowV2Token, endpoint: loginFlowV2Endpoint) { [self] server, loginName, appPassword, _, error in
-                    if error == .success, let urlBase = server, let user = loginName, let appPassword {
-                        loginFlowInProgress = true
-                        ncLoginPollModel.isLoading = true
-
-                        NCAccount().createAccount(urlBase: urlBase, user: user, password: appPassword, controller: controller) { account, error in
-
-                            if error == .success {
-                                let window = UIApplication.shared.firstWindow
-                                if let controller = window?.rootViewController as? NCMainTabBarController {
-                                    controller.account = account
-                                    controller.dismiss(animated: true, completion: nil)
-                                } else {
-                                    if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as? NCMainTabBarController {
-                                        controller.account = account
-                                        controller.modalPresentationStyle = .fullScreen
-                                        controller.view.alpha = 0
-
-                                        window?.rootViewController = controller
-                                        window?.makeKeyAndVisible()
-
-                                        if let scene = window?.windowScene {
-                                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
-                                        }
-
-                                        UIView.animate(withDuration: 0.5) {
-                                            controller.view.alpha = 1
-                                        }
-                                    }
-                                }
-
-                                timer.cancel()
-                            }
-                        }
-                    }
-                }
-            }
-        })
-
-        timer.resume()
-    }
+//    func poll(loginFlowV2Token: String, loginFlowV2Endpoint: String, loginFlowV2Login: String) {
+//        let queue = DispatchQueue.global(qos: .background)
+//        pollTimer = DispatchSource.makeTimerSource(queue: queue)
+//
+//        guard let timer = pollTimer else { return }
+//
+//        timer.schedule(deadline: .now(), repeating: .seconds(1), leeway: .seconds(1))
+//        timer.setEventHandler(handler: {
+//            DispatchQueue.main.async {
+//                let controller = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
+//                NextcloudKit.shared.getLoginFlowV2Poll(token: loginFlowV2Token, endpoint: loginFlowV2Endpoint) { [self] server, loginName, appPassword, _, error in
+//                    if error == .success, let urlBase = server, let user = loginName, let appPassword {
+//                        loginFlowInProgress = true
+//                        ncLoginPollModel.isLoading = true
+//
+//                        NCAccount().createAccount(urlBase: urlBase, user: user, password: appPassword, controller: controller) { account, error in
+//
+//                            if error == .success {
+//                                let window = UIApplication.shared.firstWindow
+//                                if let controller = window?.rootViewController as? NCMainTabBarController {
+//                                    controller.account = account
+//                                    controller.dismiss(animated: true, completion: nil)
+//                                } else {
+//                                    if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as? NCMainTabBarController {
+//                                        controller.account = account
+//                                        controller.modalPresentationStyle = .fullScreen
+//                                        controller.view.alpha = 0
+//
+//                                        window?.rootViewController = controller
+//                                        window?.makeKeyAndVisible()
+//
+//                                        if let scene = window?.windowScene {
+//                                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
+//                                        }
+//
+//                                        UIView.animate(withDuration: 0.5) {
+//                                            controller.view.alpha = 1
+//                                        }
+//                                    }
+//                                }
+//
+//                                timer.cancel()
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        })
+//
+//        timer.resume()
+//    }
 }
 
 extension NCLogin: SFSafariViewControllerDelegate {

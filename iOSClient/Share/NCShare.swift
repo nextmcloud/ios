@@ -129,7 +129,7 @@ class NCShare: UIViewController, NCSharePagingContent {
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        tableView.reloadData()
+//        tableView.reloadData()
     }
 
     @objc func exitTapped() {
@@ -265,7 +265,8 @@ class NCShare: UIViewController, NCSharePagingContent {
                     nextLinkNumberByShare[shareId] = nextNum + 1
                     saveLinkNumberData()
                 }
-                
+//                if item.shareType == shareCommon.SHARE_TYPE_LINK { shareLinksCount += 1 }
+
                 shareLinks.append(item)
             } else {
                 shareEmails.append(item)

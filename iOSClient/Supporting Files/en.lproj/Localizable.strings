@@ -55,7 +55,7 @@
 "_select_all_"              = "Select all";
 "_upload_"                  = "Upload";
 "_home_"                    = "Files";
-"_files_"                   = "Files";
+//"_files_"                   = "Files";
 "_home_dir_"                = "Home";
 "_file_to_upload_"          = "File to upload";
 "_destination_"             = "Destination";
@@ -326,6 +326,7 @@
 "_service_"                     = "Service";
 "_imprint_"                     = "Imprint";
 "_magentacloud_version_"        = "MagentaCLOUD Version";
+"_your_secure_cloud_storage_"   = "Your secure cloud storage";
 "_url_"                         = "URL";
 "_username_"                    = "Username";
 "_change_credentials_"          = "Change your credentials";

@@ -91,45 +91,45 @@ class NCAccount: NSObject {
         }
     }
 
-    func createAccount(urlBase: String,
-                       user: String,
-                       password: String,
-                       controller: NCMainTabBarController?,
-                       completion: @escaping (_ account: String, _ error: NKError) -> Void) {
-        var urlBase = urlBase
-        if urlBase.last == "/" { urlBase = String(urlBase.dropLast()) }
-        let account: String = "\(user) \(urlBase)"
-
-        NextcloudKit.shared.appendSession(account: account,
-                                          urlBase: urlBase,
-                                          user: user,
-                                          userId: user,
-                                          password: password,
-                                          userAgent: userAgent,
-                                          nextcloudVersion: NCCapabilities.shared.getCapabilities(account: account).capabilityServerVersionMajor,
-                                          httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
-                                          httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
-                                          httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
-                                          groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
-
-        NextcloudKit.shared.getUserProfile(account: account) { account, userProfile, _, error in
-            if error == .success, let userProfile {
-                NextcloudKit.shared.updateSession(account: account, userId: userProfile.userId)
-                NCSession.shared.appendSession(account: account, urlBase: urlBase, user: user, userId: userProfile.userId)
-                self.database.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
-                self.changeAccount(account, userProfile: userProfile, controller: controller) {
-                    NCKeychain().setClientCertificate(account: account, p12Data: NCNetworking.shared.p12Data, p12Password: NCNetworking.shared.p12Password)
-                    completion(account, error)
-                }
-            } else {
-                NextcloudKit.shared.removeSession(account: account)
-                let alertController = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: error.errorDescription, preferredStyle: .alert)
-                alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
-                UIApplication.shared.firstWindow?.rootViewController?.present(alertController, animated: true)
-                completion(account, error)
-            }
-        }
-    }
+//    func createAccount(urlBase: String,
+//                       user: String,
+//                       password: String,
+//                       controller: NCMainTabBarController?,
+//                       completion: @escaping (_ account: String, _ error: NKError) -> Void) {
+//        var urlBase = urlBase
+//        if urlBase.last == "/" { urlBase = String(urlBase.dropLast()) }
+//        let account: String = "\(user) \(urlBase)"
+//
+//        NextcloudKit.shared.appendSession(account: account,
+//                                          urlBase: urlBase,
+//                                          user: user,
+//                                          userId: user,
+//                                          password: password,
+//                                          userAgent: userAgent,
+//                                          nextcloudVersion: NCCapabilities.shared.getCapabilities(account: account).capabilityServerVersionMajor,
+//                                          httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
+//                                          httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
+//                                          httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
+//                                          groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
+//
+//        NextcloudKit.shared.getUserProfile(account: account) { account, userProfile, _, error in
+//            if error == .success, let userProfile {
+//                NextcloudKit.shared.updateSession(account: account, userId: userProfile.userId)
+//                NCSession.shared.appendSession(account: account, urlBase: urlBase, user: user, userId: userProfile.userId)
+//                self.database.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
+//                self.changeAccount(account, userProfile: userProfile, controller: controller) {
+//                    NCKeychain().setClientCertificate(account: account, p12Data: NCNetworking.shared.p12Data, p12Password: NCNetworking.shared.p12Password)
+//                    completion(account, error)
+//                }
+//            } else {
+//                NextcloudKit.shared.removeSession(account: account)
+//                let alertController = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: error.errorDescription, preferredStyle: .alert)
+//                alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
+//                UIApplication.shared.firstWindow?.rootViewController?.present(alertController, animated: true)
+//                completion(account, error)
+//            }
+//        }
+//    }
 
     @objc func changeAccount(_ account: String,
                        userProfile: NKUserProfile?,

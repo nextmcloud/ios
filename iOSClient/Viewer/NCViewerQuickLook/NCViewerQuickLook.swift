@@ -90,11 +90,19 @@ private var hasChangesQuickLook: Bool = false
         }
 
         if let metadata = metadata, metadata.isImage {
+//            let buttonDone = UIBarButtonItem(title: NSLocalizedString("_done_", comment: ""), style: .done) {
+//                self.dismissView()
+//            }
             let buttonDone = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(dismissView))
             let buttonCrop = UIBarButtonItem(image: NCUtility().loadImage(named: "crop"), style: .plain, target: self, action: #selector(crop))
             navigationItem.leftBarButtonItems = [buttonDone, buttonCrop]
+//            self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
+//            self.navigationItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.brand
+
             startTimer(navigationItem: navigationItem)
         }
+//        self.navigationItem.rightBarButtonItem?.tintColor = NCBrandColor.shared.brand
+
     }
 
     override func viewDidAppear(_ animated: Bool) {

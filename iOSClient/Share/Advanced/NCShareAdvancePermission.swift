@@ -29,6 +29,29 @@ import XLForm
 
 class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelegate, NCShareNavigationTitleSetting {
     func dismissShareAdvanceView(shouldSave: Bool) {
+        
+        guard shouldSave else {
+            guard oldTableShare?.hasChanges(comparedTo: share) != false else {
+                navigationController?.popViewController(animated: true)
+                return
+            }
+
+            let alert = UIAlertController(
+                title: NSLocalizedString("_cancel_request_", comment: ""),
+                message: NSLocalizedString("_discard_changes_info_", comment: ""),
+                preferredStyle: .alert)
+
+            alert.addAction(UIAlertAction(
+                title: NSLocalizedString("_discard_changes_", comment: ""),
+                style: .destructive,
+                handler: { _ in self.navigationController?.popViewController(animated: true) }))
+
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_editing_", comment: ""), style: .default))
+            self.present(alert, animated: true)
+
+            return
+        }
+        
         if shouldSave {
             self.oldTableShare?.permissions = self.permission ?? (self.oldTableShare?.permissions ?? 0)
             self.share.permissions = self.permission ?? (self.oldTableShare?.permissions ?? 0)
@@ -451,6 +474,10 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
         if let date = oldTableShare?.expirationDate {
             row.cellConfig["cellTextField.text"] = DateFormatter.shareExpDate.string(from: date as Date)
         }
+//        else {
+//            row.cellConfig["cellTextField.text"] = DateFormatter.shareExpDate.string(from: Date.dayAfterYear as Date)
+//            share.expirationDate = row.cellConfig["cellTextField.text"] as? NSDate
+//        }
         row.height = 44
         let hasExpiry = oldTableShare?.expirationDate != nil
         row.hidden = NSNumber.init(booleanLiteral: !hasExpiry)
