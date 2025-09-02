@@ -22,28 +22,25 @@ struct AlbumsGridView: View {
     ]
     
     var body: some View {
+        
         ScrollView {
+            
             VStack(alignment: .leading, spacing: 16) {
                 
                 Text("My albums")
                     .font(.system(size: 21, weight: .bold))
-                    .padding(.horizontal)
                 
                 LazyVGrid(columns: columns, spacing: 20) {
-                    
                     ForEach(albums, id: \.id) { album in
-                        
                         NavigationLink(
                             destination: {
                                 AlbumDetailsScreen(
-                                    viewModel: .init(
-                                        account: localAccount,
-                                        album: album
-                                    )
+                                    account: localAccount,
+                                    album: album
                                 )
                             }
                         ) {
-                            VStack(alignment: .leading, spacing: 8) {
+                            VStack(alignment: .leading, spacing: 6) {
                                 
                                 AlbumGridPhoto(album: album)
                                 
@@ -56,14 +53,14 @@ struct AlbumsGridView: View {
                                     Text(subtitle)
                                         .font(.system(size: 13))
                                         .foregroundColor(Color(UIColor.systemGray))
+                                        .lineLimit(1)
                                 }
                             }
                         }
                     }
-                    .padding(.horizontal)
                 }
-                .padding(.top)
             }
+            .padding()
         }
     }
     
@@ -87,41 +84,44 @@ fileprivate struct AlbumGridPhoto: View {
     let album: Album
     @Environment(\.localAccount) var localAccount: String
     
+    private let fixedThumbnailHeight: CGFloat = 160
+    
     private enum ImageState { case loading, empty, thumbnail(UIImage) }
     @State private var imageState: ImageState = .loading
     
     var body: some View {
-        GeometryReader { proxy in
-            let cellWidth = proxy.size.width
-            let clampedHeight = min(max(cellWidth, 140), 200) // 140–200 cap
-            
+        GeometryReader { geo in
             ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.secondary.opacity(0.08))
-                
                 switch imageState {
                 case .loading:
-                    ProgressView()
-                        .progressViewStyle(.circular)
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.15))
+                        .overlay(
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .gray))
+                        )
                 case .empty:
                     Image("EmptyAlbum")
                         .resizable()
-                        .scaledToFit()   // fit inside box, no overflow
-                        .padding(16)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(
+                            width: geo.size.width,
+                            height: fixedThumbnailHeight,
+                            alignment: .top
+                        )
+                        .clipped()
                 case .thumbnail(let img):
                     Image(uiImage: img)
                         .resizable()
-                        .scaledToFill()  // fill box, center crop
+                        .scaledToFill()
                 }
             }
-            .frame(width: cellWidth, height: clampedHeight)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.gray.opacity(0.5), lineWidth: 1)
-            )
+            .frame(width: geo.size.width, height: fixedThumbnailHeight)
+            .clipped()
+            .overlay(frame)
+            .cornerRadius(8)
         }
-        .aspectRatio(1, contentMode: .fit) // keep grid cell square-ish
+        .frame(height: fixedThumbnailHeight)
         .task(id: album.lastPhotoId) {
             await loadThumbnail()
         }
@@ -148,6 +148,16 @@ fileprivate struct AlbumGridPhoto: View {
         } else {
             await MainActor.run { imageState = .empty }
         }
+    }
+    
+    private var frame: some View {
+        RoundedRectangle(
+            cornerRadius: 8
+        )
+        .stroke(
+            Color.gray.opacity(1),
+            lineWidth: 1 / UIScreen.main.scale
+        )
     }
 }
 

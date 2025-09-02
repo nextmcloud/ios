@@ -14,8 +14,10 @@ struct AlbumDetailsScreen: View {
     
     @Environment(\.dismiss) private var dismiss
     
-    init(viewModel: AlbumDetailsViewModel) {
-        self._viewModel = StateObject(wrappedValue: viewModel)
+    init(account: String, album: Album) {
+        _viewModel = StateObject(
+            wrappedValue: AlbumDetailsViewModel(account: account, album: album)
+        )
     }
     
     var body: some View {
@@ -33,9 +35,6 @@ struct AlbumDetailsScreen: View {
             ToolbarItem(placement: .topBarTrailing) {
                 toolbarContent()
             }
-        }
-        .onAppear {
-            viewModel.loadAlbumPhotos()
         }
         .onReceive(viewModel.goBack) {
             dismiss()
@@ -107,15 +106,24 @@ struct AlbumDetailsScreen: View {
             ProgressView("Loading photos...")
         } else if let error = viewModel.errorMessage {
             Text(error)
+                .refreshable {
+                    viewModel.onPulledToRefresh()
+                }
         } else if viewModel.photos.isEmpty {
             NoPhotosEmptyView(
                 onAddPhotosIntent: handleAddPhotosIntent
             )
+            .refreshable {
+                viewModel.onPulledToRefresh()
+            }
         } else {
             PhotosGridView(
                 photos: viewModel.photos,
                 onAddPhotosIntent: handleAddPhotosIntent
             )
+            .refreshable {
+                viewModel.onPulledToRefresh()
+            }
         }
     }
     
@@ -128,16 +136,14 @@ struct AlbumDetailsScreen: View {
 #Preview {
     NavigationView {
         AlbumDetailsScreen(
-            viewModel: .init(
-                account: "123",
-                album: Album(
-                    href: "/Urlaub",
-                    lastPhotoId: "mountain",
-                    itemCount: 42,
-                    location: "Alps",
-                    dateRange: nil,
-                    collaborators: nil
-                )
+            account: "120049010000000000682377",
+            album: Album(
+                href: "/Urlaub",
+                lastPhotoId: "mountain",
+                itemCount: 42,
+                location: "Alps",
+                dateRange: nil,
+                collaborators: nil
             )
         )
     }

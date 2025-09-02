@@ -34,6 +34,7 @@ class AlbumsListViewModel: ObservableObject {
     init(account: String) {
         self.account = account
         registerPublishers()
+        loadAlbums()
     }
     
     // MARK: - Album name validation
@@ -89,7 +90,11 @@ class AlbumsListViewModel: ObservableObject {
     }
     
     // MARK: - APIs
-    func loadAlbums(
+    func onPulledToRefresh() {
+        loadAlbums()
+    }
+    
+    private func loadAlbums(
         doOnSuccess: (() -> Void)? = nil
     ) {
         

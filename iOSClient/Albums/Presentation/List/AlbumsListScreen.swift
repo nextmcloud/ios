@@ -53,9 +53,6 @@ struct AlbumsListScreen: View {
                 viewModel.onNewAlbumPopupCancel()
             }
         )
-        .onAppear {
-            viewModel.loadAlbums()
-        }
     }
     
     @ViewBuilder
@@ -64,12 +61,21 @@ struct AlbumsListScreen: View {
             ProgressView("Loading albums...")
         } else if let error = viewModel.errorMessage {
             Text(error)
+                .refreshable {
+                    viewModel.onPulledToRefresh()
+                }
         } else if viewModel.albums.isEmpty {
             NoAlbumsEmptyView(onNewAlbumCreationIntent: viewModel.onNewAlbumClick)
+                .refreshable {
+                    viewModel.onPulledToRefresh()
+                }
         } else {
             AlbumsGridView(
                 albums: viewModel.albums
             )
+            .refreshable {
+                viewModel.onPulledToRefresh()
+            }
         }
     }
     
@@ -99,7 +105,7 @@ struct AlbumsListScreen: View {
     private func navigationDestination(_ destination: NavigationDestination) -> some View {
         switch destination {
         case .albumDetails(let album):
-            AlbumDetailsScreen(viewModel: .init(account: localAccount, album: album))
+            AlbumDetailsScreen(account: localAccount, album: album)
         }
     }
 }

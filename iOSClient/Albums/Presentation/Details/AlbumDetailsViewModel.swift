@@ -38,6 +38,7 @@ class AlbumDetailsViewModel: ObservableObject {
         self.album = album
         self.screenTitle = album.name
         registerPublishers()
+        loadAlbumPhotos()
     }
     
     // MARK: - Album name validation
@@ -99,7 +100,11 @@ class AlbumDetailsViewModel: ObservableObject {
     }
     
     // MARK: - APIs
-    func loadAlbumPhotos(
+    func onPulledToRefresh() {
+        loadAlbumPhotos()
+    }
+    
+    private func loadAlbumPhotos(
         doOnSuccess: (() -> Void)? = nil
     ) {
         
