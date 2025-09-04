@@ -42,6 +42,11 @@ struct AlbumsListScreen: View {
                 .foregroundColor(Color(NCBrandColor.shared.customer))
             }
         }
+//        .sheet(isPresented: $viewModel.isPhotoSelectionSheetVisible) {
+//            PhotoSelectionSheet(
+//                onPhotosSelected: viewModel.onPhotosSelected
+//            )
+//        }
         .inputAlbumNameAlert(
             isPresented: $viewModel.isNewAlbumCreationPopupVisible,
             albumName: $viewModel.newAlbumName,

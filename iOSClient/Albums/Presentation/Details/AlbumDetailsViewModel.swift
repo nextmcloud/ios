@@ -17,7 +17,7 @@ class AlbumDetailsViewModel: ObservableObject {
     
     @Published private(set) var screenTitle: String
     
-    @Published private(set) var photos: [AlbumPhoto] = []
+    @Published private(set) var photos: [AlbumPhoto : tableMetadata?] = [:]
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String? = nil
     
@@ -119,7 +119,11 @@ class AlbumDetailsViewModel: ObservableObject {
             
             switch result {
             case .success(let photos):
-                self?.photos = photos.toAlbumPhotos()
+                self?.photos = Dictionary(uniqueKeysWithValues: photos.map { photo in
+                    let meta = NCManageDatabase.shared.getMetadataFromFileId(photo.fileId)
+                    return (photo.toAlbumPhoto(), meta)
+                })
+                
                 if let callback = doOnSuccess {
                     callback()
                 }

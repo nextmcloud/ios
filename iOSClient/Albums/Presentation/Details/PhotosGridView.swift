@@ -10,31 +10,39 @@ import SwiftUI
 
 struct PhotosGridView: View {
     
-    let photos: [AlbumPhoto]
-    
+    let photos: [AlbumPhoto : tableMetadata?]
     let onAddPhotosIntent: () -> Void
     
-    private let gridItems = [
-        GridItem(.flexible(), spacing: 1),
-        GridItem(.flexible(), spacing: 1),
-        GridItem(.flexible(), spacing: 1)
+    private let columns = [
+        GridItem(
+            .adaptive(
+                minimum: 100,
+                maximum: 300
+            ),
+            spacing: 1
+        )
     ]
     
     var body: some View {
-        
-        //            NCMediaViewRepresentable(photos: photos)
-        //                .edgesIgnoringSafeArea(.all)
-        
         ScrollView {
-            LazyVGrid(columns: gridItems, spacing: 1) {
-                ForEach(photos) { photo in
-                    NavigationLink(
-                        destination: {
-                            Color(.blue)
-                                .edgesIgnoringSafeArea(.all)
+            LazyVGrid(columns: columns, spacing: 1) {
+                
+                ForEach(Array(photos), id: \.key) { (photo, metadata) in
+                    
+                    NavigationLink {
+                        
+                        if let metadata {
+                            
+                            NCViewerMediaPageWrapper(
+                                ocIds: [metadata.ocId],
+                                metadatas: [metadata],
+                                currentIndex: 0
+                            )
                         }
-                    ) {
+                    } label: {
                         PhotoGridItemView(photo: photo)
+                            .aspectRatio(1, contentMode: .fill)
+                            .clipped()
                     }
                 }
             }

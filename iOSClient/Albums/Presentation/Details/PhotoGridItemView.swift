@@ -22,11 +22,12 @@ struct PhotoGridItemView: View {
             if let thumbnail = thumbnail {
                 Image(uiImage: thumbnail)
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
+                    .scaledToFill()
+                    .clipped()
             } else {
                 Rectangle()
                     .fill(Color.gray)
-                    .aspectRatio(1, contentMode: .fill)
+                    .scaledToFill()
             }
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)

@@ -27,6 +27,9 @@ class AlbumsListViewModel: ObservableObject {
     @Published var newAlbumName: String = ""
     @Published private(set) var newAlbumNameError: String? = nil
     
+    @Published var isPhotoSelectionSheetVisible: Bool = false
+    @Published var newlyCreatedAlbum: Album? = nil
+    
     @Published var navigationDestination: AlbumsListScreen.NavigationDestination? = nil
     
     private var cancellables: Set<AnyCancellable> = []
@@ -133,17 +136,11 @@ class AlbumsListViewModel: ObservableObject {
             switch result {
             case .success(_):
                 
-                NextcloudKit.shared.copyPhotoToAlbum(
-                    account: self?.account ?? "",
-                    sourcePath: "https://dev1.next.magentacloud.de/remote.php/dav/files/120049010000000000682377/Files___MagentaCLOUD.mp4",
-                    albumName: name,
-                    fileName: "Files___MagentaCLOUD.mp4"
-                ) { [weak self] result in
-                    
-                    self?.loadAlbums {
-                        if let newAlbum = self?.albums.first(where: { $0.name == name }) {
-                            self?.navigationDestination = .albumDetails(album: newAlbum)
-                        }
+                self?.loadAlbums {
+                    if let newAlbum = self?.albums.first(where: { $0.name == name }) {
+                        self?.newlyCreatedAlbum = newAlbum
+                        //self?.isPhotoSelectionSheetVisible = true // either this
+                        self?.navigationDestination = .albumDetails(album: newAlbum) // or this
                     }
                 }
                 
@@ -152,4 +149,26 @@ class AlbumsListViewModel: ObservableObject {
             }
         }
     }
+    
+//    func onPhotosSelected(selectedPhotos: [String]) {
+//        
+//        guard let album = newlyCreatedAlbum else { return }
+//        
+//        for photo in selectedPhotos {
+//            NextcloudKit.shared.copyPhotoToAlbum(
+//                account: account,
+//                sourcePath: photo, //"https://dev1.next.magentacloud.de/remote.php/dav/files/120049010000000000682377/Files___MagentaCLOUD.mp4",
+//                albumName: album.name,
+//                fileName: photo.split(separator: "/").last.map(String.init) ?? photo, // "Files___MagentaCLOUD.mp4"
+//            ) { [weak self] result in
+//                
+//                switch result {
+//                case .success:
+//                    self?.navigationDestination = .albumDetails(album: album)
+//                case .failure(let error):
+//                    NCContentPresenter().showError(error: NKError(error: error))
+//                }
+//            }
+//        }
+//    }
 }
