@@ -12,45 +12,37 @@ struct PhotoSelectionSheet: View {
     
     let onPhotosSelected: ([String]) -> Void
     
-    @State private var selectedPhotos: [String] = []
+    @State private var selectedPhotosCount: Int = 0 // TODO: Figure out how to get this count from NCMedia
+    
+    @State private var mediaVC: NCMedia?
     
     var body: some View {
         NavigationView {
             VStack {
-                // Your photo grid goes here
-                Text("Photo grid here")
+                NCMediaViewRepresentable(ncMedia: $mediaVC)
                     .frame(maxHeight: .infinity)
             }
-            .navigationTitle("Objekte hinzufügen")
+            .navigationTitle("Select items")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Zurück") {
-                        // dismiss action
+                    Button("Back") {
+                        onPhotosSelected([])
                     }
-                    .foregroundColor(.pink)
+                    .foregroundColor(Color(NCBrandColor.shared.customer))
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Fertig") {
-                        onPhotosSelected(selectedPhotos)
+                    Button("Done") {
+                        onPhotosSelected(mediaVC?.fileSelect ?? [])
                     }
-                    .foregroundColor(.pink)
+                    .foregroundColor(Color(NCBrandColor.shared.customer))
                 }
                 
-                // ✅ Bottom bar toolbar group
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Text("\(selectedPhotos.count) Objekte ausgewählt")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Button("Hinzufügen") {
-                        onPhotosSelected(selectedPhotos)
-                    }
-                    .disabled(selectedPhotos.isEmpty)
-                    .foregroundColor(.pink)
-                }
+                //                ToolbarItemGroup(placement: .bottomBar) {
+                //                    Text("\(selectedPhotosCount) items selected")
+                //                        .font(.subheadline)
+                //                        .foregroundColor(.secondary)
+                //                }
             }
         }
     }

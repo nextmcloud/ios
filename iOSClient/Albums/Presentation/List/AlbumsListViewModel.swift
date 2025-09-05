@@ -139,8 +139,7 @@ class AlbumsListViewModel: ObservableObject {
                 self?.loadAlbums {
                     if let newAlbum = self?.albums.first(where: { $0.name == name }) {
                         self?.newlyCreatedAlbum = newAlbum
-                        //self?.isPhotoSelectionSheetVisible = true // either this
-                        self?.navigationDestination = .albumDetails(album: newAlbum) // or this
+                        self?.isPhotoSelectionSheetVisible = true // either this
                     }
                 }
                 
@@ -150,25 +149,35 @@ class AlbumsListViewModel: ObservableObject {
         }
     }
     
-//    func onPhotosSelected(selectedPhotos: [String]) {
-//        
-//        guard let album = newlyCreatedAlbum else { return }
-//        
-//        for photo in selectedPhotos {
-//            NextcloudKit.shared.copyPhotoToAlbum(
-//                account: account,
-//                sourcePath: photo, //"https://dev1.next.magentacloud.de/remote.php/dav/files/120049010000000000682377/Files___MagentaCLOUD.mp4",
-//                albumName: album.name,
-//                fileName: photo.split(separator: "/").last.map(String.init) ?? photo, // "Files___MagentaCLOUD.mp4"
-//            ) { [weak self] result in
-//                
-//                switch result {
-//                case .success:
-//                    self?.navigationDestination = .albumDetails(album: album)
-//                case .failure(let error):
-//                    NCContentPresenter().showError(error: NKError(error: error))
-//                }
-//            }
-//        }
-//    }
+    func onPhotosSelected(selectedPhotos: [String]) {
+        
+        isPhotoSelectionSheetVisible = false
+        
+        guard let album = newlyCreatedAlbum else { return }
+        
+        if selectedPhotos.isEmpty {
+            navigationDestination = .albumDetails(album: album)
+            return
+        }
+        
+        for photo in selectedPhotos {
+            
+            let metadata: tableMetadata? = NCManageDatabase.shared.getMetadataFromOcId(photo)
+            
+            NextcloudKit.shared.copyPhotoToAlbum(
+                account: account,
+                sourcePath: metadata?.serveUrlFileName ?? photo, //"https://dev1.next.magentacloud.de/remote.php/dav/files/120049010000000000682377/Files___MagentaCLOUD.mp4",
+                albumName: album.name,
+                fileName: metadata?.fileName ?? photo, // "Files___MagentaCLOUD.mp4"
+            ) { [weak self] result in
+                
+                switch result {
+                case .success:
+                    self?.navigationDestination = .albumDetails(album: album)
+                case .failure(let error):
+                    NCContentPresenter().showError(error: NKError(error: error))
+                }
+            }
+        }
+    }
 }
