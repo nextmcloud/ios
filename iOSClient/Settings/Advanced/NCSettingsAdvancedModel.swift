@@ -124,7 +124,7 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
         NextcloudKit.shared.nkCommonInstance.levelLog = selectedLogLevel.rawValue
         // with Nextcloudkit latest version will uncomment below line once updated to latest Nextcloudkit version
 //        NKLogFileManager.shared.logLevel = NKLogLevel(rawValue: selectedLogLevel.rawValue) ?? .normal
-        exit(0)
+//        exit(0)
     }
 
     /// Updates the value of `selectedInterval` in the keychain.
@@ -198,6 +198,21 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
         controller?.present(viewerQuickLook, animated: true, completion: nil)
     }
 
+//    /// Presents the log file viewer.
+//    func viewLogFile() {
+//        // Path of the current (active) log file
+//        let currentLogURL = NKLogFileManager.shared.currentLogFileURL()
+//
+//        // Create NCViewerQuickLook with the current log file
+//        let viewerQuickLook = NCViewerQuickLook(
+//            with: currentLogURL,
+//            isEditingEnabled: false,
+//            metadata: nil
+//        )
+//
+//        controller?.present(viewerQuickLook, animated: true, completion: nil)
+//    }
+    
     /// Clears the log file.
     func clearLogFile() {
         // Clear the log file using NextcloudKit

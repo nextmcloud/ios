@@ -175,9 +175,9 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     /// Updates the auto-upload image setting.
     func handleAutoUploadImageChange(newValue: Bool) {
         database.updateAccountProperty(\.autoUploadImage, value: newValue, account: session.account)
-        if newValue {
-            NCAutoUpload.shared.alignPhotoLibrary(controller: controller, account: session.account)
-        }
+//        if newValue {
+//            NCAutoUpload.shared.alignPhotoLibrary(controller: controller, account: session.account)
+//        }
     }
 
     /// Updates the auto-upload image over WWAN setting.
@@ -188,9 +188,9 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     /// Updates the auto-upload video setting.
     func handleAutoUploadVideoChange(newValue: Bool) {
         database.updateAccountProperty(\.autoUploadVideo, value: newValue, account: session.account)
-        if newValue {
-            NCAutoUpload.shared.alignPhotoLibrary(controller: controller, account: session.account)
-        }
+//        if newValue {
+//            NCAutoUpload.shared.alignPhotoLibrary(controller: controller, account: session.account)
+//        }
     }
 
     /// Updates the auto-upload video over WWAN setting.
@@ -207,9 +207,9 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     /// Updates the auto-upload favorite only.
     func handleAutoUploadFavoritesOnlyChange(newValue: Bool) {
         database.updateAccountProperty(\.autoUploadFavoritesOnly, value: newValue, account: session.account)
-        if newValue {
-            NCAutoUpload.shared.alignPhotoLibrary(controller: controller, account: session.account)
-        }
+//        if newValue {
+//            NCAutoUpload.shared.alignPhotoLibrary(controller: controller, account: session.account)
+//        }
     }
 
     /// Updates the auto-upload full content setting.
