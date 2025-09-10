@@ -92,6 +92,8 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
     var lastContentOffsetY: CGFloat = 0
     let maxImageGrid: CGFloat = 7
     var hiddenCellMetadats: ThreadSafeArray<String> = ThreadSafeArray()
+    
+    var isInGeneralPhotosSelectionContext: Bool = false
 
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: tabBarController)
@@ -140,7 +142,9 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         titleDate.text = ""
         titleDate.isHidden = true
         menuButton.isHidden = true
+        
         setupMediaCommandView()
+        setupForGeneralPhotosSelection()
 
         gradient.startPoint = CGPoint(x: 0, y: 0.1)
         gradient.endPoint = CGPoint(x: 0, y: 1)
@@ -380,6 +384,13 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         self.updateMediaControlVisibility()
     }
     
+    private func setupForGeneralPhotosSelection() {
+        if isInGeneralPhotosSelectionContext {
+            mediaCommandView?.setupForGeneralPhotosSelection()
+            isEditMode = true
+        }
+    }
+    
     @objc func zoomOutGrid() {
         UIView.animate(withDuration: 0.0, animations: {
             NCKeychain().mediaColumnCount += 1
@@ -552,6 +563,14 @@ class NCMediaCommandView: UIView {
         layer.insertSublayer(gradient, at: 0)
         moreButton.setImage(UIImage(named: "more")!.image(color: .white, size: 25), for: .normal)
         title.text = ""
+    }
+    
+    func setupForGeneralPhotosSelection() {
+        gridSwitchButton.isHidden = true
+        moreView.isHidden = true
+        title.isHidden = true
+        controlButtonView.isHidden = true
+        gradient.isHidden = true
     }
 
     func toggleEmptyView(isEmpty: Bool) {

@@ -70,7 +70,7 @@ let userAgent: String = {
     
     // BRAND ONLY
     // Set use_login_web_personalized to true for prod and false for configurable path
-    @objc public var use_login_web_personalized: Bool = true                               // Don't touch me !!
+    @objc public var use_login_web_personalized: Bool = false                               // Don't touch me !!
     @objc public var use_AppConfig: Bool = false                                                // Don't touch me !!
     @objc public var use_GroupApps: Bool = true                                                 // Don't touch me !!
 
