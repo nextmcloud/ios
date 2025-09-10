@@ -39,6 +39,16 @@ struct AlbumDetailsScreen: View {
         .onReceive(viewModel.goBack) {
             dismiss()
         }
+        .sheet(
+            isPresented: $viewModel.isPhotoSelectionSheetVisible,
+//            onDismiss: {
+//                viewModel.onPhotosSelected(selectedPhotos: [])
+//            }
+        ) {
+            PhotoSelectionSheet(
+                onPhotosSelected: viewModel.onPhotosSelected
+            )
+        }
         .inputAlbumNameAlert(
             isPresented: $viewModel.isRenameAlbumPopupVisible,
             albumName: $viewModel.newAlbumName,
@@ -128,7 +138,7 @@ struct AlbumDetailsScreen: View {
     }
     
     private func handleAddPhotosIntent() {
-        
+        viewModel.onAddPhotosIntent()
     }
 }
 

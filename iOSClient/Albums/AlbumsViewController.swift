@@ -39,6 +39,11 @@ class AlbumsViewController: UIViewController {
         // Needed, since we use NCViewerMediaPage to show the media, which expects this!
         navigationController?.navigationBar.prefersLargeTitles = false
         
+        // Setting up AlbumsManager
+        AlbumsManager.shared.setAccount(appDelegate.account)
+        AlbumsManager.shared.syncAlbums()
+        
+        // UI changes
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = NCBrandColor.shared.customer
         UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.self])
             .tintColor = NCBrandColor.shared.customer

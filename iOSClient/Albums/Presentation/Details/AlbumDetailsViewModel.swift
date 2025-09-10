@@ -29,6 +29,8 @@ class AlbumDetailsViewModel: ObservableObject {
     @Published var newAlbumName: String = ""
     @Published private(set) var newAlbumNameError: String? = nil
     
+    @Published var isPhotoSelectionSheetVisible: Bool = false
+    
     let goBack = PassthroughSubject<Void, Never>()
     
     private var cancellables: Set<AnyCancellable> = []
@@ -123,10 +125,7 @@ class AlbumDetailsViewModel: ObservableObject {
                     let meta = NCManageDatabase.shared.getMetadataFromFileId(photo.fileId)
                     return (photo.toAlbumPhoto(), meta)
                 })
-                
-                if let callback = doOnSuccess {
-                    callback()
-                }
+                doOnSuccess?()
                 
             case .failure(let error):
                 NCContentPresenter().showError(error: NKError(error: error))
@@ -150,6 +149,7 @@ class AlbumDetailsViewModel: ObservableObject {
             
             switch result {
             case .success():
+                AlbumsManager.shared.syncAlbums()
                 self?.goBack.send()
                 
             case .failure(let error):
@@ -179,24 +179,53 @@ class AlbumDetailsViewModel: ObservableObject {
     
     private func reloadAlbumAfterRenaming(albumName: String) {
         
-        NextcloudKit.shared.fetchAllAlbums(for: account) { [weak self] result in
+        AlbumsManager.shared.syncAlbums { [weak self] resultAlbums in
             
             self?.isLoadingPopupVisible = false
             
-            switch result {
-            case .success(let albums):
-                
-                if let newAlbum = albums.toAlbums().first(where: { $0.name == albumName }) {
-                    self?.album = newAlbum
-                    self?.loadAlbumPhotos {
-                        self?.screenTitle = self?.album.name ?? ""
-                        self?.newAlbumName = ""
-                    }
+            if let newAlbum = resultAlbums.first(where: { $0.name == albumName }) {
+                self?.album = newAlbum
+                self?.loadAlbumPhotos {
+                    self?.screenTitle = self?.album.name ?? ""
+                    self?.newAlbumName = ""
                 }
+            }
+        }
+    }
+    
+    func onAddPhotosIntent() {
+        isPhotoSelectionSheetVisible = true
+    }
+    
+    func onPhotosSelected(selectedPhotos: [String]) {
+        
+        isPhotoSelectionSheetVisible = false
+        
+        if selectedPhotos.isEmpty {
+            return
+        }
+        
+        self.isLoadingPopupVisible = true
+        
+        for photo in selectedPhotos {
+            
+            let metadata: tableMetadata? = NCManageDatabase.shared.getMetadataFromOcId(photo)
+            
+            NextcloudKit.shared.copyPhotoToAlbum(
+                account: account,
+                sourcePath: metadata?.serveUrlFileName ?? photo, //"https://dev1.next.magentacloud.de/remote.php/dav/files/120049010000000000682377/Files___MagentaCLOUD.mp4",
+                albumName: album.name,
+                fileName: metadata?.fileName ?? photo, // "Files___MagentaCLOUD.mp4"
+            ) { [weak self] result in
                 
-            case .failure(let error):
-                NCContentPresenter().showError(error: NKError(error: error))
                 self?.isLoadingPopupVisible = false
+                
+                switch result {
+                case .success:
+                    self?.loadAlbumPhotos()
+                case .failure(let error):
+                    NCContentPresenter().showError(error: NKError(error: error))
+                }
             }
         }
     }

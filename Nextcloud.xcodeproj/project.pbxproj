@@ -297,6 +297,8 @@
 		C0A0D48D2E1CECF900476BFF /* AlbumsListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0D48C2E1CECF200476BFF /* AlbumsListViewModel.swift */; };
 		C0C90A4B2E6990920017835F /* PhotoSelectionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C90A4A2E6990910017835F /* PhotoSelectionSheet.swift */; };
 		C0C90A502E6AE7110017835F /* AlbumGridItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C90A4F2E6AE70A0017835F /* AlbumGridItemView.swift */; };
+		C0C90A532E6FBE2C0017835F /* AlbumsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C90A522E6FBE250017835F /* AlbumsManager.swift */; };
+		C0C90A592E6FCCDA0017835F /* LoadableState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C90A582E6FCCD80017835F /* LoadableState.swift */; };
 		C0F615C92E5DB44700EFBDAC /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F615C82E5DB43E00EFBDAC /* Album.swift */; };
 		C0F615CF2E60382600EFBDAC /* AlbumMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F615CE2E60381A00EFBDAC /* AlbumMapper.swift */; };
 		C0F615D12E603A2700EFBDAC /* AlbumPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0F615D02E603A2100EFBDAC /* AlbumPhoto.swift */; };
@@ -1437,6 +1439,8 @@
 		C0A0D48C2E1CECF200476BFF /* AlbumsListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsListViewModel.swift; sourceTree = "<group>"; };
 		C0C90A4A2E6990910017835F /* PhotoSelectionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoSelectionSheet.swift; sourceTree = "<group>"; };
 		C0C90A4F2E6AE70A0017835F /* AlbumGridItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumGridItemView.swift; sourceTree = "<group>"; };
+		C0C90A522E6FBE250017835F /* AlbumsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsManager.swift; sourceTree = "<group>"; };
+		C0C90A582E6FCCD80017835F /* LoadableState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadableState.swift; sourceTree = "<group>"; };
 		C0F615C82E5DB43E00EFBDAC /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		C0F615CE2E60381A00EFBDAC /* AlbumMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumMapper.swift; sourceTree = "<group>"; };
 		C0F615D02E603A2100EFBDAC /* AlbumPhoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumPhoto.swift; sourceTree = "<group>"; };
@@ -2402,6 +2406,7 @@
 		C0A0D4822E1BD6EA00476BFF /* Albums */ = {
 			isa = PBXGroup;
 			children = (
+				C0C90A512E6FBE1F0017835F /* Data */,
 				C0F615D42E603D9F00EFBDAC /* Presentation */,
 				C0F615CB2E60379100EFBDAC /* Domain */,
 				C0F615CA2E60378900EFBDAC /* API */,
@@ -2430,6 +2435,15 @@
 				C0FD963F2E572E04008F9D56 /* NCMediaViewRepresentable.swift */,
 			);
 			path = PhotoSelection;
+			sourceTree = "<group>";
+		};
+		C0C90A512E6FBE1F0017835F /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				C0C90A582E6FCCD80017835F /* LoadableState.swift */,
+				C0C90A522E6FBE250017835F /* AlbumsManager.swift */,
+			);
+			path = Data;
 			sourceTree = "<group>";
 		};
 		C0F615CA2E60378900EFBDAC /* API */ = {
@@ -4811,6 +4825,7 @@
 			files = (
 				B5E2E73B2DAE89D700AB2EDD /* NCEmptyDataSet.swift in Sources */,
 				B5E2E7322DAE894C00AB2EDD /* NCSectionHeaderMenu.swift in Sources */,
+				C0C90A532E6FBE2C0017835F /* AlbumsManager.swift in Sources */,
 				F78C6FDE296D677300C952C3 /* NCContextMenu.swift in Sources */,
 				B5F079F42DF8557500EBD527 /* FileNameInputTextField.swift in Sources */,
 				C0A0D4892E1BDAC300476BFF /* AlbumsListScreen.swift in Sources */,
@@ -5085,6 +5100,7 @@
 				F7FA7FFC2C0F4EE40072FC60 /* NCViewerQuickLookView.swift in Sources */,
 				F3A0479B2BD2668800658E7B /* NCAssistant.swift in Sources */,
 				F359D8672A7D03420023F405 /* NCUtility+Exif.swift in Sources */,
+				C0C90A592E6FCCDA0017835F /* LoadableState.swift in Sources */,
 				B5E2E7232DAE873D00AB2EDD /* NCLoginWeb.swift in Sources */,
 				F7A03E352D427312007AA677 /* NCMainNavigationController.swift in Sources */,
 				F769CA192966EA3C00039397 /* ComponentView.swift in Sources */,

@@ -36,8 +36,30 @@ class AlbumsListViewModel: ObservableObject {
     
     init(account: String) {
         self.account = account
+        observeAlbums()
         registerPublishers()
-        loadAlbums()
+    }
+    
+    // MARK: - Subscriptions
+    private func observeAlbums() {
+        AlbumsManager.shared.albumsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                switch state {
+                case .idle:
+                    self?.isLoading = false
+                case .loading:
+                    self?.isLoading = true
+                    self?.errorMessage = nil
+                case .success(let albums):
+                    self?.isLoading = false
+                    self?.albums = albums
+                case .failure(let error):
+                    self?.isLoading = false
+                    self?.errorMessage = "Unable to load albums: \(error.localizedDescription)"
+                }
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Album name validation
@@ -94,33 +116,7 @@ class AlbumsListViewModel: ObservableObject {
     
     // MARK: - APIs
     func onPulledToRefresh() {
-        loadAlbums()
-    }
-    
-    private func loadAlbums(
-        doOnSuccess: (() -> Void)? = nil
-    ) {
-        
-        guard !isLoading else { return } // Prevent double calls
-        
-        isLoading = true
-        errorMessage = nil
-        
-        NextcloudKit.shared.fetchAllAlbums(for: account) { result in
-            
-            self.isLoading = false
-            
-            switch result {
-            case .success(let albums):
-                self.albums = albums.toAlbums()
-                if let callback = doOnSuccess {
-                    callback()
-                }
-            case .failure(let error):
-                NCContentPresenter().showError(error: NKError(error: error))
-                self.errorMessage = "Unable to load albums. Please try again later!"
-            }
-        }
+        AlbumsManager.shared.syncAlbums()
     }
     
     private func createNewAlbum(for name: String) {
@@ -136,8 +132,8 @@ class AlbumsListViewModel: ObservableObject {
             switch result {
             case .success(_):
                 
-                self?.loadAlbums {
-                    if let newAlbum = self?.albums.first(where: { $0.name == name }) {
+                AlbumsManager.shared.syncAlbums { [weak self] resultAlbums in
+                    if let newAlbum = resultAlbums.first(where: { $0.name == name }) {
                         self?.newlyCreatedAlbum = newAlbum
                         self?.isPhotoSelectionSheetVisible = true // either this
                     }
