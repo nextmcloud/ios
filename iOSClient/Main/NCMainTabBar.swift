@@ -153,7 +153,8 @@ class NCMainTabBar: UITabBar {
         // Album
         if let item = items?[3] {
             item.title = NSLocalizedString("_albums_", comment: "")
-            item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+            item.image = UIImage(named: "photo")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+            item.selectedImage = item.image
             item.isEnabled = true
             item.tag = 103
         }
