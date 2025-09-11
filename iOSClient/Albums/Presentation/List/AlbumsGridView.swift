@@ -16,6 +16,8 @@ struct AlbumsGridView: View {
     
     let albums: [Album]
     
+    let onAlbumClicked: (Album) -> Void
+    
     private let columns = [
         GridItem(.flexible(), spacing: 16),
         GridItem(.flexible(), spacing: 16)
@@ -27,19 +29,14 @@ struct AlbumsGridView: View {
             
             VStack(alignment: .leading, spacing: 16) {
                 
-                Text("My albums")
+                Text(NSLocalizedString("_albums_list_own_albums_heading_", comment: ""))
                     .font(.system(size: 21, weight: .bold))
                 
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(albums, id: \.id) { album in
-                        NavigationLink(
-                            destination: {
-                                AlbumDetailsScreen(
-                                    account: localAccount,
-                                    album: album
-                                )
-                            }
-                        ) {
+                        Button {
+                            onAlbumClicked(album)
+                        } label: {
                             VStack(alignment: .leading, spacing: 6) {
                                 
                                 AlbumGridItemView(album: album)
@@ -67,7 +64,7 @@ struct AlbumsGridView: View {
     private func makeSubtitle(for album: Album) -> String? {
         guard let count = album.itemCount else { return nil }
         
-        var parts: [String] = ["\(count) Items"]
+        var parts: [String] = ["\(count) \(NSLocalizedString("_albums_list_entities_", comment: ""))"]
         
         if count > 0, let end = album.endDate {
             let formatter = DateFormatter()
@@ -107,7 +104,8 @@ struct AlbumsGridView: View {
                 dateRange: "Dec 2023",
                 collaborators: nil
             )
-        ]
+        ],
+        onAlbumClicked: { _ in}
     )
 }
 #endif

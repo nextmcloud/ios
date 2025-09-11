@@ -12,10 +12,6 @@ struct AlbumsListScreen: View {
     
     @Environment(\.localAccount) var localAccount: String
     
-    enum NavigationDestination: Hashable {
-        case albumDetails(album: Album)
-    }
-    
     @StateObject private var viewModel: AlbumsListViewModel
     
     init(viewModel: AlbumsListViewModel) {
@@ -31,12 +27,11 @@ struct AlbumsListScreen: View {
                 NCLoadingAlert()
             }
         }
-        .navigationTitle("Albums")
+        .navigationTitle(NSLocalizedString("_albums_list_nav_title_", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
-        .background(setupNavigation)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button("New") {
+                Button(NSLocalizedString("_albums_list_new_album_btn_", comment: "")) {
                     viewModel.onNewAlbumClick()
                 }
                 .foregroundColor(Color(NCBrandColor.shared.customer))
@@ -44,9 +39,9 @@ struct AlbumsListScreen: View {
         }
         .sheet(
             isPresented: $viewModel.isPhotoSelectionSheetVisible,
-//            onDismiss: {
-//                viewModel.onPhotosSelected(selectedPhotos: [])
-//            }
+            onDismiss: {
+                viewModel.onPhotosSelected(selectedPhotos: [])
+            }
         ) {
             PhotoSelectionSheet(
                 onPhotosSelected: viewModel.onPhotosSelected
@@ -68,12 +63,18 @@ struct AlbumsListScreen: View {
     @ViewBuilder
     private func content() -> some View {
         if viewModel.isLoading {
-            ProgressView("Loading albums...")
+            ProgressView(NSLocalizedString("_albums_list_loading_msg_", comment: ""))
         } else if let error = viewModel.errorMessage {
-            Text(error)
-                .refreshable {
-                    viewModel.onPulledToRefresh()
+            ScrollView(.vertical) {
+                VStack {
+                    Spacer()
+                    Text(error)
+                    Spacer()
                 }
+            }
+            .refreshable {
+                viewModel.onPulledToRefresh()
+            }
         } else if viewModel.albums.isEmpty {
             NoAlbumsEmptyView(onNewAlbumCreationIntent: viewModel.onNewAlbumClick)
                 .refreshable {
@@ -81,41 +82,12 @@ struct AlbumsListScreen: View {
                 }
         } else {
             AlbumsGridView(
-                albums: viewModel.albums
+                albums: viewModel.albums,
+                onAlbumClicked: viewModel.onAlbumClicked
             )
             .refreshable {
                 viewModel.onPulledToRefresh()
             }
-        }
-    }
-    
-    private var setupNavigation: some View {
-        
-        let binding = Binding<Bool> { [weak viewModel] in
-            viewModel?.navigationDestination != nil
-        } set: { [weak viewModel] value in
-            guard !value else { return }
-            viewModel?.navigationDestination = nil
-        }
-        
-        return NavigationLink(isActive: binding) {
-            switch viewModel.navigationDestination {
-            case .some(let value):
-                navigationDestination(value)
-                
-            case .none:
-                EmptyView()
-            }
-        } label: {
-            EmptyView()
-        }
-    }
-    
-    @ViewBuilder
-    private func navigationDestination(_ destination: NavigationDestination) -> some View {
-        switch destination {
-        case .albumDetails(let album):
-            AlbumDetailsScreen(account: localAccount, album: album)
         }
     }
 }

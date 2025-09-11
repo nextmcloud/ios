@@ -291,6 +291,8 @@
 		C08DFB462E378BD200731698 /* AlbumsGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08DFB452E378BC800731698 /* AlbumsGridView.swift */; };
 		C08DFB492E378E5F00731698 /* AlbumDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08DFB482E378E5E00731698 /* AlbumDTO.swift */; };
 		C08DFB4C2E38B89400731698 /* NCAlbums.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C08DFB4B2E38B89400731698 /* NCAlbums.storyboard */; };
+		C095896F2E72B70D0054E711 /* AlbumsNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C095896E2E72B7090054E711 /* AlbumsNavigator.swift */; };
+		C09589712E72B76F0054E711 /* AlbumsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = C09589702E72B76A0054E711 /* AlbumsRoutes.swift */; };
 		C0A0D4852E1BD73700476BFF /* AlbumsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0D4842E1BD73700476BFF /* AlbumsViewController.swift */; };
 		C0A0D4892E1BDAC300476BFF /* AlbumsListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0D4882E1BDABD00476BFF /* AlbumsListScreen.swift */; };
 		C0A0D48B2E1BEBD400476BFF /* Albums+WebDAV.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A0D48A2E1BEBC600476BFF /* Albums+WebDAV.swift */; };
@@ -1433,6 +1435,8 @@
 		C08DFB452E378BC800731698 /* AlbumsGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsGridView.swift; sourceTree = "<group>"; };
 		C08DFB482E378E5E00731698 /* AlbumDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDTO.swift; sourceTree = "<group>"; };
 		C08DFB4B2E38B89400731698 /* NCAlbums.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCAlbums.storyboard; sourceTree = "<group>"; };
+		C095896E2E72B7090054E711 /* AlbumsNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsNavigator.swift; sourceTree = "<group>"; };
+		C09589702E72B76A0054E711 /* AlbumsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsRoutes.swift; sourceTree = "<group>"; };
 		C0A0D4842E1BD73700476BFF /* AlbumsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsViewController.swift; sourceTree = "<group>"; };
 		C0A0D4882E1BDABD00476BFF /* AlbumsListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsListScreen.swift; sourceTree = "<group>"; };
 		C0A0D48A2E1BEBC600476BFF /* Albums+WebDAV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Albums+WebDAV.swift"; sourceTree = "<group>"; };
@@ -2403,6 +2407,15 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		C095896D2E72B7040054E711 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				C09589702E72B76A0054E711 /* AlbumsRoutes.swift */,
+				C095896E2E72B7090054E711 /* AlbumsNavigator.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
 		C0A0D4822E1BD6EA00476BFF /* Albums */ = {
 			isa = PBXGroup;
 			children = (
@@ -2485,6 +2498,7 @@
 		C0F615D42E603D9F00EFBDAC /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
+				C095896D2E72B7040054E711 /* Navigation */,
 				C0C90A492E698F3A0017835F /* PhotoSelection */,
 				C00513292E421313003E0D87 /* Alerts */,
 				C01E4B712E38D74A0099F5C4 /* Details */,
@@ -5154,6 +5168,7 @@
 				F7E402312BA891EB007E5609 /* NCTrash+SelectTabBarDelegate.swift in Sources */,
 				B5F079F52DF8561C00EBD527 /* NCAcknowledgementsView.swift in Sources */,
 				F70753EB2542A99800972D44 /* NCViewerMediaPage.swift in Sources */,
+				C09589712E72B76F0054E711 /* AlbumsRoutes.swift in Sources */,
 				F7817CF829801A3500FFBC65 /* Data+Extension.swift in Sources */,
 				F749B651297B0F2400087535 /* NCManageDatabase+Avatar.swift in Sources */,
 				F7FAFD3A28BFA948000777FE /* NCNotification+Menu.swift in Sources */,
@@ -5202,6 +5217,7 @@
 				B580F8222DF978E200CB7473 /* TextFileWithOcrSwitchView.swift in Sources */,
 				B580F8242DF978E200CB7473 /* PdfWithOcrSwitchView.swift in Sources */,
 				B580F8252DF978E200CB7473 /* PNGImageSaveSwitchView.swift in Sources */,
+				C095896F2E72B70D0054E711 /* AlbumsNavigator.swift in Sources */,
 				B580F8262DF978E200CB7473 /* SetPDFPasswordSwitchView.swift in Sources */,
 				B5F5459A2DF198DC008137AB /* NCAskAuthorization.swift in Sources */,
 				F76882292C0DD1E7001CF441 /* NCManageE2EEModel.swift in Sources */,

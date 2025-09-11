@@ -30,8 +30,6 @@ class AlbumsListViewModel: ObservableObject {
     @Published var isPhotoSelectionSheetVisible: Bool = false
     @Published var newlyCreatedAlbum: Album? = nil
     
-    @Published var navigationDestination: AlbumsListScreen.NavigationDestination? = nil
-    
     private var cancellables: Set<AnyCancellable> = []
     
     init(account: String) {
@@ -54,9 +52,9 @@ class AlbumsListViewModel: ObservableObject {
                 case .success(let albums):
                     self?.isLoading = false
                     self?.albums = albums
-                case .failure(let error):
+                case .failure:
                     self?.isLoading = false
-                    self?.errorMessage = "Unable to load albums: \(error.localizedDescription)"
+                    self?.errorMessage = NSLocalizedString("_albums_list_error_msg_", comment: "")
                 }
             }
             .store(in: &cancellables)
@@ -78,16 +76,21 @@ class AlbumsListViewModel: ObservableObject {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if trimmed.isEmpty {
-            return ["Album name cannot be empty."]
+            return [NSLocalizedString("_albums_list_album_name_validation_nonempty_", comment: "")]
         } else if trimmed.count < 3 {
-            return ["Album name must be at least 3 characters."]
+            return [NSLocalizedString("_albums_list_album_name_validation_min_length_", comment: "")]
         } else if trimmed.count > 30 {
-            return ["Album name cannot be more than 30 characters."]
+            return [NSLocalizedString("_albums_list_album_name_validation_max_length_", comment: "")]
         } else if trimmed.contains("/") || trimmed.contains("\\") {
-            return ["Album name cannot contain slashes."]
+            return [NSLocalizedString("_albums_list_album_name_validation_specials_", comment: "")]
         }
         
         return []
+    }
+    
+    // MARK: - Events
+    func onAlbumClicked(_ album: Album) {
+        AlbumsNavigator.shared.push(.albumDetails(album: album))
     }
     
     // MARK: - Album name popup
@@ -121,7 +124,7 @@ class AlbumsListViewModel: ObservableObject {
     
     private func createNewAlbum(for name: String) {
         
-        guard !isLoadingPopupVisible else { return } // Prevent double calls
+        guard !isLoadingPopupVisible else { return }
         
         isLoadingPopupVisible = true
         
@@ -135,7 +138,7 @@ class AlbumsListViewModel: ObservableObject {
                 AlbumsManager.shared.syncAlbums { [weak self] resultAlbums in
                     if let newAlbum = resultAlbums.first(where: { $0.name == name }) {
                         self?.newlyCreatedAlbum = newAlbum
-                        self?.isPhotoSelectionSheetVisible = true // either this
+                        self?.isPhotoSelectionSheetVisible = true
                     }
                 }
                 
@@ -152,7 +155,7 @@ class AlbumsListViewModel: ObservableObject {
         guard let album = newlyCreatedAlbum else { return }
         
         if selectedPhotos.isEmpty {
-            navigationDestination = .albumDetails(album: album)
+            AlbumsNavigator.shared.push(.albumDetails(album: album))
             return
         }
         
@@ -162,14 +165,16 @@ class AlbumsListViewModel: ObservableObject {
             
             NextcloudKit.shared.copyPhotoToAlbum(
                 account: account,
-                sourcePath: metadata?.serveUrlFileName ?? photo, //"https://dev1.next.magentacloud.de/remote.php/dav/files/120049010000000000682377/Files___MagentaCLOUD.mp4",
+                sourcePath: metadata?.serveUrlFileName ?? photo,
                 albumName: album.name,
-                fileName: metadata?.fileName ?? photo, // "Files___MagentaCLOUD.mp4"
-            ) { [weak self] result in
+                fileName: metadata?.fileName ?? photo,
+            ) { result in
                 
                 switch result {
                 case .success:
-                    self?.navigationDestination = .albumDetails(album: album)
+                    AlbumsNavigator.shared.push(.albumDetails(album: album))
+                    AlbumsManager.shared.syncAlbums()
+                    
                 case .failure(let error):
                     NCContentPresenter().showError(error: NKError(error: error))
                 }

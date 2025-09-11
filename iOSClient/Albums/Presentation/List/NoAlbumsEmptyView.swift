@@ -12,50 +12,41 @@ struct NoAlbumsEmptyView: View {
     
     let onNewAlbumCreationIntent: () -> Void
     
-    private let contentPadding: CGFloat = 56.0
+    private let contentPadding: CGFloat = 32.0
     
     var body: some View {
         
-        GeometryReader { geometry in
+        ScrollView(.vertical) {
             
-            ScrollView(.vertical) {
+            VStack {
                 
-                ZStack(alignment: .top) {
+                // Background image
+                Image("noAlbum")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                VStack(alignment: .leading, spacing: 24) {
                     
-                    // Background image
-                    Image("noAlbum")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: geometry.size.height * 0.5)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    // Foreground content
-                    VStack(alignment: .leading, spacing: 24) {
-                        
-                        Spacer().frame(height: geometry.size.height * 0.4)
-                        
-                        Text("Create\nAlbums\nfor your\nPhotos")
-                            .font(.system(size: 48, weight: .bold))
-                            .padding(.horizontal, contentPadding)
-                        
-                        Text("You can organize all your photos in as many albums as you like. You haven't created an album yet.")
-                            .font(.system(size: 15, weight: .regular))
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal, contentPadding)
-                        
-                        Button(action: onNewAlbumCreationIntent) {
-                            Label("Create album", systemImage: "plus")
-                                .font(.system(size: 15, weight: .medium))
-                                .foregroundColor(Color(NCBrandColor.shared.customer))
-                        }
+                    Text(NSLocalizedString("_albums_list_empty_heading_", comment: ""))
+                        .font(.system(size: 48, weight: .bold))
                         .padding(.horizontal, contentPadding)
-                        
-                        Spacer(minLength: 40)
+                    
+                    Text(NSLocalizedString("_albums_list_empty_subheading_", comment: ""))
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, contentPadding)
+                    
+                    Button(action: onNewAlbumCreationIntent) {
+                        Label(NSLocalizedString("_albums_list_empty_new_album_btn_", comment: ""), systemImage: "plus")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(Color(NCBrandColor.shared.customer))
                     }
                     .padding(.horizontal, contentPadding)
-                    .frame(minHeight: geometry.size.height)
+                    
+                    Spacer(minLength: 40)
                 }
-                .frame(width: geometry.size.width, height: geometry.size.height)
+                .padding(.horizontal, contentPadding)
             }
         }
     }
