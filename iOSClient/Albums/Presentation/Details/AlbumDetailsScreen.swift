@@ -12,8 +12,6 @@ struct AlbumDetailsScreen: View {
     
     @StateObject private var viewModel: AlbumDetailsViewModel
     
-    @Environment(\.dismiss) private var dismiss
-    
     init(account: String, album: Album) {
         _viewModel = StateObject(
             wrappedValue: AlbumDetailsViewModel(account: account, album: album)
@@ -36,14 +34,8 @@ struct AlbumDetailsScreen: View {
                 toolbarContent()
             }
         }
-        .onReceive(viewModel.goBack) {
-            dismiss()
-        }
         .sheet(
             isPresented: $viewModel.isPhotoSelectionSheetVisible,
-//            onDismiss: {
-//                viewModel.onPhotosSelected(selectedPhotos: [])
-//            }
         ) {
             PhotoSelectionSheet(
                 onPhotosSelected: viewModel.onPhotosSelected
@@ -62,14 +54,22 @@ struct AlbumDetailsScreen: View {
             }
         )
         .alert(
-            "Delete Album?",
+            NSLocalizedString("_albums_delete_album_popup_title_", comment: ""),
             isPresented: $viewModel.isDeleteAlbumPopupVisible,
             actions: {
-                Button("Delete", role: .destructive, action: viewModel.onDeleteAlbumPopupConfirm)
-                Button("Cancel", role: .cancel, action: viewModel.onDeleteAlbumPopupCancel)
+                Button(
+                    NSLocalizedString("_albums_delete_album_popup_positive_btn_", comment: ""),
+                    role: .destructive,
+                    action: viewModel.onDeleteAlbumPopupConfirm
+                )
+                Button(
+                    NSLocalizedString("_albums_delete_album_popup_negative_btn_", comment: ""),
+                    role: .cancel,
+                    action: viewModel.onDeleteAlbumPopupCancel
+                )
             },
             message: {
-                Text("Are you sure you want to delete this album? This action cannot be undone.")
+                Text(NSLocalizedString("_albums_delete_album_popup_desc_", comment: ""))
             }
         )
     }
@@ -82,8 +82,10 @@ struct AlbumDetailsScreen: View {
             HStack {
                 
                 if viewModel.photos.isEmpty {
-                    Button("Add", action: handleAddPhotosIntent)
-                        .foregroundColor(Color(NCBrandColor.shared.customer))
+                    Button(
+                        NSLocalizedString("_albums_photos_add_photos_btn_", comment: ""),
+                        action: handleAddPhotosIntent
+                    ).foregroundColor(Color(NCBrandColor.shared.customer))
                 } else {
                     Button(action: handleAddPhotosIntent) {
                         Image(systemName: "plus")
@@ -95,15 +97,17 @@ struct AlbumDetailsScreen: View {
                     .frame(width: 4)
                 
                 Menu {
-                    Button("Rename Album") {
+                    Button(NSLocalizedString("_albums_photos_rename_album_btn_", comment: "")) {
                         viewModel.onRenameAlbumIntent()
                     }
-                    Button("Delete Album", role: .destructive) {
+                    Button(
+                        NSLocalizedString("_albums_photos_delete_album_btn_", comment: ""),
+                        role: .destructive
+                    ) {
                         viewModel.onDeleteAlbumIntent()
                     }
                 } label: {
                     Image(systemName: "ellipsis")
-                        .rotationEffect(.degrees(90))
                         .foregroundStyle(Color(NCBrandColor.shared.customer))
                 }
             }
@@ -113,7 +117,7 @@ struct AlbumDetailsScreen: View {
     @ViewBuilder
     private func content() -> some View {
         if viewModel.isLoading {
-            ProgressView("Loading photos...")
+            ProgressView(NSLocalizedString("_albums_photos_loading_msg_", comment: ""))
         } else if let error = viewModel.errorMessage {
             Text(error)
                 .refreshable {

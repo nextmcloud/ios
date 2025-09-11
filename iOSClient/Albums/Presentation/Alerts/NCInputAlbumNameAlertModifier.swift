@@ -64,17 +64,17 @@ private struct NCInputAlbumNameAlertModifier: ViewModifier {
         self.onCancel = onCancel
         
         if isForRenamingAlbum {
-            title = "Rename Album"
-            description = "Please enter new album name between 3 and 30 characters."
-            textFieldHint = "Album's new name"
-            positiveButtonText = "Rename"
-            negativeButtonText = "Cancel"
+            title = NSLocalizedString("_albums_list_rename_album_popup_title_", comment: "")
+            description = NSLocalizedString("_albums_list_rename_album_popup_desc_", comment: "")
+            textFieldHint = NSLocalizedString("_albums_list_rename_album_popup_hint_", comment: "")
+            positiveButtonText = NSLocalizedString("_albums_list_rename_album_popup_positive_btn_", comment: "")
+            negativeButtonText = NSLocalizedString("_albums_list_rename_album_popup_negative_btn_", comment: "")
         } else {
-            title = "Create new Album"
-            description = "Please enter an album name between 3 and 30 characters."
-            textFieldHint = "Album's name"
-            positiveButtonText = "Create"
-            negativeButtonText = "Cancel"
+            title = NSLocalizedString("_albums_list_new_album_popup_title_", comment: "")
+            description = NSLocalizedString("_albums_list_new_album_popup_desc_", comment: "")
+            textFieldHint = NSLocalizedString("_albums_list_new_album_popup_hint_", comment: "")
+            positiveButtonText = NSLocalizedString("_albums_list_new_album_popup_positive_btn_", comment: "")
+            negativeButtonText = NSLocalizedString("_albums_list_new_album_popup_negative_btn_", comment: "")
         }
     }
     

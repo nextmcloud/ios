@@ -31,8 +31,6 @@ class AlbumDetailsViewModel: ObservableObject {
     
     @Published var isPhotoSelectionSheetVisible: Bool = false
     
-    let goBack = PassthroughSubject<Void, Never>()
-    
     private var cancellables: Set<AnyCancellable> = []
     
     init(account: String, album: Album) {
@@ -59,13 +57,13 @@ class AlbumDetailsViewModel: ObservableObject {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if trimmed.isEmpty {
-            return ["Album name cannot be empty."]
+            return [NSLocalizedString("_albums_list_album_name_validation_nonempty_", comment: "")]
         } else if trimmed.count < 3 {
-            return ["Album name must be at least 3 characters."]
+            return [NSLocalizedString("_albums_list_album_name_validation_min_length_", comment: "")]
         } else if trimmed.count > 30 {
-            return ["Album name cannot be more than 30 characters."]
+            return [NSLocalizedString("_albums_list_album_name_validation_max_length_", comment: "")]
         } else if trimmed.contains("/") || trimmed.contains("\\") {
-            return ["Album name cannot contain slashes."]
+            return [NSLocalizedString("_albums_list_album_name_validation_specials_", comment: "")]
         }
         
         return []
@@ -110,7 +108,7 @@ class AlbumDetailsViewModel: ObservableObject {
         doOnSuccess: (() -> Void)? = nil
     ) {
         
-        guard !isLoading else { return } // Prevent double calls
+        guard !isLoading else { return }
         
         isLoading = true
         errorMessage = nil
@@ -129,7 +127,7 @@ class AlbumDetailsViewModel: ObservableObject {
                 
             case .failure(let error):
                 NCContentPresenter().showError(error: NKError(error: error))
-                self?.errorMessage = "Unable to load photos. Please try again later!"
+                self?.errorMessage = NSLocalizedString("_albums_photos_error_msg_", comment: "")
             }
         }
     }
@@ -150,7 +148,7 @@ class AlbumDetailsViewModel: ObservableObject {
             switch result {
             case .success():
                 AlbumsManager.shared.syncAlbums()
-                self?.goBack.send()
+                AlbumsNavigator.shared.pop()
                 
             case .failure(let error):
                 NCContentPresenter().showError(error: NKError(error: error))
@@ -213,9 +211,9 @@ class AlbumDetailsViewModel: ObservableObject {
             
             NextcloudKit.shared.copyPhotoToAlbum(
                 account: account,
-                sourcePath: metadata?.serveUrlFileName ?? photo, //"https://dev1.next.magentacloud.de/remote.php/dav/files/120049010000000000682377/Files___MagentaCLOUD.mp4",
+                sourcePath: metadata?.serveUrlFileName ?? photo,
                 albumName: album.name,
-                fileName: metadata?.fileName ?? photo, // "Files___MagentaCLOUD.mp4"
+                fileName: metadata?.fileName ?? photo,
             ) { [weak self] result in
                 
                 self?.isLoadingPopupVisible = false
@@ -223,6 +221,8 @@ class AlbumDetailsViewModel: ObservableObject {
                 switch result {
                 case .success:
                     self?.loadAlbumPhotos()
+                    AlbumsManager.shared.syncAlbums()
+                    
                 case .failure(let error):
                     NCContentPresenter().showError(error: NKError(error: error))
                 }

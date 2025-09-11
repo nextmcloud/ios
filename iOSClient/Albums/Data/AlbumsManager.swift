@@ -45,7 +45,6 @@ final class AlbumsManager {
                 
             case .failure(let error):
                 let nkError = NKError(error: error)
-                NCContentPresenter().showError(error: nkError)
                 self?.albumsSubject.send(.failure(nkError))
             }
         }
