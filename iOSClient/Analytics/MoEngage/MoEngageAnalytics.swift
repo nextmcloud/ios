@@ -49,14 +49,41 @@ class MoEngageAnalytics: NSObject {
     }
     
     // Handles triggering Apple's native review popup
+//    private func requestAppStoreReview() {
+//        DispatchQueue.main.async {
+//            if let scene = UIApplication.shared.connectedScenes
+//                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+//                SKStoreReviewController.requestReview(in: scene)
+//            }
+//        }
+//    }
+    
     private func requestAppStoreReview() {
         DispatchQueue.main.async {
-            if let scene = UIApplication.shared.connectedScenes
-                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
-                SKStoreReviewController.requestReview(in: scene)
+            guard
+                let windowScene = UIApplication.shared.connectedScenes
+                    .compactMap({ $0 as? UIWindowScene })
+                    .first(where: { $0.activationState == .foregroundActive })
+            else {
+                return
             }
+            
+            #if targetEnvironment(simulator)
+            // Simulator fallback for testing
+            let alert = UIAlertController(
+                title: "Review Prompt (Simulator)",
+                message: "This simulates the App Store review dialog.",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            windowScene.keyWindow?.rootViewController?.present(alert, animated: true)
+            #else
+            // Real request on device
+            SKStoreReviewController.requestReview(in: windowScene)
+            #endif
         }
     }
+
 }
 
 // AnalyticsService protocol

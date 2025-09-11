@@ -63,12 +63,14 @@ class NCShareLinkCell: UITableViewCell {
         }
     }
 
-    func configure(with share: tableShare?, at indexPath: IndexPath, isDirectory: Bool, shareLinksCount: Int) {
+    func configure(with share: tableShare?, at indexPath: IndexPath, isDirectory: Bool, title: String) {
         self.tableShare = share
         self.indexPath = indexPath
         self.isDirectory = isDirectory
-        let shareLinksCountString = shareLinksCount > 0 ? String(shareLinksCount) : ""
-        setupCellAppearance(titleAppendString: shareLinksCountString)
+        setupCellAppearance(titleAppendString: title)
+
+//        let shareLinksCountString = shareLinksCount > 0 ? String(shareLinksCount) : ""
+//        setupCellAppearance(titleAppendString: shareLinksCountString)
 //        setupCellAppearance(titleAppendString: String(shareLinksCount))
     }
 

@@ -135,20 +135,6 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     }
 
     /// Updates the auto-upload setting.
-//    func handleAutoUploadChange(newValue: Bool) {
-//        if newValue {
-//            requestAuthorization()
-//            self.autoUpload = photosPermissionsGranted
-//            database.updateAccountProperty(\.autoUpload, value: photosPermissionsGranted, account: session.account)
-//            self.database.setAccountAutoUploadFileName("")
-//            self.database.setAccountAutoUploadDirectory("", session: self.session)
-//            NCAutoUpload.shared.alignPhotoLibrary(controller: self.controller, account: self.session.account)
-//        } else {
-//            database.updateAccountProperty(\.autoUpload, value: photosPermissionsGranted, account: session.account)
-//            database.updateAccountProperty(\.autoUploadStart, value: photosPermissionsGranted, account: session.account)
-//            self.database.clearMetadatasUpload(account: session.account)
-//        }
-//    }
     func handleAutoUploadChange(newValue: Bool) {
         if newValue {
             requestAuthorization()
@@ -175,9 +161,11 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     /// Updates the auto-upload image setting.
     func handleAutoUploadImageChange(newValue: Bool) {
         database.updateAccountProperty(\.autoUploadImage, value: newValue, account: session.account)
-//        if newValue {
-//            NCAutoUpload.shared.alignPhotoLibrary(controller: controller, account: session.account)
-//        }
+        if !newValue && !autoUploadVideo {
+            // Ensure at least one toggle is active
+            autoUploadVideo = true
+            database.updateAccountProperty(\.autoUploadVideo, value: true, account: session.account)
+        }
     }
 
     /// Updates the auto-upload image over WWAN setting.
@@ -188,9 +176,11 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     /// Updates the auto-upload video setting.
     func handleAutoUploadVideoChange(newValue: Bool) {
         database.updateAccountProperty(\.autoUploadVideo, value: newValue, account: session.account)
-//        if newValue {
-//            NCAutoUpload.shared.alignPhotoLibrary(controller: controller, account: session.account)
-//        }
+        if !newValue && !autoUploadImage {
+            // Ensure at least one toggle is active
+            autoUploadImage = true
+            database.updateAccountProperty(\.autoUploadImage, value: true, account: session.account)
+        }
     }
 
     /// Updates the auto-upload video over WWAN setting.
@@ -207,37 +197,18 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     /// Updates the auto-upload favorite only.
     func handleAutoUploadFavoritesOnlyChange(newValue: Bool) {
         database.updateAccountProperty(\.autoUploadFavoritesOnly, value: newValue, account: session.account)
-//        if newValue {
-//            NCAutoUpload.shared.alignPhotoLibrary(controller: controller, account: session.account)
-//        }
     }
 
-    /// Updates the auto-upload full content setting.
-    func handleAutoUploadFullChange(newValue: Bool) {
-        database.updateAccountProperty(\.autoUploadStart, value: photosPermissionsGranted, account: session.account)
-        if newValue {
-            NCAutoUpload.shared.autoUploadFullPhotos(controller: self.controller, log: "Auto upload full", account: session.account)
-        } else {
-            self.database.clearMetadatasUpload(account: session.account)
-        }
+    /// Updates the auto-upload create subfolder setting.
+    func handleAutoUploadCreateSubfolderChange(newValue: Bool) {
+        database.updateAccountProperty(\.autoUploadCreateSubfolder, value: newValue, account: session.account)
     }
 
-    /// Updates the auto-upload full content setting.
-//    func handleAutoUploadChange(newValue: Bool, assetCollections: [PHAssetCollection]) {
-//        if let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)), tableAccount.autoUploadStart == newValue { return }
-//
-//        database.updateAccountProperty(\.autoUploadStart, value: newValue, account: session.account)
-//
-//        if newValue {
-//            if autoUploadNewPhotosOnly {
-//                database.updateAccountProperty(\.autoUploadSinceDate, value: Date.now, account: session.account)
-//            }
-//            NCAutoUpload.shared.autoUploadSelectedAlbums(controller: self.controller, assetCollections: assetCollections, log: "Auto upload selected albums", account: session.account)
-//            NCAutoUpload.shared.autoUploadFullPhotos(controller: self.controller, log: "Auto upload full", account: session.account)
-//        } else {
-//            database.clearMetadatasUpload(account: session.account)
-//        }
-//    }
+    /// Updates the auto-upload subfolder granularity setting.
+    func handleAutoUploadSubfolderGranularityChange(newValue: Granularity) {
+        database.updateAccountProperty(\.autoUploadSubfolderGranularity, value: newValue.rawValue, account: session.account)
+    }
+
     func handleAutoUploadChange(newValue: Bool, assetCollections: [PHAssetCollection]) {
         if let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)),
            tableAccount.autoUploadStart == newValue {
@@ -280,20 +251,8 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
         }
     }
 
-
-    /// Updates the auto-upload create subfolder setting.
-    func handleAutoUploadCreateSubfolderChange(newValue: Bool) {
-        database.updateAccountProperty(\.autoUploadCreateSubfolder, value: newValue, account: session.account)
-    }
-
-    /// Updates the auto-upload subfolder granularity setting.
-    func handleAutoUploadSubfolderGranularityChange(newValue: Granularity) {
-        database.updateAccountProperty(\.autoUploadSubfolderGranularity, value: newValue.rawValue, account: session.account)
-    }
-
     func resetAutoUploadLastUploadedDate() {
         guard let activeAccount = database.getTableAccount(account: session.account) else { return }
-//        activeAccount[keyPath: keyPath] = value
         activeAccount.autoUploadLastUploadedDate = nil
         database.updateAccount(activeAccount)
     }
@@ -317,31 +276,27 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
         let home = NCUtilityFileSystem().getHomeServer(session: session)
         if home != serverUrl {
             let fileName = (serverUrl as NSString).lastPathComponent
-            self.database.setAccountAutoUploadFileName(fileName)
+            database.setAccountAutoUploadFileName(fileName)
             if let path = NCUtilityFileSystem().deleteLastPath(serverUrlPath: serverUrl, home: home) {
-                self.database.setAccountAutoUploadDirectory(path, session: session)
+                database.setAccountAutoUploadDirectory(path, session: session)
             }
         }
-
         onViewAppear()
     }
 
     func createAlbumTitle(autoUploadAlbumIds: Set<String>) -> String {
         if autoUploadAlbumIds.count == 1 {
             let album = PHAssetCollection.allAlbums.first(where: { autoUploadAlbumIds.first == $0.localIdentifier })
-            return (album?.assetCollectionSubtype == .smartAlbumUserLibrary) ? NSLocalizedString("_camera_roll_", comment: "") : (album?.localizedTitle ?? "")
+            return album?.assetCollectionSubtype == .smartAlbumUserLibrary ? NSLocalizedString("_camera_roll_", comment: "") : album?.localizedTitle ?? ""
         } else {
             return NSLocalizedString("_multiple_albums_", comment: "")
         }
     }
 }
 
-/// An enum that represents the granularity of the subfolders for auto upload
+/// Granularity options for auto-upload subfolders
 enum Granularity: Int {
-    /// Daily granularity, meaning the subfolders are named by day
     case daily = 2
-    /// Monthly granularity, meaning the subfolders are named by month
     case monthly = 1
-    /// Yearly granularity, meaning the subfolders are named by year
     case yearly = 0
 }

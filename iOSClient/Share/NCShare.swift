@@ -78,12 +78,12 @@ class NCShare: UIViewController, NCSharePagingContent {
     var shareOthers: [tableShare] = []
     private var cachedHeader: NCShareAdvancePermissionHeader?
     // Stores the next number per share
-    var nextLinkNumberByShare: [String: Int] = [:]
+//    var nextLinkNumberByShare: [String: Int] = [:]
+//
+//    // Stores assigned numbers for each link (per share)
+//    var linkNumbersByShare: [String: [String: Int]] = [:]
 
-    // Stores assigned numbers for each link (per share)
-    var linkNumbersByShare: [String: [String: Int]] = [:]
-
-    var shareLinksCount = 0
+//    var shareLinksCount = 0
 
     // MARK: - View Life Cycle
 
@@ -115,7 +115,7 @@ class NCShare: UIViewController, NCSharePagingContent {
 
         guard let metadata = metadata else { return }
         
-        loadLinkNumberData()
+//        loadLinkNumberData()
         reloadData()
 
         networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session)
@@ -229,117 +229,265 @@ class NCShare: UIViewController, NCSharePagingContent {
         guard let metadata = metadata else {
             return
         }
+//        shares = (nil, nil) // reset
         shares = self.database.getTableShares(metadata: metadata)
-        shareLinksCount = 0
         updateShareArrays()
         tableView.reloadData()
     }
-
+    
     func updateShareArrays() {
         shareLinks.removeAll()
         shareEmails.removeAll()
-        
-        if let shareLink = shares.firstShareLink {
-            shares.share?.insert(shareLink, at: 0)
+
+        guard var allShares = shares.share else { return }
+
+        if let firstLink = shares.firstShareLink {
+            // Remove if already exists to avoid duplication
+            allShares.removeAll { $0.idShare == firstLink.idShare }
+            allShares.insert(firstLink, at: 0)
         }
-        
-        guard let allShares = shares.share else { return }
-        
-        // Use current shareId as the scope
-        let shareId = metadata?.ocId ?? "0"
-        
-        // Ensure storage exists for this share
-        if nextLinkNumberByShare[shareId] == nil {
-            nextLinkNumberByShare[shareId] = 1
-            linkNumbersByShare[shareId] = [:]
-        }
-        
+
+        shares.share = allShares
+
         for item in allShares {
             if item.shareType == shareCommon.SHARE_TYPE_LINK {
-                let linkId = String(item.idShare)
-                
-                // Assign a number if missing
-                if linkNumbersByShare[shareId]?[linkId] == nil {
-                    let nextNum = nextLinkNumberByShare[shareId] ?? 1
-                    linkNumbersByShare[shareId]?[linkId] = nextNum
-                    nextLinkNumberByShare[shareId] = nextNum + 1
-                    saveLinkNumberData()
-                }
-//                if item.shareType == shareCommon.SHARE_TYPE_LINK { shareLinksCount += 1 }
-
                 shareLinks.append(item)
             } else {
                 shareEmails.append(item)
             }
         }
-        
-        // Sort links by assigned number (per-share)
-        shareLinks.sort { lhs, rhs in
-            let lhsNum = linkNumbersByShare[shareId]?[String(lhs.idShare)] ?? 0
-            let rhsNum = linkNumbersByShare[shareId]?[String(rhs.idShare)] ?? 0
-            return lhsNum < rhsNum
-        }
-        
-        // ✅ If this share has no links, reset numbering for it
-        if shareLinks.isEmpty {
-            linkNumbersByShare[shareId] = [:]
-            nextLinkNumberByShare[shareId] = 1
-            saveLinkNumberData()
-        }
-        
-//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare,
-//                                                    userInfo: ["links": shareLinks.count,
-//                                                               "emails": shareEmails.count])
     }
 
-    // MARK: - Persistence
-    func saveLinkNumberData() {
-        // Save both maps as UserDefaults property lists
-        UserDefaults.standard.set(linkNumbersByShare, forKey: "linkNumbersByShare")
-        UserDefaults.standard.set(nextLinkNumberByShare, forKey: "nextLinkNumberByShare")
-    }
-
-    func loadLinkNumberData() {
-        if let savedMap = UserDefaults.standard.dictionary(forKey: "linkNumbersByShare") as? [String: [String: Int]] {
-            linkNumbersByShare = savedMap
-        } else {
-            linkNumbersByShare = [:]
-        }
-        
-        if let savedNext = UserDefaults.standard.dictionary(forKey: "nextLinkNumberByShare") as? [String: Int] {
-            nextLinkNumberByShare = savedNext
-        } else {
-            nextLinkNumberByShare = [:]
-        }
-    }
     
-    // MARK: - Number Assignment
+//    func updateShareArrays() {
+//        shareLinks.removeAll()
+//        shareEmails.removeAll()
+//        
+//        var allShares = shares.share ?? []
+//        
+//        if let firstLink = shares.firstShareLink {
+//            if let idx = allShares.firstIndex(where: { $0.idShare == firstLink.idShare }) {
+//                allShares.remove(at: idx)   // only one removal
+//            }
+//            allShares.insert(firstLink, at: 0)
+//        }
+//        
+//        shares.share = allShares
+//        
+//        for item in allShares {
+//            if item.shareType == shareCommon.SHARE_TYPE_LINK {
+//                shareLinks.append(item)
+//            } else {
+//                shareEmails.append(item)
+//            }
+//        }
+//    }
+
+
+
+
+//    func updateShareArrays() {
+//        shareLinks.removeAll()
+//        shareEmails.removeAll()
+//        
+//        if let shareLink = shares.firstShareLink {
+//            shares.share?.insert(shareLink, at: 0)
+//        }
+//        
+//        guard let allShares = shares.share else { return }
+//        
+////        // Use current shareId as the scope
+////        let shareId = metadata?.ocId ?? "0"
+////        
+////        // Ensure storage exists for this share
+////        if nextLinkNumberByShare[shareId] == nil {
+////            nextLinkNumberByShare[shareId] = 1
+////            linkNumbersByShare[shareId] = [:]
+////        }
+//        
+//        for item in allShares {
+//            if item.shareType == shareCommon.SHARE_TYPE_LINK {
+//                shareLinks.append(item)
+//            } else {
+//                shareEmails.append(item)
+//            }
+//        }
+//        
+////        // Sort links by assigned number (per-share)
+////        shareLinks.sort { lhs, rhs in
+////            let lhsNum = linkNumbersByShare[shareId]?[String(lhs.idShare)] ?? 0
+////            let rhsNum = linkNumbersByShare[shareId]?[String(rhs.idShare)] ?? 0
+////            return lhsNum < rhsNum
+////        }
+////        
+////        // ✅ If this share has no links, reset numbering for it
+////        if shareLinks.isEmpty {
+////            linkNumbersByShare[shareId] = [:]
+////            nextLinkNumberByShare[shareId] = 1
+////            saveLinkNumberData()
+////        }
+//        
+////        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare,
+////                                                    userInfo: ["links": shareLinks.count,
+////                                                               "emails": shareEmails.count])
+//    }
+
+//    // MARK: - Persistence
+//    func saveLinkNumberData() {
+//        // Save both maps as UserDefaults property lists
+//        UserDefaults.standard.set(linkNumbersByShare, forKey: "linkNumbersByShare")
+//        UserDefaults.standard.set(nextLinkNumberByShare, forKey: "nextLinkNumberByShare")
+//    }
+//
+//    func loadLinkNumberData() {
+//        if let savedMap = UserDefaults.standard.dictionary(forKey: "linkNumbersByShare") as? [String: [String: Int]] {
+//            linkNumbersByShare = savedMap
+//        } else {
+//            linkNumbersByShare = [:]
+//        }
+//        
+//        if let savedNext = UserDefaults.standard.dictionary(forKey: "nextLinkNumberByShare") as? [String: Int] {
+//            nextLinkNumberByShare = savedNext
+//        } else {
+//            nextLinkNumberByShare = [:]
+//        }
+//    }
+//    
+//    // MARK: - Number Assignment
+//    
+//    // Assign number to a link (or reuse existing)
+//    func assignLinkNumber(forShare shareId: String, linkId: String) -> Int {
+//        if nextLinkNumberByShare[shareId] == nil {
+//            nextLinkNumberByShare[shareId] = 1
+//            linkNumbersByShare[shareId] = [:]
+//        }
+//
+//        if let number = linkNumbersByShare[shareId]?[linkId] {
+//            return number
+//        }
+//
+//        let nextNum = nextLinkNumberByShare[shareId]!
+//        linkNumbersByShare[shareId]?[linkId] = nextNum
+//        nextLinkNumberByShare[shareId]! += 1
+//        return nextNum
+//    }
+//
+//    func removeLink(forShare shareId: String, linkId: String) {
+//        linkNumbersByShare[shareId]?.removeValue(forKey: linkId)
+//
+//        if linkNumbersByShare[shareId]?.isEmpty ?? true {
+//            linkNumbersByShare[shareId] = [:]
+//            nextLinkNumberByShare[shareId] = 1
+//        }
+//    }
+
+
     
-    // Assign number to a link (or reuse existing)
-    func assignLinkNumber(forShare shareId: String, linkId: String) -> Int {
-        if nextLinkNumberByShare[shareId] == nil {
-            nextLinkNumberByShare[shareId] = 1
-            linkNumbersByShare[shareId] = [:]
-        }
-
-        if let number = linkNumbersByShare[shareId]?[linkId] {
-            return number
-        }
-
-        let nextNum = nextLinkNumberByShare[shareId]!
-        linkNumbersByShare[shareId]?[linkId] = nextNum
-        nextLinkNumberByShare[shareId]! += 1
-        return nextNum
-    }
-
-    func removeLink(forShare shareId: String, linkId: String) {
-        linkNumbersByShare[shareId]?.removeValue(forKey: linkId)
-
-        if linkNumbersByShare[shareId]?.isEmpty ?? true {
-            linkNumbersByShare[shareId] = [:]
-            nextLinkNumberByShare[shareId] = 1
-        }
-    }
+//    func updateShareArrays() {
+//        shareLinks.removeAll()
+//        shareEmails.removeAll()
+//        
+//        if let shareLink = shares.firstShareLink {
+//            shares.share?.insert(shareLink, at: 0)
+//        }
+//        
+//        guard let allShares = shares.share else { return }
+//        
+//        // Use current shareId as the scope
+//        let shareId = metadata?.ocId ?? "0"
+//        
+//        // Ensure storage exists for this share
+//        if nextLinkNumberByShare[shareId] == nil {
+//            nextLinkNumberByShare[shareId] = 1
+//            linkNumbersByShare[shareId] = [:]
+//        }
+//        
+//        for item in allShares {
+//            if item.shareType == shareCommon.SHARE_TYPE_LINK {
+//                let linkId = String(item.idShare)
+//                
+//                // Assign a number if missing
+//                if linkNumbersByShare[shareId]?[linkId] == nil {
+//                    let nextNum = nextLinkNumberByShare[shareId] ?? 1
+//                    linkNumbersByShare[shareId]?[linkId] = nextNum
+//                    nextLinkNumberByShare[shareId] = nextNum + 1
+//                    saveLinkNumberData()
+//                }
+////                if item.shareType == shareCommon.SHARE_TYPE_LINK { shareLinksCount += 1 }
+//
+//                shareLinks.append(item)
+//            } else {
+//                shareEmails.append(item)
+//            }
+//        }
+//        
+//        // Sort links by assigned number (per-share)
+//        shareLinks.sort { lhs, rhs in
+//            let lhsNum = linkNumbersByShare[shareId]?[String(lhs.idShare)] ?? 0
+//            let rhsNum = linkNumbersByShare[shareId]?[String(rhs.idShare)] ?? 0
+//            return lhsNum < rhsNum
+//        }
+//        
+//        // ✅ If this share has no links, reset numbering for it
+//        if shareLinks.isEmpty {
+//            linkNumbersByShare[shareId] = [:]
+//            nextLinkNumberByShare[shareId] = 1
+//            saveLinkNumberData()
+//        }
+//        
+////        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare,
+////                                                    userInfo: ["links": shareLinks.count,
+////                                                               "emails": shareEmails.count])
+//    }
+//
+//    // MARK: - Persistence
+//    func saveLinkNumberData() {
+//        // Save both maps as UserDefaults property lists
+//        UserDefaults.standard.set(linkNumbersByShare, forKey: "linkNumbersByShare")
+//        UserDefaults.standard.set(nextLinkNumberByShare, forKey: "nextLinkNumberByShare")
+//    }
+//
+//    func loadLinkNumberData() {
+//        if let savedMap = UserDefaults.standard.dictionary(forKey: "linkNumbersByShare") as? [String: [String: Int]] {
+//            linkNumbersByShare = savedMap
+//        } else {
+//            linkNumbersByShare = [:]
+//        }
+//        
+//        if let savedNext = UserDefaults.standard.dictionary(forKey: "nextLinkNumberByShare") as? [String: Int] {
+//            nextLinkNumberByShare = savedNext
+//        } else {
+//            nextLinkNumberByShare = [:]
+//        }
+//    }
+//    
+//    // MARK: - Number Assignment
+//    
+//    // Assign number to a link (or reuse existing)
+//    func assignLinkNumber(forShare shareId: String, linkId: String) -> Int {
+//        if nextLinkNumberByShare[shareId] == nil {
+//            nextLinkNumberByShare[shareId] = 1
+//            linkNumbersByShare[shareId] = [:]
+//        }
+//
+//        if let number = linkNumbersByShare[shareId]?[linkId] {
+//            return number
+//        }
+//
+//        let nextNum = nextLinkNumberByShare[shareId]!
+//        linkNumbersByShare[shareId]?[linkId] = nextNum
+//        nextLinkNumberByShare[shareId]! += 1
+//        return nextNum
+//    }
+//
+//    func removeLink(forShare shareId: String, linkId: String) {
+//        linkNumbersByShare[shareId]?.removeValue(forKey: linkId)
+//
+//        if linkNumbersByShare[shareId]?.isEmpty ?? true {
+//            linkNumbersByShare[shareId] = [:]
+//            nextLinkNumberByShare[shareId] = 1
+//        }
+//    }
 
     // MARK: - IBAction
 
@@ -442,15 +590,30 @@ class NCShare: UIViewController, NCSharePagingContent {
 extension NCShare: NCShareNetworkingDelegate {
     func readShareCompleted() {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
+//        self.reloadData()
     }
 
     func shareCompleted() {
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
+//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
+//        self.reloadData()
+        // Allow DB async save to finish before reload
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.reloadData()
+        }
     }
 
     func unShareCompleted() {
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
+//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataNCShare)
+        // Same buffer for consistency
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.reloadData()
+        }
     }
+//    func unShareCompleted() {
+//        DispatchQueue.main.async {
+//            self.reloadData()
+//        }
+//    }
 
     func updateShareWithError(idShare: Int) {
         self.reloadData()
@@ -609,16 +772,12 @@ extension NCShare: UITableViewDataSource {
                 return UITableViewCell()
             }
             cell.delegate = self
-            // Get the shareId and linkId as strings (for dictionary keys)
-            let shareId = String(metadata.ocId)
-            let linkId = String(tableShare.idShare)
-
-            // Get or assign a number for this link
-            let assignedNumber = assignLinkNumber(forShare: shareId, linkId: linkId)
-
-//            cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, shareLinksCount: assignedNumber)
-            cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, shareLinksCount: shareLinksCount)
-            if tableShare.shareType == shareCommon.SHARE_TYPE_LINK { shareLinksCount += 1 }
+            if indexPath.row == 0 {
+                cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, title: "")
+            } else {
+                let linkNumber = " \(indexPath.row + 1)"
+                cell.configure(with: tableShare, at: indexPath, isDirectory: metadata.directory, title: linkNumber)
+            }
             return cell
 
         case .emails:

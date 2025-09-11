@@ -442,6 +442,11 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.label
             row.cellConfig["backgroundColor"] = NCBrandColor.shared.secondarySystemGroupedBackground
             row.height = 44
+            
+//            // Add validator for min 6 characters
+//            guard let minLengthValidator = XLFormRegexValidator(msg: NSLocalizedString("_password_min_6_chars_", comment: "Password must be at least 6 characters"), andRegexString: "^.{6,}$") else { return <#default value#> }
+//            row.addValidator(minLengthValidator)
+
             let hasPassword = oldTableShare?.password != nil && !oldTableShare!.password.isEmpty
             row.hidden = NSNumber.init(booleanLiteral: !hasPassword)
             section.addFormRow(row)
@@ -475,9 +480,11 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             row.cellConfig["cellTextField.text"] = DateFormatter.shareExpDate.string(from: date as Date)
         }
 //        else {
-//            row.cellConfig["cellTextField.text"] = DateFormatter.shareExpDate.string(from: Date.dayAfterYear as Date)
-//            share.expirationDate = row.cellConfig["cellTextField.text"] as? NSDate
+//            let nextYearTomorrow = Date.tomorrowNextYear
+//            row.cellConfig["cellTextField.text"] = DateFormatter.shareExpDate.string(from: nextYearTomorrow)
+//            share.expirationDate = nextYearTomorrow as NSDate
 //        }
+        
         row.height = 44
         let hasExpiry = oldTableShare?.expirationDate != nil
         row.hidden = NSNumber.init(booleanLiteral: !hasExpiry)
@@ -791,6 +798,36 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                 self.form.delegate = self
             }
 
+//        case "SetPasswordInputField":
+//            if let pwd = formRow.value as? String {
+//                self.form.delegate = nil
+//                
+//                // Validate password length
+//                if pwd.count < 6 {
+//                    share.password = ""
+//                    
+//                    // Show alert for invalid password
+//                    let alert = UIAlertController(
+//                        title: NSLocalizedString("_invalid_password_title_", comment: "Invalid Password"),
+//                        message: NSLocalizedString("_password_min_length_", comment: "Password must be at least 6 characters"),
+//                        preferredStyle: .alert
+//                    )
+//                    alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: "OK"), style: .default))
+//                    self.present(alert, animated: true)
+//                    
+//                    // Clear the text field in the cell
+//                    if let indexPath = self.form.indexPath(ofFormRow: formRow),
+//                       let cell = tableView.cellForRow(at: indexPath) as? PasswordInputField {
+//                        cell.fileNameInputTextField.text = ""
+//                    }
+//                } else {
+//                    // Password is valid
+//                    share.password = pwd
+//                }
+//                
+//                self.form.delegate = self
+//            }
+
         case "kNMCFilePermissionEditCellLinkLabel":
             if let label = formRow.value as? String {
                 self.form.delegate = nil
@@ -798,10 +835,37 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                 self.form.delegate = self
             }
 
+//        case "kNMCFilePermissionEditCellExpiration":
+//            if let value = newValue as? Bool {
+//                if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellExpiry") {
+//                    inputField.hidden = !value
+//                }
+//            }
+
         case "kNMCFilePermissionEditCellExpiration":
             if let value = newValue as? Bool {
-                if let inputField : XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellExpiry") {
+                if let inputField: XLFormRowDescriptor = self.form.formRow(withTag: "NCShareTextInputCellExpiry") {
                     inputField.hidden = !value
+
+                    // Only set expiration date if toggle is ON and there's no existing value
+                    if value && share.expirationDate == nil {
+                        let defaultExpiry = Date.dayNextYear
+                        inputField.value = defaultExpiry
+                        share.expirationDate = defaultExpiry as NSDate
+
+                        // Reload the cell to update the UI
+                        if let indexPath = self.form.indexPath(ofFormRow: inputField) {
+                            // Reload row to ensure the text field is updated
+//                            self.tableView.reloadRows(at: [indexPath], with: .automatic)
+
+                            // Manually update the cell's text field to display the expiration date
+                            if let cell = self.tableView.cellForRow(at: indexPath) as? NCShareTextInputCell {
+                                // Use DateFormatter to format the date
+                                let formattedDate = DateFormatter.shareExpDate.string(from: defaultExpiry)
+                                cell.cellTextField.text = formattedDate
+                            }
+                        }
+                    }
                 }
             }
 
@@ -973,5 +1037,17 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
 extension NCShareAdvancePermission: NCShareDownloadLimitTableViewControllerDelegate {
     func didSetDownloadLimit(_ downloadLimit: DownloadLimitViewModel) {
         self.downloadLimit = downloadLimit
+    }
+}
+
+extension Date {
+    static var dayNextYear: Date {
+//        let calendar = Calendar.current
+//        let now = Date()
+//        var components = DateComponents()
+//        components.year = 1
+//        components.day = 1
+//        return calendar.date(byAdding: components, to: now)!
+        return Calendar.current.date(byAdding: .year, value: 1, to: Date())!
     }
 }

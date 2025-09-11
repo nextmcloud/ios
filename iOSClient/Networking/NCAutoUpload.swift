@@ -126,7 +126,6 @@ class NCAutoUpload: NSObject {
                     }
                     return completion(0)
                 }
-
             }
             
             self.hud.setText(text: NSLocalizedString("_creating_db_photo_progress", comment: ""))
@@ -140,6 +139,14 @@ class NCAutoUpload: NSObject {
                 let assetMediaType = asset.mediaType
                 var serverUrl: String = ""
                 let fileName = NCUtilityFileSystem().createFileName(asset.originalFilename as String, fileDate: assetDate, fileType: assetMediaType)
+
+                // ✅ Respect toggles: skip if disabled
+                if assetMediaType == .image && !tableAccount.autoUploadImage {
+                    continue
+                }
+                if assetMediaType == .video && !tableAccount.autoUploadVideo {
+                    continue
+                }
 
                 if tableAccount.autoUploadCreateSubfolder {
                     serverUrl = NCUtilityFileSystem().createGranularityPath(asset: asset, serverUrl: autoUploadPath)
@@ -220,6 +227,7 @@ class NCAutoUpload: NSObject {
         }
     }
 
+
     func autoUploadSelectedAlbums(controller: NCMainTabBarController?, assetCollections: [PHAssetCollection], log: String, account: String) {
         applicationState = UIApplication.shared.applicationState
         hud.initHudRing(view: controller?.view, text: nil, detailText: nil, tapToCancelDetailText: false)
@@ -260,10 +268,19 @@ class NCAutoUpload: NSObject {
             var lastUploadDate = Date()
 
             for asset in assets {
+                let assetMediaType = asset.mediaType
+
+                // ✅ Respect toggles: skip if disabled
+                if assetMediaType == .image && !tableAccount.autoUploadImage {
+                    continue
+                }
+                if assetMediaType == .video && !tableAccount.autoUploadVideo {
+                    continue
+                }
+
                 var isLivePhoto = false
                 var uploadSession: String = ""
                 let assetDate = asset.creationDate ?? Date()
-                let assetMediaType = asset.mediaType
                 var serverUrl: String = ""
                 let fileName = NCUtilityFileSystem().createFileName(asset.originalFilename as String, fileDate: assetDate, fileType: assetMediaType)
 
@@ -277,13 +294,13 @@ class NCAutoUpload: NSObject {
                     isLivePhoto = true
                 }
 
-                if assetMediaType == PHAssetMediaType.image && tableAccount.autoUploadWWAnPhoto == false {
+                if assetMediaType == .image && tableAccount.autoUploadWWAnPhoto == false {
                     uploadSession = NCNetworking.shared.sessionUploadBackground
-                } else if assetMediaType == PHAssetMediaType.video && tableAccount.autoUploadWWAnVideo == false {
+                } else if assetMediaType == .video && tableAccount.autoUploadWWAnVideo == false {
                     uploadSession = NCNetworking.shared.sessionUploadBackground
-                } else if assetMediaType == PHAssetMediaType.image && tableAccount.autoUploadWWAnPhoto {
+                } else if assetMediaType == .image && tableAccount.autoUploadWWAnPhoto {
                     uploadSession = NCNetworking.shared.sessionUploadBackgroundWWan
-                } else if assetMediaType == PHAssetMediaType.video && tableAccount.autoUploadWWAnVideo {
+                } else if assetMediaType == .video && tableAccount.autoUploadWWAnVideo {
                     uploadSession = NCNetworking.shared.sessionUploadBackgroundWWan
                 } else {
                     uploadSession = NCNetworking.shared.sessionUploadBackground
@@ -315,14 +332,13 @@ class NCAutoUpload: NSObject {
                     metadata.sessionSelector = NCGlobal.shared.selectorUploadAutoUpload
                     metadata.status = NCGlobal.shared.metadataStatusWaitUpload
                     metadata.sessionDate = Date()
-                    if assetMediaType == PHAssetMediaType.video {
+                    if assetMediaType == .video {
                         metadata.classFile = NKCommon.TypeClassFile.video.rawValue
-                    } else if assetMediaType == PHAssetMediaType.image {
+                    } else if assetMediaType == .image {
                         metadata.classFile = NKCommon.TypeClassFile.image.rawValue
                     }
 
                     let metadataCreationDate = metadata.creationDate as Date
-
                     if lastUploadDate < metadataCreationDate {
                         lastUploadDate = metadataCreationDate
                     }
@@ -340,6 +356,7 @@ class NCAutoUpload: NSObject {
             NCNetworkingProcess.shared.createProcessUploads(metadatas: metadatas, completion: completion)
         }
     }
+
 
     // MARK: -
 

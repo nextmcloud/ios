@@ -135,7 +135,6 @@ struct NCAutoUploadView: View {
                         .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                         .opacity(model.autoUploadStart ? 0.15 : 1)
                         .onChange(of: model.autoUploadImage) { newValue in
-                            if !newValue { model.autoUploadVideo = true }
                             model.handleAutoUploadImageChange(newValue: newValue)
                         }
 
@@ -155,7 +154,6 @@ struct NCAutoUploadView: View {
                         .tint(Color(NCBrandColor.shared.getElement(account: model.session.account)))
                         .opacity(model.autoUploadStart ? 0.15 : 1)
                         .onChange(of: model.autoUploadVideo) { newValue in
-                            if !newValue { model.autoUploadImage = true }
                             model.handleAutoUploadVideoChange(newValue: newValue)
                         }
 
