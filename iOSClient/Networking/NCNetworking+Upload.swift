@@ -149,6 +149,9 @@ extension NCNetworking {
                                                                    "account": metadata.account,
                                                                    "fileName": metadata.fileName,
                                                                    "sessionSelector": metadata.sessionSelector])
+            self.transferDelegate?.tranferChange(status: self.global.notificationCenterUploadStartFile,
+                                                 metadata: tableMetadata(value: metadata),
+                                                 error: .success)
             start()
         }, progressHandler: { progress in
             NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterProgressTask,
@@ -163,6 +166,11 @@ extension NCNetworking {
                                                                    "progress": NSNumber(value: progress.fractionCompleted),
                                                                    "totalBytes": NSNumber(value: progress.totalUnitCount),
                                                                    "totalBytesExpected": NSNumber(value: progress.completedUnitCount)])
+            self.transferDelegate?.transferProgressDidUpdate(progress: Float(progress.fractionCompleted),
+                                                             totalBytes: progress.totalUnitCount,
+                                                             totalBytesExpected: progress.completedUnitCount,
+                                                             fileName: metadata.fileName,
+                                                             serverUrl: metadata.serverUrl)
             progressHandler(progress.completedUnitCount, progress.totalUnitCount, progress.fractionCompleted)
         }) { account, ocId, etag, date, size, responseData, afError, error in
             var error = error
@@ -213,6 +221,9 @@ extension NCNetworking {
                                                                    "fileName": metadata.fileName,
                                                                    "sessionSelector": metadata.sessionSelector],
                                                         second: 0.2)
+            self.transferDelegate?.tranferChange(status: self.global.notificationCenterUploadStartFile,
+                                                 metadata: tableMetadata(value: metadata),
+                                                 error: .success)
         } requestHandler: { _ in
             self.database.setMetadataSession(ocId: metadata.ocId,
                                              status: self.global.metadataStatusUploading)
@@ -234,6 +245,11 @@ extension NCNetworking {
                                                                    "progress": NSNumber(value: fractionCompleted),
                                                                    "totalBytes": NSNumber(value: totalBytes),
                                                                    "totalBytesExpected": NSNumber(value: totalBytesExpected)])
+            self.transferDelegate?.transferProgressDidUpdate(progress: Float(fractionCompleted),
+                                                             totalBytes: totalBytes,
+                                                             totalBytesExpected: totalBytesExpected,
+                                                             fileName: metadata.fileName,
+                                                             serverUrl: metadata.serverUrl)
 
             progressHandler(totalBytesExpected, totalBytes, fractionCompleted)
         } uploaded: { fileChunk in
@@ -284,6 +300,9 @@ extension NCNetworking {
                                                                        "account": metadata.account,
                                                                        "fileName": metadata.fileName,
                                                                        "sessionSelector": metadata.sessionSelector])
+                self.transferDelegate?.tranferChange(status: self.global.notificationCenterUploadStartFile,
+                                                     metadata: tableMetadata(value: metadata),
+                                                     error: .success)
             } else {
                 self.database.deleteMetadataOcId(metadata.ocId)
             }
@@ -424,6 +443,9 @@ extension NCNetworking {
                                                                     object: nil,
                                                                     userInfo: userInfo,
                                                                     second: 0.5)
+                        self.transferDelegate?.tranferChange(status: self.global.notificationCenterUploadedFile,
+                                                             metadata: tableMetadata(value: metadata),
+                                                             error: error)
                     }
                 } else {
                     if error.errorCode == NSURLErrorCancelled || error.errorCode == self.global.errorRequestExplicityCancelled {
@@ -528,6 +550,9 @@ extension NCNetworking {
                                                                                "fileName": metadata.fileName,
                                                                                "error": error],
                                                                     second: 0.5)
+                        self.transferDelegate?.tranferChange(status: self.global.notificationCenterUploadedFile,
+                                                             metadata: tableMetadata(value: metadata),
+                                                             error: error)
                         // Client Diagnostic
                         if error.errorCode == self.global.errorInternalServerError {
                             self.database.addDiagnostic(account: metadata.account,
@@ -574,5 +599,31 @@ extension NCNetworking {
                                                                        "totalBytesExpected": NSNumber(value: totalBytesExpected)])
             }
         }
+        self.transferDelegate?.transferProgressDidUpdate(progress: progress,
+                                                         totalBytes: totalBytes,
+                                                         totalBytesExpected: totalBytesExpected,
+                                                         fileName: fileName,
+                                                         serverUrl: serverUrl)
+    }
+    
+    func uploadCancelFile(metadata: tableMetadata) {
+        NCTransferProgress.shared.clearCountError(ocIdTransfer: metadata.ocIdTransfer)
+#if EXTENSION
+                self.utilityFileSystem.removeFile(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocIdTransfer))
+#else
+                removeFileInBackgroundSafe(atPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocIdTransfer))
+#endif
+        self.database.deleteMetadataOcId(metadata.ocIdTransfer)
+        NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadCancelFile,
+                                                    object: nil,
+                                                    userInfo: ["ocId": metadata.ocId,
+                                                               "ocIdTransfer": metadata.ocIdTransfer,
+                                                               "session": metadata.session,
+                                                               "serverUrl": metadata.serverUrl,
+                                                               "account": metadata.account],
+                                                    second: 1)
+        self.transferDelegate?.tranferChange(status: self.global.notificationCenterUploadCancelFile,
+                                             metadata: tableMetadata(value: metadata),
+                                             error: .success)
     }
 }

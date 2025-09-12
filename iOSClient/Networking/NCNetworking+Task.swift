@@ -126,14 +126,17 @@ extension NCNetworking {
                 cancelDownloadBackgroundTask(metadata: metadata)
             }
 
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterDownloadCancelFile,
-                                                        object: nil,
-                                                        userInfo: ["ocId": metadata.ocId,
-                                                                   "ocIdTransfer": metadata.ocIdTransfer,
-                                                                   "session": metadata.session,
-                                                                   "serverUrl": metadata.serverUrl,
-                                                                   "account": metadata.account],
-                                                        second: 0.5)
+//            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterDownloadCancelFile,
+//                                                        object: nil,
+//                                                        userInfo: ["ocId": metadata.ocId,
+//                                                                   "ocIdTransfer": metadata.ocIdTransfer,
+//                                                                   "session": metadata.session,
+//                                                                   "serverUrl": metadata.serverUrl,
+//                                                                   "account": metadata.account],
+//                                                        second: 0.5)
+            self.transferDelegate?.tranferChange(status: self.global.notificationCenterDownloadCancelFile,
+                                                 metadata: tableMetadata(value: metadata),
+                                                 error: .success)
         }
 
         /// UPLOAD
@@ -146,14 +149,17 @@ extension NCNetworking {
             }
             utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId))
 
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadCancelFile,
-                                                        object: nil,
-                                                        userInfo: ["ocId": metadata.ocId,
-                                                                   "ocIdTransfer": metadata.ocIdTransfer,
-                                                                   "session": metadata.session,
-                                                                   "serverUrl": metadata.serverUrl,
-                                                                   "account": metadata.account],
-                                                        second: 0.5)
+//            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterUploadCancelFile,
+//                                                        object: nil,
+//                                                        userInfo: ["ocId": metadata.ocId,
+//                                                                   "ocIdTransfer": metadata.ocIdTransfer,
+//                                                                   "session": metadata.session,
+//                                                                   "serverUrl": metadata.serverUrl,
+//                                                                   "account": metadata.account],
+//                                                        second: 0.5)
+            self.transferDelegate?.tranferChange(status: self.global.notificationCenterUploadCancelFile,
+                                                 metadata: tableMetadata(value: metadata),
+                                                 error: .success)
         }
     }
 

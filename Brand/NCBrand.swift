@@ -149,9 +149,9 @@ let userAgent: String = {
             }
         }
 
-#if DEBUG
-        pushNotificationServerProxy = "https://c0004.customerpush.nextcloud.com"
-#endif
+//#if DEBUG
+//        pushNotificationServerProxy = "https://c0004.customerpush.nextcloud.com"
+//#endif
     }
 
     @objc func getUserAgent() -> String {

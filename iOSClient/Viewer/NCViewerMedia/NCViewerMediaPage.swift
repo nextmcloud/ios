@@ -165,6 +165,8 @@ class NCViewerMediaPage: UIViewController {
         timerAutoHide?.invalidate()
         timerAutoHide = nil
 
+        NCNetworking.shared.transferDelegate = nil
+
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterEnableSwipeGesture), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDisableSwipeGesture), object: nil)
 
@@ -183,6 +185,8 @@ class NCViewerMediaPage: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        NCNetworking.shared.transferDelegate = self
 
         startTimerAutoHide()
     }
@@ -723,5 +727,19 @@ extension NCViewerMediaPage: UIScrollViewDelegate {
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         preventScrollOnDragAndDrop = true
+    }
+}
+
+extension NCViewerMediaPage: NCTransferDelegate {
+    func tranferChange(status: String, metadata: tableMetadata, error: NKError) { }
+
+    func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) {
+        DispatchQueue.main.async {
+            if progress == 1 {
+                self.progressView.progress = 0
+            } else {
+                self.progressView.progress = progress
+            }
+        }
     }
 }

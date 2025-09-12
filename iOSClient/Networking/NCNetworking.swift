@@ -44,6 +44,16 @@ protocol NCNetworkingDelegate {
     func didAskForClientCertificate()
 }
 
+protocol NCTransferDelegate: AnyObject {
+    func transferProgressDidUpdate(progress: Float,
+                                   totalBytes: Int64,
+                                   totalBytesExpected: Int64,
+                                   fileName: String,
+                                   serverUrl: String)
+
+    func tranferChange(status: String, metadata: tableMetadata, error: NKError)
+}
+
 @objcMembers
 class NCNetworking: NSObject, NextcloudKitDelegate, @unchecked Sendable {
     public static let shared: NCNetworking = {
@@ -75,6 +85,7 @@ class NCNetworking: NSObject, NextcloudKitDelegate, @unchecked Sendable {
     var p12Data: Data?
     var p12Password: String?
     var tapHudStopDelete = false
+    weak var transferDelegate: NCTransferDelegate?
 
     var isOffline: Bool {
         return networkReachability == NKCommon.TypeReachability.notReachable || networkReachability == NKCommon.TypeReachability.unknown
@@ -428,4 +439,58 @@ class NCNetworking: NSObject, NextcloudKitDelegate, @unchecked Sendable {
 
         return key
     }
+    
+    // MARK: - Util FileSystem Safe
+#if !EXTENSION
+    func removeFileInBackgroundSafe(atPath: String) {
+        var bgTask: UIBackgroundTaskIdentifier = .invalid
+
+        bgTask = UIApplication.shared.beginBackgroundTask(withName: "SafeRemove") {
+            UIApplication.shared.endBackgroundTask(bgTask)
+            bgTask = .invalid
+        }
+
+        DispatchQueue.global().async {
+            defer {
+                UIApplication.shared.endBackgroundTask(bgTask)
+                bgTask = .invalid
+            }
+
+            do {
+                try FileManager.default.removeItem(atPath: atPath)
+            } catch {
+                print("Errore nella rimozione file:", error)
+            }
+        }
+    }
+
+    func moveFileSafely(atPath: String, toPath: String) {
+        if atPath == toPath { return }
+
+        var bgTask: UIBackgroundTaskIdentifier = .invalid
+        bgTask = UIApplication.shared.beginBackgroundTask(withName: "MoveFile") {
+            UIApplication.shared.endBackgroundTask(bgTask)
+            bgTask = .invalid
+        }
+
+        DispatchQueue.global().async {
+            defer {
+                UIApplication.shared.endBackgroundTask(bgTask)
+                bgTask = .invalid
+            }
+
+            do {
+                if FileManager.default.fileExists(atPath: toPath) {
+                    try FileManager.default.removeItem(atPath: toPath)
+                }
+
+                try FileManager.default.copyItem(atPath: atPath, toPath: toPath)
+                try FileManager.default.removeItem(atPath: atPath)
+
+            } catch {
+                print("Errore nello spostamento file:", error)
+            }
+        }
+    }
+#endif
 }

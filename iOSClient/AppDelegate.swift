@@ -128,9 +128,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
 
         /// Activation singleton
+        _ = NCNetworking.shared
         _ = NCActionCenter.shared
         _ = NCNetworkingProcess.shared
+        _ = NCTransferProgress.shared
+        _ = NCActionCenter.shared
 
+        NCTransferProgress.shared.setup()
+        NCActionCenter.shared.setup()
+        
 //        if account.isEmpty {
 //            if NCBrandOptions.shared.disable_intro {
 //                openLogin(viewController: nil, selector: NCGlobal.shared.introLogin, openLoginWeb: false)

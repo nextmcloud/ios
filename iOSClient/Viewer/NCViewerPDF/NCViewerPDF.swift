@@ -256,6 +256,8 @@ class NCViewerPDF: UIViewController, NCViewerPDFSearchDelegate {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        NCNetworking.shared.transferDelegate = self
+
         showTip()
     }
 
@@ -599,5 +601,33 @@ extension NCViewerPDF: EasyTipViewDelegate {
         }
         tipView?.dismiss()
         tipView = nil
+    }
+}
+
+extension NCViewerPDF: NCTransferDelegate {
+    func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) { }
+
+    func tranferChange(status: String, metadata: tableMetadata, error: NKError) {
+        guard self.metadata?.serverUrl == metadata.serverUrl,
+              self.metadata?.fileName == metadata.fileName
+        else {
+            return
+        }
+
+        DispatchQueue.main.async {
+            switch status {
+            case NCGlobal.shared.notificationCenterUploadStartFile:
+                NCActivityIndicator.shared.start()
+            case NCGlobal.shared.notificationCenterUploadedFile:
+                NCActivityIndicator.shared.stop()
+                if error == .success {
+                    self.pdfDocument = PDFDocument(url: URL(fileURLWithPath: self.filePath))
+                    self.pdfView.document = self.pdfDocument
+                    self.pdfView.layoutDocumentView()
+                }
+            default:
+                break
+            }
+        }
     }
 }
