@@ -202,11 +202,11 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         layoutForView = self.database.getLayoutForView(account: session.account, key: layoutKey, serverUrl: serverUrl)
         gridLayout.column = CGFloat(layoutForView?.columnGrid ?? 3)
         
-        if layoutForView?.layout == NCGlobal.shared.layoutList {
-            collectionView.collectionViewLayout = listLayout
-        } else {
-            collectionView.collectionViewLayout = gridLayout
-        }
+//        if layoutForView?.layout == NCGlobal.shared.layoutList {
+//            collectionView.collectionViewLayout = listLayout
+//        } else {
+//            collectionView.collectionViewLayout = gridLayout
+//        }
         reloadDataSource()
         if let item = items.first, item.serverUrl == serverUrl {
             selectCommandViewSelect?.moveButton?.isEnabled = false
