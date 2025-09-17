@@ -1355,6 +1355,7 @@
 "_albums_list_empty_subheading_"                    = "You can organize all your photos in as many albums as you like. You haven't created an album yet.";
 "_albums_list_empty_new_album_btn_"                 = "Create album";
 "_albums_list_own_albums_heading_"                  = "My albums";
+"_albums_list_entity_"                              = "Item";
 "_albums_list_entities_"                            = "Items";
 "_albums_list_new_album_popup_title_"               = "Create new Album";
 "_albums_list_new_album_popup_desc_"                = "Please enter an album name between 3 and 30 characters.";

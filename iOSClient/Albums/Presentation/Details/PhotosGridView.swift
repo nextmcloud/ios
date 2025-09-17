@@ -10,18 +10,29 @@ import SwiftUI
 
 struct PhotosGridView: View {
     
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
     let photos: [AlbumPhoto : tableMetadata?]
     let onAddPhotosIntent: () -> Void
     
-    private let columns = [
-        GridItem(
-            .adaptive(
-                minimum: 100,
-                maximum: 300
-            ),
-            spacing: 1
-        )
-    ]
+    private var columns: [GridItem] {
+        let min: CGFloat
+        let max: CGFloat
+        
+        if horizontalSizeClass == .compact {
+            // iPhone
+            min = 120
+            max = 160
+        } else {
+            // iPad
+            min = 200
+            max = 300
+        }
+        
+        return [
+            GridItem(.adaptive(minimum: min, maximum: max), spacing: 1)
+        ]
+    }
     
     var body: some View {
         

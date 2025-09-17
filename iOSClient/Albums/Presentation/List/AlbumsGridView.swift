@@ -64,7 +64,11 @@ struct AlbumsGridView: View {
     private func makeSubtitle(for album: Album) -> String? {
         guard let count = album.itemCount else { return nil }
         
-        var parts: [String] = ["\(count) \(NSLocalizedString("_albums_list_entities_", comment: ""))"]
+        let quantifyingString = (count == 1)
+        ? NSLocalizedString("_albums_list_entity_", comment: "")
+        : NSLocalizedString("_albums_list_entities_", comment: "")
+        
+        var parts: [String] = ["\(count) \(quantifyingString)"]
         
         if count > 0, let end = album.endDate {
             let formatter = DateFormatter()

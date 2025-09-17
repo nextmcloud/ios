@@ -37,6 +37,7 @@ class AlbumDetailsViewModel: ObservableObject {
         self.account = account
         self.album = album
         self.screenTitle = album.name
+        self.newAlbumName = album.name
         registerPublishers()
         loadAlbumPhotos()
     }
