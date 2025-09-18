@@ -13,11 +13,14 @@ struct NCMediaViewRepresentable: UIViewControllerRepresentable {
     
     @Binding var ncMedia: NCMedia?
     
+    let itemSelectionCountCallback: (Int) -> Void
+    
     func makeUIViewController(context: Context) -> UIViewController {
         
         let sb = UIStoryboard(name: "NCMedia", bundle: nil)
         let media = sb.instantiateInitialViewController() as! NCMedia
         media.isInGeneralPhotosSelectionContext = true
+        media.generalPhotosSelectionCountCallback = itemSelectionCountCallback
         
         DispatchQueue.main.async {
             self.ncMedia = media
@@ -26,12 +29,7 @@ struct NCMediaViewRepresentable: UIViewControllerRepresentable {
         let nav = UINavigationController(rootViewController: media)
         nav.navigationBar.isHidden = true
         
-        let tab = UITabBarController()
-        tab.setViewControllers([nav], animated: false)
-        tab.tabBar.isHidden = true
-        tab.additionalSafeAreaInsets.bottom = 0
-        
-        return tab
+        return nav
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

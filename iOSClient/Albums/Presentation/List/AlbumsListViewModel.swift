@@ -18,9 +18,6 @@ class AlbumsListViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String? = nil
     
-    private var thumbnailsTask: Task<Void, Never>?
-    @Published private(set) var albumThumbnails: [String: UIImage] = [:]
-    
     @Published var isLoadingPopupVisible: Bool = false
     
     @Published var isNewAlbumCreationPopupVisible: Bool = false

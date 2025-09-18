@@ -37,6 +37,7 @@ class AlbumDetailsViewModel: ObservableObject {
         self.account = account
         self.album = album
         self.screenTitle = album.name
+        self.newAlbumName = album.name
         registerPublishers()
         loadAlbumPhotos()
     }
@@ -90,7 +91,7 @@ class AlbumDetailsViewModel: ObservableObject {
     }
     
     func onRenameAlbumPopupCancel() {
-        newAlbumName = ""
+        newAlbumName = self.album.name
         isRenameAlbumPopupVisible = false
     }
     
@@ -185,7 +186,7 @@ class AlbumDetailsViewModel: ObservableObject {
                 self?.album = newAlbum
                 self?.loadAlbumPhotos {
                     self?.screenTitle = self?.album.name ?? ""
-                    self?.newAlbumName = ""
+                    self?.newAlbumName = self?.album.name ?? ""
                 }
             }
         }
@@ -224,7 +225,12 @@ class AlbumDetailsViewModel: ObservableObject {
                     AlbumsManager.shared.syncAlbums()
                     
                 case .failure(let error):
-                    NCContentPresenter().showError(error: NKError(error: error))
+                    if error.errorCode == 409 {
+                        // Item already present in album error handling
+                        NCContentPresenter().showInfo(title: "Some items are already present in this album")
+                    } else {
+                        NCContentPresenter().showError(error: NKError(error: error))
+                    }
                 }
             }
         }

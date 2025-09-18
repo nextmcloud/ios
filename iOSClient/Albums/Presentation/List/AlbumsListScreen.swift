@@ -51,12 +51,8 @@ struct AlbumsListScreen: View {
             isPresented: $viewModel.isNewAlbumCreationPopupVisible,
             albumName: $viewModel.newAlbumName,
             error: viewModel.newAlbumNameError,
-            onCreate: {
-                viewModel.onNewAlbumPopupCreate()
-            },
-            onCancel: {
-                viewModel.onNewAlbumPopupCancel()
-            }
+            onCreate: viewModel.onNewAlbumPopupCreate,
+            onCancel: viewModel.onNewAlbumPopupCancel
         )
     }
     

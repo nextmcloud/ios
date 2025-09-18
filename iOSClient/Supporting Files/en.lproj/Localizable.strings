@@ -1355,6 +1355,7 @@
 "_albums_list_empty_subheading_"                    = "You can organize all your photos in as many albums as you like. You haven't created an album yet.";
 "_albums_list_empty_new_album_btn_"                 = "Create album";
 "_albums_list_own_albums_heading_"                  = "My albums";
+"_albums_list_entity_"                              = "Item";
 "_albums_list_entities_"                            = "Items";
 "_albums_list_new_album_popup_title_"               = "Create new Album";
 "_albums_list_new_album_popup_desc_"                = "Please enter an album name between 3 and 30 characters.";
@@ -1369,6 +1370,8 @@
 "_albums_photo_selection_sheet_title_"              = "Select items";
 "_albums_photo_selection_sheet_back_btn_"           = "Back";
 "_albums_photo_selection_sheet_done_btn_"           = "Done";
+"_albums_photo_selection_sheet_item_selected_"      = "item selected";
+"_albums_photo_selection_sheet_items_selected_"     = "items selected";
 "_albums_photos_loading_msg_"                       = "Loading photos...";
 "_albums_photos_error_msg_"                         = "Unable to load photos. Please try again later!";
 "_albums_photos_empty_heading_"                     = "All that's\nmissing are\nyour photos";
