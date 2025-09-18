@@ -225,7 +225,12 @@ class AlbumDetailsViewModel: ObservableObject {
                     AlbumsManager.shared.syncAlbums()
                     
                 case .failure(let error):
-                    NCContentPresenter().showError(error: NKError(error: error))
+                    if error.errorCode == 409 {
+                        // Item already present in album error handling
+                        NCContentPresenter().showInfo(title: "Some items are already present in this album")
+                    } else {
+                        NCContentPresenter().showError(error: NKError(error: error))
+                    }
                 }
             }
         }

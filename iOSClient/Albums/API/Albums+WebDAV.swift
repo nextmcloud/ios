@@ -393,7 +393,7 @@ public extension NextcloudKit {
         fileName: String,
         options: NKRequestOptions = NKRequestOptions(),
         taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
-        completion: @escaping (Result<Void, Error>) -> Void
+        completion: @escaping (Result<Void, NKError>) -> Void
     ) {
         
         let session = NCSession.shared.getSession(account: account)
