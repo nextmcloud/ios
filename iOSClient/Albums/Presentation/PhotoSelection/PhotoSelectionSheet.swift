@@ -12,15 +12,19 @@ struct PhotoSelectionSheet: View {
     
     let onPhotosSelected: ([String]) -> Void
     
-    @State private var selectedPhotosCount: Int = 0 // TODO: Figure out how to get this count from NCMedia
+    @State private var selectedPhotosCount: Int = 0
     
     @State private var mediaVC: NCMedia?
     
     var body: some View {
         NavigationView {
             VStack {
-                NCMediaViewRepresentable(ncMedia: $mediaVC)
-                    .frame(maxHeight: .infinity)
+                NCMediaViewRepresentable(
+                    ncMedia: $mediaVC,
+                    itemSelectionCountCallback: { count in
+                        selectedPhotosCount = count
+                    }
+                ).frame(maxHeight: .infinity)
             }
             .navigationTitle(NSLocalizedString("_albums_photo_selection_sheet_title_", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
@@ -38,11 +42,16 @@ struct PhotoSelectionSheet: View {
                     .foregroundColor(Color(NCBrandColor.shared.customer))
                 }
                 
-                //                ToolbarItemGroup(placement: .bottomBar) {
-                //                    Text("\(selectedPhotosCount) items selected")
-                //                        .font(.subheadline)
-                //                        .foregroundColor(.secondary)
-                //                }
+                ToolbarItemGroup(placement: .bottomBar) {
+                    
+                    let quantifyingString = (selectedPhotosCount == 1)
+                    ? NSLocalizedString("_albums_photo_selection_sheet_item_selected_", comment: "")
+                    : NSLocalizedString("_albums_photo_selection_sheet_items_selected_", comment: "")
+                    
+                    Text("\(selectedPhotosCount) \(quantifyingString)")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
             }
         }
     }

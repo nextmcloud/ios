@@ -54,7 +54,11 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
     let refreshControl = UIRefreshControl()
     var isTop: Bool = true
     var isEditMode = false
-    var fileSelect: [String] = []
+    var fileSelect: [String] = [] {
+        didSet {
+            generalPhotosSelectionCountCallback?(fileSelect.count)
+        }
+    }
     var filesExists: ThreadSafeArray<String> = ThreadSafeArray()
     var ocIdDoNotExists: ThreadSafeArray<String> = ThreadSafeArray()
     var searchMediaInProgress: Bool = false
@@ -94,6 +98,7 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
     var hiddenCellMetadats: ThreadSafeArray<String> = ThreadSafeArray()
     
     var isInGeneralPhotosSelectionContext: Bool = false
+    var generalPhotosSelectionCountCallback: ((Int) -> Void)?
 
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: tabBarController)

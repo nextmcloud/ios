@@ -46,12 +46,8 @@ struct AlbumDetailsScreen: View {
             albumName: $viewModel.newAlbumName,
             error: viewModel.newAlbumNameError,
             isForRenamingAlbum: true,
-            onCreate: {
-                viewModel.onRenameAlbumPopupConfirm()
-            },
-            onCancel: {
-                viewModel.onRenameAlbumPopupCancel()
-            }
+            onCreate: viewModel.onRenameAlbumPopupConfirm,
+            onCancel: viewModel.onRenameAlbumPopupCancel
         )
         .alert(
             NSLocalizedString("_albums_delete_album_popup_title_", comment: ""),

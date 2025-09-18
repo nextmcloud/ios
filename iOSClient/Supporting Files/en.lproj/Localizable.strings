@@ -1370,6 +1370,8 @@
 "_albums_photo_selection_sheet_title_"              = "Select items";
 "_albums_photo_selection_sheet_back_btn_"           = "Back";
 "_albums_photo_selection_sheet_done_btn_"           = "Done";
+"_albums_photo_selection_sheet_item_selected_"      = "item selected";
+"_albums_photo_selection_sheet_items_selected_"     = "items selected";
 "_albums_photos_loading_msg_"                       = "Loading photos...";
 "_albums_photos_error_msg_"                         = "Unable to load photos. Please try again later!";
 "_albums_photos_empty_heading_"                     = "All that's\nmissing are\nyour photos";
