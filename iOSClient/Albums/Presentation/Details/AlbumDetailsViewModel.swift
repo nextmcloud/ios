@@ -91,7 +91,7 @@ class AlbumDetailsViewModel: ObservableObject {
     }
     
     func onRenameAlbumPopupCancel() {
-        newAlbumName = ""
+        newAlbumName = self.album.name
         isRenameAlbumPopupVisible = false
     }
     
@@ -186,7 +186,7 @@ class AlbumDetailsViewModel: ObservableObject {
                 self?.album = newAlbum
                 self?.loadAlbumPhotos {
                     self?.screenTitle = self?.album.name ?? ""
-                    self?.newAlbumName = ""
+                    self?.newAlbumName = self?.album.name ?? ""
                 }
             }
         }
