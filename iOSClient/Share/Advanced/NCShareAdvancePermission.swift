@@ -69,17 +69,41 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
                         setDownloadLimit(deleteLimit: true, limit: String(defaultLimit))
                     } else {
                         let downloadLimitInputCell = getDownloadLimitInputCell()
-                        let enteredDownloadLimit = downloadLimitInputCell?.cellTextField.text ?? ""
+//                        let enteredDownloadLimit = downloadLimitInputCell?.cellTextField.text ?? ""
+                        let enteredDownloadLimit = downloadLimitInputCell?.cellTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+//                        if enteredDownloadLimit.isEmpty {
+//                            showDownloadLimitError(message: NSLocalizedString("_share_download_limit_alert_empty_", comment: ""))
+//                            return
+//                        }
+//                        if let num = Int(enteredDownloadLimit), num < 1 {
+//                            showDownloadLimitError(message: NSLocalizedString("_share_download_limit_alert_zero_", comment: ""))
+//                            return
+//                        }
+//                        
+//                        self.downloadLimit = .limited(limit: Int(enteredDownloadLimit)!, count: downloadLimit.count ?? 0)
+                       
+                        // Case 1: Empty input
                         if enteredDownloadLimit.isEmpty {
                             showDownloadLimitError(message: NSLocalizedString("_share_download_limit_alert_empty_", comment: ""))
                             return
                         }
-                        if let num = Int(enteredDownloadLimit), num < 1 {
+
+                        // Case 2: Non-numeric or too large
+                        guard let num = Int(enteredDownloadLimit) else {
+                            // Input is either not a number or exceeds Int range
+                            showDownloadLimitError(message: NSLocalizedString("_share_download_limit_alert_invalid_", comment: ""))
+                            return
+                        }
+
+                        // Case 3: Zero or negative
+                        if num < 1 {
                             showDownloadLimitError(message: NSLocalizedString("_share_download_limit_alert_zero_", comment: ""))
                             return
                         }
-                        
-                        self.downloadLimit = .limited(limit: Int(enteredDownloadLimit)!, count: downloadLimit.count ?? 0)
+
+                        // ✅ Safe assignment
+                        self.downloadLimit = .limited(limit: num, count: downloadLimit.count ?? 0)
                         setDownloadLimit(deleteLimit: false, limit: enteredDownloadLimit)
                         updateDownloadLimitUI()
                     }

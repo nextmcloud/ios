@@ -740,6 +740,7 @@
 "_share_download_limit_placeholder_" = "Enter download limit";
 "_share_download_limit_alert_empty_" = "Download limit cannot be empty.";
 "_share_download_limit_alert_zero_"  = "Download limit should be greater than 0.";
+"_share_download_limit_alert_invalid_" = "Please enter a valid number for the download limit.";
 "_share_remaining_download_"    = "Downloads:";
 //"_share_read_only_"             = "Read only";
 "_share_read_only_"             = "View only";

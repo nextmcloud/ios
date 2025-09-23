@@ -107,12 +107,15 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
     }
 
     @objc func doneDatePicker() {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = NCShareAdvancePermission.displayDateFormat
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.dateFormat = NCShareAdvancePermission.displayDateFormat
+//        var expiryDate = dateFormatter.string(from: datePicker.date)
+//        expiryDate = expiryDate.replacingOccurrences(of: "..", with: ".")
+//        self.expirationDateText = expiryDate
+//        self.expirationDate = datePicker.date as NSDate
 
-        var expiryDate = dateFormatter.string(from: datePicker.date)
-        expiryDate = expiryDate.replacingOccurrences(of: "..", with: ".")
-        self.expirationDateText = expiryDate
+        let expiryDateString = DateFormatter.shareExpDate.string(from: datePicker.date)
+        self.expirationDateText = expiryDateString
         self.expirationDate = datePicker.date as NSDate
 
         self.cellTextField.text = self.expirationDateText
