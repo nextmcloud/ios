@@ -110,7 +110,7 @@ const CGFloat kTOPasscodeKeypadMaxHeight = 330.0f;
 
     __weak typeof(self) weakSelf = self;
 
-    self.title = NSLocalizedString(@"Enter Passcode", @"");
+    self.title = NSLocalizedString(@"_enter_passcode_", @"");
 
     // Create container view
     self.containerView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -123,7 +123,7 @@ const CGFloat kTOPasscodeKeypadMaxHeight = 330.0f;
     self.titleLabel.font = [UIFont systemFontOfSize:17.0f];
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     self.titleLabel.textColor = [UIColor blackColor];
-    self.titleLabel.text = @"Enter your passcode";
+    self.titleLabel.text = @"_enter_your_passcode_";
     self.titleLabel.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
     [self.titleLabel sizeToFit];
     [self.containerView addSubview:self.titleLabel];
@@ -150,7 +150,7 @@ const CGFloat kTOPasscodeKeypadMaxHeight = 330.0f;
 
     // Create error label view
     self.errorLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.errorLabel.text = NSLocalizedString(@"Passcodes didn't match. Try again.", @"");
+    self.errorLabel.text = NSLocalizedString(@"_passcodes_didnt_match_try_again_", @"");
     self.errorLabel.textAlignment = NSTextAlignmentCenter;
     self.errorLabel.font = [UIFont systemFontOfSize:15.0f];
     self.errorLabel.numberOfLines = 0;
@@ -160,7 +160,7 @@ const CGFloat kTOPasscodeKeypadMaxHeight = 330.0f;
 
     // Create Options button
     self.optionsButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.optionsButton setTitle:NSLocalizedString(@"Passcode Options", @"") forState:UIControlStateNormal];
+    [self.optionsButton setTitle:NSLocalizedString(@"_passcode_options_", @"") forState:UIControlStateNormal];
     self.optionsButton.titleLabel.font = [UIFont systemFontOfSize:15.0f];
     [self.optionsButton sizeToFit];
     self.optionsButton.hidden = _hideOptionsButton;
@@ -237,7 +237,7 @@ const CGFloat kTOPasscodeKeypadMaxHeight = 330.0f;
     // Update text depending on state
     switch (state) {
         case TOPasscodeSettingsViewStateEnterCurrentPasscode:
-            self.titleLabel.text = NSLocalizedString(@"Enter your passcode", @"");
+            self.titleLabel.text = NSLocalizedString(@"_enter_your_passcode_", @"");
             self.navigationItem.rightBarButtonItem = variableSizePasscode ? self.nextBarButtonItem : nil;
             if (@available(iOS 9.0, *)) {
                 self.inputField.returnKeyType = UIReturnKeyContinue;
@@ -247,7 +247,7 @@ const CGFloat kTOPasscodeKeypadMaxHeight = 330.0f;
             }
             break;
         case TOPasscodeSettingsViewStateEnterNewPasscode:
-            self.titleLabel.text = NSLocalizedString(@"Enter a new passcode", @"");
+            self.titleLabel.text = NSLocalizedString(@"_enter_a_new_passcode_", @"");
             self.navigationItem.rightBarButtonItem = variableSizePasscode ? self.nextBarButtonItem : nil;
             if (@available(iOS 9.0, *)) {
                 self.inputField.returnKeyType = UIReturnKeyContinue;
@@ -257,7 +257,7 @@ const CGFloat kTOPasscodeKeypadMaxHeight = 330.0f;
             }
             break;
         case TOPasscodeSettingsViewStateConfirmNewPasscode:
-            self.titleLabel.text = NSLocalizedString(@"Confirm new passcode", @"");
+            self.titleLabel.text = NSLocalizedString(@"_confirm_new_passcode_", @"");
             self.navigationItem.rightBarButtonItem = variableSizePasscode ? self.doneBarButtonItem : nil;
             self.inputField.returnKeyType = UIReturnKeyDone;
             break;
@@ -562,10 +562,10 @@ const CGFloat kTOPasscodeKeypadMaxHeight = 330.0f;
                       ];
 
 
-    NSArray *titles = @[NSLocalizedString(@"4-Digit Numeric Code", @""),
-                        NSLocalizedString(@"6-Digit Numeric Code", @""),
-                        NSLocalizedString(@"Custom Numeric Code", @""),
-                        NSLocalizedString(@"Custom Alphanumeric Code", @"")];
+    NSArray *titles = @[NSLocalizedString(@"_4_digit_numeric_code_", @""),
+                        NSLocalizedString(@"_6_digit_numeric_code_", @""),
+                        NSLocalizedString(@"_custom_numeric_code_", @""),
+                        NSLocalizedString(@"_custom_alphanumeric_code_", @"")];
 
     // Add all the buttons
     for (NSInteger i = 0; i < types.count; i++) {

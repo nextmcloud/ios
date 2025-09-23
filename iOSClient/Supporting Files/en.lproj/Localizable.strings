@@ -239,6 +239,23 @@
 "_change_lock_passcode_"  = "Change passcode";
 "_lock_cannot_disable_mdm_" = "Disabling the passcode lock is not permitted by your configuration profile.";
 
+//TOPasscodeSettingsViewController.m
+"_enter_passcode_" = "Enter Passcode";
+"_passcodes_didnt_match_try_again_" = "Passcodes didn't match. Try again.";
+"_passcode_options_" = "Passcode Options";
+//"_next_" = "Next";
+"_enter_your_passcode_" = "Enter your passcode";
+"_enter_a_new_passcode_" = "Enter a new passcode";
+"_confirm_new_passcode_" = "Confirm new passcode";
+"_4_digit_numeric_code_" = "4-Digit Numeric Code";
+"_6_digit_numeric_code_" = "6-Digit Numeric Code";
+"_custom_numeric_code_" = "Custom Numeric Code";
+"_custom_alphanumeric_code_" = "Custom Alphanumeric Code";
+
+//TOPasscodeSettingsWarningLabel.m
+"_1_failed_passcode_attempt" = "1 Failed Passcode Attempt";
+"_failed_passcode_attempts" = "%d Failed Passcode Attempts";
+
 /* Background of the file listing view */
 "_use_as_background_"       = "Use it as a background";
 
@@ -297,7 +314,7 @@
 "_...loading..._"           = "Loading …";
 "_download_plist_"          = " ";
 "_no_reuploadfile_"         = "Could not find nor resend file. Delete the upload and reload the file to upload it.";
-"_file_already_exists_"     = "Unable to complete the operation, a file with the same name exists.";
+//"_file_already_exists_"     = "Unable to complete the operation, a file with the same name exists.";
 "_read_file_error_"         = "Could not read the file";
 "_write_file_error_"        = "Could not write the file";
 "_files_lock_error_"        = "There was an error changing the lock of this file.";
@@ -319,6 +336,8 @@
 "_lock_protection_no_screen_"        = "Do not ask at startup";
 "_lock_protection_no_screen_footer_" = "Use \"Do not ask at startup\" for the encryption option.";
 "_enable_touch_face_id_"        = "Enable Touch/Face ID";
+"_face_id_"                     = "Face ID";
+"_touch_id_"                    = "Touch ID";
 "_security_"                    = "Security";
 "_data_protection_"             = "Data protection";
 "_privacy_settings_"            = "Privacy Settings";
@@ -337,11 +356,8 @@
 "_contact_by_email_"            = "Contact us by email";
 "_clear_cache_"                 = "Clear cache";
 "_clear_cache_footer_"          = "Clear downloaded and offline files from the app";
-"_exit_footer_"                 = "Remove all accounts and local data from the app.";
 "_exit_"                        = "Logout";
 "_exit_footer_"                 = "Remove all accounts and local data from the app";
-"_exit_footer_"                 = "Remove all accounts and local data from the app.";
-"_exit_"                        = "Logout";
 "_funct_not_enabled_"           = "Functionality not enabled";
 "_passcode_activate_"           = "Password lock on";
 "_disabling_passcode_"          = "Removing password lock";
@@ -359,8 +375,8 @@
 "_manage_account_"              = "Manage account";
 "_change_password_"             = "Change password";
 "_add_account_"                 = "Add account";
-"_want_delete_"                 = "You will delete the following: ";
-"_want_leave_share_"            = "You will leave the following shares: ";
+//"_want_delete_"                 = "You will delete the following: ";
+//"_want_leave_share_"            = "You will leave the following shares: ";
 "_delete_account_"              = "Remove account";
 "_delete_active_account_"       = "Remove active account";
 "_want_delete_"                 = "Do you really want to delete?";
@@ -414,9 +430,7 @@
 "_autoupload_photos_"               = "Auto upload photos";
 "_autoupload_videos_"               = "Auto upload videos";
 "_autoupload_favorites_"            = "Auto upload favorites only";
-"_autoupload_description_"          = "New photos/videos will be automatically uploaded to your server.";
-"_autoupload_description_"          = "New photos/videos will be automatically uploaded to your MagentaCLOUD";
-"_autoupload_description_"          = "New photos/videos will be automatically uploaded to your Nextcloud";
+//"_autoupload_description_"          = "New photos/videos will be automatically uploaded to your server.";
 "_autoupload_description_"          = "New photos/videos will be automatically uploaded to your MagentaCLOUD";
 "_autoupload_description_background_"  = "This option requires the use of GPS to trigger the detection of new photos/videos in the camera roll once the location changes significantly";
 "_autoupload_background_title_"     = "Limitations";
@@ -622,7 +636,6 @@
 
 "_personal_files_only_"         = "Personal files only";
 "audio"                         = "AUDIO";
-"directory"                     = "FOLDERS";
 "compress"                      = "COMPRESS";
 "directory"                     = "FOLDERS";
 "document"                      = "DOCUMENTS";
@@ -700,9 +713,9 @@
 "_password_obligatory_"         = "Enforce password protection enabled, password obligatory";
 "_shared_with_you_by_"          = "Shared with you by";
 //"_shareLinksearch_placeholder_" = "Name, email";//, or Federated Cloud ID …";
-"_new_comment_"                 = "New comment …";
-"_edit_comment_"                = "Edit comment";
-"_delete_comment_"              = "Delete comment";
+//"_new_comment_"                 = "New comment …";
+//"_edit_comment_"                = "Edit comment";
+//"_delete_comment_"              = "Delete comment";
 "_share_reshare_allowed_"       = "Resharing is allowed.";
 "_share_reshare_not_allowed_"   = "Resharing is not allowed.";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
@@ -732,7 +745,6 @@
 "_share_read_only_"             = "View only";
 "_share_editing_"               = "Can edit";
 "_share_file_drop_"             = "Filedrop only";
-"_share_hide_download_"         = "Prevent download";
 "_share_note_recipient_"        = "YOUR MESSAGE";
 "_shareLinksearch_placeholder_" = "Contact name or email address";
 //"_shareLinksearch_placeholder_" = "Type a name and press Search";
@@ -745,6 +757,7 @@
 "_share_allow_upload_"          = "Allow upload and editing";
 "_share_secure_file_drop_"      = "Secure file drop (upload only)";
 //"_share_hide_download_"         = "Hide download";
+"_share_hide_download_"         = "Prevent download";
 "_share_limit_download_"        = "Limit downloads";
 "_remaining_"                   = "%d remaining";
 "_share_password_protect_"      = "Password protection";
@@ -756,12 +769,12 @@
 "_share_can_create_"            = "Allow creating";
 "_share_can_change_"            = "Allow editing";
 "_share_can_delete_"            = "Allow deleting";
+"_share_can_download_"          = "Allow download";
 "_share_unshare_"               = "Unshare";
 "_share_internal_link_"         = "Internal link";
 "_share_internal_link_des_"     = "Only works for users with access to this file/folder";
 "_share_reshare_disabled_"      = "You are not allowed to reshare this file/folder";
 "_share_reshare_restricted_"    = "Note: You only have limited permission to reshare this file/folder";
-"_share_can_download_"          = "Allow download";
 "_create_new_link_"             = "Create new link";
 "_share_send_link_by_mail_"      = "Send link by mail";
 "_share_or_"                     = "or";
@@ -819,6 +832,7 @@
 "_no_notification_"                 = "No notifications yet";
 "_autoupload_filename_title_"       = "Auto upload filename";
 "_untitled_"                        = "Untitled";
+"_untitled_txt_"                    = "Untitled.txt";
 "_text_upload_title_"               = "Upload text file";
 "_e2e_settings_title_"              = "Encryption";
 "_e2e_settings_"                    = "End-to-end encryption";
@@ -900,7 +914,8 @@
 "_trash_restore_all_"               = "Restore all files";
 "_trash_delete_all_"                = "Empty trash";
 "_trash_delete_permanently_"        = "Delete permanently";
-"_trash_delete_all_description_"    = "Do you want to empty the trash bin?";"_trash_no_trash_"                  = "No files deleted";
+"_trash_delete_all_description_"    = "Do you want to empty the trash bin?";
+"_trash_no_trash_"                  = "No files deleted";
 "_trash_no_trash_description_"      = "You can restore deleted files from here";
 "_trash_restore_selected_"          = "Restore selected files";
 "_trash_delete_selected_"           = "Delete selected files";
@@ -976,13 +991,13 @@
 "_err_permission_microphone_"           = "Please allow Microphone usage from Settings";
 "_err_permission_photolibrary_"         = "Please allow Photos from Settings";
 "_err_permission_locationmanager_"      = "Please allow Location - Always from Settings";
-"_ssl_certificate_untrusted_"           = "The certificate for this server is invalid.";
-"_ssl_certificate_changed_"             = "The certificate for this server seems to have changed.";
-"_file_already_exists_"                 = "Could not complete the operation, a file with the same name exists.";
-"_error_files_upload_"                  = "Error uploading files.";
-"_internal_generic_error_"              = "internal error.";
-"_err_permission_microphone_"           = "Please allow Microphone usage from Settings.";
-"_err_permission_photolibrary_"         = "Please allow Photos from Settings.";
+//"_ssl_certificate_untrusted_"           = "The certificate for this server is invalid.";
+//"_ssl_certificate_changed_"             = "The certificate for this server seems to have changed.";
+//"_file_already_exists_"                 = "Could not complete the operation, a file with the same name exists.";
+//"_error_files_upload_"                  = "Error uploading files.";
+//"_internal_generic_error_"              = "internal error.";
+//"_err_permission_microphone_"           = "Please allow Microphone usage from Settings.";
+//"_err_permission_photolibrary_"         = "Please allow Photos from Settings.";
 "_qrcode_not_authorized_"   = "This app is not authorized to use the Back Camera.";
 "_qrcode_not_supported_"    = "QR code not supported by the current device.";
 "_create_voice_memo_"       = "Create voice memo";
@@ -1068,7 +1083,7 @@
 "_no_items_"                = "No items";
 "_check_back_later_"        = "Check back later";
 "_exporting_video_"         = "Exporting video … Tap to cancel.";
-"_keep_running_"            = "Keep the app running for a better user experience.";
+//"_keep_running_"            = "Keep the app running for a better user experience.";
 "_apps_nextcloud_detect_"   = "Detected %@ apps";
 "_add_existing_account_"    = "Other %@ Apps has been detected, do you want to add an existing account?";
 "_status_in_progress_"      = "Status reading in progress …";
@@ -1275,6 +1290,7 @@
 "_file_name_validator_error_invalid_character_" = "Name contains an invalid character: \"%@\".";
 "_file_name_validator_error_space_" = "Name must not contain spaces at the beginning or end.";
 "_file_name_new_extension_" = "Changing the extension might cause this file to open in a different application.";
+"_file_name_empty_" = "File name cannot be empty.";
 "_please_rename_file_" = "Please rename the file or folder.";
 "hidden_file_name_warning" = "Name will result in a hidden file.";
 
@@ -1311,8 +1327,6 @@
 
 // MARK: Scan
 "_location_"                        = "Location";
-"_prefix_upload_path_"              = "MagentaCLOUD/";
-
 "_save_with_text_recognition_"      = "SAVE WITH TEXT RECOGNITION (OCR)";
 "_pdf_with_ocr_"                    = "PDF (OCR)";
 "_text_file_ocr_"                   = "Textfile (txt)";
