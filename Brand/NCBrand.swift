@@ -60,12 +60,12 @@ let userAgent: String = {
 
 //#if DEBUG
     // QA :
-//    @objc public var capabilitiesGroup:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
-//    @objc public var capabilitiesGroupApps:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
+    @objc public var capabilitiesGroup:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
+    @objc public var capabilitiesGroupApps:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
 //#else
 //    // PROD :
-    @objc public var capabilitiesGroup:              String = "group.de.telekom.Mediencenter"
-    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
+//    @objc public var capabilitiesGroup:              String = "group.de.telekom.Mediencenter"
+//    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
 //#endif
     
     // BRAND ONLY

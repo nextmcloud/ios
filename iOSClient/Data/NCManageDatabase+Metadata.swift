@@ -1122,6 +1122,29 @@ extension NCManageDatabase {
         }
     }
     
+//    func getMetadataFromOcIdAndocIdTransfer(_ ocId: String?) -> tableMetadata? {
+//        guard let ocId else { return nil }
+//
+//        return performRealmRead { realm in
+//            // First, try to find by ocId
+//            if let result = realm.objects(tableMetadata.self)
+//                .filter("ocId == %@", ocId)
+//                .first {
+//                return tableMetadata(value: result)
+//            }
+//
+//            // If not found, try to find by ocIdTransfer
+//            if let result = realm.objects(tableMetadata.self)
+//                .filter("ocIdTransfer == %@", ocId)
+//                .first {
+//                return tableMetadata(value: result)
+//            }
+//
+//            // Not found
+//            return nil
+//        }
+//    }
+    
     func getMetadataFolder(session: NCSession.Session, serverUrl: String) -> tableMetadata? {
         var serverUrl = serverUrl
         var fileName = ""
