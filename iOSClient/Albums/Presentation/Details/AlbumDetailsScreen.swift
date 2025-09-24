@@ -35,7 +35,7 @@ struct AlbumDetailsScreen: View {
             }
         }
         .sheet(
-            isPresented: $viewModel.isPhotoSelectionSheetVisible,
+            isPresented: $viewModel.isPhotoSelectionSheetVisible
         ) {
             PhotoSelectionSheet(
                 onPhotosSelected: viewModel.onPhotosSelected

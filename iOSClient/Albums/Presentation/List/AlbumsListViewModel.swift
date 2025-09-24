@@ -167,7 +167,7 @@ class AlbumsListViewModel: ObservableObject {
                 account: account,
                 sourcePath: metadata?.serveUrlFileName ?? photo,
                 albumName: album.name,
-                fileName: metadata?.fileName ?? photo,
+                fileName: metadata?.fileName ?? photo
             ) { result in
                 
                 switch result {

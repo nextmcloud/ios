@@ -67,7 +67,7 @@ public extension NextcloudKit {
         }
         
         nkSession.sessionData.request(
-            urlRequest,
+            urlRequest
             //interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)
         )
         .validate(statusCode: 200..<300)
@@ -179,7 +179,7 @@ public extension NextcloudKit {
         }
         
         nkSession.sessionData.request(
-            urlRequest,
+            urlRequest
             //interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)
         )
         //        .validate(statusCode: 200..<300)
@@ -274,7 +274,7 @@ public extension NextcloudKit {
         }
         
         nkSession.sessionData.request(
-            urlRequest,
+            urlRequest
             //interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)
         )
         .validate(statusCode: 200..<300)

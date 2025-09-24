@@ -185,7 +185,17 @@ extension NCMedia {
             actions.append(.seperator(order: 0))
 
             let selectedMetadatas = fileSelect.compactMap(NCManageDatabase.shared.getMetadataFromOcId)
-
+            
+            //
+            // Add to Album
+            //
+            actions.append(.addToAlbumAction(photoSelection: fileSelect, selectedMetadatas: selectedMetadatas, controller: self.controller, completion: tapSelect))
+            
+            //
+            // Create new Album
+            //
+            actions.append(.createNewAlbumAction(photoSelection: fileSelect, selectedMetadatas: selectedMetadatas, controller: self.controller, completion: tapSelect))
+            
             //
             // OPEN IN
             //

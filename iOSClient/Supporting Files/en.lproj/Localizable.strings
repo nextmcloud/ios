@@ -1381,3 +1381,4 @@
 "_albums_delete_album_popup_desc_"                  = "Are you sure you want to delete this album? This action cannot be undone.";
 "_albums_delete_album_popup_positive_btn_"          = "Delete";
 "_albums_delete_album_popup_negative_btn_"          = "Cancel";
+"_add_to_album"                                     = "Add to Album";
