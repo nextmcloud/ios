@@ -233,16 +233,34 @@ class NCShareAdvancePermission: XLFormViewController, NCShareAdvanceFotterDelega
             tableView.layoutIfNeeded()
         }
     }
-    
-    @objc func keyboardWillShow(_ notification:Notification) {
-        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
-            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardSize.height + 60, right: 0)
+
+    @objc func keyboardWillShow(_ notification: Notification) {
+        guard let userInfo = notification.userInfo else { return }
+        
+        // Use the end frame for the keyboard
+        if let keyboardFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            
+            // Adjust the content inset of the table view
+            let keyboardHeight = keyboardFrame.height
+            let extraPadding: CGFloat = 60
+            
+            // Animate the content inset change to match the keyboard's animation
+            UIView.animate(withDuration: 0.3, animations: {
+                self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardHeight + extraPadding, right: 0)
+                self.tableView.scrollIndicatorInsets = self.tableView.contentInset
+            })
         }
     }
-    
-    @objc func keyboardWillHide(_ notification:Notification) {
-        if ((notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue) != nil {
-            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: tableViewBottomInset, right: 0)
+
+    @objc func keyboardWillHide(_ notification: Notification) {
+        guard let userInfo = notification.userInfo else { return }
+        
+        // Reset the content inset when the keyboard is hidden
+        if let _ = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue) {
+            UIView.animate(withDuration: 0.3, animations: {
+                self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: self.tableViewBottomInset, right: 0)
+                self.tableView.scrollIndicatorInsets = self.tableView.contentInset
+            })
         }
     }
 
