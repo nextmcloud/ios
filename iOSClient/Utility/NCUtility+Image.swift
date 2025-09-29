@@ -84,7 +84,7 @@ extension NCUtility {
 
     func loadUserImage(for user: String, displayName: String?, urlBase: String) -> UIImage {
         let fileName = NCSession.shared.getFileName(urlBase: urlBase, user: user)
-        let localFilePath = utilityFileSystem.directoryUserData + "/" + fileName
+        let localFilePath = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileName)
 
         if var localImage = UIImage(contentsOfFile: localFilePath) {
             let rect = CGRect(x: 0, y: 0, width: 30, height: 30)
@@ -96,7 +96,7 @@ extension NCUtility {
             return localImage
         } else if let image = NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName).image {
             return image
-        } else if let displayName = displayName, !displayName.isEmpty, let avatarImg = createAvatar(displayName: displayName, size: 30) {
+        } else if let displayName, !displayName.isEmpty, let avatarImg = createAvatar(displayName: displayName, size: 30) {
             return avatarImg
         } else {
             return loadImage(named: "person.crop.circle", colors: [NCBrandColor.shared.iconImageColor])
@@ -125,7 +125,10 @@ extension NCUtility {
     func createImageFileFrom(metadata: tableMetadata) {
         if metadata.classFile != NKTypeClassFile.image.rawValue, metadata.classFile != NKTypeClassFile.video.rawValue { return }
         var image: UIImage?
-        let fileNamePath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)
+        let fileNamePath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                             fileName: metadata.fileNameView,
+                                                                             userId: metadata.userId,
+                                                                             urlBase: metadata.urlBase)
 
         if image == nil {
             if metadata.classFile == NKTypeClassFile.image.rawValue {
@@ -139,47 +142,51 @@ extension NCUtility {
 
         guard let image else { return }
 
-        createImageStandard(ocId: metadata.ocId, etag: metadata.etag, image: image)
+        createImageStandard(ocId: metadata.ocId, etag: metadata.etag, image: image, userId: metadata.userId, urlBase: metadata.urlBase)
     }
 
     func createImageFileFrom(data: Data, metadata: tableMetadata) {
-        createImageFileFrom( data: data, ocId: metadata.ocId, etag: metadata.etag)
+        createImageFileFrom( data: data, ocId: metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
     }
 
-    func createImageFileFrom(data: Data, ocId: String, etag: String) {
+    func createImageFileFrom(data: Data, ocId: String, etag: String, userId: String, urlBase: String) {
         guard let image = UIImage(data: data) else { return }
-        let fileNamePath1024 = self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: global.previewExt1024)
+        let fileNamePath1024 = self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId,
+                                                                                           etag: etag,
+                                                                                           ext: global.previewExt1024,
+                                                                                           userId: userId,
+                                                                                           urlBase: urlBase)
 
         do {
             try data.write(to: URL(fileURLWithPath: fileNamePath1024), options: .atomic)
         } catch { }
 
-        createImageStandard(ocId: ocId, etag: etag, image: image)
+        createImageStandard(ocId: ocId, etag: etag, image: image, userId: userId, urlBase: urlBase)
     }
 
-    private func createImageStandard(ocId: String, etag: String, image: UIImage) {
+    private func createImageStandard(ocId: String, etag: String, image: UIImage, userId: String, urlBase: String) {
         let ext = [global.previewExt1024, global.previewExt512, global.previewExt256]
         let size = [global.size1024, global.size512, global.size256]
         let compressionQuality = [0.5, 0.6, 0.7]
 
         for i in 0..<ext.count {
-            if !utilityFileSystem.fileProviderStorageImageExists(ocId, etag: etag, ext: ext[i]),
+            if !utilityFileSystem.fileProviderStorageImageExists(ocId, etag: etag, ext: ext[i], userId: userId, urlBase: urlBase),
                let image = image.resizeImage(size: size[i]),
                let data = image.jpegData(compressionQuality: compressionQuality[i]) {
                 do {
-                    let fileNamePath = utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext[i])
+                    let fileNamePath = utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext[i], userId: userId, urlBase: urlBase)
                     try data.write(to: URL(fileURLWithPath: fileNamePath))
                 } catch { }
             }
         }
     }
 
-    func getImage(ocId: String, etag: String, ext: String) -> UIImage? {
-        return UIImage(contentsOfFile: self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext))
+    func getImage(ocId: String, etag: String, ext: String, userId: String, urlBase: String) -> UIImage? {
+        return UIImage(contentsOfFile: self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext, userId: userId, urlBase: urlBase))
     }
 
-    func existsImage(ocId: String, etag: String, ext: String) -> Bool {
-        return FileManager().fileExists(atPath: self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext))
+    func existsImage(ocId: String, etag: String, ext: String, userId: String, urlBase: String) -> Bool {
+        return FileManager().fileExists(atPath: self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext, userId: userId, urlBase: urlBase))
     }
 
     func imageFromVideo(url: URL, at time: TimeInterval, completion: @escaping (UIImage?) -> Void) {
@@ -283,10 +290,17 @@ extension NCUtility {
         } else {
             fileNamePNG = iconURL.deletingPathExtension().lastPathComponent + ".png"
         }
-        let imageNamePath = utilityFileSystem.directoryUserData + "/" + fileNamePNG
+        let imageNamePath = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileNamePNG)
 
         if !FileManager.default.fileExists(atPath: imageNamePath) || rewrite == true {
-            NextcloudKit.shared.downloadContent(serverUrl: iconURL.absoluteString, account: account) { _, responseData, error in
+            NextcloudKit.shared.downloadContent(serverUrl: iconURL.absoluteString, account: account) { task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                path: iconURL.absoluteString,
+                                                                                                name: "downloadContent")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
+            } completion: { _, responseData, error in
                 if error == .success, let data = responseData?.data {
                     if let image = UIImage(data: data) {
                         var newImage: UIImage = image
@@ -339,29 +353,39 @@ extension NCUtility {
         }
     }
 
-    func getUserStatus(userIcon: String?, userStatus: String?, userMessage: String?) -> (statusImage: UIImage?, statusMessage: String, descriptionMessage: String) {
+    func getUserStatus(userIcon: String?, userStatus: String?, userMessage: String?) -> (statusImage: UIImage?, statusImageColor: UIColor, statusMessage: String, descriptionMessage: String) {
         var statusImage: UIImage?
+        var statusImageColor: UIColor = .black
         var statusMessage: String = ""
         var descriptionMessage: String = ""
         var messageUserDefined: String = ""
 
         if userStatus?.lowercased() == "online" {
-            statusImage = loadImage(named: "circle_fill", colors: [UIColor(red: 103.0 / 255.0, green: 176.0 / 255.0, blue: 134.0 / 255.0, alpha: 1.0)])
+            statusImage = UIImage(systemName: "checkmark.circle.fill")?.withTintColor(.systemGreen).withRenderingMode(.alwaysOriginal)
+            statusImageColor = UIColor.systemGreen
             messageUserDefined = NSLocalizedString("_online_", comment: "")
         }
         if userStatus?.lowercased() == "away" {
-            statusImage = loadImage(named: "userStatusAway", colors: [UIColor(red: 233.0 / 255.0, green: 166.0 / 255.0, blue: 75.0 / 255.0, alpha: 1.0)])
+            statusImage = UIImage(systemName: "clock.fill")?.withTintColor(.systemYellow).withRenderingMode(.alwaysOriginal)
+            statusImageColor = UIColor.systemYellow
             messageUserDefined = NSLocalizedString("_away_", comment: "")
         }
         if userStatus?.lowercased() == "dnd" {
-            statusImage = loadImage(named: "userStatusDnd")
+            statusImage = UIImage(systemName: "minus.circle.fill")?.withTintColor(.systemRed).withRenderingMode(.alwaysOriginal)
+            statusImageColor = UIColor.systemRed
             messageUserDefined = NSLocalizedString("_dnd_", comment: "")
             descriptionMessage = NSLocalizedString("_dnd_description_", comment: "")
         }
         if userStatus?.lowercased() == "offline" || userStatus?.lowercased() == "invisible" {
-            statusImage = UIImage(named: "userStatusOffline")!.withTintColor(.init(named: "SystemBackgroundInverted")!)
+            statusImage = UIImage(systemName: "circle")?.withTintColor(.init(named: "SystemBackgroundInverted")!).withRenderingMode(.alwaysOriginal)
+            statusImageColor = .init(named: "SystemBackgroundInverted")!
             messageUserDefined = NSLocalizedString("_invisible_", comment: "")
             descriptionMessage = NSLocalizedString("_invisible_description_", comment: "")
+        }
+        if userStatus?.lowercased() == "busy" {
+            statusImage = UIImage(systemName: "circle.fill")?.withTintColor(.systemRed).withRenderingMode(.alwaysOriginal)
+            statusImageColor = UIColor.systemRed
+            messageUserDefined = NSLocalizedString("_busy_", comment: "")
         }
 
         if let userIcon = userIcon {
@@ -375,7 +399,7 @@ extension NCUtility {
             statusMessage = messageUserDefined
         }
 
-        return(statusImage, statusMessage, descriptionMessage)
+        return(statusImage, statusImageColor, statusMessage, descriptionMessage)
     }
 
     func memorySizeOfImage(_ image: UIImage) -> Int {

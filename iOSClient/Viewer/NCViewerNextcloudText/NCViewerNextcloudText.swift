@@ -33,6 +33,7 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     var metadata: tableMetadata = tableMetadata()
     var imageIcon: UIImage?
     let utility = NCUtility()
+    var items: [UIBarButtonItem] = []
 
     var sceneIdentifier: String {
         (self.tabBarController as? NCMainTabBarController)?.sceneIdentifier ?? ""
@@ -48,12 +49,23 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
         super.viewDidLoad()
 
         if !metadata.ocId.hasPrefix("TEMP") {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(image: NCImageCache.shared.getImageButtonMore(), style: .plain, target: self, action: #selector(self.openMenuMore))
-        }
-        navigationController?.navigationBar.prefersLargeTitles = false
-        navigationItem.title = metadata.fileNameView
+            let moreButton = UIBarButtonItem(
+                image: NCImageCache.shared.getImageButtonMore(),
+                primaryAction: nil,
+                menu: UIMenu(title: "", children: [
+                    UIDeferredMenuElement.uncached { [self] completion in
+                        if let menu = NCViewerContextMenu.makeContextMenu(controller: self.tabBarController as? NCMainTabBarController, metadata: self.metadata, webView: true, sender: self) {
+                            completion(menu.children)
+                        }
+                    }
+                ]))
 
-        if editor == "Nextcloud Text" {
+            items.append(moreButton)
+        }
+
+        navigationItem.rightBarButtonItems = items
+        navigationItem.leftBarButtonItems = nil
+        if editor == "nextcloud text" {
             navigationItem.hidesBackButton = true
         }
 
@@ -81,7 +93,7 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
 
         if editor == "onlyoffice" {
             webView.customUserAgent = utility.getCustomUserAgentOnlyOffice()
-        } else if editor == "Nextcloud Text" {
+        } else if editor == "nextcloud text" {
             webView.customUserAgent = utility.getCustomUserAgentNCText()
         } // else: use default
 
@@ -102,6 +114,8 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        tabBarController?.tabBar.isHidden = true
+
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
@@ -109,7 +123,9 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        NCNetworking.shared.addDelegate(self)
+        Task {
+            await NCNetworking.shared.transferDispatcher.addDelegate(self)
+        }
 
         NCActivityIndicator.shared.start(backgroundView: view)
     }
@@ -117,7 +133,11 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        NCNetworking.shared.removeDelegate(self)
+        tabBarController?.tabBar.isHidden = false
+
+        Task {
+            await NCNetworking.shared.transferDispatcher.removeDelegate(self)
+        }
 
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "DirectEditingMobileInterface")
 
@@ -143,18 +163,10 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
         bottomConstraint?.constant = 0
     }
 
-    // MARK: - Action
-
-    @objc private func openMenuMore(_ sender: Any?) {
-        if imageIcon == nil { imageIcon = NCUtility().loadImage(named: "doc.text", colors: [NCBrandColor.shared.iconImageColor]) }
-        NCViewer().toggleMenu(controller: (self.tabBarController as? NCMainTabBarController), metadata: metadata, webView: true, imageIcon: imageIcon, sender: nil)
-    }
-
     // MARK: -
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if message.name == "DirectEditingMobileInterface" {
-
             if message.body as? String == "close" {
                 viewUnload()
             }
@@ -204,7 +216,7 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         if navigationAction.targetFrame == nil {
             if let url = navigationAction.request.url, UIApplication.shared.canOpenURL(url) {
-               UIApplication.shared.open(url)
+                UIApplication.shared.open(url)
             }
         }
         return nil
@@ -215,9 +227,11 @@ extension NCViewerNextcloudText: UINavigationControllerDelegate {
     override func didMove(toParent parent: UIViewController?) {
         super.didMove(toParent: parent)
 
-        if parent == nil {
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferRequestData(serverUrl: self.metadata.serverUrl)
+        Task {
+            if parent == nil {
+                await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
+                    delegate.transferRequestData(serverUrl: self.metadata.serverUrl)
+                }
             }
         }
     }
@@ -227,7 +241,7 @@ extension NCViewerNextcloudText: NCTransferDelegate {
     func transferChange(status: String, metadata: tableMetadata, error: NKError) {
         DispatchQueue.main.async {
             switch status {
-            /// FAVORITE
+            // FAVORITE
             case NCGlobal.shared.networkingStatusFavorite:
                 if self.metadata.ocId == metadata.ocId {
                     self.metadata = metadata
