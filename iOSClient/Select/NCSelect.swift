@@ -79,9 +79,6 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationController?.setNavigationBarAppearance()
-        navigationController?.navigationBar.prefersLargeTitles = true
-
         view.backgroundColor = .systemBackground
         collectionView.backgroundColor = .systemBackground
 
@@ -147,20 +144,20 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        let folderPath = utilityFileSystem.getFileNamePath("", serverUrl: serverUrl, session: session)
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: session.account)
+        Task { @MainActor in
+            let folderPath = utilityFileSystem.getFileNamePath("", serverUrl: serverUrl, session: session)
+            let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
 
-        if serverUrl.isEmpty || !FileNameValidator.checkFolderPath(folderPath, account: session.account, capabilities: capabilities) {
-            serverUrl = utilityFileSystem.getHomeServer(session: session)
-            titleCurrentFolder = NCBrandOptions.shared.brand
-        }
+            if serverUrl.isEmpty || !FileNameValidator.checkFolderPath(folderPath, account: session.account, capabilities: capabilities) {
+                serverUrl = utilityFileSystem.getHomeServer(session: session)
+                titleCurrentFolder = NCBrandOptions.shared.brand
+            }
 
-        autoUploadFileName = self.database.getAccountAutoUploadFileName(account: session.account)
-        autoUploadDirectory = self.database.getAccountAutoUploadDirectory(session: session)
+            autoUploadFileName = await self.database.getAccountAutoUploadFileNameAsync(account: session.account)
+            autoUploadDirectory = await self.database.getAccountAutoUploadDirectoryAsync(account: session.account, urlBase: session.urlBase, userId: session.userId)
 
-        self.navigationItem.title = titleCurrentFolder
+            self.navigationItem.title = titleCurrentFolder
 
-        Task {
             await reloadDataSource()
         }
     }
@@ -168,17 +165,26 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        self.networking.addDelegate(self)
+        Task {
+            await NCNetworking.shared.transferDispatcher.addDelegate(self)
+            await getServerData()
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
 
         Task {
-            await getServerData()
+            await NCNetworking.shared.networkingTasks.cancel(identifier: "NCSelect")
         }
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
-        self.networking.removeDelegate(self)
+        Task {
+            await NCNetworking.shared.transferDispatcher.removeDelegate(self)
+        }
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -239,8 +245,11 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     }
 
     func createFolderButtonPressed(_ sender: UIButton) {
-        let alertController = UIAlertController.createFolder(serverUrl: serverUrl, session: session)
-        self.present(alertController, animated: true, completion: nil)
+        Task { @MainActor in
+            let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
+            let alertController = UIAlertController.createFolder(serverUrl: serverUrl, session: session, capabilities: capabilities)
+            self.present(alertController, animated: true, completion: nil)
+        }
     }
 
     @IBAction func valueChangedSwitchOverwrite(_ sender: UISwitch) {
@@ -262,28 +271,36 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     // MARK: - Push metadata
 
     func pushMetadata(_ metadata: tableMetadata) {
-        let serverUrlPush = utilityFileSystem.stringAppendServerUrl(metadata.serverUrl, addFileName: metadata.fileName)
-        guard let viewController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateViewController(withIdentifier: "NCSelect.storyboard") as? NCSelect else { return }
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: metadata.account)
+        Task { @MainActor in
+            let serverUrlPush = utilityFileSystem.createServerUrl(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
+            guard let viewController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateViewController(withIdentifier: "NCSelect.storyboard") as? NCSelect else {
+                return
+            }
+            let capabilities = await NKCapabilities.shared.getCapabilities(for: metadata.account)
 
-        self.serverUrlPush = serverUrlPush
+            // Set Last Opening Date
+            await database.setDirectoryLastOpeningDateAsync(ocId: metadata.ocId)
 
-        viewController.delegate = delegate
-        viewController.typeOfCommandView = typeOfCommandView
-        viewController.includeDirectoryE2EEncryption = includeDirectoryE2EEncryption
-        viewController.includeImages = includeImages
-        viewController.enableSelectFile = enableSelectFile
-        viewController.type = type
-        viewController.overwrite = overwrite
-        viewController.items = items
-        viewController.titleCurrentFolder = metadata.fileNameView
-        viewController.serverUrl = serverUrlPush
-        viewController.session = session
+            self.serverUrlPush = serverUrlPush
 
-        if let fileNameError = FileNameValidator.checkFileName(metadata.fileNameView, account: session.account, capabilities: capabilities) {
-            present(UIAlertController.warning(message: "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
-        } else {
-            navigationController?.pushViewController(viewController, animated: true)
+            viewController.delegate = delegate
+            viewController.typeOfCommandView = typeOfCommandView
+            viewController.includeDirectoryE2EEncryption = includeDirectoryE2EEncryption
+            viewController.includeImages = includeImages
+            viewController.enableSelectFile = enableSelectFile
+            viewController.type = type
+            viewController.overwrite = overwrite
+            viewController.items = items
+            viewController.titleCurrentFolder = metadata.fileNameView
+            viewController.serverUrl = serverUrlPush
+            viewController.session = session
+
+            if let fileNameError = FileNameValidator.checkFileName(metadata.fileNameView, account: session.account, capabilities: capabilities) {
+                let message = "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"
+                await UIAlertController.warningAsync(message: message, presenter: self)
+            } else {
+                navigationController?.pushViewController(viewController, animated: true)
+            }
         }
     }
 }
@@ -313,7 +330,7 @@ extension NCSelect: UICollectionViewDataSource {
 
         // Thumbnail
         if !metadata.directory {
-            if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt512) {
+            if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt512, userId: metadata.userId, urlBase: metadata.urlBase) {
                 (cell as? NCCellProtocol)?.filePreviewImageView?.image = image
             } else {
                 if metadata.iconName.isEmpty {
@@ -349,10 +366,9 @@ extension NCSelect: UICollectionViewDataSource {
 
         var isShare = false
         var isMounted = false
-        let permissions = NCPermissions()
 
-        isShare = metadata.permissions.contains(permissions.permissionShared) && !metadataFolder.permissions.contains(permissions.permissionShared)
-        isMounted = metadata.permissions.contains(permissions.permissionMounted) && !metadataFolder.permissions.contains(permissions.permissionMounted)
+        isShare = metadata.permissions.contains(NCMetadataPermissions.permissionShared) && !metadataFolder.permissions.contains(NCMetadataPermissions.permissionShared)
+        isMounted = metadata.permissions.contains(NCMetadataPermissions.permissionMounted) && !metadataFolder.permissions.contains(NCMetadataPermissions.permissionMounted)
 
         cell.listCellDelegate = self
 
@@ -462,13 +478,10 @@ extension NCSelect: UICollectionViewDataSource {
             let section = indexPath.section
 
             footer.setTitleLabel("")
-            footer.separatorIsHidden(true)
 
             if sections == 1 || section == sections - 1 {
                 let info = self.dataSource.getFooterInformation()
                 footer.setTitleLabel(directories: info.directories, files: info.files, size: info.size)
-            } else {
-                footer.separatorIsHidden(false)
             }
 
             return footer
@@ -503,29 +516,39 @@ extension NCSelect {
 
         if includeDirectoryE2EEncryption {
             if includeImages {
-                predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND (directory == true OR classFile == 'image') AND NOT (status IN %@)", session.account, serverUrl, NCGlobal.shared.metadataStatusHideInView)
+                predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName != %@ AND (directory == true OR classFile == 'image') AND NOT (status IN %@)", session.account, serverUrl, NextcloudKit.shared.nkCommonInstance.rootFileName, NCGlobal.shared.metadataStatusHideInView)
             } else {
-                predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND directory == true AND NOT (status IN %@)", session.account, serverUrl, NCGlobal.shared.metadataStatusHideInView)
+                predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName != %@ AND directory == true AND NOT (status IN %@)", session.account, serverUrl, NextcloudKit.shared.nkCommonInstance.rootFileName, NCGlobal.shared.metadataStatusHideInView)
             }
         } else {
             if includeImages {
-                predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND e2eEncrypted == false AND (directory == true OR classFile == 'image') AND NOT (status IN %@)", session.account, serverUrl, NCGlobal.shared.metadataStatusHideInView)
+                predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName != %@ AND e2eEncrypted == false AND (directory == true OR classFile == 'image') AND NOT (status IN %@)", session.account, serverUrl, NextcloudKit.shared.nkCommonInstance.rootFileName, NCGlobal.shared.metadataStatusHideInView)
             } else if enableSelectFile {
-                predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND e2eEncrypted == false AND NOT (status IN %@)", session.account, serverUrl, NCGlobal.shared.metadataStatusHideInView)
+                predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName != %@ AND e2eEncrypted == false AND NOT (status IN %@)", session.account, serverUrl, NextcloudKit.shared.nkCommonInstance.rootFileName, NCGlobal.shared.metadataStatusHideInView)
             } else {
-                predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND e2eEncrypted == false AND directory == true AND NOT (status IN %@)", session.account, serverUrl, NCGlobal.shared.metadataStatusHideInView)
+                predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName != %@ AND e2eEncrypted == false AND directory == true AND NOT (status IN %@)", session.account, serverUrl, NextcloudKit.shared.nkCommonInstance.rootFileName, NCGlobal.shared.metadataStatusHideInView)
             }
         }
 
         let metadatas = await self.database.getMetadatasAsync(predicate: predicate,
                                                               withLayout: NCDBLayoutForView(),
                                                               withAccount: session.account)
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, account: session.account)
+        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas,
+                                                     account: session.account)
         self.collectionView.reloadData()
     }
 
     func getServerData() async {
-        let resultsReadFolder = await NCNetworking.shared.readFolderAsync(serverUrl: serverUrl, account: session.account)
+        // If is already in-flight, do nothing
+        if await NCNetworking.shared.networkingTasks.isReading(identifier: "NCSelect") {
+            return
+        }
+
+        let resultsReadFolder = await NCNetworking.shared.readFolderAsync(serverUrl: serverUrl, account: session.account) { task in
+            Task {
+                await NCNetworking.shared.networkingTasks.track(identifier: "NCSelect", task: task)
+            }
+        }
         if resultsReadFolder.error == .success {
             await reloadDataSource()
         }

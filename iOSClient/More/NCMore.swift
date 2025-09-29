@@ -60,12 +60,17 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     private var sections: [Section] = []
 
+    @MainActor
     private var session: NCSession.Session {
         NCSession.shared.getSession(controller: tabBarController)
     }
 
     private var controller: NCMainTabBarController? {
         self.tabBarController as? NCMainTabBarController
+    }
+
+    var mainNavigationController: NCMainNavigationController? {
+        self.navigationController as? NCMainNavigationController
     }
 
     // MARK: - View Life Cycle
@@ -111,12 +116,12 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     }
 
     func loadItems() {
-        guard let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)) else {
+        guard let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)),
+              let capabilities = NCNetworking.shared.capabilities[tableAccount.account] else {
             return
         }
         var item = NKExternalSite()
         var quota: String = ""
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: tableAccount.account)
 
         // Clear
         functionMenu.removeAll()
@@ -452,6 +457,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         } else if item.url == "openSettings" {
             let settingsView = NCSettingsView(model: NCSettingsModel(controller: self.controller))
             let settingsController = UIHostingController(rootView: settingsView)
+            settingsController.title = NSLocalizedString("_settings_", comment: "")
             navigationController?.pushViewController(settingsController, animated: true)
         } else {
             applicationHandle.didSelectItem(item, viewController: self)
