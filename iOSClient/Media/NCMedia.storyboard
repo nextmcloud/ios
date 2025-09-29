@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="EFX-fO-Oip">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="EFX-fO-Oip">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -100,6 +100,7 @@
                         <outlet property="activityIndicatorTrailing" destination="xM8-MC-pfg" id="htW-4Z-2Uz"/>
                         <outlet property="collectionView" destination="Zaz-Cl-qpZ" id="8oA-Gx-z7T"/>
                         <outlet property="gradientView" destination="7rV-YL-aM7" id="2QI-sZ-TeA"/>
+                        <outlet property="gradientViewHeightContsraint" destination="uAz-q2-42a" id="nsF-1t-3Mp"/>
                         <outlet property="menuButton" destination="0dF-cq-2wr" id="AoT-Kf-eTR"/>
                         <outlet property="selectOrCancelButton" destination="Enx-va-Bud" id="18I-LW-ruL"/>
                         <outlet property="selectOrCancelButtonTrailing" destination="exV-eQ-FmL" id="zrA-Xq-fWL"/>
