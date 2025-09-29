@@ -273,7 +273,8 @@ extension NCMenuAction {
             icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconColor]),
             order: order,
             action: { _ in
-                
+                guard let controller = controller, let delegate = UIApplication.shared.delegate as? AppDelegate else { return }
+                presentExistingAlbums(presentingController: controller, selectedPhotos: photoSelection, account: delegate.account)
                 completion?()
             }
         )
@@ -403,29 +404,29 @@ extension NCMenuAction {
         on viewController: UIViewController,
         onCreate: @escaping (String) -> Void,
         onCancel: @escaping () -> Void
-    ) {
-        let alert = UIAlertController(
-            title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
-            message: NSLocalizedString("_albums_list_new_album_popup_desc_", comment: ""),
-            preferredStyle: .alert
-        )
-
-        alert.addTextField { textField in
-            textField.placeholder = NSLocalizedString("_albums_list_new_album_popup_hint_", comment: "")
-        }
-
-        alert.addAction(UIAlertAction(title: NSLocalizedString("_albums_list_new_album_popup_negative_btn_", comment: ""), style: .default) { _ in
-            onCancel()
-        })
-
-        alert.addAction(UIAlertAction(title: NSLocalizedString("_albums_list_new_album_popup_positive_btn_", comment: ""), style: .default) { _ in
-            let text = alert.textFields?.first?.text ?? ""
-            onCreate(text)
-        })
-
-        alert.view.tintColor = NCBrandColor.shared.customer
-        viewController.present(alert, animated: true)
-    }
+   ) {
+       let alert = UIAlertController(
+        title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
+        message: NSLocalizedString("_albums_list_new_album_popup_desc_", comment: ""),
+        preferredStyle: .alert
+       )
+       
+       alert.addTextField { textField in
+           textField.placeholder = NSLocalizedString("_albums_list_new_album_popup_hint_", comment: "")
+       }
+       
+       alert.addAction(UIAlertAction(title: NSLocalizedString("_albums_list_new_album_popup_negative_btn_", comment: ""), style: .default) { _ in
+           onCancel()
+       })
+       
+       alert.addAction(UIAlertAction(title: NSLocalizedString("_albums_list_new_album_popup_positive_btn_", comment: ""), style: .default) { _ in
+           let text = alert.textFields?.first?.text ?? ""
+           onCreate(text)
+       })
+       
+       alert.view.tintColor = NCBrandColor.shared.customer
+       viewController.present(alert, animated: true)
+   }
     
     static private func createNewAlbum(for name: String, selectedPhotos: [String], controller: UIViewController) {
         
@@ -448,9 +449,35 @@ extension NCMenuAction {
         }
     }
     
+    static func presentExistingAlbums(presentingController: UIViewController,selectedPhotos: [String], account: String) {
+        let viewModel = AlbumsListViewModel(account: account)
+        let albumListView = AddToAlbumsListView(viewModel: viewModel, localAccount: account, onFinish: { selectedAlbum in
+            presentingController.dismiss(animated: true)
+            addPhotosToAlbum(album: selectedAlbum, selectedPhotos: selectedPhotos, account: account)
+        }, onDismiss: {
+            presentingController.dismiss(animated: true)
+        }, onCreateAlbum: {
+            presentingController.dismiss(animated: true)
+            presentInputAlbumNameAlert(on: presentingController) { albumName in
+                createNewAlbum(for: albumName, selectedPhotos: selectedPhotos, controller: presentingController)
+            } onCancel: {
+               
+            }
+        })
+        
+        let hostingController = UIHostingController(rootView: albumListView)
+        let navController = UINavigationController(rootViewController: hostingController)
+        
+        if let sheet = navController.sheetPresentationController {
+            sheet.detents = [.large()]
+            sheet.prefersGrabberVisible = true
+            sheet.preferredCornerRadius = 24
+        }
+        presentingController.present(hostingController, animated: true, completion: nil)
+    }
     
     static func addPhotosToAlbum(album: Album, selectedPhotos: [String], account: String) {
-                        
+        
         if selectedPhotos.isEmpty {
             AlbumsNavigator.shared.push(.albumDetails(album: album))
             return
@@ -469,7 +496,7 @@ extension NCMenuAction {
                 
                 switch result {
                 case .success:
-                   let tabbarController = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
+                    let tabbarController = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
                     tabbarController?.selectedIndex = 3
                     AlbumsNavigator.shared.push(.albumDetails(album: album))
                     AlbumsManager.shared.syncAlbums()
