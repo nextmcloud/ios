@@ -23,7 +23,7 @@ class NCAutoUpload: NSObject {
               tblAccount.autoUploadOnlyNew else {
             return 0
         }
-        let albumIds = NCKeychain().getAutoUploadAlbumIds(account: tblAccount.account)
+        let albumIds = NCPreferences().getAutoUploadAlbumIds(account: tblAccount.account)
         let assetCollections = PHAssetCollection.allAlbums.filter({albumIds.contains($0.localIdentifier)})
 
         let result = await getCameraRollAssets(controller: nil, assetCollections: assetCollections, tblAccount: tableAccount(value: tblAccount))
@@ -83,8 +83,8 @@ class NCAutoUpload: NSObject {
         let session = NCSession.shared.getSession(account: tblAccount.account)
         let autoUploadServerUrlBase = await self.database.getAccountAutoUploadServerUrlBaseAsync(account: tblAccount.account, urlBase: tblAccount.urlBase, userId: tblAccount.userId)
         var metadatas: [tableMetadata] = []
-        let formatCompatibility = NCKeychain().formatCompatibility
-        let keychainLivePhoto = NCKeychain().livePhoto
+        let formatCompatibility = NCPreferences().formatCompatibility
+        let keychainLivePhoto = NCPreferences().livePhoto
         let fileSystem = NCUtilityFileSystem()
         let skipFileNames = await self.database.fetchSkipFileNamesAsync(account: tblAccount.account,
                                                                         autoUploadServerUrlBase: autoUploadServerUrlBase)
@@ -107,12 +107,11 @@ class NCAutoUpload: NSObject {
             let onWWAN = (mediaType == .image && tblAccount.autoUploadWWAnPhoto) || (mediaType == .video && tblAccount.autoUploadWWAnVideo)
             let uploadSession = onWWAN ? self.networking.sessionUploadBackgroundWWan : self.networking.sessionUploadBackground
 
-            let metadata = await self.database.createMetadata(fileName: fileName,
-                                                              ocId: UUID().uuidString,
-                                                              serverUrl: serverUrl,
-                                                              session: session,
-                                                              sceneIdentifier: controller?.sceneIdentifier
-            )
+            let metadata = await self.database.createMetadataAsync(fileName: fileName,
+                                                                   ocId: UUID().uuidString,
+                                                                   serverUrl: serverUrl,
+                                                                   session: session,
+                                                                   sceneIdentifier: controller?.sceneIdentifier)
 
             if isLivePhoto {
                 metadata.livePhotoFile = (metadata.fileName as NSString).deletingPathExtension + ".mov"
@@ -159,7 +158,7 @@ class NCAutoUpload: NSObject {
         }
 
         if !metadatas.isEmpty {
-            let metadatasFolder = await self.database.createMetadatasFolder(assets: assets, useSubFolder: tblAccount.autoUploadCreateSubfolder, session: session)
+            let metadatasFolder = await self.database.createMetadatasFolderAsync(assets: assets, useSubFolder: tblAccount.autoUploadCreateSubfolder, session: session)
             await self.database.addMetadatasAsync(metadatasFolder + metadatas)
         }
 

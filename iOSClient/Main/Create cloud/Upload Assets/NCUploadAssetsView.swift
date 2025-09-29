@@ -122,7 +122,7 @@ struct NCUploadAssetsView: View {
                                                 Text(renameError)
                                             }
                                     }
-                                    .onChange(of: renameFileName) { newValue in
+                                    .onChange(of: renameFileName) { _, newValue in
                                         if let error = FileNameValidator.checkFileName(newValue, account: model.controller?.account, capabilities: model.capabilities) {
                                             renameError = error.errorDescription
                                         } else {
@@ -135,14 +135,16 @@ struct NCUploadAssetsView: View {
                     }
 
                     Section {
-                        ///
-                        /// Auto upload requires creating folders and subfolders which are difficult to manage offline
-                        /// 
+                        // Auto upload requires creating folders and subfolders which are difficult to manage offline
+                        // 
                         if NCNetworking.shared.isOnline {
                             Toggle(isOn: $model.useAutoUploadFolder, label: {
                                 Text(NSLocalizedString("_use_folder_auto_upload_", comment: ""))
                                     .font(.system(size: 15))
                             })
+                            .onChange(of: model.useAutoUploadFolder) {
+                                model.updateUseAutoUploadFolder()
+                            }
                             .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.getElement(account: metadata?.account))))
 
                             if model.useAutoUploadFolder {
@@ -150,6 +152,9 @@ struct NCUploadAssetsView: View {
                                     Text(NSLocalizedString("_autoupload_create_subfolder_", comment: ""))
                                         .font(.system(size: 15))
                                 })
+                                .onChange(of: model.useAutoUploadSubFolder) {
+                                    model.updateUseAutoUploadSubFolder()
+                                }
                                 .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.getElement(account: metadata?.account))))
                             }
                         }
