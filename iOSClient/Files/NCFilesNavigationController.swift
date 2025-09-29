@@ -21,14 +21,16 @@ class NCFilesNavigationController: NCMainNavigationController {
                 return
             }
 
-            self.setNavigationLeftItems()
+            Task {
+                await self.setNavigationLeftItems()
+            }
         }
     }
 
     // MARK: - Right
 
-    override func createRightMenu() -> UIMenu? {
-        guard let items = self.createRightMenuActions(),
+    override func createRightMenu() async -> UIMenu? {
+        guard let items = await self.createRightMenuActions(),
               let collectionViewCommon
         else {
             return nil
@@ -53,7 +55,7 @@ class NCFilesNavigationController: NCMainNavigationController {
 
     // MARK: - Left
 
-    override func setNavigationLeftItems() {
+    override func setNavigationLeftItems() async {
         guard let tableAccount = database.getTableAccount(predicate: NSPredicate(format: "account == %@", self.session.account))
         else {
             self.collectionViewCommon?.navigationItem.leftBarButtonItems = nil
@@ -70,9 +72,10 @@ class NCFilesNavigationController: NCMainNavigationController {
             }
         }
 
-        func createLeftMenu() -> UIMenu? {
+        @MainActor
+        func createLeftMenu() async -> UIMenu? {
             var childrenAccountSubmenu: [UIMenuElement] = []
-            let accounts = database.getAllAccountOrderAlias()
+            let accounts = await database.getAllAccountOrderAliasAsync()
             guard !accounts.isEmpty,
                   let controller = collectionViewCommon?.controller
             else {
@@ -91,9 +94,10 @@ class NCFilesNavigationController: NCMainNavigationController {
                     name = account.alias
                 }
 
-                let action = UIAction(title: name, image: image, state: account.account == controller.account ? .on : .off) { _ in
-                    if !account.active {
-                        NCAccount().changeAccount(account.account, userProfile: nil, controller: self.controller) { }
+                let attributes: UIMenuElement.Attributes = account.account == controller.account ? [.disabled] : []
+                let action = UIAction(title: name, image: image, attributes: attributes, state: account.account == controller.account ? .on : .off) { _ in
+                    Task { @MainActor in
+                        await NCAccount().changeAccount(account.account, userProfile: nil, controller: self.controller)
                         self.collectionViewCommon?.setEditMode(false)
                     }
                 }
@@ -152,7 +156,7 @@ class NCFilesNavigationController: NCMainNavigationController {
             accountButton.semanticContentAttribute = .forceLeftToRight
             accountButton.sizeToFit()
 
-            accountButton.menu = createLeftMenu()
+            accountButton.menu = await createLeftMenu()
             accountButton.showsMenuAsPrimaryAction = true
 
             accountButton.onMenuOpened = {
@@ -165,7 +169,7 @@ class NCFilesNavigationController: NCMainNavigationController {
 
             let accountButton = self.collectionViewCommon?.navigationItem.leftBarButtonItems?.first?.customView as? UIButton
             accountButton?.setImage(image, for: .normal)
-            accountButton?.menu = createLeftMenu()
+            accountButton?.menu = await createLeftMenu()
         }
     }
 }

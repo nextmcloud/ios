@@ -1,25 +1,6 @@
-//
-//  NCMedia.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 12/02/2019.
-//  Copyright © 2019 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2019 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import UIKit
@@ -30,15 +11,11 @@ class NCMedia: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var titleDate: UILabel!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var selectOrCancelButton: UIButton!
-    @IBOutlet weak var menuButton: UIButton!
-    @IBOutlet weak var assistantButton: UIButton!
+    @IBOutlet weak var titleConstraint: NSLayoutConstraint!
     @IBOutlet weak var gradientView: UIView!
-    @IBOutlet weak var stackView: UIStackView!
-
-    let semaphoreNotificationCenter = DispatchSemaphore(value: 1)
 
     let layout = NCMediaLayout()
+    let gradientLayer = CAGradientLayer()
     var layoutType = NCGlobal.shared.mediaLayoutRatio
     var documentPickerViewController: NCDocumentPickerViewController?
     var tabBarSelect: NCMediaSelectTabBar!
@@ -49,21 +26,15 @@ class NCMedia: UIViewController {
     let imageCache = NCImageCache.shared
     let networking = NCNetworking.shared
     var dataSource = NCMediaDataSource()
-    let refreshControl = UIRefreshControl()
-    var isTop: Bool = true
     var isEditMode = false
     var fileSelect: [String] = []
-    var ocIdVerified: [String] = []
-    var ocIdDeleted: [String] = []
     var searchMediaInProgress: Bool = false
     var attributesZoomIn: UIMenuElement.Attributes = []
     var attributesZoomOut: UIMenuElement.Attributes = []
-    let gradient: CAGradientLayer = CAGradientLayer()
     var showOnlyImages = false
     var showOnlyVideos = false
     var timeIntervalSearchNewMedia: TimeInterval = 2.0
     var timerSearchNewMedia: Timer?
-    let insetsTop: CGFloat = 65
     let livePhotoImage = NCUtility().loadImage(named: "livephoto", colors: [.white])
     let playImage = NCUtility().loadImage(named: "play.fill", colors: [.white])
     var photoImage = UIImage()
@@ -84,6 +55,7 @@ class NCMedia: UIViewController {
 
     let debouncer = NCDebouncer(delay: 1)
 
+    @MainActor
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: tabBarController)
     }
@@ -115,62 +87,62 @@ class NCMedia: UIViewController {
         collectionView.register(UINib(nibName: "NCSectionFooter", bundle: nil), forSupplementaryViewOfKind: mediaSectionFooter, withReuseIdentifier: "sectionFooter")
         collectionView.register(UINib(nibName: "NCMediaCell", bundle: nil), forCellWithReuseIdentifier: "mediaCell")
         collectionView.alwaysBounceVertical = true
-        collectionView.contentInset = UIEdgeInsets(top: insetsTop, left: 0, bottom: 50, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         collectionView.backgroundColor = .systemBackground
         collectionView.prefetchDataSource = self
         collectionView.dragInteractionEnabled = true
         collectionView.dragDelegate = self
         collectionView.dropDelegate = self
         collectionView.accessibilityIdentifier = "NCMedia"
+        // collectionView.contentInsetAdjustmentBehavior = .never
 
         layout.sectionInset = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: 2)
         collectionView.collectionViewLayout = layout
         layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layout: global.mediaLayoutRatio).layout
 
-        tabBarSelect = NCMediaSelectTabBar(controller: self.tabBarController, delegate: self)
+        // Gradient Layer
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+        gradientLayer.endPoint   = CGPoint(x: 0, y: 1)
 
-        titleDate.text = ""
+        gradientLayer.colors = [
+            UIColor.black.withAlphaComponent(0.55).cgColor,
+            UIColor.black.withAlphaComponent(0.40).cgColor,
+            UIColor.black.withAlphaComponent(0.25).cgColor,
+            UIColor.black.withAlphaComponent(0.15).cgColor,
+            UIColor.black.withAlphaComponent(0.08).cgColor,
+            UIColor.black.withAlphaComponent(0.04).cgColor,
+            UIColor.black.withAlphaComponent(0.015).cgColor,
+            UIColor.clear.cgColor
+        ]
 
-        menuButton.backgroundColor = .clear
-        menuButton.layer.cornerRadius = 15
-        menuButton.layer.masksToBounds = true
-        menuButton.showsMenuAsPrimaryAction = true
-        menuButton.configuration = UIButton.Configuration.plain()
-        menuButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
-        menuButton.addBlur(style: .systemUltraThinMaterial)
+        gradientLayer.locations = [0.0, 0.20, 0.40, 0.60, 0.75, 0.85, 0.95, 1.0]
+        gradientView.layer.insertSublayer(gradientLayer, at: 0)
 
-        assistantButton.backgroundColor = .clear
-        assistantButton.layer.cornerRadius = 15
-        assistantButton.layer.masksToBounds = true
-        assistantButton.configuration = UIButton.Configuration.plain()
-        assistantButton.setImage(UIImage(systemName: "sparkles"), for: .normal)
-        assistantButton.addBlur(style: .systemUltraThinMaterial)
-
-        selectOrCancelButton.backgroundColor = .clear
-        selectOrCancelButton.layer.cornerRadius = 15
-        selectOrCancelButton.layer.masksToBounds = true
-        selectOrCancelButton.setTitle( NSLocalizedString("_select_", comment: ""), for: .normal)
-        selectOrCancelButton.addBlur(style: .systemUltraThinMaterial)
-
-        gradient.startPoint = CGPoint(x: 0, y: 0.1)
-        gradient.endPoint = CGPoint(x: 0, y: 1)
-        gradient.colors = [UIColor.black.withAlphaComponent(UIAccessibility.isReduceTransparencyEnabled ? 0.8 : 0.4).cgColor, UIColor.clear.cgColor]
-        gradientView.layer.insertSublayer(gradient, at: 0)
-
-        collectionView.refreshControl = refreshControl
-        refreshControl.action(for: .valueChanged) { _ in
-            Task {
-                await self.loadDataSource()
-                await self.searchMediaUI(true)
+        // Title + Activity indicator
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            titleConstraint.constant = 0
+        } else {
+            if #available(iOS 26.0, *) {
+                titleConstraint.constant = -44
+            } else {
+                titleConstraint.constant = -34
             }
         }
+        titleDate.text = ""
+        titleDate?.textColor = .white
+        activityIndicator.color = .white
 
         pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture(_:)))
         collectionView.addGestureRecognizer(pinchGesture)
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterChangeUser), object: nil, queue: nil) { _ in
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterChangeUser), object: nil, queue: nil) { notification in
             Task { @MainActor in
-                self.layoutType = await self.database.getLayoutForViewAsync(account: self.session.account, key: self.global.layoutViewMedia, serverUrl: "").layout
+                guard let userInfo = notification.userInfo,
+                   let account = userInfo["account"] as? String else {
+                    return
+                }
+
+                self.layoutType = self.database.getLayoutForView(account: account, key: self.global.layoutViewMedia, serverUrl: "").layout
                 self.imageCache.removeAll()
                 await self.loadDataSource()
                 await self.searchMediaUI(true)
@@ -179,7 +151,7 @@ class NCMedia: UIViewController {
 
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterClearCache), object: nil, queue: nil) { _ in
             Task {
-                await self.dataSource.metadatas.removeAll()
+                await self.dataSource.clearMetadatas()
                 self.imageCache.removeAll()
                 await self.searchMediaUI(true)
             }
@@ -195,7 +167,17 @@ class NCMedia: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        navigationController?.setMediaAppreance()
+        if tabBarSelect == nil {
+            tabBarSelect = NCMediaSelectTabBar(controller: self.tabBarController, viewController: self, delegate: self)
+        }
+
+        Task {
+            await (self.navigationController as? NCMediaNavigationController)?.setNavigationRightItems()
+            if #unavailable(iOS 26.0) {
+                (self.navigationController as? NCMediaNavigationController)?.updateRightBarButtonsTint(to: .white)
+            }
+        }
+
         if dataSource.metadatas.isEmpty {
             Task {
                 await loadDataSource()
@@ -206,41 +188,30 @@ class NCMedia: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        networking.addDelegate(self)
+        Task {
+            await networking.transferDispatcher.addDelegate(self)
+        }
 
         NotificationCenter.default.addObserver(self, selector: #selector(enterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
 
         searchNewMedia()
-        createMenu()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
-        networking.removeDelegate(self)
-
-        NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
-
         Task {
+            await networking.transferDispatcher.removeDelegate(self)
             await networkRemoveAll()
         }
-    }
 
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        if self.traitCollection.userInterfaceStyle == .dark {
-            return .lightContent
-        } else if isTop {
-            return .darkContent
-        } else {
-            return .lightContent
-        }
+        NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
 
-        tabBarSelect?.setFrame()
-        gradient.frame = gradientView.bounds
+        gradientLayer.frame = gradientView.bounds
     }
 
     func searchNewMedia() {
@@ -259,11 +230,7 @@ class NCMedia: UIViewController {
         timerSearchNewMedia?.invalidate()
         timerSearchNewMedia = nil
 
-        networking.fileExistsQueue.cancelAll()
         networking.downloadThumbnailQueue.cancelAll()
-
-        ocIdVerified.removeAll()
-        ocIdDeleted.removeAll()
 
         let tasks = await networking.getAllDataTask()
         for task in tasks.filter({ $0.taskDescription == global.taskDescriptionRetrievesProperties }) {
@@ -299,13 +266,10 @@ class NCMedia: UIViewController {
 extension NCMedia: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if !dataSource.metadatas.isEmpty {
-            isTop = scrollView.contentOffset.y <= -(insetsTop + view.safeAreaInsets.top - 25)
-            setColor()
             setTitleDate()
             setNeedsStatusBarAppearanceUpdate()
-        } else {
-            setColor()
         }
+        setElements()
     }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
@@ -323,10 +287,7 @@ extension NCMedia: UIScrollViewDelegate {
         searchNewMedia()
     }
 
-    func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
-        let y = view.safeAreaInsets.top
-        scrollView.contentOffset.y = -(insetsTop + y)
-    }
+    func scrollViewDidScrollToTop(_ scrollView: UIScrollView) { }
 }
 
 // MARK: -
