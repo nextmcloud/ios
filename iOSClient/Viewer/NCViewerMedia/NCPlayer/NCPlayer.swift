@@ -133,7 +133,7 @@ class NCPlayer: NSObject {
 
             if metadata.isVideo {
                 if position == 0 {
-                    imageVideoContainer?.image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024)
+                    imageVideoContainer?.image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase)
                 } else {
                     imageVideoContainer?.image = nil
                 }
@@ -307,7 +307,7 @@ extension NCPlayer: VLCCustomDialogRendererProtocol {
 
         alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in
             self.playerToolBar?.removeFromSuperview()
-            self.viewerMediaPage?.viewUnload()
+            self.viewerMediaPage?.navigationController?.popViewController(animated: true)
         }))
 
         self.viewerMediaPage?.present(alert, animated: true)
