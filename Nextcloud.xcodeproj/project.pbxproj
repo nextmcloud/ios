@@ -886,6 +886,7 @@
 		F7C30DFE291BD0B80017149B /* NCNetworkingE2EEDelete.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C30DFC291BD0B80017149B /* NCNetworkingE2EEDelete.swift */; };
 		F7C30E00291BD2610017149B /* NCNetworkingE2EERename.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C30DFF291BD2610017149B /* NCNetworkingE2EERename.swift */; };
 		F7C30E01291BD2610017149B /* NCNetworkingE2EERename.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C30DFF291BD2610017149B /* NCNetworkingE2EERename.swift */; };
+		F7C4525E2E8569A70071378E /* AddToAlbumsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C4525D2E8569A70071378E /* AddToAlbumsListView.swift */; };
 		F7C687E92D22BD46004757BC /* NCManageDatabase+RecommendedFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C687E82D22BD46004757BC /* NCManageDatabase+RecommendedFiles.swift */; };
 		F7C687EC2D22BDE5004757BC /* NCManageDatabase+RecommendedFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C687E82D22BD46004757BC /* NCManageDatabase+RecommendedFiles.swift */; };
 		F7C687ED2D22BDE5004757BC /* NCManageDatabase+RecommendedFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C687E82D22BD46004757BC /* NCManageDatabase+RecommendedFiles.swift */; };
@@ -1820,6 +1821,7 @@
 		F7C30DF9291BCF790017149B /* NCNetworkingE2EECreateFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNetworkingE2EECreateFolder.swift; sourceTree = "<group>"; };
 		F7C30DFC291BD0B80017149B /* NCNetworkingE2EEDelete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNetworkingE2EEDelete.swift; sourceTree = "<group>"; };
 		F7C30DFF291BD2610017149B /* NCNetworkingE2EERename.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNetworkingE2EERename.swift; sourceTree = "<group>"; };
+		F7C4525D2E8569A70071378E /* AddToAlbumsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToAlbumsListView.swift; sourceTree = "<group>"; };
 		F7C687E82D22BD46004757BC /* NCManageDatabase+RecommendedFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCManageDatabase+RecommendedFiles.swift"; sourceTree = "<group>"; };
 		F7C7B488245EBA4100D93E60 /* NCViewerQuickLook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCViewerQuickLook.swift; sourceTree = "<group>"; };
 		F7C9555221F0C4CA0024296E /* NCActivity.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCActivity.storyboard; sourceTree = "<group>"; };
@@ -2437,6 +2439,7 @@
 				C010D98A2E324604007B86CD /* NoAlbumsEmptyView.swift */,
 				C0A0D4882E1BDABD00476BFF /* AlbumsListScreen.swift */,
 				C0A0D48C2E1CECF200476BFF /* AlbumsListViewModel.swift */,
+				F7C4525D2E8569A70071378E /* AddToAlbumsListView.swift */,
 			);
 			path = List;
 			sourceTree = "<group>";
@@ -4935,6 +4938,7 @@
 				F78A18B823CDE2B300F681F3 /* NCViewerRichWorkspace.swift in Sources */,
 				F768822E2C0DD1E7001CF441 /* NCSettingsBundleHelper.swift in Sources */,
 				F7A60F86292D215000FCE1F2 /* NCShareAccounts.swift in Sources */,
+				F7C4525E2E8569A70071378E /* AddToAlbumsListView.swift in Sources */,
 				F72408332B8A27C900F128E2 /* NCMedia+Command.swift in Sources */,
 				F755CB402B8CB13C00CE27E9 /* NCMediaLayout.swift in Sources */,
 				F73EF7B72B0224AB0087E6E9 /* NCManageDatabase+ExternalSites.swift in Sources */,

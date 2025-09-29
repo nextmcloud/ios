@@ -213,7 +213,7 @@ class AlbumDetailsViewModel: ObservableObject {
                 account: account,
                 sourcePath: metadata?.serveUrlFileName ?? photo,
                 albumName: album.name,
-                fileName: metadata?.fileName ?? photo,
+                fileName: metadata?.fileName ?? photo
             ) { [weak self] result in
                 
                 self?.isLoadingPopupVisible = false

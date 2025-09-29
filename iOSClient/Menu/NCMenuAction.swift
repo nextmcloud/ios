@@ -26,6 +26,7 @@ import Foundation
 import UIKit
 import NextcloudKit
 import SVGKit
+import SwiftUI
 
 class NCMenuAction {
     let accessibilityIdentifier: String?
@@ -264,6 +265,42 @@ extension NCMenuAction {
         )
     }
     
+    
+    /// Add selected files to existing album
+    static func addToAlbumAction(photoSelection: [String], selectedMetadatas: [tableMetadata], controller: NCMainTabBarController?, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
+        NCMenuAction(
+            title: NSLocalizedString("_add_to_album", comment: ""),
+            icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconColor]),
+            order: order,
+            action: { _ in
+                guard let controller = controller, let delegate = UIApplication.shared.delegate as? AppDelegate else { return }
+                presentExistingAlbums(presentingController: controller, selectedPhotos: photoSelection, account: delegate.account)
+                completion?()
+            }
+        )
+    }
+
+    
+    
+    /// Create new album for selected files
+    static func createNewAlbumAction(photoSelection: [String], selectedMetadatas: [tableMetadata], controller: NCMainTabBarController?, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
+        NCMenuAction(
+            title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
+            icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconColor]),
+            order: order,
+            action: { _ in
+                guard let controller = controller else { return }
+                presentInputAlbumNameAlert(on: controller) { albumName in
+                    createNewAlbum(for: albumName, selectedPhotos: photoSelection, controller: controller)
+                } onCancel: {
+                    completion?()
+                }
+                completion?()
+            }
+        )
+    }
+
+    
     /// Open "share view" (activity VC) to open files in another app
     static func openInAction(selectedMetadatas: [tableMetadata], controller: NCMainTabBarController?, order: Int = 0, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
@@ -361,5 +398,113 @@ extension NCMenuAction {
         formatter.perPageContentInsets.right = 72
         printController.printFormatter = formatter
         printController.present(animated: true)
+    }
+    
+   static func presentInputAlbumNameAlert(
+        on viewController: UIViewController,
+        onCreate: @escaping (String) -> Void,
+        onCancel: @escaping () -> Void
+   ) {
+       let alert = UIAlertController(
+        title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
+        message: NSLocalizedString("_albums_list_new_album_popup_desc_", comment: ""),
+        preferredStyle: .alert
+       )
+       
+       alert.addTextField { textField in
+           textField.placeholder = NSLocalizedString("_albums_list_new_album_popup_hint_", comment: "")
+       }
+       
+       alert.addAction(UIAlertAction(title: NSLocalizedString("_albums_list_new_album_popup_negative_btn_", comment: ""), style: .default) { _ in
+           onCancel()
+       })
+       
+       alert.addAction(UIAlertAction(title: NSLocalizedString("_albums_list_new_album_popup_positive_btn_", comment: ""), style: .default) { _ in
+           let text = alert.textFields?.first?.text ?? ""
+           onCreate(text)
+       })
+       
+       alert.view.tintColor = NCBrandColor.shared.customer
+       viewController.present(alert, animated: true)
+   }
+    
+    static private func createNewAlbum(for name: String, selectedPhotos: [String], controller: UIViewController) {
+        
+        guard  let delegate = UIApplication.shared.delegate as? AppDelegate else { return }
+        
+        controller.showLoader()
+        NextcloudKit.shared.createNewAlbum(for: delegate.account, albumName: name) { result in
+            controller.hideLoader()
+            switch result {
+            case .success(_):
+                AlbumsManager.shared.syncAlbums { resultAlbums in
+                    if let newAlbum = resultAlbums.first(where: { $0.name == name }) {
+                        addPhotosToAlbum(album: newAlbum, selectedPhotos: selectedPhotos, account: delegate.account)
+                    }
+                }
+                
+            case .failure(let error):
+                NCContentPresenter().showError(error: NKError(error: error))
+            }
+        }
+    }
+    
+    static func presentExistingAlbums(presentingController: UIViewController,selectedPhotos: [String], account: String) {
+        let viewModel = AlbumsListViewModel(account: account)
+        let albumListView = AddToAlbumsListView(viewModel: viewModel, localAccount: account, onFinish: { selectedAlbum in
+            presentingController.dismiss(animated: true)
+            addPhotosToAlbum(album: selectedAlbum, selectedPhotos: selectedPhotos, account: account)
+        }, onDismiss: {
+            presentingController.dismiss(animated: true)
+        }, onCreateAlbum: {
+            presentingController.dismiss(animated: true)
+            presentInputAlbumNameAlert(on: presentingController) { albumName in
+                createNewAlbum(for: albumName, selectedPhotos: selectedPhotos, controller: presentingController)
+            } onCancel: {
+               
+            }
+        })
+        
+        let hostingController = UIHostingController(rootView: albumListView)
+        let navController = UINavigationController(rootViewController: hostingController)
+        
+        if let sheet = navController.sheetPresentationController {
+            sheet.detents = [.large()]
+            sheet.prefersGrabberVisible = true
+            sheet.preferredCornerRadius = 24
+        }
+        presentingController.present(hostingController, animated: true, completion: nil)
+    }
+    
+    static func addPhotosToAlbum(album: Album, selectedPhotos: [String], account: String) {
+        
+        if selectedPhotos.isEmpty {
+            AlbumsNavigator.shared.push(.albumDetails(album: album))
+            return
+        }
+        
+        for photo in selectedPhotos {
+            
+            let metadata: tableMetadata? = NCManageDatabase.shared.getMetadataFromOcId(photo)
+            
+            NextcloudKit.shared.copyPhotoToAlbum(
+                account: account,
+                sourcePath: metadata?.serveUrlFileName ?? photo,
+                albumName: album.name,
+                fileName: metadata?.fileName ?? photo
+            ) { result in
+                
+                switch result {
+                case .success:
+                    let tabbarController = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
+                    tabbarController?.selectedIndex = 3
+                    AlbumsNavigator.shared.push(.albumDetails(album: album))
+                    AlbumsManager.shared.syncAlbums()
+                    
+                case .failure(let error):
+                    NCContentPresenter().showError(error: NKError(error: error))
+                }
+            }
+        }
     }
 }
