@@ -25,9 +25,9 @@ import UIKit
 import NextcloudKit
 
 class NCShares: NCCollectionViewCommon {
-    private var backgroundTask: Task<Void, Never>?
-
     @MainActor private var ocIdShares: Set<String> = []
+
+    private var backgroundTask: Task<Void, Never>?
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -62,7 +62,10 @@ class NCShares: NCCollectionViewCommon {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        backgroundTask?.cancel()
+        Task {
+            await NCNetworking.shared.networkingTasks.cancel(identifier: "NCShares")
+            backgroundTask?.cancel()
+        }
     }
 
     // MARK: - DataSource
@@ -72,20 +75,27 @@ class NCShares: NCCollectionViewCommon {
                                                          withLayout: layoutForView,
                                                          withAccount: session.account)
 
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView, account: session.account)
+        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas,
+                                                     layoutForView: layoutForView,
+                                                     account: session.account)
 
         await super.reloadDataSource()
 
         cachingAsync(metadatas: metadatas)
     }
 
-    override func getServerData(refresh: Bool = false) async {
-        await super.getServerData()
+    override func getServerData(forced: Bool = false) async {
+        // If is already in-flight, do nothing
+        if await NCNetworking.shared.networkingTasks.isReading(identifier: "NCShares") {
+            return
+        }
 
         showLoadingTitle()
 
         let resultsReadShares = await NextcloudKit.shared.readSharesAsync(parameters: NKShareParameter(), account: session.account) { task in
-            self.dataSourceTask = task
+            Task {
+                await NCNetworking.shared.networkingTasks.track(identifier: "NCShares", task: task)
+            }
             if self.dataSource.isEmpty() {
                 self.collectionView.reloadData()
             }
@@ -118,7 +128,7 @@ class NCShares: NCCollectionViewCommon {
                         self.ocIdShares.insert(ocId)
                     }
                 } else {
-                    let serverUrlFileName = share.serverUrl + "/" + share.fileName
+                    let serverUrlFileName = NCUtilityFileSystem().createServerUrl(serverUrl: share.serverUrl, fileName: share.fileName)
                     let resultReadShare = await NCNetworking.shared.readFileAsync(serverUrlFileName: serverUrlFileName, account: session.account)
                     if resultReadShare.error == .success, let metadata = resultReadShare.metadata {
                         let ocId = metadata.ocId
