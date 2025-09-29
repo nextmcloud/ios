@@ -23,23 +23,22 @@
 import UIKit
 import DropDown
 
-class NCShareCommon: NSObject {
+enum NCShareCommon {
+    static let shareTypeUser = 0
+    static let shareTypeGroup = 1
+    static let shareTypeLink = 3
+    static let shareTypeEmail = 4
+    static let shareTypeContact = 5
+    static let shareTypeFederated = 6
+    static let shareTypeTeam = 7
+    static let shareTypeGuest = 8
+    static let shareTypeFederatedGroup = 9
+    static let shareTypeRoom = 10
 
-    // swiftlint:disable identifier_name
-    let SHARE_TYPE_USER = 0
-    let SHARE_TYPE_GROUP = 1
-    let SHARE_TYPE_LINK = 3
-    let SHARE_TYPE_EMAIL = 4
-    let SHARE_TYPE_CONTACT = 5
-    let SHARE_TYPE_FEDERATED = 6
-    let SHARE_TYPE_CIRCLE = 7
-    let SHARE_TYPE_GUEST = 8
-    let SHARE_TYPE_FEDERATED_GROUP = 9
-    let SHARE_TYPE_ROOM = 10
-    // swiftlint:enable identifier_name
+    static let itemTypeFile = "file"
+    static let itemTypeFolder = "folder"
 
-    func createLinkAvatar(imageName: String, colorCircle: UIColor) -> UIImage? {
-
+    static func createLinkAvatar(imageName: String, colorCircle: UIColor) -> UIImage? {
         let size: CGFloat = 200
 
         let bottomImage = UIImage(named: "circle_fill")!.image(color: colorCircle, size: size / 2)
@@ -53,7 +52,7 @@ class NCShareCommon: NSObject {
         return image
     }
 
-    func copyLink(link: String, viewController: UIViewController, sender: Any) {
+    static func copyLink(link: String, viewController: UIViewController, sender: Any) {
         let objectsToShare = [link]
 
         let activityViewController = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
@@ -82,7 +81,7 @@ class NCShareCommon: NSObject {
             return UIImage(named: isDropDown ? "email" : "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_CONTACT:
             return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case self.SHARE_TYPE_FEDERATED:
+        case NCShareCommon.shareTypeFederated:
             return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
 //            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_REMOTE:
@@ -91,7 +90,7 @@ class NCShareCommon: NSObject {
             return UIImage(named: "shareTypeCircles")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_GUEST:
             return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case self.SHARE_TYPE_FEDERATED_GROUP:
+        case NCShareCommon.shareTypeFederatedGroup:
             return UIImage(named: "shareTypeGroup")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
 //            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_REMOTE_GROUP:

@@ -29,12 +29,12 @@ final class NCImageCache: @unchecked Sendable {
 
     init() {
         NotificationCenter.default.addObserver(forName: LRUCacheMemoryWarningNotification, object: nil, queue: nil) { _ in
-            self.cache.removeAllValues()
+            self.cache.removeAll()
             self.cache = LRUCache<String, UIImage>(countLimit: self.countLimit)
         }
 
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
-            self.cache.removeAllValues()
+            self.cache.removeAll()
             self.cache = LRUCache<String, UIImage>(countLimit: self.countLimit)
         }
 
@@ -52,31 +52,35 @@ final class NCImageCache: @unchecked Sendable {
                 if let tblAccount = await self.database.getTableAccountAsync(predicate: NSPredicate(format: "account == %@", controller.account)),
                    NCImageCache.shared.cache.count == 0 {
 
-                    self.isLoadingCache = true
-
                     // MEDIA
-                    let predicate = self.getMediaPredicateAsync(filterLivePhotoFile: true, session: session, mediaPath: tblAccount.mediaPath, showOnlyImages: false, showOnlyVideos: false)
-                    if let metadatas = await self.database.getMetadatasAsync(predicate: predicate, sortedByKeyPath: "datePhotosOriginal", limit: self.countLimit) {
-                        autoreleasepool {
-                            self.cache.removeAllValues()
+                    let predicate = self.getMediaPredicate(session: session, mediaPath: tblAccount.mediaPath, showOnlyImages: false, showOnlyVideos: false)
+                    guard let metadatas = await self.database.getMetadatasAsync(predicate: predicate, sortedByKeyPath: "datePhotosOriginal", limit: self.countLimit) else {
+                        return
+                    }
 
+                    self.isLoadingCache = true
+                    self.database.filterAndNormalizeLivePhotos(from: metadatas) { metadatas in
+                        autoreleasepool {
+                            self.cache.removeAll()
                             for metadata in metadatas {
                                 guard !isAppInBackground else {
-                                    self.cache.removeAllValues()
+                                    self.cache.removeAll()
                                     break
                                 }
-                                if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt256) {
+                                if let image = self.utility.getImage(ocId: metadata.ocId,
+                                                                     etag: metadata.etag,
+                                                                     ext: self.global.previewExt256,
+                                                                     userId: metadata.userId,
+                                                                     urlBase: metadata.urlBase) {
                                     self.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: self.global.previewExt256, cost: cost)
                                     cost += 1
                                 }
                             }
+                            self.isLoadingCache = false
                         }
                     }
-
-                    self.isLoadingCache = false
                 }
             }
-
 #endif
         }
     }
@@ -102,8 +106,16 @@ final class NCImageCache: @unchecked Sendable {
         cache.setValue(image, forKey: ocId + etag + ext, cost: cost)
     }
 
+    func addImageCache(image: UIImage, key: String) {
+        cache.setValue(image, forKey: key)
+    }
+
     func getImageCache(ocId: String, etag: String, ext: String) -> UIImage? {
         return cache.value(forKey: ocId + etag + ext)
+    }
+
+    func getImageCache(key: String) -> UIImage? {
+        return cache.value(forKey: key)
     }
 
     func removeImageCache(ocIdPlusEtag: String) {
@@ -113,83 +125,79 @@ final class NCImageCache: @unchecked Sendable {
     }
 
     func removeAll() {
-        cache.removeAllValues()
+        cache.removeAll()
     }
 
     // MARK: - MEDIA -
 
-    func getMediaPredicateAsync(filterLivePhotoFile: Bool, session: NCSession.Session, mediaPath: String, showOnlyImages: Bool, showOnlyVideos: Bool) -> NSPredicate {
+    func getMediaPredicate(session: NCSession.Session,
+                           mediaPath: String,
+                           showOnlyImages: Bool,
+                           showOnlyVideos: Bool) -> NSPredicate {
         var predicate = NSPredicate()
         let startServerUrl = self.utilityFileSystem.getHomeServer(session: session) + mediaPath
+        let showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND mediaSearch == true AND hasPreview == true AND (classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)') AND NOT (status IN %@)"
+        let showOnlyPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND mediaSearch == true AND hasPreview == true AND classFile == %@ AND NOT (status IN %@)"
 
-            var showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND hasPreview == true AND (classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)') AND NOT (status IN %@)"
-
-            var showOnlyPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND hasPreview == true AND classFile == %@ AND NOT (status IN %@)"
-
-            if filterLivePhotoFile {
-                showBothPredicateMediaString = showBothPredicateMediaString + " AND NOT (livePhotoFile != '' AND classFile == '\(NKTypeClassFile.video.rawValue)')"
-                showOnlyPredicateMediaString = showOnlyPredicateMediaString + " AND NOT (livePhotoFile != '' AND classFile == '\(NKTypeClassFile.video.rawValue)')"
-            }
-
-            if showOnlyImages {
-                predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKTypeClassFile.image.rawValue, global.metadataStatusHideInView)
-            } else if showOnlyVideos {
-                predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKTypeClassFile.video.rawValue, global.metadataStatusHideInView)
-            } else {
-                predicate = NSPredicate(format: showBothPredicateMediaString, session.account, startServerUrl, global.metadataStatusHideInView)
-            }
-
-            return predicate
+        if showOnlyImages {
+            predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKTypeClassFile.image.rawValue, global.metadataStatusHideInView)
+        } else if showOnlyVideos {
+            predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKTypeClassFile.video.rawValue, global.metadataStatusHideInView)
+        } else {
+            predicate = NSPredicate(format: showBothPredicateMediaString, session.account, startServerUrl, global.metadataStatusHideInView)
         }
+
+        return predicate
+    }
 
     // MARK: -
 
-    func getImageFile() -> UIImage {
-        return utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor2])
+    func getImageFile(colors: [UIColor] = [NCBrandColor.shared.iconImageColor2]) -> UIImage {
+        return utility.loadImage(named: "doc", colors: colors)
     }
 
-    func getImageShared() -> UIImage {
-        return utility.loadImage(named: "person.fill.badge.plus", colors: NCBrandColor.shared.iconImageMultiColors)
+    func getImageShared(colors: [UIColor] = NCBrandColor.shared.iconImageMultiColors) -> UIImage {
+        return utility.loadImage(named: "person.fill.badge.plus", colors: colors)
     }
 
-    func getImageCanShare() -> UIImage {
-        return utility.loadImage(named: "person.fill.badge.plus", colors: NCBrandColor.shared.iconImageMultiColors)
+    func getImageCanShare(colors: [UIColor] = NCBrandColor.shared.iconImageMultiColors) -> UIImage {
+        return utility.loadImage(named: "person.fill.badge.plus", colors: colors)
     }
 
-    func getImageShareByLink() -> UIImage {
-        return utility.loadImage(named: "link", colors: [NCBrandColor.shared.iconImageColor])
+    func getImageShareByLink(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return utility.loadImage(named: "link", colors: colors)
     }
 
-    func getImageFavorite() -> UIImage {
-        return utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
+    func getImageFavorite(colors: [UIColor] = [NCBrandColor.shared.yellowFavorite]) -> UIImage {
+        return utility.loadImage(named: "star.fill", colors: colors)
     }
 
-    func getImageOfflineFlag() -> UIImage {
-        return utility.loadImage(named: "arrow.down.circle.fill", colors: [.systemGreen])
+    func getImageOfflineFlag(colors: [UIColor] = [.systemGreen]) -> UIImage {
+        return utility.loadImage(named: "arrow.down.circle.fill", colors: colors)
     }
 
-    func getImageLocal() -> UIImage {
-        return utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen])
+    func getImageLocal(colors: [UIColor] = [.systemGreen]) -> UIImage {
+        return utility.loadImage(named: "checkmark.circle.fill", colors: colors)
     }
 
-    func getImageCheckedYes() -> UIImage {
-        return utility.loadImage(named: "checkmark.circle.fill", colors: [NCBrandColor.shared.iconImageColor2])
+    func getImageCheckedYes(colors: [UIColor] = [NCBrandColor.shared.iconImageColor2]) -> UIImage {
+        return utility.loadImage(named: "checkmark.circle.fill", colors: colors)
     }
 
-    func getImageCheckedNo() -> UIImage {
-        return utility.loadImage(named: "circle", colors: [NCBrandColor.shared.iconImageColor])
+    func getImageCheckedNo(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return utility.loadImage(named: "circle", colors: colors)
     }
 
-    func getImageButtonMore() -> UIImage {
-        return utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor])
+    func getImageButtonMore(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return utility.loadImage(named: "ellipsis", colors: colors)
     }
 
-    func getImageButtonStop() -> UIImage {
-        return utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor])
+    func getImageButtonStop(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return utility.loadImage(named: "stop.circle", colors: colors)
     }
 
-    func getImageButtonMoreLock() -> UIImage {
-        return utility.loadImage(named: "lock.fill", colors: [NCBrandColor.shared.iconImageColor])
+    func getImageButtonMoreLock(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
+        return utility.loadImage(named: "lock.fill", colors: colors)
     }
 
     func getFolder(account: String) -> UIImage {

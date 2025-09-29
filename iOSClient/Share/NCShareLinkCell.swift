@@ -64,11 +64,8 @@ class NCShareLinkCell: UITableViewCell {
         descriptionLabel.isHidden = !isInternalLink
         copyButton.isHidden = !isInternalLink && tableShare == nil
         statusStackView.isHidden = isInternalLink
-        if #available(iOS 18.0, *) {
-            // use NCShareLinkCell image
-        } else {
-            copyButton.setImage(UIImage(systemName: "doc.on.doc")?.withTintColor(.label, renderingMode: .alwaysOriginal), for: .normal)
-        }
+
+        copyButton.setImage(UIImage(systemName: "doc.on.doc")?.withTintColor(.label, renderingMode: .alwaysOriginal), for: .normal)
         copyButton.accessibilityLabel = NSLocalizedString("_copy_", comment: "")
         
         menuButton.accessibilityLabel = NSLocalizedString("_more_", comment: "")
@@ -105,15 +102,14 @@ class NCShareLinkCell: UITableViewCell {
         
         if let tableShare {
             statusStackView.isHidden = false
-            labelQuickStatus.text = NSLocalizedString("_custom_permissions_", comment: "")
-            
+            labelQuickStatus.text = NSLocalizedString("_custom_permissions_", comment: "")            
             if permissions.canEdit(tableShare.permissions, isDirectory: isDirectory) { // Can edit
                 labelQuickStatus.text = NSLocalizedString("_share_editing_", comment: "")
             }
-            if permissions.getPermissionValue(canRead: false, canCreate: true, canEdit: false, canDelete: false, canShare: false, isDirectory: isDirectory) == tableShare.permissions {
+            if NCSharePermissions.getPermissionValue(canRead: false, canCreate: true, canEdit: false, canDelete: false, canShare: false, isDirectory: isDirectory) == tableShare.permissions { // File request
                 labelQuickStatus.text = NSLocalizedString("_share_file_drop_", comment: "")
             }
-            if permissions.getPermissionValue(canCreate: false, canEdit: false, canDelete: false, canShare: true, isDirectory: isDirectory) == tableShare.permissions { // Read only
+            if NCSharePermissions.getPermissionValue(canCreate: false, canEdit: false, canDelete: false, canShare: true, isDirectory: isDirectory) == tableShare.permissions { // Read only
                 labelQuickStatus.text = NSLocalizedString("_share_read_only_", comment: "")
             }
             

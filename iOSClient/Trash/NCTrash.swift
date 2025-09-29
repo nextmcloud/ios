@@ -33,7 +33,6 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     var filePath = ""
     var titleCurrentFolder = NSLocalizedString("_trash_view_", comment: "")
     var blinkFileId: String?
-    var dataSourceTask: URLSessionTask?
     let utilityFileSystem = NCUtilityFileSystem()
     let database = NCManageDatabase.shared
     let utility = NCUtility()
@@ -48,6 +47,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     let refreshControl = UIRefreshControl()
     var filename: String?
 
+    @MainActor
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: tabBarController)
     }
@@ -60,11 +60,9 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        tabBarSelect = NCTrashSelectTabBar(controller: tabBarController, delegate: self)
+        navigationController?.setNavigationBarAppearance()
 
         view.backgroundColor = .systemBackground
-        self.navigationController?.navigationBar.prefersLargeTitles = true
 
         collectionView.register(UINib(nibName: "NCTrashListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
         collectionView.register(UINib(nibName: "NCTrashGridCell", bundle: nil), forCellWithReuseIdentifier: "gridCell")
@@ -91,6 +89,10 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        if tabBarSelect == nil {
+            tabBarSelect = NCTrashSelectTabBar(controller: tabBarController, viewController: self, delegate: self)
+        }
+
         navigationController?.setNavigationBarAppearance()
         navigationItem.title = titleCurrentFolder
 
@@ -103,9 +105,9 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         }
 
         isEditMode = false
-        (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
 
         Task {
+            await (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
             await self.reloadDataSource()
             await loadListingTrash()
         }
@@ -114,15 +116,12 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
+        Task {
+            await NCNetworking.shared.networkingTasks.cancel(identifier: "NCTrash")
+        }
+
         // Cancel Queue & Retrieves Properties
         NCNetworking.shared.downloadThumbnailTrashQueue.cancelAll()
-        dataSourceTask?.cancel()
-    }
-
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-
-        tabBarSelect?.setFrame()
     }
 
     // MARK: TAP EVENT
@@ -168,10 +167,11 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
     func reloadDataSource(withQueryDB: Bool = true) async {
         let results = await self.database.getTableTrashAsync(filePath: getFilePath(), account: session.account)
 
+        await (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
+
         await MainActor.run {
             self.datasource = results
             self.collectionView.reloadData()
-            (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
 
             guard let blinkFileId = self.blinkFileId else { return }
 

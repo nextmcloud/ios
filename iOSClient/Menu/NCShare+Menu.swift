@@ -31,7 +31,7 @@ extension NCShare {
 //    func toggleShareMenu(for share: tableShare, sendMail: Bool, folder: Bool, sender: Any) {
         var actions = [NCMenuAction]()
 
-        if share.shareType == NCShareCommon().SHARE_TYPE_LINK, canReshare {
+        if share.shareType == NCShareCommon.shareTypeLink, canReshare {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_share_add_sharelink_", comment: ""),
@@ -106,7 +106,7 @@ extension NCShare {
                 sender: sender,
                 action: { _ in
                     Task {
-                        if share.shareType != NCShareCommon().SHARE_TYPE_LINK, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+                        if share.shareType != NCShareCommon.shareTypeLink, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
                             if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
                                 let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
                                 return NCContentPresenter().showInfo(error: error)
@@ -127,7 +127,6 @@ extension NCShare {
 
     func toggleQuickPermissionsMenu(isDirectory: Bool, share: tableShare, sender: Any?) {
         var actions = [NCMenuAction]()
-        let permissions = NCPermissions()
 
         actions.append(contentsOf:
             [NCMenuAction(
@@ -139,7 +138,7 @@ extension NCShare {
                 on: false,
                 sender: sender,
                 action: { _ in
-                    let permissions = permissions.getPermissionValue(canCreate: false, canEdit: false, canDelete: false, canShare: false, isDirectory: isDirectory)
+                    let permissions = NCSharePermissions.getPermissionValue(canCreate: false, canEdit: false, canDelete: false, canShare: false, isDirectory: isDirectory)
                     self.updateSharePermissions(share: share, permissions: permissions)
                 }
             ),
@@ -153,7 +152,7 @@ extension NCShare {
                 on: false,
                 sender: sender,
                 action: { _ in
-                    let permissions = permissions.getPermissionValue(canCreate: true, canEdit: true, canDelete: true, canShare: true, isDirectory: isDirectory)
+                    let permissions = NCSharePermissions.getPermissionValue(canCreate: true, canEdit: true, canDelete: true, canShare: true, isDirectory: isDirectory)
                     self.updateSharePermissions(share: share, permissions: permissions)
                 }
             ),
@@ -213,12 +212,11 @@ extension NCShare {
     }
 
     fileprivate func hasUploadPermission(tableShare: tableShare) -> Bool {
-        let permissions = NCPermissions()
         let uploadPermissions = [
-            permissions.permissionMaxFileShare,
-            permissions.permissionMaxFolderShare,
-            permissions.permissionDefaultFileRemoteShareNoSupportShareOption,
-            permissions.permissionDefaultFolderRemoteShareNoSupportShareOption]
+            NCSharePermissions.permissionMaxFileShare,
+            NCSharePermissions.permissionMaxFolderShare,
+            NCSharePermissions.permissionDefaultFileRemoteShareNoSupportShareOption,
+            NCSharePermissions.permissionDefaultFolderRemoteShareNoSupportShareOption]
         return uploadPermissions.contains(tableShare.permissions)
     }
 

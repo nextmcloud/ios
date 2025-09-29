@@ -25,7 +25,9 @@ extension NCManageDatabase {
     ///   - errorCode: Optional error code to persist.
     /// - Returns: A detached copy of the updated `tableMetadata` object, or `nil` if not found.
     @discardableResult
-    func setMetadataSessionAsync(ocId: String,
+    func setMetadataSessionAsync(account: String? = nil,
+                                 ocId: String? = nil,
+                                 serverUrlFileName: String? = nil,
                                  newFileName: String? = nil,
                                  session: String? = nil,
                                  sessionTaskIdentifier: Int? = nil,
@@ -33,10 +35,20 @@ extension NCManageDatabase {
                                  selector: String? = nil,
                                  status: Int? = nil,
                                  etag: String? = nil,
-                                 errorCode: Int? = nil) async -> tableMetadata? {
+                                 errorCode: Int? = nil,
+                                 progress: Double? = nil) async -> tableMetadata? {
+        var query: NSPredicate = NSPredicate()
+        if let ocId {
+            query = NSPredicate(format: "ocId == %@", ocId)
+        } else if let account, let serverUrlFileName {
+            query = NSPredicate(format: "account == %@ AND serverUrlFileName == %@", account, serverUrlFileName)
+        } else {
+            return nil
+        }
+
         await performRealmWriteAsync { realm in
             guard let metadata = realm.objects(tableMetadata.self)
-                .filter("ocId == %@", ocId)
+                .filter(query)
                 .first else {
                     return
             }
@@ -85,14 +97,50 @@ extension NCManageDatabase {
                 metadata.errorCode = errorCode
             }
 
-            realm.add(metadata, update: .all)
+            if let progress {
+                metadata.progress = progress
+            }
         }
 
         return await performRealmReadAsync { realm in
             realm.objects(tableMetadata.self)
-                .filter("ocId == %@", ocId)
+                .filter(query)
                 .first?
                 .detachedCopy()
+        }
+    }
+
+    func setMetadataProgress(fileName: String,
+                             serverUrl: String,
+                             taskIdentifier: Int,
+                             progress: Double) async {
+        await performRealmWriteAsync { realm in
+            guard let metadata = realm.objects(tableMetadata.self)
+                .filter("fileName == %@ AND serverUrl == %@ and sessionTaskIdentifier == %d", fileName, serverUrl, taskIdentifier)
+                .first else {
+                return
+            }
+
+            if abs(metadata.progress - progress) > 0.001 {
+                metadata.progress = progress
+                print(progress)
+            }
+        }
+    }
+
+    func setMetadataProgress(ocId: String,
+                             progress: Double) async {
+        await performRealmWriteAsync { realm in
+            guard let metadata = realm.objects(tableMetadata.self)
+                .filter("ocId == %@", ocId)
+                .first else {
+                return
+            }
+
+            if abs(metadata.progress - progress) > 0.001 {
+                metadata.progress = progress
+                print(progress)
+            }
         }
     }
 
@@ -122,8 +170,7 @@ extension NCManageDatabase {
             metadata.sessionSelector = selector
             metadata.status = NCGlobal.shared.metadataStatusWaitDownload
             metadata.sessionDate = Date()
-
-            realm.add(metadata, update: .all)
+            metadata.progress = 0
         }
 
         return await performRealmReadAsync { realm in
@@ -153,6 +200,7 @@ extension NCManageDatabase {
             metadata.sessionSelector = ""
             metadata.sessionDate = nil
             metadata.status = NCGlobal.shared.metadataStatusNormal
+            metadata.progress = 0
             return metadata
         }
 
@@ -166,30 +214,6 @@ extension NCManageDatabase {
 
     // MARK: - Realm Read
 
-    func getMetadataAsync(from url: URL?, sessionTaskIdentifier: Int) async -> tableMetadata? {
-        guard let url,
-              var serverUrl = url.deletingLastPathComponent().absoluteString.removingPercentEncoding
-        else {
-            return nil
-        }
-        let fileName = url.lastPathComponent
-
-        if serverUrl.hasSuffix("/") {
-            serverUrl = String(serverUrl.dropLast())
-        }
-        let predicate = NSPredicate(format: "serverUrl == %@ AND fileName == %@ AND sessionTaskIdentifier == %d",
-                                    serverUrl,
-                                    fileName,
-                                    sessionTaskIdentifier)
-
-        return await performRealmReadAsync { realm in
-            realm.objects(tableMetadata.self)
-                .filter(predicate)
-                .first
-                .map { $0.detachedCopy() }
-        }
-    }
-
     func updateBadge() async {
         #if !EXTENSION
         let num = await performRealmReadAsync { realm in
@@ -198,7 +222,11 @@ extension NCManageDatabase {
                 .count
         } ?? 0
         DispatchQueue.main.async {
-            UIApplication.shared.applicationIconBadgeNumber = num
+            UNUserNotificationCenter.current().setBadgeCount(num) { error in
+                if let error {
+                    print("Failed to set badge count: \(error)")
+                }
+            }
         }
         #endif
     }

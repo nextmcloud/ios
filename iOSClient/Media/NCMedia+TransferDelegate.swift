@@ -17,30 +17,17 @@ extension NCMedia: NCTransferDelegate {
         }
     }
 
-    func transferCopy(metadata: tableMetadata, error: NKError) {
-        setEditMode(false)
-
+    func transferCopy(metadata: tableMetadata, destination: String, error: NKError) {
         Task {
             await self.loadDataSource()
             await self.searchMediaUI()
         }
     }
 
-    func transferMove(metadata: tableMetadata, error: NKError) {
-        setEditMode(false)
-
+    func transferMove(metadata: tableMetadata, destination: String, error: NKError) {
         Task {
             await self.loadDataSource()
             await self.searchMediaUI()
-        }
-    }
-
-    func transferFileExists(ocId: String, exists: Bool) {
-        Task {
-            if !exists {
-                await self.deleteImage(with: ocId)
-            }
-            ocIdVerified.append(ocId)
         }
     }
 }

@@ -7,12 +7,13 @@ import NextcloudKit
 
 let userAgent: String = {
     let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-    // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
-    return "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
+    // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)-Nextcloud"
+    let suffixBrand = NCBrandOptions.shared.brandUserAgent.isEmpty ? "" : "-\(NCBrandOptions.shared.brandUserAgent)"
+    return "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)\(suffixBrand)"
 }()
 
  /*
- Codname Matheria
+ Codename Matheria
 
  Matheria represents a pivotal step forward in the evolution of our software. This release delivers substantial architectural enhancements, increased performance, and a robust foundation for future innovations.
 
@@ -23,6 +24,7 @@ final class NCBrandOptions: @unchecked Sendable {
     static let shared = NCBrandOptions()
 
     var brand: String = "Nextcloud"
+    var brandUserAgent: String = ""
     var textCopyrightNextcloudiOS: String = "Nextcloud Matheria for iOS %@ © 2025"
     var textCopyrightNextcloudServer: String = "Nextcloud Server %@"
     var loginBaseUrl: String = "https://cloud.nextcloud.com"
@@ -55,7 +57,7 @@ final class NCBrandOptions: @unchecked Sendable {
     var disable_openin_file: Bool = false                                                       // Don't touch me !!
     var disable_crash_service: Bool = false
     var disable_log: Bool = false
-    var disable_mobileconfig: Bool = false
+    var disable_mobileconfig: Bool = false  
     var disable_show_more_nextcloud_apps_in_settings: Bool = false
     var doNotAskPasscodeAtStartup: Bool = false
     var disable_source_code_in_settings: Bool = false
@@ -72,6 +74,9 @@ final class NCBrandOptions: @unchecked Sendable {
     let httpMaximumConnectionsPerHost: Int = 8
     let httpMaximumConnectionsPerHostInDownload: Int = 8
     let httpMaximumConnectionsPerHostInUpload: Int = 8
+
+    // Max request/download/upload process
+    let numMaximumProcess: Int = 50
 
     // Number of failed attempts after reset app
     let resetAppPasscodeAttempts: Int = 10
@@ -110,14 +115,13 @@ final class NCBrandOptions: @unchecked Sendable {
                 enforce_passcode_lock = (str as NSString).boolValue
             }
         }
-        #if DEBUG
-        pushNotificationServerProxy = "https://c0004.customerpush.nextcloud.com"
-        #else
+
         if pushNotificationServerProxy.isEmpty,
             brand == "Nextcloud" {
             pushNotificationServerProxy = "https://push-notifications.nextcloud.com"
+            // DEBUG SERVER PUSH
+            // pushNotificationServerProxy = "https://c0004.customerpush.nextcloud.com"
         }
-        #endif
     }
 
     @objc func getUserAgent() -> String {
@@ -128,9 +132,8 @@ final class NCBrandOptions: @unchecked Sendable {
 final class NCBrandColor: @unchecked Sendable {
     static let shared = NCBrandColor()
 
-    /// This is rewrited from customet theme, default is Nextcloud color
-    ///
-    let customer: UIColor = UIColor(red: 0.0 / 255.0, green: 130.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)         // BLU NC : #0082c9
+    // This is rewrited from customet theme, default is Nextcloud color
+    let customer: UIColor = UIColor(red: 0.0 / 255.0, green: 130.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)         // Nextcloud : #0082C9
     var customerText: UIColor = .white
 
     // INTERNAL DEFINE COLORS
@@ -139,7 +142,6 @@ final class NCBrandColor: @unchecked Sendable {
     private var themingColorText = ThreadSafeDictionary<String, UIColor>()
 
     var userColors: [CGColor] = []
-    let nextcloud: UIColor = UIColor(red: 0.0 / 255.0, green: 130.0 / 255.0, blue: 201.0 / 255.0, alpha: 1.0)
     let yellowFavorite: UIColor = UIColor(red: 248.0 / 255.0, green: 205.0 / 255.0, blue: 70.0 / 255.0, alpha: 1.0)
     let iconImageColor: UIColor = .label
     let iconImageColor2: UIColor = .secondaryLabel
@@ -220,7 +222,7 @@ final class NCBrandColor: @unchecked Sendable {
     }
 
     @discardableResult
-    func settingThemingColor(account: String) -> Bool {
+    func settingThemingColor(account: String, capabilities: NKCapabilities.Capabilities) -> Bool {
         let darker: CGFloat = 30    // %
         let lighter: CGFloat = 30   // %
         var colorThemingColor: UIColor?
@@ -228,7 +230,6 @@ final class NCBrandColor: @unchecked Sendable {
         var colorThemingColorText: UIColor?
 
         if NCBrandOptions.shared.use_themingColor {
-            let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
             let themingColor = capabilities.themingColor
             let themingColorElement = capabilities.themingColorElement
             let themingColorText = capabilities.themingColorText
@@ -299,7 +300,6 @@ final class NCBrandColor: @unchecked Sendable {
         }
 
         if self.themingColor[account] != colorThemingColor || self.themingColorElement[account] != colorThemingColorElement || self.themingColorText[account] != colorThemingColorText {
-
             self.themingColor[account] = colorThemingColor
             self.themingColorElement[account] = colorThemingColorElement
             self.themingColorText[account] = colorThemingColorText

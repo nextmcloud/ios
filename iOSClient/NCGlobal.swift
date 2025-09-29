@@ -175,13 +175,15 @@ final class NCGlobal: Sendable {
     let errorDisableFilesApp: Int               = -99992
     let errorUnexpectedResponseFromDB: Int      = -99991
     let errorIncorrectFileName: Int             = -99990
+    let errorVersionMismatch: Int               = -99989
+    let errorNCSessionNotFound: Int             = -99988
 
     // E2EE
     let errorE2EENotEnabled: Int                = -98000
     let errorE2EEVersion: Int                   = -98001
     let errorE2EEKeyChecksums: Int              = -98002
     let errorE2EEKeyEncodeMetadata: Int         = -98003
-    let errorE2EEKeyDecodeMetadata: Int         = -98004
+    let errorE2EEKeyDecodeMetadataV12: Int      = -98004
     let errorE2EEKeyVerifySignature: Int        = -98005
     let errorE2EEKeyCiphertext: Int             = -98006
     let errorE2EEKeyFiledropCiphertext: Int     = -98007
@@ -194,6 +196,8 @@ final class NCGlobal: Sendable {
     let errorE2EEEncodedKey: Int                = -98014
     let errorE2EENoUserFound: Int               = -98015
     let errorE2EEUploadInProgress: Int          = -98016
+    let errorE2EEKeyDirectoryTop: Int           = -98017
+
 
     // Selector
     //
@@ -258,7 +262,7 @@ final class NCGlobal: Sendable {
     let notificationCenterReloadAvatar                          = "reloadAvatar"
     let notificationCenterClearCache                            = "clearCache"
     let notificationCenterCheckUserDelaultErrorDone             = "checkUserDelaultErrorDone"       // userInfo: account, controller
-    let notificationCenterUpdateNotification                    = "updateNotification"
+    let notificationCenterServerDidUpdate                       = "serverDidUpdate"                 // userInfo: account
 
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
@@ -379,17 +383,26 @@ final class NCGlobal: Sendable {
     //
     let groupAdmin                          = "admin"
 
-    // DATA TASK DESCRIPTION
+    // TASK DESCRIPTION
     //
     let taskDescriptionRetrievesProperties  = "retrievesProperties"
     let taskDescriptionSynchronization      = "synchronization"
 
     // LOG TAG
+    //
     let logTagTask                          = "BGT"
     let logTagLocation                      = "LOCATION"
     let logTagBgSync                        = "BGSYNC"
     let logTagE2EE                          = "E2EE"
-    let logTagPN                            = "PUSH NOTIF"
+    let logTagPN                            = "PUSH NOTIFICATION"
     let logTagSync                          = "SYNC"
     let logTagServiceProficer               = "SERVICE PROVIDER"
+    let logTagDatabase                      = "DB"
+    let logSpeedUpSyncMetadata              = "SYNC METADATA"
+    let logNetworkingTasks                  = "NETWORKING TASKS"
+
+    // USER DEFAULTS
+    //
+    let udMigrationMultiDomains             = "migrationMultiDomains"
+    let udLastVersion                       = "lastVersion"
 }
