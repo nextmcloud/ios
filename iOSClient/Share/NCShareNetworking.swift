@@ -113,6 +113,24 @@ class NCShareNetworking: NSObject {
             }
         }
     }
+    
+    func createShareLink(password: String?) {
+        NCActivityIndicator.shared.start(backgroundView: view)
+        let filenamePath = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
+        NextcloudKit.shared.createShareLink(path: filenamePath, account: metadata.account) { [self] account, share, data, error in
+            NCActivityIndicator.shared.stop()
+            if error == .success && share != nil {
+                let home = self.utilityFileSystem.getHomeServer(session: self.session)
+                NCManageDatabase.shared.addShare(account: self.metadata.account, home:home, shares: [share!])
+                if !metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__SHARE_FILE ,metadata: metadata)
+                }
+            } else if error != .success{
+                NCContentPresenter().showError(error: error)
+            }
+            self.delegate?.shareCompleted()
+        }
+    }
 
     func createShare(_ shareable: Shareable, downloadLimit: DownloadLimitViewModel) {
         NCActivityIndicator.shared.start(backgroundView: view)
@@ -159,6 +177,11 @@ class NCShareNetworking: NSObject {
                     await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
                         delegate.transferRequestData(serverUrl: self.metadata.serverUrl)
                     }
+                }
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateShare, userInfo: ["account": self.metadata.account, "serverUrl": self.metadata.serverUrl])
+
+                if !self.metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__SHARE_FILE ,metadata: self.metadata)
                 }
             } else {
                 NCContentPresenter().showError(error: error)

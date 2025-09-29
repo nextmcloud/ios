@@ -12,7 +12,7 @@ class NCActivity: UIViewController, NCSharePagingContent {
     @IBOutlet weak var tableView: UITableView!
 
     var commentView: NCActivityCommentView?
-    var textField: UIView? { commentView?.newCommentField }
+    var textField: UITextField? { commentView?.newCommentField }
     var height: CGFloat = 0
     var metadata: tableMetadata?
     var showComments: Bool = false
@@ -35,6 +35,7 @@ class NCActivity: UIViewController, NCSharePagingContent {
         }
     }
     var dateAutomaticFetch: Date?
+    private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
 
     @MainActor
     var session: NCSession.Session {
@@ -92,6 +93,8 @@ class NCActivity: UIViewController, NCSharePagingContent {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        appDelegate.activeViewController = self
+        navigationController?.setNavigationBarAppearance()
         fetchAll(isInitial: true)
     }
 
@@ -122,14 +125,10 @@ class NCActivity: UIViewController, NCSharePagingContent {
 
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 15)
-        label.textColor = NCBrandColor.shared.textColor2
+        label.textColor = UIColor.systemGray
         label.textAlignment = .center
         label.text = NSLocalizedString("_no_activity_footer_", comment: "")
         view.addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.topAnchor.constraint(equalTo: view.topAnchor, constant: 20).isActive = true
-        label.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        label.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
 
         return view
     }

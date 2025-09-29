@@ -271,27 +271,12 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
         let capabilities = NCNetworking.shared.capabilities[metadata.account] ?? NKCapabilities.Capabilities()
 
         NCActivityIndicator.shared.start(backgroundView: viewController.view)
-        NCNetworking.shared.readFile(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account) { _, metadata, file, error in
-            Task { @MainActor in
-                NCActivityIndicator.shared.stop()
+        NCNetworking.shared.readFile(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account, queue: .main) { _, metadata, error in
+            NCActivityIndicator.shared.stop()
 
-                if let metadata = metadata, let file = file, error == .success {
-                    // Remove all known download limits from shares related to the given file.
-                    // This avoids obsolete download limit objects to stay around.
-                    // Afterwards create new download limits, should any such be returned for the known shares.
-                    let shares = await NCManageDatabase.shared.getTableSharesAsync(account: metadata.account,
-                                                                                   serverUrl: metadata.serverUrl,
-                                                                                   fileName: metadata.fileName)
-                    for share in shares {
-                        await NCManageDatabase.shared.deleteDownloadLimitAsync(byAccount: metadata.account, shareToken: share.token)
-
-                        if let receivedDownloadLimit = file.downloadLimits.first(where: { $0.token == share.token }) {
-                            await NCManageDatabase.shared.createDownloadLimitAsync(account: metadata.account,
-                                                                                   count: receivedDownloadLimit.count,
-                                                                                   limit: receivedDownloadLimit.limit,
-                                                                                   token: receivedDownloadLimit.token)
-                        }
-                    }
+            if let metadata = metadata, error == .success {
+                let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
+                let shareViewController = shareNavigationController?.topViewController as? NCSharePaging
 
                     var pages: [NCBrandOptions.NCInfoPagingTab] = []
                     let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
@@ -309,21 +294,12 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
 
                     (pages, page) = NCApplicationHandle().filterPages(pages: pages, page: page, metadata: metadata)
 
-                    shareViewController?.pages = pages
-                    shareViewController?.metadata = metadata
-
-                    if pages.contains(page) {
-                        shareViewController?.page = page
-                    } else if let page = pages.first {
-                        shareViewController?.page = page
-                    } else {
-                        return
-                    }
-
-                    shareNavigationController?.modalPresentationStyle = .formSheet
-                    if let shareNavigationController = shareNavigationController {
-                        viewController.present(shareNavigationController, animated: true, completion: nil)
-                    }
+                shareViewController?.pages = pages
+//                let shareViewController = shareNavigationController?.topViewController as? NCShare
+                shareViewController?.metadata = metadata
+                shareNavigationController?.modalPresentationStyle = .formSheet
+                if let shareNavigationController = shareNavigationController {
+                    viewController.present(shareNavigationController, animated: true, completion: nil)
                 }
             }
         }
