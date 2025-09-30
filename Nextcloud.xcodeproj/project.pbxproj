@@ -90,7 +90,6 @@
 		B5D45E602DA50C8500773929 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E5C2DA50C8500773929 /* AdjustHelper.m */; };
 		B5D45E632DA50D6A00773929 /* CCManageAutoUpload.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E622DA50D6A00773929 /* CCManageAutoUpload.m */; };
 		B5D45E642DA50D6A00773929 /* CCAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E612DA50D6A00773929 /* CCAdvanced.m */; };
-		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
 		F310B1EF2BA862F1001C42F5 /* NCViewerMedia+VisionKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F310B1EE2BA862F1001C42F5 /* NCViewerMedia+VisionKit.swift */; };
@@ -2435,7 +2434,7 @@
 				AF2D7C7D2742559100ADF566 /* NCShareUserCell.swift */,
 				AF93471727E2361E002537EE /* NCShareHeader.xib */,
 				AF93471527E2361E002537EE /* NCShareHeader.swift */,
-				AFCE353827E5DE0400FEA6C2 /* Shareable.swift */,
+				AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */,
 				AA8E03D92D2ED83300E7E89C /* TransientShare.swift */,
 			);
 			path = Share;
@@ -4679,6 +4678,8 @@
 				F704B5E92430C0B800632F5F /* NCCreateFormUploadConflictCell.swift in Sources */,
 				F72D404923D2082500A97FD0 /* NCViewerDirectEditing.swift in Sources */,
 				AFCE353927E5DE0500FEA6C2 /* Shareable.swift in Sources */,
+				F72D404923D2082500A97FD0 /* NCViewerNextcloudText.swift in Sources */,
+				AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */,
 				F77BB746289984CA0090FC19 /* UIViewController+Extension.swift in Sources */,
 				F700510522DF6A89003A3356 /* NCShare.swift in Sources */,
 				F72D1007210B6882009C96B7 /* NCPushNotificationEncryption.m in Sources */,
@@ -4748,7 +4749,6 @@
 				F74B6D952A7E239A00F03C5F /* NCManageDatabase+Chunk.swift in Sources */,
 				B5D45E632DA50D6A00773929 /* CCManageAutoUpload.m in Sources */,
 				B5D45E642DA50D6A00773929 /* CCAdvanced.m in Sources */,
-				F7A8FD522C5E2557006C9CF8 /* NCAccount.swift in Sources */,
 				F310B1EF2BA862F1001C42F5 /* NCViewerMedia+VisionKit.swift in Sources */,
 				F702F2F725EE5CED008F8E80 /* NCLogin.swift in Sources */,
 				F75D90212D2BE26F003E740B /* NCRecommendationsCell.swift in Sources */,
