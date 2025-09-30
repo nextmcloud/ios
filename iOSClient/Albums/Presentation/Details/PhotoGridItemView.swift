@@ -18,6 +18,7 @@ struct PhotoGridItemView: View {
     @State private var thumbnail: UIImage?
     
     var body: some View {
+        
         Group {
             if let thumbnail = thumbnail {
                 Image(uiImage: thumbnail)
@@ -34,6 +35,10 @@ struct PhotoGridItemView: View {
         .clipped()
         .task {
             await loadThumbnail()
+        }
+        .overlay {
+            Image(systemName: "play.fill")
+                .renderingMode(.original)
         }
     }
     
