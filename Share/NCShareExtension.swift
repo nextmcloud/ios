@@ -10,7 +10,7 @@ enum NCShareExtensionError: Error {
     case cancel, fileUpload, noAccount, noFiles, versionMismatch
 }
 
-class NCShareExtension: UIViewController {
+class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
@@ -40,15 +40,31 @@ class NCShareExtension: UIViewController {
     let heightCommandView: CGFloat = 170
     var autoUploadFileName = ""
     var autoUploadDirectory = ""
+    let refreshControl = UIRefreshControl()
     var progress: CGFloat = 0
     var counterUploaded: Int = 0
+    var uploadErrors: [tableMetadata] = []
     var uploadMetadata: [tableMetadata] = []
+    var uploadStarted = false
     let hud = NCHud()
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
     let global = NCGlobal.shared
     var maintenanceMode: Bool = false
-
+    let database = NCManageDatabase.shared
+    var account: String = ""
+    var session: NCSession.Session {
+        if !account.isEmpty,
+           let tableAccount = self.database.getTableAccount(account: account) {
+            return NCSession.Session(account: tableAccount.account, urlBase: tableAccount.urlBase, user: tableAccount.user, userId: tableAccount.userId)
+        } else if let activeTableAccount = self.database.getActiveTableAccount() {
+            self.account = activeTableAccount.account
+            return NCSession.Session(account: activeTableAccount.account, urlBase: activeTableAccount.urlBase, user: activeTableAccount.user, userId: activeTableAccount.userId)
+        } else {
+            return NCSession.Session(account: "", urlBase: "", user: "", userId: "")
+        }
+    }
+    
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -91,6 +107,21 @@ class NCShareExtension: UIViewController {
 
         nkLog(start: "Start Share session " + versionNextcloudiOS)
 
+        // LOG
+        let levelLog = NCKeychain().logLevel
+//
+//        NextcloudKit.shared.nkCommonInstance.levelLog = levelLog
+//        NextcloudKit.shared.nkCommonInstance.pathLog = utilityFileSystem.directoryGroup
+//        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start Share session with level \(levelLog) " + versionNextcloudiOS)
+        NKLogFileManager.shared.logLevel = NKLogLevel(rawValue: levelLog) ?? .normal
+        NKLogFileManager.shared.logDirectory = URL(fileURLWithPath: utilityFileSystem.directoryGroup)
+        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Start Share session with level \(levelLog) " + versionNextcloudiOS)
+
+//        hud.indicatorView = JGProgressHUDRingIndicatorView()
+//        if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
+//            indicatorView.ringWidth = 1.5
+//            indicatorView.ringColor = NCBrandColor.shared.brandElement
+//        }
         NCBrandColor.shared.createUserColors()
 
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { _ in
@@ -136,6 +167,8 @@ class NCShareExtension: UIViewController {
             }
         }
 
+        accountRequestChangeAccount(account: account, controller: nil)
+
         guard let inputItems = extensionContext?.inputItems as? [NSExtensionItem] else {
             cancel(with: .noFiles)
             return
@@ -174,10 +207,26 @@ class NCShareExtension: UIViewController {
         }
     }
 
+    // MARK: - Empty
+
+    func emptyDataSetView(_ view: NCEmptyView) {
+
+        if self.dataSourceTask?.state == .running {
+            view.emptyImage.image = UIImage(named: "networkInProgress")?.image(color: .gray, size: UIScreen.main.bounds.width)
+            view.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
+            view.emptyDescription.text = ""
+        } else {
+            view.emptyImage.image = UIImage(named: "folder_nmcloud")
+            view.emptyTitle.text = NSLocalizedString("_files_no_folders_", comment: "")
+            view.emptyDescription.text = ""
+        }
+    }
+
     // MARK: -
 
     func cancel(with error: NCShareExtensionError) {
         // make sure no uploads are continued
+        uploadStarted = false
         extensionContext?.cancelRequest(withError: error)
     }
 
@@ -436,6 +485,16 @@ extension NCShareExtension {
         }
 
         return error
+    }
+}
+
+extension NCShareExtension: uploadE2EEDelegate {
+    func start() {
+        self.hud.progress(0)
+    }
+
+    func uploadE2EEProgress(_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) {
+        self.hud.progress(fractionCompleted)
     }
 }
 
