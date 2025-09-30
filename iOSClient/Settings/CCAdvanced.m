@@ -25,6 +25,7 @@
 #import "CCUtility.h"
 #import "NCBridgeSwift.h"
 #import "AdjustHelper.h"
+//#import <NextcloudKit/NextcloudKit.h>
 
 @interface CCAdvanced ()
 {
@@ -54,6 +55,7 @@
     else row.value = @"0";
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+    row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
     
     // Format Compatibility + Live Photo + Delete asset
@@ -68,6 +70,7 @@
     else row.value = @"0";
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+    row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
     
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"livePhoto" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_upload_mov_livephoto_", nil)];
@@ -76,6 +79,7 @@
     else row.value = @"0";
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+    row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
     [section addFormRow:row];
 
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"removePhotoCameraRoll" rowType:XLFormRowDescriptorTypeBooleanSwitch title:NSLocalizedString(@"_remove_photo_CameraRoll_", nil)];
@@ -101,6 +105,7 @@
         else row.value = @"0";
         [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
         [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+        row.cellConfig[@"switchControl.onTintColor"] = NCBrandColor.shared.brand;
         [section addFormRow:row];
     }
 
@@ -122,13 +127,17 @@
         [section addFormRow:row];
     }
     
+//#ifdef DEBUG
     // Section DIAGNOSTICS -------------------------------------------------
 
     section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_diagnostics_", nil)];
     [form addFormSection:section];
         
     if ([[NSFileManager defaultManager] fileExistsAtPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] && NCBrandOptions.shared.disable_log == false) {
-        
+    // with Nextcloudkit latest version will uncomment below line once updated to latest Nextcloudkit version
+//    if ([[NSFileManager defaultManager] fileExistsAtPath:NKLogFileManager.shared.logDirectory.path] && NCBrandOptions.shared.disable_log == false) {
+//    if (NCBrandOptions.shared.disable_log) {
+
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"log" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_view_log_", nil)];
         row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
         [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
@@ -138,9 +147,53 @@
         row.action.formBlock = ^(XLFormRowDescriptor * sender) {
                     
             [self deselectFormRow:sender];
-            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] isEditingEnabled:false metadata:nil];
+            
+//            NSURL *logFilePath = [self getLogFilePath];
+//            if (logFilePath) {
+//                // Use the log file path (e.g., to write logs)
+//                NSLog(@"Log file path: %@", logFilePath.path);
+//                NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:logFilePath fileNameSource:@"" isEditingEnabled:false metadata:nil];
+//                [self presentViewController:viewerQuickLook animated:YES completion:nil];
+//            } else {
+//                // Handle error (logs folder could not be created)
+//                NSLog(@"Failed to get log file path.");
+//            }
+
+            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] fileNameSource:@"" isEditingEnabled:false metadata:nil];
+            // with Nextcloudkit latest version will uncomment below line once updated to latest Nextcloudkit version
+//            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:NKLogFileManager.shared.logDirectory.path] fileNameSource:NKLogFileManager.shared.logFileName isEditingEnabled:false metadata:nil];
+//            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:@""] fileNameSource:@"" isEditingEnabled:false metadata:nil];
             [self presentViewController:viewerQuickLook animated:YES completion:nil];
         };
+        [section addFormRow:row];
+        
+        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"logLevel" rowType:XLFormRowDescriptorTypeSelectorPush title:NSLocalizedString(@"_set_log_level_", nil)];
+        NSInteger logLevel = [[NCKeychain alloc] init].logLevel;
+        row.value = @(logLevel);
+        switch ([[NCKeychain alloc] init].logLevel) {
+            case 0:
+                row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:NSLocalizedString(@"_disabled_", nil)];
+                break;
+            case 1:
+                row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:NSLocalizedString(@"_standard_", nil)];
+                break;
+            case 2:
+                row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:NSLocalizedString(@"_maximum_", nil)];
+                break;
+            default:
+                row.value = [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:NSLocalizedString(@"_standard_", nil)];
+                break;
+        }
+        
+        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+        [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+        row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+        row.cellConfigForSelector[@"tintColor"] = NCBrandColor.shared.customer;
+        row.selectorTitle = NSLocalizedString(@"_set_log_level_", nil);
+        row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:NSLocalizedString(@"_disabled_", nil)],
+                                [XLFormOptionsObject formOptionsObjectWithValue:@(1) displayText:NSLocalizedString(@"_standard_", nil)],
+                                [XLFormOptionsObject formOptionsObjectWithValue:@(2) displayText:NSLocalizedString(@"_maximum_", nil)],
+                                ];
         [section addFormRow:row];
         
         row = [XLFormRowDescriptor formRowDescriptorWithTag:@"clearlog" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_clear_log_", nil)];
@@ -154,6 +207,9 @@
             [self deselectFormRow:sender];
 
             [[[NextcloudKit shared] nkCommonInstance] clearFileLog];
+            // with Nextcloudkit latest version will uncomment below line once updated to latest Nextcloudkit version
+//            [[NKLogFileManager shared] clearLogFiles];
+//            [self createLogFiles];
             
             NSInteger logLevel = [[NCKeychain alloc] init].logLevel;
             BOOL isSimulatorOrTestFlight = [[[NCUtility alloc] init] isSimulatorOrTestFlight];
@@ -163,22 +219,19 @@
             } else {
                 [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@", (unsigned long)logLevel, versionNextcloudiOS]];
             }
+            // with Nextcloudkit latest version will uncomment below line once updated to latest Nextcloudkit version
+//            if (isSimulatorOrTestFlight) {
+//                [[NKLogFileManager shared] writeLogWithInfo:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@ (Simulator / TestFlight)", (unsigned long)logLevel, versionNextcloudiOS]];
+//            } else {
+//                [[NKLogFileManager shared] writeLogWithInfo:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@", (unsigned long)logLevel, versionNextcloudiOS]];
+//            }
         };
         [section addFormRow:row];
         
-        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"logLevel" rowType:XLFormRowDescriptorTypeSlider title:NSLocalizedString(@"_level_log_", nil)];
-        row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
-        [row.cellConfig setObject:@(NSTextAlignmentCenter) forKey:@"textLabel.textAlignment"];
-        [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
-        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
-        NSInteger logLevel = [[NCKeychain alloc] init].logLevel;
-        row.value = @(logLevel);
-        [row.cellConfigAtConfigure setObject:@(2) forKey:@"slider.maximumValue"];
-        [row.cellConfigAtConfigure setObject:@(0) forKey:@"slider.minimumValue"];
-        [row.cellConfigAtConfigure setObject:@(2) forKey:@"steps"];
-        [section addFormRow:row];
     }
-    
+   
+#ifdef DEBUG
+
     row = [XLFormRowDescriptor formRowDescriptorWithTag:@"capabilities" rowType:XLFormRowDescriptorTypeButton title:NSLocalizedString(@"_capabilities_", nil)];
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
@@ -193,6 +246,7 @@
         [self.navigationController pushViewController:vc animated:YES];
     };
     [section addFormRow:row];
+#endif
     
     // Section : Delete files / Clear cache --------------------------------------------------------------
 
@@ -232,6 +286,7 @@
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+    row.cellConfigForSelector[@"tintColor"] = NCBrandColor.shared.customer;
     row.selectorTitle = NSLocalizedString(@"_delete_old_files_", nil);
     row.selectorOptions = @[[XLFormOptionsObject formOptionsObjectWithValue:@(0) displayText:NSLocalizedString(@"_never_", nil)],
                             [XLFormOptionsObject formOptionsObjectWithValue:@(365) displayText:NSLocalizedString(@"_1_year_", nil)],
@@ -281,6 +336,7 @@
     self.title = NSLocalizedString(@"_advanced_", nil);
     appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
     self.view.backgroundColor = UIColor.systemGroupedBackgroundColor;
+    
     adjust = [[AdjustHelper alloc] init];
     self.tableView.backgroundColor = UIColor.systemGroupedBackgroundColor;
     
@@ -353,6 +409,72 @@
     }
 }
 
+#pragma mark - Log files
+
+- (NSURL *)getLogFilePath {
+    // Define the log file name
+    NSString *logFileName = @"log.txt";
+
+    // Get the documents directory URL
+    NSArray<NSURL *> *documentURLs = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask];
+    NSURL *documentsDirectory = [documentURLs firstObject];
+
+    // Define the logs folder URL
+    NSURL *logsFolder = [documentsDirectory URLByAppendingPathComponent:@"Logs" isDirectory:YES];
+
+    // Check if the "Logs" folder exists
+    if (![[NSFileManager defaultManager] fileExistsAtPath:logsFolder.path]) {
+        NSError *error = nil;
+        // Create the "Logs" folder if it doesn't exist
+        BOOL success = [[NSFileManager defaultManager] createDirectoryAtURL:logsFolder withIntermediateDirectories:YES attributes:nil error:&error];
+        if (!success) {
+            NSLog(@"Failed to create Logs folder: %@", error.localizedDescription);
+            return nil;  // Return nil in case of error
+        }
+    }
+
+    // Create the full log file path
+    NSURL *logPath = [logsFolder URLByAppendingPathComponent:logFileName];
+
+    // Return the log file path
+    return logPath;
+}
+
+// Method to create log files
+- (void)createLogFiles {
+    
+    // Property to control whether to copy log to the Documents directory
+   BOOL copyLogToDocumentDirectory;
+
+    copyLogToDocumentDirectory = (!NCBrandOptions.shared.disable_log) ? YES : NO;
+   
+    // Define log file paths
+    NSString *filenamePathLog = @"/log.txt";  // Set your desired path for the log file
+    NSString *filenameLog = @"log.txt";  // This will be the filename to copy
+
+    // Create the log file at the given path
+    BOOL success = [[NSFileManager defaultManager] createFileAtPath:filenamePathLog contents:nil attributes:nil];
+    if (!success) {
+        NSLog(@"Failed to create file at path: %@", filenamePathLog);
+    }
+
+    // If we want to copy the log file to the Documents directory
+    if (copyLogToDocumentDirectory) {  // Check the property value
+        NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentDirectory = [documentPaths firstObject];
+        
+        // Create the path to copy the log file in Documents directory
+        NSString *filenameCopyToDocumentDirectory = [documentDirectory stringByAppendingPathComponent:filenameLog];
+        
+        // Create the log file at the new path in the Documents directory
+        success = [[NSFileManager defaultManager] createFileAtPath:filenameCopyToDocumentDirectory contents:nil attributes:nil];
+        if (!success) {
+            NSLog(@"Failed to create file at Documents path: %@", filenameCopyToDocumentDirectory);
+        }
+    }
+}
+
+
 #pragma mark - Clear Cache
 
 - (void)clearCache:(NSString *)account
@@ -366,7 +488,8 @@
         [[NSURLCache sharedURLCache] setMemoryCapacity:0];
         [[NSURLCache sharedURLCache] setDiskCapacity:0];
 
-        [[NCManageDatabase shared] clearDatabaseWithAccount:account removeAccount:false];
+        [[NCManageDatabase shared] clearDatabaseWithAccount:account removeAccount:false removeAutoUpload:false];
+//        [[NCManageDatabase shared] clearDatabaseWithAccount:account removeAccount:false];
 
         [ufs removeGroupDirectoryProviderStorage];
         [ufs removeGroupLibraryDirectory];
@@ -376,7 +499,8 @@
 
         [ufs createDirectoryStandard];
 
-        [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
+        [[NCAutoUpload shared] alignPhotoLibraryWithController:self account:appDelegate.account];
+//        [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
 
         [[NCImageCache shared] createMediaCacheWithAccount:appDelegate.account withCacheSize:true];
 

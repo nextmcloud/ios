@@ -53,4 +53,3 @@ class TealiumHelper: NSObject {
         TealiumHelper.shared.tealium?.track(tealEvent)
     }
 }
-
