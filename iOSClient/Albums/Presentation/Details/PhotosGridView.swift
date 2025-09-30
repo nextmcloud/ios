@@ -34,7 +34,7 @@ struct PhotosGridView: View {
                     Button {
                         openPhotoViewer(for: metadata)
                     } label: {
-                        PhotoGridItemView(photo: photo)
+                        PhotoGridItemView(photo: photo, isVideo: (metadata?.isVideo ?? false))
                             .aspectRatio(1, contentMode: .fill)
                             .clipped()
                     }
