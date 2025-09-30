@@ -13,6 +13,7 @@ import Queuer
 import EasyTipView
 import SwiftUI
 import RealmSwift
+import MoEngageInApps
 
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var backgroundSessionCompletionHandler: (() -> Void)?
@@ -25,6 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         return ProcessInfo.processInfo.arguments.contains("UI_TESTING")
     }
     var notificationSettings: UNNotificationSettings?
+    var pushKitToken: String?
 
     var loginFlowV2Token = ""
     var loginFlowV2Endpoint = ""
@@ -46,13 +48,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     @objc var userId: String = ""
     @objc var password: String = ""
     var timerErrorNetworking: Timer?
-    
+    var tipView: EasyTipView?
+
+    var pushSubscriptionTask: Task<Void, Never>?
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if isUiTestingEnabled {
             Task {
                 await NCAccount().deleteAllAccounts()
             }
         }
+        
+        UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
+        UIToolbar.appearance().tintColor = NCBrandColor.shared.customer
+        
         let utilityFileSystem = NCUtilityFileSystem()
         let utility = NCUtility()
 
@@ -96,6 +105,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         nkLog(start: "Start session with level \(NCPreferences().log) " + versionNextcloudiOS)
 
+//        if NCBrandOptions.shared.disable_log {
+//            utilityFileSystem.removeFile(atPath: NextcloudKit.shared.nkCommonInstance.filenamePathLog)
+//            utilityFileSystem.removeFile(atPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first! + "/" + NextcloudKit.shared.nkCommonInstance.filenameLog)
+//        } else {
+//            NextcloudKit.shared.setupLog(pathLog: utilityFileSystem.directoryGroup,
+//                                         levelLog: NCKeychain().logLevel,
+//                                         copyLogToDocumentDirectory: true)
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start session with level \(NCKeychain().logLevel) " + versionNextcloudiOS)
+//        }
+        
         // Push Notification & display notification
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             self.notificationSettings = settings
@@ -137,7 +156,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         _ = NCNetworking.shared
         _ = NCDownloadAction.shared
         _ = NCNetworkingProcess.shared
-
+        _ = NCTransferProgress.shared
+        _ = NCActionCenter.shared
+        
+        NCTransferProgress.shared.setup()
+        NCActionCenter.shared.setup()
+        
 //        if account.isEmpty {
 //            if NCBrandOptions.shared.disable_intro {
 //                openLogin(viewController: nil, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
@@ -187,6 +211,247 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
+
+    // MARK: - Background Task
+
+    /*
+    @discussion Schedule a refresh task request to ask that the system launch your app briefly so that you can download data and keep your app's contents up-to-date. The system will fulfill this request intelligently based on system conditions and app usage.
+     */
+    func scheduleAppRefresh() {
+        let request = BGAppRefreshTaskRequest(identifier: global.refreshTask)
+
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 60) // Refresh after 60 seconds.
+
+        do {
+            try BGTaskScheduler.shared.submit(request)
+        } catch {
+            nkLog(tag: self.global.logTagTask, emoji: .error, message: "Refresh task failed to submit request: \(error)")
+        }
+    }
+
+    /*
+     @discussion Schedule a processing task request to ask that the system launch your app when conditions are favorable for battery life to handle deferrable, longer-running processing, such as syncing, database maintenance, or similar tasks. The system will attempt to fulfill this request to the best of its ability within the next two days as long as the user has used your app within the past week.
+     */
+    func scheduleAppProcessing() {
+        let request = BGProcessingTaskRequest(identifier: global.processingTask)
+
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 5 * 60) // Refresh after 5 minutes.
+        request.requiresNetworkConnectivity = false
+        request.requiresExternalPower = false
+
+        do {
+            try BGTaskScheduler.shared.submit(request)
+        } catch {
+            nkLog(tag: self.global.logTagTask, emoji: .error, message: "Processing task failed to submit request: \(error)")
+        }
+    }
+
+    func handleAppRefresh(_ task: BGAppRefreshTask) {
+        nkLog(tag: self.global.logTagTask, emoji: .start, message: "Start refresh task")
+        guard NCManageDatabase.shared.openRealmBackground() else {
+            nkLog(tag: self.global.logTagTask, emoji: .error, message: "Failed to open Realm in background")
+            task.setTaskCompleted(success: false)
+            return
+        }
+
+        // Schedule next refresh
+        scheduleAppRefresh()
+
+        Task {
+            defer {
+                task.setTaskCompleted(success: true)
+            }
+
+            await backgroundSync(task: task)
+        }
+    }
+
+    func handleProcessingTask(_ task: BGProcessingTask) {
+        nkLog(tag: self.global.logTagTask, emoji: .start, message: "Start processing task")
+        guard NCManageDatabase.shared.openRealmBackground() else {
+            nkLog(tag: self.global.logTagTask, emoji: .error, message: "Failed to open Realm in background")
+            task.setTaskCompleted(success: false)
+            return
+        }
+        var expired = false
+        task.expirationHandler = {
+            expired = true
+        }
+
+        // Schedule next processing task
+        scheduleAppProcessing()
+
+       Task {
+           defer {
+               task.setTaskCompleted(success: true)
+           }
+
+           // If possible, cleaning every week
+           if NCPreferences().cleaningWeek() {
+               // BGTask expiration flag
+               nkLog(tag: self.global.logTagBgSync, emoji: .start, message: "Start cleaning week")
+               let tblAccounts = await NCManageDatabase.shared.getAllTableAccountAsync()
+               for tblAccount in tblAccounts {
+                   await NCManageDatabase.shared.cleanTablesOcIds(account: tblAccount.account, userId: tblAccount.userId, urlBase: tblAccount.urlBase)
+                   guard !expired else { return }
+               }
+               await NCUtilityFileSystem().cleanUpAsync()
+
+               NCPreferences().setDoneCleaningWeek()
+               nkLog(tag: self.global.logTagBgSync, emoji: .stop, message: "Stop cleaning week")
+           } else {
+               await backgroundSync(task: task)
+           }
+       }
+    }
+
+    func backgroundSync(task: BGTask? = nil) async {
+        defer {
+            // Update badge safely at the end of the background sync
+            Task { @MainActor in
+                do {
+                    let count = await NCManageDatabase.shared.getMetadatasInWaitingCountAsync()
+                    try await UNUserNotificationCenter.current().setBadgeCount(count)
+                } catch { }
+            }
+        }
+
+        // BGTask expiration flag
+        var expired = false
+        task?.expirationHandler = {
+            expired = true
+        }
+
+        // Discover new items for Auto Upload
+        let numAutoUpload = await NCAutoUpload.shared.initAutoUpload()
+        nkLog(tag: self.global.logTagBgSync, emoji: .start, message: "Auto upload found \(numAutoUpload) new items")
+        guard !expired else { return }
+
+        // Fetch METADATAS
+        let metadatas = await NCManageDatabase.shared.getMetadataProcess()
+        guard !metadatas.isEmpty, !expired else {
+            return
+        }
+
+        // Create all pending Auto Upload folders (fail-fast)
+        let pendingCreateFolders = metadatas.lazy.filter {
+            $0.status == self.global.metadataStatusWaitCreateFolder &&
+            $0.sessionSelector == self.global.selectorUploadAutoUpload
+        }
+
+        for metadata in pendingCreateFolders {
+            guard !expired else { return }
+
+            let err = await NCNetworking.shared.createFolderForAutoUpload(
+                serverUrlFileName: metadata.serverUrlFileName,
+                account: metadata.account
+            )
+            // Fail-fast: abort the whole sync on first failure
+            if err != .success {
+                nkLog(tag: self.global.logTagBgSync, emoji: .error, message: "Create folder '\(metadata.serverUrlFileName)' failed: \(err.errorCode) – aborting sync")
+                return
+            }
+        }
+
+        // Capacity computation
+        let downloading = metadatas.lazy.filter { $0.status == self.global.metadataStatusDownloading }.count
+        let uploading = metadatas.lazy.filter { $0.status == self.global.metadataStatusUploading }.count
+        let availableProcess = max(0, NCBrandOptions.shared.numMaximumProcess - (downloading + uploading))
+
+        // Start Auto Uploads
+        let metadatasToUpload = Array(
+            metadatas.lazy.filter {
+                $0.status == self.global.metadataStatusWaitUpload &&
+                $0.sessionSelector == self.global.selectorUploadAutoUpload &&
+                $0.chunk == 0
+            }
+            .prefix(availableProcess)
+        )
+
+        let cameraRoll = NCCameraRoll()
+
+        for metadata in metadatasToUpload {
+            guard !expired else { return }
+
+            // File exists? skip it
+            let existsResult = await NCNetworking.shared.fileExists(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account)
+            if existsResult == .success {
+                // File exists → delete from local metadata and skip
+                await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
+                continue
+            } else if existsResult.errorCode == 404 {
+                // 404 Not Found → directory does not exist
+                // Proceed
+            } else {
+                // Any other error (423 locked, 401 auth, 403 forbidden, 5xx, etc.)
+                continue
+            }
+
+            // Expand seed into concrete metadatas (e.g., Live Photo pair)
+            let extracted = await cameraRoll.extractCameraRoll(from: metadata)
+            guard !expired else { return }
+
+            for metadata in extracted {
+                // Sequential await keeps ordering and simplifies backpressure
+                let err = await NCNetworking.shared.uploadFileInBackground(metadata: metadata.detachedCopy())
+                if err == .success {
+                    nkLog(tag: self.global.logTagBgSync, message: "In queued upload \(metadata.fileName) -> \(metadata.serverUrl)")
+                } else {
+                    nkLog(tag: self.global.logTagBgSync, emoji: .error, message: "Upload failed \(metadata.fileName) -> \(metadata.serverUrl) [\(err.errorDescription)]")
+                }
+                guard !expired else { return }
+            }
+        }
+    }
+    
+//    func handleAppRefreshProcessingTask(taskText: String, completion: @escaping () -> Void = {}) {
+//        Task {
+//            var numAutoUpload = 0
+//            guard let account = NCManageDatabase.shared.getActiveTableAccount()?.account else {
+//                return
+//            }
+//
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) start handle")
+//
+//            // Test every > 1 min
+//            if Date() > self.taskAutoUploadDate.addingTimeInterval(60) {
+//                self.taskAutoUploadDate = Date()
+//                numAutoUpload = await NCAutoUpload.shared.initAutoUpload(account: account)
+//                NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) auto upload with \(numAutoUpload) uploads")
+//            } else {
+//                NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) disabled auto upload")
+//            }
+//
+//            let results = await NCNetworkingProcess.shared.refreshProcessingTask()
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) networking process with download: \(results.counterDownloading) upload: \(results.counterUploading)")
+//
+//            if taskText == "ProcessingTask",
+//               numAutoUpload == 0,
+//               results.counterDownloading == 0,
+//               results.counterUploading == 0,
+//               let directories = NCManageDatabase.shared.getTablesDirectory(predicate: NSPredicate(format: "account == %@ AND offline == true", account), sorted: "offlineDate", ascending: true) {
+//                for directory: tableDirectory in directories {
+//                    // test only 3 time for day (every 8 h.)
+//                    if let offlineDate = directory.offlineDate, offlineDate.addingTimeInterval(28800) > Date() {
+//                        NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) skip synchronization for \(directory.serverUrl) in date \(offlineDate)")
+//                        continue
+//                    }
+//                    let results = await NCNetworking.shared.synchronization(account: account, serverUrl: directory.serverUrl, add: false)
+//                    NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) end synchronization for \(directory.serverUrl), errorCode: \(results.errorCode), item: \(results.num)")
+//                }
+//            }
+//
+//            let counter = NCManageDatabase.shared.getResultsMetadatas(predicate: NSPredicate(format: "account == %@ AND (session == %@ || session == %@) AND status != %d",
+//                                                                                   account,
+//                                                                                   NCNetworking.shared.sessionDownloadBackground,
+//                                                                                   NCNetworking.shared.sessionUploadBackground,
+//                                                                                   NCGlobal.shared.metadataStatusNormal))?.count ?? 0
+//            UIApplication.shared.applicationIconBadgeNumber = counter
+//
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) completion handle")
+//            completion()
+//        }
+//    }
 
     // MARK: - Background Networking Session
 
@@ -246,6 +511,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
     }
 
+    func subscribingPushNotification(account: String, urlBase: String, user: String) {
+    #if !targetEnvironment(simulator)
+            NCNetworking.shared.checkPushNotificationServerProxyCertificateUntrusted(viewController: UIApplication.shared.firstWindow?.rootViewController) { error in
+                if error == .success {
+                    NCPushNotification.shared.subscribingNextcloudServerPushNotification(account: account, urlBase: urlBase, user: user, pushKitToken: self.pushKitToken)
+                }
+            }
+    #endif
+        }
+    
     func nextcloudPushNotificationAction(data: [String: AnyObject]) {
         let account = data["account"] as? String ?? "unavailable"
         let app = data["app"] as? String
@@ -529,6 +804,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         utilityFileSystem.removeTemporaryDirectory()
 
         NCPreferences().removeAll()
+//        NCKeychain().removeAll()
+//        NCNetworking.shared.removeAllKeyUserDefaultsData(account: nil)
 
         exit(0)
     }
