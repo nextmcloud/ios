@@ -6,7 +6,8 @@
 //  Copyright © 2023 Marino Faggiana. All rights reserved.
 //
 #import <Foundation/Foundation.h>
-#import <Adjust.h>
+//#import <Adjust.h>
+#import <AdjustSdk/AdjustSdk.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
