@@ -44,6 +44,10 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
     private var p12Data: Data?
     private var p12Password: String?
 
+    var pollTimer: DispatchSourceTimer?
+    var ncLoginPollModel = NCLoginPollModel()
+    var loginFlowInProgress = false
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -82,9 +86,6 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
         // Login button
         loginAddressDetail.textColor = textColor
         loginAddressDetail.text = String.localizedStringWithFormat(NSLocalizedString("_login_address_detail_", comment: ""), NCBrandOptions.shared.brand)
-
-        // QR code button
-        qrCode.tintColor = NCBrandColor.shared.customer.isTooLight() ? .black : .white
 
         // brand
         if NCBrandOptions.shared.disable_request_login_url {
@@ -129,7 +130,7 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
                 if !accountTemp.isEmpty {
                     self.shareAccounts = accountTemp
                     let image = NCUtility().loadImage(named: "person.badge.plus")
-                    let navigationItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(openShareAccountsViewController(_:)))
+                    let navigationItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(openShareAccountsViewController))
                     navigationItem.tintColor = textColor
                     self.navigationItem.rightBarButtonItem = navigationItem
                 }
@@ -180,7 +181,7 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
 
         if !NCManageDatabase.shared.getAllTableAccount().isEmpty,
            self.navigationController?.viewControllers.count ?? 0 == 1 {
-            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: self, action: #selector(actionCancel(_:)))
+            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .done, target: self, action: #selector(self.actionCancel))
             navigationItemCancel.tintColor = textColor
             navigationItem.leftBarButtonItem = navigationItemCancel
         }
@@ -194,9 +195,18 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
             let description = String(format: NSLocalizedString("_add_existing_account_", comment: ""), NCBrandOptions.shared.brand)
             NCContentPresenter().alertAction(image: image, contentModeImage: .scaleAspectFit, sizeImage: CGSize(width: 45, height: 45), backgroundColor: backgroundColor, textColor: textColor, title: title, description: description, textCancelButton: "_cancel_", textOkButton: "_ok_", attributes: EKAttributes.topFloat) { identifier in
                 if identifier == "ok" {
-                    self.openShareAccountsViewController(nil)
+                    self.openShareAccountsViewController()
                 }
             }
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        if navigationController?.isBeingDismissed == true {
+            pollTimer?.cancel()
+            pollTimer = nil
         }
     }
 
@@ -268,7 +278,7 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
 
     // MARK: - Action
 
-    @objc func actionCancel(_ sender: Any?) {
+    @objc func actionCancel() {
         dismiss(animated: true) { }
     }
 
@@ -289,7 +299,7 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
 
     // MARK: - Share accounts View Controller
 
-    @objc func openShareAccountsViewController(_ sender: Any?) {
+    @objc func openShareAccountsViewController() {
         if let shareAccounts = self.shareAccounts, let vc = UIStoryboard(name: "NCShareAccounts", bundle: nil).instantiateInitialViewController() as? NCShareAccounts {
             vc.accounts = shareAccounts
             vc.enableTimerProgress = false
@@ -326,31 +336,31 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
 
         NextcloudKit.shared.getServerStatus(serverUrl: url) { [self] _, serverInfoResult in
             switch serverInfoResult {
-            case .success:
+            case .success(let serverInfo):
                 if let host = URL(string: url)?.host {
                     NCNetworking.shared.writeCertificate(host: host)
                 }
-                NextcloudKit.shared.getLoginFlowV2(serverUrl: url) { [self] token, endpoint, login, _, error in                    
+                NextcloudKit.shared.getLoginFlowV2(serverUrl: url) { [self] token, endpoint, login, _, error in
                     // Login Flow V2
-//                    if error == .success, let token, let endpoint, let login {
-//                        nkLog(debug: "Successfully received login flow information.")
-//                        let safariVC = NCLoginProvider()
-//                        safariVC.initialURLString = login
-//                        safariVC.uiColor = textColor
-//                        safariVC.delegate = self
-//                        safariVC.startPolling(loginFlowV2Token: token, loginFlowV2Endpoint: endpoint, loginFlowV2Login: login)
-//                        navigationController?.pushViewController(safariVC, animated: true)
                     if error == .success && NCBrandOptions.shared.use_loginflowv2 && token != nil && endpoint != nil && login != nil {
-
+                        
                         if let loginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb {
-
+                            
                             loginWeb.urlBase = url
                             loginWeb.user = user
                             loginWeb.loginFlowV2Available = true
                             loginWeb.loginFlowV2Token = token!
                             loginWeb.loginFlowV2Endpoint = endpoint!
                             loginWeb.loginFlowV2Login = login!
-
+                            
+                            self.navigationController?.pushViewController(loginWeb, animated: true)
+                        }
+                    } else if serverInfo.versionMajor >= NCGlobal.shared.nextcloudVersion12 {
+                        
+                        if let loginWeb = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginWeb") as? NCLoginWeb {
+                            
+                            loginWeb.urlBase = url
+                            loginWeb.user = user
                             self.navigationController?.pushViewController(loginWeb, animated: true)
                         }
                     } else if serverInfo.versionMajor < NCGlobal.shared.nextcloudVersion12 { // No login flow available
@@ -444,15 +454,11 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
     }
 }
 
-// MARK: - NCShareAccountsDelegate
-
 extension NCLogin: NCShareAccountsDelegate {
     func selected(url: String, user: String) {
         isUrlValid(url: url, user: user)
     }
 }
-
-// MARK: - UIDocumentPickerDelegate
 
 extension NCLogin: ClientCertificateDelegate, UIDocumentPickerDelegate {
     func didAskForClientCertificate() {
@@ -493,13 +499,76 @@ extension NCLogin: ClientCertificateDelegate, UIDocumentPickerDelegate {
             self.present(alertWrongPassword, animated: true)
         }
     }
+    
+//    func poll(loginFlowV2Token: String, loginFlowV2Endpoint: String, loginFlowV2Login: String) {
+//        let queue = DispatchQueue.global(qos: .background)
+//        pollTimer = DispatchSource.makeTimerSource(queue: queue)
+//
+//        guard let timer = pollTimer else { return }
+//
+//        timer.schedule(deadline: .now(), repeating: .seconds(1), leeway: .seconds(1))
+//        timer.setEventHandler(handler: {
+//            DispatchQueue.main.async {
+//                let controller = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
+//                NextcloudKit.shared.getLoginFlowV2Poll(token: loginFlowV2Token, endpoint: loginFlowV2Endpoint) { [self] server, loginName, appPassword, _, error in
+//                    if error == .success, let urlBase = server, let user = loginName, let appPassword {
+//                        loginFlowInProgress = true
+//                        ncLoginPollModel.isLoading = true
+//
+//                        NCAccount().createAccount(urlBase: urlBase, user: user, password: appPassword, controller: controller) { account, error in
+//
+//                            if error == .success {
+//                                let window = UIApplication.shared.firstWindow
+//                                if let controller = window?.rootViewController as? NCMainTabBarController {
+//                                    controller.account = account
+//                                    controller.dismiss(animated: true, completion: nil)
+//                                } else {
+//                                    if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as? NCMainTabBarController {
+//                                        controller.account = account
+//                                        controller.modalPresentationStyle = .fullScreen
+//                                        controller.view.alpha = 0
+//
+//                                        window?.rootViewController = controller
+//                                        window?.makeKeyAndVisible()
+//
+//                                        if let scene = window?.windowScene {
+//                                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
+//                                        }
+//
+//                                        UIView.animate(withDuration: 0.5) {
+//                                            controller.view.alpha = 1
+//                                        }
+//                                    }
+//                                }
+//
+//                                timer.cancel()
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        })
+//
+//        timer.resume()
+//    }
 }
 
-// MARK: - NCLoginProviderDelegate
+extension NCLogin: SFSafariViewControllerDelegate {
+    func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+        if !loginFlowInProgress {
+            loginButton.isEnabled = true
+            loginButton.hideSpinnerAndShowButton()
+        }
+    }
+}
 
 extension NCLogin: NCLoginProviderDelegate {
     func onBack() {
         loginButton.isEnabled = true
         loginButton.hideSpinnerAndShowButton()
     }
+}
+
+protocol NCLoginProviderDelegate: AnyObject {
+    func onBack()
 }
