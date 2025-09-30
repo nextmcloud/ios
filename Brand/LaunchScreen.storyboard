@@ -42,7 +42,7 @@
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" red="0.0" green="0.50980392156862742" blue="0.78823529411764703" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.88627450980392" green="0" blue="0.45490196078431" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="rV0-dq-CYC" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="XMf-14-BfA"/>
                             <constraint firstItem="7UE-Dr-Fma" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="XdS-tM-D9I"/>
