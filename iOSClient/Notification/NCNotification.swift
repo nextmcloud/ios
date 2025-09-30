@@ -13,6 +13,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
     var notifications: [NKNotifications] = []
+    var dataSourceTask: URLSessionTask?
     var session: NCSession.Session!
     private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     var emptyDataSet: NCEmptyDataSet?
@@ -95,7 +96,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
     
     // MARK: - NotificationCenter
     @objc func initialize() {
-        getNetwokingNotification(nil)
+        getNetwokingNotification()
     }
 
     // MARK: - Empty
@@ -221,7 +222,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
 
         cell.date.text = DateFormatter.localizedString(from: notification.date as Date, dateStyle: .medium, timeStyle: .medium)
         cell.notification = notification
-        cell.date.text = utility.dateDiff(notification.date as Date)
+        cell.date.text = utility.getRelativeDateTitle(notification.date as Date)
         cell.date.textColor = .gray
         cell.subject.text = notification.subject
         cell.subject.textColor = NCBrandColor.shared.textColor
@@ -322,22 +323,21 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
         }
     }
 
-    func tapAction(with notification: NKNotifications, label: String, sender: Any?) {
-        guard let actions = notification.actions,
-              let jsonActions = JSON(actions).array,
-              let action = jsonActions.first(where: { $0["label"].string == label })
-        else { return }
+    func tapAction(with notification: NKNotifications, label: String) {
+        if notification.app == NCGlobal.shared.spreedName,
+           let roomToken = notification.objectId.split(separator: "/").first,
+           let talkUrl = URL(string: "nextcloudtalk://open-conversation?server=\(session.urlBase)&user=\(session.userId)&withRoomToken=\(roomToken)"),
+           UIApplication.shared.canOpenURL(talkUrl) {
+            UIApplication.shared.open(talkUrl)
+        } else if let actions = notification.actions,
+                  let jsonActions = JSON(actions).array,
+                  let action = jsonActions.first(where: { $0["label"].string == label }) {
+                      let serverUrl = action["link"].stringValue
+            let method = action["type"].stringValue
 
-        let serverUrl = action["link"].stringValue
-        let method = action["type"].stringValue
-
-        if method == "WEB", var url = action["link"].url {
-            if notification.app == NCGlobal.shared.spreedName,
-               let roomToken = notification.objectId.split(separator: "/").first,
-               let talkUrl = URL(string: "nextcloudtalk://open-conversation?server=\(session.urlBase)&user=\(session.userId)&withRoomToken=\(roomToken)"),
-               UIApplication.shared.canOpenURL(talkUrl) {
-
-                url = talkUrl
+            if method == "WEB", let url = action["link"].url {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                return
             }
 
             UIApplication.shared.open(url)
@@ -361,7 +361,11 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
             } else {
                 print("[Error] The user has been changed during networking process.")
             }
-        }
+        } // else: Action not found
+    }
+
+    func tapMore(with notification: NKNotifications) {
+       toggleMenu(notification: notification)
     }
 
     // MARK: - Load notification networking
@@ -425,7 +429,7 @@ class NCNotificationCell: UITableViewCell {
 
     @IBAction func touchUpInsideRemove(_ sender: Any) {
         guard let notification = notification else { return }
-        delegate?.tapRemove(with: notification, sender: sender)
+        delegate?.tapRemove(with: notification)
     }
 
     @IBAction func touchUpInsidePrimary(_ sender: Any) {
@@ -433,7 +437,7 @@ class NCNotificationCell: UITableViewCell {
               let button = sender as? UIButton,
               let label = button.titleLabel?.text
         else { return }
-        delegate?.tapAction(with: notification, label: label, sender: sender)
+        delegate?.tapAction(with: notification, label: label)
     }
 
     @IBAction func touchUpInsideSecondary(_ sender: Any) {
@@ -441,7 +445,7 @@ class NCNotificationCell: UITableViewCell {
               let button = sender as? UIButton,
               let label = button.titleLabel?.text
         else { return }
-        delegate?.tapAction(with: notification, label: label, sender: sender)
+        delegate?.tapAction(with: notification, label: label)
     }
 }
 
