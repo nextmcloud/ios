@@ -27,9 +27,10 @@ import Foundation
 
 // MARK: UICollectionViewDelegate
 extension NCTrash: UICollectionViewDelegate {
-
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let resultTableTrash = datasource[indexPath.item]
+
+        guard let resultTableTrash = datasource?[indexPath.item] else { return }
 
         guard !isEditMode else {
             if let index = fileSelect.firstIndex(of: resultTableTrash.fileId) {
@@ -57,10 +58,9 @@ extension NCTrash: UICollectionViewDelegate {
 extension NCTrash: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let numberOfItems = datasource.count
-        emptyDataSet?.numberOfItemsInSection(numberOfItems, section: section)
+        emptyDataSet?.numberOfItemsInSection(datasource?.count ?? 0, section: section)
         setNavigationRightItems()
-        return numberOfItems
+        return datasource?.count ?? 0
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -78,7 +78,8 @@ extension NCTrash: UICollectionViewDataSource {
             cell = gridCell
         }
         
-        let resultTableTrash = datasource[indexPath.item]
+        guard let resultTableTrash = datasource?[indexPath.item] else { return cell }
+
         cell.imageItem.contentMode = .scaleAspectFit
 
         if resultTableTrash.iconName.isEmpty {
@@ -87,24 +88,21 @@ extension NCTrash: UICollectionViewDataSource {
             image = UIImage(named: resultTableTrash.iconName)
         }
 
-        if let imageIcon = utility.getImage(ocId: resultTableTrash.fileId,
-                                            etag: resultTableTrash.fileName,
-                                            ext: NCGlobal.shared.previewExt512,
-                                            userId: session.userId,
-                                            urlBase: session.urlBase) {
+        if let imageIcon = utility.getImage(ocId: resultTableTrash.fileId, etag: resultTableTrash.fileName, ext: NCGlobal.shared.previewExt512) {
             image = imageIcon
             cell.imageItem.contentMode = .scaleAspectFill
         } else {
             if resultTableTrash.hasPreview {
                 if NCNetworking.shared.downloadThumbnailTrashQueue.operations.filter({ ($0 as? NCOperationDownloadThumbnailTrash)?.fileId == resultTableTrash.fileId }).isEmpty {
-                    NCNetworking.shared.downloadThumbnailTrashQueue.addOperation(NCOperationDownloadThumbnailTrash(fileId: resultTableTrash.fileId, fileName: resultTableTrash.fileName, session: session, collectionView: collectionView))
+                    NCNetworking.shared.downloadThumbnailTrashQueue.addOperation(NCOperationDownloadThumbnailTrash(fileId: resultTableTrash.fileId, fileName: resultTableTrash.fileName, account: session.account, collectionView: collectionView))
                 }
             }
         }
+
         cell.account = resultTableTrash.account
         cell.objectId = resultTableTrash.fileId
         cell.setupCellUI(tableTrash: resultTableTrash, image: image)
-        cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, account: resultTableTrash.account)
+        cell.selected(fileSelect.contains(resultTableTrash.fileId), isEditMode: isEditMode, account: resultTableTrash.account)
         return cell
     }
 
@@ -161,7 +159,7 @@ extension NCTrash: UICollectionViewDataSource {
             }
             
             header.delegate = self
-            header.setStatusButtonsView(enable: !datasource.isEmpty)
+            header.setStatusButtonsView(enable: !(datasource?.isEmpty ?? false))
             header.setSortedTitle(layoutForView?.titleButtonHeader ?? "")
             header.setButtonsView(height: NCGlobal.shared.heightButtonsView)
             header.setRichWorkspaceHeight(0)
@@ -173,8 +171,10 @@ extension NCTrash: UICollectionViewDataSource {
         } else {
             guard let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFooter", for: indexPath) as? NCSectionFooter
             else { return UICollectionReusableView() }
-            footer.setTitleLabel(setTextFooter(datasource: datasource))
-            footer.separatorIsHidden(true)
+            if let datasource {
+                footer.setTitleLabel(setTextFooter(datasource: datasource))
+                footer.separatorIsHidden(true)
+            }
             return footer
         }
     }
@@ -184,7 +184,7 @@ extension NCTrash: UICollectionViewDataSource {
 extension NCTrash: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        if datasource.isEmpty {
+        if let datasource, datasource.isEmpty {
             let height = utility.getHeightHeaderEmptyData(view: view, portraitOffset: 0, landscapeOffset: -20)
             return CGSize(width: collectionView.frame.width, height: height)
         }
