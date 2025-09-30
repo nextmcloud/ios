@@ -37,6 +37,7 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
     @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var activityIndicatorTrailing: NSLayoutConstraint!
     @IBOutlet weak var selectOrCancelButtonTrailing: NSLayoutConstraint!
+    @IBOutlet weak var gradientViewHeightContsraint: NSLayoutConstraint!
 
     let semaphoreSearchMedia = DispatchSemaphore(value: 1)
     let semaphoreNotificationCenter = DispatchSemaphore(value: 1)
@@ -123,7 +124,7 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         collectionView.register(UINib(nibName: "NCSectionFooter", bundle: nil), forSupplementaryViewOfKind: mediaSectionFooter, withReuseIdentifier: "sectionFooter")
         collectionView.register(UINib(nibName: "NCMediaCell", bundle: nil), forCellWithReuseIdentifier: "mediaCell")
         collectionView.alwaysBounceVertical = true
-        collectionView.contentInset = UIEdgeInsets(top: insetsTop, left: 0, bottom: 50, right: 0)
+        collectionView.contentInset = isInGeneralPhotosSelectionContext ? UIEdgeInsets(top: 10, left: 0, bottom: 50, right: 0) : UIEdgeInsets(top: insetsTop, left: 0, bottom: 50, right: 0)
         collectionView.backgroundColor = .systemBackground
         collectionView.prefetchDataSource = self
         collectionView.dragInteractionEnabled = true
@@ -143,8 +144,13 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         titleDate.isHidden = true
         menuButton.isHidden = true
         
-        setupMediaCommandView()
-        setupForGeneralPhotosSelection()
+        
+        if isInGeneralPhotosSelectionContext {
+            setupForGeneralPhotosSelection()
+        } else {
+            setupMediaCommandView()
+        }
+        
 
         gradient.startPoint = CGPoint(x: 0, y: 0.1)
         gradient.endPoint = CGPoint(x: 0, y: 1)
@@ -386,6 +392,7 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
     
     private func setupForGeneralPhotosSelection() {
         if isInGeneralPhotosSelectionContext {
+            gradientViewHeightContsraint.constant = 0
             mediaCommandView?.setupForGeneralPhotosSelection()
             isEditMode = true
         }

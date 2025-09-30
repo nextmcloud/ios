@@ -27,27 +27,26 @@ struct NoPhotosEmptyView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 // Foreground content
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 16) {
                     
                     Text(NSLocalizedString("_albums_photos_empty_heading_", comment: ""))
                         .font(.system(size: 48, weight: .bold))
-                        .padding(.horizontal, contentPadding)
                     
                     Text(NSLocalizedString("_albums_photos_empty_subheading_", comment: ""))
                         .font(.system(size: 15, weight: .regular))
                         .foregroundColor(.secondary)
-                        .padding(.horizontal, contentPadding)
                     
                     Button(action: onAddPhotosIntent) {
                         Label(NSLocalizedString("_albums_photos_empty_add_photos_btn_", comment: ""), systemImage: "plus")
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(Color(NCBrandColor.shared.customer))
                     }
-                    .padding(.horizontal, contentPadding)
                     
                     Spacer(minLength: 40)
                 }
                 .padding(.horizontal, contentPadding)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .padding(.top, -40)
             }
         }
     }

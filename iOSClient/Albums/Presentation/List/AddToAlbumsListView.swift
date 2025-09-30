@@ -29,22 +29,29 @@ struct AddToAlbumsListView: View {
         NavigationView {
             ZStack {
                 List {
-                    Section(header: Text(NSLocalizedString("_albums_list_own_albums_heading_", comment: ""))) {
-                        ForEach(viewModel.albums) { album in
-                            AlbumRow(album: album, localAccount: localAccount)
-                                .onTapGesture {
-                                    selectedAlbum = album
-                                }
-                                .listRowBackground(
-                                            selectedAlbum?.id == album.id
-                                                ? Color.accentColor.opacity(0.2)  // light blue highlight (default iOS tint)
-                                                : Color.clear
-                                        )
-                            
+                    Section(header: Text(NSLocalizedString("_albums_list_own_albums_heading_", comment: ""))
+                        .listRowInsets(EdgeInsets())
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 16)
+                        .frame(maxWidth: .infinity, alignment: .leading)) {
+                            ForEach(viewModel.albums) { album in
+                                AlbumRow(album: album, localAccount: localAccount)
+                                    .padding(.vertical, 8)
+                                    .onTapGesture {
+                                        selectedAlbum = album
+                                    }
+                                    .listRowBackground(
+                                        selectedAlbum?.id == album.id
+                                        ? Color.accentColor.opacity(0.2)  // light blue highlight (default iOS tint)
+                                        : Color.clear
+                                    )
+                                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)) // Match header padding
+                                    .listRowSeparator(.hidden)
+                            }
                         }
-                    }
                 }
-                .listStyle(InsetGroupedListStyle())
+                .listStyle(PlainListStyle())
                 .navigationBarTitle(NSLocalizedString("_add_to_album", comment: ""), displayMode: .inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
@@ -75,6 +82,7 @@ struct AddToAlbumsListView: View {
                 AlbumsManager.shared.syncAlbums()
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     @ViewBuilder
@@ -110,7 +118,7 @@ struct AlbumRow: View {
     var body: some View {
         HStack {
             thumbnailView()
-                .frame(width: 70, height: 50)
+                .frame(width: 80, height: 60)
                 .cornerRadius(6)
             
             VStack(alignment: .leading, spacing: 2) {
@@ -127,6 +135,7 @@ struct AlbumRow: View {
                 }
             }
         }
+        .padding(.horizontal, 8)
         .task(id: album.lastPhotoId) {
             await loadThumbnail()
         }
@@ -158,12 +167,14 @@ struct AlbumRow: View {
             Image("EmptyAlbum")
                 .resizable()
                 .scaledToFill()
+                .clipped()
                 .foregroundColor(.gray)
                 .background(Color.gray.opacity(0.1))
         case .thumbnail(let uiImage):
             Image(uiImage: uiImage)
                 .resizable()
                 .scaledToFill()
+                .clipped()
         }
     }
     
