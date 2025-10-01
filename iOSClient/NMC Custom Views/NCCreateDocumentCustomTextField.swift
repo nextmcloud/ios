@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import XLForm
 
 class NCCreateDocumentCustomTextField: XLFormBaseCell,UITextFieldDelegate {
 
