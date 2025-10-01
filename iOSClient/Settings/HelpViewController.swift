@@ -54,4 +54,3 @@ class HelpViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
             }
     }
 }
-
