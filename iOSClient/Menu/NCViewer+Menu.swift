@@ -26,29 +26,12 @@ import FloatingPanel
 import NextcloudKit
 
 extension NCViewer {
-    func toggleMenu(controller: NCMainTabBarController?, metadata: tableMetadata, webView: Bool, imageIcon: UIImage?, indexPath: IndexPath = IndexPath(), sender: Any?) {
+    func toggleMenu(controller: NCMainTabBarController?, metadata: tableMetadata, webView: Bool, imageIcon: UIImage?, indexPath: IndexPath = IndexPath()) {
         guard let metadata = self.database.getMetadataFromOcId(metadata.ocId),
               let controller else { return }
         var actions = [NCMenuAction]()
         let localFile = self.database.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
         let isOffline = localFile?.offline == true
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: metadata.account)
-
-        //
-        // DETAIL
-        //
-        if !(!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty) {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_details_", comment: ""),
-                    icon: utility.loadImage(named: "info.circle", colors: [NCBrandColor.shared.iconImageColor]),
-                    sender: sender,
-                    action: { _ in
-                        NCDownloadAction.shared.openShare(viewController: controller, metadata: metadata, page: .activity)
-                    }
-                )
-            )
-        }
 
         //
         // VIEW IN FOLDER
@@ -57,11 +40,9 @@ extension NCViewer {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_view_in_folder_", comment: ""),
-                    icon: utility.loadImage(named: "questionmark.folder", colors: [NCBrandColor.shared.iconImageColor]),
-//                    icon: utility.loadImage(named: "arrow.forward.square", colors: [NCBrandColor.shared.iconColor]),
-                    sender: sender,
+                    icon: utility.loadImage(named: "arrow.forward.square", colors: [NCBrandColor.shared.iconColor]),
                     action: { _ in
-                        NCDownloadAction.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileNameBlink: metadata.fileName, fileNameOpen: nil, sceneIdentifier: controller.sceneIdentifier)
+                        NCActionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileNameBlink: metadata.fileName, fileNameOpen: nil, sceneIdentifier: controller.sceneIdentifier)
                     }
                 )
             )
@@ -76,7 +57,6 @@ extension NCViewer {
                 NCMenuAction(
                     title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
                     icon: utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite]),
-                    sender: sender,
                     action: { _ in
                         NCNetworking.shared.favoriteMetadata(metadata) { error in
                             if error != .success {
@@ -92,16 +72,14 @@ extension NCViewer {
         // OFFLINE
         //
         if !webView, metadata.canSetAsAvailableOffline {
-            actions.append(.setAvailableOfflineAction(selectedMetadatas: [metadata], isAnyOffline: isOffline, viewController: controller, sender: sender))
+            actions.append(.setAvailableOfflineAction(selectedMetadatas: [metadata], isAnyOffline: isOffline, viewController: controller))
         }
 
         //
         // SHARE
         //
         if !webView, metadata.canShare {
-            actions.append(.share(selectedMetadatas: [metadata],
-                                  controller: controller,
-                                  sender: sender))
+            actions.append(.share(selectedMetadatas: [metadata], controller: controller))
         }
         
         //
@@ -114,22 +92,9 @@ extension NCViewer {
                     icon: utility.loadImage(named: "printer", colors: [NCBrandColor.shared.iconColor]),
                     action: { _ in
                         if self.utilityFileSystem.fileProviderStorageExists(metadata) {
-                            NCNetworking.shared.notifyAllDelegates { delegate in
-                                let metadata = metadata.detachedCopy()
-                                metadata.sessionSelector = NCGlobal.shared.selectorSaveAsScan
-                                delegate.transferChange(status: NCGlobal.shared.networkingStatusDownloaded,
-                                                        metadata: metadata,
-                                                        error: .success)
-                            }
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorPrint, "error": NKError(), "account": metadata.account, "ocIdTransfer": metadata.ocIdTransfer])
                         } else {
-                            Task {
-                                if let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
-                                                                                                            session: NCNetworking.shared.sessionDownload,
-                                                                                                            selector: NCGlobal.shared.selectorSaveAsScan,
-                                                                                                            sceneIdentifier: controller.sceneIdentifier) {
-                                    NCNetworking.shared.download(metadata: metadata)
-                                }
-                            }
+                            NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint))
                         }
                     }
                 )
@@ -169,45 +134,11 @@ extension NCViewer {
                 )
             )
         }
-
+        
         //
         // COPY - MOVE
         //
         if !webView, metadata.isCopyableMovable {
-            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], viewController: viewController, indexPath: []))
-        }
-
-        //
-        // DOWNLOAD - LOCAL
-        //
-        if !webView, metadata.session.isEmpty, !self.utilityFileSystem.fileProviderStorageExists(metadata) {
-            var title = ""
-            if metadata.isImage {
-                title = NSLocalizedString("_try_download_full_resolution_", comment: "")
-            } else if metadata.isVideo {
-                title = NSLocalizedString("_download_video_", comment: "")
-            } else if metadata.isAudio {
-                title = NSLocalizedString("_download_audio_", comment: "")
-            } else {
-                title = NSLocalizedString("_download_file_", comment: "")
-            }
-            actions.append(
-                NCMenuAction(
-                    title: title,
-                    icon: utility.loadImage(named: "iphone.circle", colors: [NCBrandColor.shared.iconImageColor]),
-                    sender: sender,
-                    action: { _ in
-                        Task {
-                            if let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
-                                                                                                        session: NCNetworking.shared.sessionDownload,
-                                                                                                        selector: "",
-                                                                                                        sceneIdentifier: controller.sceneIdentifier) {
-                                NCNetworking.shared.download(metadata: metadata)
-                            }
-                        }
-                    }
-                )
-            )
             actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], controller: controller))
         }
         
@@ -225,7 +156,6 @@ extension NCViewer {
                 NCMenuAction(
                     title: NSLocalizedString("_search_", comment: ""),
                     icon: utility.loadImage(named: "search", colors: [NCBrandColor.shared.iconColor]),
-                    sender: sender,
                     action: { _ in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuSearchTextPDF)
                     }
@@ -236,7 +166,6 @@ extension NCViewer {
                 NCMenuAction(
                     title: NSLocalizedString("_go_to_page_", comment: ""),
                     icon: utility.loadImage(named: "go-to-page", colors: [NCBrandColor.shared.iconColor]),
-                    sender: sender,
                     action: { _ in
                         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuGotToPageInPDF)
                     }
@@ -252,25 +181,23 @@ extension NCViewer {
                 NCMenuAction(
                     title: NSLocalizedString("_modify_", comment: ""),
                     icon: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconColor]),
-                    sender: sender,
                     action: { _ in
                         if self.utilityFileSystem.fileProviderStorageExists(metadata) {
-                            NCNetworking.shared.notifyAllDelegates { delegate in
-                                let metadata = metadata.detachedCopy()
-                                metadata.sessionSelector = NCGlobal.shared.selectorLoadFileQuickLook
-                                delegate.transferChange(status: NCGlobal.shared.networkingStatusDownloaded,
-                                                        metadata: metadata,
-                                                        error: .success)
-                            }
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile,
+                                                                        object: nil,
+                                                                        userInfo: ["ocId": metadata.ocId,
+                                                                                   "ocIdTransfer": metadata.ocIdTransfer,
+                                                                                   "session": metadata.session,
+                                                                                   "selector": NCGlobal.shared.selectorLoadFileQuickLook,
+                                                                                   "error": NKError(),
+                                                                                   "account": metadata.account],
+                                                                        second: 0.5)
                         } else {
-                            Task {
-                                if let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
-                                                                                                            session: NCNetworking.shared.sessionDownload,
-                                                                                                            selector: NCGlobal.shared.selectorLoadFileQuickLook,
-                                                                                                            sceneIdentifier: controller.sceneIdentifier) {
-                                    NCNetworking.shared.download(metadata: metadata)
-                                }
-                            }
+                            guard let metadata = self.database.setMetadatasSessionInWaitDownload(metadatas: [metadata],
+                                                                                                 session: NCNetworking.shared.sessionDownload,
+                                                                                                 selector: NCGlobal.shared.selectorLoadFileQuickLook,
+                                                                                                 sceneIdentifier: controller.sceneIdentifier) else { return }
+                            NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
                         }
                     }
                 )
@@ -281,9 +208,9 @@ extension NCViewer {
         // DELETE
         //
         if !webView, metadata.isDeletable {
-            actions.append(.deleteAction(selectedMetadatas: [metadata], metadataFolder: nil, controller: controller, sender: sender))
+            actions.append(.deleteAction(selectedMetadatas: [metadata], metadataFolder: nil, controller: controller))
         }
 
-        controller.presentMenu(with: actions, sender: sender)
+        controller.presentMenu(with: actions)
     }
 }
