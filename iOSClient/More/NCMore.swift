@@ -41,11 +41,11 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     private var settingsMenu: [NKExternalSite] = []
     private var quotaMenu: [NKExternalSite] = []
     private let applicationHandle = NCApplicationHandle()
-    private let utilityFileSystem = NCUtilityFileSystem()
-    private let utility = NCUtility()
+    private var tabAccount: tableAccount?
+    let utilityFileSystem = NCUtilityFileSystem()
+    let utility = NCUtility()
     private let database = NCManageDatabase.shared
     private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    private var tabAccount: tableAccount?
 
     private struct Section {
         var items: [NKExternalSite]
@@ -60,17 +60,12 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     private var sections: [Section] = []
 
-    @MainActor
     private var session: NCSession.Session {
         NCSession.shared.getSession(controller: tabBarController)
     }
 
     private var controller: NCMainTabBarController? {
         self.tabBarController as? NCMainTabBarController
-    }
-
-    var mainNavigationController: NCMainNavigationController? {
-        self.navigationController as? NCMainNavigationController
     }
 
     // MARK: - View Life Cycle
@@ -89,7 +84,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         tableView.register(NCMoreAppSuggestionsCell.fromNib(), forCellReuseIdentifier: NCMoreAppSuggestionsCell.reuseIdentifier)
 
         // create tap gesture recognizer
-        let tapQuota = UITapGestureRecognizer(target: self, action: #selector(tapLabelQuotaExternalSite(_:)))
+        let tapQuota = UITapGestureRecognizer(target: self, action: #selector(tapLabelQuotaExternalSite))
         labelQuotaExternalSite.isUserInteractionEnabled = true
         labelQuotaExternalSite.addGestureRecognizer(tapQuota)
     }
@@ -120,12 +115,13 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     }
 
     func loadItems() {
-        guard let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)),
-              let capabilities = NCNetworking.shared.capabilities[tableAccount.account] else {
+
+        guard let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)) else {
             return
         }
         var item = NKExternalSite()
         var quota: String = ""
+        let capabilities = NCCapabilities.shared.getCapabilities(account: tableAccount.account)
 
         // Clear
         functionMenu.removeAll()
@@ -160,30 +156,16 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         item.order = 30
         functionMenu.append(item)
 
-        /*
-        if capabilities.capabilityActivityEnabled {
-            // ITEM : Activity
-            item = NKExternalSite()
-            item.name = "_activity_"
-            item.icon = "bolt"
-            item.url = "segueActivity"
-            item.order = 30
-            functionMenu.append(item)
-        }
-        */
-
-        if capabilities.assistantEnabled, NCBrandOptions.shared.disable_show_more_nextcloud_apps_in_settings {
-            // ITEM : Assistant
-            item = NKExternalSite()
-            item.name = "_assistant_"
-            item.icon = "sparkles"
-            item.url = "openAssistant"
-            item.order = 40
-//            functionMenu.append(item)
-        }
+        // ITEM : Activity
+        item = NKExternalSite()
+        item.name = "_activity_"
+        item.icon = "bolt"
+        item.url = "segueActivity"
+        item.order = 40
+//        functionMenu.append(item)
 
         // ITEM : Shares
-        if capabilities.fileSharingApiEnabled {
+        if capabilities.capabilityFileSharingApiEnabled {
             item = NKExternalSite()
             item.name = "_list_shares_"
             item.icon = "shareFill"
@@ -201,7 +183,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         functionMenu.append(item)
 
         // ITEM : Groupfolders
-        if capabilities.groupfoldersEnabled {
+        if capabilities.capabilityGroupfoldersEnabled {
             item = NKExternalSite()
             item.name = "_group_folders_"
             item.icon = "person.2"
@@ -235,7 +217,9 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         item = NKExternalSite()
         item.name = "_settings_"
         item.icon = "settings"
-        item.url = "segueSettings"
+//        item.url = "segueSettings"
+        item.url = "openSettings"
+
         settingsMenu.append(item)
 
         if !quotaMenu.isEmpty {
@@ -283,6 +267,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                     }
                 }
             }
+
             
             switch tableAccount.quotaTotal {
             case -1:
@@ -294,17 +279,18 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             default:
                 quota = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
             }
-            
-            let quotaUsed: String = utilityFileSystem.transformedSize(tableAccount.quotaUsed)
-            let quota2: String = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
+
+            let quotaUsed: String = utilityFileSystem.transformedSize(activeAccount.quotaUsed)
+            let quota2: String = utilityFileSystem.transformedSize(activeAccount.quotaTotal)
             let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
-            
+
             labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
             
             quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
             quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
+
         }
-        
+
         // ITEM : External
         if NCBrandOptions.shared.disable_more_external_site == false {
             if let externalSites = NCManageDatabase.shared.getAllExternalSites(account: session.account) {
@@ -322,6 +308,26 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                 }
             }
         }
+            
+        switch tableAccount.quotaTotal {
+        case -1:
+            quota = "0"
+        case -2:
+            quota = NSLocalizedString("_quota_space_unknown_", comment: "")
+        case -3:
+            quota = NSLocalizedString("_quota_space_unlimited_", comment: "")
+        default:
+            quota = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
+        }
+
+        let quotaUsed: String = utilityFileSystem.transformedSize(tableAccount.quotaUsed)
+        let quota2: String = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
+        let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
+
+        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
+        
+        quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
+        quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
 
         loadSections()
     }
@@ -425,6 +431,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         } else if section.type == .moreApps {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: NCMoreAppSuggestionsCell.reuseIdentifier, for: indexPath) as? NCMoreAppSuggestionsCell else { return UITableViewCell() }
+
+//            cell.setupCell(account: session.account)
             cell.controller = self.controller
             return cell
         } else {
@@ -490,7 +498,6 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         } else if item.url == "openSettings" {
             let settingsView = NCSettingsView(model: NCSettingsModel(controller: self.controller))
             let settingsController = UIHostingController(rootView: settingsView)
-            settingsController.title = NSLocalizedString("_settings_", comment: "")
             navigationController?.pushViewController(settingsController, animated: true)
         } else {
             applicationHandle.didSelectItem(item, viewController: self)
