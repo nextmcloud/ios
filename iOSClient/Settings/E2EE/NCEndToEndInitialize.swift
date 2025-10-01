@@ -1,6 +1,25 @@
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2017 Marino Faggiana
-// SPDX-License-Identifier: GPL-3.0-or-later
+//
+//  NCEndToEndInitialize.swift
+//  Nextcloud
+//
+//  Created by Marino Faggiana on 03/04/17.
+//  Copyright © 2017 Marino Faggiana. All rights reserved.
+//
+//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 import UIKit
 import NextcloudKit
@@ -28,32 +47,21 @@ class NCEndToEndInitialize: NSObject {
         self.metadata = metadata
 
         // Clear all keys
-        NCPreferences().clearAllKeysEndToEnd(account: session.account)
+        NCKeychain().clearAllKeysEndToEnd(account: session.account)
         self.getPublicKey()
     }
 
     func statusOfService(session: NCSession.Session, completion: @escaping (_ error: NKError?) -> Void) {
-        NextcloudKit.shared.getE2EECertificate(account: session.account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: session.account,
-                                                                                            name: "getE2EECertificate")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        } completion: { _, _, _, _, error in
+        NextcloudKit.shared.getE2EECertificate(account: session.account) { _, _, _, _, error in
             completion(error)
         }
     }
 
     private func getPublicKey() {
-        NextcloudKit.shared.getE2EECertificate(account: session.account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
-                                                                                            name: "getE2EECertificate")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        } completion: { account, certificate, _, _, error in
+
+        NextcloudKit.shared.getE2EECertificate(account: session.account) { account, certificate, _, _, error in
             if error == .success, let certificate {
-                NCPreferences().setEndToEndCertificate(account: account, certificate: certificate)
+                NCKeychain().setEndToEndCertificate(account: account, certificate: certificate)
                 self.extractedPublicKey = NCEndToEndEncryption.shared().extractPublicKey(fromCertificate: certificate)
                 // Request PrivateKey chiper to Server
                 self.getPrivateKeyCipher()
@@ -70,13 +78,7 @@ class NCEndToEndInitialize: NSObject {
                         return
                     }
 
-                    NextcloudKit.shared.signE2EECertificate(certificate: csr, account: account) {task in
-                        Task {
-                            let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                                        name: "signE2EECertificate")
-                            await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                        }
-                    } completion: { account, certificate, _, error in
+                    NextcloudKit.shared.signE2EECertificate(certificate: csr, account: account) { account, certificate, _, error in
                         if error == .success, let certificate {
                             // TEST publicKey
                             let extractedPublicKey = NCEndToEndEncryption.shared().extractPublicKey(fromCertificate: certificate)
@@ -84,7 +86,7 @@ class NCEndToEndInitialize: NSObject {
                                 let error = NKError(errorCode: error.errorCode, errorDescription: "error: the public key is incorrect")
                                 NCContentPresenter().messageNotification("E2E sign publicKey", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
                             } else {
-                                NCPreferences().setEndToEndCertificate(account: account, certificate: certificate)
+                                NCKeychain().setEndToEndCertificate(account: account, certificate: certificate)
                                 // Request PrivateKey chiper to Server
                                 self.getPrivateKeyCipher()
                             }
@@ -111,61 +113,32 @@ class NCEndToEndInitialize: NSObject {
         }
     }
 
-    func detectPrivateKeyFormat(from data: Data) -> String {
-        print("🔍 Hex dump:", data.prefix(32).map { String(format: "%02X", $0) }.joined(separator: " "))
-
-        // PKCS#8 has OBJECT IDENTIFIER for RSA
-        let oidRsaPrefix: [UInt8] = [0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01]
-
-        if data.range(of: Data(oidRsaPrefix)) != nil {
-            print("🔐 Format: PKCS#8 (BEGIN PRIVATE KEY)")
-            return "PKCS#8"
-        } else if data.starts(with: [0x30, 0x82]) {
-            print("🔐 Format: PKCS#1 (BEGIN RSA PRIVATE KEY)")
-            return "PKCS#1"
-        } else {
-            print("❌ Unknown key format")
-            return "Unknown"
-        }
-    }
-
     private func getPrivateKeyCipher() {
         // Request PrivateKey chiper to Server
-        NextcloudKit.shared.getE2EEPrivateKey(account: session.account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
-                                                                                            name: "getE2EEPrivateKey")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        } completion: { account, privateKeyChiper, _, error in
+        NextcloudKit.shared.getE2EEPrivateKey(account: session.account) { account, privateKeyChiper, _, error in
             if error == .success {
                 // request Passphrase
                 var passphraseTextField: UITextField?
                 let alertController = UIAlertController(title: NSLocalizedString("_e2e_passphrase_request_title_", comment: ""), message: NSLocalizedString("_e2e_passphrase_request_message_", comment: ""), preferredStyle: .alert)
                 let ok = UIAlertAction(title: "OK", style: .default, handler: { _ in
                     let passphrase = passphraseTextField?.text ?? ""
-                    if let privateKeyData = NCEndToEndEncryption.shared().decryptPrivateKey(privateKeyChiper, passphrase: passphrase),
+                    let publicKey = NCKeychain().getEndToEndCertificate(account: account)
+                    if let privateKeyData = (NCEndToEndEncryption.shared().decryptPrivateKey(privateKeyChiper, passphrase: passphrase)),
                        let keyData = Data(base64Encoded: privateKeyData),
                        let privateKey = String(data: keyData, encoding: .utf8) {
-                        NCPreferences().setEndToEndPrivateKey(account: account, privateKey: privateKey)
+                        NCKeychain().setEndToEndPrivateKey(account: account, privateKey: privateKey)
                     } else {
+
                         let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: NSLocalizedString("_e2e_error_incorrect_passphrase_", comment: ""))
                         NCContentPresenter().messageNotification(NSLocalizedString("_e2e_error_passphrase_title", comment: ""), error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
-
                         return
                     }
                     // Save to keychain
-                    NCPreferences().setEndToEndPassphrase(account: account, passphrase: passphrase)
+                    NCKeychain().setEndToEndPassphrase(account: account, passphrase: passphrase)
                     // request server publicKey
-                    NextcloudKit.shared.getE2EEPublicKey(account: account) { task in
-                        Task {
-                            let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
-                                                                                                        name: "getE2EEPublicKey")
-                            await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                        }
-                    } completion: { account, publicKey, _, error in
+                    NextcloudKit.shared.getE2EEPublicKey(account: account) { account, publicKey, _, error in
                         if error == .success, let publicKey {
-                            NCPreferences().setEndToEndPublicKey(account: account, publicKey: publicKey)
+                            NCKeychain().setEndToEndPublicKey(account: account, publicKey: publicKey)
                             NCManageDatabase.shared.clearTablesE2EE(account: account)
                             self.delegate?.endToEndInitializeSuccess(metadata: self.metadata)
                         } else if error != .success {
@@ -191,7 +164,7 @@ class NCEndToEndInitialize: NSObject {
 
                 alertController.addAction(ok)
                 alertController.addAction(cancel)
-                alertController.addTextField { textField in
+                alertController.addTextField { textField -> Void in
                     passphraseTextField = textField
                     passphraseTextField?.placeholder = NSLocalizedString("_enter_passphrase_", comment: "")
                 }
@@ -239,29 +212,17 @@ class NCEndToEndInitialize: NSObject {
         // privateKeyChiper
         print(privateKeyCipher)
 
-        NextcloudKit.shared.storeE2EEPrivateKey(privateKey: privateKeyCipher, account: session.account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
-                                                                                            name: "storeE2EEPrivateKey")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
-        } completion: { account, _, _, error in
+        NextcloudKit.shared.storeE2EEPrivateKey(privateKey: privateKeyCipher, account: session.account) { account, _, _, error in
             if error == .success, let privateKey = privateKeyString {
 
-                NCPreferences().setEndToEndPrivateKey(account: account, privateKey: String(privateKey))
-                NCPreferences().setEndToEndPassphrase(account: account, passphrase: e2ePassphrase)
+                NCKeychain().setEndToEndPrivateKey(account: account, privateKey: String(privateKey))
+                NCKeychain().setEndToEndPassphrase(account: account, passphrase: e2ePassphrase)
 
                 // request server publicKey
-                NextcloudKit.shared.getE2EEPublicKey(account: account) { task in
-                    Task {
-                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
-                                                                                                    name: "getE2EEPublicKey")
-                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                    }
-                } completion: { account, publicKey, _, error in
+                NextcloudKit.shared.getE2EEPublicKey(account: account) { account, publicKey, _, error in
                     if error == .success, let publicKey {
 
-                        NCPreferences().setEndToEndPublicKey(account: account, publicKey: publicKey)
+                        NCKeychain().setEndToEndPublicKey(account: account, publicKey: publicKey)
                         NCManageDatabase.shared.clearTablesE2EE(account: account)
 
                         if copyPassphrase {
