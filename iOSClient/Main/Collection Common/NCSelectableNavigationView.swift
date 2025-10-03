@@ -57,7 +57,7 @@ protocol NCSelectableNavigationView: AnyObject {
 //    func reloadDataSource(withQueryDB: Bool)
     var tabBarSelect: NCSelectableViewTabBar? { get set }
 
-    func reloadDataSource(withQueryDB: Bool)
+//    func reloadDataSource(withQueryDB: Bool)
     func setNavigationLeftItems()
     func setNavigationRightItems(enableMenu: Bool)
     func createMenuActions() -> [NCMenuAction]
