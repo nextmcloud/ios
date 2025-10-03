@@ -45,6 +45,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             delegate?.openContextMenu(with: metadata, button: buttonMore, sender: self) /* preconfigure UIMenu with each metadata */
         }
     }
+
     var previewImg: UIImageView? {
         get { return imageItem }
         set { imageItem = newValue }
@@ -62,17 +63,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         set { labelInfo = newValue }
     }
 
-    override var accessibilityIdentifier: String? {
-        get {
-            super.accessibilityIdentifier
-        }
-        set {
-            super.accessibilityIdentifier = newValue
-
-            if let newValue {
-                buttonShared.accessibilityIdentifier = "\(newValue)/shareButton"
-            }
-        }
+    var fileSharedLabel: UILabel? {
+        get { return labelShared }
+        set { labelShared = newValue }
     }
 
     override func awakeFromNib() {
@@ -96,6 +89,17 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         
         imageItem.layer.cornerRadius = 6
         imageItem.layer.masksToBounds = true
+        imageStatus.image = nil
+        imageFavorite.image = nil
+        imageFavoriteBackground.isHidden = true
+        imageLocal.image = nil
+        labelTitle.text = ""
+        labelInfo.text = ""
+        labelSubinfo.text = ""
+        imageShared.image = nil
+        imageMore.image = nil
+
+        // use entire cell as accessibility element
         
         accessibilityHint = nil
         accessibilityLabel = nil
@@ -121,6 +125,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
 
         imageItemLeftConstraint.constant = 10
         separatorHeightConstraint.constant = 0.5
+        titleInfoTrailingDefault()
 
         // Dynamic Type Font Configuration
         //
@@ -190,7 +195,24 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
         return nil
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateConstraintsForCurrentDevice()
+    }
 
+    func updateConstraintsForCurrentDevice() {
+        if labelShared?.isHidden == false {
+            iPhoneLabelTitleTrailingConstraint.isActive = false
+            iPadLabelTitleTrailingConstraint.isActive = true
+        } else {
+            iPhoneLabelTitleTrailingConstraint.isActive = true
+            iPadLabelTitleTrailingConstraint.isActive = false
+        }
+//        iPhoneLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? false : true
+//        iPadLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? true : false
+    }
+    
     @IBAction func touchUpInsideShare(_ sender: Any) {
         delegate?.tapShareListItem(with: metadata, button: buttonShared, sender: sender)
     }
@@ -282,7 +304,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
-        labelInfo.text = NCUtility().dateDiff(date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
+        labelInfo.text = NCUtility().getRelativeDateTitle(date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
         labelSubinfo.text = ""
     }
 
