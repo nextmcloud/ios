@@ -40,7 +40,6 @@ public protocol NCSelectableViewTabBar {
 
 protocol NCSelectableNavigationView: AnyObject {
     var viewController: UIViewController { get }
-//    var appDelegate: AppDelegate { get }
     var selectableDataSource: [RealmSwiftObject] { get }
     var collectionView: UICollectionView! { get set }
     var isEditMode: Bool { get set }
@@ -84,7 +83,6 @@ extension NCSelectableNavigationView {
         DispatchQueue.main.async {
             self.isEditMode = isOn ?? !self.isEditMode
             self.fileSelect.removeAll()
-//            self.selectIndexPaths.removeAll()
             self.setNavigationLeftItems()
             self.setNavigationRightItems(enableMenu: true)
             self.collectionView.reloadData()
