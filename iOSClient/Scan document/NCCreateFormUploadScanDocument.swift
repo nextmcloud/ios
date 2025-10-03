@@ -141,47 +141,44 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
         var section: XLFormSectionDescriptor
         var row: XLFormRowDescriptor
-
+        
         // Section: Destination Folder
 
-        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: ""))
+        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
+        section.footerTitle = ""
         form.addFormSection(section)
-        
-        XLFormViewController.cellClassesForRowDescriptorTypes()["NMCScamFileNameCustomInputField"] = FileNameInputTextField.self
-        row = XLFormRowDescriptor(tag: "fileName", rowType: "NMCScamFileNameCustomInputField", title: NSLocalizedString("_filename_", comment: ""))
-        row.cellClass = FileNameInputTextField.self
-        row.cellConfig["fileNameInputTextField.placeholder"] = self.fileName
-        
-        row.cellConfig["fileNameInputTextField.textAlignment"] = NSTextAlignment.left.rawValue
-        row.cellConfig["fileNameInputTextField.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.label
-        
-        
-        section.addFormRow(row)
-        //FileName custom view END
-        
-        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_location_", comment: ""))
-        form.addFormSection(section)
-        
-        //Scan documnet folder path
-        XLFormViewController.cellClassesForRowDescriptorTypes()["NMCScanFolderPathCustomCell"] = ScanDocumentPathView.self
-        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "NMCScanFolderPathCustomCell", title: self.titleServerUrl)
+
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
+        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
+        row.cellConfig["backgroundColor"] = UIColor.secondarySystemGroupedBackground
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["backgroundColor"] = cellBackgoundColor
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")?.imageColor(NCBrandColor.shared.customer)
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder_nmcloud")?.image(color: NCBrandColor.shared.brandElement, size: 25)
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
-        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label
+        row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
         if(self.titleServerUrl == "/"){
             row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         }else{
             row.cellConfig["photoLabel.text"] = self.titleServerUrl
         }
         row.cellConfig["textLabel.text"] = ""
-        
         section.addFormRow(row)
-        // END of Scan documnet folder path
+
+        // Section: File Name
+
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = TextTableViewCell.self
         
+        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
+        form.addFormSection(section)
+
+        row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = TextTableViewCell.self
+        row.cellConfigAtConfigure["backgroundColor"] = UIColor.secondarySystemGroupedBackground;
+        row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["fileNameTextField.textColor"] = UIColor.label
+        row.cellConfig["fileNameTextField.text"] = self.fileName
+        section.addFormRow(row)
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_with_text_recognition_", comment: ""))
         form.addFormSection(section)
@@ -309,7 +306,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             let fileNameNew = newValue as? String
 
             if let fileNameNew = newValue as? String {
-                self.fileName = utility.removeForbiddenCharacters(fileNameNew)
+                self.fileName = FileAutoRenamer.rename(fileNameNew, account: session.account)
             } else {
                 self.fileName = ""
             }
@@ -456,7 +453,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         var newFileName: String = ""
 
         if fileName == nil || fileName == "" {
-            name = utilityFileSystem.createFileNameDate("scan", ext: "pdf") 
+            name = utilityFileSystem.createFileNameDate("scan", ext: "pdf")
         } else {
             name = fileName!
         }
@@ -717,8 +714,9 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
             metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
             metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-            
+                            
             if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
+                
 
                 guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
                 conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
@@ -770,7 +768,6 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 fileNameSave = ((name as? NSString)?.deletingPathExtension ?? "") + "." + fileType.lowercased()
             }
         }
-        
         
         let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate?.sceneIdentifier)
 
@@ -849,8 +846,9 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
                 metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
                 metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-                
+                                    
                 if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
+                    
 
                     guard let conflictViewController = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
                     conflictViewController.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
@@ -1060,6 +1058,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 //                let image = changeCompressionImage(self.arrayImages[0])
                 guard let data = image.jpegData(compressionQuality: CGFloat(0.5)) else {
                     NCActivityIndicator.shared.stop()
+                    contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: NSLocalizedString("_error_creation_file_", comment: "")), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     return
                 }
@@ -1068,6 +1067,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                     try data.write(to: fileUrl, options: .atomic)
                 } catch {
                     NCActivityIndicator.shared.stop()
+                    contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: NSLocalizedString("_error_creation_file_", comment: "")), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     return
                 }
@@ -1084,6 +1084,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 //                let image = changeCompressionImage(self.arrayImages[0])
                 guard let data = image.jpegData(compressionQuality: CGFloat(0.5)) else {
                     NCActivityIndicator.shared.stop()
+                    contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: NSLocalizedString("_error_creation_file_", comment: "")), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     return
                 }
@@ -1092,6 +1093,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                     try data.write(to: NSURL.fileURL(withPath: fileNameGenerateExport), options: .atomic)
                 } catch {
                     NCActivityIndicator.shared.stop()
+                    contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: "_error_creation_file_"), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     contentPresenter.messageNotification("_error_", error: NKError(errorCode: NCGlobal.shared.errorCreationFile, errorDescription: NSLocalizedString("_error_creation_file_", comment: "")), delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.info)
                     return
                 }
@@ -1265,4 +1267,3 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         return nil
     }
 }
-
