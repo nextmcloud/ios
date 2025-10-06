@@ -9,12 +9,22 @@ var isAppSuspending: Bool = false
 /// Used for know if the app in in Background mode
 var isAppInBackground: Bool = false
 
-//class NCGlobal: NSObject, @unchecked Sendable  {
-final class NCGlobal: Sendable {
+class NCGlobal: NSObject, @unchecked Sendable  {
     @objc static let shared = NCGlobal()
+    
+    override init() {
+        super.init()
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { _ in
+            isAppSuspending = true
+            isAppInBackground = true
+        }
 
-    init() { }
-
+        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
+            isAppSuspending = false
+            isAppInBackground = false
+        }
+    }
+    
     // ENUM
     //
     public enum TypeFilterScanDocument: String {
@@ -48,6 +58,7 @@ final class NCGlobal: Sendable {
     
     // Nextcloud version
     //
+    let nextcloudVersion12: Int                     = 12
     let nextcloudVersion18: Int                     = 18
     let nextcloudVersion20: Int                     = 20
     let nextcloudVersion23: Int                     = 23
@@ -141,12 +152,14 @@ final class NCGlobal: Sendable {
     let layoutViewGroupfolders                      = "LayoutGroupfolders"
     let layoutViewMedia                             = "LayoutMedia"
     let layoutViewMove                              = "LayoutMove"
+
     
     // Button Type in Cell list/grid
     //
     let buttonMoreMore                              = "more"
     let buttonMoreLock                              = "moreLock"
     let buttonMoreStop                              = "stop"
+
     
     // Standard height sections header/footer
     //
@@ -157,6 +170,7 @@ final class NCGlobal: Sendable {
     let heightFooterButton: CGFloat                 = 30
     let endHeightFooter: CGFloat                    = 85
     
+
     // Text -  OnlyOffice - Collabora - QuickLook
     //
     let editorText                                  = "text"
@@ -248,6 +262,7 @@ final class NCGlobal: Sendable {
     let selectorDownloadFile                    = "downloadFile"
 
     let selectorUploadAutoUpload                = "uploadAutoUpload"
+    let selectorUploadAutoUploadAll             = "uploadAutoUploadAll"
     let selectorUploadFile                      = "uploadFile"
     let selectorUploadFileNODelete              = "UploadFileNODelete"
     let selectorUploadFileShareExtension        = "uploadFileShareExtension"
@@ -282,11 +297,12 @@ final class NCGlobal: Sendable {
     let metadataStatusWaitFavorite: Int         = 13
     let metadataStatusWaitCopy: Int             = 14
     let metadataStatusWaitMove: Int             = 15
-
+    
     let metadataStatusUploadingAllMode          = [1,2,3]
-    let metadataStatusDownloadingAllMode        = [-1, -2, -3]
-    let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
+    let metadataStatusInTransfer                = [-1, -2, 1, 2]
+    let metadataStatusFileDown                  = [-1, -2, -3]
     let metadataStatusHideInView                = [1, 2, 3, 11]
+    let metadataStatusHideInFileExtension       = [1, 2, 3, 10, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
     let metadataStatusTransfers                 = [-2, -3, 2, 3, 10, 11, 12, 13, 14, 15]
 
@@ -294,6 +310,9 @@ final class NCGlobal: Sendable {
     let metadatasStatusInProgress               = [-2, 2]
 
     
+    let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
+
     //  Hidden files included in the read
     //
     let includeHiddenFiles: [String] = [".LivePhoto"]
@@ -306,25 +325,30 @@ final class NCGlobal: Sendable {
     
     // Notification Center
     //
-    @objc let notificationCenterChangeUser                            = "changeUser"
+    @objc let notificationCenterChangeUser                      = "changeUser"
     let notificationCenterChangeTheming                         = "changeTheming"
     @objc let notificationCenterApplicationDidEnterBackground   = "applicationDidEnterBackground"
     @objc let notificationCenterApplicationDidBecomeActive      = "applicationDidBecomeActive"
     @objc let notificationCenterApplicationWillResignActive     = "applicationWillResignActive"
     @objc let notificationCenterApplicationWillEnterForeground  = "applicationWillEnterForeground"
+
     
     @objc let notificationCenterInitialize                      = "initialize"
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
+    let notificationCenterDidCreateShareLink                    = "didCreateShareLink"
+    
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
     let notificationCenterReloadAvatar                          = "reloadAvatar"
+    let notificationCenterReloadHeader                          = "reloadHeader"
     let notificationCenterClearCache                            = "clearCache"
+    let notificationCenterChangeLayout                          = "changeLayout"                    // userInfo: account, serverUrl, layoutForView
     let notificationCenterCheckUserDelaultErrorDone             = "checkUserDelaultErrorDone"       // userInfo: account, controller
     let notificationCenterServerDidUpdate                       = "serverDidUpdate"                 // userInfo: account
     let notificationCenterNetworkReachability                   = "networkReachability"
 
     let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
-    
+    let notificationCenterUpdateNotification                    = "updateNotification"
     let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
     let notificationCenterGetServerData                         = "getServerData"                   // userInfo: serverUrl?
     
@@ -390,6 +414,8 @@ final class NCGlobal: Sendable {
 
     let networkingStatusReloadAvatar                            = "statusReloadAvatar"
     let notificationCenterUpdateShare                           = "updateShare"
+    let notificationCenterShareCountsUpdated                    = "shareCountsUpdated"
+    let notificationCenterUpdateIcons                           = "updateIcons"
     
     // TIP
     //
@@ -397,7 +423,6 @@ final class NCGlobal: Sendable {
     let tipAccountRequest                                       = "tipAccountRequest"
     let tipScanAddImage                                         = "tipScanAddImage"
     let tipMediaDetailView                                      = "tipMediaDetailView"
-    let tipAutoUploadButton                                     = "tipAutoUploadButton"
     let tipAutoUpload                                           = "tipAutoUpload"
     
     // ACTION
