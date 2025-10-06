@@ -12,9 +12,7 @@ import RealmSwift
     @objc static let shared = NCImageCache()
 
     private let utility = NCUtility()
-    private let utilityFileSystem = NCUtilityFileSystem()
     private let global = NCGlobal.shared
-    private let database = NCManageDatabase.shared
 
     private let allowExtensions = [NCGlobal.shared.previewExt256]
     private var brandElementColor: UIColor?
@@ -27,7 +25,7 @@ import RealmSwift
     }()
 
     public var isLoadingCache: Bool = false
-    public var controller: UITabBarController?
+    var isDidEnterBackground: Bool = false
 
     struct metadataInfo {
         var etag: String
@@ -77,51 +75,66 @@ import RealmSwift
         }
 
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
-            self.cache.removeAll()
+            self.isDidEnterBackground = true
+            self.cache.removeAllValues()
             self.cache = LRUCache<String, UIImage>(countLimit: self.countLimit)
         }
 
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { _ in
 #if !EXTENSION
-            Task {
-                guard let controller = self.controller as? NCMainTabBarController,
-                    !self.isLoadingCache else {
-                    return
+            guard !self.isLoadingCache else {
+                return
+            }
+            self.isDidEnterBackground = false
+
+            var files: [NCFiles] = []
+            var cost: Int = 0
+
+            if let activeTableAccount = NCManageDatabase.shared.getActiveTableAccount(),
+               NCImageCache.shared.cache.count == 0 {
+                let session = NCSession.shared.getSession(account: activeTableAccount.account)
+
+                for mainTabBarController in SceneManager.shared.getControllers() {
+                    if let currentVC = mainTabBarController.selectedViewController as? UINavigationController,
+                       let file = currentVC.visibleViewController as? NCFiles {
+                        files.append(file)
+                    }
                 }
 
-                var cost: Int = 0
-                let session = await NCSession.shared.getSession(account: controller.account)
+                DispatchQueue.global().async {
+                    self.isLoadingCache = true
 
-                if let tblAccount = await self.database.getTableAccountAsync(predicate: NSPredicate(format: "account == %@", controller.account)),
-                   NCImageCache.shared.cache.count == 0 {
-
-                    // MEDIA
-                    let predicate = self.getMediaPredicate(session: session, mediaPath: tblAccount.mediaPath, showOnlyImages: false, showOnlyVideos: false)
-                    guard let metadatas = await self.database.getMetadatasAsync(predicate: predicate, sortedByKeyPath: "datePhotosOriginal", limit: self.countLimit) else {
-                        return
-                    }
+                    /// MEDIA
+                    if let metadatas = NCManageDatabase.shared.getResultsMetadatas(predicate: self.getMediaPredicate(filterLivePhotoFile: true, session: session, showOnlyImages: false, showOnlyVideos: false), sortedByKeyPath: "datePhotosOriginal", freeze: true)?.prefix(self.countLimit) {
+                        autoreleasepool {
+                            self.cache.removeAllValues()
 
                     self.isLoadingCache = true
                     self.database.filterAndNormalizeLivePhotos(from: metadatas) { metadatas in
                         autoreleasepool {
                             self.cache.removeAll()
                             for metadata in metadatas {
-                                guard !isAppInBackground else {
-                                    self.cache.removeAll()
+                                guard !self.isDidEnterBackground else {
+                                    self.cache.removeAllValues()
                                     break
                                 }
-                                if let image = self.utility.getImage(ocId: metadata.ocId,
-                                                                     etag: metadata.etag,
-                                                                     ext: self.global.previewExt256,
-                                                                     userId: metadata.userId,
-                                                                     urlBase: metadata.urlBase) {
-                                    self.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: self.global.previewExt256, cost: cost)
+                                if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt256) {
+                                    self.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: NCGlobal.shared.previewExt256, cost: cost)
                                     cost += 1
                                 }
                             }
                             self.isLoadingCache = false
                         }
                     }
+
+                    /// FILE
+                    if !self.isDidEnterBackground {
+                        for file in files where !file.serverUrl.isEmpty {
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": file.serverUrl])
+                        }
+                    }
+
+                    self.isLoadingCache = false
                 }
             }
 #endif
@@ -137,6 +150,7 @@ import RealmSwift
     @objc func createMediaCache(account: String, withCacheSize: Bool) {
         if createMediaCacheInProgress {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] ThumbnailLRUCache image process already in progress")
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] ThumbnailLRUCache image process already in progress")
             return
         }
         createMediaCacheInProgress = true
@@ -245,6 +259,7 @@ import RealmSwift
         return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
     }
     
+
     func allowExtensions(ext: String) -> Bool {
         return allowExtensions.contains(ext)
     }
@@ -286,21 +301,28 @@ import RealmSwift
 
     // MARK: - MEDIA -
 
-    func getMediaPredicate(session: NCSession.Session,
-                           mediaPath: String,
-                           showOnlyImages: Bool,
-                           showOnlyVideos: Bool) -> NSPredicate {
-        var predicate = NSPredicate()
-        let startServerUrl = self.utilityFileSystem.getHomeServer(session: session) + mediaPath
-        let showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND mediaSearch == true AND hasPreview == true AND (classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)') AND NOT (status IN %@)"
-        let showOnlyPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND mediaSearch == true AND hasPreview == true AND classFile == %@ AND NOT (status IN %@)"
+    func getMediaPredicate(filterLivePhotoFile: Bool, session: NCSession.Session, showOnlyImages: Bool, showOnlyVideos: Bool) -> NSPredicate {
+            guard let tableAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)) else { return NSPredicate() }
+            var predicate = NSPredicate()
+            let startServerUrl = NCUtilityFileSystem().getHomeServer(session: session) + tableAccount.mediaPath
 
-        if showOnlyImages {
-            predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKTypeClassFile.image.rawValue, global.metadataStatusHideInView)
-        } else if showOnlyVideos {
-            predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKTypeClassFile.video.rawValue, global.metadataStatusHideInView)
-        } else {
-            predicate = NSPredicate(format: showBothPredicateMediaString, session.account, startServerUrl, global.metadataStatusHideInView)
+            var showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND hasPreview == true AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (status IN %@)"
+            var showOnlyPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND hasPreview == true AND classFile == %@ AND NOT (status IN %@)"
+
+            if filterLivePhotoFile {
+                showBothPredicateMediaString = showBothPredicateMediaString + " AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
+                showOnlyPredicateMediaString = showOnlyPredicateMediaString + " AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
+            }
+
+            if showOnlyImages {
+                predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKCommon.TypeClassFile.image.rawValue, global.metadataStatusHideInView)
+            } else if showOnlyVideos {
+                predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKCommon.TypeClassFile.video.rawValue, global.metadataStatusHideInView)
+            } else {
+                predicate = NSPredicate(format: showBothPredicateMediaString, session.account, startServerUrl, global.metadataStatusHideInView)
+            }
+
+            return predicate
         }
 
         return predicate
@@ -336,6 +358,7 @@ import RealmSwift
         static var buttonMore = UIImage()
         static var buttonStop = UIImage()
         static var buttonMoreLock = UIImage()
+
         static var buttonRestore = UIImage()
         static var buttonTrash = UIImage()
         
@@ -413,10 +436,6 @@ import RealmSwift
     func getImageShared() -> UIImage {
         return NCImageCache.images.shared
     }
-    
-    func getImageShared(account: String) -> UIImage {
-        return NCImageCache.images.shared
-    }
 
     func getImageCanShare() -> UIImage {
         return NCImageCache.images.canShare
@@ -461,10 +480,6 @@ import RealmSwift
     func getImageLivePhoto() -> UIImage {
         return NCImageCache.images.livePhoto
     }
-    
-    func getFolder(account: String) -> UIImage {
-        return NCImageCache.images.folder
-    }
 
     func getAddFolder() -> UIImage {
         return UIImage(named: "addFolder")!
@@ -485,7 +500,7 @@ import RealmSwift
     func getFolderSharedWithMe() -> UIImage {
         return NCImageCache.images.folderSharedWithMe
     }
-    
+        
     func getFolderPublic() -> UIImage {
         return NCImageCache.images.folderPublic
     }

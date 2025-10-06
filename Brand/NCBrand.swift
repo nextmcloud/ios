@@ -1,9 +1,27 @@
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2017 Marino Faggiana
-// SPDX-License-Identifier: GPL-3.0-or-later
+//
+//  NCBrandColor.swift
+//  Nextcloud
+//
+//  Created by Marino Faggiana on 24/04/17.
+//  Copyright (c) 2017 Marino Faggiana. All rights reserved.
+//
+//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 import UIKit
-import NextcloudKit
 
 let userAgent: String = {
     let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
@@ -21,6 +39,7 @@ let userAgent: String = {
 
 //final class NCBrandOptions: @unchecked Sendable {
 //    static let shared = NCBrandOptions()
+
 @objc class NCBrandOptions: NSObject, @unchecked Sendable {
     @objc static let shared: NCBrandOptions = {
         let instance = NCBrandOptions()
@@ -31,6 +50,7 @@ let userAgent: String = {
     @objc public var textCopyrightNextcloudiOS:       String = "MagentaCLOUD for iOS %@"
     @objc public var textCopyrightNextcloudServer:    String = "MagentaCLOUD Server %@"
     @objc public var loginBaseUrl:                    String = "https://magentacloud.de"
+
     @objc public var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
     @objc public var linkLoginHost: String = "https://nextcloud.com/install"
     @objc public var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
@@ -47,19 +67,26 @@ let userAgent: String = {
     // Auto Upload default folder
     @objc public var folderDefaultAutoUpload: String = Locale.current.languageCode == "de" ? "Kamera-Medien" : "Camera-Media"
 
-    // Capabilities Group
-    @objc public var capabilitiesGroup:              String = "group.de.telekom.Mediencenter"
-    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
+    // Options
 
+//#if DEBUG
+    // QA :
+    @objc public var capabilitiesGroup:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
+    @objc public var capabilitiesGroupApps:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
+//#else
+//    // PROD :
+//    @objc public var capabilitiesGroup:              String = "group.de.telekom.Mediencenter"
+//    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
+//#endif
+    
     // BRAND ONLY
     // Set use_login_web_personalized to true for prod and false for configurable path
     @objc public var use_login_web_personalized: Bool = true                               // Don't touch me !!
     @objc public var use_AppConfig: Bool = false                                                // Don't touch me !!
     @objc public var use_GroupApps: Bool = true                                                 // Don't touch me !!
 
-    // Options
-    // Use server theming color
     @objc public var use_default_auto_upload: Bool = false
+    // Use server theming color
     @objc public var use_themingColor: Bool = false
     @objc public var use_themingLogo: Bool = false
     @objc public var use_storeLocalAutoUploadAll: Bool = false
@@ -81,16 +108,16 @@ let userAgent: String = {
     @objc var use_in_app_browser_for_login = false
     var enforce_privacyScreenEnabled = false
 
-    // Example: (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
+    // (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
     var enforce_servers: [(name: String, url: String)] = []
 
     // Internal option behaviour
     @objc var cleanUpDay: Int = 0                                                                     // Set default "Delete all cached files older than" possible days value are: 0, 1, 7, 30, 90, 180, 365
 
     // Max request/download/upload concurrent
-    let httpMaximumConnectionsPerHost: Int = 8
-    let httpMaximumConnectionsPerHostInDownload: Int = 8
-    let httpMaximumConnectionsPerHostInUpload: Int = 8
+    let httpMaximumConnectionsPerHost: Int = 6
+    let httpMaximumConnectionsPerHostInDownload: Int = 6
+    let httpMaximumConnectionsPerHostInUpload: Int = 6
 
     // Max request/download/upload process
     let numMaximumProcess: Int = 50
@@ -104,7 +131,7 @@ let userAgent: String = {
         case activity, sharing
     }
 
-    init() {
+    override init() {
         // wrapper AppConfig
         if let configurationManaged = UserDefaults.standard.dictionary(forKey: "com.apple.configuration.managed"), use_AppConfig {
             if let str = configurationManaged[NCGlobal.shared.configuration_brand] as? String {
@@ -150,13 +177,12 @@ let userAgent: String = {
 }
 
 class NCBrandColor: NSObject, @unchecked Sendable  {
-    static let shared: NCBrandColor = {
+    @objc static let shared: NCBrandColor = {
         let instance = NCBrandColor()
         return instance
     }()
 
-    /// This is rewrited from customet theme, default is Nextcloud color
-    ///
+    // Color
     @objc let customer:              UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)
     @objc var customerText: UIColor = .white
 
@@ -420,4 +446,20 @@ class NCBrandColor: NSObject, @unchecked Sendable  {
     @objc public var seperatorRename: UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
     @objc public let gray: UIColor = UIColor(red: 104.0/255.0, green: 104.0/255.0, blue: 104.0/255.0, alpha: 1.0)
     @objc public var nmcIconSharedWithMe: UIColor = UIColor(displayP3Red: 0.0/255.0, green: 153.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+    
+    var shareBlueColor: UIColor{
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return UIColor(hex: "#7d94f9")!
+        }else {
+            return UIColor(hex: "#2238df")!
+        }
+    }
+    
+    var shareBlackColor: UIColor{
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return UIColor.white
+        }else {
+            return UIColor.black
+        }
+    }
 }
