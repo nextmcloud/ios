@@ -44,12 +44,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         let canDeleteServer = metadatas.allSatisfy { !$0.lock }
 
         if canDeleteServer {
-            alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { _ in
-                self.networking.setStatusWaitDelete(metadatas: metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
-                self.setEditMode(false)
-                Task {
-                    await self.reloadDataSource()
-                }
+            alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { [self] _ in
+                NCNetworking.shared.deleteMetadatas(metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
+                toggleSelect()
             })
         }
 
@@ -58,9 +56,14 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
 
             Task {
                 var error = NKError()
+                var ocId: [String] = []
                 for metadata in copyMetadatas where error == .success {
-                    error = await self.networking.deleteCache(metadata, sceneIdentifier: self.controller?.sceneIdentifier)
+                    error = await NCNetworking.shared.deleteCache(metadata, sceneIdentifier: self.controller?.sceneIdentifier)
+                    if error == .success {
+                        ocId.append(metadata.ocId)
+                    }
                 }
+                NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterDeleteFile, userInfo: ["ocId": ocId, "error": error])
             }
             toggleSelect()
         })
@@ -72,18 +75,14 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
     func move() {
         let metadatas = getSelectedMetadatas()
 
-        NCDownloadAction.shared.openSelectView(items: metadatas, controller: self.controller)
-        setEditMode(false)
-//        NCActionCenter.shared.openSelectView(items: metadatas, controller: self.controller)
-//        toggleSelect()
+        NCActionCenter.shared.openSelectView(items: metadatas, controller: self.controller)
+        toggleSelect()
     }
 
     func share() {
         let metadatas = getSelectedMetadatas()
-        NCDownloadAction.shared.openActivityViewController(selectedMetadata: metadatas, controller: self.controller, sender: nil)
-        setEditMode(false)
-//        NCActionCenter.shared.openActivityViewController(selectedMetadata: metadatas, controller: self.controller)
-//        toggleSelect()
+        NCActionCenter.shared.openActivityViewController(selectedMetadata: metadatas, controller: self.controller)
+        toggleSelect()
     }
 
     func saveAsAvailableOffline(isAnyOffline: Bool) {
@@ -93,35 +92,22 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
                 title: NSLocalizedString("_set_available_offline_", comment: ""),
                 message: NSLocalizedString("_select_offline_warning_", comment: ""),
                 preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { _ in
-                Task {
-                    for metadata in metadatas {
-                        await NCDownloadAction.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
-                    }
-                }
-                self.setEditMode(false)
-//            alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { [self] _ in
-//                metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
-//                toggleSelect()
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { [self] _ in
+                metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
+                toggleSelect()
             }))
             alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
             self.present(alert, animated: true)
         } else {
-            Task {
-                for metadata in metadatas {
-                    await NCDownloadAction.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
-                }
-            }
-            setEditMode(false)
-//            metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
-//            toggleSelect()
+            metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
+            toggleSelect()
         }
     }
 
     func lock(isAnyLocked: Bool) {
         let metadatas = getSelectedMetadatas()
         for metadata in metadatas where metadata.lock == isAnyLocked {
-            self.networking.lockUnlockFile(metadata, shoulLock: !isAnyLocked)
+            NCNetworking.shared.lockUnlockFile(metadata, shoulLock: !isAnyLocked)
         }
         toggleSelect()
     }
@@ -138,11 +124,6 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
     func setEditMode(_ editMode: Bool) {
         isEditMode = editMode
         fileSelect.removeAll()
-
-        navigationItem.hidesBackButton = editMode
-        navigationController?.interactivePopGestureRecognizer?.isEnabled = !editMode
-        searchController(enabled: !editMode)
-        isHiddenPlusButton(editMode)
 
         if editMode {
             navigationItem.leftBarButtonItems = nil
@@ -161,7 +142,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
     func convertLivePhoto(metadataFirst: tableMetadata?, metadataLast: tableMetadata?) {
         if let metadataFirst, let metadataLast {
             Task {
-                await self.networking.setLivePhoto(metadataFirst: metadataFirst, metadataLast: metadataLast)
+                let userInfo: [String: Any] = ["serverUrl": metadataFirst.serverUrl,
+                                               "account": metadataFirst.account]
+
+                await NCNetworking.shared.setLivePhoto(metadataFirst: metadataFirst, metadataLast: metadataLast, userInfo: userInfo)
             }
         }
         setEditMode(false)
@@ -235,14 +219,43 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         }
         
         if canOpenIn {
-            actions.append(.openInAction(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
+            actions.append(.share(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
         }
 
-        if !isAnyFolder, canUnlock, !NCCapabilities.shared.getCapabilities(account: controller?.account).capabilityFilesLockVersion.isEmpty {
+       if !isAnyFolder, canUnlock, !NCCapabilities.shared.getCapabilities(account: controller?.account).capabilityFilesLockVersion.isEmpty {
             actions.append(.lockUnlockFiles(shouldLock: !isAnyLocked, metadatas: selectedMetadatas, completion: { self.toggleSelect() }))
         }
 
         if !selectedMediaMetadatas.isEmpty {
+//            var title: String = NSLocalizedString("_save_selected_files_", comment: "")
+//            var icon = NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconImageColor])
+//            if selectedMediaMetadatas.allSatisfy({ NCManageDatabase.shared.getMetadataLivePhoto(metadata: $0) != nil }) {
+//                title = NSLocalizedString("_livephoto_save_", comment: "")
+//                icon = NCUtility().loadImage(named: "livephoto")
+//            }
+//
+//            actions.append(NCMenuAction(
+//                title: title,
+//                icon: icon,
+//                order: 0,
+//                action: { _ in
+//                    for metadata in selectedMediaMetadatas {
+//                        if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
+//                            NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV, hudView: self.view))
+//                        } else {
+//                            if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
+//                                NCActionCenter.shared.saveAlbum(metadata: metadata, controller: self.tabBarController as? NCMainTabBarController)
+//                            } else {
+//                                if NCNetworking.shared.downloadQueue.operations.filter({ ($0 as? NCOperationDownload)?.metadata.ocId == metadata.ocId }).isEmpty {
+//                                    NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum))
+//                                }
+//                            }
+//                        }
+//                    }
+//                    self.toggleSelect()
+//                }
+//            )
+//            )
             actions.append(.saveMediaAction(selectedMediaMetadatas: selectedMediaMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
         }
         actions.append(.setAvailableOfflineAction(selectedMetadatas: selectedMetadatas, isAnyOffline: isAnyOffline, viewController: self, completion: {
@@ -251,10 +264,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         }))
         
         if !isDirectoryE2EE {
-            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, viewController: self, indexPath: [], completion: { self.toggleSelect() }))
-            actions.append(.copyAction(selectOcId: selectOcId, viewController: self, completion: { self.toggleSelect() }))
+            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
+            actions.append(.copyAction(fileSelect: fileSelect, controller: self.controller, completion: { self.toggleSelect() }))
         }
-        actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, indexPaths: [], viewController: self, completion: { self.toggleSelect() }))
+        actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
         return actions
     }
 
