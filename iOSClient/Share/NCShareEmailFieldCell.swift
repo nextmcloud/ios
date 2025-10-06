@@ -7,83 +7,169 @@
 //
 
 import UIKit
+import MarqueeLabel
+import NextcloudKit
 
 enum Tag {
     static let searchField = 999
 }
 
 class NCShareEmailFieldCell: UITableViewCell {
-    @IBOutlet weak var searchField: UITextField!
-    @IBOutlet weak var btnCreateLink: UIButton!
-    @IBOutlet weak var labelYourShare: UILabel!
-    @IBOutlet weak var labelShareByMail: UILabel!
-    @IBOutlet weak var btnContact: UIButton!
-    @IBOutlet weak var labelNoShare: UILabel!
-    @IBOutlet weak var heightLabelNoShare: NSLayoutConstraint!
     
+    @IBOutlet weak var searchField: UITextField!
+    @IBOutlet weak var labelOrLink: UILabel!
+    @IBOutlet weak var btnContact: UIButton!
+    @IBOutlet weak var labelSeparator1: UILabel!
+    @IBOutlet weak var labelSeparator2: UILabel!
+    @IBOutlet weak var labelSendLinkByMail: UILabel!
+    @IBOutlet weak var labelSharedWithBy: UILabel!
+    @IBOutlet weak var labelResharingAllowed: UILabel!
+    @IBOutlet weak var topConstraintResharingView: NSLayoutConstraint!
+    @IBOutlet weak var viewOrLinkSeparator: UIView!
+
+    var ocId = ""
+
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
-        setupCell()
     }
-    
+
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-        
-        // Configure the view for the selected state
     }
-    
-    func setupCell(){
-        self.btnCreateLink.setTitle(NSLocalizedString("_create_link_", comment: ""), for: .normal)
-        self.btnCreateLink.layer.cornerRadius = 7
-        self.btnCreateLink.layer.masksToBounds = true
-        self.btnCreateLink.layer.borderWidth = 1
-        self.btnCreateLink.titleLabel?.font = UIFont.systemFont(ofSize: 17)
-        self.btnCreateLink.titleLabel!.adjustsFontSizeToFitWidth = true
-        self.btnCreateLink.titleLabel!.minimumScaleFactor = 0.5
-        self.btnCreateLink.layer.borderColor = NCBrandColor.shared.label.cgColor
-        self.btnCreateLink.setTitleColor(NCBrandColor.shared.label, for: .normal)
-        self.btnCreateLink.backgroundColor = .clear
+
+    func setupCell(with metadata: tableMetadata) {
+        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        ocId = metadata.ocId
+
+        configureSearchField()
+        configureContactButton()
+        configureLabels()
+        updateCanReshareUI()
         
-        self.labelShareByMail.text = NSLocalizedString("personal_share_by_mail", comment: "")
-        self.labelShareByMail.textColor = NCBrandColor.shared.shareByEmailTextColor
-        
-        labelYourShare.text = NSLocalizedString("_your_shares_", comment: "")
-        
+        setNeedsLayout()
+        layoutIfNeeded()
+    }
+
+    private func configureSearchField() {
         searchField.layer.cornerRadius = 5
         searchField.layer.masksToBounds = true
         searchField.layer.borderWidth = 1
-        self.searchField.text = ""
-        searchField.attributedPlaceholder = NSAttributedString(string: NSLocalizedString("_shareLinksearch_placeholder_", comment: ""),
-                                                               attributes: [NSAttributedString.Key.foregroundColor: NCBrandColor.shared.gray60])
-        searchField.textColor = NCBrandColor.shared.label
         searchField.layer.borderColor = NCBrandColor.shared.label.cgColor
+        searchField.text = ""
+        searchField.textColor = NCBrandColor.shared.label
+        searchField.attributedPlaceholder = NSAttributedString(
+            string: NSLocalizedString("_shareLinksearch_placeholder_", comment: ""),
+            attributes: [.foregroundColor: NCBrandColor.shared.gray60]
+        )
         searchField.tag = Tag.searchField
         setDoneButton(sender: searchField)
-        
+    }
+
+    private func configureContactButton() {
         btnContact.layer.cornerRadius = 5
         btnContact.layer.masksToBounds = true
         btnContact.layer.borderWidth = 1
         btnContact.layer.borderColor = NCBrandColor.shared.label.cgColor
         btnContact.tintColor = NCBrandColor.shared.label
-        btnContact.setImage(NCUtility().loadImage(named: "contact", colors: [NCBrandColor.shared.label], size: 24), for: .normal)
-        labelNoShare.textColor = NCBrandColor.shared.textInfo
-        labelNoShare.numberOfLines = 0
-        labelNoShare.font = UIFont.systemFont(ofSize: 17)
-        labelNoShare.text = NSLocalizedString("no_shares_created", comment: "")
+        let contactImage = NCUtility().loadImage(named: "contact").image(color: NCBrandColor.shared.label, size: 24)
+        btnContact.setImage(contactImage, for: .normal)
     }
-    
+
+    private func configureLabels() {
+        labelOrLink.text = NSLocalizedString("_share_or_", comment: "")
+        labelSendLinkByMail.text = NSLocalizedString("_share_send_link_by_mail_", comment: "")
+        labelSharedWithBy.text = NSLocalizedString("_share_received_shares_text_", comment: "")
+        labelResharingAllowed.text = NSLocalizedString("_share_reshare_allowed_", comment: "")
+        
+        labelSendLinkByMail.textColor = NCBrandColor.shared.label
+        labelSharedWithBy.textColor = NCBrandColor.shared.label
+        labelResharingAllowed.textColor = NCBrandColor.shared.label
+    }
+
+    func updateCanReshareUI() {
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
+
+        let isCurrentUser = NCShareCommon().isCurrentUserIsFileOwner(fileOwnerId: metadata.ownerId)
+        let canReshare = (metadata.sharePermissionsCollaborationServices & NCPermissions().permissionShareShare) != 0
+
+        labelSharedWithBy.isHidden = isCurrentUser
+        labelResharingAllowed.isHidden = isCurrentUser
+
+        if !canReshare {
+            searchField.isUserInteractionEnabled = false
+            searchField.alpha = 0.5
+            btnContact.isEnabled = false
+            btnContact.alpha = 0.5
+        }
+
+        if !isCurrentUser {
+            let ownerName = metadata.ownerDisplayName
+            let fullText = NSLocalizedString("_share_received_shares_text_", comment: "") + " " + ownerName
+            let attributed = NSMutableAttributedString(string: fullText)
+
+            if let range = fullText.range(of: ownerName) {
+                let nsRange = NSRange(range, in: fullText)
+                attributed.addAttribute(.font, value: UIFont.boldSystemFont(ofSize: 16), range: nsRange)
+            }
+
+            labelSharedWithBy.attributedText = attributed
+            labelSharedWithBy.numberOfLines = 0
+
+            labelResharingAllowed.text = canReshare
+                ? NSLocalizedString("_share_reshare_allowed_", comment: "")
+                : NSLocalizedString("_share_reshare_not_allowed_", comment: "")
+
+            topConstraintResharingView.constant = 15
+        } else {
+            topConstraintResharingView.constant = 0
+        }
+
+        viewOrLinkSeparator.isHidden = !canReshare
+    }
+
+    func updateShareUI(ocId: String, count: Int) {
+        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
+
+        let isCurrentUser = NCShareCommon().isCurrentUserIsFileOwner(fileOwnerId: metadata.ownerId)
+        let canReshare = (metadata.sharePermissionsCollaborationServices & NCPermissions().permissionShareShare) != 0
+
+        if !isCurrentUser {
+            if canReshare {
+                labelOrLink.isHidden = true
+                labelSeparator1.isHidden = true
+                labelSeparator2.isHidden = true
+            }
+        }
+    }
+
     @objc func cancelDatePicker() {
         self.searchField.endEditing(true)
     }
-    
-    func setDoneButton(sender: UITextField) {
-        //ToolBar
-        let toolbar = UIToolbar();
+
+    private func setDoneButton(sender: UITextField) {
+        let toolbar = UIToolbar()
         toolbar.sizeToFit()
-        let doneButton = UIBarButtonItem(title: NSLocalizedString("_done_", comment: ""), style: .plain, target: self, action: #selector(cancelDatePicker));
-        let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
-        toolbar.setItems([spaceButton, doneButton], animated: false)
+        let doneButton = UIBarButtonItem(
+            title: NSLocalizedString("_done_", comment: ""),
+            style: .plain,
+            target: self,
+            action: #selector(cancelDatePicker)
+        )
+        let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        toolbar.setItems([space, doneButton], animated: false)
         sender.inputAccessoryView = toolbar
+    }
+
+    @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
+        // Hook for favorite action if needed
+    }
+
+    @IBAction func touchUpInsideDetails(_ sender: UIButton) {
+        // Hook for toggling detail visibility if needed
+    }
+
+    @objc func longTap(_ sender: UIGestureRecognizer) {
+        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_copied_path_")
+        NCContentPresenter().showInfo(error: error)
     }
 }
