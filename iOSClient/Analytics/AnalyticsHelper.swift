@@ -81,5 +81,10 @@ class AnalyticsHelper: NSObject, AnalyticsService {
             self.analyticsServices.forEach { $0.trackCreateFolder(isEncrypted: isEncrypted, creationDate: creationDate) }
         }
     }
+    
+    func displayInAppNotification() {
+        self.analyticsServices.forEach { $0.displayInAppNotification() }
+    }
+
 
 }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+
 import XLForm
 
 class PdfWithoutOcrSwitchView: XLFormBaseCell{
