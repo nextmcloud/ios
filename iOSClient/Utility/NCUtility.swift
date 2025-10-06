@@ -2,12 +2,14 @@
 // SPDX-FileCopyrightText: 2018 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import Foundation
 import UIKit
 import NextcloudKit
 import PDFKit
 import Accelerate
 import CoreMedia
 import Photos
+import Alamofire
 
 final class NCUtility: NSObject, Sendable {
     let utilityFileSystem = NCUtilityFileSystem()
@@ -28,23 +30,19 @@ final class NCUtility: NSObject, Sendable {
     }
 
     func isTypeFileRichDocument(_ metadata: tableMetadata) -> Bool {
+        guard metadata.fileNameView != "." else { return false }
         let fileExtension = (metadata.fileNameView as NSString).pathExtension
-        guard let capabilities = NCNetworking.shared.capabilities[metadata.account],
-              !fileExtension.isEmpty,
-              let mimeType = UTType(tag: fileExtension.uppercased(), tagClass: .filenameExtension, conformingTo: nil)?.identifier else {
-            return false
-        }
-
+        guard !fileExtension.isEmpty else { return false }
+        guard let mimeType = UTType(tag: fileExtension.uppercased(), tagClass: .filenameExtension, conformingTo: nil)?.identifier else { return false }
         /// contentype
-        if !capabilities.richDocumentsMimetypes.filter({ $0.contains(metadata.contentType) || $0.contains("text/plain") }).isEmpty {
+        if !NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityRichDocumentsMimetypes.filter({ $0.contains(metadata.contentType) || $0.contains("text/plain") }).isEmpty {
             return true
         }
-
         /// mimetype
-        if !capabilities.richDocumentsMimetypes.isEmpty && mimeType.components(separatedBy: ".").count > 2 {
+        if !NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityRichDocumentsMimetypes.isEmpty && mimeType.components(separatedBy: ".").count > 2 {
             let mimeTypeArray = mimeType.components(separatedBy: ".")
             let mimeType = mimeTypeArray[mimeTypeArray.count - 2] + "." + mimeTypeArray[mimeTypeArray.count - 1]
-            if !capabilities.richDocumentsMimetypes.filter({ $0.contains(mimeType) }).isEmpty {
+            if !NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityRichDocumentsMimetypes.filter({ $0.contains(mimeType) }).isEmpty {
                 return true
             }
         }
@@ -52,33 +50,39 @@ final class NCUtility: NSObject, Sendable {
     }
 
     func editorsDirectEditing(account: String, contentType: String) -> [String] {
-        var identifiers: [String] = []
-        let capabilities = NCNetworking.shared.capabilities[account]
+        var editor: [String] = []
+        guard let results = NCManageDatabase.shared.getDirectEditingEditors(account: account) else { return editor }
 
-        capabilities?.directEditingEditors.forEach { editor in
-            editor.mimetypes.forEach { mimetype in
+        for result: tableDirectEditingEditors in results {
+            for mimetype in result.mimetypes {
                 if mimetype == contentType {
-                    identifiers.append(editor.identifier)
+                    editor.append(result.editor)
                 }
                 // HARDCODE
                 // https://github.com/nextcloud/text/issues/913
                 if mimetype == "text/markdown" && contentType == "text/x-markdown" {
-                    identifiers.append(editor.identifier)
+                    editor.append(result.editor)
                 }
                 if contentType == "text/html" {
-                    identifiers.append(editor.identifier)
+                    editor.append(result.editor)
                 }
             }
             for mimetype in result.optionalMimetypes {
                 if mimetype == contentType {
-                    identifiers.append(editor.identifier)
+                    editor.append(result.editor)
                 }
             }
         }
         return Array(Set(editor))
     }
 
-        return Array(Set(identifiers))
+    func permissionsContainsString(_ metadataPermissions: String, permissions: String) -> Bool {
+        for char in permissions {
+            if metadataPermissions.contains(char) == false {
+                return false
+            }
+        }
+        return true
     }
 
     func getCustomUserAgentNCText() -> String {
@@ -129,18 +133,6 @@ final class NCUtility: NSObject, Sendable {
         let zeros = String(repeating: "0", count: 8 - fileId.count)
         return zeros + fileId
     }
-//    func getVersionApp(withBuild: Bool = true) -> String {
-//        if let dictionary = Bundle.main.infoDictionary {
-//            if let version = dictionary["CFBundleShortVersionString"], let build = dictionary["CFBundleVersion"] {
-//                if withBuild {
-//                    return "\(version).\(build)"
-//                } else {
-//                    return "\(version)"
-//                }
-//            }
-//        }
-//        return ""
-//    }
 
     func getVersionBuild() -> String {
         if let dictionary = Bundle.main.infoDictionary,
@@ -155,6 +147,19 @@ final class NCUtility: NSObject, Sendable {
         if let dictionary = Bundle.main.infoDictionary,
            let version = dictionary["CFBundleShortVersionString"] {
             return "\(version)"
+        }
+        return ""
+    }
+    
+    @objc func getVersionApp(withBuild: Bool = true) -> String {
+        if let dictionary = Bundle.main.infoDictionary {
+            if let version = dictionary["CFBundleShortVersionString"], let build = dictionary["CFBundleVersion"] {
+                if withBuild {
+                    return "\(version).\(build)"
+                } else {
+                    return "\(version)"
+                }
+            }
         }
         return ""
     }
@@ -242,6 +247,7 @@ final class NCUtility: NSObject, Sendable {
         return isEqual
     }
 
+    #if !EXTENSION_FILE_PROVIDER_EXTENSION
     func getLocation(latitude: Double, longitude: Double, completion: @escaping (String?) -> Void) {
         let geocoder = CLGeocoder()
         let llocation = CLLocation(latitude: latitude, longitude: longitude)
@@ -262,6 +268,7 @@ final class NCUtility: NSObject, Sendable {
             }
         }
     }
+    #endif
 
     // https://stackoverflow.com/questions/5887248/ios-app-maximum-memory-budget/19692719#19692719
     // https://stackoverflow.com/questions/27556807/swift-pointer-problems-with-mach-task-basic-info/27559770#27559770
@@ -292,14 +299,6 @@ final class NCUtility: NSObject, Sendable {
         return (usedmegabytes, totalmegabytes)
     }
 
-//    func removeForbiddenCharacters(_ fileName: String) -> String {
-//        var fileName = fileName
-//        for character in global.forbiddenCharacters {
-//            fileName = fileName.replacingOccurrences(of: character, with: "")
-//        }
-//        return fileName
-//    }
-    
     func getHeightHeaderEmptyData(view: UIView, portraitOffset: CGFloat, landscapeOffset: CGFloat, isHeaderMenuTransferViewEnabled: Bool = false) -> CGFloat {
         var height: CGFloat = 0
         if UIDevice.current.orientation.isPortrait {
@@ -309,7 +308,17 @@ final class NCUtility: NSObject, Sendable {
         }
         return height
     }
+
+    func formatBadgeCount(_ count: Int) -> String {
+        if count <= 9999 {
+            return "\(count)"
+        } else {
+            return count.formatted(.number.notation(.compactName).locale(Locale(identifier: "en_US")))
+        }
+    }
     
+    func isValidEmail(_ email: String) -> Bool {
+        
     // E-mail validations
     // 1. Basic Email Validator (ASCII only)
     func isValidEmail(_ email: String) -> Bool {
@@ -382,12 +391,5 @@ final class NCUtility: NSObject, Sendable {
             print("Invalid email: \(email)")
             return false
         }
-    }
-    
-    func isValidEmail(_ email: String) -> Bool {
-        
-        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-        return emailPred.evaluate(with: email)
     }
 }

@@ -37,30 +37,19 @@ class NCShareEmailFieldCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
-            setupCellAppearance()
-        }
-    }
-    
     func setupCell(with metadata: tableMetadata) {
-//        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         ocId = metadata.ocId
 
-        setupCellAppearance()
+        configureSearchField()
+        configureContactButton()
+        configureLabels()
         updateCanReshareUI()
         
         setNeedsLayout()
         layoutIfNeeded()
     }
 
-    func setupCellAppearance() {
-        configureSearchField()
-        configureContactButton()
-        configureLabels()
-    }
-    
     private func configureSearchField() {
         searchField.layer.cornerRadius = 5
         searchField.layer.masksToBounds = true
@@ -81,11 +70,9 @@ class NCShareEmailFieldCell: UITableViewCell {
         btnContact.layer.masksToBounds = true
         btnContact.layer.borderWidth = 1
         btnContact.layer.borderColor = NCBrandColor.shared.label.cgColor
-        if let image = UIImage(named: "Contacts")?.withRenderingMode(.alwaysTemplate) {
-            btnContact.setImage(image, for: .normal)
-        }
         btnContact.tintColor = NCBrandColor.shared.label
-
+        let contactImage = NCUtility().loadImage(named: "contact").image(color: NCBrandColor.shared.label, size: 24)
+        btnContact.setImage(contactImage, for: .normal)
     }
 
     private func configureLabels() {
@@ -102,7 +89,7 @@ class NCShareEmailFieldCell: UITableViewCell {
     func updateCanReshareUI() {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
 
-        let isCurrentUser = NCShareCommon.isCurrentUserIsFileOwner(fileOwnerId: metadata.ownerId)
+        let isCurrentUser = NCShareCommon().isCurrentUserIsFileOwner(fileOwnerId: metadata.ownerId)
         let canReshare = (metadata.sharePermissionsCollaborationServices & NCPermissions().permissionShareShare) != 0
 
         labelSharedWithBy.isHidden = isCurrentUser
@@ -143,7 +130,7 @@ class NCShareEmailFieldCell: UITableViewCell {
     func updateShareUI(ocId: String, count: Int) {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
 
-        let isCurrentUser = NCShareCommon.isCurrentUserIsFileOwner(fileOwnerId: metadata.ownerId)
+        let isCurrentUser = NCShareCommon().isCurrentUserIsFileOwner(fileOwnerId: metadata.ownerId)
         let canReshare = (metadata.sharePermissionsCollaborationServices & NCPermissions().permissionShareShare) != 0
 
         if !isCurrentUser {
