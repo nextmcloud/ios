@@ -23,22 +23,23 @@
 import UIKit
 import DropDown
 
-enum NCShareCommon {
-    static let shareTypeUser = 0
-    static let shareTypeGroup = 1
-    static let shareTypeLink = 3
-    static let shareTypeEmail = 4
-    static let shareTypeContact = 5
-    static let shareTypeFederated = 6
-    static let shareTypeTeam = 7
-    static let shareTypeGuest = 8
-    static let shareTypeFederatedGroup = 9
-    static let shareTypeRoom = 10
+class NCShareCommon: NSObject {
 
-    static let itemTypeFile = "file"
-    static let itemTypeFolder = "folder"
+    // swiftlint:disable identifier_name
+    let SHARE_TYPE_USER = 0
+    let SHARE_TYPE_GROUP = 1
+    let SHARE_TYPE_LINK = 3
+    let SHARE_TYPE_EMAIL = 4
+    let SHARE_TYPE_CONTACT = 5
+    let SHARE_TYPE_REMOTE = 6
+    let SHARE_TYPE_CIRCLE = 7
+    let SHARE_TYPE_GUEST = 8
+    let SHARE_TYPE_REMOTE_GROUP = 9
+    let SHARE_TYPE_ROOM = 10
+    // swiftlint:enable identifier_name
 
-    static func createLinkAvatar(imageName: String, colorCircle: UIColor) -> UIImage? {
+    func createLinkAvatar(imageName: String, colorCircle: UIColor) -> UIImage? {
+
         let size: CGFloat = 200
 
         let bottomImage = UIImage(named: "circle_fill")!.image(color: colorCircle, size: size / 2)
@@ -52,7 +53,7 @@ enum NCShareCommon {
         return image
     }
 
-    static func copyLink(link: String, viewController: UIViewController, sender: Any) {
+    func copyLink(link: String, viewController: UIViewController, sender: Any) {
         let objectsToShare = [link]
 
         let activityViewController = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
@@ -80,19 +81,13 @@ enum NCShareCommon {
         case self.SHARE_TYPE_EMAIL:
             return UIImage(named: isDropDown ? "email" : "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_CONTACT:
-            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case NCShareCommon.shareTypeFederated:
-            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-//            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
+            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_REMOTE:
             return UIImage(named: isDropDown ? "shareTypeUser" : "shareTypeEmail")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_CIRCLE:
             return UIImage(named: "shareTypeCircles")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_GUEST:
-            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case NCShareCommon.shareTypeFederatedGroup:
-            return UIImage(named: "shareTypeGroup")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-//            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
+            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_REMOTE_GROUP:
             return UIImage(named: "shareTypeGroup")?.imageColor(NCBrandColor.shared.label)
         case self.SHARE_TYPE_ROOM:

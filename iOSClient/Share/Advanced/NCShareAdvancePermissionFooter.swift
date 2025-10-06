@@ -42,17 +42,6 @@ class NCShareAdvancePermissionFooter: UIView {
         buttonCancel.layer.cornerRadius = 10
         buttonCancel.layer.masksToBounds = true
         buttonCancel.layer.borderWidth = 1
-        buttonCancel.layer.borderColor = NCBrandColor.shared.textColor2.cgColor
-        buttonCancel.backgroundColor = .secondarySystemBackground
-        buttonCancel.addTarget(self, action: #selector(cancelClicked(_:)), for: .touchUpInside)
-        buttonCancel.setTitleColor(NCBrandColor.shared.textColor2, for: .normal)
-
-        buttonNext.setTitle(NSLocalizedString(delegate?.isNewShare == true ? "_share_" : "_save_", comment: ""), for: .normal)
-        buttonNext.layer.cornerRadius = 25
-        buttonNext.layer.masksToBounds = true
-        buttonNext.backgroundColor = NCBrandColor.shared.getElement(account: account)
-        buttonNext.addTarget(self, action: #selector(nextClicked(_:)), for: .touchUpInside)
-
         addShadow(location: .top)
         layer.cornerRadius = 10
         layer.masksToBounds = true
@@ -66,11 +55,11 @@ class NCShareAdvancePermissionFooter: UIView {
         buttonNext.layer.masksToBounds = true
     }
 
-    @objc func cancelClicked(_ sender: Any?) {
+    @objc func cancelClicked() {
         delegate?.dismissShareAdvanceView(shouldSave: false)
     }
 
-    @objc func nextClicked(_ sender: Any?) {
+    @objc func nextClicked() {
         delegate?.dismissShareAdvanceView(shouldSave: true)
     }
 }

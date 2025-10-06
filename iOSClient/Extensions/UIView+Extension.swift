@@ -51,6 +51,15 @@ extension UIView {
         hiddenView.addSubview(view)
     }
 
+    func addBlur(style: UIBlurEffect.Style) {
+        let blur = UIBlurEffect(style: style)
+        let blurredEffectView = UIVisualEffectView(effect: blur)
+        blurredEffectView.frame = self.bounds
+        blurredEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        blurredEffectView.isUserInteractionEnabled = false
+        self.addSubview(blurredEffectView)
+    }
+
     func insertBlur(style: UIBlurEffect.Style) {
         let blur = UIBlurEffect(style: style)
         let blurredEffectView = UIVisualEffectView(effect: blur)
@@ -64,17 +73,6 @@ extension UIView {
         self.backgroundColor = backgroundColor
         self.layer.cornerRadius = self.frame.size.width / 2
         self.layer.masksToBounds = true
-    }
-
-    var parentTabBarController: UITabBarController? {
-        var responder: UIResponder? = self
-        while let nextResponder = responder?.next {
-            if let tabBarController = nextResponder as? UITabBarController {
-                return tabBarController
-            }
-            responder = nextResponder
-        }
-        return nil
     }
     
     func addShadow(location: VerticalLocation, height: CGFloat = 2, color: UIColor = NCBrandColor.shared.customerDarkGrey, opacity: Float = 0.4, radius: CGFloat = 2) {
