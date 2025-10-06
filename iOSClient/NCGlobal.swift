@@ -4,11 +4,27 @@
 
 import UIKit
 
-final class NCGlobal: Sendable {
-    static let shared = NCGlobal()
+/// Used for read/write in Realm
+var isAppSuspending: Bool = false
+/// Used for know if the app in in Background mode
+var isAppInBackground: Bool = false
 
-    init() { }
+class NCGlobal: NSObject, @unchecked Sendable  {
+    @objc static let shared = NCGlobal()
+    
+    override init() {
+        super.init()
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { _ in
+            isAppSuspending = true
+            isAppInBackground = true
+        }
 
+        NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
+            isAppSuspending = false
+            isAppInBackground = false
+        }
+    }
+    
     // ENUM
     //
     public enum TypeFilterScanDocument: String {
@@ -42,6 +58,7 @@ final class NCGlobal: Sendable {
 
     // Nextcloud version
     //
+    let nextcloudVersion12: Int                     = 12
     let nextcloudVersion18: Int                     = 18
     let nextcloudVersion20: Int                     = 20
     let nextcloudVersion23: Int                     = 23
@@ -52,13 +69,9 @@ final class NCGlobal: Sendable {
     let nextcloudVersion28: Int                     = 28
     let nextcloudVersion30: Int                     = 30
     let nextcloudVersion31: Int                     = 31
-<<<<<<< HEAD
     let nextcloudVersion32: Int                     = 32
     let nextcloudVersion33: Int                     = 33
     let nextcloudVersionFuture: Int                 = 99999
-
-=======
->>>>>>> 374626da0d (NMC-2611 - Update theming customisation to remove confilcts)
 
     // Nextcloud unsupported
     //
@@ -137,7 +150,9 @@ final class NCGlobal: Sendable {
     let layoutViewShareExtension                    = "LayoutShareExtension"
     let layoutViewGroupfolders                      = "LayoutGroupfolders"
     let layoutViewMedia                             = "LayoutMedia"
+    let layoutViewMove                              = "LayoutMove"
 
+    
     // Button Type in Cell list/grid
     //
     let buttonMoreMore                              = "more"
@@ -192,11 +207,9 @@ final class NCGlobal: Sendable {
     let errorConflict: Int                      = 409
     let errorPreconditionFailed: Int            = 412
     let errorUnsupportedMediaType: Int          = 415
-<<<<<<< HEAD
     let errorExpectationFailed: Int             = 417
     let errorWebDAVLocked: Int                  = 423
-=======
->>>>>>> 374626da0d (NMC-2611 - Update theming customisation to remove confilcts)
+
     let errorInternalServerError: Int           = 500
     let errorMaintenance: Int                   = 503
     let errorQuota: Int                         = 507
@@ -252,6 +265,7 @@ final class NCGlobal: Sendable {
     let selectorDownloadFile                    = "downloadFile"
 
     let selectorUploadAutoUpload                = "uploadAutoUpload"
+    let selectorUploadAutoUploadAll             = "uploadAutoUploadAll"
     let selectorUploadFile                      = "uploadFile"
     let selectorUploadFileNODelete              = "UploadFileNODelete"
     let selectorUploadFileShareExtension        = "uploadFileShareExtension"
@@ -304,11 +318,23 @@ final class NCGlobal: Sendable {
     let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
 
     let metadataStatusUploadingAllMode          = [1,2,3]
-    let metadataStatusDownloadingAllMode        = [-1, -2, -3]
-    let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
+    let metadataStatusInTransfer                = [-1, -2, 1, 2]
+    let metadataStatusFileDown                  = [-1, -2, -3]
     let metadataStatusHideInView                = [1, 2, 3, 11]
+    let metadataStatusHideInFileExtension       = [1, 2, 3, 10, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
 
+    let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadatasStatusInProgress               = [-2, 2]
+
+    
+    let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
+
+    //  Hidden files included in the read
+    //
+    let includeHiddenFiles: [String] = [".LivePhoto"]
+    
     // Auto upload subfolder granularity
     //
     let subfolderGranularityDaily               = 2
@@ -317,19 +343,53 @@ final class NCGlobal: Sendable {
 
     // Notification Center
     //
-    let notificationCenterChangeUser                            = "changeUser"                      // userInfo: account, controller
-    let notificationCenterChangeTheming                         = "changeTheming"                   // userInfo: account
+    @objc let notificationCenterChangeUser                      = "changeUser"
+    let notificationCenterChangeTheming                         = "changeTheming"
+    @objc let notificationCenterApplicationDidEnterBackground   = "applicationDidEnterBackground"
+    @objc let notificationCenterApplicationDidBecomeActive      = "applicationDidBecomeActive"
+    @objc let notificationCenterApplicationWillResignActive     = "applicationWillResignActive"
+    @objc let notificationCenterApplicationWillEnterForeground  = "applicationWillEnterForeground"
+
+    
+    @objc let notificationCenterInitialize                      = "initialize"
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
     let notificationCenterDidCreateShareLink                    = "didCreateShareLink"
-
+    
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
     let notificationCenterReloadAvatar                          = "reloadAvatar"
+    let notificationCenterReloadHeader                          = "reloadHeader"
     let notificationCenterClearCache                            = "clearCache"
+    let notificationCenterChangeLayout                          = "changeLayout"                    // userInfo: account, serverUrl, layoutForView
     let notificationCenterCheckUserDelaultErrorDone             = "checkUserDelaultErrorDone"       // userInfo: account, controller
     let notificationCenterServerDidUpdate                       = "serverDidUpdate"                 // userInfo: account
     let notificationCenterNetworkReachability                   = "networkReachability"
 
+    let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
+    let notificationCenterUpdateNotification                    = "updateNotification"
+    let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
+    let notificationCenterGetServerData                         = "getServerData"                   // userInfo: serverUrl?
+    
+    let notificationCenterChangeStatusFolderE2EE                = "changeStatusFolderE2EE"          // userInfo: serverUrl
+    
+    let notificationCenterDownloadStartFile                     = "downloadStartFile"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    let notificationCenterDownloadedFile                        = "downloadedFile"                  // userInfo: ocId, ocIdTransfer, session, session, serverUrl, account, selector, error
+    let notificationCenterDownloadCancelFile                    = "downloadCancelFile"              // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    
+    let notificationCenterUploadStartFile                       = "uploadStartFile"                 // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, sessionSelector
+    let notificationCenterUploadedFile                          = "uploadedFile"                    // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadedLivePhoto                     = "uploadedLivePhoto"               // userInfo: ocId, ocIdTransfer, session, serverUrl, account, fileName, ocIdTransfer, error
+    let notificationCenterUploadCancelFile                      = "uploadCancelFile"                // userInfo: ocId, ocIdTransfer, session, serverUrl, account
+    
+    let notificationCenterProgressTask                          = "progressTask"                    // userInfo: account, ocId, ocIdTransfer, session, serverUrl, status, chunk, e2eEncrypted, progress, totalBytes, totalBytesExpected
+    
+    let notificationCenterUpdateBadgeNumber                     = "updateBadgeNumber"               // userInfo: counterDownload, counterUpload
+    
+    let notificationCenterCreateFolder                          = "createFolder"                    // userInfo: ocId, serverUrl, account, withPush, sceneIdentifier
+    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
+    let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
+    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: [ocId], [indexPath], error
     let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
 
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
@@ -346,13 +406,10 @@ final class NCGlobal: Sendable {
     let notificationCenterPlayerIsPlaying                       = "playerIsPlaying"
     let notificationCenterPlayerStoppedPlaying                  = "playerStoppedPlaying"
 
-<<<<<<< HEAD
     let notificationCenterUserInteractionMonitor                = "serInteractionMonitor"
 
     let notificationCenterNetworkingProcess                     = "networkingProcess"
-=======
     let notificationCenterFavoriteStatusChanged                  = "favoriteStatusChanged"
->>>>>>> 374626da0d (NMC-2611 - Update theming customisation to remove confilcts)
 
     // Networking Status
     let networkingStatusCreateFolder                            = "statusCreateFolder"
@@ -370,8 +427,10 @@ final class NCGlobal: Sendable {
 
 
     let networkingStatusReloadAvatar                            = "statusReloadAvatar"
+    let notificationCenterUpdateShare                           = "updateShare"
+    let notificationCenterShareCountsUpdated                    = "shareCountsUpdated"
     let notificationCenterUpdateIcons                           = "updateIcons"
-
+    
     // TIP
     //
     let tipPDFThumbnail                                         = "tipPDFThumbnail"
@@ -379,7 +438,8 @@ final class NCGlobal: Sendable {
     let tipScanAddImage                                         = "tipScanAddImage"
     let tipMediaDetailView                                      = "tipMediaDetailView"
     let tipAutoUploadButton                                     = "tipAutoUploadButton"
-
+    let tipAutoUpload                                           = "tipAutoUpload"
+    
     // ACTION
     //
     let actionNoAction                                          = "no-action"
