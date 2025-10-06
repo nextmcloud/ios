@@ -31,6 +31,9 @@ class NCFiles: NCCollectionViewCommon {
 
     internal var fileNameBlink: String?
     internal var fileNameOpen: String?
+    internal var matadatasHash: String = ""
+    internal var semaphoreReloadDataSource = DispatchSemaphore(value: 1)
+    private var timerProcess: Timer?
 
     internal var lastOffsetY: CGFloat = 0
     internal var lastScrollTime: TimeInterval = 0
@@ -57,10 +60,7 @@ class NCFiles: NCCollectionViewCommon {
 
         plusButton.setTitle("", for: .normal)
         plusButton.setImage(image, for: .normal)
-        plusButton.backgroundColor = NCBrandColor.shared.customer
-        if let activeTableAccount = NCManageDatabase.shared.getActiveTableAccount() {
-            self.plusButton.backgroundColor = NCBrandColor.shared.getElement(account: activeTableAccount.account)
-        }
+        plusButton.backgroundColor = NCBrandColor.shared.getElement(account: session.account)
         plusButton.accessibilityLabel = NSLocalizedString("_accessibility_add_upload_", comment: "")
         plusButton.layer.cornerRadius = plusButton.frame.size.width / 2.0
         plusButton.layer.masksToBounds = false
@@ -73,7 +73,7 @@ class NCFiles: NCCollectionViewCommon {
                 self.plusButton.backgroundColor = NCBrandColor.shared.getElement(account: activeTableAccount.account)
             }
         }
-
+        
         if self.serverUrl.isEmpty {
 
             ///
@@ -87,6 +87,7 @@ class NCFiles: NCCollectionViewCommon {
                     if let controller = userInfo["controller"] as? NCMainTabBarController,
                        controller == self.controller {
                         controller.account = account
+                        controller.availableNotifications = false
                     } else {
                         return
                     }
@@ -98,6 +99,7 @@ class NCFiles: NCCollectionViewCommon {
                 self.isEditMode = false
                 self.fileSelect.removeAll()
                 self.layoutForView = self.database.getLayoutForView(account: self.session.account, key: self.layoutKey, serverUrl: self.serverUrl)
+                self.gridLayout.column = CGFloat(self.layoutForView?.columnGrid ?? 3)
 
                 if self.isLayoutList {
                     self.collectionView?.collectionViewLayout = self.listLayout
@@ -111,21 +113,21 @@ class NCFiles: NCCollectionViewCommon {
                 ///Magentacloud branding changes hide user account button on left navigation bar
 //                self.setNavigationLeftItems()
 
-                Task {
-                    await self.reloadDataSource()
-                    await self.getServerData()
-                }
+                self.dataSource.removeAll()
+                self.reloadDataSource()
+                self.getServerData()
             }
         }
+        self.timerProcess = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
+            self.setNavigationRightItems(enableMenu: false)
+        })
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         resetPlusButtonAlpha()
-        Task {
-            await self.reloadDataSource()
-        }
+        reloadDataSource()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -147,6 +149,8 @@ class NCFiles: NCCollectionViewCommon {
                 await getServerData()
             }
         }
+
+        self.showTipAutoUpload()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -160,55 +164,67 @@ class NCFiles: NCCollectionViewCommon {
 
     @IBAction func plusButtonAction(_ sender: UIButton) {
         resetPlusButtonAlpha()
-        guard let controller else { return }
-        let fileFolderPath = NCUtilityFileSystem().getFileNamePath("", serverUrl: serverUrl, session: NCSession.shared.getSession(controller: controller))
-        let fileFolderName = (serverUrl as NSString).lastPathComponent
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: controller.account)
+        if let controller = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController {
+            let serverUrl = controller.currentServerUrl()
+            if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", NCSession.shared.getSession(controller: controller).account, serverUrl)) {
+                if !directory.permissions.contains("CK") {
+                    let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_add_file_")
+                    NCContentPresenter().showWarning(error: error)
+                    return
+                }
+            }
 
-        if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", controller.account, serverUrl)) {
-            if !directory.permissions.contains("CK") {
-                let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_add_file_")
-                NCContentPresenter().showWarning(error: error)
+            let fileFolderPath = NCUtilityFileSystem().getFileNamePath("", serverUrl: serverUrl, session: NCSession.shared.getSession(controller: controller))
+            let fileFolderName = (serverUrl as NSString).lastPathComponent
+
+            if !FileNameValidator.checkFolderPath(fileFolderPath, account: controller.account) {
+                controller.present(UIAlertController.warning(message: "\(String(format: NSLocalizedString("_file_name_validator_error_reserved_name_", comment: ""), fileFolderName)) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
+
                 return
             }
-        }
 
-        if !FileNameValidator.checkFolderPath(fileFolderPath, account: controller.account, capabilities: capabilities) {
-            controller.present(UIAlertController.warning(message: "\(String(format: NSLocalizedString("_file_name_validator_error_reserved_name_", comment: ""), fileFolderName)) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
-            return
+            self.appDelegate.toggleMenu(controller: controller)
         }
-
-        self.appDelegate.toggleMenu(controller: controller, sender: sender)
+        
     }
-
+    
     // MARK: - DataSource
 
-    override func reloadDataSource() async {
-        guard !isSearchingMode else {
-            await super.reloadDataSource()
-            return
+    override func reloadDataSource() {
+        guard !isSearchingMode
+        else {
+            return super.reloadDataSource()
         }
 
-        let predicate: NSPredicate = {
-            if NCKeychain().getPersonalFilesOnly(account: self.session.account) {
-                return self.personalFilesOnlyPredicate
-            } else {
-                return self.defaultPredicate
-            }
-        }()
-
-        self.metadataFolder = await self.database.getMetadataFolderAsync(session: self.session, serverUrl: self.serverUrl)
-        if let tblDirectory = await self.database.getTableDirectoryAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", self.session.account, self.serverUrl)) {
-            self.richWorkspaceText = tblDirectory.richWorkspace
+        // Watchdog: this is only a fail safe "dead lock", I don't think the timeout will ever be called but at least nothing gets stuck, if after 5 sec. (which is a long time in this routine), the semaphore is still locked
+        //
+        if self.semaphoreReloadDataSource.wait(timeout: .now() + 5) == .timedOut {
+            self.semaphoreReloadDataSource.signal()
         }
-        let metadatas = await self.database.getMetadatasAsync(predicate: predicate,
-                                                              withLayout: self.layoutForView,
-                                                              withAccount: self.session.account)
 
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView, account: session.account)
-        await super.reloadDataSource()
+        var predicate = self.defaultPredicate
+        let predicateDirectory = NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, self.serverUrl)
+        let dataSourceMetadatas = self.dataSource.getMetadatas()
 
-        cachingAsync(metadatas: metadatas)
+        if NCKeychain().getPersonalFilesOnly(account: session.account) {
+            predicate = self.personalFilesOnlyPredicate
+        }
+
+        self.metadataFolder = database.getMetadataFolder(session: session, serverUrl: self.serverUrl)
+        self.richWorkspaceText = database.getTableDirectory(predicate: predicateDirectory)?.richWorkspace
+
+        let metadatas = self.database.getResultsMetadatasPredicate(predicate, layoutForView: layoutForView)
+        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView)
+
+        if metadatas.isEmpty {
+            self.semaphoreReloadDataSource.signal()
+            return super.reloadDataSource()
+        }
+
+        self.dataSource.caching(metadatas: metadatas, dataSourceMetadatas: dataSourceMetadatas) {
+            self.semaphoreReloadDataSource.signal()
+            super.reloadDataSource()
+        }
     }
 
     override func getServerData(refresh: Bool = false) async {
@@ -222,48 +238,54 @@ class NCFiles: NCCollectionViewCommon {
         Task {
             await networking.networkingTasks.cancel(identifier: "\(self.serverUrl)_NCFiles")
         }
-
         guard !isSearchingMode else {
             return networkSearch()
         }
 
-        func downloadMetadata(_ metadata: tableMetadata) async -> Bool {
+        func downloadMetadata(_ metadata: tableMetadata) -> Bool {
             let fileSize = utilityFileSystem.fileProviderStorageSize(metadata.ocId, fileNameView: metadata.fileNameView)
             guard fileSize > 0 else { return false }
 
-            if let tblLocalFile = await database.getTableLocalFileAsync(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {
-                if tblLocalFile.etag != metadata.etag {
+            if let localFile = database.getResultsTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))?.first {
+                if localFile.etag != metadata.etag {
                     return true
                 }
             }
             return false
         }
 
-        let resultsReadFolder = await networkReadFolderAsync(serverUrl: self.serverUrl, refresh: refresh)
-        guard resultsReadFolder.error == .success, resultsReadFolder.reloadRequired else {
-            return
-        }
+        DispatchQueue.global().async {
+            self.networkReadFolder { metadatas, isChanged, error in
+                DispatchQueue.main.async {
+                    self.refreshControl.endRefreshing()
 
-        let metadatasForDownload: [tableMetadata] = resultsReadFolder.metadatas ?? self.dataSource.getMetadatas()
-        Task.detached(priority: .utility) {
-            for metadata in metadatasForDownload where !metadata.directory {
-                if await downloadMetadata(metadata) {
-                    if let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
-                                                                                                session: NCNetworking.shared.sessionDownload,
-                                                                                                selector: NCGlobal.shared.selectorDownloadFile,
-                                                                                                sceneIdentifier: self.controller?.sceneIdentifier) {
-                        NCNetworking.shared.download(metadata: metadata)
+                    if isChanged || self.isNumberOfItemsInAllSectionsNull {
+                        self.reloadDataSource()
+                    }
+                }
+
+                if error == .success {
+                    let metadatas: [tableMetadata] = metadatas ?? self.dataSource.getMetadatas()
+                    for metadata in metadatas where !metadata.directory && downloadMetadata(metadata) {
+                        self.database.setMetadatasSessionInWaitDownload(metadatas: [metadata],
+                                                                        session: NCNetworking.shared.sessionDownload,
+                                                                        selector: NCGlobal.shared.selectorDownloadFile,
+                                                                        sceneIdentifier: self.controller?.sceneIdentifier)
+                        NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
+                    }
+                    /// Recommendation
+                    if self.isRecommendationActived {
+                        Task.detached {
+                            await NCNetworking.shared.createRecommendations(session: self.session)
+                        }
                     }
                 }
             }
         }
-
-        await self.reloadDataSource()
     }
 
-    private func networkReadFolderAsync(serverUrl: String, refresh: Bool) async -> (metadatas: [tableMetadata]?, error: NKError, reloadRequired: Bool) {
-        let isDirectoryE2EE = await NCUtilityFileSystem().isDirectoryE2EEAsync(session: self.session, serverUrl: serverUrl)
-        let resultsReadFile = await NCNetworking.shared.readFileAsync(serverUrlFileName: serverUrl, account: session.account) { task in
+    private func networkReadFolder(completion: @escaping (_ metadatas: [tableMetadata]?, _ isDataChanged: Bool, _ error: NKError) -> Void) {
+        NCNetworking.shared.readFile(serverUrlFileName: serverUrl, account: session.account) { task in
             self.dataSourceTask = task
             if self.dataSource.isEmpty() {
                 self.collectionView.reloadData()
@@ -297,7 +319,6 @@ class NCFiles: NCCollectionViewCommon {
             if self.dataSource.isEmpty() {
                 self.collectionView.reloadData()
             }
-        }
 
         guard error == .success else {
             return (nil, error, false)
@@ -378,12 +399,11 @@ class NCFiles: NCCollectionViewCommon {
                                       errorCode: error.errorCode)
             }
         }
-        return (metadatas, error, true)
     }
 
     func blinkCell(fileName: String?) {
         if let fileName = fileName, let metadata = database.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", session.account, self.serverUrl, fileName)) {
-            let indexPath = self.dataSource.getIndexPathMetadata(ocId: metadata.ocId)
+            let indexPath = self.dataSource.getIndexPathMetadata(ocId: metadata.ocId).indexPath
             if let indexPath = indexPath {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     UIView.animate(withDuration: 0.3) {
@@ -403,7 +423,7 @@ class NCFiles: NCCollectionViewCommon {
 
     func openFile(fileName: String?) {
         if let fileName = fileName, let metadata = database.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", session.account, self.serverUrl, fileName)) {
-            let indexPath = self.dataSource.getIndexPathMetadata(ocId: metadata.ocId)
+            let indexPath = self.dataSource.getIndexPathMetadata(ocId: metadata.ocId).indexPath
             if let indexPath = indexPath {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     self.collectionView(self.collectionView, didSelectItemAt: indexPath)
@@ -411,7 +431,7 @@ class NCFiles: NCCollectionViewCommon {
             }
         }
     }
-
+    
     override func resetPlusButtonAlpha(animated: Bool = true) {
         accumulatedScrollDown = 0
         let update = {
@@ -448,12 +468,9 @@ class NCFiles: NCCollectionViewCommon {
         let currentAccount = session.account
 
         if database.getAllTableAccount().isEmpty {
-            let navigationController: UINavigationController?
-
-            if NCBrandOptions.shared.disable_intro, let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
-                navigationController = UINavigationController(rootViewController: viewController)
-            } else {
-                navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController
+            if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+                navigationController.modalPresentationStyle = .fullScreen
+                self.present(navigationController, animated: true)
             }
 
             UIApplication.shared.mainAppWindow?.rootViewController = navigationController
@@ -466,6 +483,6 @@ class NCFiles: NCCollectionViewCommon {
             navigationItem.title = self.titleCurrentFolder
         }
 
-        (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
+//        (self.navigationController as? NCMainNavigationController)?.setNavigationLeftItems()
     }
 }

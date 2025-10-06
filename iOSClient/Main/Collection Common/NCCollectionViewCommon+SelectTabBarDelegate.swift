@@ -58,8 +58,12 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
 
             Task {
                 var error = NKError()
+                var ocId: [String] = []
                 for metadata in copyMetadatas where error == .success {
-                    error = await self.networking.deleteCache(metadata, sceneIdentifier: self.controller?.sceneIdentifier)
+                    error = await NCNetworking.shared.deleteCache(metadata, sceneIdentifier: self.controller?.sceneIdentifier)
+                    if error == .success {
+                        ocId.append(metadata.ocId)
+                    }
                 }
                 await self.setEditMode(false)
             }
@@ -163,7 +167,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
     func convertLivePhoto(metadataFirst: tableMetadata?, metadataLast: tableMetadata?) {
         if let metadataFirst, let metadataLast {
             Task {
-                await self.networking.setLivePhoto(metadataFirst: metadataFirst, metadataLast: metadataLast)
+                let userInfo: [String: Any] = ["serverUrl": metadataFirst.serverUrl,
+                                               "account": metadataFirst.account]
+
+                await NCNetworking.shared.setLivePhoto(metadataFirst: metadataFirst, metadataLast: metadataLast, userInfo: userInfo)
             }
         }
         setEditMode(false)
@@ -240,14 +247,43 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         }
         
         if canOpenIn {
-            actions.append(.openInAction(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
+            actions.append(.share(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
         }
 
-        if !isAnyFolder, canUnlock, !NCCapabilities.shared.getCapabilities(account: controller?.account).capabilityFilesLockVersion.isEmpty {
+       if !isAnyFolder, canUnlock, !NCCapabilities.shared.getCapabilities(account: controller?.account).capabilityFilesLockVersion.isEmpty {
             actions.append(.lockUnlockFiles(shouldLock: !isAnyLocked, metadatas: selectedMetadatas, completion: { self.toggleSelect() }))
         }
 
         if !selectedMediaMetadatas.isEmpty {
+//            var title: String = NSLocalizedString("_save_selected_files_", comment: "")
+//            var icon = NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconImageColor])
+//            if selectedMediaMetadatas.allSatisfy({ NCManageDatabase.shared.getMetadataLivePhoto(metadata: $0) != nil }) {
+//                title = NSLocalizedString("_livephoto_save_", comment: "")
+//                icon = NCUtility().loadImage(named: "livephoto")
+//            }
+//
+//            actions.append(NCMenuAction(
+//                title: title,
+//                icon: icon,
+//                order: 0,
+//                action: { _ in
+//                    for metadata in selectedMediaMetadatas {
+//                        if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
+//                            NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV, hudView: self.view))
+//                        } else {
+//                            if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
+//                                NCActionCenter.shared.saveAlbum(metadata: metadata, controller: self.tabBarController as? NCMainTabBarController)
+//                            } else {
+//                                if NCNetworking.shared.downloadQueue.operations.filter({ ($0 as? NCOperationDownload)?.metadata.ocId == metadata.ocId }).isEmpty {
+//                                    NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum))
+//                                }
+//                            }
+//                        }
+//                    }
+//                    self.toggleSelect()
+//                }
+//            )
+//            )
             actions.append(.saveMediaAction(selectedMediaMetadatas: selectedMediaMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
         }
         actions.append(.setAvailableOfflineAction(selectedMetadatas: selectedMetadatas, isAnyOffline: isAnyOffline, viewController: self, completion: {
@@ -256,10 +292,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         }))
         
         if !isDirectoryE2EE {
-            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, viewController: self, indexPath: [], completion: { self.toggleSelect() }))
-            actions.append(.copyAction(selectOcId: selectOcId, viewController: self, completion: { self.toggleSelect() }))
+            actions.append(.moveOrCopyAction(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
+            actions.append(.copyAction(fileSelect: fileSelect, controller: self.controller, completion: { self.toggleSelect() }))
         }
-        actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, indexPaths: [], viewController: self, completion: { self.toggleSelect() }))
+        actions.append(.deleteAction(selectedMetadatas: selectedMetadatas, controller: self.controller, completion: { self.toggleSelect() }))
         return actions
     }
 
