@@ -12,9 +12,7 @@ final class NCImageCache: @unchecked Sendable {
     static let shared = NCImageCache()
 
     private let utility = NCUtility()
-    private let utilityFileSystem = NCUtilityFileSystem()
     private let global = NCGlobal.shared
-    private let database = NCManageDatabase.shared
 
     private let allowExtensions = [NCGlobal.shared.previewExt256]
     private var brandElementColor: UIColor?
@@ -25,7 +23,7 @@ final class NCImageCache: @unchecked Sendable {
     }()
 
     public var isLoadingCache: Bool = false
-    public var controller: UITabBarController?
+    var isDidEnterBackground: Bool = false
 
     let showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKTypeClassFile.video.rawValue)')"
 
@@ -81,14 +79,27 @@ final class NCImageCache: @unchecked Sendable {
 
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { _ in
 #if !EXTENSION
-            Task {
-                guard let controller = self.controller as? NCMainTabBarController,
-                    !self.isLoadingCache else {
-                    return
+            guard !self.isLoadingCache else {
+                return
+            }
+            self.isDidEnterBackground = false
+
+            var files: [NCFiles] = []
+            var cost: Int = 0
+
+            if let activeTableAccount = NCManageDatabase.shared.getActiveTableAccount(),
+               NCImageCache.shared.cache.count == 0 {
+                let session = NCSession.shared.getSession(account: activeTableAccount.account)
+
+                for mainTabBarController in SceneManager.shared.getControllers() {
+                    if let currentVC = mainTabBarController.selectedViewController as? UINavigationController,
+                       let file = currentVC.visibleViewController as? NCFiles {
+                        files.append(file)
+                    }
                 }
 
-                var cost: Int = 0
-                let session = await NCSession.shared.getSession(account: controller.account)
+                DispatchQueue.global().async {
+                    self.isLoadingCache = true
 
                 if let tblAccount = await self.database.getTableAccountAsync(predicate: NSPredicate(format: "account == %@", controller.account)),
                    NCImageCache.shared.cache.count == 0 {
@@ -108,18 +119,23 @@ final class NCImageCache: @unchecked Sendable {
                                     self.cache.removeAllValues()
                                     break
                                 }
-                                if let image = self.utility.getImage(ocId: metadata.ocId,
-                                                                     etag: metadata.etag,
-                                                                     ext: self.global.previewExt256,
-                                                                     userId: metadata.userId,
-                                                                     urlBase: metadata.urlBase) {
-                                    self.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: self.global.previewExt256, cost: cost)
+                                if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt256) {
+                                    self.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: NCGlobal.shared.previewExt256, cost: cost)
                                     cost += 1
                                 }
                             }
                             self.isLoadingCache = false
                         }
                     }
+
+                    /// FILE
+                    if !self.isDidEnterBackground {
+                        for file in files where !file.serverUrl.isEmpty {
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": file.serverUrl])
+                        }
+                    }
+
+                    self.isLoadingCache = false
                 }
             }
 #endif
@@ -130,6 +146,111 @@ final class NCImageCache: @unchecked Sendable {
         NotificationCenter.default.removeObserver(self, name: LRUCacheMemoryWarningNotification, object: nil)
     }
 
+    @objc func createMediaCache(account: String, withCacheSize: Bool) {
+        if createMediaCacheInProgress {
+            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] ThumbnailLRUCache image process already in progress")
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] ThumbnailLRUCache image process already in progress")
+            return
+        }
+        createMediaCacheInProgress = true
+
+        self.metadatasInfo.removeAll()
+        self.metadatas = nil
+        self.metadatas = getMediaMetadatas(account: account)
+        let ext = ".preview.ico"
+        let manager = FileManager.default
+        let resourceKeys = Set<URLResourceKey>([.nameKey, .pathKey, .fileSizeKey, .creationDateKey])
+        struct FileInfo {
+            var path: URL
+            var ocIdEtag: String
+            var date: Date
+            var fileSize: Int
+            var width: Int
+            var height: Int
+        }
+        var files: [FileInfo] = []
+        let startDate = Date()
+
+        if let metadatas = metadatas {
+            metadatas.forEach { metadata in
+                metadatasInfo[metadata.ocId] = metadataInfo(etag: metadata.etag, date: metadata.date, width: metadata.width, height: metadata.height)
+            }
+        }
+
+        if let enumerator = manager.enumerator(at: URL(fileURLWithPath: NCUtilityFileSystem().directoryProviderStorage), includingPropertiesForKeys: [.isRegularFileKey], options: [.skipsHiddenFiles]) {
+            for case let fileURL as URL in enumerator where fileURL.lastPathComponent.hasSuffix(ext) {
+                let fileName = fileURL.lastPathComponent
+                let ocId = fileURL.deletingLastPathComponent().lastPathComponent
+                guard let resourceValues = try? fileURL.resourceValues(forKeys: resourceKeys),
+                      let fileSize = resourceValues.fileSize,
+                      fileSize > 0 else { continue }
+                let width = metadatasInfo[ocId]?.width ?? 0
+                let height = metadatasInfo[ocId]?.height ?? 0
+                if withCacheSize {
+                    if let date = metadatasInfo[ocId]?.date,
+                       let etag = metadatasInfo[ocId]?.etag,
+                       fileName == etag + ext {
+                        files.append(FileInfo(path: fileURL, ocIdEtag: ocId + etag, date: date as Date, fileSize: fileSize, width: width, height: height))
+                    } else {
+                        let etag = fileName.replacingOccurrences(of: ".preview.ico", with: "")
+                        files.append(FileInfo(path: fileURL, ocIdEtag: ocId + etag, date: Date.distantPast, fileSize: fileSize, width: width, height: height))
+                    }
+                } else if let date = metadatasInfo[ocId]?.date, let etag = metadatasInfo[ocId]?.etag, fileName == etag + ext {
+                    files.append(FileInfo(path: fileURL, ocIdEtag: ocId + etag, date: date as Date, fileSize: fileSize, width: width, height: height))
+                } else {
+                    print("Nothing")
+                }
+            }
+        }
+
+        files.sort(by: { $0.date > $1.date })
+        if let firstDate = files.first?.date, let lastDate = files.last?.date {
+            print("First date: \(firstDate)")
+            print("Last date: \(lastDate)")
+        }
+
+        cacheImage.removeAllValues()
+        cacheSize.removeAllValues()
+        var counter: Int = 0
+        for file in files {
+            if !withCacheSize, counter > limit {
+                break
+            }
+            autoreleasepool {
+                if let image = UIImage(contentsOfFile: file.path.path) {
+                    if counter < limit {
+                        cacheImage.setValue(imageInfo(image: image, size: image.size, date: file.date), forKey: file.ocIdEtag)
+                        totalSize = totalSize + Int64(file.fileSize)
+                    }
+                    if file.width == 0, file.height == 0 {
+                        cacheSize.setValue(image.size, forKey: file.ocIdEtag)
+                    }
+                }
+            }
+            counter += 1
+        }
+
+        let diffDate = Date().timeIntervalSinceReferenceDate - startDate.timeIntervalSinceReferenceDate
+        NextcloudKit.shared.nkCommonInstance.writeLog("--------- ThumbnailLRUCache image process ---------")
+        NextcloudKit.shared.nkCommonInstance.writeLog("Counter cache image: \(cacheImage.count)")
+        NextcloudKit.shared.nkCommonInstance.writeLog("Counter cache size: \(cacheSize.count)")
+        NextcloudKit.shared.nkCommonInstance.writeLog("Total size images process: " + NCUtilityFileSystem().transformedSize(totalSize))
+        NextcloudKit.shared.nkCommonInstance.writeLog("Time process: \(diffDate)")
+        NextcloudKit.shared.nkCommonInstance.writeLog("--------- ThumbnailLRUCache image process ---------")
+
+        createMediaCacheInProgress = false
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCreateMediaCacheEnded)
+    }
+    
+    func calculateMaxImages(percentage: Double, imageSizeKB: Double) -> Int {
+        let totalRamBytes = Double(ProcessInfo.processInfo.physicalMemory)
+        let cacheSizeBytes = totalRamBytes * (percentage / 100.0)
+        let imageSizeBytes = imageSizeKB * 1024
+        let maxImages = Int(cacheSizeBytes / imageSizeBytes)
+
+        return maxImages
+    }
+    
     func getMediaMetadatas(account: String, predicate: NSPredicate? = nil) -> ThreadSafeArray<tableMetadata>? {
         guard let tableAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", account)) else { return nil }
         let startServerUrl = NCUtilityFileSystem().getHomeServer(urlBase: tableAccount.urlBase, userId: tableAccount.userId) + tableAccount.mediaPath
@@ -137,6 +258,7 @@ final class NCImageCache: @unchecked Sendable {
         return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
     }
     
+
     func allowExtensions(ext: String) -> Bool {
         return allowExtensions.contains(ext)
     }
@@ -442,6 +564,10 @@ final class NCImageCache: @unchecked Sendable {
     func getImageFavorite(colors: [UIColor] = [NCBrandColor.shared.yellowFavorite]) -> UIImage {
         return utility.loadImage(named: "star.fill", colors: colors, size: 24)
     }
+            
+    func getImageShared() -> UIImage {
+        return NCImageCache.images.shared
+    }
 
     func getImageOfflineFlag(colors: [UIColor] = [.systemGreen]) -> UIImage {
         return utility.loadImage(named: "arrow.down.circle.fill", colors: colors, size: 24)
@@ -475,12 +601,16 @@ final class NCImageCache: @unchecked Sendable {
         return UIImage(named: "folder")!
     }
 
-    func getFolder(account: String) -> UIImage {
-        return UIImage(named: "folder")!
+    func getImageButtonStop() -> UIImage {
+        return NCImageCache.images.buttonStop
     }
 
-    func getFolderEncrypted(account: String) -> UIImage {
-        return UIImage(named: "folderEncrypted")!
+    func getImageButtonMoreLock() -> UIImage {
+        return NCImageCache.images.buttonMoreLock
+    }
+    
+    func getImageLivePhoto() -> UIImage {
+        return NCImageCache.images.livePhoto
     }
 
     func getFolderEncrypted(account: String) -> UIImage {

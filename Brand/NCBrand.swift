@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
-import NextcloudKit
 
 let userAgent: String = {
     let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
@@ -63,8 +62,12 @@ final class NCBrandOptions: @unchecked Sendable {
     
     var use_AppConfig: Bool = false                                                         // Don't touch me !!
 
+    @objc public var use_default_auto_upload: Bool = false
     // Use server theming color
-    var use_themingColor: Bool = true
+    @objc public var use_themingColor: Bool = false
+    @objc public var use_themingLogo: Bool = false
+    @objc public var use_storeLocalAutoUploadAll: Bool = false
+    @objc public var use_loginflowv2: Bool = false
 
     var disable_intro: Bool = false
     var disable_request_login_url: Bool = false
@@ -80,7 +83,7 @@ final class NCBrandOptions: @unchecked Sendable {
     var enforce_passcode_lock = false
     var enforce_privacyScreenEnabled = false
 
-    // Example: (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
+    // (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
     var enforce_servers: [(name: String, url: String)] = []
 
     // Internal option behaviour
@@ -103,7 +106,7 @@ final class NCBrandOptions: @unchecked Sendable {
         case activity, sharing
     }
 
-    init() {
+    override init() {
         // wrapper AppConfig
         if let configurationManaged = UserDefaults.standard.dictionary(forKey: "com.apple.configuration.managed"), use_AppConfig {
             if let str = configurationManaged[NCGlobal.shared.configuration_brand] as? String {
@@ -161,12 +164,19 @@ final class NCBrandOptions: @unchecked Sendable {
     }
 }
 
-final class NCBrandColor: @unchecked Sendable {
-    static let shared = NCBrandColor()
+class NCBrandColor: NSObject, @unchecked Sendable  {
+    @objc static let shared: NCBrandColor = {
+        let instance = NCBrandColor()
+        return instance
+    }()
 
-    // This is rewrited from customet theme, default is Nextcloud color
-    let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // Nextcloud : #0082C9
-    var customerText: UIColor = .white
+    // Color
+    @objc let customer:              UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)
+    @objc var customerText: UIColor = .white
+
+    @objc var brand: UIColor                                                                                         // don't touch me
+    @objc var brandElement: UIColor                                                                                  // don't touch me
+    @objc var brandText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
 
     var brand: UIColor                                                                                         // don't touch me
     var brandElement: UIColor                                                                                  // don't touch me
