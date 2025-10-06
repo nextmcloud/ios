@@ -2,8 +2,6 @@
 // SPDX-FileCopyrightText: 2022 Henrik Storch
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import NextcloudKit
-
 ///
 /// Table view cell to manage the expiration date on a share in its details.
 ///
@@ -12,6 +10,7 @@ class NCShareDateCell: UITableViewCell {
     let textField = UITextField()
     var shareType: Int
     var onReload: (() -> Void)?
+    let shareCommon = NCShareCommon()
 
     init(share: Shareable) {
         self.shareType = share.shareType
@@ -68,8 +67,6 @@ class NCShareDateCell: UITableViewCell {
     }
 
     private func isExpireDateEnforced(account: String) -> Bool {
-        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
-
         switch self.shareType {
         case NKShare.ShareType.publicLink.rawValue,
             NKShare.ShareType.email.rawValue,
@@ -89,8 +86,6 @@ class NCShareDateCell: UITableViewCell {
     }
 
     private func defaultExpirationDays(account: String) -> Int {
-        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
-
         switch self.shareType {
         case NKShare.ShareType.publicLink.rawValue,
             NKShare.ShareType.email.rawValue,

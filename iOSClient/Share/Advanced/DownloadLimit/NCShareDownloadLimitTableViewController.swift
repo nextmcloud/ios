@@ -32,37 +32,11 @@ class NCShareDownloadLimitTableViewController: UITableViewController {
     /// Default value for limits as possibly provided by the server capabilities.
     ///
     var defaultLimit: Int {
-        let capabilities = NCNetworking.shared.capabilities[metadata.account] ?? NKCapabilities.Capabilities()
-        return capabilities.fileSharingDownloadLimitDefaultLimit
+        NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityFileSharingDownloadLimitDefaultLimit
     }
 
-    @IBOutlet var allowedDownloadsCell: UITableViewCell!
-    @IBOutlet var limitDownloadCell: UITableViewCell!
     @IBOutlet var limitSwitch: UISwitch!
     @IBOutlet var limitTextField: UITextField!
-
-    // MARK: - Keyboard accessory
-    private func makeNumberPadAccessoryToolbar() -> UIToolbar {
-        let toolbar = UIToolbar()
-        toolbar.sizeToFit()
-        let clearTitle = NSLocalizedString("_clear_", comment: "Clear numeric input")
-        let doneTitle = NSLocalizedString("_done_", comment: "Dismiss number pad")
-        let clear = UIBarButtonItem(title: clearTitle, style: .plain, target: self, action: #selector(clearButtonTapped))
-        let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let done = UIBarButtonItem(title: doneTitle, style: .plain, target: self, action: #selector(doneButtonTapped))
-        toolbar.items = [clear, flex, done]
-        return toolbar
-    }
-
-    @objc private func doneButtonTapped() {
-        // End editing to trigger editingDidEnd validation path
-        view.endEditing(true)
-    }
-
-    @objc private func clearButtonTapped() {
-        // Clear the text but keep the keyboard open so the user can enter a new value
-        limitTextField.text = ""
-    }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -73,18 +47,6 @@ class NCShareDownloadLimitTableViewController: UITableViewController {
         } else {
             limitSwitch.isOn = false
         }
-
-        var allowedDownloadsCellConfiguration = UIListContentConfiguration.cell()
-        allowedDownloadsCellConfiguration.text = NSLocalizedString("_share_allowed_downloads_", comment: "")
-        allowedDownloadsCell.contentConfiguration = allowedDownloadsCellConfiguration
-
-        var limitDownloadCellConfiguration = UIListContentConfiguration.cell()
-        limitDownloadCellConfiguration.text = NSLocalizedString("_share_limit_download_", comment: "")
-        limitDownloadCell.contentConfiguration = limitDownloadCellConfiguration
-
-        // Configure numeric keyboard and add Done accessory
-        limitTextField.keyboardType = .numberPad
-        limitTextField.inputAccessoryView = makeNumberPadAccessoryToolbar()
     }
 
     @IBAction func switchDownloadLimit(_ sender: UISwitch) {

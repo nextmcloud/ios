@@ -52,6 +52,9 @@ class NCShareCommentsCell: UITableViewCell, NCCellProtocol {
         avatarButton.showsMenuAsPrimaryAction = true
 
         buttonMenu.showsMenuAsPrimaryAction = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAvatarImage))
+        imageItem?.addGestureRecognizer(tapGesture)
+        buttonMenu.setImage(UIImage(named: "shareMenu")!.image(color: .lightGray, size: 50), for: .normal)
     }
 
     @objc func tapAvatarImage(_ sender: UITapGestureRecognizer) {
