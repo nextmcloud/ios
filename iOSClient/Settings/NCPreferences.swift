@@ -6,7 +6,6 @@
 import Foundation
 import UIKit
 import KeychainAccess
-import NextcloudKit
 
 final class NCPreferences: NSObject {
     private static let userDefaultsMigrationKey = "NCPreferencesUserDefaultsMigrationVersion"
@@ -243,20 +242,16 @@ final class NCPreferences: NSObject {
         }
     }
 
-    /// Stores and retrieves the current log level from the keychain.
-    var log: NKLogLevel {
-//    @objc var logLevel: Int {
+    @objc var logLevel: Int {
         get {
             migrate(key: "logLevel")
-            if let value = try? keychain.get("logLevel"),
-               let intValue = Int(value),
-               let level = NKLogLevel(rawValue: intValue) {
-                return level
+            if let value = try? keychain.get("logLevel"), let result = Int(value) {
+                return result
             }
-            return NKLogLevel.normal
+            return 1
         }
         set {
-            keychain["logLevel"] = String(newValue.rawValue)
+            keychain["logLevel"] = String(newValue)
         }
     }
 
@@ -299,9 +294,6 @@ final class NCPreferences: NSObject {
 //    @objc var privacyScreenEnabled: Bool {
         get {
             migrate(key: "privacyScreen")
-            if NCBrandOptions.shared.enforce_privacyScreenEnabled {
-                return true
-            }
             if let value = try? keychain.get("privacyScreen"), let result = Bool(value) {
                 return result
             }
@@ -493,25 +485,12 @@ final class NCPreferences: NSObject {
         }
     }
 
-    var location: Bool {
-        get {
-            if let value = try? keychain.get("location"), let result = Bool(value) {
-                return result
-            }
-            return false
-        }
-        set {
-            keychain["location"] = String(newValue)
-        }
-    }
-
     // MARK: -
 
-    func getPassword(account: String) -> String {
+    @objc func getPassword(account: String) -> String {
         let key = "password" + account
         migrate(key: key)
-        let password = (try? keychain.get(key)) ?? ""
-        return password
+        return (try? keychain.get(key)) ?? ""
     }
 
     func setPassword(account: String, password: String?) {
@@ -533,20 +512,7 @@ final class NCPreferences: NSObject {
         }
     }
 
-    func setFavoriteOnTop(account: String, value: Bool) {
-        let key = "favoriteOnTop" + account
-        keychain[key] = String(value)
-    }
-
-    func getFavoriteOnTop(account: String) -> Bool {
-        let key = "favoriteOnTop" + account
-        if let value = try? keychain.get(key), let result = Bool(value) {
-            return result
-        } else {
-            return true
-        }
-    }
-
+    /* OBSOLETE
     func setDirectoryOnTop(account: String, value: Bool) {
         let key = "directoryOnTop" + account
         keychain[key] = String(value)
@@ -560,20 +526,7 @@ final class NCPreferences: NSObject {
             return true
         }
     }
-
-    func setShowHiddenFiles(account: String, value: Bool) {
-        let key = "showHiddenFiles" + account
-        keychain[key] = String(value)
-    }
-
-    func getShowHiddenFiles(account: String) -> Bool {
-        let key = "showHiddenFiles" + account
-        if let value = try? keychain.get(key), let result = Bool(value) {
-            return result
-        } else {
-            return false
-        }
-    }
+    */
 
     func setTitleButtonHeader(account: String, value: String?) {
         let key = "titleButtonHeader" + account
@@ -670,13 +623,12 @@ final class NCPreferences: NSObject {
     }
 
     func isEndToEndEnabled(account: String) -> Bool {
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+        let capabilities = NCCapabilities.shared.getCapabilities(account: account)
         guard let certificate = getEndToEndCertificate(account: account), !certificate.isEmpty,
               let publicKey = getEndToEndPublicKey(account: account), !publicKey.isEmpty,
               let privateKey = getEndToEndPrivateKey(account: account), !privateKey.isEmpty,
-              let passphrase = getEndToEndPassphrase(account: account), !passphrase.isEmpty else {
-            return false
-        }
+              let passphrase = getEndToEndPassphrase(account: account), !passphrase.isEmpty,
+              NCGlobal.shared.e2eeVersions.contains(capabilities.capabilityE2EEApiVersion) else { return false }
         return true
     }
 
@@ -877,6 +829,16 @@ final class NCPreferences: NSObject {
         let password = keychain[key]
 
         return (data, password)
+    }
+    
+    @objc func setAccountName(account: String) {
+        let key = "AccountName"
+        keychain[key] = account
+    }
+
+    @objc func getAccountName() -> String? {
+        let key = "AccountName"
+        return try? keychain.get(key)
     }
 
     // MARK: - Albums

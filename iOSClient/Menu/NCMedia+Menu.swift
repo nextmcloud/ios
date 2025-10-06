@@ -55,6 +55,7 @@ extension NCMedia {
                         icon: utility.loadImage(named: "selectFull", colors: [NCBrandColor.shared.iconColor]),
                         action: { _ in
                             self.isEditMode = true
+                            self.collectionView.reloadData()
                         }
                     )
                 )
