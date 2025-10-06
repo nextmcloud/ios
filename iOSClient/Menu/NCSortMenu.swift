@@ -122,7 +122,7 @@ class NCSortMenu: NSObject {
                     on: layoutForView.directoryOnTop,
                     action: { _ in
                         layoutForView.directoryOnTop = !layoutForView.directoryOnTop
-                        NCKeychain().setDirectoryOnTop(account: self.account, value: layoutForView.directoryOnTop)
+//                        NCKeychain().setDirectoryOnTop(account: self.account, value: layoutForView.directoryOnTop)
                         self.actionMenu(layoutForView: layoutForView)
                     }
                 )
