@@ -2414,7 +2414,6 @@
 				CA1700013000000000000002 /* NCUploadedAssetsCleanupTests.swift */,
 				AA52EB452D42AC5A0089C348 /* Placeholder.swift */,
 				B5E2E6D32DAE52B500AB2EDD /* SharingTest.swift */,
-				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
@@ -5353,8 +5352,6 @@
 				F7D60CAF2C941ACB008FBFDD /* NCMediaPinchGesture.swift in Sources */,
 				F71916142E2901FB00E13E96 /* NCNetworking+Upload.swift in Sources */,
 				F704B5E92430C0B800632F5F /* NCCreateFormUploadConflictCell.swift in Sources */,
-				F72D404923D2082500A97FD0 /* NCViewerDirectEditing.swift in Sources */,
-				AFCE353927E5DE0500FEA6C2 /* Shareable.swift in Sources */,
 				F72D404923D2082500A97FD0 /* NCViewerNextcloudText.swift in Sources */,
 				AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */,
 				F77BB746289984CA0090FC19 /* UIViewController+Extension.swift in Sources */,
