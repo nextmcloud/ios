@@ -24,6 +24,7 @@
 import UIKit
 import MapKit
 import NextcloudKit
+import Alamofire
 
 public protocol NCViewerMediaDetailViewDelegate: AnyObject {
     func downloadFullResolution()
