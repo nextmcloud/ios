@@ -24,32 +24,27 @@ import UIKit
 import NextcloudKit
 
 class NCShareLinkCell: UITableViewCell {
-    @IBOutlet private weak var imageItem: UIImageView!
-    @IBOutlet private weak var labelTitle: UILabel!
-    @IBOutlet private weak var descriptionLabel: UILabel!
 
+    @IBOutlet weak var labelTitle: UILabel!
+    @IBOutlet weak var buttonDetail: UIButton!
+    @IBOutlet weak var buttonCopy: UIButton!
+    @IBOutlet weak var btnQuickStatus: UIButton!
+    @IBOutlet weak var imagePermissionType: UIImageView!
+    @IBOutlet weak var imageExpiredDateSet: UIImageView!
+    @IBOutlet weak var imagePasswordSet: UIImageView!
+    @IBOutlet weak var imageAllowedPermission: UIImageView!
+    @IBOutlet weak var imageRightArrow: UIImageView!
     @IBOutlet weak var labelQuickStatus: UILabel!
-    @IBOutlet weak var statusStackView: UIStackView!
-    @IBOutlet private weak var menuButton: UIButton!
-    @IBOutlet private weak var copyButton: UIButton!
-    @IBOutlet weak var imageDownArrow: UIImageView!
+    @IBOutlet weak var leadingContraintofImageRightArrow: NSLayoutConstraint!
 
-//    @IBOutlet weak var imageItem: UIImageView!
-//    @IBOutlet weak var labelTitle: UILabel!
-//    @IBOutlet weak var buttonCopy: UIButton!
-//    @IBOutlet weak var buttonMenu: UIButton!
-//    @IBOutlet weak var status: UILabel!
-//    @IBOutlet weak var btnQuickStatus: UIButton!
-//    @IBOutlet weak var imageDownArrow: UIImageView!
-//    @IBOutlet weak var labelQuickStatus: UILabel!
+    private let iconShareSize: CGFloat = 200
 
-    private let iconShare: CGFloat = 200
-    var tableShare: tableShare?
-    var isDirectory = false
     weak var delegate: NCShareLinkCellDelegate?
+    
+    var tableShare: tableShare?
     var isInternalLink = false
+    var isDirectory = false
     var indexPath = IndexPath()
-    let utility = NCUtility()
 
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -128,44 +123,84 @@ class NCShareLinkCell: UITableViewCell {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        buttonMenu.contentMode = .scaleAspectFill
-        imageItem.image = UIImage(named: "sharebylink")?.image(color: NCBrandColor.shared.label, size: 30)
-        buttonCopy.setImage(UIImage.init(named: "shareCopy")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
-        buttonMenu.setImage(UIImage.init(named: "shareMenu")!.image(color: NCBrandColor.shared.customer, size: 24), for: .normal)
-        labelQuickStatus.textColor = NCBrandColor.shared.customer
+        setupCellAppearance()
     }
 
-    func setupCellUI() {
-        let permissions = NCPermissions()
-        guard let tableShare = tableShare else {
-            return
-        }
-        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        labelTitle.textColor = NCBrandColor.shared.label
-        
-        if tableShare.permissions == permissions.permissionCreateShare {
-            labelQuickStatus.text = NSLocalizedString("_share_file_drop_", comment: "")
-        } else {
-            // Read Only
-            if permissions.isAnyPermissionToEdit(tableShare.permissions) {
-                labelQuickStatus.text = NSLocalizedString("_share_editing_", comment: "")
-            } else {
-                labelQuickStatus.text = NSLocalizedString("_share_read_only_", comment: "")
-            }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
+            setupCellAppearance()
         }
     }
-    
+
+    func configure(with share: tableShare?, at indexPath: IndexPath, isDirectory: Bool, title: String) {
+        self.tableShare = share
+        self.indexPath = indexPath
+        self.isDirectory = isDirectory
+        setupCellAppearance(titleAppendString: title)
+
+//        let shareLinksCountString = shareLinksCount > 0 ? String(shareLinksCount) : ""
+//        setupCellAppearance(titleAppendString: shareLinksCountString)
+//        setupCellAppearance(titleAppendString: String(shareLinksCount))
+    }
+
+    private func setupCellAppearance(titleAppendString: String? = nil) {
+        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        labelTitle.textColor = NCBrandColor.shared.label
+        labelQuickStatus.textColor = NCBrandColor.shared.shareBlueColor
+
+        buttonDetail.setTitleColor(NCBrandColor.shared.shareBlackColor, for: .normal)
+        buttonCopy.setImage(UIImage(named: "share")?.image(color: NCBrandColor.shared.brand, size: 24), for: .normal)
+
+        imageRightArrow.image = UIImage(named: "rightArrow")?.imageColor(NCBrandColor.shared.shareBlueColor)
+        imageExpiredDateSet.image = UIImage(named: "calenderNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+        imagePasswordSet.image = UIImage(named: "lockNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+
+        buttonDetail.setTitle(NSLocalizedString("_share_details_", comment: ""), for: .normal)
+        labelTitle.text = NSLocalizedString("_share_link_", comment: "")
+
+        if let tableShare = tableShare, let titleAppendString {
+            if !tableShare.label.isEmpty {
+                labelTitle.text? += " (\(tableShare.label))"
+            } else {
+                labelTitle.text?.append(" \(titleAppendString)")
+            }
+        }
+        updatePermissionUI()
+    }
+
+    private func updatePermissionUI() {
+        guard let tableShare = tableShare else { return }
+
+        let permissions = NCPermissions()
+
+        if tableShare.permissions == permissions.permissionCreateShare {
+            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_just_upload_", comment: "")
+            imagePermissionType.image = UIImage(named: "upload")?.imageColor(NCBrandColor.shared.shareBlueColor)
+        } else if permissions.isAnyPermissionToEdit(tableShare.permissions) {
+            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_edit_", comment: "")
+            imagePermissionType.image = UIImage(named: "editNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+        } else {
+            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_only_view_", comment: "")
+            imagePermissionType.image = UIImage(named: "showPasswordNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+        }
+
+        imagePasswordSet.isHidden = tableShare.password.isEmpty
+        imageExpiredDateSet.isHidden = (tableShare.expirationDate == nil)
+        
+        leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
+    }
+
+    // MARK: - Actions
+
     @IBAction func touchUpInsideCopy(_ sender: Any) {
         delegate?.tapCopy(with: tableShare, sender: sender)
     }
-    
-    @IBAction func touchUpInsideMenu(_ sender: Any) {
+
+    @IBAction func touchUpInsideDetail(_ sender: Any) {
         delegate?.tapMenu(with: tableShare, sender: sender)
     }
 
-    @objc func openQuickStatus(_ sender: UITapGestureRecognizer) {
-    }
-    
     @IBAction func quickStatusClicked(_ sender: UIButton) {
         delegate?.quickStatus(with: tableShare, sender: sender)
     }

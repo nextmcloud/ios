@@ -22,8 +22,6 @@ class TransientShare: Shareable {
     var note: String = ""
     var expirationDate: NSDate?
     var shareWithDisplayname: String = ""
-    var downloadAndSync = false
-    var itemType: String = ""
 
     var attributes: String?
 
@@ -33,12 +31,10 @@ class TransientShare: Shareable {
         if metadata.e2eEncrypted, capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV12 {
             self.permissions = NKShare.Permission.create.rawValue
         } else {
-            self.permissions = capabilities.fileSharingDefaultPermission & metadata.sharePermissionsCollaborationServices
+            self.permissions = NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityFileSharingDefaultPermission & metadata.sharePermissionsCollaborationServices
         }
 
         self.shareType = shareType
-
-        self.itemType = metadata.isDirectory ? NCShareCommon.itemTypeFolder : NCShareCommon.itemTypeFile
 
         if let password = password {
             self.password = password
@@ -48,6 +44,7 @@ class TransientShare: Shareable {
     convenience init(sharee: NKSharee, metadata: tableMetadata, password: String?) {
         self.init(shareType: sharee.shareType, metadata: metadata, password: password)
         self.shareWith = sharee.shareWith
+        self.shareWithDisplayname = sharee.label
     }
 
     static func shareLink(metadata: tableMetadata, password: String?) -> TransientShare {

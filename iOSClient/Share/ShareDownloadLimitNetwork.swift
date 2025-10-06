@@ -22,9 +22,13 @@ class NMCCommunication: NSObject, XMLParserDelegate {
     var foundCharacters = "";
     var downloadLimit = DownloadLimit()
     private lazy var appDelegate = UIApplication.shared.delegate as? AppDelegate
+    var controller: NCMainTabBarController!
+    var session: NCSession.Session {
+        NCSession.shared.getSession(controller: controller)
+    }
     
     func getDownloadLimit(token: String, completion: @escaping (_ downloadLimit: DownloadLimit?, _ errorDescription: String) -> Void)  {
-        let baseUrl = appDelegate?.urlBase ?? ""       // NCBrandOptions.shared.loginBaseUrl
+        let baseUrl = session.urlBase       // NCBrandOptions.shared.loginBaseUrl
         let endPoint = "/ocs/v2.php/apps/files_downloadlimit/\(token)/limit"
         let path = baseUrl+endPoint
         do {
@@ -62,7 +66,7 @@ class NMCCommunication: NSObject, XMLParserDelegate {
     }
 
     func setDownloadLimit(deleteLimit: Bool, limit: String, token: String, completion: @escaping (_ success: Bool, _ errorDescription: String) -> Void)  {
-        let baseUrl = appDelegate?.urlBase ?? ""         //NCBrandOptions.shared.loginBaseUrl
+        let baseUrl = session.urlBase         //NCBrandOptions.shared.loginBaseUrl
         let endPoint = "/ocs/v2.php/apps/files_downloadlimit/\(token)/limit"
         let path = baseUrl+endPoint
         do {
@@ -108,8 +112,8 @@ class NMCCommunication: NSObject, XMLParserDelegate {
     }
     
     public func authorizationToken() -> String {
-        let accountDetails = NCManageDatabase.shared.getAllAccount().first
-        let password = NCKeychain().getPassword(account: accountDetails?.account ?? "") 
+        let accountDetails = NCManageDatabase.shared.getAllTableAccount().first
+        let password = NCKeychain().getPassword(account: accountDetails?.account ?? "")
         let username = accountDetails?.user ?? ""
         let credential = Data("\(username):\(password)".utf8).base64EncodedString()
         return ("Basic \(credential)")
@@ -140,7 +144,7 @@ class NMCCommunication: NSObject, XMLParserDelegate {
     }
 }
 
-struct DownloadLimit: Codable {
-    var limit: Int?
-    var count: Int?
-}
+//struct DownloadLimit: Codable {
+//    var limit: Int?
+//    var count: Int?
+//}
