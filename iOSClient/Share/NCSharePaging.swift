@@ -113,12 +113,7 @@ class NCSharePaging: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        navigationController?.setNavigationBarAppearance()
-
-        let capabilities = NCNetworking.shared.capabilities[metadata.account] ?? NKCapabilities.Capabilities()
-
-        if !capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty {
+        if NCCapabilities.shared.disableSharesView(account: metadata.account) {
             self.dismiss(animated: false, completion: nil)
         }
 
@@ -173,7 +168,7 @@ class NCSharePaging: UIViewController {
         view.frame.origin.y = 0
     }
 
-    @objc func exitTapped(_ sender: Any?) {
+    @objc func exitTapped() {
         self.dismiss(animated: true, completion: nil)
     }
 
@@ -199,6 +194,7 @@ class NCSharePaging: UIViewController {
 // MARK: - PagingViewController Delegate
 
 extension NCSharePaging: PagingViewControllerDelegate {
+
     func pagingViewController(_ pagingViewController: PagingViewController, willScrollToItem pagingItem: PagingItem, startingViewController: UIViewController, destinationViewController: UIViewController) {
 
         currentVC?.textField?.resignFirstResponder()
@@ -209,6 +205,7 @@ extension NCSharePaging: PagingViewControllerDelegate {
 // MARK: - PagingViewController DataSource
 
 extension NCSharePaging: PagingViewControllerDataSource {
+
     func pagingViewController(_: PagingViewController, viewControllerAt index: Int) -> UIViewController {
         let height: CGFloat = 50
 
@@ -255,8 +252,13 @@ extension NCSharePaging: PagingViewControllerDataSource {
 // MARK: - Header
 
 class NCShareHeaderViewController: PagingViewController {
+
     public var image: UIImage?
     public var metadata = tableMetadata()
+
+    public var activityEnabled = true
+    public var commentsEnabled = true
+    public var sharingEnabled = true
 
     override func loadView() {
         view = NCSharePagingView(
@@ -286,6 +288,7 @@ class NCSharePagingView: PagingView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
 }
 
 class NCShareHeaderView: UIView {
@@ -307,8 +310,6 @@ class NCShareHeaderView: UIView {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap(_:)))
-        path.addGestureRecognizer(longGesture)
         setupUI()
     }
 
@@ -358,17 +359,6 @@ class NCShareHeaderView: UIView {
                 NCContentPresenter().showError(error: error)
             }
         }
-    }
-
-    @IBAction func touchUpInsideDetails(_ sender: UIButton) {
-        creation.isHidden = !creation.isHidden
-        upload.isHidden = !upload.isHidden
-    }
-
-    @objc func longTap(_ sender: UIGestureRecognizer) {
-        UIPasteboard.general.string = path.text
-        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_copied_path_")
-        NCContentPresenter().showInfo(error: error)
     }
 }
 
