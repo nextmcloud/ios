@@ -8,11 +8,15 @@
 
 import Foundation
 import MoEngageSDK
+import MoEngageInApps
+import StoreKit
 
-class MoEngageAnalytics {
+class MoEngageAnalytics: NSObject {
     
     // Initializer for the MoEngageAnalytics class
-    init() {
+    override init() {
+        super.init()
+
         // Create a configuration object for MoEngage SDK with the given App ID and Data Center
         let sdkConfig = MoEngageSDKConfig(appId: "7KWWUKA6OKXGP8Q6DMCXLDX5", dataCenter: MoEngageDataCenter.data_center_02)
         
@@ -27,12 +31,59 @@ class MoEngageAnalytics {
 #else
         MoEngage.sharedInstance.initializeDefaultLiveInstance(sdkConfig)
 #endif
+        setupMoEngageInAppMessaging()
+        
+        // Register delegate for In-App Native callbacks
+        MoEngageSDKInApp.sharedInstance.setInAppDelegate(self)
     }
     
     // Method to track the App ID
     func trackAppId() {
         MoEngageSDKAnalytics.sharedInstance.trackLocale(forAppID: "312838242")
     }
+    
+    func setupMoEngageInAppMessaging() {
+        //MARK: MoEngage In-App messages
+        MoEngageSDKInApp.sharedInstance.showInApp()
+        MoEngageSDKInApp.sharedInstance.showNudge()
+    }
+    
+    // Handles triggering Apple's native review popup
+//    private func requestAppStoreReview() {
+//        DispatchQueue.main.async {
+//            if let scene = UIApplication.shared.connectedScenes
+//                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+//                SKStoreReviewController.requestReview(in: scene)
+//            }
+//        }
+//    }
+    
+    private func requestAppStoreReview() {
+        DispatchQueue.main.async {
+            guard
+                let windowScene = UIApplication.shared.connectedScenes
+                    .compactMap({ $0 as? UIWindowScene })
+                    .first(where: { $0.activationState == .foregroundActive })
+            else {
+                return
+            }
+            
+            #if targetEnvironment(simulator)
+            // Simulator fallback for testing
+            let alert = UIAlertController(
+                title: "Review Prompt (Simulator)",
+                message: "This simulates the App Store review dialog.",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            windowScene.keyWindow?.rootViewController?.present(alert, animated: true)
+            #else
+            // Real request on device
+            SKStoreReviewController.requestReview(in: windowScene)
+            #endif
+        }
+    }
+
 }
 
 // AnalyticsService protocol
@@ -136,7 +187,11 @@ extension MoEngageAnalytics: AnalyticsService {
         MoEngageSDKAnalytics.sharedInstance.trackEvent(AnalyticEvents.EVENT__CREATE_VOICE_MEMO.rawValue, withProperties: properties)
     }
     
-    
+    func displayInAppNotification() {
+        MoEngageSDKInApp.sharedInstance.showInApp()
+        //For showing nudges at any mentioned position
+        MoEngageSDKInApp.sharedInstance.showNudge()
+    }
 }
 
 // Functions
@@ -176,6 +231,44 @@ extension MoEngageAnalytics {
 
 }
 
-//    SCAN("scan"),
+// MARK: - MoEngage In-App Native Delegate
+extension MoEngageAnalytics: MoEngageInAppNativeDelegate {
 
+    // Called when user clicks an in-app with navigation action (e.g., deep link)
+    func inAppClicked(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
+                      andNavigationActionInfo navigationAction: MoEngageInAppNavigationAction,
+                      forAccountMeta accountMeta: MoEngageAccountMeta) {
+        // handle navigation actions if needed
+    }
 
+    // Called when user clicks an in-app with custom action (e.g., our rating trigger)
+    func inAppClicked(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
+                      andCustomActionInfo customAction: MoEngageInAppAction,
+                      forAccountMeta accountMeta: MoEngageAccountMeta) {
+
+        let kv = customAction.keyValuePairs
+
+        if let showRating = kv["show-native-rating"] as? String,
+           showRating.lowercased() == "true" {
+            requestAppStoreReview()
+        }
+    }
+
+    // Called when a "self-handled" in-app is triggered
+    func selfHandledInAppTriggered(withInfo inAppCampaign: MoEngageInAppSelfHandledCampaign,
+                                   forAccountMeta accountMeta: MoEngageAccountMeta) {
+        // no-op unless you use self-handled campaigns
+    }
+
+    // Optional — track impression
+    func inAppShown(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
+                    forAccountMeta accountMeta: MoEngageAccountMeta) {
+        // no-op
+    }
+
+    // Optional — track dismissal
+    func inAppDismissed(withCampaignInfo inappCampaign: MoEngageInAppCampaign,
+                        forAccountMeta accountMeta: MoEngageAccountMeta) {
+        // no-op
+    }
+}

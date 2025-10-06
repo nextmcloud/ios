@@ -144,7 +144,7 @@ class NMCCommunication: NSObject, XMLParserDelegate {
     }
 }
 
-struct DownloadLimit: Codable {
-    var limit: Int?
-    var count: Int?
-}
+//struct DownloadLimit: Codable {
+//    var limit: Int?
+//    var count: Int?
+//}
