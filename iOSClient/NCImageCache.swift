@@ -13,7 +13,6 @@ final class NCImageCache: @unchecked Sendable {
     private let maximumCachedImages = 510
     private let utilityFileSystem = NCUtilityFileSystem()
     private let global = NCGlobal.shared
-    private let database = NCManageDatabase.shared
 
     private lazy var mediaWindowCache = MediaWindowCache(
         maximumCachedImages: maximumCachedImages,
@@ -35,7 +34,7 @@ final class NCImageCache: @unchecked Sendable {
     }()
 
     public var isLoadingCache: Bool = false
-    public var controller: UITabBarController?
+    var isDidEnterBackground: Bool = false
 
     let showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKTypeClassFile.video.rawValue)')"
 
@@ -112,10 +111,23 @@ final class NCImageCache: @unchecked Sendable {
 
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { _ in
 #if !EXTENSION
-            Task {
-                guard let controller = self.controller as? NCMainTabBarController,
-                    !self.isLoadingCache else {
-                    return
+            guard !self.isLoadingCache else {
+                return
+            }
+            self.isDidEnterBackground = false
+
+            var files: [NCFiles] = []
+            var cost: Int = 0
+
+            if let activeTableAccount = NCManageDatabase.shared.getActiveTableAccount(),
+               NCImageCache.shared.cache.count == 0 {
+                let session = NCSession.shared.getSession(account: activeTableAccount.account)
+
+                for mainTabBarController in SceneManager.shared.getControllers() {
+                    if let currentVC = mainTabBarController.selectedViewController as? UINavigationController,
+                       let file = currentVC.visibleViewController as? NCFiles {
+                        files.append(file)
+                    }
                 }
 
                 DispatchQueue.global().async {
@@ -142,18 +154,23 @@ final class NCImageCache: @unchecked Sendable {
                                     self.cache.removeAllValues()
                                     break
                                 }
-                                if let image = self.utility.getImage(ocId: metadata.ocId,
-                                                                     etag: metadata.etag,
-                                                                     ext: self.global.previewExt256,
-                                                                     userId: metadata.userId,
-                                                                     urlBase: metadata.urlBase) {
-                                    self.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: self.global.previewExt256, cost: cost)
+                                if let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt256) {
+                                    self.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: NCGlobal.shared.previewExt256, cost: cost)
                                     cost += 1
                                 }
                             }
                             self.isLoadingCache = false
                         }
                     }
+
+                    /// FILE
+                    if !self.isDidEnterBackground {
+                        for file in files where !file.serverUrl.isEmpty {
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": file.serverUrl])
+                        }
+                    }
+
+                    self.isLoadingCache = false
                 }
             }
 #endif
@@ -284,6 +301,7 @@ final class NCImageCache: @unchecked Sendable {
         return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
     }
     
+
     func allowExtensions(ext: String) -> Bool {
         return allowExtensions.contains(ext)
     }
@@ -767,6 +785,10 @@ private actor MediaWindowCache {
     func getImageFavorite(colors: [UIColor] = [NCBrandColor.shared.yellowFavorite]) -> UIImage {
         return utility.loadImage(named: "star.fill", colors: colors, size: 24)
     }
+            
+    func getImageShared() -> UIImage {
+        return NCImageCache.images.shared
+    }
 
     func getImageOfflineFlag(colors: [UIColor] = [.systemGreen]) -> UIImage {
         return utility.loadImage(named: "arrow.down.circle.fill", colors: colors, size: 24)
@@ -800,6 +822,18 @@ private actor MediaWindowCache {
         return UIImage(named: "folder")!
     }
 
+    func getImageButtonStop() -> UIImage {
+        return NCImageCache.images.buttonStop
+    }
+
+    func getImageButtonMoreLock() -> UIImage {
+        return NCImageCache.images.buttonMoreLock
+    }
+    
+    func getImageLivePhoto() -> UIImage {
+        return NCImageCache.images.livePhoto
+    }
+
     func getFolderEncrypted(account: String) -> UIImage {
         return UIImage(named: "folderEncrypted")!
     }
@@ -822,5 +856,25 @@ private actor MediaWindowCache {
 
     func getFolderAutomaticUpload(account: String) -> UIImage {
         return UIImage(named: "folderAutomaticUpload")!
+    }
+            
+    func getFolderPublic() -> UIImage {
+        return NCImageCache.images.folderPublic
+    }
+    
+    func getFolderGroup() -> UIImage {
+        return NCImageCache.images.folderGroup
+    }
+    
+    func getFolderExternal() -> UIImage {
+        return NCImageCache.images.folderExternal
+    }
+    
+    func getFolderAutomaticUpload() -> UIImage {
+        return NCImageCache.images.folderAutomaticUpload
+    }
+    
+    func getFolder() -> UIImage {
+        return NCImageCache.images.folder
     }
 }
