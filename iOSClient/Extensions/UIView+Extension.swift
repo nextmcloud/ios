@@ -30,6 +30,45 @@ enum VerticalLocation: String {
 }
 
 extension UIView {
+
+    // Source
+    // https://stackoverflow.com/questions/18680028/prevent-screen-capture-in-an-ios-app/67054892#67054892
+    //
+    // private weak var scrollView: UIScrollView! (it's an outlet)
+    // self.view.preventScreenshot(for: self.scrollView)
+    //
+    func preventScreenshot(for view: UIView) {
+        let textField = UITextField()
+        textField.isSecureTextEntry = true
+        textField.isUserInteractionEnabled = false
+        guard let hiddenView = textField.layer.sublayers?.first?.delegate as? UIView else {
+            return
+        }
+        hiddenView.subviews.forEach { $0.removeFromSuperview() }
+        hiddenView.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(hiddenView)
+        hiddenView.fillSuperview()
+        hiddenView.addSubview(view)
+    }
+
+    func addBlur(style: UIBlurEffect.Style) {
+        let blur = UIBlurEffect(style: style)
+        let blurredEffectView = UIVisualEffectView(effect: blur)
+        blurredEffectView.frame = self.bounds
+        blurredEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        blurredEffectView.isUserInteractionEnabled = false
+        self.addSubview(blurredEffectView)
+    }
+
+    func insertBlur(style: UIBlurEffect.Style) {
+        let blur = UIBlurEffect(style: style)
+        let blurredEffectView = UIVisualEffectView(effect: blur)
+        blurredEffectView.frame = self.bounds
+        blurredEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        blurredEffectView.isUserInteractionEnabled = false
+        self.insertSubview(blurredEffectView, at: 0)
+    }
+
     func makeCircularBackground(withColor backgroundColor: UIColor) {
         self.backgroundColor = backgroundColor
         self.layer.cornerRadius = self.frame.size.width / 2
@@ -69,7 +108,7 @@ extension UIView {
         }
         return nil
     }
-    
+
     func addShadow(location: VerticalLocation, height: CGFloat = 2, color: UIColor = NCBrandColor.shared.customerDarkGrey, opacity: Float = 0.4, radius: CGFloat = 2) {
         switch location {
         case .bottom:
