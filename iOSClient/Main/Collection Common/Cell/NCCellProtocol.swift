@@ -123,6 +123,7 @@ extension NCCellProtocol {
         get { return nil }
         set { }
     }
+
     var fileProgressView: UIProgressView? {
         get { return nil }
         set {}
