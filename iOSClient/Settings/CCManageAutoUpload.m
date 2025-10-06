@@ -44,7 +44,7 @@
     XLFormRowDescriptor *row;
  
     tableAccount *activeAccount = [[NCManageDatabase shared] getActiveTableAccount];
-    
+
     // Auto Upload
     
     section = [XLFormSectionDescriptor formSection];
@@ -146,11 +146,11 @@
     [form addFormSection:section];
     
     NSString *title = NSLocalizedString(@"_autoupload_fullphotos_", nil);
-    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"autoUploadFull" rowType:XLFormRowDescriptorTypeBooleanSwitch title:title];
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"autoUploadStart" rowType:XLFormRowDescriptorTypeBooleanSwitch title:title];
     row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
     row.hidden = [NSString stringWithFormat:@"$%@==0", @"autoUpload"];
     row.value = 0;
-    if (activeAccount.autoUploadFull) row.value = @1;
+    if (activeAccount.autoUploadStart) row.value = @1;
     else row.value = @0;
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
@@ -234,6 +234,7 @@
     [super viewWillAppear:animated];
     
     appDelegate.activeViewController = self;
+    appDelegate.account = [[[NCKeychain alloc] init] getAccountName] ;
     [[[NCAskAuthorization alloc] init] askAuthorizationPhotoLibraryWithController:self completion:^(BOOL status) { }];
 }
 
@@ -254,7 +255,7 @@
     [super formRowDescriptorValueHasChanged:rowDescriptor oldValue:oldValue newValue:newValue];
     
     tableAccount *activeAccount = [[NCManageDatabase shared] getActiveTableAccount];
-    
+
     if ([rowDescriptor.tag isEqualToString:@"autoUpload"]) {
         
         if ([[rowDescriptor.value valueData] boolValue] == YES) {
@@ -273,10 +274,12 @@
             
             [[NCAutoUpload shared] alignPhotoLibraryWithController:self account:appDelegate.account];
                         
+//            [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
+            
         } else {
             
             [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUpload" state:NO];
-            [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadFull" state:NO];
+            [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadStart" state:NO];
 
             // remove
             [[NCManageDatabase shared] clearMetadatasUploadWithAccount:appDelegate.account];
@@ -290,17 +293,18 @@
         [[NCKeychain alloc] init].removePhotoCameraRoll = [[rowDescriptor.value valueData] boolValue];
     }
 
-    if ([rowDescriptor.tag isEqualToString:@"autoUploadFull"]) {
+    if ([rowDescriptor.tag isEqualToString:@"autoUploadStart"]) {
         
         if ([[rowDescriptor.value valueData] boolValue] == YES) {
             
             [[NCAutoUpload shared] autoUploadFullPhotosWithController:self log:@"Auto upload full" account:appDelegate.account];
-            [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadFull" state:YES];
+//            [[NCAutoUpload shared] autoUploadFullPhotosWithViewController:self log:@"Auto upload full"];
+            [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadStart" state:YES];
             
         } else {
             
             [[NCManageDatabase shared] clearMetadatasUploadWithAccount:appDelegate.account];
-            [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadFull" state:NO];
+            [[NCManageDatabase shared] setAccountAutoUploadProperty:@"autoUploadStart" state:NO];
         }
     }
 
@@ -310,6 +314,7 @@
 
         if ([[rowDescriptor.value valueData] boolValue] == YES) {
             [[NCAutoUpload shared] alignPhotoLibraryWithController:self account:appDelegate.account];
+//            [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
         }
     }
     
@@ -324,6 +329,7 @@
 
         if ([[rowDescriptor.value valueData] boolValue] == YES){
             [[NCAutoUpload shared] alignPhotoLibraryWithController:self account:appDelegate.account];
+//            [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
         }
     }
     
@@ -361,7 +367,7 @@
     XLFormRowDescriptor *rowAutoUploadWWAnVideo = [self.form formRowWithTag:@"autoUploadWWAnVideo"];
     XLFormRowDescriptor *rowRemovePhotoCameraRoll = [self.form formRowWithTag:@"removePhotoCameraRoll"];
 
-    XLFormRowDescriptor *rowAutoUploadFull = [self.form formRowWithTag:@"autoUploadFull"];
+    XLFormRowDescriptor *rowAutoUploadFull = [self.form formRowWithTag:@"autoUploadStart"];
     
     XLFormRowDescriptor *rowAutoUploadCreateSubfolder = [self.form formRowWithTag:@"autoUploadCreateSubfolder"];
     
@@ -390,7 +396,7 @@
     if (activeAccount.autoUploadWWAnVideo)
         [rowAutoUploadWWAnVideo setValue:@1]; else [rowAutoUploadWWAnVideo setValue:@0];
 
-    if (activeAccount.autoUploadFull)
+    if (activeAccount.autoUploadStart)
         [rowAutoUploadFull setValue:@1]; else [rowAutoUploadFull setValue:@0];
     
     if (activeAccount.autoUploadCreateSubfolder)
