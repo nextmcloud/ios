@@ -10,10 +10,11 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
     func copyInternalLink(sender: Any) {
         guard let metadata = self.metadata else { return }
 
-        NCNetworking.shared.readFile(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account) { _, metadata, _, error in
+        let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
+        NCNetworking.shared.readFile(serverUrlFileName: serverUrlFileName, account: metadata.account) { _, metadata, error in
             if error == .success, let metadata = metadata {
                 let internalLink = metadata.urlBase + "/index.php/f/" + metadata.fileId
-                NCShareCommon.copyLink(link: internalLink, viewController: self, sender: sender)
+                self.shareCommon.copyLink(link: internalLink, viewController: self, sender: sender)
             } else {
                 Task {
                     let windowScene = SceneManager.shared.getWindowScene(controller: self.controller)
@@ -27,7 +28,7 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
         guard let tableShare = tableShare else {
             return copyInternalLink(sender: sender)
         }
-        NCShareCommon.copyLink(link: tableShare.url, viewController: self, sender: sender)
+        shareCommon.copyLink(link: tableShare.url, viewController: self, sender: sender)
     }
 
     func tapMenu(with tableShare: tableShare?, sender: Any) {
@@ -53,10 +54,8 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
     }
 
     func quickStatus(with tableShare: tableShare?, sender: Any) {
-        guard let tableShare, let metadata else { return }
-        self.toggleQuickPermissionsMenu(isDirectory: metadata.directory, share: tableShare, sender: sender)
-//        guard let tableShare = tableShare,
-//              let metadata = metadata else { return }
-//        self.toggleUserPermissionMenu(isDirectory: metadata.directory, tableShare: tableShare)
+        guard let tableShare = tableShare,
+              let metadata = metadata else { return }
+        self.toggleUserPermissionMenu(isDirectory: metadata.directory, tableShare: tableShare)
     }
 }
