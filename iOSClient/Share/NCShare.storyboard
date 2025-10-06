@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Ts3-RO-A9l">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22155" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="IP9-yB-QOU">
     <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
-        <capability name="Image references" minToolsVersion="12.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22131"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -238,81 +237,8 @@
         <!--Share Paging-->
         <scene sceneID="TiZ-Yu-tnz">
             <objects>
-                <tableViewController id="z7r-s7-nxD" customClass="NCShareDownloadLimitTableViewController" customModule="Nextcloud" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="GIS-yz-DEq">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="516"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <sections>
-                            <tableViewSection footerTitle="123 remaining downloads allowed" id="eag-Ek-kyv">
-                                <cells>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="Nhk-Fc-G3o">
-                                        <rect key="frame" x="0.0" y="50" width="414" height="44.333332061767578"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Nhk-Fc-G3o" id="qUd-cW-Bvy">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44.333332061767578"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </tableViewCellContentView>
-                                        <listContentConfiguration key="contentConfiguration" text="Limit Downloads" secondaryText=""/>
-                                        <connections>
-                                            <outlet property="accessoryView" destination="nFs-et-CHB" id="8Sm-24-xgE"/>
-                                        </connections>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="tvZ-6P-X8V">
-                                        <rect key="frame" x="0.0" y="94.333332061767578" width="414" height="44.333332061767578"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="tvZ-6P-X8V" id="gDL-8G-sHX">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44.333332061767578"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                        </tableViewCellContentView>
-                                        <listContentConfiguration key="contentConfiguration" text="Allowed Downloads" secondaryText=""/>
-                                        <connections>
-                                            <outlet property="accessoryView" destination="XQ1-Wz-Q84" id="YQu-MJ-xGi"/>
-                                        </connections>
-                                    </tableViewCell>
-                                </cells>
-                            </tableViewSection>
-                        </sections>
-                        <connections>
-                            <outlet property="dataSource" destination="z7r-s7-nxD" id="bcZ-EG-Ns9"/>
-                            <outlet property="delegate" destination="z7r-s7-nxD" id="CYZ-nh-TPG"/>
-                        </connections>
-                    </tableView>
-                    <connections>
-                        <outlet property="allowedDownloadsCell" destination="tvZ-6P-X8V" id="XyE-JY-D4y"/>
-                        <outlet property="limitDownloadCell" destination="Nhk-Fc-G3o" id="OhC-yT-fQp"/>
-                        <outlet property="limitSwitch" destination="nFs-et-CHB" id="VPn-S5-HsB"/>
-                        <outlet property="limitTextField" destination="XQ1-Wz-Q84" id="Wr9-ib-xta"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="xFX-mf-2eM" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" id="nFs-et-CHB">
-                    <rect key="frame" x="0.0" y="0.0" width="51" height="31"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <accessibility key="accessibilityConfiguration" identifier="downloadLimitSwitch"/>
-                    <connections>
-                        <action selector="switchDownloadLimit:" destination="z7r-s7-nxD" eventType="valueChanged" id="BgD-7W-XjM"/>
-                    </connections>
-                </switch>
-                <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="right" contentVerticalAlignment="center" text="1" textAlignment="right" adjustsFontForContentSizeCategory="YES" minimumFontSize="17" id="XQ1-Wz-Q84">
-                    <rect key="frame" x="0.0" y="0.0" width="97" height="34"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <accessibility key="accessibilityConfiguration" identifier="downloadLimitTextField"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                    <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="numberPad" returnKeyType="done"/>
-                    <connections>
-                        <action selector="editingAllowedDownloadsDidBegin:" destination="z7r-s7-nxD" eventType="editingDidBegin" id="aN8-OV-iMc"/>
-                        <action selector="editingAllowedDownloadsDidEnd:" destination="z7r-s7-nxD" eventType="editingDidEnd" id="hqq-ag-KN9"/>
-                    </connections>
-                </textField>
-            </objects>
-            <point key="canvasLocation" x="6554" y="-170"/>
-        </scene>
-        <!--Share Advance Permission-->
-        <scene sceneID="59b-BB-FLA">
-            <objects>
-                <tableViewController storyboardIdentifier="NCShareAdvancePermission" id="r5U-VP-Qhs" customClass="NCShareAdvancePermission" customModule="Nextcloud" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="lDu-k5-2hT">
+                <viewController id="30S-OK-nGZ" customClass="NCSharePaging" customModule="Nextcloud" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Bl0-TL-Rzu">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <viewLayoutGuide key="safeArea" id="W3d-DJ-YQJ"/>
