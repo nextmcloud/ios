@@ -20,3 +20,19 @@ enum DownloadLimitViewModel {
     ///
     case limited(limit: Int, count: Int)
 }
+
+extension DownloadLimitViewModel {
+    var limit: Int? {
+        if case let .limited(limit, _) = self {
+            return limit
+        }
+        return nil
+    }
+    
+    var count: Int? {
+        if case let .limited(_, count) = self {
+            return count
+        }
+        return nil
+    }
+}

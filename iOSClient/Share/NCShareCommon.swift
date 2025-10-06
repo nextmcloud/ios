@@ -27,8 +27,25 @@ import NextcloudKit
 enum NCShareCommon {
     static let itemTypeFile = "file"
     static let itemTypeFolder = "folder"
+}
 
-    static func createLinkAvatar(imageName: String, colorCircle: UIColor) -> UIImage? {
+class NCShareCommon: NSObject {
+
+    // swiftlint:disable identifier_name
+    let SHARE_TYPE_USER = 0
+    let SHARE_TYPE_GROUP = 1
+    let SHARE_TYPE_LINK = 3
+    let SHARE_TYPE_EMAIL = 4
+    let SHARE_TYPE_CONTACT = 5
+    let SHARE_TYPE_REMOTE = 6
+    let SHARE_TYPE_CIRCLE = 7
+    let SHARE_TYPE_GUEST = 8
+    let SHARE_TYPE_REMOTE_GROUP = 9
+    let SHARE_TYPE_ROOM = 10
+    // swiftlint:enable identifier_name
+
+    func createLinkAvatar(imageName: String, colorCircle: UIColor) -> UIImage? {
+
         let size: CGFloat = 200
 
         let bottomImage = UIImage(named: "circle_fill")!.image(color: colorCircle, size: size / 2)
@@ -42,7 +59,7 @@ enum NCShareCommon {
         return image
     }
 
-    static func copyLink(link: String, viewController: UIViewController, sender: Any) {
+    func copyLink(link: String, viewController: UIViewController, sender: Any) {
         let objectsToShare = [link]
 
         let activityViewController = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
