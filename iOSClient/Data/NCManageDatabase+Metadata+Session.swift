@@ -120,11 +120,8 @@ extension NCManageDatabase {
                 .first else {
                 return
             }
-
-            if abs(metadata.progress - progress) > 0.001 {
-                metadata.progress = progress
-                print(progress)
-            }
+            metadata.progress = progress
+            print(progress)
         }
     }
 
@@ -136,11 +133,8 @@ extension NCManageDatabase {
                 .first else {
                 return
             }
-
-            if abs(metadata.progress - progress) > 0.001 {
-                metadata.progress = progress
-                print(progress)
-            }
+            metadata.progress = progress
+            print(progress)
         }
     }
 
@@ -210,24 +204,5 @@ extension NCManageDatabase {
                 realm.add(metadata, update: .all)
             }
         }
-    }
-
-    // MARK: - Realm Read
-
-    func updateBadge() async {
-        #if !EXTENSION
-        let num = await performRealmReadAsync { realm in
-            realm.objects(tableMetadata.self)
-                .filter(NSPredicate(format: "status != %i", NCGlobal.shared.metadataStatusNormal))
-                .count
-        } ?? 0
-        DispatchQueue.main.async {
-            UNUserNotificationCenter.current().setBadgeCount(num) { error in
-                if let error {
-                    print("Failed to set badge count: \(error)")
-                }
-            }
-        }
-        #endif
     }
 }

@@ -50,19 +50,17 @@ extension NCNetworking {
             taskHandler(task)
         } progressHandler: { progress in
             Task {
-                guard await self.progressQuantizer.shouldEmit(serverUrlFileName: serverUrlFileName, fraction: progress.fractionCompleted) else {
+                guard let metadata,
+                    await self.progressQuantizer.shouldEmit(serverUrlFileName: serverUrlFileName, fraction: progress.fractionCompleted) else {
                     return
                 }
-
-                if let metadata {
-                    await NCManageDatabase.shared.setMetadataProgress(ocId: metadata.ocId, progress: progress.fractionCompleted)
-                    await self.transferDispatcher.notifyAllDelegates { delegate in
-                        delegate.transferProgressDidUpdate(progress: Float(progress.fractionCompleted),
-                                                           totalBytes: progress.totalUnitCount,
-                                                           totalBytesExpected: progress.completedUnitCount,
-                                                           fileName: metadata.fileName,
-                                                           serverUrl: metadata.serverUrl)
-                    }
+                await NCManageDatabase.shared.setMetadataProgress(ocId: metadata.ocId, progress: progress.fractionCompleted)
+                await self.transferDispatcher.notifyAllDelegates { delegate in
+                    delegate.transferProgressDidUpdate(progress: Float(progress.fractionCompleted),
+                                                        totalBytes: progress.totalUnitCount,
+                                                        totalBytesExpected: progress.completedUnitCount,
+                                                        fileName: metadata.fileName,
+                                                        serverUrl: metadata.serverUrl)
                 }
             }
             progressHandler(progress.completedUnitCount, progress.totalUnitCount, progress.fractionCompleted)
@@ -174,6 +172,19 @@ extension NCNetworking {
             await NCManageDatabase.shared.deleteChunksAsync(account: metadata.account,
                                                             ocId: metadata.ocId,
                                                             directory: directory)
+        } else if results.error.errorCode == -1 ||
+                  results.error.errorCode == -2 ||
+                  results.error.errorCode == -3 ||
+                  results.error.errorCode == -4 ||
+                  results.error.errorCode == -5 {
+            await NCManageDatabase.shared.deleteChunksAsync(account: metadata.account,
+                                                            ocId: metadata.ocId,
+                                                            directory: directory)
+            await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
+            utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, userId: metadata.userId, urlBase: metadata.urlBase))
+
+            NCContentPresenter().showError(error: results.error)
+            return results
         }
 
         if withUploadComplete {
@@ -349,7 +360,6 @@ extension NCNetworking {
                 }
             }
         }
-        await NCManageDatabase.shared.updateBadge()
     }
 
     func uploadCancelFile(metadata: tableMetadata) async {
@@ -481,6 +491,23 @@ extension NCNetworking {
                                                              error: error)
                 return
             #endif
+
+            if error == .success {
+                // TODO: upload item
+                /*
+                let uploadItem = UploadItemDisk(fileName: fileName,
+                                                serverUrl: serverUrl,
+                                                ocId: ocId,
+                                                ocIdTransfer: nil,
+                                                etag: etag,
+                                                date: date,
+                                                size: size,
+                                                taskIdentifier: task.taskIdentifier)
+                addUploadItem(uploadItem, fileName: fileName, serverUrl: serverUrl)
+                */
+            } else {
+
+            }
 
             if let metadata = await NCManageDatabase.shared.getMetadataAsync(predicate: NSPredicate(format: "serverUrl == %@ AND fileName == %@ AND sessionTaskIdentifier == %d", serverUrl, fileName, task.taskIdentifier)) {
                 await uploadComplete(withMetadata: metadata, ocId: ocId, etag: etag, date: date, size: size, error: error)

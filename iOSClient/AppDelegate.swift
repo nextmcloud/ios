@@ -196,12 +196,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 task.setTaskCompleted(success: true)
             }
 
-            guard let tblAccount = await NCManageDatabase.shared.getActiveTableAccountAsync() else {
-                nkLog(tag: self.global.logTagTask, emoji: .info, message: "No active account or background task already running")
-                return
-            }
-
-            await backgroundSync(tblAccount: tblAccount, task: task)
+            await backgroundSync(task: task)
         }
     }
 
@@ -221,16 +216,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                task.setTaskCompleted(success: true)
            }
 
-           guard let tblAccount = await NCManageDatabase.shared.getActiveTableAccountAsync() else {
-               nkLog(tag: self.global.logTagTask, emoji: .info, message: "No active account or background task already running")
-               return
-           }
-
-           await backgroundSync(tblAccount: tblAccount, task: task)
+           await backgroundSync(task: task)
        }
     }
 
-    func backgroundSync(tblAccount: tableAccount, task: BGTask? = nil) async {
+    func backgroundSync(task: BGTask? = nil) async {
         // BGTask expiration flag
         var expired = false
         task?.expirationHandler = {
@@ -238,8 +228,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
 
         // Discover new items for Auto Upload
-        let numAutoUpload = await NCAutoUpload.shared.initAutoUpload(tblAccount: tblAccount)
-        nkLog(tag: self.global.logTagBgSync, emoji: .start, message: "Auto upload found \(numAutoUpload) new items for \(tblAccount.account)")
+        let numAutoUpload = await NCAutoUpload.shared.initAutoUpload()
+        nkLog(tag: self.global.logTagBgSync, emoji: .start, message: "Auto upload found \(numAutoUpload) new items")
         guard !expired else {
             return
         }
@@ -249,8 +239,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             predicate: NSPredicate(format: "status != %d", self.global.metadataStatusNormal),
             withSort: [RealmSwift.SortDescriptor(keyPath: "sessionDate", ascending: true)],
             withLimit: NCBrandOptions.shared.numMaximumProcess),
-              !allMetadatas.isEmpty,
-              !expired else {
+                !allMetadatas.isEmpty,
+                !expired else {
             return
         }
 
@@ -260,17 +250,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             $0.sessionSelector == self.global.selectorUploadAutoUpload
         }
 
-        for meta in pendingCreateFolders {
+        for metadata in pendingCreateFolders {
             guard !expired else {
                 return
             }
             let err = await NCNetworking.shared.createFolderForAutoUpload(
-                serverUrlFileName: meta.serverUrlFileName,
-                account: meta.account
+                serverUrlFileName: metadata.serverUrlFileName,
+                account: metadata.account
             )
             // Fail-fast: abort the whole sync on first failure
             if err != .success {
-                nkLog(tag: self.global.logTagBgSync, emoji: .error, message: "Create folder '\(meta.serverUrlFileName)' failed: \(err.errorCode) – aborting sync")
+                nkLog(tag: self.global.logTagBgSync, emoji: .error, message: "Create folder '\(metadata.serverUrlFileName)' failed: \(err.errorCode) – aborting sync")
                 return
             }
         }
@@ -280,7 +270,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let uploading   = allMetadatas.lazy.filter { $0.status == self.global.metadataStatusUploading }.count
         let used        = downloading + uploading
         let maximum     = NCBrandOptions.shared.numMaximumProcess
-        let available   = Swift.max(0, maximum - used)
+        let available   = max(0, maximum - used)
 
         // Only inject more work if overall utilization <= 20%
         let utilization = Double(used) / Double(maximum)
@@ -291,7 +281,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
 
         // Start Auto Uploads (cap by available slots)
-        let seedsToUpload = Array(
+        let metadatasToUpload = Array(
             allMetadatas.lazy.filter {
                 $0.status == self.global.metadataStatusWaitUpload &&
                 $0.sessionSelector == self.global.selectorUploadAutoUpload &&
@@ -301,12 +291,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         )
 
         let cameraRoll = NCCameraRoll()
-        for seed in seedsToUpload {
+        for metadata in metadatasToUpload {
             guard !expired else {
                 return
             }
             // Expand seed into concrete metadatas (e.g., Live Photo pair)
-            let extracted = await cameraRoll.extractCameraRoll(from: seed)
+            let extracted = await cameraRoll.extractCameraRoll(from: metadata)
 
             for metadata in extracted {
                 // Sequential await keeps ordering and simplifies backpressure
@@ -324,10 +314,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
         nkLog(debug: "Handle events For background URLSession: \(identifier)")
-
-        if NCManageDatabase.shared.openRealmBackground() {
-            WidgetCenter.shared.reloadAllTimelines()
-        }
 
         backgroundSessionCompletionHandler = completionHandler
     }

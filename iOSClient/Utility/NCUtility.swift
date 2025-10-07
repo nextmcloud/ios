@@ -365,5 +365,14 @@ final class NCUtility: NSObject, Sendable {
             print("Invalid email: \(email)")
             return false
         }
+      
+    }
+  
+    func formatBadgeCount(_ count: Int) -> String {
+        if count <= 9999 {
+            return "\(count)"
+        } else {
+            return count.formatted(.number.notation(.compactName).locale(Locale(identifier: "en_US")))
+        }
     }
 }

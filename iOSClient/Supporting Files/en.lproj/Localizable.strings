@@ -115,7 +115,7 @@
 "_images_"                  = "Images";
 "_confirm_"                 = "Confirm";
 "_confirm_continue_"        = "Confirm by continuing the previous uploading";
-"_confirm_resetting_"       = "confirm ignoring previous uploading ";
+"_confirm_resetting_"       = "Confirm ignoring previous uploading ";
 "_background_location_access_title_"    = "Background Location Access";
 "_background_location_access_message_"  = "This app needs background location access to automatically upload files when you move between areas. GPS is not used and your location is never stored.";
 "_enable_background_location_title_"    = "Enable Background Location";
@@ -256,8 +256,8 @@
 "_autoupload_favorites_"            = "Auto upload favorites only";
 "_autoupload_description_"          = "New photos/videos will be automatically uploaded to your server.";
 "_autoupload_fullphotos_"           = "Upload the whole camera roll";
-"_start_autoupload_"                = "Turn on auto uploading";
-"_stop_autoupload_"                 = "Stop auto uploading";
+"_start_autoupload_"                = "Turn on auto upload";
+"_stop_autoupload_"                 = "Turn off auto upload";
 "_autoupload_fullphotos_footer_"    = "Adjust the options above before uploading.";
 "_autoupload_create_subfolder_"     = "Use subfolders";
 "_autoupload_create_subfolder_footer_"  = "Store photos in subfolders based on year, month or day.";
@@ -651,6 +651,7 @@
 "_recommended_files_"       = "Recommended Files";
 "_propagate_layout_"        = "Apply the following change to all subfolders";
 "_version_mismatch_error_"  = "Version change: please open the main app to update the data.";
+"_check_auto_upload_"       = "Automatic photo upload is currently disabled.\nWith Nextcloud iOS you can automatically back up your photos and keep them safe on your server.\nJust open Settings → Auto Upload, choose the options you prefer, and turn it on with the \"%@\" button.";
 
 // Tip
 "_tip_pdf_thumbnails_"      = "Swipe left from the right edge of the screen to show the thumbnails";

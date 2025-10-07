@@ -300,6 +300,7 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     
     let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
     let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
+    let metadataStatusTransfers                 = [-2, -3, 2, 3, 10, 11, 12, 13, 14, 15]
 
     //  Hidden files included in the read
     //
@@ -362,6 +363,9 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
     let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
     
+    let notificationCenterServerDidUpdate                       = "serverDidUpdate"                 // userInfo: account
+    let notificationCenterNetworkReachability                   = "networkReachability"
+
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
     
@@ -390,7 +394,24 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let notificationCenterShareCountsUpdated                    = "shareCountsUpdated"
     let notificationCenterUpdateIcons                           = "updateIcons"
 
-    
+    // Networking Status
+    let networkingStatusCreateFolder                            = "statusCreateFolder"
+    let networkingStatusDelete                                  = "statusDelete"
+    let networkingStatusRename                                  = "statusRename"
+    let networkingStatusFavorite                                = "statusFavorite"
+
+    let networkingStatusDownloading                             = "statusDownloading"
+    let networkingStatusDownloaded                              = "statusDownloaded"
+    let networkingStatusDownloadCancel                          = "statusDownloadCancel"
+
+    let networkingStatusUploading                               = "statusUploading"
+    let networkingStatusUploaded                                = "statusUploaded"
+    let networkingStatusUploadedLivePhoto                       = "statusUploadedLivePhoto"
+    let networkingStatusUploadCancel                            = "statusUploadCancel"
+
+    let networkingStatusReloadAvatar                            = "statusReloadAvatar"
+
+
     // TIP
     //
     let tipPDFThumbnail                                         = "tipPDFThumbnail"
