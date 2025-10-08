@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
+import NextcloudKit
 
 class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     @IBOutlet weak var buttonLogin: UIButton!
@@ -11,22 +12,30 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     @IBOutlet weak var buttonHost: UIButton!
     @IBOutlet weak var introCollectionView: UICollectionView!
     @IBOutlet weak var pageControl: UIPageControl!
+    @IBOutlet weak var contstraintBottomLoginButton: NSLayoutConstraint!
 
     weak var delegate: NCIntroViewController?
     // Controller
     var controller: NCMainTabBarController?
 
     private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    private let titles = [NSLocalizedString("_intro_1_title_", comment: ""), NSLocalizedString("_intro_2_title_", comment: ""), NSLocalizedString("_intro_3_title_", comment: ""), NSLocalizedString("_intro_4_title_", comment: "")]
-    private let images = [UIImage(named: "intro1"), UIImage(named: "intro2"), UIImage(named: "intro3"), UIImage(named: "intro4")]
-    private var timer: Timer?
+    private let titles = [NSLocalizedString("", comment: ""), NSLocalizedString("", comment: ""), NSLocalizedString("", comment: "")]
+    private var images:[UIImage?] = []
+    private var timerAutoScroll: Timer?
+
     private var textColor: UIColor = .white
     private var textColorOpponent: UIColor = .black
+    private let imagesLandscape = [UIImage(named: "introSlideLand1"), UIImage(named: "introSlideLand2"), UIImage(named: "introSlideLand3")]
+    private let imagesPortrait = [UIImage(named: "introSlide1"), UIImage(named: "introSlide2"), UIImage(named: "introSlide3")]
+    private let imagesEightPortrait = [UIImage(named: "introSlideEight1"), UIImage(named: "introSlideEight2"), UIImage(named: "introSlideEight3")]
 
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let isEightPlusDevice = UIScreen.main.bounds.height == 736
+        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : (isEightPlusDevice ? imagesEightPortrait : imagesPortrait)
 
         let isTooLight = NCBrandColor.shared.customer.isTooLight()
         let isTooDark = NCBrandColor.shared.customer.isTooDark()
@@ -51,7 +60,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         self.navigationController?.navigationBar.tintColor = textColor
 
         if !NCManageDatabase.shared.getAllTableAccount().isEmpty {
-            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: self, action: #selector(actionCancel(_:)))
+            let navigationItemCancel = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .done, target: self, action: #selector(self.actionCancel))
             navigationItemCancel.tintColor = textColor
             navigationItem.leftBarButtonItem = navigationItemCancel
         }
@@ -64,10 +73,13 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         buttonLogin.backgroundColor = textColor
         buttonLogin.setTitle(NSLocalizedString("_log_in_", comment: ""), for: .normal)
 
-        buttonSignUp.layer.cornerRadius = 8
+        buttonSignUp.layer.cornerRadius = 20
+        buttonSignUp.layer.borderColor = textColor.cgColor
+        buttonSignUp.layer.borderWidth = 1.0
         buttonSignUp.setTitleColor(textColor, for: .normal)
-        buttonSignUp.backgroundColor = textColor.withAlphaComponent(0.2)
+        buttonSignUp.backgroundColor = NCBrandColor.shared.customer
         buttonSignUp.titleLabel?.adjustsFontSizeToFitWidth = true
+        buttonSignUp.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
         buttonSignUp.setTitle(NSLocalizedString("_sign_up_", comment: ""), for: .normal)
 
         buttonHost.layer.cornerRadius = 20
@@ -82,7 +94,8 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
 
         view.backgroundColor = NCBrandColor.shared.customer
 
-        self.timer = Timer.scheduledTimer(timeInterval: 4, target: self, selector: (#selector(self.autoScroll(_:))), userInfo: nil, repeats: true)
+        timerAutoScroll = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(NCIntroViewController.autoScroll)), userInfo: nil, repeats: true)
+        NotificationCenter.default.addObserver(self, selector: #selector(resetPageController(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -93,23 +106,41 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         }
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        timer?.invalidate()
-        timer = nil
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if (UIDevice.current.userInterfaceIdiom != .pad){
+            AppUtility.lockOrientation(UIInterfaceOrientationMask.portrait, andRotateTo: UIInterfaceOrientation.portrait)
+        }
+        navigationController?.setNavigationBarHidden(true, animated: animated)
     }
-
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-
-        coordinator.animate(alongsideTransition: nil) { _ in
-            self.pageControl?.currentPage = 0
-            self.introCollectionView?.collectionViewLayout.invalidateLayout()
+    
+    override func viewDidLayoutSubviews() {
+        if UIScreen.main.bounds.width < 350 || UIScreen.main.bounds.height > 800 {
+            contstraintBottomLoginButton.constant = 15
         }
     }
 
-    @objc func autoScroll(_ sender: Any?) {
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        timerAutoScroll?.invalidate()
+        AppUtility.lockOrientation(UIInterfaceOrientationMask.all)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        let isEightPlusDevice = UIScreen.main.bounds.height == 736
+        images = UIDevice.current.orientation.isLandscape ?  imagesLandscape : (isEightPlusDevice ? imagesEightPortrait : imagesPortrait)
+        pageControl.currentPage = 0
+        introCollectionView.collectionViewLayout.invalidateLayout()
+        self.introCollectionView.reloadData()
+    }
+    
+    @objc func resetPageController(_ notification: NSNotification){
+        pageControl.currentPage = 0
+        introCollectionView.scrollToItem(at: IndexPath(row: pageControl.currentPage, section: 0), at: .centeredHorizontally, animated: true)
+    }
+
+    @objc func autoScroll() {
         if pageControl.currentPage + 1 >= titles.count {
             pageControl.currentPage = 0
         } else {
@@ -133,6 +164,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         cell.titleLabel.textColor = textColor
         cell.titleLabel.text = titles[indexPath.row]
         cell.imageView.image = images[indexPath.row]
+        cell.imageView.contentMode = .scaleAspectFill
         return cell
     }
 
@@ -141,34 +173,52 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        timer = Timer.scheduledTimer(timeInterval: 4, target: self, selector: (#selector(autoScroll(_:))), userInfo: nil, repeats: true)
-        pageControl.currentPage = Int(scrollView.contentOffset.x) / Int(scrollView.frame.width)
+        timerAutoScroll = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(NCIntroViewController.autoScroll)), userInfo: nil, repeats: true)
+        let page = Int(scrollView.contentOffset.x) / Int(scrollView.frame.width)
+        if pageControl.currentPage == (images.count - 1), pageControl.currentPage <= page {
+            pageControl.currentPage = 0
+            introCollectionView.scrollToItem(at: IndexPath(row: pageControl.currentPage, section: 0), at: .centeredHorizontally, animated: false)
+        } else {
+            pageControl.currentPage = Int(scrollView.contentOffset.x) / Int(scrollView.frame.width)
+        }
     }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        timer?.invalidate()
-        timer = nil
+        timerAutoScroll?.invalidate()
+        timerAutoScroll = nil
     }
 
     // MARK: - Action
 
-    @objc func actionCancel(_ sender: Any?) {
+    @objc func actionCancel() {
         dismiss(animated: true) { }
     }
 
     @IBAction func login(_ sender: Any) {
-        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
-            viewController.controller = self.controller
-            self.navigationController?.pushViewController(viewController, animated: true)
+        if NCBrandOptions.shared.use_AppConfig {
+            let loginViewPage = UIStoryboard(name: "NCLogin", bundle: Bundle.main).instantiateViewController(identifier: "NCLogin")
+            navigationController?.pushViewController(loginViewPage, animated: true)
+        } else {
+            if NextcloudKit.shared.isNetworkReachable() {
+                appDelegate.openLogin(viewController: navigationController, selector: NCGlobal.shared.introLogin, openLoginWeb: false)
+            } else {
+                showNoInternetAlert()
+            }
         }
+    }
+    
+    func showNoInternetAlert(){
+        let alertController = UIAlertController(title: NSLocalizedString("_no_internet_alert_title_", comment: ""), message: NSLocalizedString("_no_internet_alert_message_", comment: ""), preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { action in }))
+        self.present(alertController, animated: true)
     }
 
     @IBAction func signupWithProvider(_ sender: Any) {
-        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
-            viewController.controller = self.controller
-            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
-            self.navigationController?.pushViewController(viewController, animated: true)
-        }
+        appDelegate.openLogin(selector: NCGlobal.shared.introSignup)
+    }
+    
+    @IBAction func signup(_ sender: Any) {
+        appDelegate.openLogin(selector: NCGlobal.shared.introSignup)
     }
 
     @IBAction func host(_ sender: Any) {
