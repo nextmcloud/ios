@@ -114,6 +114,7 @@ class NMCCommunication: NSObject, XMLParserDelegate {
     public func authorizationToken() -> String {
         let accountDetails = NCManageDatabase.shared.getAllTableAccount().first
         let password = NCKeychain().getPassword(account: accountDetails?.account ?? "") 
+        let password = NCKeychain().getPassword(account: accountDetails?.account ?? "")
         let username = accountDetails?.user ?? ""
         let credential = Data("\(username):\(password)".utf8).base64EncodedString()
         return ("Basic \(credential)")

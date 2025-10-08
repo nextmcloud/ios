@@ -274,6 +274,31 @@
 		B5BEBE292E93BE200002C9E5 /* TextFileWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE182E93BE200002C9E5 /* TextFileWithOcrSwitchView.xib */; };
 		B5BEBE2A2E93BE200002C9E5 /* PdfWithoutOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE102E93BE200002C9E5 /* PdfWithoutOcrSwitchView.xib */; };
 		B5BEBE2B2E93BE200002C9E5 /* JPGImageSaveSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE0A2E93BE200002C9E5 /* JPGImageSaveSwitchView.xib */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B5BEBD192E93A5260002C9E5 /* Shareable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD182E93A5260002C9E5 /* Shareable.swift */; };
+		B5BEBD1E2E93A74C0002C9E5 /* CreateLinkFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1A2E93A74C0002C9E5 /* CreateLinkFooterView.swift */; };
+		B5BEBD1F2E93A74C0002C9E5 /* NCPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1B2E93A74C0002C9E5 /* NCPermissions.swift */; };
+		B5BEBD202E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1C2E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift */; };
+		B5BEBD212E93A74C0002C9E5 /* NoSharesFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1D2E93A74C0002C9E5 /* NoSharesFooterView.swift */; };
+		B5BEBD222E93A74C0002C9E5 /* CreateLinkFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1A2E93A74C0002C9E5 /* CreateLinkFooterView.swift */; };
+		B5BEBD232E93A74C0002C9E5 /* NCPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1B2E93A74C0002C9E5 /* NCPermissions.swift */; };
+		B5BEBD242E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1C2E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift */; };
+		B5BEBD252E93A74C0002C9E5 /* NoSharesFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1D2E93A74C0002C9E5 /* NoSharesFooterView.swift */; };
+		B5E2E6D42DAE52B500AB2EDD /* SharingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6D32DAE52B500AB2EDD /* SharingTest.swift */; };
+		B5E2E6D72DAE571200AB2EDD /* PasswordInputField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6D62DAE571200AB2EDD /* PasswordInputField.xib */; };
+		B5E2E6D82DAE571200AB2EDD /* PasswordInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6D52DAE571200AB2EDD /* PasswordInputField.swift */; };
+		B5E2E6DD2DAE573B00AB2EDD /* NCFilePermissionEditCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6DC2DAE573B00AB2EDD /* NCFilePermissionEditCell.xib */; };
+		B5E2E6DE2DAE573B00AB2EDD /* NCFilePermissionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6DA2DAE573B00AB2EDD /* NCFilePermissionCell.xib */; };
+		B5E2E6DF2DAE573B00AB2EDD /* NCFilePermissionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6D92DAE573B00AB2EDD /* NCFilePermissionCell.swift */; };
+		B5E2E6E02DAE573B00AB2EDD /* NCFilePermissionEditCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6DB2DAE573B00AB2EDD /* NCFilePermissionEditCell.swift */; };
+		B5E2E6E22DAE59CD00AB2EDD /* NCShareAdvancePermissionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6E12DAE59CD00AB2EDD /* NCShareAdvancePermissionHeader.xib */; };
+		B5E2E6E72DAE59F000AB2EDD /* NCShareHeaderCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6E42DAE59F000AB2EDD /* NCShareHeaderCustomCell.xib */; };
+		B5E2E6E82DAE59F000AB2EDD /* NCShareTextInputCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6E62DAE59F000AB2EDD /* NCShareTextInputCell.xib */; };
+		B5E2E6E92DAE59F000AB2EDD /* NCShareTextInputCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6E52DAE59F000AB2EDD /* NCShareTextInputCell.swift */; };
+		B5E2E6EA2DAE59F000AB2EDD /* NCShareHeaderCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6E32DAE59F000AB2EDD /* NCShareHeaderCustomCell.swift */; };
+		B5E2E6ED2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6EC2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib */; };
+		B5E2E6EE2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6EB2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift */; };
+		B5E2E6F02DAE6E3F00AB2EDD /* ShareDownloadLimitNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6EF2DAE6E3F00AB2EDD /* ShareDownloadLimitNetwork.swift */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
 		F310B1EF2BA862F1001C42F5 /* NCViewerMedia+VisionKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F310B1EE2BA862F1001C42F5 /* NCViewerMedia+VisionKit.swift */; };
@@ -846,6 +871,12 @@
 		F77DD6AC2C5CC093009448FB /* NCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77DD6A72C5CC093009448FB /* NCSession.swift */; };
 		F77DD6AD2C5CC093009448FB /* NCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77DD6A72C5CC093009448FB /* NCSession.swift */; };
 		F77DD6AE2C5CC093009448FB /* NCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77DD6A72C5CC093009448FB /* NCSession.swift */; };
+		F77E8C1F2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
+		F77E8C202E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
+		F77E8C212E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
+		F77E8C222E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
+		F77E8C242E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
+		F77E8C252E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
 		F77ED59128C9CE9D00E24ED0 /* ToolbarData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77ED59028C9CE9D00E24ED0 /* ToolbarData.swift */; };
 		F77ED59328C9CEA000E24ED0 /* ToolbarWidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77ED59228C9CEA000E24ED0 /* ToolbarWidgetProvider.swift */; };
 		F77ED59528C9CEA400E24ED0 /* ToolbarWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77ED59428C9CEA300E24ED0 /* ToolbarWidgetView.swift */; };
@@ -1584,6 +1615,27 @@
 		B5BEBE162E93BE200002C9E5 /* SetPDFPasswordSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SetPDFPasswordSwitchView.xib; sourceTree = "<group>"; };
 		B5BEBE172E93BE200002C9E5 /* TextFileWithOcrSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFileWithOcrSwitchView.swift; sourceTree = "<group>"; };
 		B5BEBE182E93BE200002C9E5 /* TextFileWithOcrSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFileWithOcrSwitchView.xib; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B5BEBD182E93A5260002C9E5 /* Shareable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shareable.swift; sourceTree = "<group>"; };
+		B5BEBD1A2E93A74C0002C9E5 /* CreateLinkFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateLinkFooterView.swift; sourceTree = "<group>"; };
+		B5BEBD1B2E93A74C0002C9E5 /* NCPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCPermissions.swift; sourceTree = "<group>"; };
+		B5BEBD1C2E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareEmailLinkHeaderView.swift; sourceTree = "<group>"; };
+		B5BEBD1D2E93A74C0002C9E5 /* NoSharesFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoSharesFooterView.swift; sourceTree = "<group>"; };
+		B5E2E6D32DAE52B500AB2EDD /* SharingTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingTest.swift; sourceTree = "<group>"; };
+		B5E2E6D52DAE571200AB2EDD /* PasswordInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordInputField.swift; sourceTree = "<group>"; };
+		B5E2E6D62DAE571200AB2EDD /* PasswordInputField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PasswordInputField.xib; sourceTree = "<group>"; };
+		B5E2E6D92DAE573B00AB2EDD /* NCFilePermissionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCFilePermissionCell.swift; sourceTree = "<group>"; };
+		B5E2E6DA2DAE573B00AB2EDD /* NCFilePermissionCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCFilePermissionCell.xib; sourceTree = "<group>"; };
+		B5E2E6DB2DAE573B00AB2EDD /* NCFilePermissionEditCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCFilePermissionEditCell.swift; sourceTree = "<group>"; };
+		B5E2E6DC2DAE573B00AB2EDD /* NCFilePermissionEditCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCFilePermissionEditCell.xib; sourceTree = "<group>"; };
+		B5E2E6E12DAE59CD00AB2EDD /* NCShareAdvancePermissionHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareAdvancePermissionHeader.xib; sourceTree = "<group>"; };
+		B5E2E6E32DAE59F000AB2EDD /* NCShareHeaderCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareHeaderCustomCell.swift; sourceTree = "<group>"; };
+		B5E2E6E42DAE59F000AB2EDD /* NCShareHeaderCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareHeaderCustomCell.xib; sourceTree = "<group>"; };
+		B5E2E6E52DAE59F000AB2EDD /* NCShareTextInputCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareTextInputCell.swift; sourceTree = "<group>"; };
+		B5E2E6E62DAE59F000AB2EDD /* NCShareTextInputCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareTextInputCell.xib; sourceTree = "<group>"; };
+		B5E2E6EB2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareEmailFieldCell.swift; sourceTree = "<group>"; };
+		B5E2E6EC2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCShareEmailFieldCell.xib; sourceTree = "<group>"; };
+		B5E2E6EF2DAE6E3F00AB2EDD /* ShareDownloadLimitNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareDownloadLimitNetwork.swift; sourceTree = "<group>"; };
 		C0046CDA2A17B98400D87C9D /* NextcloudUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04E2F202A17BB4D001BAD85 /* NextcloudIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NextcloudIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCActivityTableViewCell.swift; sourceTree = "<group>"; };
@@ -2388,6 +2440,7 @@
 				B5BEBD692E93AE4B0002C9E5 /* SettingsTestCases.swift */,
 				B5BEBD6A2E93AE4B0002C9E5 /* SharingTest.swift */,
 				AA52EB452D42AC5A0089C348 /* Placeholder.swift */,
+				B5E2E6D32DAE52B500AB2EDD /* SharingTest.swift */,
 			);
 			path = NextcloudUnitTests;
 			sourceTree = "<group>";
@@ -2415,6 +2468,15 @@
 			isa = PBXGroup;
 			children = (
 				AA8D316D2D4123B200FE2775 /* DownloadLimit */,
+				B5E2E6E32DAE59F000AB2EDD /* NCShareHeaderCustomCell.swift */,
+				B5E2E6E42DAE59F000AB2EDD /* NCShareHeaderCustomCell.xib */,
+				B5E2E6E52DAE59F000AB2EDD /* NCShareTextInputCell.swift */,
+				B5E2E6E62DAE59F000AB2EDD /* NCShareTextInputCell.xib */,
+				B5E2E6E12DAE59CD00AB2EDD /* NCShareAdvancePermissionHeader.xib */,
+				B5E2E6D92DAE573B00AB2EDD /* NCFilePermissionCell.swift */,
+				B5E2E6DA2DAE573B00AB2EDD /* NCFilePermissionCell.xib */,
+				B5E2E6DB2DAE573B00AB2EDD /* NCFilePermissionEditCell.swift */,
+				B5E2E6DC2DAE573B00AB2EDD /* NCFilePermissionEditCell.xib */,
 				AF93471627E2361E002537EE /* NCShareAdvancePermission.swift */,
 				AF93471827E2361E002537EE /* NCShareAdvancePermissionFooter.swift */,
 				AF93471427E2361E002537EE /* NCShareAdvancePermissionFooter.xib */,
@@ -2738,6 +2800,14 @@
 		F728CE741BF6322C00E69702 /* Share */ = {
 			isa = PBXGroup;
 			children = (
+				B5BEBD1A2E93A74C0002C9E5 /* CreateLinkFooterView.swift */,
+				B5BEBD1B2E93A74C0002C9E5 /* NCPermissions.swift */,
+				B5BEBD1C2E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift */,
+				B5BEBD1D2E93A74C0002C9E5 /* NoSharesFooterView.swift */,
+				B5BEBD182E93A5260002C9E5 /* Shareable.swift */,
+				B5E2E6EF2DAE6E3F00AB2EDD /* ShareDownloadLimitNetwork.swift */,
+				B5E2E6EB2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift */,
+				B5E2E6EC2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib */,
 				AF93471327E235EB002537EE /* Advanced */,
 				F724377A2C10B83E00C7C68D /* NCPermissions.swift */,
 				F700510022DF63AC003A3356 /* NCShare.storyboard */,
@@ -2758,7 +2828,7 @@
 				AF2D7C7D2742559100ADF566 /* NCShareUserCell.swift */,
 				AF93471727E2361E002537EE /* NCShareHeader.xib */,
 				AF93471527E2361E002537EE /* NCShareHeader.swift */,
-				AFCE353827E5DE0400FEA6C2 /* Shareable.swift */,
+				AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */,
 				AA8E03D92D2ED83300E7E89C /* TransientShare.swift */,
 			);
 			path = Share;
@@ -2867,6 +2937,8 @@
 			children = (
 				B5BEBE192E93BE200002C9E5 /* NMC Views */,
 				B5BEBE052E93BE0C0002C9E5 /* NCCreateFormUploadScanDocument.swift */,
+				B5E2E6D52DAE571200AB2EDD /* PasswordInputField.swift */,
+				B5E2E6D62DAE571200AB2EDD /* PasswordInputField.xib */,
 				F758B457212C564000515F55 /* NCScan.storyboard */,
 				F758B45D212C569C00515F55 /* NCScanCell.swift */,
 				F758B45F212C56A400515F55 /* NCScan.swift */,
@@ -4415,9 +4487,14 @@
 				F758B45A212C564000515F55 /* NCScan.storyboard in Resources */,
 				F765F73225237E3F00391DBE /* NCRecent.storyboard in Resources */,
 				F78F74342163757000C2ADAD /* NCTrash.storyboard in Resources */,
+				B5E2E6E72DAE59F000AB2EDD /* NCShareHeaderCustomCell.xib in Resources */,
+				B5E2E6E82DAE59F000AB2EDD /* NCShareTextInputCell.xib in Resources */,
 				F702F30225EE5D2C008F8E80 /* english.txt in Resources */,
 				F757CC8C29E82D0500F31428 /* NCGroupfolders.storyboard in Resources */,
 				F79A65C32191D90F00FF6DCC /* NCSelect.storyboard in Resources */,
+				B5E2E6DD2DAE573B00AB2EDD /* NCFilePermissionEditCell.xib in Resources */,
+				B5E2E6ED2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib in Resources */,
+				B5E2E6DE2DAE573B00AB2EDD /* NCFilePermissionCell.xib in Resources */,
 				F7226EDC1EE4089300EBECB1 /* Main.storyboard in Resources */,
 				AF56C1DC2784856200D8BAE2 /* NCActivityCommentView.xib in Resources */,
 				F7F4F10B27ECDBDB008676F9 /* Inconsolata-Light.ttf in Resources */,
@@ -4441,9 +4518,11 @@
 				F723B3DD22FC6D1D00301EFE /* NCShareCommentsCell.xib in Resources */,
 				F78ACD4B21903F850088454D /* NCTrashListCell.xib in Resources */,
 				AF93471927E2361E002537EE /* NCShareAdvancePermissionFooter.xib in Resources */,
+				B5E2E6E22DAE59CD00AB2EDD /* NCShareAdvancePermissionHeader.xib in Resources */,
 				F7725A61251F33BB00D125E0 /* NCFiles.storyboard in Resources */,
 				F7CBC1232BAC8B0000EC1D55 /* NCSectionFirstHeaderEmptyData.xib in Resources */,
 				F700510122DF63AC003A3356 /* NCShare.storyboard in Resources */,
+				B5E2E6D72DAE571200AB2EDD /* PasswordInputField.xib in Resources */,
 				F787704F22E7019900F287A9 /* NCShareLinkCell.xib in Resources */,
 				F70753F72542A9C000972D44 /* NCViewerMediaPage.storyboard in Resources */,
 				F7F4F10627ECDBDB008676F9 /* Inconsolata-Medium.ttf in Resources */,
@@ -4634,6 +4713,7 @@
 				B5BEBD752E93AE4B0002C9E5 /* E2EETests.swift in Sources */,
 				B5BEBD762E93AE4B0002C9E5 /* ScanTests.swift in Sources */,
 				B5BEBD772E93AE4B0002C9E5 /* PrivacyPolicyTest.swift in Sources */,
+				B5E2E6D42DAE52B500AB2EDD /* SharingTest.swift in Sources */,
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4881,6 +4961,10 @@
 				B5BEBDB32E93AF010002C9E5 /* AdjustHelper.m in Sources */,
 				B5BEBDB42E93AF010002C9E5 /* TealiumHelper.swift in Sources */,
 				B5BEBDB52E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */,
+				B5BEBD1E2E93A74C0002C9E5 /* CreateLinkFooterView.swift in Sources */,
+				B5BEBD1F2E93A74C0002C9E5 /* NCPermissions.swift in Sources */,
+				B5BEBD202E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift in Sources */,
+				B5BEBD212E93A74C0002C9E5 /* NoSharesFooterView.swift in Sources */,
 				F7327E322B73A86700A462C7 /* NCNetworking+WebDAV.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5102,6 +5186,8 @@
 				370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */,
 				F32FADA92D1176E3007035E2 /* UIButton+Extension.swift in Sources */,
 				F768822C2C0DD1E7001CF441 /* NCKeychain.swift in Sources */,
+				F768822C2C0DD1E7001CF441 /* NCPreferences.swift in Sources */,
+				B5E2E6EE2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift in Sources */,
 				F7BFFD282C8846020029A201 /* NCHud.swift in Sources */,
 				F71CD6CA2930D7B1006C95C1 /* NCApplicationHandle.swift in Sources */,
 				F3754A7D2CF87D600009312E /* SetupPasscodeView.swift in Sources */,
@@ -5109,6 +5195,8 @@
 				F3374A842D64AC31002A38F9 /* AssistantLabelStyle.swift in Sources */,
 				F74BAE172C7E2F4E0028D4FA /* FileProviderDomain.swift in Sources */,
 				F76882402C0DD30B001CF441 /* ViewOnAppear.swift in Sources */,
+				B5E2E6E92DAE59F000AB2EDD /* NCShareTextInputCell.swift in Sources */,
+				B5E2E6EA2DAE59F000AB2EDD /* NCShareHeaderCustomCell.swift in Sources */,
 				F790110E21415BF600D7B136 /* NCViewerRichDocument.swift in Sources */,
 				F78ACD4021903CC20088454D /* NCGridCell.swift in Sources */,
 				F7D890752BD25C570050B8A6 /* NCCollectionViewCommon+DragDrop.swift in Sources */,
@@ -5140,6 +5228,7 @@
 				B5BEBE202E93BE200002C9E5 /* JPGImageSaveSwitchView.swift in Sources */,
 				B5BEBE212E93BE200002C9E5 /* PasswordInputField.swift in Sources */,
 				B5BEBE222E93BE200002C9E5 /* PdfWithOcrSwitchView.swift in Sources */,
+				B5BEBD192E93A5260002C9E5 /* Shareable.swift in Sources */,
 				F702F2CF25EE5B5C008F8E80 /* NCGlobal.swift in Sources */,
 				F794E13F2BBC0F70003693D7 /* SceneDelegate.swift in Sources */,
 				F7A3DB932DDE23B5008F7EC8 /* NCDebouncer.swift in Sources */,
@@ -5198,7 +5287,7 @@
 				F704B5E92430C0B800632F5F /* NCCreateFormUploadConflictCell.swift in Sources */,
 				F7327E3D2B73B92800A462C7 /* NCNetworking+Synchronization.swift in Sources */,
 				F72D404923D2082500A97FD0 /* NCViewerNextcloudText.swift in Sources */,
-				AFCE353927E5DE0500FEA6C2 /* Shareable.swift in Sources */,
+				AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */,
 				F77BB746289984CA0090FC19 /* UIViewController+Extension.swift in Sources */,
 				F700510522DF6A89003A3356 /* NCShare.swift in Sources */,
 				F72D1007210B6882009C96B7 /* NCPushNotificationEncryption.m in Sources */,
@@ -5256,6 +5345,7 @@
 				F73EF7BF2B02250B0087E6E9 /* NCManageDatabase+GPS.swift in Sources */,
 				F39A1EE22D0AF8A400DAD522 /* Albums.swift in Sources */,
 				F71F6D072B6A6A5E00F1EB15 /* ThreadSafeArray.swift in Sources */,
+				B5E2E6D82DAE571200AB2EDD /* PasswordInputField.swift in Sources */,
 				F761856C29E98543006EB3B0 /* NCIntroCollectionViewCell.swift in Sources */,
 				F75DD765290ABB25002EB562 /* Intent.intentdefinition in Sources */,
 				F7D4BF012CA1831900A5E746 /* NCCollectionViewCommonPinchGesture.swift in Sources */,
@@ -5308,6 +5398,10 @@
 				F7FA7FFC2C0F4EE40072FC60 /* NCViewerQuickLookView.swift in Sources */,
 				B5BEBDC72E93AF7E0002C9E5 /* NCLoginWeb.swift in Sources */,
 				F3A0479B2BD2668800658E7B /* NCAssistant.swift in Sources */,
+				B5BEBD222E93A74C0002C9E5 /* CreateLinkFooterView.swift in Sources */,
+				B5BEBD232E93A74C0002C9E5 /* NCPermissions.swift in Sources */,
+				B5BEBD242E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift in Sources */,
+				B5BEBD252E93A74C0002C9E5 /* NoSharesFooterView.swift in Sources */,
 				F359D8672A7D03420023F405 /* NCUtility+Exif.swift in Sources */,
 				F7A03E352D427312007AA677 /* NCMainNavigationController.swift in Sources */,
 				F769CA192966EA3C00039397 /* ComponentView.swift in Sources */,
@@ -5317,6 +5411,7 @@
 				F702F30125EE5D2C008F8E80 /* NYMnemonic.m in Sources */,
 				AF93474E27E3F212002537EE /* NCShareNewUserAddComment.swift in Sources */,
 				F7C30DFD291BD0B80017149B /* NCNetworkingE2EEDelete.swift in Sources */,
+				B5E2E6F02DAE6E3F00AB2EDD /* ShareDownloadLimitNetwork.swift in Sources */,
 				F76882302C0DD1E7001CF441 /* NCFileNameModel.swift in Sources */,
 				F7CF06882E1127460063AD04 /* NCManageDatabase+Metadata+Create.swift in Sources */,
 				F72FD3B5297ED49A00075D28 /* NCManageDatabase+E2EE.swift in Sources */,
@@ -5346,6 +5441,8 @@
 				AF93471B27E2361E002537EE /* NCShareAdvancePermission.swift in Sources */,
 				F77BC3ED293E528A005F2B08 /* NCConfigServer.swift in Sources */,
 				F7A560422AE1593700BE8FD6 /* NCOperationSaveLivePhoto.swift in Sources */,
+				B5E2E6DF2DAE573B00AB2EDD /* NCFilePermissionCell.swift in Sources */,
+				B5E2E6E02DAE573B00AB2EDD /* NCFilePermissionEditCell.swift in Sources */,
 				F7D1C4AC2C9484FD00EC6D44 /* NCMedia+CollectionViewDataSourcePrefetching.swift in Sources */,
 				F7D368DF2DAFE19E0037E7C6 /* NCActivityNavigationController.swift in Sources */,
 				F7A03E332D426115007AA677 /* NCMoreNavigationController.swift in Sources */,

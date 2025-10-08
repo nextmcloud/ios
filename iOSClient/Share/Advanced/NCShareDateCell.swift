@@ -2,8 +2,6 @@
 // SPDX-FileCopyrightText: 2022 Henrik Storch
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import NextcloudKit
-
 ///
 /// Table view cell to manage the expiration date on a share in its details.
 ///
@@ -12,6 +10,7 @@ class NCShareDateCell: UITableViewCell {
     let textField = UITextField()
     var shareType: Int
     var onReload: (() -> Void)?
+    let shareCommon = NCShareCommon()
 
     init(share: Shareable) {
         self.shareType = share.shareType
@@ -59,42 +58,38 @@ class NCShareDateCell: UITableViewCell {
     }
 
     private func isExpireDateEnforced(account: String) -> Bool {
-        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
-
         switch self.shareType {
-        case NCShareCommon.shareTypeLink,
-            NCShareCommon.shareTypeEmail,
-            NCShareCommon.shareTypeGuest:
-            return capabilities.fileSharingPubExpireDateEnforced
-        case NCShareCommon.shareTypeUser,
-            NCShareCommon.shareTypeGroup,
-            NCShareCommon.shareTypeTeam,
-            NCShareCommon.shareTypeRoom:
-            return capabilities.fileSharingInternalExpireDateEnforced
-        case NCShareCommon.shareTypeFederated,
-            NCShareCommon.shareTypeFederatedGroup:
-            return capabilities.fileSharingRemoteExpireDateEnforced
+        case shareCommon.SHARE_TYPE_LINK,
+            shareCommon.SHARE_TYPE_EMAIL,
+            shareCommon.SHARE_TYPE_GUEST:
+            return NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingPubExpireDateEnforced
+        case shareCommon.SHARE_TYPE_USER,
+            shareCommon.SHARE_TYPE_GROUP,
+            shareCommon.SHARE_TYPE_CIRCLE,
+            shareCommon.SHARE_TYPE_ROOM:
+            return NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingInternalExpireDateEnforced
+        case shareCommon.SHARE_TYPE_REMOTE,
+            shareCommon.SHARE_TYPE_REMOTE_GROUP:
+            return NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingRemoteExpireDateEnforced
         default:
             return false
         }
     }
 
     private func defaultExpirationDays(account: String) -> Int {
-        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
-
         switch self.shareType {
-        case NCShareCommon.shareTypeLink,
-            NCShareCommon.shareTypeEmail,
-            NCShareCommon.shareTypeGuest:
-            return capabilities.fileSharingPubExpireDateDays
-        case NCShareCommon.shareTypeUser,
-            NCShareCommon.shareTypeGroup,
-            NCShareCommon.shareTypeTeam,
-            NCShareCommon.shareTypeRoom:
-            return capabilities.fileSharingInternalExpireDateDays
-        case NCShareCommon.shareTypeFederated,
-            NCShareCommon.shareTypeFederatedGroup:
-            return capabilities.fileSharingRemoteExpireDateDays
+        case shareCommon.SHARE_TYPE_LINK,
+            shareCommon.SHARE_TYPE_EMAIL,
+            shareCommon.SHARE_TYPE_GUEST:
+            return NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingPubExpireDateDays
+        case shareCommon.SHARE_TYPE_USER,
+            shareCommon.SHARE_TYPE_GROUP,
+            shareCommon.SHARE_TYPE_CIRCLE,
+            shareCommon.SHARE_TYPE_ROOM:
+            return NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingInternalExpireDateDays
+        case shareCommon.SHARE_TYPE_REMOTE,
+            shareCommon.SHARE_TYPE_REMOTE_GROUP:
+            return NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingRemoteExpireDateDays
         default:
             return 0
         }
