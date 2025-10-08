@@ -29,6 +29,11 @@ final class NCImageCache: @unchecked Sendable {
     public var isLoadingCache: Bool = false
     public var controller: UITabBarController?
 
+    var createMediaCacheInProgress: Bool = false
+    let showAllPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload')"
+    let showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
+    let showOnlyPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND classFile == %@ AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
+
     init() {
         observerToken = NotificationCenter.default.addObserver(forName: LRUCacheMemoryWarningNotification, object: nil, queue: nil) { _ in
             self.cache.removeAll()
@@ -91,6 +96,22 @@ final class NCImageCache: @unchecked Sendable {
         if let token = observerToken {
             NotificationCenter.default.removeObserver(token)
         }
+    }
+
+    func calculateMaxImages(percentage: Double, imageSizeKB: Double) -> Int {
+        let totalRamBytes = Double(ProcessInfo.processInfo.physicalMemory)
+        let cacheSizeBytes = totalRamBytes * (percentage / 100.0)
+        let imageSizeBytes = imageSizeKB * 1024
+        let maxImages = Int(cacheSizeBytes / imageSizeBytes)
+
+        return maxImages
+    }
+    
+    func getMediaMetadatas(account: String, predicate: NSPredicate? = nil) -> ThreadSafeArray<tableMetadata>? {
+        guard let tableAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", account)) else { return nil }
+        let startServerUrl = NCUtilityFileSystem().getHomeServer(urlBase: tableAccount.urlBase, userId: tableAccount.userId) + tableAccount.mediaPath
+        let predicateBoth = NSPredicate(format: showBothPredicateMediaString, account, startServerUrl)
+        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
     }
 
     func allowExtensions(ext: String) -> Bool {
