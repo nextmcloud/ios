@@ -176,6 +176,21 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label
+        
+        // Section: Destination Folder
+
+        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: "").uppercased())
+        section.footerTitle = ""
+        form.addFormSection(section)
+
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
+        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: self.titleServerUrl)
+        row.cellConfig["backgroundColor"] = UIColor.secondarySystemGroupedBackground
+        row.action.formSelector = #selector(changeDestinationFolder(_:))
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder_nmcloud")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
         if(self.titleServerUrl == "/"){
             row.cellConfig["photoLabel.text"] = NSLocalizedString("_prefix_upload_path_", comment: "")
         }else{
@@ -186,6 +201,23 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         section.addFormRow(row)
         // END of Scan documnet folder path
         
+        section.addFormRow(row)
+
+        // Section: File Name
+
+        XLFormViewController.cellClassesForRowDescriptorTypes()["kMyAppCustomCellType"] = TextTableViewCell.self
+        
+        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_filename_", comment: "").uppercased())
+        form.addFormSection(section)
+
+        row = XLFormRowDescriptor(tag: "fileName", rowType: "kMyAppCustomCellType", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = TextTableViewCell.self
+        row.cellConfigAtConfigure["backgroundColor"] = UIColor.secondarySystemGroupedBackground;
+        row.cellConfig["fileNameTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["fileNameTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["fileNameTextField.textColor"] = UIColor.label
+        row.cellConfig["fileNameTextField.text"] = self.fileName
+        section.addFormRow(row)
         
         section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_with_text_recognition_", comment: ""))
         form.addFormSection(section)
@@ -314,6 +346,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
             if let fileNameNew = newValue as? String {
                 self.fileName = utility.removeForbiddenCharacters(fileNameNew)
+                self.fileName = FileAutoRenamer.rename(fileNameNew, account: session.account)
             } else {
                 self.fileName = ""
             }
@@ -461,6 +494,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
         if fileName == nil || fileName == "" {
             name = utilityFileSystem.createFileNameDate("scan", ext: "pdf") 
+            name = utilityFileSystem.createFileNameDate("scan", ext: "pdf")
         } else {
             name = fileName!
         }
@@ -734,6 +768,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             
             if NCManageDatabase.shared.getMetadataConflict(account: appDelegate?.account ?? "", serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
                 
+                            
             if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
                 
 
@@ -875,6 +910,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 
                 if NCManageDatabase.shared.getMetadataConflict(account: appDelegate?.account ?? "", serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
                     
+                                    
                 if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
                     
 

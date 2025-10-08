@@ -57,6 +57,14 @@ class NCGroupfolders: NCCollectionViewCommon {
         }
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        Task {
+            await NCNetworking.shared.networkingTasks.cancel(identifier: "NCGroupfolders")
+        }
+    }
+
     // MARK: - DataSource
 
     override func reloadDataSource() {
@@ -80,30 +88,39 @@ class NCGroupfolders: NCCollectionViewCommon {
             metadatas = await database.getMetadatasFromGroupfoldersAsync(session: session,
                                                                          layoutForView: layoutForView)
         } else {
-            metadatas = await database.getMetadatasAsync(predicate: defaultPredicate,
-                                                         withLayout: layoutForView,
-                                                         withAccount: session.account)
+            metadatas = await self.database.getMetadatasAsyncDataSource(withServerUrl: self.serverUrl,
+                                                                        withUserId: self.session.userId,
+                                                                        withAccount: self.session.account,
+                                                                        withLayout: self.layoutForView)
         }
 
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView, account: session.account)
+        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas,
+                                                     layoutForView: layoutForView,
+                                                     account: session.account)
         await super.reloadDataSource()
 
         cachingAsync(metadatas: metadatas)
     }
 
-    override func getServerData(refresh: Bool = false) async {
-        await super.getServerData()
-
+    override func getServerData(forced: Bool = false) async {
         defer {
             restoreDefaultTitle()
+        }
+
+        // If is already in-flight, do nothing
+        if await NCNetworking.shared.networkingTasks.isReading(identifier: "NCGroupfolders") {
+            return
         }
 
         showLoadingTitle()
 
         let homeServerUrl = utilityFileSystem.getHomeServer(session: session)
+        let showHiddenFiles = NCPreferences().getShowHiddenFiles(account: session.account)
 
         let resultsGroupfolders = await NextcloudKit.shared.getGroupfoldersAsync(account: session.account) { task in
-            self.dataSourceTask = task
+            Task {
+                await NCNetworking.shared.networkingTasks.track(identifier: "NCGroupfolders", task: task)
+            }
             if self.dataSource.isEmpty() {
                 self.collectionView.reloadData()
             }
@@ -128,18 +145,22 @@ class NCGroupfolders: NCCollectionViewCommon {
             let serverUrlFileName = homeServerUrl + mountPoint
             let resultsReadFile = await NextcloudKit.shared.readFileOrFolderAsync(serverUrlFileName: serverUrlFileName,
                                                                                   depth: "0", showHiddenFiles: showHiddenFiles,
-                                                                                  account: session.account)
+                                                                                  account: session.account) { task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
+                                                                                                path: serverUrlFileName,
+                                                                                                name: "readFileOrFolder")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
+            }
 
             guard resultsReadFile.error == .success, let file = resultsReadFile.files?.first else {
                 return
             }
             self.refreshControl.endRefreshing()
 
-            let isDirectoryE2EE = await self.utilityFileSystem.isDirectoryE2EEAsync(file: file)
-            let metadata = await self.database.convertFileToMetadataAsync(file, isDirectoryE2EE: isDirectoryE2EE)
-
-            await self.database.addMetadataAsync(metadata)
-            await self.database.addDirectoryAsync(e2eEncrypted: isDirectoryE2EE, favorite: metadata.favorite, ocId: metadata.ocId, fileId: metadata.fileId, permissions: metadata.permissions, serverUrl: serverUrlFileName, account: metadata.account)
+            let metadata = await self.database.convertFileToMetadataAsync(file)
+            await self.database.createDirectory(metadata: metadata)
 
             await self.reloadDataSource()
         }

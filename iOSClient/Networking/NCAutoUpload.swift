@@ -79,20 +79,24 @@ class NCAutoUpload: NSObject {
         guard self.networking.isOnline,
               tblAccount.autoUploadStart,
               tblAccount.autoUploadOnlyNew else {
+    func initAutoUpload(controller: NCMainTabBarController? = nil) async -> Int {
+        guard self.networking.isOnline else {
             return 0
         }
-        let albumIds = NCKeychain().getAutoUploadAlbumIds(account: tblAccount.account)
-        let assetCollections = PHAssetCollection.allAlbums.filter({albumIds.contains($0.localIdentifier)})
+        var counter = 0
 
-        let result = await getCameraRollAssets(controller: nil, assetCollections: assetCollections, tblAccount: tableAccount(value: tblAccount))
-
-        guard let assets = result.assets,
-              !assets.isEmpty,
-              let fileNames = result.fileNames else {
-            return 0
+        let tblAccounts = await NCManageDatabase.shared.getTableAccountsAsync(predicate: NSPredicate(format: "autoUploadStart == true"))
+        for tblAccount in tblAccounts {
+            let albumIds = NCPreferences().getAutoUploadAlbumIds(account: tblAccount.account)
+            let assetCollections = PHAssetCollection.allAlbums.filter({albumIds.contains($0.localIdentifier)})
+            let result = await getCameraRollAssets(controller: nil, assetCollections: assetCollections, tblAccount: tableAccount(value: tblAccount))
+            if let assets = result.assets, !assets.isEmpty, let fileNames = result.fileNames {
+                let item = await uploadAssets(controller: nil, tblAccount: tblAccount, assets: assets, fileNames: fileNames)
+                counter += item
+            }
         }
 
-        return await uploadAssets(controller: nil, tblAccount: tblAccount, assets: assets, fileNames: fileNames)
+        return counter
     }
 
     func initAutoUpload(controller: NCMainTabBarController? = nil, account: String) async -> Int {
@@ -113,6 +117,7 @@ class NCAutoUpload: NSObject {
                 self.uploadAssets(controller: controller, assetCollections: assetCollections, log: log, account: account) { _ in
                     self.hud.dismiss()
                 }
+    @MainActor
     func startManualAutoUploadForAlbums(controller: NCMainTabBarController?,
                                         model: NCAutoUploadModel,
                                         assetCollections: [PHAssetCollection],
@@ -125,31 +130,25 @@ class NCAutoUpload: NSObject {
             return
         }
 
-        if !tblAccount.autoUploadOnlyNew {
-            await MainActor.run {
-                let image = UIImage(systemName: "photo.on.rectangle.angled")?.image(color: .white, size: 20)
-                NCContentPresenter().noteTop(text: NSLocalizedString("_creating_db_photo_progress_", comment: ""), image: image, color: .lightGray, delay: .infinity, priority: .max)
-            }
-        }
+        let image = UIImage(systemName: "photo.on.rectangle.angled")?.image(color: .white, size: 20)
+        NCContentPresenter().noteTop(text: NSLocalizedString("_creating_db_photo_progress_", comment: ""), image: image, color: .lightGray, delay: .infinity, priority: .max)
 
         let result = await getCameraRollAssets(controller: controller, assetCollections: assetCollections, tblAccount: tblAccount)
+
+        // IMPORTANT: Always set to autoUploadSinceDate to now
+        await self.database.updateAccountPropertyAsync(\.autoUploadSinceDate, value: Date.now, account: tblAccount.account)
+
+        model.onViewAppear()
 
         guard let assets = result.assets,
               !assets.isEmpty,
               let fileNames = result.fileNames else {
+            nkLog(debug: "Automatic upload 0 upload")
             return
         }
 
         let num = await uploadAssets(controller: controller, tblAccount: tblAccount, assets: assets, fileNames: fileNames)
         nkLog(debug: "Automatic upload \(num) upload")
-
-        // Automatic move to auto upload new
-        if !tblAccount.autoUploadOnlyNew {
-            await self.database.updateAccountPropertyAsync(\.autoUploadOnlyNew, value: true, account: tblAccount.account)
-            await MainActor.run {
-                model.onViewAppear()
-            }
-        }
     }
 
     private func uploadAssets(controller: NCMainTabBarController?, assetCollections: [PHAssetCollection] = [], log: String, account: String, completion: @escaping (_ num: Int) -> Void) {
@@ -171,8 +170,8 @@ class NCAutoUpload: NSObject {
         let session = NCSession.shared.getSession(account: tblAccount.account)
         let autoUploadServerUrlBase = await self.database.getAccountAutoUploadServerUrlBaseAsync(account: tblAccount.account, urlBase: tblAccount.urlBase, userId: tblAccount.userId)
         var metadatas: [tableMetadata] = []
-        let formatCompatibility = NCKeychain().formatCompatibility
-        let keychainLivePhoto = NCKeychain().livePhoto
+        let formatCompatibility = NCPreferences().formatCompatibility
+        let keychainLivePhoto = NCPreferences().livePhoto
         let fileSystem = NCUtilityFileSystem()
         let skipFileNames = await self.database.fetchSkipFileNamesAsync(account: tblAccount.account,
                                                                         autoUploadServerUrlBase: autoUploadServerUrlBase)
@@ -199,12 +198,11 @@ class NCAutoUpload: NSObject {
             let onWWAN = (mediaType == .image && tblAccount.autoUploadWWAnPhoto) || (mediaType == .video && tblAccount.autoUploadWWAnVideo)
             let uploadSession = onWWAN ? self.networking.sessionUploadBackgroundWWan : self.networking.sessionUploadBackground
 
-            let metadata = await self.database.createMetadata(fileName: fileName,
-                                                              ocId: UUID().uuidString,
-                                                              serverUrl: serverUrl,
-                                                              session: session,
-                                                              sceneIdentifier: controller?.sceneIdentifier
-            )
+            let metadata = await self.database.createMetadataAsync(fileName: fileName,
+                                                                   ocId: UUID().uuidString,
+                                                                   serverUrl: serverUrl,
+                                                                   session: session,
+                                                                   sceneIdentifier: controller?.sceneIdentifier)
 
             self.hud.setText(text: NSLocalizedString("_creating_db_photo_progress", comment: ""))
             self.hud.progress(0.0)
@@ -315,11 +313,11 @@ class NCAutoUpload: NSObject {
         // Set last date in autoUploadOnlyNewSinceDate
         if let metadata = metadatas.last {
             let date = metadata.creationDate as Date
-            await self.database.updateAccountPropertyAsync(\.autoUploadOnlyNewSinceDate, value: date, account: session.account)
+            await self.database.updateAccountPropertyAsync(\.autoUploadSinceDate, value: date, account: session.account)
         }
 
         if !metadatas.isEmpty {
-            let metadatasFolder = await self.database.createMetadatasFolder(assets: assets, useSubFolder: tblAccount.autoUploadCreateSubfolder, session: session)
+            let metadatasFolder = await self.database.createMetadatasFolderAsync(assets: assets, useSubFolder: tblAccount.autoUploadCreateSubfolder, session: session)
             await self.database.addMetadatasAsync(metadatasFolder + metadatas)
         }
 
@@ -424,8 +422,8 @@ class NCAutoUpload: NSObject {
             mediaPredicates.append(NSPredicate(format: "mediaType == %i", PHAssetMediaType.video.rawValue))
         }
 
-        if tblAccount.autoUploadOnlyNew {
-            datePredicates.append(NSPredicate(format: "creationDate > %@", tblAccount.autoUploadOnlyNewSinceDate as NSDate))
+        if let autoUploadSinceDate = tblAccount.autoUploadSinceDate {
+            datePredicates.append(NSPredicate(format: "creationDate > %@", autoUploadSinceDate as NSDate))
         } else if let lastDate = await self.database.fetchLastAutoUploadedDateAsync(account: tblAccount.account, autoUploadServerUrlBase: autoUploadServerUrlBase) {
             datePredicates.append(NSPredicate(format: "creationDate > %@", lastDate as NSDate))
         }

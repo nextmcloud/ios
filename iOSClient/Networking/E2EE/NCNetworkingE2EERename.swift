@@ -64,8 +64,8 @@ class NCNetworkingE2EERename: NSObject {
 
         // MOVE FILE SYSTEM
         //
-        let atPath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId) + "/" + metadata.fileNameView
-        let toPath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId) + "/" + fileNameNew
+        let atPath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, userId: metadata.userId, urlBase: metadata.urlBase) + "/" + metadata.fileNameView
+        let toPath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, userId: metadata.userId, urlBase: metadata.urlBase) + "/" + fileNameNew
         do {
             try FileManager.default.moveItem(atPath: atPath, toPath: toPath)
         } catch { }
@@ -75,6 +75,11 @@ class NCNetworkingE2EERename: NSObject {
         await networkingE2EE.unlock(account: metadata.account, serverUrl: metadata.serverUrl)
 
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["serverUrl": metadata.serverUrl, "account": metadata.account, "error": uploadMetadataError])
+        await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
+            delegate.transferChange(status: NCGlobal.shared.networkingStatusRename,
+                                    metadata: metadata,
+                                    error: uploadMetadataError)
+        }
 
         return NKError()
     }

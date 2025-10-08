@@ -25,7 +25,6 @@ import UIKit
 import NextcloudKit
 
 class NCRecent: NCCollectionViewCommon {
-
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
 
@@ -56,13 +55,22 @@ class NCRecent: NCCollectionViewCommon {
         }
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        Task {
+            await NCNetworking.shared.networkingTasks.cancel(identifier: "NCRecent")
+        }
+    }
+
     // MARK: - DataSource
 
     override func reloadDataSource() async {
+        if let metadatas = await self.database.getMetadatasAsync(predicate: NSPredicate(format: "account == %@ AND fileName != %@", session.account, NextcloudKit.shared.nkCommonInstance.rootFileName), sortedByKeyPath: "date", ascending: false) {
 
-        if let metadatas = await self.database.getMetadatasAsync(predicate: NSPredicate(format: "account == %@ AND fileName != '.'", session.account), sortedByKeyPath: "date", ascending: false) {
-
-            self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView, account: session.account)
+            self.dataSource = NCCollectionViewDataSource(metadatas: metadatas,
+                                                         layoutForView: layoutForView,
+                                                         account: session.account)
 
             cachingAsync(metadatas: metadatas)
         }
@@ -76,11 +84,14 @@ class NCRecent: NCCollectionViewCommon {
         await super.reloadDataSource()
     }
 
-    override func getServerData(refresh: Bool = false) async {
-        await super.getServerData()
-
+    override func getServerData(forced: Bool = false) async {
         defer {
             restoreDefaultTitle()
+        }
+
+        // If is already in-flight, do nothing
+        if await NCNetworking.shared.networkingTasks.isReading(identifier: "NCRecent") {
+            return
         }
 
         let requestBodyRecent =
@@ -150,6 +161,7 @@ class NCRecent: NCCollectionViewCommon {
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
         let lessDateString = dateFormatter.string(from: Date())
         let requestBody = String(format: requestBodyRecent, "/files/" + session.userId, lessDateString)
+        let showHiddenFiles = NCPreferences().getShowHiddenFiles(account: session.account)
 
         NextcloudKit.shared.searchBodyRequest(serverUrl: session.urlBase,
                                               requestBody: requestBody,
@@ -161,7 +173,9 @@ class NCRecent: NCCollectionViewCommon {
                                                                              requestBody: requestBody,
                                                                              showHiddenFiles: showHiddenFiles,
                                                                              account: session.account) { task in
-            self.dataSourceTask = task
+            Task {
+                await NCNetworking.shared.networkingTasks.track(identifier: "NCRecent", task: task)
+            }
             if self.dataSource.isEmpty() {
                 self.collectionView.reloadData()
             }
@@ -180,7 +194,7 @@ class NCRecent: NCCollectionViewCommon {
             return
         }
 
-        let (_, metadatas) = await self.database.convertFilesToMetadatasAsync(files, useFirstAsMetadataFolder: false)
+        let (_, metadatas) = await self.database.convertFilesToMetadatasAsync(files)
 
         await self.database.addMetadatasAsync(metadatas)
         await self.reloadDataSource()

@@ -33,6 +33,12 @@ extension PHAsset {
             return self.value(forKey: "filename") as? NSString
             ?? ("IMG_" + NCKeychain().incrementalNumber + getExtension()) as NSString
         }
+
+        if let filename = self.value(forKey: "filename") as? String {
+            return filename
+        }
+
+        return "IMG_" + NCPreferences().incrementalNumber + getExtension()
     }
 
     private func getExtension() -> String {

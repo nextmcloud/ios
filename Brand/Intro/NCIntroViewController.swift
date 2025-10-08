@@ -1,27 +1,7 @@
-//
-//  NCIntroViewController.swift
-//  Nextcloud
-//
-//  Created by Philippe Weidmann on 24.12.19.
-//  Copyright © 2019 Philippe Weidmann. All rights reserved.
-//  Copyright © 2019 Marino Faggiana All rights reserved.
-//
-//  Author Philippe Weidmann
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2019 Marino Faggiana
+// SPDX-FileCopyrightText: 2019 Philippe Weidmann
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import NextcloudKit
@@ -35,6 +15,10 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     @IBOutlet weak var contstraintBottomLoginButton: NSLayoutConstraint!
 
     @objc weak var delegate: NCIntroViewController?
+    weak var delegate: NCIntroViewController?
+    // Controller
+    var controller: NCMainTabBarController?
+
     private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     private let titles = [NSLocalizedString("", comment: ""), NSLocalizedString("", comment: ""), NSLocalizedString("", comment: "")]
     private var images:[UIImage?] = []
@@ -86,6 +70,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         pageControl.pageIndicatorTintColor = .lightGray
 
         buttonLogin.layer.cornerRadius = 4
+        buttonLogin.layer.cornerRadius = 8
         buttonLogin.setTitleColor(NCBrandColor.shared.customer, for: .normal)
         buttonLogin.backgroundColor = textColor
         buttonLogin.setTitle(NSLocalizedString("_log_in_", comment: ""), for: .normal)
@@ -96,9 +81,7 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
         buttonSignUp.setTitleColor(textColor, for: .normal)
         buttonSignUp.backgroundColor = NCBrandColor.shared.customer
         buttonSignUp.titleLabel?.adjustsFontSizeToFitWidth = true
-        var configButtonSignUp = UIButton.Configuration.filled()
-        configButtonSignUp.titlePadding = 10
-        buttonSignUp.configuration = configButtonSignUp
+        buttonSignUp.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
         buttonSignUp.setTitle(NSLocalizedString("_sign_up_", comment: ""), for: .normal)
 
         buttonHost.layer.cornerRadius = 20
@@ -229,8 +212,8 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        timer?.invalidate()
-        timer = nil
+        timerAutoScroll?.invalidate()
+        timerAutoScroll = nil
     }
 
     // MARK: - Action
@@ -263,11 +246,11 @@ class NCIntroViewController: UIViewController, UICollectionViewDataSource, UICol
     }
 
     @IBAction func signupWithProvider(_ sender: Any) {
-        if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLoginProvider") as? NCLoginProvider {
-            viewController.controller = self.controller
-            viewController.initialURLString = NCBrandOptions.shared.linkloginPreferredProviders
-            self.navigationController?.pushViewController(viewController, animated: true)
-        }
+        appDelegate.openLogin(selector: NCGlobal.shared.introSignup)
+    }
+    
+    @IBAction func signup(_ sender: Any) {
+        appDelegate.openLogin(selector: NCGlobal.shared.introSignup)
     }
 
     @IBAction func host(_ sender: Any) {

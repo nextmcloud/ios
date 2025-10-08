@@ -74,6 +74,29 @@ extension NCManageDatabase {
         return downloadLimit
     }
 
+    /// Asynchronously creates or updates a `TableDownloadLimit` object in Realm for the given account and token.
+    ///
+    /// - Parameters:
+    ///   - account: The account identifier.
+    ///   - count: The current download count.
+    ///   - limit: The maximum allowed download count.
+    ///   - token: A unique token used for identifying the limit record.
+    /// - Returns: The attached `TableDownloadLimit` object stored in Realm.
+    func createDownloadLimitAsync(account: String, count: Int, limit: Int, token: String) async {
+        let id = formatId(by: account, token: token)
+        let downloadLimit = TableDownloadLimit()
+        downloadLimit.id = id
+        downloadLimit.account = account
+        downloadLimit.count = count
+        downloadLimit.limit = limit
+        downloadLimit.token = token
+
+        await performRealmWriteAsync { realm in
+            // Add or update the download limit object in Realm
+            realm.add(downloadLimit, update: .all)
+        }
+    }
+
     ///
     /// Delete an existing download limit object identified by the token of its related share.
     ///
@@ -93,6 +116,23 @@ extension NCManageDatabase {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
         }
     }
+
+    ///
+    /// Delete an existing download limit object identified by the token of its related share.
+    ///
+    /// - Parameters:
+    ///     - account: The unique account identifier to namespace the limit.
+    ///     - token: The `token` of the associated ``Nextcloud/tableShare/token``.
+    ///
+    func deleteDownloadLimitAsync(byAccount account: String, shareToken token: String) async {
+        await performRealmWriteAsync { realm in
+            if let object = realm.object(ofType: TableDownloadLimit.self, forPrimaryKey: self.formatId(by: account, token: token)) {
+                realm.delete(object)
+            }
+        }
+    }
+
+    // MARK: - Realm read
 
     ///
     /// Retrieve a download limit by the token of the associated ``Nextcloud/tableShare/token``.

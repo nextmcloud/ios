@@ -26,12 +26,10 @@ class TransientShare: Shareable {
     var attributes: String?
 
     private init(shareType: Int, metadata: tableMetadata, password: String?) {
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: metadata.account)
-
-        if metadata.e2eEncrypted, capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV12 {
+        if metadata.e2eEncrypted, NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityE2EEApiVersion == NCGlobal.shared.e2eeVersionV12 {
             self.permissions = NCPermissions().permissionCreateShare
         } else {
-            self.permissions = capabilities.fileSharingDefaultPermission & metadata.sharePermissionsCollaborationServices
+            self.permissions = NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityFileSharingDefaultPermission & metadata.sharePermissionsCollaborationServices
         }
 
         self.shareType = shareType
@@ -44,6 +42,7 @@ class TransientShare: Shareable {
     convenience init(sharee: NKSharee, metadata: tableMetadata, password: String?) {
         self.init(shareType: sharee.shareType, metadata: metadata, password: password)
         self.shareWith = sharee.shareWith
+        self.shareWithDisplayname = sharee.label
     }
 
     static func shareLink(metadata: tableMetadata, password: String?) -> TransientShare {

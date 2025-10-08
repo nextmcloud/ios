@@ -3,6 +3,19 @@
     {
       "filename" : "share.pdf",
       "idiom" : "universal"
+      "filename" : "shareNew.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "shareNew@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "shareNew@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
     }
   ],
   "info" : {

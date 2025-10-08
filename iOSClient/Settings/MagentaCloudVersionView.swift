@@ -8,6 +8,7 @@
 
 import Foundation
 
+import XLForm
 
 class MagentaCloudVersionView: XLFormBaseCell{
     

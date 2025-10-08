@@ -2,8 +2,6 @@
 // SPDX-FileCopyrightText: 2022 Henrik Storch
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import NextcloudKit
-
 ///
 /// Table view cell to manage the expiration date on a share in its details.
 ///
@@ -19,7 +17,7 @@ class NCShareDateCell: UITableViewCell {
         super.init(style: .value1, reuseIdentifier: "shareExpDate")
 
         picker.datePickerMode = .date
-        picker.minimumDate = Date()
+        picker.minimumDate = Calendar.current.date(byAdding: .day, value: 1, to: Date())
         picker.preferredDatePickerStyle = .wheels
         picker.action(for: .valueChanged) { datePicker in
             guard let datePicker = datePicker as? UIDatePicker else { return }
@@ -60,13 +58,11 @@ class NCShareDateCell: UITableViewCell {
     }
 
     private func isExpireDateEnforced(account: String) -> Bool {
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
-
         switch self.shareType {
         case shareCommon.SHARE_TYPE_LINK,
             shareCommon.SHARE_TYPE_EMAIL,
             shareCommon.SHARE_TYPE_GUEST:
-            return capabilities.fileSharingPubExpireDateEnforced
+            return NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingPubExpireDateEnforced
         case shareCommon.SHARE_TYPE_USER,
             shareCommon.SHARE_TYPE_GROUP,
             shareCommon.SHARE_TYPE_CIRCLE,
@@ -85,13 +81,11 @@ class NCShareDateCell: UITableViewCell {
     }
 
     private func defaultExpirationDays(account: String) -> Int {
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
-
         switch self.shareType {
         case shareCommon.SHARE_TYPE_LINK,
             shareCommon.SHARE_TYPE_EMAIL,
             shareCommon.SHARE_TYPE_GUEST:
-            return capabilities.fileSharingPubExpireDateDays
+            return NCCapabilities.shared.getCapabilities(account: account).capabilityFileSharingPubExpireDateDays
         case shareCommon.SHARE_TYPE_USER,
             shareCommon.SHARE_TYPE_GROUP,
             shareCommon.SHARE_TYPE_CIRCLE,

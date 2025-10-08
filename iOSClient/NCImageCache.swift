@@ -13,22 +13,57 @@ import RealmSwift
     @objc static let shared = NCImageCache()
 
     private let utility = NCUtility()
-    private let utilityFileSystem = NCUtilityFileSystem()
     private let global = NCGlobal.shared
-    private let database = NCManageDatabase.shared
 
     private let allowExtensions = [NCGlobal.shared.previewExt256]
     private var brandElementColor: UIColor?
 
     private let limit: Int = 1000
     private var totalSize: Int64 = 0
+    private var observerToken: NSObjectProtocol?
+
     public var countLimit: Int = 2000
     lazy var cache: LRUCache<String, UIImage> = {
         return LRUCache<String, UIImage>(countLimit: countLimit)
     }()
 
     public var isLoadingCache: Bool = false
-    public var controller: UITabBarController?
+    var isDidEnterBackground: Bool = false
+
+    struct metadataInfo {
+        var etag: String
+        var date: NSDate
+        var width: Int
+        var height: Int
+    }
+
+    struct imageInfo {
+        var image: UIImage?
+        var size: CGSize?
+        var date: Date
+    }
+
+    private typealias ThumbnailImageLRUCache = LRUCache<String, imageInfo>
+    private typealias ThumbnailSizeLRUCache = LRUCache<String, CGSize?>
+
+    private lazy var cacheImage: ThumbnailImageLRUCache = {
+        return ThumbnailImageLRUCache(countLimit: limit)
+    }()
+    private lazy var cacheSize: ThumbnailSizeLRUCache = {
+        return ThumbnailSizeLRUCache()
+    }()
+    private var metadatasInfo: [String: metadataInfo] = [:]
+    private var metadatas: ThreadSafeArray<tableMetadata>?
+
+    var createMediaCacheInProgress: Bool = false
+    let showAllPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload')"
+    let showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
+    let showOnlyPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND classFile == %@ AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
+
+    var createMediaCacheInProgress: Bool = false
+    let showAllPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload')"
+    let showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
+    let showOnlyPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND classFile == %@ AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
 
     struct metadataInfo {
         var etag: String
@@ -98,6 +133,9 @@ import RealmSwift
 
     override init() {
         super.init()
+    init() {
+        observerToken = NotificationCenter.default.addObserver(forName: LRUCacheMemoryWarningNotification, object: nil, queue: nil) { _ in
+            self.cache.removeAll()
 
         countLimit = calculateMaxImages(percentage: 5.0, imageSizeKB: 30.0) // 5% of cache = 20
         NextcloudKit.shared.nkCommonInstance.writeLog("Counter cache image: \(countLimit)")
@@ -113,34 +151,46 @@ import RealmSwift
         }
 
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
+            self.isDidEnterBackground = true
             self.cache.removeAllValues()
             self.cache = LRUCache<String, UIImage>(countLimit: self.countLimit)
         }
 
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { _ in
 #if !EXTENSION
-            Task {
-                guard let controller = self.controller as? NCMainTabBarController,
-                    !self.isLoadingCache else {
-                    return
+            guard !self.isLoadingCache else {
+                return
+            }
+            self.isDidEnterBackground = false
+
+            var files: [NCFiles] = []
+            var cost: Int = 0
+
+            if let activeTableAccount = NCManageDatabase.shared.getActiveTableAccount(),
+               NCImageCache.shared.cache.count == 0 {
+                let session = NCSession.shared.getSession(account: activeTableAccount.account)
+
+                for mainTabBarController in SceneManager.shared.getControllers() {
+                    if let currentVC = mainTabBarController.selectedViewController as? UINavigationController,
+                       let file = currentVC.visibleViewController as? NCFiles {
+                        files.append(file)
+                    }
                 }
 
-                var cost: Int = 0
-                let session = await NCSession.shared.getSession(account: controller.account)
-
-                if let tblAccount = await self.database.getTableAccountAsync(predicate: NSPredicate(format: "account == %@", controller.account)),
-                   NCImageCache.shared.cache.count == 0 {
-
+                DispatchQueue.global().async {
                     self.isLoadingCache = true
 
-                    // MEDIA
-                    let predicate = self.getMediaPredicateAsync(filterLivePhotoFile: true, session: session, mediaPath: tblAccount.mediaPath, showOnlyImages: false, showOnlyVideos: false)
-                    if let metadatas = await self.database.getMetadatasAsync(predicate: predicate, sortedByKeyPath: "datePhotosOriginal", limit: self.countLimit) {
+                    /// MEDIA
+                    if let metadatas = NCManageDatabase.shared.getResultsMetadatas(predicate: self.getMediaPredicate(filterLivePhotoFile: true, session: session, showOnlyImages: false, showOnlyVideos: false), sortedByKeyPath: "datePhotosOriginal", freeze: true)?.prefix(self.countLimit) {
                         autoreleasepool {
                             self.cache.removeAllValues()
 
+                    self.isLoadingCache = true
+                    self.database.filterAndNormalizeLivePhotos(from: metadatas) { metadatas in
+                        autoreleasepool {
+                            self.cache.removeAll()
                             for metadata in metadatas {
-                                guard !isAppInBackground else {
+                                guard !self.isDidEnterBackground else {
                                     self.cache.removeAllValues()
                                     break
                                 }
@@ -149,6 +199,14 @@ import RealmSwift
                                     cost += 1
                                 }
                             }
+                            self.isLoadingCache = false
+                        }
+                    }
+
+                    /// FILE
+                    if !self.isDidEnterBackground {
+                        for file in files where !file.serverUrl.isEmpty {
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": file.serverUrl])
                         }
                     }
 
@@ -162,18 +220,20 @@ import RealmSwift
                     self.isLoadingCache = false
                 }
             }
-
 #endif
         }
     }
 
     deinit {
-        NotificationCenter.default.removeObserver(self, name: LRUCacheMemoryWarningNotification, object: nil)
+        if let token = observerToken {
+            NotificationCenter.default.removeObserver(token)
+        }
     }
 
     @objc func createMediaCache(account: String, withCacheSize: Bool) {
         if createMediaCacheInProgress {
             NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] ThumbnailLRUCache image process already in progress")
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] ThumbnailLRUCache image process already in progress")
             return
         }
         createMediaCacheInProgress = true
@@ -303,8 +363,16 @@ import RealmSwift
         cache.setValue(image, forKey: ocId + etag + ext, cost: cost)
     }
 
+    func addImageCache(image: UIImage, key: String) {
+        cache.setValue(image, forKey: key)
+    }
+
     func getImageCache(ocId: String, etag: String, ext: String) -> UIImage? {
         return cache.value(forKey: ocId + etag + ext)
+    }
+
+    func getImageCache(key: String) -> UIImage? {
+        return cache.value(forKey: key)
     }
 
     func removeImageCache(ocIdPlusEtag: String) {
@@ -314,28 +382,28 @@ import RealmSwift
     }
 
     func removeAll() {
-        cache.removeAllValues()
+        cache.removeAll()
     }
 
     // MARK: - MEDIA -
 
-    func getMediaPredicateAsync(filterLivePhotoFile: Bool, session: NCSession.Session, mediaPath: String, showOnlyImages: Bool, showOnlyVideos: Bool) -> NSPredicate {
-        var predicate = NSPredicate()
-        let startServerUrl = self.utilityFileSystem.getHomeServer(session: session) + mediaPath
+    func getMediaPredicate(filterLivePhotoFile: Bool, session: NCSession.Session, showOnlyImages: Bool, showOnlyVideos: Bool) -> NSPredicate {
+            guard let tableAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)) else { return NSPredicate() }
+            var predicate = NSPredicate()
+            let startServerUrl = NCUtilityFileSystem().getHomeServer(session: session) + tableAccount.mediaPath
 
-            var showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND hasPreview == true AND (classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)') AND NOT (status IN %@)"
-
+            var showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND hasPreview == true AND (classFile == '\(NKCommon.TypeClassFile.image.rawValue)' OR classFile == '\(NKCommon.TypeClassFile.video.rawValue)') AND NOT (status IN %@)"
             var showOnlyPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND hasPreview == true AND classFile == %@ AND NOT (status IN %@)"
 
             if filterLivePhotoFile {
-                showBothPredicateMediaString = showBothPredicateMediaString + " AND NOT (livePhotoFile != '' AND classFile == '\(NKTypeClassFile.video.rawValue)')"
-                showOnlyPredicateMediaString = showOnlyPredicateMediaString + " AND NOT (livePhotoFile != '' AND classFile == '\(NKTypeClassFile.video.rawValue)')"
+                showBothPredicateMediaString = showBothPredicateMediaString + " AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
+                showOnlyPredicateMediaString = showOnlyPredicateMediaString + " AND NOT (livePhotoFile != '' AND classFile == '\(NKCommon.TypeClassFile.video.rawValue)')"
             }
 
             if showOnlyImages {
-                predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKTypeClassFile.image.rawValue, global.metadataStatusHideInView)
+                predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKCommon.TypeClassFile.image.rawValue, global.metadataStatusHideInView)
             } else if showOnlyVideos {
-                predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKTypeClassFile.video.rawValue, global.metadataStatusHideInView)
+                predicate = NSPredicate(format: showOnlyPredicateMediaString, session.account, startServerUrl, NKCommon.TypeClassFile.video.rawValue, global.metadataStatusHideInView)
             } else {
                 predicate = NSPredicate(format: showBothPredicateMediaString, session.account, startServerUrl, global.metadataStatusHideInView)
             }
@@ -566,6 +634,119 @@ import RealmSwift
     }
 
     func getImageCanShare() -> UIImage {
+        return predicate
+    }
+
+    // MARK: -
+
+    struct images {
+        static var file = UIImage()
+
+        static var shared = UIImage()
+        static var canShare = UIImage()
+        static var shareByLink = UIImage()
+        static var sharedWithMe = UIImage()
+
+        static var favorite = UIImage()
+        static var comment = UIImage()
+        static var livePhoto = UIImage()
+        static var offlineFlag = UIImage()
+        static var local = UIImage()
+
+        static var folderEncrypted = UIImage()
+        static var folderSharedWithMe = UIImage()
+        static var folderPublic = UIImage()
+        static var folderGroup = UIImage()
+        static var folderExternal = UIImage()
+        static var folderAutomaticUpload = UIImage()
+        static var folder = UIImage()
+
+        static var checkedYes = UIImage()
+        static var checkedNo = UIImage()
+
+        static var buttonMore = UIImage()
+        static var buttonStop = UIImage()
+        static var buttonMoreLock = UIImage()
+
+        static var buttonRestore = UIImage()
+        static var buttonTrash = UIImage()
+        
+        static var iconContacts = UIImage()
+        static var iconTalk = UIImage()
+        static var iconCalendar = UIImage()
+        static var iconDeck = UIImage()
+        static var iconMail = UIImage()
+        static var iconConfirm = UIImage()
+        static var iconPages = UIImage()
+        static var iconFile = UIImage()
+    }
+
+    func createImagesCache() {
+        let utility = NCUtility()
+
+        images.file = UIImage(named: "file")!
+
+        images.shared = UIImage(named: "share")!.image(color: .systemGray, size: 24)//50)
+        images.canShare = UIImage(named: "share")!.image(color: .systemGray, size: 24)//50)
+        images.shareByLink = UIImage(named: "sharebylink")!.image(color: .systemGray, size: 24)//50)
+        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)//50)
+        
+        images.favorite = utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
+        images.comment = UIImage(named: "comment")!.image(color: .systemGray, size: 24)//50)
+        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
+        images.offlineFlag = UIImage(named: "offlineFlag")!
+        images.local = UIImage(named: "local")!
+
+        images.checkedYes = UIImage(named: "checkedYes")!
+        images.checkedNo = utility.loadImage(named: "circle")
+
+        images.buttonMore = UIImage(named: "more")!.image(color: .systemGray, size: 24)//50)
+        images.buttonStop = UIImage(named: "stop")!.image(color: .systemGray, size: 24)//50)
+        images.buttonMoreLock = UIImage(named: "moreLock")!.image(color: .systemGray, size: 24)//50)
+        images.buttonRestore = UIImage(named: "restore")!.image(color: .systemGray, size: 24)//50)
+        images.buttonTrash = UIImage(named: "trash")!.image(color: .systemGray, size: 24)//50)
+
+        createImagesBrandCache()
+    }
+
+    func createImagesBrandCache() {
+
+        let brandElement = NCBrandColor.shared.brandElement
+        guard brandElement != self.brandElementColor else { return }
+        self.brandElementColor = brandElement
+        
+        let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
+        images.folderEncrypted = UIImage(named: "folderEncrypted")!
+        images.folderSharedWithMe = UIImage(named: "folder-share")!
+        images.folderPublic = UIImage(named: "folder-share")!
+        images.folderGroup = UIImage(named: "folder_group")!
+        images.folderExternal = UIImage(named: "folder_external")!
+        images.folderAutomaticUpload = UIImage(named: "folder-photo")!
+        images.folder = UIImage(named: "folder_nmcloud")!
+        
+        images.iconContacts = UIImage(named: "icon-contacts")!.image(color: brandElement, size: folderWidth)
+        images.iconTalk = UIImage(named: "icon-talk")!.image(color: brandElement, size: folderWidth)
+        images.iconCalendar = UIImage(named: "icon-calendar")!.image(color: brandElement, size: folderWidth)
+        images.iconDeck = UIImage(named: "icon-deck")!.image(color: brandElement, size: folderWidth)
+        images.iconMail = UIImage(named: "icon-mail")!.image(color: brandElement, size: folderWidth)
+        images.iconConfirm = UIImage(named: "icon-confirm")!.image(color: brandElement, size: folderWidth)
+        images.iconPages = UIImage(named: "icon-pages")!.image(color: brandElement, size: folderWidth)
+//        images.iconFile = UIImage(named: "icon-file")!.image(color: brandElement, size: folderWidth)
+        
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming)
+    }
+    
+    // MARK: -
+    
+    func getImageFile() -> UIImage {
+        return NCImageCache.images.file
+    }
+    
+    func getImageShared() -> UIImage {
+        return NCImageCache.images.shared
+    }
+
+    func getImageCanShare() -> UIImage {
         return NCImageCache.images.canShare
     }
 
@@ -637,9 +818,21 @@ import RealmSwift
     func getEncryptedFolder() -> UIImage {
         return UIImage(named: "encryptedfolder")!.imageColor(NCBrandColor.shared.iconImageColor)
     }
+    
+    func getImageLivePhoto() -> UIImage {
+        return NCImageCache.images.livePhoto
+    }
 
-    func getFolderSharedWithMe(account: String) -> UIImage {
-        return UIImage(named: "folder_shared_with_me")!.image(color: NCBrandColor.shared.getElement(account: account))
+    func getAddFolder() -> UIImage {
+        return UIImage(named: "addFolder")!
+    }
+
+    func getAddFolderInfo() -> UIImage {
+        return UIImage(named: "addFolderInfo")!.imageColor(NCBrandColor.shared.iconImageColor)
+    }
+
+    func getEncryptedFolder() -> UIImage {
+        return NCImageCache.images.folderEncrypted
     }
 
     func getAddFolderInfo() -> UIImage {
@@ -691,6 +884,18 @@ import RealmSwift
         return NCImageCache.images.folderSharedWithMe
     }
     
+    func getFolderPublic() -> UIImage {
+        return NCImageCache.images.folderPublic
+    }
+    
+    func getFolderEncrypted() -> UIImage {
+        return NCImageCache.images.folderEncrypted
+    }
+    
+    func getFolderSharedWithMe() -> UIImage {
+        return NCImageCache.images.folderSharedWithMe
+    }
+        
     func getFolderPublic() -> UIImage {
         return NCImageCache.images.folderPublic
     }

@@ -38,6 +38,7 @@ class NCViewCertificateDetails: UIViewController {
     @IBOutlet weak var buttonCancel: UIBarButtonItem!
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var textView: UITextView!
+    @IBOutlet weak var privateKey: UILabel!
 
     var delegate: NCViewCertificateDetailsDelegate?
     let utilityFileSystem = NCUtilityFileSystem()
@@ -51,9 +52,15 @@ class NCViewCertificateDetails: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
+        navigationController?.setNavigationBarAppearance()
         navigationItem.title = certificateTitle
         buttonCancel.title = NSLocalizedString("_close_", comment: "")
+
+        if privateKeyString.isEmpty {
+            self.privateKey.text = ""
+        } else {
+            self.privateKey.text = "First base64 8 chars of private key: \(privateKeyString)"
+        }
 
         if fileNamePath.isEmpty {
             fileNamePath = utilityFileSystem.directoryCertificates + "/" + host + ".txt"
@@ -108,6 +115,7 @@ class NCViewCertificateDetails: UIViewController {
 
 struct certificateDetailsView: UIViewControllerRepresentable {
     typealias UIViewControllerType = UINavigationController
+    var privateKeyString: String = ""
     var host: String = ""
     var title: String = ""
 
@@ -116,6 +124,7 @@ struct certificateDetailsView: UIViewControllerRepresentable {
         let navigationController = storyboard.instantiateInitialViewController() as? UINavigationController
         let viewController = navigationController?.topViewController as? NCViewCertificateDetails
 
+        viewController?.privateKeyString = privateKeyString
         viewController?.host = host
         viewController?.certificateTitle = title
 

@@ -30,9 +30,12 @@ class NCCreateDocument: NSObject {
     let utility = NCUtility()
     let database = NCManageDatabase.shared
 
-    func createDocument(controller: NCMainTabBarController, fileNamePath: String, fileName: String, editorId: String, creatorId: String? = nil, templateId: String, account: String) {
+    @MainActor
+    func createDocument(controller: NCMainTabBarController, fileNamePath: String, fileName: String, editorId: String, creatorId: String? = nil, templateId: String, account: String) async {
         let session = NCSession.shared.getSession(account: account)
-        guard let viewController = controller.currentViewController() else { return }
+        guard let viewController = controller.currentViewController() else {
+            return
+        }
         var UUID = NSUUID().uuidString
         UUID = "TEMP" + UUID.replacingOccurrences(of: "-", with: "")
         var options = NKRequestOptions()
@@ -52,39 +55,51 @@ class NCCreateDocument: NSObject {
             } else if editorId == "text" {
                 options = NKRequestOptions(customUserAgent: NCUtility().getCustomUserAgentNCText())
             }
-
-            NextcloudKit.shared.textCreateFile(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateId, account: account, options: options) { _, url, _, error in
-                guard error == .success, let url else {
-                    return NCContentPresenter().showError(error: error)
+            let results = await NextcloudKit.shared.textCreateFileAsync(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateId, account: account, options: options) { task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                path: fileNamePath,
+                                                                                                name: "textCreateFile")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
                 }
-
-                let metadata = self.database.createMetadata(fileName: fileName,
-                                                            ocId: UUID,
-                                                            serverUrl: serverUrl,
-                                                            url: url,
-                                                            session: session,
-                                                            sceneIdentifier: controller.sceneIdentifier)
-
-                NCViewer().view(viewController: viewController, metadata: metadata)
+            }
+            guard results.error == .success, let url = results.url else {
+                return NCContentPresenter().showError(error: results.error)
+            }
+            let metadata = await self.database.createMetadataAsync(fileName: fileName,
+                                                                   ocId: UUID,
+                                                                   serverUrl: serverUrl,
+                                                                   url: url,
+                                                                   session: session,
+                                                                   sceneIdentifier: controller.sceneIdentifier)
+            if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: viewController) {
+                viewController.navigationController?.pushViewController(vc, animated: true)
             }
 
         } else if editorId == NCGlobal.shared.editorCollabora {
         } else if editorId == "collabora" {
 
-            NextcloudKit.shared.createRichdocuments(path: fileNamePath, templateId: templateId, account: account) { returnedAccount, url, _, error in
-                guard error == .success, let url else {
-                    return NCContentPresenter().showError(error: error)
+            let results = await NextcloudKit.shared.createRichdocumentsAsync(path: fileNamePath, templateId: templateId, account: account) { task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                path: fileNamePath,
+                                                                                                name: "CreateRichdocuments")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
                 }
-                if account == returnedAccount {
-                    let metadata = self.database.createMetadata(fileName: fileName,
-                                                                ocId: UUID,
-                                                                serverUrl: serverUrl,
-                                                                url: url,
-                                                                session: session,
-                                                                sceneIdentifier: controller.sceneIdentifier)
+            }
+            guard results.error == .success, let url = results.url else {
+                return NCContentPresenter().showError(error: results.error)
+            }
 
-                    NCViewer().view(viewController: viewController, metadata: metadata)
-                }
+            let metadata = await self.database.createMetadataAsync(fileName: fileName,
+                                                                   ocId: UUID,
+                                                                   serverUrl: serverUrl,
+                                                                   url: url,
+                                                                   session: session,
+                                                                   sceneIdentifier: controller.sceneIdentifier)
+
+            if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: viewController) {
+                viewController.navigationController?.pushViewController(vc, animated: true)
             }
         }
     }
@@ -108,6 +123,13 @@ class NCCreateDocument: NSObject {
             }
 
             let results = await textGetListOfTemplates(account: account, options: options)
+            let results = await NextcloudKit.shared.textGetListOfTemplatesAsync(account: account, options: options) { task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                name: "textGetListOfTemplates")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
+            }
             if results.error == .success, let resultTemplates = results.templates {
                 for template in resultTemplates {
                     var temp = NKEditorTemplate()
@@ -154,7 +176,14 @@ class NCCreateDocument: NSObject {
         if editorId == NCGlobal.shared.editorCollabora {
             let results = await getTemplatesRichdocuments(typeTemplate: templateId, account: account)
         if editorId == "collabora" {
-            let results = await NextcloudKit.shared.getTemplatesRichdocumentsAsync(typeTemplate: templateId, account: account)
+            let results = await NextcloudKit.shared.getTemplatesRichdocumentsAsync(typeTemplate: templateId, account: account) { task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                path: templateId,
+                                                                                                name: "getTemplatesRichdocuments")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
+            }
             if results.error == .success {
                 for template in results.templates! {
                     var temp = NKEditorTemplate()

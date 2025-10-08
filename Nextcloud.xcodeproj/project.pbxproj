@@ -291,7 +291,200 @@
 		B5E2E73D2DAE89D700AB2EDD /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E7392DAE89D700AB2EDD /* NCEmptyView.xib */; };
 		B5E2E7412DAE89D700AB2EDD /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E7382DAE89D700AB2EDD /* NCEmptyDataSet.swift */; };
 		B5E2E7432DAE89D700AB2EDD /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E7392DAE89D700AB2EDD /* NCEmptyView.xib */; };
+		AFCE353927E5DE0500FEA6C2 /* Shareable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* Shareable.swift */; };
+		B5BEBD2F2E93AD540002C9E5 /* iOSClient.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2A2E93AD540002C9E5 /* iOSClient.plist */; };
+		B5BEBD302E93AD540002C9E5 /* Share.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2E2E93AD540002C9E5 /* Share.plist */; };
+		B5BEBD312E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2C2E93AD540002C9E5 /* Notification_Service_Extension.plist */; };
+		B5BEBD322E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD282E93AD540002C9E5 /* File_Provider_Extension.plist */; };
+		B5BEBD332E93AD540002C9E5 /* iOSClient.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2A2E93AD540002C9E5 /* iOSClient.plist */; };
+		B5BEBD342E93AD540002C9E5 /* Share.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2E2E93AD540002C9E5 /* Share.plist */; };
+		B5BEBD352E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2C2E93AD540002C9E5 /* Notification_Service_Extension.plist */; };
+		B5BEBD362E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD282E93AD540002C9E5 /* File_Provider_Extension.plist */; };
+		B5BEBD372E93AD540002C9E5 /* iOSClient.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2A2E93AD540002C9E5 /* iOSClient.plist */; };
+		B5BEBD382E93AD540002C9E5 /* Share.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2E2E93AD540002C9E5 /* Share.plist */; };
+		B5BEBD392E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2C2E93AD540002C9E5 /* Notification_Service_Extension.plist */; };
+		B5BEBD3A2E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD282E93AD540002C9E5 /* File_Provider_Extension.plist */; };
+		B5BEBD3B2E93AD540002C9E5 /* iOSClient.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2A2E93AD540002C9E5 /* iOSClient.plist */; };
+		B5BEBD3C2E93AD540002C9E5 /* Share.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2E2E93AD540002C9E5 /* Share.plist */; };
+		B5BEBD3D2E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2C2E93AD540002C9E5 /* Notification_Service_Extension.plist */; };
+		B5BEBD3E2E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD282E93AD540002C9E5 /* File_Provider_Extension.plist */; };
+		B5BEBD3F2E93AD540002C9E5 /* iOSClient.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2A2E93AD540002C9E5 /* iOSClient.plist */; };
+		B5BEBD402E93AD540002C9E5 /* Share.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2E2E93AD540002C9E5 /* Share.plist */; };
+		B5BEBD412E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2C2E93AD540002C9E5 /* Notification_Service_Extension.plist */; };
+		B5BEBD422E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD282E93AD540002C9E5 /* File_Provider_Extension.plist */; };
+		B5BEBD432E93AD540002C9E5 /* iOSClient.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2A2E93AD540002C9E5 /* iOSClient.plist */; };
+		B5BEBD442E93AD540002C9E5 /* Share.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2E2E93AD540002C9E5 /* Share.plist */; };
+		B5BEBD452E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2C2E93AD540002C9E5 /* Notification_Service_Extension.plist */; };
+		B5BEBD462E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD282E93AD540002C9E5 /* File_Provider_Extension.plist */; };
+		B5BEBD472E93AD540002C9E5 /* iOSClient.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2A2E93AD540002C9E5 /* iOSClient.plist */; };
+		B5BEBD482E93AD540002C9E5 /* Share.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2E2E93AD540002C9E5 /* Share.plist */; };
+		B5BEBD492E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2C2E93AD540002C9E5 /* Notification_Service_Extension.plist */; };
+		B5BEBD4A2E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD282E93AD540002C9E5 /* File_Provider_Extension.plist */; };
+		B5BEBD4B2E93AD540002C9E5 /* iOSClient.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2A2E93AD540002C9E5 /* iOSClient.plist */; };
+		B5BEBD4C2E93AD540002C9E5 /* Share.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2E2E93AD540002C9E5 /* Share.plist */; };
+		B5BEBD4D2E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD2C2E93AD540002C9E5 /* Notification_Service_Extension.plist */; };
+		B5BEBD4E2E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD282E93AD540002C9E5 /* File_Provider_Extension.plist */; };
+		B5BEBD522E93AE1C0002C9E5 /* TestConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD502E93AE1C0002C9E5 /* TestConstants.swift */; };
+		B5BEBD532E93AE1C0002C9E5 /* BaseXCTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD4F2E93AE1C0002C9E5 /* BaseXCTestCase.swift */; };
+		B5BEBD542E93AE1C0002C9E5 /* TestConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD502E93AE1C0002C9E5 /* TestConstants.swift */; };
+		B5BEBD552E93AE1C0002C9E5 /* BaseXCTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD4F2E93AE1C0002C9E5 /* BaseXCTestCase.swift */; };
+		B5BEBD562E93AE1C0002C9E5 /* TestConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD502E93AE1C0002C9E5 /* TestConstants.swift */; };
+		B5BEBD572E93AE1C0002C9E5 /* BaseXCTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD4F2E93AE1C0002C9E5 /* BaseXCTestCase.swift */; };
+		B5BEBD5B2E93AE2F0002C9E5 /* LoginIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD5A2E93AE2F0002C9E5 /* LoginIntegrationTests.swift */; };
+		B5BEBD5C2E93AE2F0002C9E5 /* BaseIntegrationXCTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD582E93AE2F0002C9E5 /* BaseIntegrationXCTestCase.swift */; };
+		B5BEBD5D2E93AE2F0002C9E5 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD592E93AE2F0002C9E5 /* FilesIntegrationTests.swift */; };
+		B5BEBD6B2E93AE4B0002C9E5 /* SharingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD6A2E93AE4B0002C9E5 /* SharingTest.swift */; };
+		B5BEBD6C2E93AE4B0002C9E5 /* AssetUploadTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD5E2E93AE4B0002C9E5 /* AssetUploadTest.swift */; };
+		B5BEBD6D2E93AE4B0002C9E5 /* NCNotificationText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD642E93AE4B0002C9E5 /* NCNotificationText.swift */; };
+		B5BEBD6E2E93AE4B0002C9E5 /* SettingsTestCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD692E93AE4B0002C9E5 /* SettingsTestCases.swift */; };
+		B5BEBD6F2E93AE4B0002C9E5 /* CollaboraTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD602E93AE4B0002C9E5 /* CollaboraTestCase.swift */; };
+		B5BEBD702E93AE4B0002C9E5 /* MoveAndCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD632E93AE4B0002C9E5 /* MoveAndCopyTests.swift */; };
+		B5BEBD712E93AE4B0002C9E5 /* MoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD622E93AE4B0002C9E5 /* MoreTests.swift */; };
+		B5BEBD722E93AE4B0002C9E5 /* RenameFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD672E93AE4B0002C9E5 /* RenameFileTests.swift */; };
+		B5BEBD732E93AE4B0002C9E5 /* AudioUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD5F2E93AE4B0002C9E5 /* AudioUploadTests.swift */; };
+		B5BEBD742E93AE4B0002C9E5 /* OnboardingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD652E93AE4B0002C9E5 /* OnboardingTestCase.swift */; };
+		B5BEBD752E93AE4B0002C9E5 /* E2EETests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD612E93AE4B0002C9E5 /* E2EETests.swift */; };
+		B5BEBD762E93AE4B0002C9E5 /* ScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD682E93AE4B0002C9E5 /* ScanTests.swift */; };
+		B5BEBD772E93AE4B0002C9E5 /* PrivacyPolicyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD662E93AE4B0002C9E5 /* PrivacyPolicyTest.swift */; };
+		B5BEBD7D2E93AEA30002C9E5 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7B2E93AEA30002C9E5 /* AnalyticsService.swift */; };
+		B5BEBD7E2E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD782E93AEA30002C9E5 /* MoEngageAnalytics.swift */; };
+		B5BEBD7F2E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7A2E93AEA30002C9E5 /* AnalyticsHelper.swift */; };
+		B5BEBD802E93AEA30002C9E5 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7B2E93AEA30002C9E5 /* AnalyticsService.swift */; };
+		B5BEBD812E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD782E93AEA30002C9E5 /* MoEngageAnalytics.swift */; };
+		B5BEBD822E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7A2E93AEA30002C9E5 /* AnalyticsHelper.swift */; };
+		B5BEBD832E93AEA30002C9E5 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7B2E93AEA30002C9E5 /* AnalyticsService.swift */; };
+		B5BEBD842E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD782E93AEA30002C9E5 /* MoEngageAnalytics.swift */; };
+		B5BEBD852E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7A2E93AEA30002C9E5 /* AnalyticsHelper.swift */; };
+		B5BEBD862E93AEA30002C9E5 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7B2E93AEA30002C9E5 /* AnalyticsService.swift */; };
+		B5BEBD872E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD782E93AEA30002C9E5 /* MoEngageAnalytics.swift */; };
+		B5BEBD882E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7A2E93AEA30002C9E5 /* AnalyticsHelper.swift */; };
+		B5BEBD892E93AEA30002C9E5 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7B2E93AEA30002C9E5 /* AnalyticsService.swift */; };
+		B5BEBD8A2E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD782E93AEA30002C9E5 /* MoEngageAnalytics.swift */; };
+		B5BEBD8B2E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7A2E93AEA30002C9E5 /* AnalyticsHelper.swift */; };
+		B5BEBD8C2E93AEA30002C9E5 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7B2E93AEA30002C9E5 /* AnalyticsService.swift */; };
+		B5BEBD8D2E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD782E93AEA30002C9E5 /* MoEngageAnalytics.swift */; };
+		B5BEBD8E2E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7A2E93AEA30002C9E5 /* AnalyticsHelper.swift */; };
+		B5BEBD8F2E93AEA30002C9E5 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7B2E93AEA30002C9E5 /* AnalyticsService.swift */; };
+		B5BEBD902E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD782E93AEA30002C9E5 /* MoEngageAnalytics.swift */; };
+		B5BEBD912E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD7A2E93AEA30002C9E5 /* AnalyticsHelper.swift */; };
+		B5BEBD942E93AED80002C9E5 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD922E93AED80002C9E5 /* AppUpdater.swift */; };
+		B5BEBD952E93AED80002C9E5 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD922E93AED80002C9E5 /* AppUpdater.swift */; };
+		B5BEBD962E93AED80002C9E5 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD922E93AED80002C9E5 /* AppUpdater.swift */; };
+		B5BEBD972E93AED80002C9E5 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD922E93AED80002C9E5 /* AppUpdater.swift */; };
+		B5BEBD982E93AED80002C9E5 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD922E93AED80002C9E5 /* AppUpdater.swift */; };
+		B5BEBD992E93AED80002C9E5 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD922E93AED80002C9E5 /* AppUpdater.swift */; };
+		B5BEBD9A2E93AED80002C9E5 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD922E93AED80002C9E5 /* AppUpdater.swift */; };
+		B5BEBDA32E93AF010002C9E5 /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9B2E93AF010002C9E5 /* AppUtility.swift */; };
+		B5BEBDA42E93AF010002C9E5 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA02E93AF010002C9E5 /* AdjustHelper.m */; };
+		B5BEBDA52E93AF010002C9E5 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA12E93AF010002C9E5 /* TealiumHelper.swift */; };
+		B5BEBDA62E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
+		B5BEBDA72E93AF010002C9E5 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */; };
+		B5BEBDA82E93AF010002C9E5 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */; };
+		B5BEBDA92E93AF010002C9E5 /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9B2E93AF010002C9E5 /* AppUtility.swift */; };
+		B5BEBDAA2E93AF010002C9E5 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA02E93AF010002C9E5 /* AdjustHelper.m */; };
+		B5BEBDAB2E93AF010002C9E5 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA12E93AF010002C9E5 /* TealiumHelper.swift */; };
+		B5BEBDAC2E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
+		B5BEBDAD2E93AF010002C9E5 /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9B2E93AF010002C9E5 /* AppUtility.swift */; };
+		B5BEBDAE2E93AF010002C9E5 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA02E93AF010002C9E5 /* AdjustHelper.m */; };
+		B5BEBDAF2E93AF010002C9E5 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA12E93AF010002C9E5 /* TealiumHelper.swift */; };
+		B5BEBDB02E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
+		B5BEBDB12E93AF010002C9E5 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */; };
+		B5BEBDB22E93AF010002C9E5 /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9B2E93AF010002C9E5 /* AppUtility.swift */; };
+		B5BEBDB32E93AF010002C9E5 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA02E93AF010002C9E5 /* AdjustHelper.m */; };
+		B5BEBDB42E93AF010002C9E5 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA12E93AF010002C9E5 /* TealiumHelper.swift */; };
+		B5BEBDB52E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
+		B5BEBDB62E93AF010002C9E5 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */; };
+		B5BEBDB72E93AF010002C9E5 /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9B2E93AF010002C9E5 /* AppUtility.swift */; };
+		B5BEBDB82E93AF010002C9E5 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA02E93AF010002C9E5 /* AdjustHelper.m */; };
+		B5BEBDB92E93AF010002C9E5 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA12E93AF010002C9E5 /* TealiumHelper.swift */; };
+		B5BEBDBA2E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
+		B5BEBDBB2E93AF010002C9E5 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */; };
+		B5BEBDBC2E93AF010002C9E5 /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9B2E93AF010002C9E5 /* AppUtility.swift */; };
+		B5BEBDBD2E93AF010002C9E5 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA02E93AF010002C9E5 /* AdjustHelper.m */; };
+		B5BEBDBE2E93AF010002C9E5 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA12E93AF010002C9E5 /* TealiumHelper.swift */; };
+		B5BEBDBF2E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
+		B5BEBDC02E93AF010002C9E5 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */; };
+		B5BEBDC12E93AF010002C9E5 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */; };
+		B5BEBDC22E93AF010002C9E5 /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9B2E93AF010002C9E5 /* AppUtility.swift */; };
+		B5BEBDC32E93AF010002C9E5 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA02E93AF010002C9E5 /* AdjustHelper.m */; };
+		B5BEBDC42E93AF010002C9E5 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDA12E93AF010002C9E5 /* TealiumHelper.swift */; };
+		B5BEBDC52E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
+		B5BEBDC72E93AF7E0002C9E5 /* NCLoginWeb.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDC62E93AF7E0002C9E5 /* NCLoginWeb.swift */; };
+		B5BEBDC92E93AFF10002C9E5 /* NCSelectableNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDC82E93AFF10002C9E5 /* NCSelectableNavigationView.swift */; };
+		B5BEBDCC2E93B0210002C9E5 /* NCSectionHeaderMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDCA2E93B0210002C9E5 /* NCSectionHeaderMenu.swift */; };
+		B5BEBDCD2E93B0210002C9E5 /* NCSectionHeaderMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDCB2E93B0210002C9E5 /* NCSectionHeaderMenu.xib */; };
+		B5BEBDCE2E93B0210002C9E5 /* NCSectionHeaderMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDCA2E93B0210002C9E5 /* NCSectionHeaderMenu.swift */; };
+		B5BEBDCF2E93B0210002C9E5 /* NCSectionHeaderMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDCB2E93B0210002C9E5 /* NCSectionHeaderMenu.xib */; };
+		B5BEBDD62E93B2450002C9E5 /* NCCreateFormUploadDocuments.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDD12E93B2450002C9E5 /* NCCreateFormUploadDocuments.swift */; };
+		B5BEBDD72E93B2450002C9E5 /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDD42E93B2450002C9E5 /* TextTableViewCell.swift */; };
+		B5BEBDD82E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDD32E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.swift */; };
+		B5BEBDD92E93B2450002C9E5 /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDD52E93B2450002C9E5 /* TextTableViewCell.xib */; };
+		B5BEBDDA2E93B2450002C9E5 /* NCCreateFormUploadDocuments.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDD02E93B2450002C9E5 /* NCCreateFormUploadDocuments.storyboard */; };
+		B5BEBDDB2E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDD22E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.storyboard */; };
+		B5BEBDDC2E93B2450002C9E5 /* NCCreateFormUploadDocuments.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDD12E93B2450002C9E5 /* NCCreateFormUploadDocuments.swift */; };
+		B5BEBDDD2E93B2450002C9E5 /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDD42E93B2450002C9E5 /* TextTableViewCell.swift */; };
+		B5BEBDDE2E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDD32E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.swift */; };
+		B5BEBDDF2E93B2450002C9E5 /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDD52E93B2450002C9E5 /* TextTableViewCell.xib */; };
+		B5BEBDE02E93B2450002C9E5 /* NCCreateFormUploadDocuments.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDD02E93B2450002C9E5 /* NCCreateFormUploadDocuments.storyboard */; };
+		B5BEBDE12E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDD22E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.storyboard */; };
+		B5BEBDE32E93BD6F0002C9E5 /* NCMediaCommandView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE22E93BD6F0002C9E5 /* NCMediaCommandView.xib */; };
+		B5BEBDE92E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE42E93BDB40002C9E5 /* FolderPathCustomCell.swift */; };
+		B5BEBDEA2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift */; };
+		B5BEBDEB2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib */; };
+		B5BEBDEC2E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE52E93BDB40002C9E5 /* FolderPathCustomCell.xib */; };
+		B5BEBDED2E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE42E93BDB40002C9E5 /* FolderPathCustomCell.swift */; };
+		B5BEBDEE2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift */; };
+		B5BEBDEF2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib */; };
+		B5BEBDF02E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE52E93BDB40002C9E5 /* FolderPathCustomCell.xib */; };
+		B5BEBDF12E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE42E93BDB40002C9E5 /* FolderPathCustomCell.swift */; };
+		B5BEBDF22E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift */; };
+		B5BEBDF32E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib */; };
+		B5BEBDF42E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE52E93BDB40002C9E5 /* FolderPathCustomCell.xib */; };
+		B5BEBDF52E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE42E93BDB40002C9E5 /* FolderPathCustomCell.swift */; };
+		B5BEBDF62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift */; };
+		B5BEBDF72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib */; };
+		B5BEBDF82E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE52E93BDB40002C9E5 /* FolderPathCustomCell.xib */; };
+		B5BEBDF92E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE42E93BDB40002C9E5 /* FolderPathCustomCell.swift */; };
+		B5BEBDFA2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift */; };
+		B5BEBDFB2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib */; };
+		B5BEBDFC2E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE52E93BDB40002C9E5 /* FolderPathCustomCell.xib */; };
+		B5BEBDFD2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib */; };
+		B5BEBDFE2E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE52E93BDB40002C9E5 /* FolderPathCustomCell.xib */; };
+		B5BEBDFF2E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE42E93BDB40002C9E5 /* FolderPathCustomCell.swift */; };
+		B5BEBE002E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift */; };
+		B5BEBE012E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib */; };
+		B5BEBE022E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBDE52E93BDB40002C9E5 /* FolderPathCustomCell.xib */; };
+		B5BEBE032E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE42E93BDB40002C9E5 /* FolderPathCustomCell.swift */; };
+		B5BEBE042E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBDE62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift */; };
+		B5BEBE062E93BE0C0002C9E5 /* NCCreateFormUploadScanDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBE052E93BE0C0002C9E5 /* NCCreateFormUploadScanDocument.swift */; };
+		B5BEBE1A2E93BE200002C9E5 /* PNGImageSaveSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBE112E93BE200002C9E5 /* PNGImageSaveSwitchView.swift */; };
+		B5BEBE1B2E93BE200002C9E5 /* FileNameInputTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBE072E93BE200002C9E5 /* FileNameInputTextField.swift */; };
+		B5BEBE1C2E93BE200002C9E5 /* PdfWithoutOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBE0F2E93BE200002C9E5 /* PdfWithoutOcrSwitchView.swift */; };
+		B5BEBE1D2E93BE200002C9E5 /* TextFileWithOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBE172E93BE200002C9E5 /* TextFileWithOcrSwitchView.swift */; };
+		B5BEBE1E2E93BE200002C9E5 /* ScanDocumentPathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBE132E93BE200002C9E5 /* ScanDocumentPathView.swift */; };
+		B5BEBE1F2E93BE200002C9E5 /* SetPDFPasswordSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBE152E93BE200002C9E5 /* SetPDFPasswordSwitchView.swift */; };
+		B5BEBE202E93BE200002C9E5 /* JPGImageSaveSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBE092E93BE200002C9E5 /* JPGImageSaveSwitchView.swift */; };
+		B5BEBE212E93BE200002C9E5 /* PasswordInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBE0B2E93BE200002C9E5 /* PasswordInputField.swift */; };
+		B5BEBE222E93BE200002C9E5 /* PdfWithOcrSwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBE0D2E93BE200002C9E5 /* PdfWithOcrSwitchView.swift */; };
+		B5BEBE232E93BE200002C9E5 /* PasswordInputField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE0C2E93BE200002C9E5 /* PasswordInputField.xib */; };
+		B5BEBE242E93BE200002C9E5 /* ScanDocumentPathView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE142E93BE200002C9E5 /* ScanDocumentPathView.xib */; };
+		B5BEBE252E93BE200002C9E5 /* SetPDFPasswordSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE162E93BE200002C9E5 /* SetPDFPasswordSwitchView.xib */; };
+		B5BEBE262E93BE200002C9E5 /* PdfWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE0E2E93BE200002C9E5 /* PdfWithOcrSwitchView.xib */; };
+		B5BEBE272E93BE200002C9E5 /* PNGImageSaveSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE122E93BE200002C9E5 /* PNGImageSaveSwitchView.xib */; };
+		B5BEBE282E93BE200002C9E5 /* FileNameInputTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE082E93BE200002C9E5 /* FileNameInputTextField.xib */; };
+		B5BEBE292E93BE200002C9E5 /* TextFileWithOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE182E93BE200002C9E5 /* TextFileWithOcrSwitchView.xib */; };
+		B5BEBE2A2E93BE200002C9E5 /* PdfWithoutOcrSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE102E93BE200002C9E5 /* PdfWithoutOcrSwitchView.xib */; };
+		B5BEBE2B2E93BE200002C9E5 /* JPGImageSaveSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBE0A2E93BE200002C9E5 /* JPGImageSaveSwitchView.xib */; };
 		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B5BEBD192E93A5260002C9E5 /* Shareable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD182E93A5260002C9E5 /* Shareable.swift */; };
+		B5BEBD1E2E93A74C0002C9E5 /* CreateLinkFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1A2E93A74C0002C9E5 /* CreateLinkFooterView.swift */; };
+		B5BEBD1F2E93A74C0002C9E5 /* NCPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1B2E93A74C0002C9E5 /* NCPermissions.swift */; };
+		B5BEBD202E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1C2E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift */; };
+		B5BEBD212E93A74C0002C9E5 /* NoSharesFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1D2E93A74C0002C9E5 /* NoSharesFooterView.swift */; };
+		B5BEBD222E93A74C0002C9E5 /* CreateLinkFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1A2E93A74C0002C9E5 /* CreateLinkFooterView.swift */; };
+		B5BEBD232E93A74C0002C9E5 /* NCPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1B2E93A74C0002C9E5 /* NCPermissions.swift */; };
+		B5BEBD242E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1C2E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift */; };
+		B5BEBD252E93A74C0002C9E5 /* NoSharesFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD1D2E93A74C0002C9E5 /* NoSharesFooterView.swift */; };
 		B5E2E6D42DAE52B500AB2EDD /* SharingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6D32DAE52B500AB2EDD /* SharingTest.swift */; };
 		B5E2E6D72DAE571200AB2EDD /* PasswordInputField.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5E2E6D62DAE571200AB2EDD /* PasswordInputField.xib */; };
 		B5E2E6D82DAE571200AB2EDD /* PasswordInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E6D52DAE571200AB2EDD /* PasswordInputField.swift */; };
@@ -315,6 +508,17 @@
 		B5C9801A2DACD56C0041B146 /* NCMedia+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */; };
 		B52FAED52DA8F616001AB1BD /* NCSelectableNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAED42DA8F616001AB1BD /* NCSelectableNavigationView.swift */; };
 		B52FAED32DA8F22F001AB1BD /* MoveAndCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAED22DA8F22F001AB1BD /* MoveAndCopyTests.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B5C9801E2DACEB5A0041B146 /* NCCollectionViewCommon+SwipeCollectionViewCellDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C9801D2DACEB5A0041B146 /* NCCollectionViewCommon+SwipeCollectionViewCellDelegate.swift */; };
+		B5C980202DAD201A0041B146 /* NCSortMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C9801F2DAD201A0041B146 /* NCSortMenu.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B5C980182DACD51C0041B146 /* NCMediaCommandView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5C980172DACD51C0041B146 /* NCMediaCommandView.xib */; };
+		B5C9801A2DACD56C0041B146 /* NCMedia+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B52FAED52DA8F616001AB1BD /* NCSelectableNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAED42DA8F616001AB1BD /* NCSelectableNavigationView.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B52FAED32DA8F22F001AB1BD /* MoveAndCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAED22DA8F22F001AB1BD /* MoveAndCopyTests.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
 		B52FAEAA2DA8EF0C001AB1BD /* ScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA92DA8EF0C001AB1BD /* ScanTests.swift */; };
 		B52FAEAC2DA8EF2C001AB1BD /* NCCreateFormUploadScanDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEAB2DA8EF2C001AB1BD /* NCCreateFormUploadScanDocument.swift */; };
 		B52FAEC02DA8EF84001AB1BD /* FileNameInputTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEAD2DA8EF84001AB1BD /* FileNameInputTextField.swift */; };
@@ -338,6 +542,11 @@
 		B52FAEA12DA8ED40001AB1BD /* AudioUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA02DA8ED40001AB1BD /* AudioUploadTests.swift */; };
 		B52FAEA42DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA32DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift */; };
 		B52FAEA82DA8EE99001AB1BD /* CCManageAutoUpload.m in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA72DA8EE99001AB1BD /* CCManageAutoUpload.m */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B52FAEA12DA8ED40001AB1BD /* AudioUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA02DA8ED40001AB1BD /* AudioUploadTests.swift */; };
+		B52FAEA42DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA32DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift */; };
+		B52FAEA82DA8EE99001AB1BD /* CCManageAutoUpload.m in Sources */ = {isa = PBXBuildFile; fileRef = B52FAEA72DA8EE99001AB1BD /* CCManageAutoUpload.m */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
 		B52FAE902DA8D9E1001AB1BD /* CollaboraTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAE8F2DA8D9E1001AB1BD /* CollaboraTestCase.swift */; };
 		B52FAE932DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B52FAE912DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.storyboard */; };
 		B52FAE942DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FAE922DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift */; };
@@ -391,6 +600,66 @@
 		B5D45E632DA50D6A00773929 /* CCManageAutoUpload.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E622DA50D6A00773929 /* CCManageAutoUpload.m */; };
 		B5D45E642DA50D6A00773929 /* CCAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E612DA50D6A00773929 /* CCAdvanced.m */; };
 		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B529E40D2E8D1F8B006D9131 /* NCManageE2EE.swift in Sources */ = {isa = PBXBuildFile; fileRef = B529E40C2E8D1F8B006D9131 /* NCManageE2EE.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B568C2B72DA7B5060072FCB4 /* SettingsTestCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2B62DA7B5060072FCB4 /* SettingsTestCases.swift */; };
+		B568C2B92DA7CCC10072FCB4 /* CCAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = B568C2B82DA7CCC10072FCB4 /* CCAdvanced.m */; };
+		B568C2BE2DA7CCDB0072FCB4 /* MagentaCloudVersionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B568C2BD2DA7CCDB0072FCB4 /* MagentaCloudVersionView.xib */; };
+		B568C2BF2DA7CCDB0072FCB4 /* MagentaCloudVersionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2BC2DA7CCDB0072FCB4 /* MagentaCloudVersionView.swift */; };
+		B568C2C02DA7CCDB0072FCB4 /* ImprintViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2BB2DA7CCDB0072FCB4 /* ImprintViewController.swift */; };
+		B568C2C12DA7CCDB0072FCB4 /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2BA2DA7CCDB0072FCB4 /* HelpViewController.swift */; };
+		B568C2C42DA7CCEA0072FCB4 /* OpenSourceSoftwareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2C32DA7CCEA0072FCB4 /* OpenSourceSoftwareViewController.swift */; };
+		B568C2C52DA7CCEA0072FCB4 /* NCSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = B568C2C22DA7CCEA0072FCB4 /* NCSettings.m */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B568C2B12DA7AA5F0072FCB4 /* MoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2B02DA7AA5F0072FCB4 /* MoreTests.swift */; };
+		B568C2B32DA7AAAE0072FCB4 /* NCMoreUserCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B568C2B22DA7AAAE0072FCB4 /* NCMoreUserCell.xib */; };
+		B568C2B52DA7AADD0072FCB4 /* NCMoreUserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2B42DA7AADD0072FCB4 /* NCMoreUserCell.swift */; };
+		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B529E4072E8D1C3E006D9131 /* NCUploadAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B529E4062E8D1C3E006D9131 /* NCUploadAssets.swift */; };
+		B529E4082E8D1C3E006D9131 /* NCUploadAssets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B529E4062E8D1C3E006D9131 /* NCUploadAssets.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B543154E2DA6913C00981E7E /* AudioUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543154D2DA6913C00981E7E /* AudioUploadTests.swift */; };
+		B54315552DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315522DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift */; };
+		B543155A2DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B54315512DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard */; };
+		B543155B2DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315522DA6929700981E7E /* NCCreateFormUploadVoiceNote.swift */; };
+		B543155C2DA6929700981E7E /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543154F2DA6929700981E7E /* FolderPathCustomCell.swift */; };
+		B543155D2DA6929700981E7E /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315532DA6929700981E7E /* TextTableViewCell.swift */; };
+		B543155E2DA6929700981E7E /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B54315542DA6929700981E7E /* TextTableViewCell.xib */; };
+		B543155F2DA6929700981E7E /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B54315502DA6929700981E7E /* FolderPathCustomCell.xib */; };
+		B54315602DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B54315512DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B543154C2DA690B700981E7E /* NCNotificationText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543154B2DA690B700981E7E /* NCNotificationText.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B54315362DA64EB100981E7E /* PrivacyPolicyTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315352DA64EB100981E7E /* PrivacyPolicyTest.swift */; };
+		B54315412DA669C700981E7E /* InitialPrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315392DA669C700981E7E /* InitialPrivacySettingsViewController.swift */; };
+		B54315422DA669C700981E7E /* RequiredDataCollectionSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543153D2DA669C700981E7E /* RequiredDataCollectionSwitch.swift */; };
+		B54315432DA669C700981E7E /* PrivacySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543153C2DA669C700981E7E /* PrivacySettingsViewController.swift */; };
+		B54315442DA669C700981E7E /* AnalysisDataCollectionSwitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315372DA669C700981E7E /* AnalysisDataCollectionSwitch.swift */; };
+		B54315452DA669C700981E7E /* PrivacyPolicyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543153B2DA669C700981E7E /* PrivacyPolicyViewController.swift */; };
+		B54315462DA669C700981E7E /* SaveSettingsCustomButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543153F2DA669C700981E7E /* SaveSettingsCustomButtonCell.swift */; };
+		B54315472DA669C700981E7E /* AnalysisDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = B54315382DA669C700981E7E /* AnalysisDataCollectionSwitch.xib */; };
+		B54315482DA669C700981E7E /* NCSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B543153A2DA669C700981E7E /* NCSettings.storyboard */; };
+		B54315492DA669C700981E7E /* SaveSettingsCustomButtonCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B54315402DA669C700981E7E /* SaveSettingsCustomButtonCell.xib */; };
+		B543154A2DA669C700981E7E /* RequiredDataCollectionSwitch.xib in Resources */ = {isa = PBXBuildFile; fileRef = B543153E2DA669C700981E7E /* RequiredDataCollectionSwitch.xib */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B54315322DA64BAF00981E7E /* OnboardingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315312DA64BAF00981E7E /* OnboardingTestCase.swift */; };
+		B54315342DA64D6500981E7E /* AppUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54315332DA64D6500981E7E /* AppUtility.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B54315302DA647A400981E7E /* NCLoginWeb.swift in Sources */ = {isa = PBXBuildFile; fileRef = B543152F2DA647A400981E7E /* NCLoginWeb.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B5D45E732DA5172900773929 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E712DA5172900773929 /* AppUpdater.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B5D45E6D2DA510E000773929 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */; };
+		B5D45E6E2DA510E000773929 /* NCRenameFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E6B2DA510E000773929 /* NCRenameFile.swift */; };
+		B5D45E702DA5119A00773929 /* RenameFileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E6F2DA5119A00773929 /* RenameFileTests.swift */; };
+		C04E2F232A17BB4D001BAD85 /* FilesIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04E2F222A17BB4D001BAD85 /* FilesIntegrationTests.swift */; };
+		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
+		B5D45E5F2DA50C8500773929 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E5D2DA50C8500773929 /* TealiumHelper.swift */; };
+		B5D45E602DA50C8500773929 /* AdjustHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E5C2DA50C8500773929 /* AdjustHelper.m */; };
+		B5D45E632DA50D6A00773929 /* CCManageAutoUpload.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E622DA50D6A00773929 /* CCManageAutoUpload.m */; };
+		B5D45E642DA50D6A00773929 /* CCAdvanced.m in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E612DA50D6A00773929 /* CCAdvanced.m */; };
 		D575039F27146F93008DC9DC /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A0D1342591FBC5008F8A13 /* String+Extension.swift */; };
 		D5B6AA7827200C7200D49C24 /* NCActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B6AA7727200C7200D49C24 /* NCActivityTableViewCell.swift */; };
 		F310B1EF2BA862F1001C42F5 /* NCViewerMedia+VisionKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F310B1EE2BA862F1001C42F5 /* NCViewerMedia+VisionKit.swift */; };
@@ -977,6 +1246,12 @@
 		F77DD6AC2C5CC093009448FB /* NCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77DD6A72C5CC093009448FB /* NCSession.swift */; };
 		F77DD6AD2C5CC093009448FB /* NCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77DD6A72C5CC093009448FB /* NCSession.swift */; };
 		F77DD6AE2C5CC093009448FB /* NCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77DD6A72C5CC093009448FB /* NCSession.swift */; };
+		F77E8C1F2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
+		F77E8C202E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
+		F77E8C212E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
+		F77E8C222E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
+		F77E8C242E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
+		F77E8C252E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77E8C1E2E79717D00EAE68F /* NCManageDatabase+LivePhoto.swift */; };
 		F77ED59128C9CE9D00E24ED0 /* ToolbarData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77ED59028C9CE9D00E24ED0 /* ToolbarData.swift */; };
 		F77ED59328C9CEA000E24ED0 /* ToolbarWidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77ED59228C9CEA000E24ED0 /* ToolbarWidgetProvider.swift */; };
 		F77ED59528C9CEA400E24ED0 /* ToolbarWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77ED59428C9CEA300E24ED0 /* ToolbarWidgetView.swift */; };
@@ -1021,6 +1296,7 @@
 		F7864AD02A78FE73004870E0 /* NCManageDatabase+LocalFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7864ACB2A78FE73004870E0 /* NCManageDatabase+LocalFile.swift */; };
 		F7864AD12A78FE73004870E0 /* NCManageDatabase+LocalFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7864ACB2A78FE73004870E0 /* NCManageDatabase+LocalFile.swift */; };
 		F7864AD22A78FE73004870E0 /* NCManageDatabase+LocalFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7864ACB2A78FE73004870E0 /* NCManageDatabase+LocalFile.swift */; };
+		F786891D2E93A9DF000E39B3 /* NCTransferStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F78689192E93A9D5000E39B3 /* NCTransferStore.swift */; };
 		F787704F22E7019900F287A9 /* NCShareLinkCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F787704E22E7019900F287A9 /* NCShareLinkCell.xib */; };
 		F787AC09298BCB4A0001BB00 /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F787AC08298BCB4A0001BB00 /* SVGKitSwift */; };
 		F787AC0B298BCB540001BB00 /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = F787AC0A298BCB540001BB00 /* SVGKitSwift */; };
@@ -1772,6 +2048,77 @@
 		AFCE353227E4ED1900FEA6C2 /* UIToolbar+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIToolbar+Extension.swift"; sourceTree = "<group>"; };
 		AFCE353427E4ED5900FEA6C2 /* DateFormatter+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+Extension.swift"; sourceTree = "<group>"; };
 		AFCE353627E4ED7B00FEA6C2 /* NCShareCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareCells.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* Shareable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shareable.swift; sourceTree = "<group>"; };
+		B5BEBD272E93AD540002C9E5 /* File_Provider_Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = File_Provider_Extension.entitlements; sourceTree = "<group>"; };
+		B5BEBD282E93AD540002C9E5 /* File_Provider_Extension.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = File_Provider_Extension.plist; sourceTree = "<group>"; };
+		B5BEBD292E93AD540002C9E5 /* iOSClient.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iOSClient.entitlements; sourceTree = "<group>"; };
+		B5BEBD2A2E93AD540002C9E5 /* iOSClient.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = iOSClient.plist; sourceTree = "<group>"; };
+		B5BEBD2B2E93AD540002C9E5 /* Notification_Service_Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Notification_Service_Extension.entitlements; sourceTree = "<group>"; };
+		B5BEBD2C2E93AD540002C9E5 /* Notification_Service_Extension.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Notification_Service_Extension.plist; sourceTree = "<group>"; };
+		B5BEBD2D2E93AD540002C9E5 /* Share.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Share.entitlements; sourceTree = "<group>"; };
+		B5BEBD2E2E93AD540002C9E5 /* Share.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Share.plist; sourceTree = "<group>"; };
+		B5BEBD4F2E93AE1C0002C9E5 /* BaseXCTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseXCTestCase.swift; sourceTree = "<group>"; };
+		B5BEBD502E93AE1C0002C9E5 /* TestConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestConstants.swift; sourceTree = "<group>"; };
+		B5BEBD582E93AE2F0002C9E5 /* BaseIntegrationXCTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseIntegrationXCTestCase.swift; sourceTree = "<group>"; };
+		B5BEBD592E93AE2F0002C9E5 /* FilesIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesIntegrationTests.swift; sourceTree = "<group>"; };
+		B5BEBD5A2E93AE2F0002C9E5 /* LoginIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginIntegrationTests.swift; sourceTree = "<group>"; };
+		B5BEBD5E2E93AE4B0002C9E5 /* AssetUploadTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetUploadTest.swift; sourceTree = "<group>"; };
+		B5BEBD5F2E93AE4B0002C9E5 /* AudioUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUploadTests.swift; sourceTree = "<group>"; };
+		B5BEBD602E93AE4B0002C9E5 /* CollaboraTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaboraTestCase.swift; sourceTree = "<group>"; };
+		B5BEBD612E93AE4B0002C9E5 /* E2EETests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = E2EETests.swift; sourceTree = "<group>"; };
+		B5BEBD622E93AE4B0002C9E5 /* MoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreTests.swift; sourceTree = "<group>"; };
+		B5BEBD632E93AE4B0002C9E5 /* MoveAndCopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveAndCopyTests.swift; sourceTree = "<group>"; };
+		B5BEBD642E93AE4B0002C9E5 /* NCNotificationText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNotificationText.swift; sourceTree = "<group>"; };
+		B5BEBD652E93AE4B0002C9E5 /* OnboardingTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTestCase.swift; sourceTree = "<group>"; };
+		B5BEBD662E93AE4B0002C9E5 /* PrivacyPolicyTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyTest.swift; sourceTree = "<group>"; };
+		B5BEBD672E93AE4B0002C9E5 /* RenameFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameFileTests.swift; sourceTree = "<group>"; };
+		B5BEBD682E93AE4B0002C9E5 /* ScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanTests.swift; sourceTree = "<group>"; };
+		B5BEBD692E93AE4B0002C9E5 /* SettingsTestCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTestCases.swift; sourceTree = "<group>"; };
+		B5BEBD6A2E93AE4B0002C9E5 /* SharingTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingTest.swift; sourceTree = "<group>"; };
+		B5BEBD782E93AEA30002C9E5 /* MoEngageAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoEngageAnalytics.swift; sourceTree = "<group>"; };
+		B5BEBD7A2E93AEA30002C9E5 /* AnalyticsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsHelper.swift; sourceTree = "<group>"; };
+		B5BEBD7B2E93AEA30002C9E5 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		B5BEBD922E93AED80002C9E5 /* AppUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdater.swift; sourceTree = "<group>"; };
+		B5BEBD9B2E93AF010002C9E5 /* AppUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUtility.swift; sourceTree = "<group>"; };
+		B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCEmptyDataSet.swift; sourceTree = "<group>"; };
+		B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCEmptyView.xib; sourceTree = "<group>"; };
+		B5BEBD9F2E93AF010002C9E5 /* AdjustHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
+		B5BEBDA02E93AF010002C9E5 /* AdjustHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
+		B5BEBDA12E93AF010002C9E5 /* TealiumHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
+		B5BEBDC62E93AF7E0002C9E5 /* NCLoginWeb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCLoginWeb.swift; sourceTree = "<group>"; };
+		B5BEBDC82E93AFF10002C9E5 /* NCSelectableNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSelectableNavigationView.swift; sourceTree = "<group>"; };
+		B5BEBDCA2E93B0210002C9E5 /* NCSectionHeaderMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSectionHeaderMenu.swift; sourceTree = "<group>"; };
+		B5BEBDCB2E93B0210002C9E5 /* NCSectionHeaderMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCSectionHeaderMenu.xib; sourceTree = "<group>"; };
+		B5BEBDD02E93B2450002C9E5 /* NCCreateFormUploadDocuments.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCCreateFormUploadDocuments.storyboard; sourceTree = "<group>"; };
+		B5BEBDD12E93B2450002C9E5 /* NCCreateFormUploadDocuments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadDocuments.swift; sourceTree = "<group>"; };
+		B5BEBDD22E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCCreateFormUploadVoiceNote.storyboard; sourceTree = "<group>"; };
+		B5BEBDD32E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadVoiceNote.swift; sourceTree = "<group>"; };
+		B5BEBDD42E93B2450002C9E5 /* TextTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
+		B5BEBDD52E93B2450002C9E5 /* TextTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
+		B5BEBDE22E93BD6F0002C9E5 /* NCMediaCommandView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCMediaCommandView.xib; sourceTree = "<group>"; };
+		B5BEBDE42E93BDB40002C9E5 /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
+		B5BEBDE52E93BDB40002C9E5 /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
+		B5BEBDE62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
+		B5BEBDE72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
+		B5BEBE052E93BE0C0002C9E5 /* NCCreateFormUploadScanDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadScanDocument.swift; sourceTree = "<group>"; };
+		B5BEBE072E93BE200002C9E5 /* FileNameInputTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileNameInputTextField.swift; sourceTree = "<group>"; };
+		B5BEBE082E93BE200002C9E5 /* FileNameInputTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FileNameInputTextField.xib; sourceTree = "<group>"; };
+		B5BEBE092E93BE200002C9E5 /* JPGImageSaveSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JPGImageSaveSwitchView.swift; sourceTree = "<group>"; };
+		B5BEBE0A2E93BE200002C9E5 /* JPGImageSaveSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = JPGImageSaveSwitchView.xib; sourceTree = "<group>"; };
+		B5BEBE0B2E93BE200002C9E5 /* PasswordInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordInputField.swift; sourceTree = "<group>"; };
+		B5BEBE0C2E93BE200002C9E5 /* PasswordInputField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PasswordInputField.xib; sourceTree = "<group>"; };
+		B5BEBE0D2E93BE200002C9E5 /* PdfWithOcrSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PdfWithOcrSwitchView.swift; sourceTree = "<group>"; };
+		B5BEBE0E2E93BE200002C9E5 /* PdfWithOcrSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PdfWithOcrSwitchView.xib; sourceTree = "<group>"; };
+		B5BEBE0F2E93BE200002C9E5 /* PdfWithoutOcrSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PdfWithoutOcrSwitchView.swift; sourceTree = "<group>"; };
+		B5BEBE102E93BE200002C9E5 /* PdfWithoutOcrSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PdfWithoutOcrSwitchView.xib; sourceTree = "<group>"; };
+		B5BEBE112E93BE200002C9E5 /* PNGImageSaveSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PNGImageSaveSwitchView.swift; sourceTree = "<group>"; };
+		B5BEBE122E93BE200002C9E5 /* PNGImageSaveSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PNGImageSaveSwitchView.xib; sourceTree = "<group>"; };
+		B5BEBE132E93BE200002C9E5 /* ScanDocumentPathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDocumentPathView.swift; sourceTree = "<group>"; };
+		B5BEBE142E93BE200002C9E5 /* ScanDocumentPathView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ScanDocumentPathView.xib; sourceTree = "<group>"; };
+		B5BEBE152E93BE200002C9E5 /* SetPDFPasswordSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPDFPasswordSwitchView.swift; sourceTree = "<group>"; };
+		B5BEBE162E93BE200002C9E5 /* SetPDFPasswordSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SetPDFPasswordSwitchView.xib; sourceTree = "<group>"; };
+		B5BEBE172E93BE200002C9E5 /* TextFileWithOcrSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFileWithOcrSwitchView.swift; sourceTree = "<group>"; };
+		B5BEBE182E93BE200002C9E5 /* TextFileWithOcrSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFileWithOcrSwitchView.xib; sourceTree = "<group>"; };
 		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
 		B5877E9C2DAFDDC60096BD3A /* AssetUploadTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetUploadTest.swift; sourceTree = "<group>"; };
 		B5877E9D2DAFDDC60096BD3A /* AudioUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUploadTests.swift; sourceTree = "<group>"; };
@@ -1826,6 +2173,11 @@
 		B5E2E7362DAE89D700AB2EDD /* AppUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdater.swift; sourceTree = "<group>"; };
 		B5E2E7382DAE89D700AB2EDD /* NCEmptyDataSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCEmptyDataSet.swift; sourceTree = "<group>"; };
 		B5E2E7392DAE89D700AB2EDD /* NCEmptyView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCEmptyView.xib; sourceTree = "<group>"; };
+		B5BEBD182E93A5260002C9E5 /* Shareable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shareable.swift; sourceTree = "<group>"; };
+		B5BEBD1A2E93A74C0002C9E5 /* CreateLinkFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateLinkFooterView.swift; sourceTree = "<group>"; };
+		B5BEBD1B2E93A74C0002C9E5 /* NCPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCPermissions.swift; sourceTree = "<group>"; };
+		B5BEBD1C2E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareEmailLinkHeaderView.swift; sourceTree = "<group>"; };
+		B5BEBD1D2E93A74C0002C9E5 /* NoSharesFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoSharesFooterView.swift; sourceTree = "<group>"; };
 		B5E2E6D32DAE52B500AB2EDD /* SharingTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingTest.swift; sourceTree = "<group>"; };
 		B5E2E6D52DAE571200AB2EDD /* PasswordInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordInputField.swift; sourceTree = "<group>"; };
 		B5E2E6D62DAE571200AB2EDD /* PasswordInputField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PasswordInputField.xib; sourceTree = "<group>"; };
@@ -1849,6 +2201,17 @@
 		B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCMedia+Menu.swift"; sourceTree = "<group>"; };
 		B52FAED42DA8F616001AB1BD /* NCSelectableNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSelectableNavigationView.swift; sourceTree = "<group>"; };
 		B52FAED22DA8F22F001AB1BD /* MoveAndCopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveAndCopyTests.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B5C9801D2DACEB5A0041B146 /* NCCollectionViewCommon+SwipeCollectionViewCellDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCCollectionViewCommon+SwipeCollectionViewCellDelegate.swift"; sourceTree = "<group>"; };
+		B5C9801F2DAD201A0041B146 /* NCSortMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSortMenu.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B5C980172DACD51C0041B146 /* NCMediaCommandView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCMediaCommandView.xib; sourceTree = "<group>"; };
+		B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCMedia+Menu.swift"; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B52FAED42DA8F616001AB1BD /* NCSelectableNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSelectableNavigationView.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B52FAED22DA8F22F001AB1BD /* MoveAndCopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoveAndCopyTests.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
 		B52FAEA92DA8EF0C001AB1BD /* ScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanTests.swift; sourceTree = "<group>"; };
 		B52FAEAB2DA8EF2C001AB1BD /* NCCreateFormUploadScanDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadScanDocument.swift; sourceTree = "<group>"; };
 		B52FAEAD2DA8EF84001AB1BD /* FileNameInputTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileNameInputTextField.swift; sourceTree = "<group>"; };
@@ -1869,10 +2232,12 @@
 		B52FAEBC2DA8EF84001AB1BD /* SetPDFPasswordSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SetPDFPasswordSwitchView.xib; sourceTree = "<group>"; };
 		B52FAEBD2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFileWithOcrSwitchView.swift; sourceTree = "<group>"; };
 		B52FAEBE2DA8EF84001AB1BD /* TextFileWithOcrSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFileWithOcrSwitchView.xib; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
 		B52FAEA02DA8ED40001AB1BD /* AudioUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUploadTests.swift; sourceTree = "<group>"; };
 		B52FAEA32DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCManageAutoUploadFileName.swift; sourceTree = "<group>"; };
 		B52FAEA62DA8EE99001AB1BD /* CCManageAutoUpload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CCManageAutoUpload.h; sourceTree = "<group>"; };
 		B52FAEA72DA8EE99001AB1BD /* CCManageAutoUpload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCManageAutoUpload.m; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
 		B52FAE8F2DA8D9E1001AB1BD /* CollaboraTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollaboraTestCase.swift; sourceTree = "<group>"; };
 		B52FAE912DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCCreateFormUploadDocuments.storyboard; sourceTree = "<group>"; };
 		B52FAE922DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateFormUploadDocuments.swift; sourceTree = "<group>"; };
@@ -1881,6 +2246,10 @@
 		B52FAE992DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocumentCustomTextField.swift; sourceTree = "<group>"; };
 		B52FAE9A2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCCreateDocumentCustomTextField.xib; sourceTree = "<group>"; };
 		B568C2C82DA7CE560072FCB4 /* E2EETests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = E2EETests.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B529E40C2E8D1F8B006D9131 /* NCManageE2EE.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCManageE2EE.swift; sourceTree = "<group>"; };
+		B568C2C82DA7CE560072FCB4 /* E2EETests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = E2EETests.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
 		B568C2B62DA7B5060072FCB4 /* SettingsTestCases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTestCases.swift; sourceTree = "<group>"; };
 		B568C2B82DA7CCC10072FCB4 /* CCAdvanced.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CCAdvanced.m; sourceTree = "<group>"; };
 		B568C2BA2DA7CCDB0072FCB4 /* HelpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
@@ -1895,6 +2264,14 @@
 		B568C2B22DA7AAAE0072FCB4 /* NCMoreUserCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCMoreUserCell.xib; sourceTree = "<group>"; };
 		B568C2B42DA7AADD0072FCB4 /* NCMoreUserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMoreUserCell.swift; sourceTree = "<group>"; };
 		B568C2AC2DA7A9000072FCB4 /* AssetUploadTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetUploadTest.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B568C2B02DA7AA5F0072FCB4 /* MoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreTests.swift; sourceTree = "<group>"; };
+		B568C2B22DA7AAAE0072FCB4 /* NCMoreUserCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCMoreUserCell.xib; sourceTree = "<group>"; };
+		B568C2B42DA7AADD0072FCB4 /* NCMoreUserCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMoreUserCell.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B529E4062E8D1C3E006D9131 /* NCUploadAssets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCUploadAssets.swift; sourceTree = "<group>"; };
+		B568C2AC2DA7A9000072FCB4 /* AssetUploadTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetUploadTest.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
 		B543154D2DA6913C00981E7E /* AudioUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUploadTests.swift; sourceTree = "<group>"; };
 		B543154F2DA6929700981E7E /* FolderPathCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPathCustomCell.swift; sourceTree = "<group>"; };
 		B54315502DA6929700981E7E /* FolderPathCustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FolderPathCustomCell.xib; sourceTree = "<group>"; };
@@ -1903,6 +2280,9 @@
 		B54315532DA6929700981E7E /* TextTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
 		B54315542DA6929700981E7E /* TextTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
 		B543154B2DA690B700981E7E /* NCNotificationText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNotificationText.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B543154B2DA690B700981E7E /* NCNotificationText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNotificationText.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
 		B54315352DA64EB100981E7E /* PrivacyPolicyTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyTest.swift; sourceTree = "<group>"; };
 		B54315372DA669C700981E7E /* AnalysisDataCollectionSwitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisDataCollectionSwitch.swift; sourceTree = "<group>"; };
 		B54315382DA669C700981E7E /* AnalysisDataCollectionSwitch.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AnalysisDataCollectionSwitch.xib; sourceTree = "<group>"; };
@@ -1921,6 +2301,18 @@
 		B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCRenameFile.storyboard; sourceTree = "<group>"; };
 		B5D45E6B2DA510E000773929 /* NCRenameFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCRenameFile.swift; sourceTree = "<group>"; };
 		B5D45E6F2DA5119A00773929 /* RenameFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameFileTests.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B54315312DA64BAF00981E7E /* OnboardingTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingTestCase.swift; sourceTree = "<group>"; };
+		B54315332DA64D6500981E7E /* AppUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUtility.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B543152F2DA647A400981E7E /* NCLoginWeb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCLoginWeb.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B5D45E712DA5172900773929 /* AppUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdater.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCRenameFile.storyboard; sourceTree = "<group>"; };
+		B5D45E6B2DA510E000773929 /* NCRenameFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCRenameFile.swift; sourceTree = "<group>"; };
+		B5D45E6F2DA5119A00773929 /* RenameFileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenameFileTests.swift; sourceTree = "<group>"; };
+		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
 		B5D45E5B2DA50C8500773929 /* AdjustHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdjustHelper.h; sourceTree = "<group>"; };
 		B5D45E5C2DA50C8500773929 /* AdjustHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdjustHelper.m; sourceTree = "<group>"; };
 		B5D45E5D2DA50C8500773929 /* TealiumHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TealiumHelper.swift; sourceTree = "<group>"; };
@@ -2212,6 +2604,7 @@
 		F785129A2D79899E0087DDD0 /* NCNetworking+TermsOfService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCNetworking+TermsOfService.swift"; sourceTree = "<group>"; };
 		F785EE9C246196DF00B3F945 /* NCNetworkingE2EE.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCNetworkingE2EE.swift; sourceTree = "<group>"; };
 		F7864ACB2A78FE73004870E0 /* NCManageDatabase+LocalFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCManageDatabase+LocalFile.swift"; sourceTree = "<group>"; };
+		F78689192E93A9D5000E39B3 /* NCTransferStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCTransferStore.swift; sourceTree = "<group>"; };
 		F787704E22E7019900F287A9 /* NCShareLinkCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NCShareLinkCell.xib; sourceTree = "<group>"; };
 		F78A10BE29322E8A008499B8 /* NCManageDatabase+Directory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NCManageDatabase+Directory.swift"; sourceTree = "<group>"; };
 		F78A18B523CDD07D00F681F3 /* NCViewerRichWorkspaceWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCViewerRichWorkspaceWebView.swift; sourceTree = "<group>"; };
@@ -2687,6 +3080,9 @@
 		371B5A2F23D0B04B00FAFAE9 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
+				F376A3732E5CC5FF0067EE25 /* ContextMenuActions.swift */,
+				F77A697C250A0FBC00FF1708 /* NCCollectionViewCommon+Menu.swift */,
+				F78C6FDD296D677300C952C3 /* NCContextMenu.swift */,
 				B5C9801F2DAD201A0041B146 /* NCSortMenu.swift */,
 				B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */,
 				3704EB2923D5A58400455C5B /* NCMenu.storyboard */,
@@ -2831,6 +3227,19 @@
 				566FCF572B3ECD3400168DEA /* TealiumHelper.swift */,
 				566FCF582B3ECD3400168DEA /* AdjustHelper.m */,
 				566FCF592B3ECD3400168DEA /* AdjustHelper.h */,
+				B5BEBD5E2E93AE4B0002C9E5 /* AssetUploadTest.swift */,
+				B5BEBD5F2E93AE4B0002C9E5 /* AudioUploadTests.swift */,
+				B5BEBD602E93AE4B0002C9E5 /* CollaboraTestCase.swift */,
+				B5BEBD612E93AE4B0002C9E5 /* E2EETests.swift */,
+				B5BEBD622E93AE4B0002C9E5 /* MoreTests.swift */,
+				B5BEBD632E93AE4B0002C9E5 /* MoveAndCopyTests.swift */,
+				B5BEBD642E93AE4B0002C9E5 /* NCNotificationText.swift */,
+				B5BEBD652E93AE4B0002C9E5 /* OnboardingTestCase.swift */,
+				B5BEBD662E93AE4B0002C9E5 /* PrivacyPolicyTest.swift */,
+				B5BEBD672E93AE4B0002C9E5 /* RenameFileTests.swift */,
+				B5BEBD682E93AE4B0002C9E5 /* ScanTests.swift */,
+				B5BEBD692E93AE4B0002C9E5 /* SettingsTestCases.swift */,
+				B5BEBD6A2E93AE4B0002C9E5 /* SharingTest.swift */,
 				AA52EB452D42AC5A0089C348 /* Placeholder.swift */,
 				B5E2E6D32DAE52B500AB2EDD /* SharingTest.swift */,
 				B52FAED22DA8F22F001AB1BD /* MoveAndCopyTests.swift */,
@@ -2840,6 +3249,11 @@
 				B568C2C82DA7CE560072FCB4 /* E2EETests.swift */,
 				B568C2B62DA7B5060072FCB4 /* SettingsTestCases.swift */,
 				B568C2B02DA7AA5F0072FCB4 /* MoreTests.swift */,
+				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
+				B568C2C82DA7CE560072FCB4 /* E2EETests.swift */,
+				B568C2B62DA7B5060072FCB4 /* SettingsTestCases.swift */,
+				B568C2B02DA7AA5F0072FCB4 /* MoreTests.swift */,
+				AF8ED1FB2757821000B8DBC4 /* NextcloudUnitTests.swift */,
 				B568C2AC2DA7A9000072FCB4 /* AssetUploadTest.swift */,
 				B543154D2DA6913C00981E7E /* AudioUploadTests.swift */,
 				B543154B2DA690B700981E7E /* NCNotificationText.swift */,
@@ -2954,6 +3368,11 @@
 			children = (
 				B5877EB92DAFDE110096BD3A /* BaseXCTestCase.swift */,
 				B5877EBA2DAFDE110096BD3A /* TestConstants.swift */,
+		B5BEBD512E93AE1C0002C9E5 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				B5BEBD4F2E93AE1C0002C9E5 /* BaseXCTestCase.swift */,
+				B5BEBD502E93AE1C0002C9E5 /* TestConstants.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -3001,6 +3420,28 @@
 			isa = PBXGroup;
 			children = (
 				B5E2E7362DAE89D700AB2EDD /* AppUpdater.swift */,
+		B5BEBD792E93AEA30002C9E5 /* MoEngage */ = {
+			isa = PBXGroup;
+			children = (
+				B5BEBD782E93AEA30002C9E5 /* MoEngageAnalytics.swift */,
+			);
+			path = MoEngage;
+			sourceTree = "<group>";
+		};
+		B5BEBD7C2E93AEA30002C9E5 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				B5BEBD792E93AEA30002C9E5 /* MoEngage */,
+				B5BEBD7A2E93AEA30002C9E5 /* AnalyticsHelper.swift */,
+				B5BEBD7B2E93AEA30002C9E5 /* AnalyticsService.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		B5BEBD932E93AED80002C9E5 /* AppUpdate */ = {
+			isa = PBXGroup;
+			children = (
+				B5BEBD922E93AED80002C9E5 /* AppUpdater.swift */,
 		B5D45E722DA5172900773929 /* AppUpdate */ = {
 			isa = PBXGroup;
 			children = (
@@ -3016,6 +3457,70 @@
 				B5E2E7392DAE89D700AB2EDD /* NCEmptyView.xib */,
 			);
 			path = EmptyView;
+		B5BEBD9E2E93AF010002C9E5 /* EmptyView */ = {
+			isa = PBXGroup;
+			children = (
+				B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */,
+				B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */,
+			);
+			path = EmptyView;
+			sourceTree = "<group>";
+		};
+		B5BEBDA22E93AF010002C9E5 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				B5BEBD9F2E93AF010002C9E5 /* AdjustHelper.h */,
+				B5BEBDA02E93AF010002C9E5 /* AdjustHelper.m */,
+				B5BEBDA12E93AF010002C9E5 /* TealiumHelper.swift */,
+		B5D45E5E2DA50C8500773929 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				B5D45E5B2DA50C8500773929 /* AdjustHelper.h */,
+				B5D45E5C2DA50C8500773929 /* AdjustHelper.m */,
+				B5D45E5D2DA50C8500773929 /* TealiumHelper.swift */,
+			);
+			path = Helper;
+			sourceTree = "<group>";
+		};
+		B5BEBDE82E93BDB40002C9E5 /* NMC Custom Views */ = {
+			isa = PBXGroup;
+			children = (
+				B5BEBDE42E93BDB40002C9E5 /* FolderPathCustomCell.swift */,
+				B5BEBDE52E93BDB40002C9E5 /* FolderPathCustomCell.xib */,
+				B5BEBDE62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift */,
+				B5BEBDE72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib */,
+		B52FAE9B2DA8DED9001AB1BD /* NMC Custom Views */ = {
+			isa = PBXGroup;
+			children = (
+				B52FAE972DA8DED9001AB1BD /* FolderPathCustomCell.swift */,
+				B52FAE982DA8DED9001AB1BD /* FolderPathCustomCell.xib */,
+				B52FAE992DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.swift */,
+				B52FAE9A2DA8DED9001AB1BD /* NCCreateDocumentCustomTextField.xib */,
+			);
+			path = "NMC Custom Views";
+			sourceTree = "<group>";
+		};
+		B5BEBE192E93BE200002C9E5 /* NMC Views */ = {
+			isa = PBXGroup;
+			children = (
+				B5BEBE072E93BE200002C9E5 /* FileNameInputTextField.swift */,
+				B5BEBE082E93BE200002C9E5 /* FileNameInputTextField.xib */,
+				B5BEBE092E93BE200002C9E5 /* JPGImageSaveSwitchView.swift */,
+				B5BEBE0A2E93BE200002C9E5 /* JPGImageSaveSwitchView.xib */,
+				B5BEBE0B2E93BE200002C9E5 /* PasswordInputField.swift */,
+				B5BEBE0C2E93BE200002C9E5 /* PasswordInputField.xib */,
+				B5BEBE0D2E93BE200002C9E5 /* PdfWithOcrSwitchView.swift */,
+				B5BEBE0E2E93BE200002C9E5 /* PdfWithOcrSwitchView.xib */,
+				B5BEBE0F2E93BE200002C9E5 /* PdfWithoutOcrSwitchView.swift */,
+				B5BEBE102E93BE200002C9E5 /* PdfWithoutOcrSwitchView.xib */,
+				B5BEBE112E93BE200002C9E5 /* PNGImageSaveSwitchView.swift */,
+				B5BEBE122E93BE200002C9E5 /* PNGImageSaveSwitchView.xib */,
+				B5BEBE132E93BE200002C9E5 /* ScanDocumentPathView.swift */,
+				B5BEBE142E93BE200002C9E5 /* ScanDocumentPathView.xib */,
+				B5BEBE152E93BE200002C9E5 /* SetPDFPasswordSwitchView.swift */,
+				B5BEBE162E93BE200002C9E5 /* SetPDFPasswordSwitchView.xib */,
+				B5BEBE172E93BE200002C9E5 /* TextFileWithOcrSwitchView.swift */,
+				B5BEBE182E93BE200002C9E5 /* TextFileWithOcrSwitchView.xib */,
 		B52FAEBF2DA8EF84001AB1BD /* NMC Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -3084,6 +3589,22 @@
 				B5877EC52DAFDEE70096BD3A /* NextcloudIntegrationTests */,
 				B5877EBB2DAFDE110096BD3A /* Common */,
 				B5877EAA2DAFDDC60096BD3A /* NextcloudUnitTests */,
+		C04E2F212A17BB4D001BAD85 /* NextcloudIntegrationTests */ = {
+			isa = PBXGroup;
+			children = (
+				B5BEBD582E93AE2F0002C9E5 /* BaseIntegrationXCTestCase.swift */,
+				B5BEBD592E93AE2F0002C9E5 /* FilesIntegrationTests.swift */,
+				B5BEBD5A2E93AE2F0002C9E5 /* LoginIntegrationTests.swift */,
+			);
+			path = NextcloudIntegrationTests;
+			sourceTree = "<group>";
+		};
+		F30A962A2A27A9C800D7BCFE /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				B5BEBD512E93AE1C0002C9E5 /* Common */,
+				C04E2F212A17BB4D001BAD85 /* NextcloudIntegrationTests */,
+				AA52EB442D42AC500089C348 /* NextcloudUnitTests */,
 				C0046CDB2A17B98400D87C9D /* NextcloudUITests */,
 				AABD0C862D5F58C400F009E6 /* Server.sh */,
 			);
@@ -3285,6 +3806,11 @@
 				566EB7E32B3D733900FB7CAD /* ShareDownloadLimitNetwork.swift */,
 				566EB7DC2B3D72CA00FB7CAD /* NCShareEmailFieldCell.swift */,
 				566EB7DB2B3D72CA00FB7CAD /* NCShareEmailFieldCell.xib */,
+				B5BEBD1A2E93A74C0002C9E5 /* CreateLinkFooterView.swift */,
+				B5BEBD1B2E93A74C0002C9E5 /* NCPermissions.swift */,
+				B5BEBD1C2E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift */,
+				B5BEBD1D2E93A74C0002C9E5 /* NoSharesFooterView.swift */,
+				B5BEBD182E93A5260002C9E5 /* Shareable.swift */,
 				B5E2E6EF2DAE6E3F00AB2EDD /* ShareDownloadLimitNetwork.swift */,
 				B5E2E6EB2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift */,
 				B5E2E6EC2DAE66AF00AB2EDD /* NCShareEmailFieldCell.xib */,
@@ -3399,6 +3925,8 @@
 				F70D8D8024A4A9BF000A5756 /* NCNetworkingProcess.swift */,
 				F755BD9A20594AC7008C5FBB /* NCService.swift */,
 				F7A51E712C721FC00037BCC0 /* NCTransfersProgress.swift */,
+				F7A3DB8F2DDE238C008F7EC8 /* NCDebouncer.swift */,
+				F78689192E93A9D5000E39B3 /* NCTransferStore.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -3419,6 +3947,8 @@
                 566EB7E72B3D7B3500FB7CAD /* NCCreateFormUploadScanDocument.swift */,
 				566EB7E92B3D7B5F00FB7CAD /* NMC Views */,
 				566EB7E72B3D7B3500FB7CAD /* NCCreateFormUploadScanDocument.swift */,
+				B5BEBE192E93BE200002C9E5 /* NMC Views */,
+				B5BEBE052E93BE0C0002C9E5 /* NCCreateFormUploadScanDocument.swift */,
 				B5E2E6D52DAE571200AB2EDD /* PasswordInputField.swift */,
 				B5E2E6D62DAE571200AB2EDD /* PasswordInputField.xib */,
 				B52FAEBF2DA8EF84001AB1BD /* NMC Views */,
@@ -3460,6 +3990,7 @@
 		F7603298252F0E550015A421 /* Collection Common */ = {
 			isa = PBXGroup;
 			children = (
+				B5BEBDC82E93AFF10002C9E5 /* NCSelectableNavigationView.swift */,
 				B5C9801D2DACEB5A0041B146 /* NCCollectionViewCommon+SwipeCollectionViewCellDelegate.swift */,
 				B52FAED42DA8F616001AB1BD /* NCSelectableNavigationView.swift */,
 				F75FE06B2BB01D0D00A0EFEF /* Cell */,
@@ -3542,6 +4073,10 @@
 				B52FAEA62DA8EE99001AB1BD /* CCManageAutoUpload.h */,
 				B52FAEA72DA8EE99001AB1BD /* CCManageAutoUpload.m */,
 				B52FAEA32DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift */,
+				B52FAEA62DA8EE99001AB1BD /* CCManageAutoUpload.h */,
+				B52FAEA72DA8EE99001AB1BD /* CCManageAutoUpload.m */,
+				B52FAEA32DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift */,
+				B529E40C2E8D1F8B006D9131 /* NCManageE2EE.swift */,
 				B568C2C62DA7CD930072FCB4 /* CCAdvanced.h */,
 				B568C2C72DA7CD930072FCB4 /* NCSettings.h */,
 				B568C2C22DA7CCEA0072FCB4 /* NCSettings.m */,
@@ -3740,6 +4275,8 @@
 			children = (
 				B5E2E7302DAE894C00AB2EDD /* NCSectionHeaderMenu.swift */,
 				B5E2E7312DAE894C00AB2EDD /* NCSectionHeaderMenu.xib */,
+				B5BEBDCA2E93B0210002C9E5 /* NCSectionHeaderMenu.swift */,
+				B5BEBDCB2E93B0210002C9E5 /* NCSectionHeaderMenu.xib */,
 				F78ACD51219046DC0088454D /* NCSectionFirstHeader.swift */,
 				F7B398412A6A91D5007538D6 /* NCSectionFirstHeader.xib */,
 				F7CBC1222BAC8B0000EC1D55 /* NCSectionFirstHeaderEmptyData.swift */,
@@ -3977,6 +4514,7 @@
 			isa = PBXGroup;
 			children = (
 				B5E2E7222DAE873D00AB2EDD /* NCLoginWeb.swift */,
+				B5BEBDC62E93AF7E0002C9E5 /* NCLoginWeb.swift */,
 				B543152F2DA647A400981E7E /* NCLoginWeb.swift */,
 				F3CA33802D106FF900672333 /* Poll */,
 				F702F2F025EE5CDA008F8E80 /* NCLogin.storyboard */,
@@ -4036,6 +4574,14 @@
 		F7C1CDD91E6DFC6F005D92BE /* Brand */ = {
 			isa = PBXGroup;
 			children = (
+				B5BEBD272E93AD540002C9E5 /* File_Provider_Extension.entitlements */,
+				B5BEBD282E93AD540002C9E5 /* File_Provider_Extension.plist */,
+				B5BEBD292E93AD540002C9E5 /* iOSClient.entitlements */,
+				B5BEBD2A2E93AD540002C9E5 /* iOSClient.plist */,
+				B5BEBD2B2E93AD540002C9E5 /* Notification_Service_Extension.entitlements */,
+				B5BEBD2C2E93AD540002C9E5 /* Notification_Service_Extension.plist */,
+				B5BEBD2D2E93AD540002C9E5 /* Share.entitlements */,
+				B5BEBD2E2E93AD540002C9E5 /* Share.plist */,
 				F761856529E98543006EB3B0 /* Intro */,
 				F700222B1EC479840080073F /* Custom.xcassets */,
 				F7362A1E220C853A005101B5 /* LaunchScreen.storyboard */,
@@ -4212,6 +4758,15 @@
 				B5E2E7272DAE880700AB2EDD /* NCCreateFormUploadVoiceNote.swift */,
 				B52FAE912DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.storyboard */,
 				B52FAE922DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift */,
+				B5BEBDD02E93B2450002C9E5 /* NCCreateFormUploadDocuments.storyboard */,
+				B5BEBDD12E93B2450002C9E5 /* NCCreateFormUploadDocuments.swift */,
+				B5BEBDD22E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.storyboard */,
+				B5BEBDD32E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.swift */,
+				B5BEBDD42E93B2450002C9E5 /* TextTableViewCell.swift */,
+				B5BEBDD52E93B2450002C9E5 /* TextTableViewCell.xib */,
+				B52FAE912DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.storyboard */,
+				B52FAE922DA8DCB2001AB1BD /* NCCreateFormUploadDocuments.swift */,
+				B529E4062E8D1C3E006D9131 /* NCUploadAssets.swift */,
 				B543154F2DA6929700981E7E /* FolderPathCustomCell.swift */,
 				B54315502DA6929700981E7E /* FolderPathCustomCell.xib */,
 				B54315512DA6929700981E7E /* NCCreateFormUploadVoiceNote.storyboard */,
@@ -4249,6 +4804,7 @@
 			children = (
                 568C76CF2BCD0822009EE9C7 /* NCMediaCommandView.xib */,
 				568C76CF2BCD0822009EE9C7 /* NCMediaCommandView.xib */,
+				B5BEBDE22E93BD6F0002C9E5 /* NCMediaCommandView.xib */,
 				B5C980172DACD51C0041B146 /* NCMediaCommandView.xib */,
 				F720B5B72507B9A5008C94E5 /* Cell */,
 				F7501C302212E57400FB1415 /* NCMedia.storyboard */,
@@ -4342,6 +4898,12 @@
 				566FCF4E2B3EB84F00168DEA /* AppUtility.swift */,
 				566FCF562B3ECD3400168DEA /* Helper */,
 				56A32E6F2CE4B75C0020EFF5 /* Analytics */,
+				B5BEBDE82E93BDB40002C9E5 /* NMC Custom Views */,
+				B5BEBD9B2E93AF010002C9E5 /* AppUtility.swift */,
+				B5BEBD9E2E93AF010002C9E5 /* EmptyView */,
+				B5BEBDA22E93AF010002C9E5 /* Helper */,
+				B5BEBD932E93AED80002C9E5 /* AppUpdate */,
+				B5BEBD7C2E93AEA30002C9E5 /* Analytics */,
 				AA517BB42D66149900F8D37C /* .tx */,
 				B52FAE9B2DA8DED9001AB1BD /* NMC Custom Views */,
 				B54315332DA64D6500981E7E /* AppUtility.swift */,
@@ -4944,6 +5506,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5BEBDBB2E93AF010002C9E5 /* NCEmptyView.xib in Resources */,
+				B5BEBDF72E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */,
+				B5BEBDF82E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */,
+				B5BEBD3F2E93AD540002C9E5 /* iOSClient.plist in Resources */,
+				B5BEBD402E93AD540002C9E5 /* Share.plist in Resources */,
+				B5BEBD412E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */,
+				B5BEBD422E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */,
 				F7E4022F2BA85D1D007E5609 /* PrivacyInfo.xcprivacy in Resources */,
 				F746EC53273906C50052598D /* NCViewCertificateDetails.storyboard in Resources */,
 			);
@@ -4953,6 +5522,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5BEBD472E93AD540002C9E5 /* iOSClient.plist in Resources */,
+				B5BEBD482E93AD540002C9E5 /* Share.plist in Resources */,
+				B5BEBD492E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */,
+				B5BEBD4A2E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4975,8 +5548,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				F7490E8D29882F5B009DCE94 /* Custom.xcassets in Resources */,
+				B5BEBDEF2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */,
+				B5BEBDF02E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */,
+				B5BEBDB12E93AF010002C9E5 /* NCEmptyView.xib in Resources */,
 				F7490E8E2988334A009DCE94 /* Localizable.strings in Resources */,
 				F7E4022E2BA85D1D007E5609 /* PrivacyInfo.xcprivacy in Resources */,
+				B5BEBD432E93AD540002C9E5 /* iOSClient.plist in Resources */,
+				B5BEBD442E93AD540002C9E5 /* Share.plist in Resources */,
+				B5BEBD452E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */,
+				B5BEBD462E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */,
 				AA517B812D660EFE00F8D37C /* Localizable.stringsdict in Resources */,
 				F722F0112CFF569500065FB5 /* MainInterface.storyboard in Resources */,
 			);
@@ -4997,11 +5577,22 @@
 				F7B398432A6A91D5007538D6 /* NCSectionFirstHeader.xib in Resources */,
 				AF22B207277B4E4C00DAB0CC /* NCCreateFormUploadConflict.storyboard in Resources */,
 				AA517B822D660EFE00F8D37C /* Localizable.stringsdict in Resources */,
+				B5BEBD2F2E93AD540002C9E5 /* iOSClient.plist in Resources */,
+				B5BEBDD92E93B2450002C9E5 /* TextTableViewCell.xib in Resources */,
+				B5BEBDDA2E93B2450002C9E5 /* NCCreateFormUploadDocuments.storyboard in Resources */,
+				B5BEBDDB2E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.storyboard in Resources */,
+				B5BEBD302E93AD540002C9E5 /* Share.plist in Resources */,
+				B5BEBDB62E93AF010002C9E5 /* NCEmptyView.xib in Resources */,
+				B5BEBD312E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */,
+				B5BEBD322E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */,
+				B5BEBDCD2E93B0210002C9E5 /* NCSectionHeaderMenu.xib in Resources */,
 				F7145A231D12E3B700CAFEEC /* Localizable.strings in Resources */,
 				F746EC51273906C40052598D /* NCViewCertificateDetails.storyboard in Resources */,
 				B5E2E7432DAE89D700AB2EDD /* NCEmptyView.xib in Resources */,
 				F76C26A62850D3A500E42BDF /* Images.xcassets in Resources */,
 				F714805E262ED52900693E51 /* NCSectionFooter.xib in Resources */,
+				B5BEBDFB2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */,
+				B5BEBDFC2E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */,
 				F700222D1EC479840080073F /* Custom.xcassets in Resources */,
 				F79ED0F22D2FCA6A00A389D9 /* NCRecommendationsCell.xib in Resources */,
 			);
@@ -5012,8 +5603,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				F7C7B25128B8B0C400E7115D /* Images.xcassets in Resources */,
+				B5BEBDFD2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */,
+				B5BEBDFE2E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */,
+				B5BEBDA82E93AF010002C9E5 /* NCEmptyView.xib in Resources */,
 				F7C7B25028B8AD4500E7115D /* Localizable.strings in Resources */,
 				F7E4022A2BA85D1D007E5609 /* PrivacyInfo.xcprivacy in Resources */,
+				B5BEBD372E93AD540002C9E5 /* iOSClient.plist in Resources */,
+				B5BEBD382E93AD540002C9E5 /* Share.plist in Resources */,
+				B5BEBD392E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */,
+				B5BEBD3A2E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */,
 				AA517B832D660EFE00F8D37C /* Localizable.stringsdict in Resources */,
 				F7346E2328B0FEBA006CE2D2 /* Assets.xcassets in Resources */,
 			);
@@ -5023,6 +5621,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5BEBDC12E93AF010002C9E5 /* NCEmptyView.xib in Resources */,
+				B5BEBE012E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */,
+				B5BEBE022E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */,
+				B5BEBD4B2E93AD540002C9E5 /* iOSClient.plist in Resources */,
+				B5BEBD4C2E93AD540002C9E5 /* Share.plist in Resources */,
+				B5BEBD4D2E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */,
+				B5BEBD4E2E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */,
 				F7E4022D2BA85D1D007E5609 /* PrivacyInfo.xcprivacy in Resources */,
 				F746EC52273906C40052598D /* NCViewCertificateDetails.storyboard in Resources */,
 			);
@@ -5040,6 +5645,7 @@
 				F78ACD4421903CF20088454D /* NCListCell.xib in Resources */,
 				F3BB464D2A39ADCC00461F6E /* NCMoreAppSuggestionsCell.xib in Resources */,
                 566EB8172B3D861500FB7CAD /* NCCreateDocumentCustomTextField.xib in Resources */,
+				B5BEBDE32E93BD6F0002C9E5 /* NCMediaCommandView.xib in Resources */,
 				F7F4F10727ECDBDB008676F9 /* Inconsolata-Black.ttf in Resources */,
                 566FCF532B3EBADE00168DEA /* NCTrashGridCell.xib in Resources */,
 				566EB7D02B3D712200FB7CAD /* NCFilePermissionEditCell.xib in Resources */,
@@ -5090,6 +5696,8 @@
 				B5E2E7212DAE86DC00AB2EDD /* SaveSettingsCustomButtonCell.xib in Resources */,
 				566EB8022B3D7B5F00FB7CAD /* JPGImageSaveSwitchView.xib in Resources */,
 				F702F2F125EE5CDB008F8E80 /* NCLogin.storyboard in Resources */,
+				B5BEBDF32E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */,
+				B5BEBDF42E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */,
 				F723985C253C95CE00257F49 /* NCViewerRichdocument.storyboard in Resources */,
 				F758B45A212C564000515F55 /* NCScan.storyboard in Resources */,
 				F70D87CF25EE6E58008CBBBD /* NCRenameFile.storyboard in Resources */,
@@ -5126,6 +5734,10 @@
                 566FCF292B3EAD0E00168DEA /* FolderPathCustomCell.xib in Resources */,
 				AF93471C27E2361E002537EE /* NCShareAdvancePermissionHeader.xib in Resources */,
                 566EB8072B3D7B5F00FB7CAD /* PdfWithOcrSwitchView.xib in Resources */,
+				B54315472DA669C700981E7E /* AnalysisDataCollectionSwitch.xib in Resources */,
+				B54315482DA669C700981E7E /* NCSettings.storyboard in Resources */,
+				B54315492DA669C700981E7E /* SaveSettingsCustomButtonCell.xib in Resources */,
+				B543154A2DA669C700981E7E /* RequiredDataCollectionSwitch.xib in Resources */,
 				F76032A0252F0F8E0015A421 /* NCTransferCell.xib in Resources */,
 				F7F4F10527ECDBDB008676F9 /* Inconsolata-SemiBold.ttf in Resources */,
                 566EB80B2B3D7B5F00FB7CAD /* PasswordInputField.xib in Resources */,
@@ -5165,6 +5777,10 @@
 				F7CA212E25F1333300826ABB /* NCAccountRequest.storyboard in Resources */,
                 566EB7FD2B3D7B5F00FB7CAD /* ScanDocumentPathView.xib in Resources */,
 				566EB7FD2B3D7B5F00FB7CAD /* ScanDocumentPathView.xib in Resources */,
+				B5BEBDCF2E93B0210002C9E5 /* NCSectionHeaderMenu.xib in Resources */,
+				B568C2B32DA7AAAE0072FCB4 /* NCMoreUserCell.xib in Resources */,
+				F7CA212E25F1333300826ABB /* NCAccountRequest.storyboard in Resources */,
+				F7CA212E25F1333300826ABB /* NCAccountRequest.storyboard in Resources */,
 				B5D45E6D2DA510E000773929 /* NCRenameFile.storyboard in Resources */,
 				F717402D24F699A5000C87D5 /* NCFavorite.storyboard in Resources */,
 				F723B3DD22FC6D1D00301EFE /* NCShareCommentsCell.xib in Resources */,
@@ -5200,8 +5816,21 @@
                 566FCF492B3EB4E800168DEA /* RequiredDataCollectionSwitch.xib in Resources */,
 				F719D9E0288D37A300762E33 /* NCColorPicker.storyboard in Resources */,
 				AA517B802D660EFE00F8D37C /* Localizable.stringsdict in Resources */,
+				B5BEBE232E93BE200002C9E5 /* PasswordInputField.xib in Resources */,
+				B5BEBE242E93BE200002C9E5 /* ScanDocumentPathView.xib in Resources */,
+				B5BEBE252E93BE200002C9E5 /* SetPDFPasswordSwitchView.xib in Resources */,
+				B5BEBE262E93BE200002C9E5 /* PdfWithOcrSwitchView.xib in Resources */,
+				B5BEBE272E93BE200002C9E5 /* PNGImageSaveSwitchView.xib in Resources */,
+				B5BEBE282E93BE200002C9E5 /* FileNameInputTextField.xib in Resources */,
+				B5BEBE292E93BE200002C9E5 /* TextFileWithOcrSwitchView.xib in Resources */,
+				B5BEBE2A2E93BE200002C9E5 /* PdfWithoutOcrSwitchView.xib in Resources */,
+				B5BEBE2B2E93BE200002C9E5 /* JPGImageSaveSwitchView.xib in Resources */,
 				F7F4F10A27ECDBDB008676F9 /* Inconsolata-ExtraBold.ttf in Resources */,
 				F704B5E72430C06700632F5F /* NCCreateFormUploadConflictCell.xib in Resources */,
+				B5BEBDDF2E93B2450002C9E5 /* TextTableViewCell.xib in Resources */,
+				B5BEBDE02E93B2450002C9E5 /* NCCreateFormUploadDocuments.storyboard in Resources */,
+				B5BEBDE12E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.storyboard in Resources */,
+				B5BEBDA72E93AF010002C9E5 /* NCEmptyView.xib in Resources */,
 				F7E402292BA85D1D007E5609 /* PrivacyInfo.xcprivacy in Resources */,
 				F7C9555321F0C4CA0024296E /* NCActivity.storyboard in Resources */,
 				F7BC287E26663F6C004D46C5 /* NCViewCertificateDetails.storyboard in Resources */,
@@ -5219,6 +5848,10 @@
 				F7FF2CB12842159500EBB7A1 /* NCSectionHeader.xib in Resources */,
                 566FCF2D2B3EAD4700168DEA /* TextTableViewCell.xib in Resources */,
 				F7D1612023CF19E30039EBBF /* NCViewerRichWorkspace.storyboard in Resources */,
+				B5BEBD332E93AD540002C9E5 /* iOSClient.plist in Resources */,
+				B5BEBD342E93AD540002C9E5 /* Share.plist in Resources */,
+				B5BEBD352E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */,
+				B5BEBD362E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */,
 				F77B0F631D118A16002130FE /* Localizable.strings in Resources */,
                 566EB80D2B3D7B5F00FB7CAD /* PdfWithoutOcrSwitchView.xib in Resources */,
 				566EB8192B3D861500FB7CAD /* FolderPathCustomCell.xib in Resources */,
@@ -5257,6 +5890,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				F7E4022B2BA85D1D007E5609 /* PrivacyInfo.xcprivacy in Resources */,
+				B5BEBDEB2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.xib in Resources */,
+				B5BEBDEC2E93BDB40002C9E5 /* FolderPathCustomCell.xib in Resources */,
+				B5BEBDC02E93AF010002C9E5 /* NCEmptyView.xib in Resources */,
+				B5BEBD3B2E93AD540002C9E5 /* iOSClient.plist in Resources */,
+				B5BEBD3C2E93AD540002C9E5 /* Share.plist in Resources */,
+				B5BEBD3D2E93AD540002C9E5 /* Notification_Service_Extension.plist in Resources */,
+				B5BEBD3E2E93AD540002C9E5 /* File_Provider_Extension.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5315,6 +5955,7 @@
 				2C33C48223E2C475005F963B /* NotificationService.swift in Sources */,
 				F73EF7A52B021FAE0087E6E9 /* NCLivePhoto.swift in Sources */,
 				F33EE6F82BF4C9B200CA1A51 /* PKCS12.swift in Sources */,
+				B5BEBD952E93AED80002C9E5 /* AppUpdater.swift in Sources */,
 				AF4BF617275629E20081CEEF /* NCManageDatabase+Account.swift in Sources */,
 				F7BF9D872934CA21009EE9A6 /* NCManageDatabase+LayoutForView.swift in Sources */,
 				AA8D31592D41052900FE2775 /* NCManageDatabase+DownloadLimit.swift in Sources */,
@@ -5324,10 +5965,15 @@
 				F7C9B9232B582F550064EA91 /* NCManageDatabase+SecurityGuard.swift in Sources */,
 				F7386E462DA90E0F009A00F6 /* NCAppVersionManager.swift in Sources */,
 				F73EF7CD2B0225610087E6E9 /* NCManageDatabase+PhotoLibrary.swift in Sources */,
+				B5BEBDF52E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */,
+				B5BEBDF62E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				F33918CA2C7CD8F2002D9AA1 /* FileNameValidator+Extensions.swift in Sources */,
 				D575039F27146F93008DC9DC /* String+Extension.swift in Sources */,
 				F7CF06832E1127460063AD04 /* NCManageDatabase+Metadata+Create.swift in Sources */,
 				F757CC8829E7F88B00F31428 /* NCManageDatabase+Groupfolders.swift in Sources */,
+				B5BEBD8C2E93AEA30002C9E5 /* AnalyticsService.swift in Sources */,
+				B5BEBD8D2E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */,
+				B5BEBD8E2E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */,
 				F79B646326CA661600838ACA /* UIControl+Extension.swift in Sources */,
 				F7C687EF2D22BDE5004757BC /* NCManageDatabase+RecommendedFiles.swift in Sources */,
 				F77DD6AE2C5CC093009448FB /* NCSession.swift in Sources */,
@@ -5346,6 +5992,10 @@
 				F763D2A32A249C4500A3C901 /* NCManageDatabase+Capabilities.swift in Sources */,
 				F749B656297B0F2400087535 /* NCManageDatabase+Avatar.swift in Sources */,
 				F782FDC424E6933900666099 /* NCUtility.swift in Sources */,
+				B5BEBDB72E93AF010002C9E5 /* AppUtility.swift in Sources */,
+				B5BEBDB82E93AF010002C9E5 /* AdjustHelper.m in Sources */,
+				B5BEBDB92E93AF010002C9E5 /* TealiumHelper.swift in Sources */,
+				B5BEBDBA2E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */,
 				F74B6D9B2A7E239A00F03C5F /* NCManageDatabase+Chunk.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5446,6 +6096,30 @@
 				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
 				566FCF552B3ECBDE00168DEA /* RenameFileTests.swift in Sources */,
 				566EB80F2B3D833000FB7CAD /* AudioUploadTests.swift in Sources */,
+				AA52EB472D42AC9E0089C348 /* Placeholder.swift in Sources */,
+				B5BEBD542E93AE1C0002C9E5 /* TestConstants.swift in Sources */,
+				B5BEBD552E93AE1C0002C9E5 /* BaseXCTestCase.swift in Sources */,
+				F372087D2BAB4C0F006B5430 /* TestConstants.swift in Sources */,
+				B52FAEA12DA8ED40001AB1BD /* AudioUploadTests.swift in Sources */,
+				B543154E2DA6913C00981E7E /* AudioUploadTests.swift in Sources */,
+				B5D45E702DA5119A00773929 /* RenameFileTests.swift in Sources */,
+				F78E2D6C29AF02DB0024D4F3 /* Database.swift in Sources */,
+				B5BEBD6B2E93AE4B0002C9E5 /* SharingTest.swift in Sources */,
+				B5BEBD6C2E93AE4B0002C9E5 /* AssetUploadTest.swift in Sources */,
+				B5BEBD6D2E93AE4B0002C9E5 /* NCNotificationText.swift in Sources */,
+				B5BEBD6E2E93AE4B0002C9E5 /* SettingsTestCases.swift in Sources */,
+				B5BEBD6F2E93AE4B0002C9E5 /* CollaboraTestCase.swift in Sources */,
+				B5BEBD702E93AE4B0002C9E5 /* MoveAndCopyTests.swift in Sources */,
+				B5BEBD712E93AE4B0002C9E5 /* MoreTests.swift in Sources */,
+				B5BEBD722E93AE4B0002C9E5 /* RenameFileTests.swift in Sources */,
+				B5BEBD732E93AE4B0002C9E5 /* AudioUploadTests.swift in Sources */,
+				B5BEBD742E93AE4B0002C9E5 /* OnboardingTestCase.swift in Sources */,
+				B5BEBD752E93AE4B0002C9E5 /* E2EETests.swift in Sources */,
+				B5BEBD762E93AE4B0002C9E5 /* ScanTests.swift in Sources */,
+				B5BEBD772E93AE4B0002C9E5 /* PrivacyPolicyTest.swift in Sources */,
+				B5E2E6D42DAE52B500AB2EDD /* SharingTest.swift in Sources */,
+				B543154C2DA690B700981E7E /* NCNotificationText.swift in Sources */,
+				F7817CFE29801A3500FFBC65 /* Data+Extension.swift in Sources */,
 				B52FAED32DA8F22F001AB1BD /* MoveAndCopyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5460,6 +6134,11 @@
 				AA74AA972D3172D100BE3458 /* UITestError.swift in Sources */,
 				AA3C85E82D36B08C00F74F12 /* UITestBackend.swift in Sources */,
 				AA8E03DC2D2FBAC200E7E89C /* DownloadLimitUITests.swift in Sources */,
+				B5BEBD562E93AE1C0002C9E5 /* TestConstants.swift in Sources */,
+				B5BEBD572E93AE1C0002C9E5 /* BaseXCTestCase.swift in Sources */,
+				B5BEBD5B2E93AE2F0002C9E5 /* LoginIntegrationTests.swift in Sources */,
+				B5BEBD5C2E93AE2F0002C9E5 /* BaseIntegrationXCTestCase.swift in Sources */,
+				B5BEBD5D2E93AE2F0002C9E5 /* FilesIntegrationTests.swift in Sources */,
 				AABD0C8A2D5F67A400F009E6 /* XCUIElement.swift in Sources */,
 				AA3C85EE2D36BCCE00F74F12 /* SharesResponse.swift in Sources */,
 				AAA7BC2E2D3E39F1008F1A22 /* CapabilitiesResponse.swift in Sources */,
@@ -5480,6 +6159,9 @@
 				B5877EC82DAFDEE70096BD3A /* FilesIntegrationTests.swift in Sources */,
 				B5877EBE2DAFDE110096BD3A /* BaseXCTestCase.swift in Sources */,
 				B5877EBF2DAFDE110096BD3A /* TestConstants.swift in Sources */,
+				B5BEBD522E93AE1C0002C9E5 /* TestConstants.swift in Sources */,
+				B5BEBD532E93AE1C0002C9E5 /* BaseXCTestCase.swift in Sources */,
+				F372087E2BAB4C0F006B5430 /* TestConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5504,6 +6186,10 @@
 				F71F6D0C2B6A6A5E00F1EB15 /* ThreadSafeArray.swift in Sources */,
 				F7490E8629882C99009DCE94 /* NCUtilityFileSystem.swift in Sources */,
 				F763D2A22A249C4500A3C901 /* NCManageDatabase+Capabilities.swift in Sources */,
+				B5BEBDAD2E93AF010002C9E5 /* AppUtility.swift in Sources */,
+				B5BEBDAE2E93AF010002C9E5 /* AdjustHelper.m in Sources */,
+				B5BEBDAF2E93AF010002C9E5 /* TealiumHelper.swift in Sources */,
+				B5BEBDB02E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */,
 				F73EF7E42B02266D0087E6E9 /* NCManageDatabase+Trash.swift in Sources */,
 				F343A4C02A1E734600DDA874 /* Optional+Extension.swift in Sources */,
 				F711A4E12AF92CAE00095DD8 /* NCUtility+Date.swift in Sources */,
@@ -5531,6 +6217,8 @@
 				F73EF7A42B021FAD0087E6E9 /* NCLivePhoto.swift in Sources */,
 				F757CC8729E7F88B00F31428 /* NCManageDatabase+Groupfolders.swift in Sources */,
 				F33EE6F72BF4C9B200CA1A51 /* PKCS12.swift in Sources */,
+				B5BEBDED2E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */,
+				B5BEBDEE2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				F7B769AD2B7A0B2000C1AAEB /* NCManageDatabase+Metadata+Session.swift in Sources */,
 				F39170AC2CB82024006127BC /* FileAutoRenamer+Extensions.swift in Sources */,
 				F73EF7BC2B0224AB0087E6E9 /* NCManageDatabase+ExternalSites.swift in Sources */,
@@ -5541,6 +6229,10 @@
 				F71433E62C778FFB00E20B5A /* NotificationCenter+MainThread.swift in Sources */,
 				F33918C92C7CD8F2002D9AA1 /* FileNameValidator+Extensions.swift in Sources */,
 				F7490E7F29882C73009DCE94 /* NCManageDatabase+Activity.swift in Sources */,
+				B5BEBD962E93AED80002C9E5 /* AppUpdater.swift in Sources */,
+				B5BEBD832E93AEA30002C9E5 /* AnalyticsService.swift in Sources */,
+				B5BEBD842E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */,
+				B5BEBD852E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5581,6 +6273,9 @@
 				F79ED0F12D2FCA5B00A389D9 /* NCSectionFirstHeader.swift in Sources */,
 				F79B646126CA661600838ACA /* UIControl+Extension.swift in Sources */,
 				F77C973A2953143A00FDDD09 /* NCCameraRoll.swift in Sources */,
+				B5BEBDD62E93B2450002C9E5 /* NCCreateFormUploadDocuments.swift in Sources */,
+				B5BEBDD72E93B2450002C9E5 /* TextTableViewCell.swift in Sources */,
+				B5BEBDD82E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.swift in Sources */,
 				F740BEF02A35C2AD00E9B6D5 /* UILabel+Extension.swift in Sources */,
 				F7C30E01291BD2610017149B /* NCNetworkingE2EERename.swift in Sources */,
 				AF4BF61A27562A4B0081CEEF /* NCManageDatabase+Metadata.swift in Sources */,
@@ -5589,6 +6284,7 @@
 				F7327E3F2B73B92800A462C7 /* NCNetworking+Synchronization.swift in Sources */,
 				F7CF067F2E0FF3990063AD04 /* NCAppStateManager.swift in Sources */,
 				F7C9B9202B582F550064EA91 /* NCManageDatabase+SecurityGuard.swift in Sources */,
+				B5BEBD942E93AED80002C9E5 /* AppUpdater.swift in Sources */,
 				F78E2D6829AF02DB0024D4F3 /* Database.swift in Sources */,
 				AA8D31562D41052300FE2775 /* NCManageDatabase+DownloadLimit.swift in Sources */,
 				F711A4DF2AF92CAE00095DD8 /* NCUtility+Date.swift in Sources */,
@@ -5617,6 +6313,9 @@
 				AF22B206277B4E4C00DAB0CC /* NCCreateFormUploadConflict.swift in Sources */,
 				F74D50362C9856D300BBBF4C /* NCCollectionViewDataSource.swift in Sources */,
 				F7A573692E190387009C9257 /* NCShareExtensionData.swift in Sources */,
+				B5BEBD862E93AEA30002C9E5 /* AnalyticsService.swift in Sources */,
+				B5BEBD872E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */,
+				B5BEBD882E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */,
 				F7BD71E62636EAFC00643C34 /* NCNetworkingE2EE.swift in Sources */,
 				F7F878AF1FB9E3B900599E4F /* NCEndToEndMetadata.swift in Sources */,
 				F7327E3B2B73B8D600A462C7 /* Array+Extension.swift in Sources */,
@@ -5638,6 +6337,7 @@
 				F7327E232B73A42F00A462C7 /* NCNetworking+Download.swift in Sources */,
 				F749B64D297B0CBB00087535 /* NCManageDatabase+Share.swift in Sources */,
 				F72FD3B8297ED49A00075D28 /* NCManageDatabase+E2EE.swift in Sources */,
+				B5BEBDCC2E93B0210002C9E5 /* NCSectionHeaderMenu.swift in Sources */,
 				F7A76DC8256A71CD00119AB3 /* UIImage+Extension.swift in Sources */,
 				F3E173C32C9B1067006D177A /* AwakeMode.swift in Sources */,
 				F711A4E52AF9310500095DD8 /* NCUtility+Image.swift in Sources */,
@@ -5645,6 +6345,8 @@
 				F763D2A02A249C4500A3C901 /* NCManageDatabase+Capabilities.swift in Sources */,
 				F757CC8529E7F88B00F31428 /* NCManageDatabase+Groupfolders.swift in Sources */,
 				F768823A2C0DD230001CF441 /* NCKeychain.swift in Sources */,
+				B5BEBDF92E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */,
+				B5BEBDFA2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				F7386E472DA90E0F009A00F6 /* NCAppVersionManager.swift in Sources */,
 				F737DA9E2B7B893C0063BAFC /* NCPasscode.swift in Sources */,
 				F7817D0129802D5F00FFBC65 /* NCViewCertificateDetails.swift in Sources */,
@@ -5669,10 +6371,19 @@
 				F74C86382AEFBE64009A1D4A /* NCImageCache.swift in Sources */,
 				F73EF7C22B02250B0087E6E9 /* NCManageDatabase+GPS.swift in Sources */,
 				F7327E2B2B73A53400A462C7 /* NCNetworking+Upload.swift in Sources */,
+				B529E4072E8D1C3E006D9131 /* NCUploadAssets.swift in Sources */,
 				F7148041262EBE4000693E51 /* NCShareExtension.swift in Sources */,
 				F76B3CCF1EAE01BD00921AC9 /* NCBrand.swift in Sources */,
 				F72944F32A84246400246839 /* NCEndToEndMetadataV20.swift in Sources */,
 				F7BAADCC1ED5A87C00B7EAD4 /* NCManageDatabase.swift in Sources */,
+				B5BEBDB22E93AF010002C9E5 /* AppUtility.swift in Sources */,
+				B5BEBDB32E93AF010002C9E5 /* AdjustHelper.m in Sources */,
+				B5BEBDB42E93AF010002C9E5 /* TealiumHelper.swift in Sources */,
+				B5BEBDB52E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */,
+				B5BEBD1E2E93A74C0002C9E5 /* CreateLinkFooterView.swift in Sources */,
+				B5BEBD1F2E93A74C0002C9E5 /* NCPermissions.swift in Sources */,
+				B5BEBD202E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift in Sources */,
+				B5BEBD212E93A74C0002C9E5 /* NoSharesFooterView.swift in Sources */,
 				F7327E322B73A86700A462C7 /* NCNetworking+WebDAV.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5682,6 +6393,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F793E5A128B76541005E4B02 /* NotificationCenter+MainThread.swift in Sources */,
+				B5BEBDFF2E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */,
+				B5BEBE002E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				F76DEE9928F808AF0041B1C9 /* LockscreenWidgetView.swift in Sources */,
 				F7817D0029802D3D00FFBC65 /* NCViewCertificateDetails.swift in Sources */,
 				F78302F928B4C3E600B84583 /* NCManageDatabase+Account.swift in Sources */,
@@ -5715,6 +6428,10 @@
 				F33EE6F32BF4C9B200CA1A51 /* PKCS12.swift in Sources */,
 				F78A10C029322E8A008499B8 /* NCManageDatabase+Directory.swift in Sources */,
 				F78302FA28B4C3EA00B84583 /* NCManageDatabase+Metadata.swift in Sources */,
+				B5BEBDA92E93AF010002C9E5 /* AppUtility.swift in Sources */,
+				B5BEBDAA2E93AF010002C9E5 /* AdjustHelper.m in Sources */,
+				B5BEBDAB2E93AF010002C9E5 /* TealiumHelper.swift in Sources */,
+				B5BEBDAC2E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */,
 				F7B769A92B7A0B2000C1AAEB /* NCManageDatabase+Metadata+Session.swift in Sources */,
 				F78E2D6629AF02DB0024D4F3 /* Database.swift in Sources */,
 				F7327E3E2B73B92800A462C7 /* NCNetworking+Synchronization.swift in Sources */,
@@ -5727,6 +6444,9 @@
 				F757CC8329E7F88B00F31428 /* NCManageDatabase+Groupfolders.swift in Sources */,
 				F73EF7A82B0223900087E6E9 /* NCManageDatabase+Comments.swift in Sources */,
 				F7327E212B73A42F00A462C7 /* NCNetworking+Download.swift in Sources */,
+				B5BEBD7D2E93AEA30002C9E5 /* AnalyticsService.swift in Sources */,
+				B5BEBD7E2E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */,
+				B5BEBD7F2E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */,
 				F7BFFD2B2C8854430029A201 /* NCHud.swift in Sources */,
 				F7386E492DA90E0F009A00F6 /* NCAppVersionManager.swift in Sources */,
 				F7327E3A2B73B8D500A462C7 /* Array+Extension.swift in Sources */,
@@ -5769,6 +6489,7 @@
 				F36E64FD2B9735900085ABB5 /* NCCellProtocol.swift in Sources */,
 				F783030128B4C49700B84583 /* UIImage+Extension.swift in Sources */,
 				F72EA95428B7BABA00C88F0C /* FilesWidgetProvider.swift in Sources */,
+				B5BEBD992E93AED80002C9E5 /* AppUpdater.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5803,10 +6524,13 @@
 				F3E173C42C9B1067006D177A /* AwakeMode.swift in Sources */,
 				AF4BF616275629E20081CEEF /* NCManageDatabase+Account.swift in Sources */,
 				F343A4B72A1E084300DDA874 /* PHAsset+Extension.swift in Sources */,
+				B5BEBD972E93AED80002C9E5 /* AppUpdater.swift in Sources */,
 				F7434B3620E23FE000417916 /* NCManageDatabase.swift in Sources */,
 				F798F0E725880609000DAFFD /* UIColor+Extension.swift in Sources */,
 				F74B6D992A7E239A00F03C5F /* NCManageDatabase+Chunk.swift in Sources */,
 				F7327E2C2B73A53400A462C7 /* NCNetworking+Upload.swift in Sources */,
+				B5BEBE032E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */,
+				B5BEBE042E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				F7D68FCF28CB9051009139F3 /* NCManageDatabase+DashboardWidget.swift in Sources */,
 				F73EF7CB2B0225610087E6E9 /* NCManageDatabase+PhotoLibrary.swift in Sources */,
 				F33EE6F62BF4C9B200CA1A51 /* PKCS12.swift in Sources */,
@@ -5825,6 +6549,13 @@
 				F785EEA42461A4A600B3F945 /* NCUtility.swift in Sources */,
 				F79B646226CA661600838ACA /* UIControl+Extension.swift in Sources */,
 				F7C1DAEF2C3D1DF4000BDC69 /* FileProviderDomain.swift in Sources */,
+				B5BEBDC22E93AF010002C9E5 /* AppUtility.swift in Sources */,
+				B5BEBDC32E93AF010002C9E5 /* AdjustHelper.m in Sources */,
+				B5BEBDC42E93AF010002C9E5 /* TealiumHelper.swift in Sources */,
+				B5BEBDC52E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */,
+				B5BEBD8F2E93AEA30002C9E5 /* AnalyticsService.swift in Sources */,
+				B5BEBD902E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */,
+				B5BEBD912E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */,
 				F73EF7AB2B0223900087E6E9 /* NCManageDatabase+Comments.swift in Sources */,
 				F7327E392B73B8D400A462C7 /* Array+Extension.swift in Sources */,
 				F78E2D6929AF02DB0024D4F3 /* Database.swift in Sources */,
@@ -5913,6 +6644,7 @@
 				370D26AF248A3D7A00121797 /* NCCellProtocol.swift in Sources */,
 				F32FADA92D1176E3007035E2 /* UIButton+Extension.swift in Sources */,
 				F768822C2C0DD1E7001CF441 /* NCKeychain.swift in Sources */,
+				F768822C2C0DD1E7001CF441 /* NCPreferences.swift in Sources */,
 				B5E2E6EE2DAE66AF00AB2EDD /* NCShareEmailFieldCell.swift in Sources */,
 				F7BFFD282C8846020029A201 /* NCHud.swift in Sources */,
                 566EB7E42B3D733900FB7CAD /* ShareDownloadLimitNetwork.swift in Sources */,
@@ -5951,11 +6683,22 @@
 				F7245924289BB50C00474787 /* ThreadSafeDictionary.swift in Sources */,
 				F73F537F1E929C8500F8678D /* NCMore.swift in Sources */,
                 566FCF462B3EB4E800168DEA /* AnalysisDataCollectionSwitch.swift in Sources */,
+				B5BEBE1A2E93BE200002C9E5 /* PNGImageSaveSwitchView.swift in Sources */,
+				B5BEBE1B2E93BE200002C9E5 /* FileNameInputTextField.swift in Sources */,
+				B5BEBE1C2E93BE200002C9E5 /* PdfWithoutOcrSwitchView.swift in Sources */,
+				B5BEBE1D2E93BE200002C9E5 /* TextFileWithOcrSwitchView.swift in Sources */,
+				B5BEBE1E2E93BE200002C9E5 /* ScanDocumentPathView.swift in Sources */,
+				B5BEBE1F2E93BE200002C9E5 /* SetPDFPasswordSwitchView.swift in Sources */,
+				B5BEBE202E93BE200002C9E5 /* JPGImageSaveSwitchView.swift in Sources */,
+				B5BEBE212E93BE200002C9E5 /* PasswordInputField.swift in Sources */,
+				B5BEBE222E93BE200002C9E5 /* PdfWithOcrSwitchView.swift in Sources */,
+				B5BEBD192E93A5260002C9E5 /* Shareable.swift in Sources */,
 				F702F2CF25EE5B5C008F8E80 /* NCGlobal.swift in Sources */,
 				F794E13F2BBC0F70003693D7 /* SceneDelegate.swift in Sources */,
 				F72CD63A25C19EBF00F46F9A /* NCAutoUpload.swift in Sources */,
 				AF93471D27E2361E002537EE /* NCShareAdvancePermissionFooter.swift in Sources */,
 				B568C2B92DA7CCC10072FCB4 /* CCAdvanced.m in Sources */,
+				F786891D2E93A9DF000E39B3 /* NCTransferStore.swift in Sources */,
 				AF1A9B6427D0CA1E00F17A9E /* UIAlertController+Extension.swift in Sources */,
 				F73B422C2476764F00A30FD3 /* NCNotification.swift in Sources */,
 				F7FA80012C0F4F3B0072FC60 /* NCUploadAssetsView.swift in Sources */,
@@ -5970,6 +6713,7 @@
 				F77BB74A2899857B0090FC19 /* UINavigationController+Extension.swift in Sources */,
 				F7327E282B73A53400A462C7 /* NCNetworking+Upload.swift in Sources */,
 				F769454622E9F1B0000A798A /* NCShareCommon.swift in Sources */,
+				B5BEBDC92E93AFF10002C9E5 /* NCSelectableNavigationView.swift in Sources */,
 				F70753F12542A9A200972D44 /* NCViewerMedia.swift in Sources */,
 				F799DF822C4B7DCC003410B5 /* NCSectionFooter.swift in Sources */,
 				F76B649C2ADFFAED00014640 /* NCImageCache.swift in Sources */,
@@ -5978,6 +6722,7 @@
 				F7A60F86292D215000FCE1F2 /* NCShareAccounts.swift in Sources */,
 				F72408332B8A27C900F128E2 /* NCMedia+Command.swift in Sources */,
 				F755CB402B8CB13C00CE27E9 /* NCMediaLayout.swift in Sources */,
+				B5BEBDCE2E93B0210002C9E5 /* NCSectionHeaderMenu.swift in Sources */,
 				F73EF7B72B0224AB0087E6E9 /* NCManageDatabase+ExternalSites.swift in Sources */,
 				B54315412DA669C700981E7E /* InitialPrivacySettingsViewController.swift in Sources */,
 				B54315422DA669C700981E7E /* RequiredDataCollectionSwitch.swift in Sources */,
@@ -6019,6 +6764,7 @@
 				F704B5E92430C0B800632F5F /* NCCreateFormUploadConflictCell.swift in Sources */,
 				F7327E3D2B73B92800A462C7 /* NCNetworking+Synchronization.swift in Sources */,
 				F72D404923D2082500A97FD0 /* NCViewerNextcloudText.swift in Sources */,
+				AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */,
 				F77BB746289984CA0090FC19 /* UIViewController+Extension.swift in Sources */,
 				F700510522DF6A89003A3356 /* NCShare.swift in Sources */,
                 566EB8042B3D7B5F00FB7CAD /* ScanDocumentPathView.swift in Sources */,
@@ -6105,6 +6851,7 @@
 				B5E2E71B2DAE86DC00AB2EDD /* SaveSettingsCustomButtonCell.swift in Sources */,
 				B5E2E71C2DAE86DC00AB2EDD /* PrivacySettingsViewController.swift in Sources */,
 				AF730AF827834B1400B7520E /* NCShare+NCCellDelegate.swift in Sources */,
+				B5BEBE062E93BE0C0002C9E5 /* NCCreateFormUploadScanDocument.swift in Sources */,
 				F70460522499061800BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
 				F3C587AE2D47E4FE004532DB /* PHAssetCollectionThumbnailLoader.swift in Sources */,
 				F78F74362163781100C2ADAD /* NCTrash.swift in Sources */,
@@ -6135,6 +6882,8 @@
 				B5D45E632DA50D6A00773929 /* CCManageAutoUpload.m in Sources */,
 				B5D45E642DA50D6A00773929 /* CCAdvanced.m in Sources */,
 				F7A8FD522C5E2557006C9CF8 /* NCAccount.swift in Sources */,
+				B5D45E632DA50D6A00773929 /* CCManageAutoUpload.m in Sources */,
+				B5D45E642DA50D6A00773929 /* CCAdvanced.m in Sources */,
 				F310B1EF2BA862F1001C42F5 /* NCViewerMedia+VisionKit.swift in Sources */,
 				F702F2F725EE5CED008F8E80 /* NCLogin.swift in Sources */,
 				F7EB9B132BBC12F300EDF036 /* UIApplication+Extension.swift in Sources */,
@@ -6190,7 +6939,12 @@
 				F765F73125237E3F00391DBE /* NCRecent.swift in Sources */,
 				F76B3CCE1EAE01BD00921AC9 /* NCBrand.swift in Sources */,
 				F7FA7FFC2C0F4EE40072FC60 /* NCViewerQuickLookView.swift in Sources */,
+				B5BEBDC72E93AF7E0002C9E5 /* NCLoginWeb.swift in Sources */,
 				F3A0479B2BD2668800658E7B /* NCAssistant.swift in Sources */,
+				B5BEBD222E93A74C0002C9E5 /* CreateLinkFooterView.swift in Sources */,
+				B5BEBD232E93A74C0002C9E5 /* NCPermissions.swift in Sources */,
+				B5BEBD242E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift in Sources */,
+				B5BEBD252E93A74C0002C9E5 /* NoSharesFooterView.swift in Sources */,
 				F359D8672A7D03420023F405 /* NCUtility+Exif.swift in Sources */,
 				B5E2E7232DAE873D00AB2EDD /* NCLoginWeb.swift in Sources */,
 				F7A03E352D427312007AA677 /* NCMainNavigationController.swift in Sources */,
@@ -6268,6 +7022,9 @@
 				F343A4B32A1E01FF00DDA874 /* PHAsset+Extension.swift in Sources */,
 				F70968A424212C4E00ED60E5 /* NCLivePhoto.swift in Sources */,
 				F7C30DFA291BCF790017149B /* NCNetworkingE2EECreateFolder.swift in Sources */,
+				B5BEBDDC2E93B2450002C9E5 /* NCCreateFormUploadDocuments.swift in Sources */,
+				B5BEBDDD2E93B2450002C9E5 /* TextTableViewCell.swift in Sources */,
+				B5BEBDDE2E93B2450002C9E5 /* NCCreateFormUploadVoiceNote.swift in Sources */,
 				F722133B2D40EF9D002F7438 /* NCFilesNavigationController.swift in Sources */,
 				F7BC288026663F85004D46C5 /* NCViewCertificateDetails.swift in Sources */,
 				F78B87E92B62550800C65ADC /* NCMediaDownloadThumbnaill.swift in Sources */,
@@ -6292,6 +7049,10 @@
 				F7C9555521F0C5470024296E /* NCActivity.swift in Sources */,
                 566EB8182B3D861500FB7CAD /* NCCreateDocumentCustomTextField.swift in Sources */,
 				566EB8182B3D861500FB7CAD /* NCCreateDocumentCustomTextField.swift in Sources */,
+				B5BEBDA32E93AF010002C9E5 /* AppUtility.swift in Sources */,
+				B5BEBDA42E93AF010002C9E5 /* AdjustHelper.m in Sources */,
+				B5BEBDA52E93AF010002C9E5 /* TealiumHelper.swift in Sources */,
+				B5BEBDA62E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */,
 				F7725A60251F33BB00D125E0 /* NCFiles.swift in Sources */,
 				F3BB46522A39EC4900461F6E /* NCMoreAppSuggestionsCell.swift in Sources */,
 				F704B5E52430AA8000632F5F /* NCCreateFormUploadConflict.swift in Sources */,
@@ -6314,13 +7075,21 @@
 				B52FAEA42DA8EE60001AB1BD /* NCManageAutoUploadFileName.swift in Sources */,
 				F76882242C0DD1E7001CF441 /* NCSettingsAdvancedView.swift in Sources */,
 				F785129C2D7989B30087DDD0 /* NCNetworking+TermsOfService.swift in Sources */,
+				B5BEBDF12E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */,
+				B5BEBDF22E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				F77C3F5B2D9BF8CD00F3C471 /* UITabBar+Extension.swift in Sources */,
 				F75CA1472962F13700B01130 /* NCHUDView.swift in Sources */,
 				F77BB748289985270090FC19 /* UITabBarController+Extension.swift in Sources */,
+				B5BEBD982E93AED80002C9E5 /* AppUpdater.swift in Sources */,
+				F752BA052E58C05200616A26 /* Maintenance.swift in Sources */,
+				B529E4082E8D1C3E006D9131 /* NCUploadAssets.swift in Sources */,
 				F763D29D2A249C4500A3C901 /* NCManageDatabase+Capabilities.swift in Sources */,
 				F76882252C0DD1E7001CF441 /* NCSettingsAdvancedModel.swift in Sources */,
 				B54315302DA647A400981E7E /* NCLoginWeb.swift in Sources */,
 				F7C7B489245EBA4100D93E60 /* NCViewerQuickLook.swift in Sources */,
+				B5BEBD892E93AEA30002C9E5 /* AnalyticsService.swift in Sources */,
+				B5BEBD8A2E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */,
+				B5BEBD8B2E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */,
 				B5D45E6E2DA510E000773929 /* NCRenameFile.swift in Sources */,
 				F758B45E212C569D00515F55 /* NCScanCell.swift in Sources */,
 				F78B87E72B62527100C65ADC /* NCMediaDataSource.swift in Sources */,
@@ -6344,6 +7113,7 @@
 				AF2D7C7E2742559100ADF566 /* NCShareUserCell.swift in Sources */,
 				F74DE14325135B6800917068 /* NCTransfers.swift in Sources */,
 				AF4BF614275629E20081CEEF /* NCManageDatabase+Account.swift in Sources */,
+				B529E40D2E8D1F8B006D9131 /* NCManageE2EE.swift in Sources */,
 				F3E173C02C9B1067006D177A /* AwakeMode.swift in Sources */,
 				F711A4DC2AF92CAE00095DD8 /* NCUtility+Date.swift in Sources */,
 				AF4BF61E27562B3F0081CEEF /* NCManageDatabase+Activity.swift in Sources */,
@@ -6361,6 +7131,9 @@
 				F7A8D74428F1827B008BBE1C /* ThreadSafeDictionary.swift in Sources */,
 				F7C9739528F17131002C43E2 /* IntentHandler.swift in Sources */,
 				F7A8D73D28F181D3008BBE1C /* NCUtilityFileSystem.swift in Sources */,
+				B5BEBD802E93AEA30002C9E5 /* AnalyticsService.swift in Sources */,
+				B5BEBD812E93AEA30002C9E5 /* MoEngageAnalytics.swift in Sources */,
+				B5BEBD822E93AEA30002C9E5 /* AnalyticsHelper.swift in Sources */,
 				F73EF7E12B02266D0087E6E9 /* NCManageDatabase+Trash.swift in Sources */,
 				F7C9B91F2B582F550064EA91 /* NCManageDatabase+SecurityGuard.swift in Sources */,
 				F75DD767290ABB25002EB562 /* Intent.intentdefinition in Sources */,
@@ -6375,6 +7148,7 @@
 				F763D29F2A249C4500A3C901 /* NCManageDatabase+Capabilities.swift in Sources */,
 				F7A8D74328F1826F008BBE1C /* String+Extension.swift in Sources */,
 				F73EF7A32B021FAC0087E6E9 /* NCLivePhoto.swift in Sources */,
+				B5BEBD9A2E93AED80002C9E5 /* AppUpdater.swift in Sources */,
 				F7A8D73728F17E1E008BBE1C /* NCManageDatabase+Account.swift in Sources */,
 				F7817CFA29801A3500FFBC65 /* Data+Extension.swift in Sources */,
 				F7BF9D842934CA21009EE9A6 /* NCManageDatabase+LayoutForView.swift in Sources */,
@@ -6383,6 +7157,8 @@
 				F7A8D73C28F181BC008BBE1C /* NCBrand.swift in Sources */,
 				F711A4DE2AF92CAE00095DD8 /* NCUtility+Date.swift in Sources */,
 				F768823B2C0DD231001CF441 /* NCKeychain.swift in Sources */,
+				B5BEBDE92E93BDB40002C9E5 /* FolderPathCustomCell.swift in Sources */,
+				B5BEBDEA2E93BDB40002C9E5 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				AA8D31532D41052300FE2775 /* NCManageDatabase+DownloadLimit.swift in Sources */,
 				F7A8D74228F18261008BBE1C /* NCUtility.swift in Sources */,
 				F7A8D73A28F17E28008BBE1C /* NCManageDatabase+Video.swift in Sources */,
@@ -6405,6 +7181,10 @@
 				F71433E52C778FFA00E20B5A /* NotificationCenter+MainThread.swift in Sources */,
 				F73EF7C92B0225610087E6E9 /* NCManageDatabase+PhotoLibrary.swift in Sources */,
 				F73EF7B92B0224AB0087E6E9 /* NCManageDatabase+ExternalSites.swift in Sources */,
+				B5BEBDBC2E93AF010002C9E5 /* AppUtility.swift in Sources */,
+				B5BEBDBD2E93AF010002C9E5 /* AdjustHelper.m in Sources */,
+				B5BEBDBE2E93AF010002C9E5 /* TealiumHelper.swift in Sources */,
+				B5BEBDBF2E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */,
 				F71F6D092B6A6A5E00F1EB15 /* ThreadSafeArray.swift in Sources */,
 				F33EE6F42BF4C9B200CA1A51 /* PKCS12.swift in Sources */,
 				F33918C62C7CD8F2002D9AA1 /* FileNameValidator+Extensions.swift in Sources */,

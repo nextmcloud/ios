@@ -49,6 +49,8 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     private let database = NCManageDatabase.shared
     private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
     private var tabAccount: tableAccount?
+    private let database = NCManageDatabase.shared
+    private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
 
     private struct Section {
         var items: [NKExternalSite]
@@ -98,6 +100,12 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         navigationController?.setGroupAppearance()
 //        appDelegate.activeViewController = self
 //        navigationController?.setGroupAppearance()
+
+        Task {
+            let capabilities = await database.getCapabilities(account: self.session.account) ?? NKCapabilities.Capabilities()
+            mainNavigationController?.createPlusMenu(session: self.session, capabilities: capabilities, isHidden: true)
+        }
+
         loadItems()
         changeTheming()
         tableView.reloadData()
@@ -122,7 +130,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         }
         var item = NKExternalSite()
         var quota: String = ""
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: tableAccount.account)
+        let capabilities = NCCapabilities.shared.getCapabilities(account: tableAccount.account)
 
         // Clear
         functionMenu.removeAll()
@@ -187,7 +195,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         }
 
         // ITEM : Shares
-        if capabilities.fileSharingApiEnabled {
+        if capabilities.capabilityFileSharingApiEnabled {
             item = NKExternalSite()
             item.name = "_list_shares_"
             item.icon = "shareFill"
@@ -205,7 +213,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         functionMenu.append(item)
 
         // ITEM : Groupfolders
-        if capabilities.groupfoldersEnabled {
+        if capabilities.capabilityGroupfoldersEnabled {
             item = NKExternalSite()
             item.name = "_group_folders_"
             item.icon = "person.2"
@@ -240,6 +248,9 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         item.name = "_settings_"
         item.icon = "settings"
         item.url = "segueSettings"
+//        item.url = "segueSettings"
+        item.url = "openSettings"
+
         settingsMenu.append(item)
 
         if !quotaMenu.isEmpty {
@@ -305,6 +316,9 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : External
         if NCBrandOptions.shared.disable_more_external_site == false {
             if let externalSites = NCManageDatabase.shared.getAllExternalSites(account: session.account) {
+        if NCBrandOptions.shared.disable_more_external_site == false,
+           capabilities.externalSites {
+            if let externalSites = self.database.getAllExternalSites(account: session.account) {
                 for externalSite in externalSites {
                     if !externalSite.name.isEmpty, !externalSite.url.isEmpty, let urlEncoded = externalSite.url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
                         item = NKExternalSite()
@@ -318,6 +332,28 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                     }
                 }
             }
+
+            
+            switch tableAccount.quotaTotal {
+            case -1:
+                quota = "0"
+            case -2:
+                quota = NSLocalizedString("_quota_space_unknown_", comment: "")
+            case -3:
+                quota = NSLocalizedString("_quota_space_unlimited_", comment: "")
+            default:
+                quota = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
+            }
+
+            let quotaUsed: String = utilityFileSystem.transformedSize(activeAccount.quotaUsed)
+            let quota2: String = utilityFileSystem.transformedSize(activeAccount.quotaTotal)
+            let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
+
+            labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
+            
+            quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
+            quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
+
         }
             }
 
@@ -340,6 +376,44 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             
             quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
             quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
+
+        // ITEM : External
+        if NCBrandOptions.shared.disable_more_external_site == false {
+            if let externalSites = NCManageDatabase.shared.getAllExternalSites(account: session.account) {
+                for externalSite in externalSites {
+                    if !externalSite.name.isEmpty, !externalSite.url.isEmpty, let urlEncoded = externalSite.url.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+                        item = NKExternalSite()
+                        item.name = externalSite.name
+                        item.url = urlEncoded
+                        item.icon = "network"
+                        if externalSite.type == "settings" {
+                            item.icon = "gear"
+                        }
+                        externalSiteMenu.append(item)
+                    }
+                }
+            }
+        }
+            
+        switch tableAccount.quotaTotal {
+        case -1:
+            quota = "0"
+        case -2:
+            quota = NSLocalizedString("_quota_space_unknown_", comment: "")
+        case -3:
+            quota = NSLocalizedString("_quota_space_unlimited_", comment: "")
+        default:
+            quota = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
+        }
+
+        let quotaUsed: String = utilityFileSystem.transformedSize(tableAccount.quotaUsed)
+        let quota2: String = utilityFileSystem.transformedSize(tableAccount.quotaTotal)
+        let percentageUsedFormatted = "\(Int(progressQuota.progress * 100))%"
+
+        labelQuota.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_percentage_", comment: ""), percentageUsedFormatted)
+        
+        quotaLabel1.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_", comment: ""), quotaUsed)
+        quotalabel2.text = String.localizedStringWithFormat(NSLocalizedString("_quota_using_of_", comment: ""), quota2)
 
         loadSections()
     }
@@ -445,6 +519,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: NCMoreAppSuggestionsCell.reuseIdentifier, for: indexPath) as? NCMoreAppSuggestionsCell else { return UITableViewCell() }
 
             cell.setupCell(account: session.account)
+//            cell.setupCell(account: session.account)
             cell.controller = self.controller
             return cell
         } else {

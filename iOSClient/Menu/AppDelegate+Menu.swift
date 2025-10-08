@@ -31,12 +31,11 @@ extension AppDelegate {
     func toggleMenu(controller: NCMainTabBarController) {
         var actions: [NCMenuAction] = []
         let session = NCSession.shared.getSession(controller: controller)
-        let utilityFileSystem = NCUtilityFileSystem()
+        let directEditingCreators = NCManageDatabase.shared.getDirectEditingCreators(account: session.account)
         let serverUrl = controller.currentServerUrl()
         let isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(serverUrl: serverUrl, account: session.account)
         let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl))
         let utility = NCUtility()
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: session.account)
 
         actions.append(
             NCMenuAction(
@@ -65,9 +64,7 @@ extension AppDelegate {
             )
         )
 
-        if NextcloudKit.shared.isNetworkReachable(),
-           let creator = capabilities.directEditingCreators.first(where: { $0.editor == "text" }),
-           !isDirectoryE2EE {
+        if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorText}) && !isDirectoryE2EE {
             actions.append(
                 NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt_menu")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
                     let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorText})!
@@ -186,7 +183,7 @@ extension AppDelegate {
             actions.append(.seperator(order: 0))
         }
 
-        if capabilities.serverVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isDirectoryE2EE && NextcloudKit.shared.isNetworkReachable() {
+        if NCCapabilities.shared.getCapabilities(account: session.account).capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isDirectoryE2EE && NextcloudKit.shared.isNetworkReachable() {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_add_folder_info_", comment: ""), icon: UIImage(named: "addFolderInfo")!.image(color: NCBrandColor.shared.iconColor, size: 50), action: { _ in
@@ -210,9 +207,8 @@ extension AppDelegate {
             )
         }
 
-        if NextcloudKit.shared.isNetworkReachable(),
-           let creator = capabilities.directEditingCreators.first(where: { $0.editor == "onlyoffice" && $0.identifier == "onlyoffice_docx"}) {
-
+        if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeDocx}) && !isDirectoryE2EE {
+            let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeDocx})!
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_create_new_document_", comment: ""), icon: UIImage(named: "create_file_document")!, action: { _ in
@@ -255,9 +251,8 @@ extension AppDelegate {
             )
         }
 
-        if NextcloudKit.shared.isNetworkReachable(),
-           let creator = capabilities.directEditingCreators.first(where: { $0.editor == "onlyoffice" && $0.identifier == "onlyoffice_xlsx"}) {
-
+        if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeXlsx}) && !isDirectoryE2EE {
+            let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeXlsx})!
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_create_new_spreadsheet_", comment: ""), icon: UIImage(named: "create_file_xls")!, action: { _ in
@@ -294,15 +289,16 @@ extension AppDelegate {
 //                                
 //                                controller.present(navigationController, animated: true, completion: nil)
 //                            }
+
+                            controller.present(navigationController, animated: true, completion: nil)
                         }
                     }
                 )
             )
         }
 
-        if NextcloudKit.shared.isNetworkReachable(),
-           let creator = capabilities.directEditingCreators.first(where: { $0.editor == "onlyoffice" && $0.identifier == "onlyoffice_pptx"}) {
-
+        if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficePptx}) && !isDirectoryE2EE {
+            let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficePptx})!
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_create_new_presentation_", comment: ""), icon: UIImage(named: "create_file_ppt")!, action: { _ in
@@ -339,13 +335,15 @@ extension AppDelegate {
 //                                
 //                                controller.present(navigationController, animated: true, completion: nil)
 //                            }
+
+                            controller.present(navigationController, animated: true, completion: nil)
                         }
                     }
                 )
             )
         }
 
-        if capabilities.richDocumentsEnabled {
+        if NCCapabilities.shared.getCapabilities(account: session.account).capabilityRichDocumentsEnabled {
             if NextcloudKit.shared.isNetworkReachable() && !isDirectoryE2EE {
                 actions.append(
                     NCMenuAction(
@@ -381,6 +379,8 @@ extension AppDelegate {
 //                                    
 //                                    controller.present(navigationController, animated: true, completion: nil)
 //                                }
+
+                                controller.present(navigationController, animated: true, completion: nil)
                             }
                         }
                     )
@@ -420,6 +420,8 @@ extension AppDelegate {
 //                                    
 //                                    controller.present(navigationController, animated: true, completion: nil)
 //                                }
+
+                                controller.present(navigationController, animated: true, completion: nil)
                             }
                         }
                     )
@@ -459,6 +461,8 @@ extension AppDelegate {
 //                                    
 //                                    controller.present(navigationController, animated: true, completion: nil)
 //                                }
+
+                                controller.present(navigationController, animated: true, completion: nil)
                             }
                         }
                     )

@@ -29,7 +29,7 @@ import Alamofire
 extension NCCollectionViewCommon: UICollectionViewDelegate {
     func didSelectMetadata(_ metadata: tableMetadata, withOcIds: Bool) {
         if metadata.e2eEncrypted {
-            if capabilities.e2EEEnabled {
+            if NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityE2EEEnabled {
                 if !NCKeychain().isEndToEndEnabled(account: metadata.account) {
                     let e2ee = NCEndToEndInitialize()
                     e2ee.delegate = self
@@ -49,11 +49,15 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
 
             if !metadata.isDirectoryE2EE, metadata.isImage || metadata.isAudioOrVideo {
                 let metadatas = self.dataSource.getMetadatas()
-                let ocIds = metadatas.filter { $0.classFile == NKTypeClassFile.image.rawValue ||
-                                               $0.classFile == NKTypeClassFile.video.rawValue ||
-                                               $0.classFile == NKTypeClassFile.audio.rawValue }.map(\.ocId)
+                let ocIds = metadatas.filter { $0.classFile == NKCommon.TypeClassFile.image.rawValue ||
+                                               $0.classFile == NKCommon.TypeClassFile.video.rawValue ||
+                                               $0.classFile == NKCommon.TypeClassFile.audio.rawValue }.map(\.ocId)
 
-                return NCViewer().view(viewController: self, metadata: metadata, ocIds: withOcIds ? ocIds : nil, image: image)
+                let metadataInfo = metadatas.filter{ $0.classFile == NKCommon.TypeClassFile.image.rawValue ||
+                    $0.classFile == NKCommon.TypeClassFile.video.rawValue ||
+                    $0.classFile == NKCommon.TypeClassFile.audio.rawValue }
+                
+                return NCViewer().view(viewController: self, metadata: metadata, ocIds: ocIds, image: image, metadatas: metadataInfo)
 
             } else if metadata.isAvailableEditorView ||
                       utilityFileSystem.fileProviderStorageExists(metadata) ||
@@ -88,42 +92,37 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                             hud.error(text: error.errorDescription)
             } else if metadata.isAvailableEditorView || utilityFileSystem.fileProviderStorageExists(metadata) || metadata.name == self.global.talkName {
 
-                NCViewer().view(viewController: self, metadata: metadata, image: image)
+                NCViewer().view(viewController: self, metadata: metadata, image: image, metadatas: [metadata])
 
-            } else if NextcloudKit.shared.isNetworkReachable() {
-                Task { @MainActor in
-                    guard let  metadata = await database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
-                                                                                               session: self.networking.sessionDownload,
-                                                                                               selector: global.selectorLoadFileView,
-                                                                                               sceneIdentifier: self.controller?.sceneIdentifier) else {
-                        return
+            } else if NextcloudKit.shared.isNetworkReachable(),
+                      let metadata = database.setMetadatasSessionInWaitDownload(metadatas: [metadata],
+                                                                                session: NCNetworking.shared.sessionDownload,
+                                                                                selector: global.selectorLoadFileView,
+                                                                                sceneIdentifier: self.controller?.sceneIdentifier) {
+                if metadata.name == "files" {
+                    let hud = NCHud(self.tabBarController?.view)
+                    var downloadRequest: DownloadRequest?
+
+                    hud.initHudRing(text: NSLocalizedString("_downloading_", comment: ""), tapToCancelDetailText: true) {
+                        if let request = downloadRequest {
+                            request.cancel()
+                        }
                     }
 
-                    if metadata.name == "files" {
-                        let hud = NCHud(self.tabBarController?.view)
-                        var downloadRequest: DownloadRequest?
-
-                        hud.initHudRing(text: NSLocalizedString("_downloading_", comment: ""), tapToCancelDetailText: true) {
-                            if let request = downloadRequest {
-                                request.cancel()
-                            }
+                    NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: false) {
+                    } requestHandler: { request in
+                        downloadRequest = request
+                    } progressHandler: { progress in
+                        hud.progress(progress.fractionCompleted)
+                    } completion: { afError, error in
+                        if error == .success || afError?.isExplicitlyCancelledError ?? false {
+                            hud.dismiss()
+                        } else {
+                            hud.error(text: error.errorDescription)
                         }
-
-                        self.networking.download(metadata: metadata) {
-                        } requestHandler: { request in
-                            downloadRequest = request
-                        } progressHandler: { progress in
-                            hud.progress(progress.fractionCompleted)
-                        } completion: { afError, error in
-                            if error == .success || afError?.isExplicitlyCancelledError ?? false {
-                                hud.dismiss()
-                            } else {
-                                hud.error(text: error.errorDescription)
-                            }
-                        }
-                    } else if !metadata.url.isEmpty {
-                        NCViewer().view(viewController: self, metadata: metadata, image: nil)
                     }
+                } else if !metadata.url.isEmpty {
+                    NCViewer().view(viewController: self, metadata: metadata, image: nil)
                 }
             } else {
                 let error = NKError(errorCode: global.errorOffline, errorDescription: "_go_online_")
@@ -152,14 +151,19 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
             return
         }
 
-        if self.isEditMode {
-            if let index = self.fileSelect.firstIndex(of: metadata.ocId) {
-                self.fileSelect.remove(at: index)
-            } else {
-                self.fileSelect.append(metadata.ocId)
+        let metadataSourceForAllSections = dataSource.getMetadataSourceForAllSections()
+
+        if isEditMode {
+            if !metadata.e2eEncrypted {
+                if let index = fileSelect.firstIndex(of: metadata.ocId) {
+                    fileSelect.remove(at: index)
+                } else {
+                    fileSelect.append(metadata.ocId)
+                }
+                collectionView.reloadItems(at: [indexPath])
+                tabBarSelect?.update(fileSelect: fileSelect, metadatas: getSelectedMetadatas(), userId: metadata.userId)
             }
-            self.collectionView.reloadItems(at: [indexPath])
-            self.tabBarSelect?.update(fileSelect: self.fileSelect, metadatas: self.getSelectedMetadatas(), userId: metadata.userId)
+            self.setNavigationRightItems()
             return
         }
 
@@ -168,23 +172,20 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         guard let metadata = self.dataSource.getMetadata(indexPath: indexPath),
-              metadata.classFile != NKTypeClassFile.url.rawValue,
+              metadata.classFile != NKCommon.TypeClassFile.url.rawValue,
               !isEditMode
         else {
             return nil
         }
         let identifier = indexPath as NSCopying
-        var image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: global.previewExt1024)
-
-        if image == nil {
-            let cell = collectionView.cellForItem(at: indexPath)
-            if cell is NCListCell {
-                image = (cell as? NCListCell)?.imageItem.image
-            } else if cell is NCGridCell {
-                image = (cell as? NCGridCell)?.imageItem.image
-            } else if cell is NCPhotoCell {
-                image = (cell as? NCPhotoCell)?.imageItem.image
-            }
+        var image: UIImage?
+        let cell = collectionView.cellForItem(at: indexPath)
+        if cell is NCListCell {
+            image = (cell as? NCListCell)?.imageItem.image
+        } else if cell is NCGridCell {
+            image = (cell as? NCGridCell)?.imageItem.image
+        } else if cell is NCPhotoCell {
+            image = (cell as? NCPhotoCell)?.imageItem.image
         }
 
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {

@@ -29,7 +29,7 @@ extension Shareable {
     ///
     var formattedDateString: String? {
         guard let date = expirationDate else {
-            return nil
+            return ""
         }
 
         let dateFormatter = DateFormatter()

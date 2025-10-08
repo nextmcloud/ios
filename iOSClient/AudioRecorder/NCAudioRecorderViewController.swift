@@ -45,7 +45,6 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
     var startDate: Date = Date()
     var fileName: String = ""
     var controller: NCMainTabBarController!
-    let database = NCManageDatabase.shared
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: controller)
     }
@@ -117,15 +116,26 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
                                                               serverUrl: controller.currentServerUrl(),
                                                               session: self.session,
                                                               sceneIdentifier: self.appDelegate.sceneIdentifier)
+        Task {
+            let fileNamePath = NSTemporaryDirectory() + self.fileName
+            let metadata = await NCManageDatabase.shared.createMetadataAsync(fileName: fileName,
+                                                                             ocId: UUID().uuidString,
+                                                                             serverUrl: controller.currentServerUrl(),
+                                                                             session: self.session,
+                                                                             sceneIdentifier: self.controller?.sceneIdentifier)
 
-        metadata.session = NCNetworking.shared.sessionUploadBackground
-        metadata.sessionSelector = NCGlobal.shared.selectorUploadFile
-        metadata.status = NCGlobal.shared.metadataStatusWaitUpload
-        metadata.sessionDate = Date()
-        metadata.size = NCUtilityFileSystem().getFileSize(filePath: fileNamePath)
-        NCUtilityFileSystem().copyFile(atPath: fileNamePath, toPath: NCUtilityFileSystem().getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView))
+            metadata.session = NCNetworking.shared.sessionUploadBackground
+            metadata.sessionSelector = NCGlobal.shared.selectorUploadFile
+            metadata.status = NCGlobal.shared.metadataStatusWaitUpload
+            metadata.sessionDate = Date()
+            metadata.size = NCUtilityFileSystem().getFileSize(filePath: fileNamePath)
+            NCUtilityFileSystem().copyFile(atPath: fileNamePath, toPath: NCUtilityFileSystem().getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                                                               fileName: metadata.fileNameView,
+                                                                                                                               userId: metadata.userId,
+                                                                                                                               urlBase: metadata.urlBase))
 
-        self.database.addMetadata(metadata)
+            await self.database.addMetadataAsync(metadata)
+        }
     }
 
     func audioMeterDidUpdate(_ db: Float) {

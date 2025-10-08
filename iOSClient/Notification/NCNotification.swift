@@ -47,6 +47,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         title = NSLocalizedString("_notifications_", comment: "")
         view.backgroundColor = .systemBackground
 
+        navigationController?.setNavigationBarAppearance()
         self.session = NCSession.shared.getSession(controller: controller)
 
         tableView.tableFooterView = UIView()
@@ -62,6 +63,19 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
             navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .plain, action: { [weak self] in
                 self?.dismiss(animated: true)
             })
+        refreshControl?.action(for: .valueChanged) { _ in
+            Task {
+                await self.getNetwokingNotification()
+            }
+        }
+        // Empty
+        let offset = (self.navigationController?.navigationBar.bounds.height ?? 0) - 20
+        emptyDataSet = NCEmptyDataSet(view: tableView, offset: -offset, delegate: self)
+        
+    }
+
+        let close = UIBarButtonItem(title: NSLocalizedString("_close_", comment: ""), style: .plain) {
+            self.dismiss(animated: true)
         }
         // Empty
         let offset = (self.navigationController?.navigationBar.bounds.height ?? 0) - 20
@@ -82,6 +96,9 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         getNetwokingNotification()
         getNetwokingNotification(nil)
         NotificationCenter.default.addObserver(self, selector: #selector(initialize), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterInitialize), object: nil)
+        Task {
+            await getNetwokingNotification()
+        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -92,6 +109,10 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
 
         // Cancel Queue & Retrieves Properties
         dataSourceTask?.cancel()
+
+        Task {
+            await NCNetworking.shared.networkingTasks.cancel(identifier: "NCNotification")
+        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -208,6 +229,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         } else {
             cell.icon.image = utility.loadImage(named: "bell", color: NCBrandColor.shared.iconColor)
             cell.icon.image = image.withTintColor(NCBrandColor.shared.iconColor, renderingMode: .alwaysOriginal)
+//            cell.icon.image = image.withTintColor(NCBrandColor.shared.getElement(account: session.account), renderingMode: .alwaysOriginal)
         } else {
             cell.icon.image = utility.loadImage(named: "bell", colors: [NCBrandColor.shared.iconColor])
         }
@@ -218,6 +240,7 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate, NCEmpty
         cell.date.text = DateFormatter.localizedString(from: notification.date as Date, dateStyle: .medium, timeStyle: .medium)
         cell.notification = notification
         cell.date.text = utility.dateDiff(notification.date as Date)
+        cell.date.text = utility.getRelativeDateTitle(notification.date as Date)
         cell.date.textColor = .gray
         cell.subject.text = notification.subject
         cell.subject.textColor = NCBrandColor.shared.textColor

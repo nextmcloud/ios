@@ -51,6 +51,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     private var objectId = ""
     private var user = ""
     var indexPath = IndexPath()
+    @IBOutlet weak var iPadLabelTitleTrailingConstraint: NSLayoutConstraint!
+    @IBOutlet weak var iPhoneLabelTitleTrailingConstraint: NSLayoutConstraint!
+    
     private var ocId = ""
     private var ocIdTransfer = ""
     private var user = ""
@@ -64,6 +67,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     var fileObjectId: String? {
         get { return objectId }
         set { objectId = newValue ?? "" }
+    
     var fileOcId: String? {
         get { return ocId }
         set { ocId = newValue ?? "" }
@@ -131,10 +135,20 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         initCell()
     }
 
+    
     func initCell() {
         
         imageItem.layer.cornerRadius = 6
         imageItem.layer.masksToBounds = true
+        imageStatus.image = nil
+        imageFavorite.image = nil
+        imageFavoriteBackground.isHidden = true
+        imageLocal.image = nil
+        labelTitle.text = ""
+        labelInfo.text = ""
+        labelSubinfo.text = ""
+        imageShared.image = nil
+        imageMore.image = nil
 
         // use entire cell as accessibility element
         
@@ -146,6 +160,19 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         progressView.tintColor = NCBrandColor.shared.brandElement
         progressView.transform = CGAffineTransform(scaleX: 1.0, y: 0.5)
         progressView.trackTintColor = .clear
+        imageItem.image = nil
+        imageItem.layer.cornerRadius = 6
+        imageItem.layer.masksToBounds = true
+        imageStatus.image = nil
+        imageFavorite.image = nil
+        imageLocal.image = nil
+        labelTitle.text = ""
+        labelInfo.text = ""
+        labelSubinfo.text = ""
+        imageShared.image = nil
+        imageMore.image = nil
+        separatorHeightConstraint.constant = 0.5
+        titleInfoTrailingDefault()
         progressView.tintColor = NCBrandColor.shared.brand
         progressView.transform = CGAffineTransform(scaleX: 1.0, y: 0.5)
         progressView.trackTintColor = .clear
@@ -166,6 +193,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         separatorHeightConstraint.constant = 0.5
 //        tag0.text = ""
 //        tag1.text = ""
+        separatorHeightConstraint.constant = 0.5
         titleInfoTrailingDefault()
 
         let longPressedGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gestureRecognizer:)))
@@ -193,12 +221,15 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         labelTitle.text = ""
         labelInfo.text = ""
         labelSubinfo.text = ""
+        titleInfoTrailingDefault()
+
         labelTitle.textColor = .label
         labelInfo.textColor = .systemGray
         labelSubinfo.textColor = .systemGray
         setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCImageCache.images.buttonMore)
         imageMore.isHidden = false
         buttonMore.isHidden = false
+        updateConstraintsForCurrentDevice()
     }
 
     override func prepareForReuse() {
@@ -213,7 +244,24 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
         return nil
     }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateConstraintsForCurrentDevice()
+    }
 
+    func updateConstraintsForCurrentDevice() {
+        if labelShared?.isHidden == false {
+            iPhoneLabelTitleTrailingConstraint.isActive = false
+            iPadLabelTitleTrailingConstraint.isActive = true
+        } else {
+            iPhoneLabelTitleTrailingConstraint.isActive = true
+            iPadLabelTitleTrailingConstraint.isActive = false
+        }
+//        iPhoneLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? false : true
+//        iPadLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? true : false
+    }
+    
     @IBAction func touchUpInsideShare(_ sender: Any) {
         listCellDelegate?.tapShareListItem(with: objectId, indexPath: indexPath, sender: sender)
     }
@@ -224,6 +272,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
     @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
         listCellDelegate?.longPressListItem(with: objectId, indexPath: indexPath, gestureRecognizer: gestureRecognizer)
+        listCellDelegate?.tapMoreListItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
+    }
+
+    @objc func longPress(gestureRecognizer: UILongPressGestureRecognizer) {
         listCellDelegate?.tapMoreListItem(with: ocId, ocIdTransfer: ocIdTransfer, namedButtonMore: namedButtonMore, image: imageItem.image, sender: sender)
     }
 
@@ -347,12 +399,45 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         labelInfo.text = NCUtility().dateDiff(date as Date)
         labelSubinfo.text = NCUtilityFileSystem().transformedSize(size)
 //        labelSubinfo.text = ""
+        labelInfo.text = NCUtility().getRelativeDateTitle(date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
         labelSubinfo.text = ""
     }
 
     func setAccessibility(label: String, value: String) {
         accessibilityLabel = label
         accessibilityValue = value
+    }
+    
+    func setIconOutlines() {
+        [imageStatus, imageLocal].forEach { imageView in
+            imageView.makeCircularBackground(withColor: imageView.image != nil ? .systemBackground : .clear)
+        }
+
+        let outlineView = UIImageView()
+        outlineView.translatesAutoresizingMaskIntoConstraints = false
+        outlineView.image = UIImage(systemName: "star")
+        outlineView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 16, weight: .thin)
+        outlineView.tintColor = .systemBackground
+
+        imageFavorite.addSubview(outlineView)
+        NSLayoutConstraint.activate([
+            outlineView.leadingAnchor.constraint(equalTo: imageFavorite.leadingAnchor, constant: -1),
+            outlineView.trailingAnchor.constraint(equalTo: imageFavorite.trailingAnchor, constant: 1),
+            outlineView.topAnchor.constraint(equalTo: imageFavorite.topAnchor, constant: -1),
+            outlineView.bottomAnchor.constraint(equalTo: imageFavorite.bottomAnchor, constant: 1)
+        ])
+        imageFavorite.sendSubviewToBack(outlineView)
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // Keep the shadow path in sync with current bounds
+        imageStatus.layer.shadowPath = UIBezierPath(ovalIn: imageStatus.bounds).cgPath
+
+        // Ensure the circular background remains correct after Auto Layout
+        if imageStatus.layer.cornerRadius != imageStatus.bounds.width / 2 {
+            imageStatus.layer.cornerRadius = imageStatus.bounds.width / 2
+        }
     }
 }
 
@@ -404,3 +489,77 @@ class NCListLayout: UICollectionViewFlowLayout {
         return proposedContentOffset
     }
 }
+
+class BidiFilenameLabel: UILabel {
+    var fullFilename: String = ""
+
+    var isFolder: Bool = false
+
+    var isRTL: Bool = false
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateText()
+    }
+
+    private func updateText() {
+        guard !fullFilename.isEmpty else {
+            self.text = ""
+            return
+        }
+
+        let availableWidth = bounds.width
+        guard availableWidth > 0 else { return }
+
+        let isRTL = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft
+        let sanitizedFilename = fullFilename.sanitizeForBidiCharacters(isFolder: isFolder, isRTL: isRTL)
+
+        let nsFilename = sanitizedFilename as NSString
+        let ext = nsFilename.pathExtension
+        let base = nsFilename.deletingPathExtension
+
+        let dotExt = ext.isEmpty ? "" : "." + ext
+        let truncatedBase = truncateBase(base: base, dotExt: dotExt, maxWidth: availableWidth, font: font ?? UIFont.systemFont(ofSize: 17))
+
+        self.text = sanitizedFilename.replacingOccurrences(of: base, with: truncatedBase)
+    }
+
+    private func truncateBase(base: String, dotExt: String, maxWidth: CGFloat, font: UIFont) -> String {
+        let extWidth = (dotExt as NSString).size(withAttributes: [.font: font]).width
+
+        if (base as NSString).size(withAttributes: [.font: font]).width + extWidth <= maxWidth {
+            return base
+        }
+
+        let characters = Array(base)
+        var low = 0
+        var high = characters.count
+        var result = ""
+
+        while low <= high {
+            let mid = (low + high) / 2
+            let prefixCount = mid / 2
+            let suffixCount = mid - prefixCount
+            let finalString = String(characters.prefix(prefixCount)) + "…" + String(characters.suffix(suffixCount))
+            let finalStringWidth = (finalString as NSString).size(withAttributes: [.font: font]).width + extWidth
+
+            if finalStringWidth <= maxWidth {
+                result = finalString
+                low = mid + 1
+            } else {
+                high = mid - 1
+            }
+        }
+
+        return result
+    }
+}
+

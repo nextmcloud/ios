@@ -24,6 +24,7 @@
 import UIKit
 import Photos
 import NextcloudKit
+import XLForm
 
 class NCManageAutoUploadFileName: XLFormViewController {
 
@@ -170,6 +171,7 @@ class NCManageAutoUploadFileName: XLFormViewController {
 
             if let fileName = fileName {
                 formRow.value = NCUtility().removeForbiddenCharacters(fileName)
+                formRow.value = FileAutoRenamer.rename(fileName, account: appDelegate.account)
             }
 
             self.form.delegate = self

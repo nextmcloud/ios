@@ -28,49 +28,66 @@ class NCNetworkingE2EE: NSObject {
         return UUID
     }
 
-    func getOptions(account: String) -> NKRequestOptions {
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+    func getOptions(account: String, capabilities: NKCapabilities.Capabilities) -> NKRequestOptions {
         let version = capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 ? e2EEApiVersion2 : e2EEApiVersion1
         return NKRequestOptions(version: version)
     }
 
     // MARK: -
 
-    func getMetadata(fileId: String,
-                     e2eToken: String?,
-                     account: String) async -> (account: String,
-                                                version: String?,
-                                                e2eMetadata: String?,
-                                                signature: String?,
-                                                responseData: AFDataResponse<Data>?,
-                                                error: NKError) {
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+    func getMetadata(fileId: String, e2eToken: String?, account: String) async -> (account: String,
+                                                                                   version: String?,
+                                                                                   e2eMetadata: String?,
+                                                                                   signature: String?,
+                                                                                   responseData: AFDataResponse<Data>?,
+                                                                                   error: NKError) {
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
 
         switch capabilities.e2EEApiVersion {
         case NCGlobal.shared.e2eeVersionV11, NCGlobal.shared.e2eeVersionV12:
             let options = NKRequestOptions(version: e2EEApiVersion1)
             let results = await NextcloudKit.shared.getE2EEMetadataAsync(fileId: fileId, e2eToken: e2eToken, account: account, options: options) { task in
-                print("Task started:", task)
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                path: fileId,
+                                                                                                name: "getE2EEMetadata")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
             }
             return (results.account, self.e2EEApiVersion1, results.e2eMetadata, results.signature, results.responseData, results.error)
         case NCGlobal.shared.e2eeVersionV20:
             var options = NKRequestOptions(version: e2EEApiVersion2)
             let results = await NextcloudKit.shared.getE2EEMetadataAsync(fileId: fileId, e2eToken: e2eToken, account: account, options: options) { task in
-                print("Task started:", task)
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                path: fileId,
+                                                                                                name: "getE2EEMetadata")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
             }
             if results.error == .success || results.error.errorCode == NCGlobal.shared.errorResourceNotFound {
                 return (results.account, self.e2EEApiVersion2, results.e2eMetadata, results.signature, results.responseData, results.error)
             } else {
                 options = NKRequestOptions(version: self.e2EEApiVersion1)
                 let results = await NextcloudKit.shared.getE2EEMetadataAsync(fileId: fileId, e2eToken: e2eToken, account: account, options: options) { task in
-                    print("Task started:", task)
+                    Task {
+                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                    path: fileId,
+                                                                                                    name: "getE2EEMetadata")
+                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                    }
                 }
                 if results.error == .success || results.error.errorCode == NCGlobal.shared.errorResourceNotFound {
                     return (results.account, self.e2EEApiVersion2, results.e2eMetadata, results.signature, results.responseData, results.error)
                 } else {
                     options = NKRequestOptions(version: self.e2EEApiVersion1)
                     let results = await NextcloudKit.shared.getE2EEMetadataAsync(fileId: fileId, e2eToken: e2eToken, account: account, options: options) { task in
-                        print("Task started:", task)
+                        Task {
+                            let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                        path: fileId,
+                                                                                                        name: "getE2EEMetadata")
+                            await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                        }
                     }
                     return (results.account, self.e2EEApiVersion1, results.e2eMetadata, results.signature, results.responseData, results.error)
                 }
@@ -90,12 +107,21 @@ class NCNetworkingE2EE: NSObject {
         var addCertificate: String?
         var method = "POST"
         let session = NCSession.shared.getSession(account: account)
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
         guard let directory = self.database.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl)) else {
             return NKError(errorCode: NCGlobal.shared.errorUnexpectedResponseFromDB, errorDescription: "_e2e_error_")
         }
 
         if let addUserId {
             let results = await NCNetworking.shared.getE2EECertificate(user: addUserId, account: session.account, options: NCNetworkingE2EE().getOptions(account: account))
+            let results = await NextcloudKit.shared.getE2EECertificateAsync(user: addUserId, account: session.account, options: NCNetworkingE2EE().getOptions(account: account, capabilities: capabilities)) {task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                path: addUserId,
+                                                                                                name: "getE2EECertificate")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
+            }
             if results.error == .success, let certificateUser = results.certificateUser {
                 addCertificate = certificateUser
             } else {
@@ -163,9 +189,17 @@ class NCNetworkingE2EE: NSObject {
             await self.database.addDiagnosticAsync(account: session.account, issue: NCGlobal.shared.diagnosticIssueE2eeErrors)
             return resultsEncodeMetadata.error
         }
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: session.account)
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
 
         let putE2EEMetadataResults = await NCNetworking.shared.putE2EEMetadata(fileId: fileId, e2eToken: e2eToken, e2eMetadata: e2eMetadata, signature: resultsEncodeMetadata.signature, method: method, account: session.account, options: NCNetworkingE2EE().getOptions(account: session.account))
+        let putE2EEMetadataResults = await NextcloudKit.shared.putE2EEMetadataAsync(fileId: fileId, e2eToken: e2eToken, e2eMetadata: e2eMetadata, signature: resultsEncodeMetadata.signature, method: method, account: session.account, options: NCNetworkingE2EE().getOptions(account: session.account, capabilities: capabilities)) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: session.account,
+                                                                                            path: fileId,
+                                                                                            name: "putE2EEMetadata")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
         guard putE2EEMetadataResults.error == .success else {
             return putE2EEMetadataResults.error
         }
@@ -209,7 +243,7 @@ class NCNetworkingE2EE: NSObject {
         guard let directory = self.database.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl)) else {
             return (nil, nil, NKError(errorCode: NCGlobal.shared.errorUnexpectedResponseFromDB, errorDescription: "_e2e_error_"))
         }
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
 
         if let tableLock = await self.database.getE2ETokenLockAsync(account: account, serverUrl: serverUrl) {
             e2eToken = tableLock.e2eToken
@@ -222,6 +256,14 @@ class NCNetworkingE2EE: NSObject {
         }
 
         let resultsLockE2EEFolder = await NCNetworking.shared.lockE2EEFolder(fileId: directory.fileId, e2eToken: e2eToken, e2eCounter: e2eCounter, method: "POST", account: account, options: NCNetworkingE2EE().getOptions(account: account))
+        let resultsLockE2EEFolder = await NextcloudKit.shared.lockE2EEFolderAsync(fileId: directory.fileId, e2eToken: e2eToken, e2eCounter: e2eCounter, method: "POST", account: account, options: NCNetworkingE2EE().getOptions(account: account, capabilities: capabilities)) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                            path: directory.fileId,
+                                                                                            name: "lockE2EEFolder")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
         if resultsLockE2EEFolder.error == .success, let e2eToken = resultsLockE2EEFolder.e2eToken {
             await self.database.setE2ETokenLockAsync(account: account, serverUrl: serverUrl, fileId: directory.fileId, e2eToken: e2eToken)
         }
@@ -235,6 +277,15 @@ class NCNetworkingE2EE: NSObject {
         }
 
         let resultsLockE2EEFolder = await NCNetworking.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, e2eCounter: nil, method: "DELETE", account: account, options: NCNetworkingE2EE().getOptions(account: account))
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
+        let resultsLockE2EEFolder = await NextcloudKit.shared.lockE2EEFolderAsync(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, e2eCounter: nil, method: "DELETE", account: account, options: NCNetworkingE2EE().getOptions(account: account, capabilities: capabilities)) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                            path: tableLock.fileId,
+                                                                                            name: "lockE2EEFolder")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
         if resultsLockE2EEFolder.error == .success {
             await self.database.deleteE2ETokenLockAsync(account: account, serverUrl: serverUrl)
         }
@@ -251,9 +302,19 @@ class NCNetworkingE2EE: NSObject {
                 if resultsLockE2EEFolder.error == .success {
                     self.database.deleteE2ETokenLock(account: account, serverUrl: result.serverUrl)
                 }
+    func unlockAll(account: String) async {
+        guard NCPreferences().isEndToEndEnabled(account: account) else { return }
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
         let results = await self.database.getE2EAllTokenLockAsync(account: account)
         for result in results {
-            let resultsLockE2EEFolder = await NextcloudKit.shared.lockE2EEFolderAsync(fileId: result.fileId, e2eToken: result.e2eToken, e2eCounter: nil, method: "DELETE", account: account, options: NCNetworkingE2EE().getOptions(account: account))
+            let resultsLockE2EEFolder = await NextcloudKit.shared.lockE2EEFolderAsync(fileId: result.fileId, e2eToken: result.e2eToken, e2eCounter: nil, method: "DELETE", account: account, options: NCNetworkingE2EE().getOptions(account: account, capabilities: capabilities)) { task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                path: result.fileId,
+                                                                                                name: "lockE2EEFolder")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
+            }
             if resultsLockE2EEFolder.error == .success {
                 await self.database.deleteE2ETokenLockAsync(account: account, serverUrl: result.serverUrl)
             }

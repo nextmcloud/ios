@@ -32,8 +32,15 @@ extension NCTrash {
             self.refreshControl.endRefreshing()
         }
 
+        // If is already in-flight, do nothing
+        if await NCNetworking.shared.networkingTasks.isReading(identifier: "NCTrash") {
+            return
+        }
+
         let resultsListingTrash = await NextcloudKit.shared.listingTrashAsync(filename: filename, showHiddenFiles: false, account: session.account) { task in
-            self.dataSourceTask = task
+            Task {
+                await NCNetworking.shared.networkingTasks.track(identifier: "NCTrash", task: task)
+            }
             self.collectionView.reloadData()
         }
 
@@ -64,7 +71,14 @@ extension NCTrash {
         let serverUrlFileNameSource = result.filePath + result.fileName
         let serverUrlFileNameDestination = session.urlBase + "/remote.php/dav/trashbin/" + session.userId + "/restore/" + result.fileName
 
-        let resultsMoveFileOrFolder = await NextcloudKit.shared.moveFileOrFolderAsync(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: true, account: self.session.account)
+        let resultsMoveFileOrFolder = await NextcloudKit.shared.moveFileOrFolderAsync(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: true, account: self.session.account) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
+                                                                                            path: serverUrlFileNameSource,
+                                                                                            name: "moveFileOrFolder")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
 
         guard resultsMoveFileOrFolder.error == .success else {
             return
@@ -76,7 +90,14 @@ extension NCTrash {
 
     func emptyTrash() async {
         let serverUrlFileName = session.urlBase + "/remote.php/dav/trashbin/" + session.userId + "/trash"
-        let response = await NextcloudKit.shared.deleteFileOrFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account)
+        let response = await NextcloudKit.shared.deleteFileOrFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
+                                                                                            path: serverUrlFileName,
+                                                                                            name: "deleteFileOrFolder")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
 
         if response.error != .success {
             NCContentPresenter().showError(error: response.error)
@@ -99,7 +120,14 @@ extension NCTrash {
                 continue
             }
             let serverUrlFileName = result.filePath + result.fileName
-            let response = await NextcloudKit.shared.deleteFileOrFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account)
+            let response = await NextcloudKit.shared.deleteFileOrFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account) { task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
+                                                                                                path: serverUrlFileName,
+                                                                                                name: "deleteFileOrFolder")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
+            }
             if response.error != .success {
                 NCContentPresenter().showError(error: response.error)
             }
@@ -113,21 +141,28 @@ class NCOperationDownloadThumbnailTrash: ConcurrentOperation, @unchecked Sendabl
     var fileId: String
     var fileName: String
     var collectionView: UICollectionView
-    var account: String
+    var session: NCSession.Session
 
-    init(fileId: String, fileName: String, account: String, collectionView: UICollectionView) {
+    init(fileId: String, fileName: String, session: NCSession.Session, collectionView: UICollectionView) {
         self.fileId = fileId
         self.fileName = fileName
-        self.account = account
+        self.session = session
         self.collectionView = collectionView
     }
 
     override func start() {
         guard !isCancelled else { return self.finish() }
 
-        NextcloudKit.shared.downloadTrashPreview(fileId: fileId, account: account) { _, _, _, responseData, error in
+        NextcloudKit.shared.downloadTrashPreview(fileId: fileId, account: session.account) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
+                                                                                            path: self.fileId,
+                                                                                            name: "DownloadPreview")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        } completion: { _, _, _, responseData, error in
             if error == .success, let data = responseData?.data {
-                NCUtility().createImageFileFrom(data: data, ocId: self.fileId, etag: self.fileName)
+                NCUtility().createImageFileFrom(data: data, ocId: self.fileId, etag: self.fileName, userId: self.session.userId, urlBase: self.session.urlBase)
 
                 for case let cell as NCTrashCellProtocol in self.collectionView.visibleCells where cell.objectId == self.fileId {
                     cell.imageItem?.contentMode = .scaleAspectFill

@@ -62,12 +62,19 @@ extension UIViewController {
     func showProfileMenu(userId: String, session: NCSession.Session) {
         guard NCCapabilities.shared.getCapabilities(account: session.account).capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion23 else { return }
     func showProfileMenu(userId: String, session: NCSession.Session, sender: Any?) {
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: session.account)
+        let capabilities = NCNetworking.shared.capabilities[session.account] ?? NKCapabilities.Capabilities()
         guard capabilities.serverVersionMajor >= NCGlobal.shared.nextcloudVersion23 else {
             return
         }
 
-        NextcloudKit.shared.getHovercard(for: userId, account: session.account) { account, card, _, _ in
+        NextcloudKit.shared.getHovercard(for: userId, account: session.account) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: session.account,
+                                                                                            path: userId,
+                                                                                            name: "getHovercard")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        } completion: { account, card, _, _ in
             guard let card = card, account == session.account else { return }
 
             let personHeader = NCMenuAction(

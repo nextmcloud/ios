@@ -10,11 +10,16 @@ import NextcloudKit
 class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
     var enumeratedItemIdentifier: NSFileProviderItemIdentifier
     var serverUrl: String?
+    let fileProviderData = FileProviderData.shared
     let providerUtility = fileProviderUtility()
     let database = NCManageDatabase.shared
+    let utilityFileSystem = NCUtilityFileSystem()
     var anchor: UInt64 = 0
+
     // X-NC-PAGINATE
     var recordsPerPage: Int = 100
+    // X-NC-PAGINATE
+
     var paginateToken: String?
     var paginatedTotal: Int = 0
 
@@ -22,14 +27,16 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
         self.enumeratedItemIdentifier = enumeratedItemIdentifier
         super.init()
 
-        Task {
-            if enumeratedItemIdentifier == .rootContainer {
-                self.serverUrl = NCUtilityFileSystem().getHomeServer(session: fileProviderData.shared.session)
-            } else {
-                if let metadata = await providerUtility.getTableMetadataFromItemIdentifierAsync(enumeratedItemIdentifier),
-                   let directorySource = await self.database.getTableDirectoryAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", metadata.account, metadata.serverUrl)) {
-                    serverUrl = directorySource.serverUrl + "/" + metadata.fileName
-                }
+        guard let session = fileProviderData.session else {
+            return
+        }
+
+        if enumeratedItemIdentifier == .rootContainer {
+            self.serverUrl = NCUtilityFileSystem().getHomeServer(session: session)
+        } else {
+            if let metadata = providerUtility.getTableMetadataFromItemIdentifier(enumeratedItemIdentifier),
+               let directorySource = self.database.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", metadata.account, metadata.serverUrl)) {
+                serverUrl = utilityFileSystem.createServerUrl(serverUrl: directorySource.serverUrl, fileName: metadata.fileName)
             }
         }
     }
@@ -39,13 +46,16 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
     func enumerateItems(for observer: NSFileProviderEnumerationObserver, startingAt page: NSFileProviderPage) {
         Task {
             var items: [NSFileProviderItemProtocol] = []
+            guard let session = fileProviderData.session else {
+                return
+            }
 
             // WorkingSet
             if enumeratedItemIdentifier == .workingSet {
                 var itemIdentifierMetadata: [NSFileProviderItemIdentifier: tableMetadata] = [:]
 
                 // Tags
-                if let tags = await self.database.getTagsAsync(predicate: NSPredicate(format: "account == %@", fileProviderData.shared.session.account)) {
+                if let tags = await self.database.getTagsAsync(predicate: NSPredicate(format: "account == %@", session.account)) {
                     for tag in tags {
                         guard let metadata = await self.database.getMetadataFromOcIdAsync(tag.ocId) else {
                             continue
@@ -55,8 +65,8 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
                 }
 
                 // Favorite
-                fileProviderData.shared.listFavoriteIdentifierRank = await self.database.getTableMetadatasDirectoryFavoriteIdentifierRankAsync(account: fileProviderData.shared.session.account)
-                for (identifier, _) in fileProviderData.shared.listFavoriteIdentifierRank {
+                fileProviderData.listFavoriteIdentifierRank = await self.database.getTableMetadatasDirectoryFavoriteIdentifierRankAsync(account: session.account)
+                for (identifier, _) in fileProviderData.listFavoriteIdentifierRank {
                     guard let metadata = await self.database.getMetadataFromOcIdAsync(identifier) else {
                         continue
                     }
@@ -86,7 +96,7 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
                     pageNumber = intPage
                 }
 
-                let (metadatas, isPaginated) = await fetchItemsForPage(serverUrl: serverUrl, pageNumber: pageNumber)
+                let (metadatas, isPaginated) = await fetchItemsForPage(serverUrl: serverUrl, pageNumber: pageNumber, account: session.account)
 
                 if let metadatas {
                     for metadata in metadatas {
@@ -121,28 +131,28 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
 
         // Report the deleted items
         if self.enumeratedItemIdentifier == .workingSet {
-            for (itemIdentifier, _) in fileProviderData.shared.fileProviderSignalDeleteWorkingSetItemIdentifier {
+            for (itemIdentifier, _) in fileProviderData.fileProviderSignalDeleteWorkingSetItemIdentifier {
                 itemsDelete.append(itemIdentifier)
             }
-            fileProviderData.shared.fileProviderSignalDeleteWorkingSetItemIdentifier.removeAll()
+            fileProviderData.fileProviderSignalDeleteWorkingSetItemIdentifier.removeAll()
         } else {
-            for (itemIdentifier, _) in fileProviderData.shared.fileProviderSignalDeleteContainerItemIdentifier {
+            for (itemIdentifier, _) in fileProviderData.fileProviderSignalDeleteContainerItemIdentifier {
                 itemsDelete.append(itemIdentifier)
             }
-            fileProviderData.shared.fileProviderSignalDeleteContainerItemIdentifier.removeAll()
+            fileProviderData.fileProviderSignalDeleteContainerItemIdentifier.removeAll()
         }
 
         // Report the updated items
         if self.enumeratedItemIdentifier == .workingSet {
-            for (_, item) in fileProviderData.shared.fileProviderSignalUpdateWorkingSetItem {
+            for (_, item) in fileProviderData.fileProviderSignalUpdateWorkingSetItem {
                 itemsUpdate.append(item)
             }
-            fileProviderData.shared.fileProviderSignalUpdateWorkingSetItem.removeAll()
+            fileProviderData.fileProviderSignalUpdateWorkingSetItem.removeAll()
         } else {
-            for (_, item) in fileProviderData.shared.fileProviderSignalUpdateContainerItem {
+            for (_, item) in fileProviderData.fileProviderSignalUpdateContainerItem {
                 itemsUpdate.append(item)
             }
-            fileProviderData.shared.fileProviderSignalUpdateContainerItem.removeAll()
+            fileProviderData.fileProviderSignalUpdateContainerItem.removeAll()
         }
 
         observer.didDeleteItems(withIdentifiers: itemsDelete)
@@ -158,8 +168,8 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
         completionHandler(NSFileProviderSyncAnchor(data!))
     }
 
-    func fetchItemsForPage(serverUrl: String, pageNumber: Int) async -> (metadatas: [tableMetadata]?, isPaginated: Bool) {
-        var useFirstAsMetadataFolder: Bool = false
+    func fetchItemsForPage(serverUrl: String, pageNumber: Int, account: String) async -> (metadatas: [tableMetadata]?, isPaginated: Bool) {
+        var serverUrlMetadataFolder: String?
         var isPaginated: Bool = false
         var paginateCount = recordsPerPage
         if pageNumber == 0 {
@@ -169,6 +179,7 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
         if pageNumber > 0 {
             offset += 1
         }
+        let showHiddenFiles = NCPreferences().getShowHiddenFiles(account: account)
         let options = NKRequestOptions(paginate: true,
                                        paginateToken: self.paginateToken,
                                        paginateOffset: offset,
@@ -186,7 +197,7 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
         let resultsRead = await NextcloudKit.shared.readFileOrFolderAsync(serverUrlFileName: serverUrl,
                                                                           depth: "1",
                                                                           showHiddenFiles: showHiddenFiles,
-                                                                          account: fileProviderData.shared.session.account,
+                                                                          account: account,
                                                                           options: options)
 
         if let headers = resultsRead.responseData?.response?.allHeaderFields as? [String: String] {
@@ -198,50 +209,27 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
 
         if resultsRead.error == .success, let files = resultsRead.files {
             if pageNumber == 0 {
-                await self.database.deleteMetadataAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND status == %d", fileProviderData.shared.session.account, serverUrl, NCGlobal.shared.metadataStatusNormal))
-                useFirstAsMetadataFolder = true
+                await self.database.deleteMetadataAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND status == %d AND fileName != %@", account, serverUrl, NCGlobal.shared.metadataStatusNormal, NextcloudKit.shared.nkCommonInstance.rootFileName))
+                serverUrlMetadataFolder = serverUrl
             }
 
-            let (metadataFolder, metadatas) = await self.database.convertFilesToMetadatasAsync(files, useFirstAsMetadataFolder: useFirstAsMetadataFolder)
+            let (metadataFolder, metadatas) = await self.database.convertFilesToMetadatasAsync(files, serverUrlMetadataFolder: serverUrlMetadataFolder)
 
             // FOLDER
-            if useFirstAsMetadataFolder {
-                await self.database.addMetadataAsync(metadataFolder)
-                await self.database.addDirectoryAsync(e2eEncrypted: metadataFolder.e2eEncrypted,
-                                                      favorite: metadataFolder.favorite,
-                                                      ocId: metadataFolder.ocId,
-                                                      fileId: metadataFolder.fileId,
-                                                      etag: metadataFolder.etag,
-                                                      permissions: metadataFolder.permissions,
-                                                      richWorkspace: metadataFolder.richWorkspace,
-                                                      serverUrl: serverUrl,
-                                                      account: metadataFolder.account)
+            if serverUrlMetadataFolder != nil {
+                await self.database.createDirectory(metadata: metadataFolder)
             }
 
             // METADATA
             var metadataToInsert: [tableMetadata] = []
             for metadata in metadatas {
-                if await self.database.getMetadataFromOcIdAsync(metadata.ocId) == nil {
+                if metadata.directory {
+                    await self.database.createDirectory(metadata: metadata)
+                } else {
                     metadataToInsert.append(metadata)
                 }
             }
             await self.database.addMetadatasAsync(metadataToInsert)
-
-            // DIRECTORY
-            for metadata in metadatas {
-                if metadata.isDirectory {
-                    let serverUrl = serverUrl + "/" + metadata.fileName
-                    await self.database.addDirectoryAsync(e2eEncrypted: metadata.e2eEncrypted,
-                                                          favorite: metadata.favorite,
-                                                          ocId: metadata.ocId,
-                                                          fileId: metadata.fileId,
-                                                          etag: metadata.etag,
-                                                          permissions: metadata.permissions,
-                                                          richWorkspace: metadata.richWorkspace,
-                                                          serverUrl: serverUrl,
-                                                          account: metadata.account)
-                }
-            }
 
             return(metadatas, isPaginated)
 
@@ -252,7 +240,7 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
 
             } else {
 
-                let metadatas = await self.database.getMetadatasAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", fileProviderData.shared.session.account, serverUrl))
+                let metadatas = await self.database.getMetadatasAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", account, serverUrl))
 
                 return (metadatas, isPaginated)
             }

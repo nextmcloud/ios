@@ -1,25 +1,6 @@
-//
-//  NCNetworking.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 23/10/19.
-//  Copyright © 2019 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2019 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import OpenSSL
@@ -27,10 +8,6 @@ import NextcloudKit
 import Alamofire
 import Queuer
 import SwiftUI
-
-#if EXTENSION_FILE_PROVIDER_EXTENSION || EXTENSION_WIDGET
-@objc protocol uploadE2EEDelegate: AnyObject { }
-#endif
 
 @objc protocol ClientCertificateDelegate {
     func onIncorrectPassword()
@@ -49,9 +26,8 @@ protocol NCTransferDelegate: AnyObject {
     func transferChange(status: String, metadatasError: [tableMetadata: NKError])
     func transferReloadData(serverUrl: String?, status: Int?)
     func transferRequestData(serverUrl: String?)
-    func transferCopy(metadata: tableMetadata, error: NKError)
-    func transferMove(metadata: tableMetadata, error: NKError)
-    func transferFileExists(ocId: String, exists: Bool)
+    func transferCopy(metadata: tableMetadata, destination: String, error: NKError)
+    func transferMove(metadata: tableMetadata, destination: String, error: NKError)
 }
 
 extension NCTransferDelegate {
@@ -64,9 +40,194 @@ extension NCTransferDelegate {
     func transferChange(status: String, metadatasError: [tableMetadata: NKError]) {}
     func transferReloadData(serverUrl: String?, status: Int?) {}
     func transferRequestData(serverUrl: String?) {}
-    func transferCopy(metadata: tableMetadata, error: NKError) {}
-    func transferMove(metadata: tableMetadata, error: NKError) {}
-    func transferFileExists(ocId: String, exists: Bool) {}
+    func transferCopy(metadata: tableMetadata, destination: String, error: NKError) {}
+    func transferMove(metadata: tableMetadata, destination: String, error: NKError) {}
+}
+
+/// Actor-based delegate dispatcher using weak references.
+actor NCTransferDelegateDispatcher {
+    // Weak reference collection of delegates
+    private var transferDelegates = NSHashTable<AnyObject>.weakObjects()
+
+    /// Adds a delegate safely.
+    func addDelegate(_ delegate: NCTransferDelegate) {
+        transferDelegates.add(delegate)
+    }
+
+    /// Remove a delegate safely.
+    func removeDelegate(_ delegate: NCTransferDelegate) {
+        transferDelegates.remove(delegate)
+    }
+
+    /// Notifies all delegates.
+    func notifyAllDelegates(_ block: (NCTransferDelegate) -> Void) {
+        let delegatesCopy = transferDelegates.allObjects
+        for delegate in delegatesCopy {
+            if let delegate = delegate as? NCTransferDelegate {
+                block(delegate)
+            }
+        }
+    }
+
+    func notifyAllDelegatesAsync(_ block: @escaping (NCTransferDelegate) async -> Void) async {
+        let delegatesCopy = transferDelegates.allObjects
+        for delegate in delegatesCopy {
+            if let delegate = delegate as? NCTransferDelegate {
+                await block(delegate)
+            }
+        }
+    }
+
+    /// Notifies the delegate for a specific scene.
+    func notifyDelegate(forScene sceneIdentifier: String, _ block: (NCTransferDelegate) -> Void) {
+        let delegatesCopy = transferDelegates.allObjects
+        for delegate in delegatesCopy {
+            if let delegate = delegate as? NCTransferDelegate,
+               delegate.sceneIdentifier == sceneIdentifier {
+                block(delegate)
+            }
+        }
+    }
+
+    /// Notifies matching and non-matching delegates for a specific scene.
+    func notifyDelegates(forScene sceneIdentifier: String,
+                         matching: (NCTransferDelegate) -> Void,
+                         others: (NCTransferDelegate) -> Void) {
+        let delegatesCopy = transferDelegates.allObjects
+        for delegate in delegatesCopy {
+            guard let delegate = delegate as? NCTransferDelegate else { continue }
+            if delegate.sceneIdentifier == sceneIdentifier {
+                matching(delegate)
+            } else {
+                others(delegate)
+            }
+        }
+    }
+}
+
+/// A thread-safe registry for tracking in-flight `URLSessionTask` instances.
+///
+/// Each task is associated with a string identifier (`identifier`) that you define,
+/// allowing you to check whether a request is already running, avoid duplicates,
+/// and cancel all active tasks at once. The registry automatically removes
+/// completed tasks via `cleanupCompleted()` to keep memory usage compact.
+///
+/// Typical use cases:
+/// - Ensure only one task per identifier is active at a time.
+/// - Query whether a specific request is still running (`isReading`).
+/// - Forcefully stop a specific request (`cancel`).
+/// - Forcefully stop all tasks when leaving a screen (`cancelAll`).
+actor NetworkingTasks {
+    private var active: [(identifier: String, task: URLSessionTask)] = []
+
+    /// Returns whether there is an in-flight task for the given URL.
+    ///
+    /// A task is considered in-flight if its `state` is `.running` or `.suspended`.
+    /// - Parameter identifier: The identifier to check.
+    /// - Returns: `true` if a matching in-flight task exists; otherwise `false`.
+    func isReading(identifier: String) -> Bool {
+        // Drop finished/canceling tasks globally
+        cleanup()
+
+        return active.contains {
+            $0.identifier == identifier && ($0.task.state == .running || $0.task.state == .suspended)
+        }
+    }
+
+    /// Tracks a newly created `URLSessionTask` for the given identifier.
+    ///
+    /// If a running entry for the same identifier exists, it is removed before appending the new one.
+    /// - Parameters:
+    ///   - identifier: The identifier associated with the task.
+    ///   - task: The `URLSessionTask` to track.
+    func track(identifier: String, task: URLSessionTask) {
+        // Drop finished/canceling tasks globally
+        cleanup()
+
+        active.removeAll {
+            $0.identifier == identifier && $0.task.state == .running
+        }
+        active.append((identifier, task))
+        nkLog(tag: NCGlobal.shared.logTagNetworkingTasks, emoji: .start, message: "Start task for identifier: \(identifier)", consoleOnly: true)
+    }
+
+    /// create a Identifier
+    /// 
+    func createIdentifier(account: String? = nil, path: String? = nil, name: String) -> String {
+        if let account,
+           let path {
+            return account + "_" + path + "_" + name
+        } else if let path {
+            return path + "_" + name
+        } else {
+            return name
+        }
+    }
+
+    /// Cancels and removes all tasks associated with the given id.
+    ///
+    /// - Parameter identifier: The identifier whose tasks should be canceled.
+    func cancel(identifier: String) {
+        // Drop finished/canceling tasks globally
+        cleanup()
+
+        for element in active where element.identifier == identifier {
+            element.task.cancel()
+            nkLog(tag: NCGlobal.shared.logTagNetworkingTasks, emoji: .cancel, message: "Cancel task for identifier: \(identifier)", consoleOnly: true)
+        }
+        active.removeAll {
+            $0.identifier == identifier
+        }
+    }
+
+    /// Cancels all tracked `URLSessionTask` and clears the registry.
+    ///
+    /// Call this when leaving the page/screen or when the operation must be forcefully stopped.
+    func cancelAll() {
+        active.forEach {
+            $0.task.cancel()
+            nkLog(tag: NCGlobal.shared.logTagNetworkingTasks, emoji: .cancel, message: "Cancel task with identifier: \($0.identifier)", consoleOnly: true)
+        }
+        active.removeAll()
+    }
+
+    /// Removes tasks that have completed from the registry.
+    ///
+    /// Useful to keep the in-memory list compact during long-running operations.
+    func cleanup() {
+        active.removeAll {
+            $0.task.state == .completed || $0.task.state == .canceling
+        }
+    }
+}
+
+/// Quantizes per-task progress updates to integer percentages (0...100).
+/// Each (serverUrlFileName) pair is tracked separately, so you get
+/// at most one update per integer percent for each transfer.
+actor ProgressQuantizer {
+    private var lastPercent: [String: Int] = [:]
+
+    /// Returns `true` only when integer percent changes (or hits 100).
+    ///
+    /// - Parameters:
+    ///   - serverUrlFileName: The name of the file being transferred.
+    ///   - fraction: Progress fraction [0.0 ... 1.0].
+    func shouldEmit(serverUrlFileName: String, fraction: Double) -> Bool {
+        let percent = min(max(Int((fraction * 100).rounded(.down)), 0), 100)
+
+        let last = lastPercent[serverUrlFileName] ?? -1
+        guard percent != last || percent == 100 else {
+            return false
+        }
+
+        lastPercent[serverUrlFileName] = percent
+        return true
+    }
+
+    /// Clears stored state for a finished transfer.
+    func clear(serverUrlFileName: String) {
+        lastPercent.removeValue(forKey: serverUrlFileName)
+    }
 }
 
 class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
@@ -76,6 +237,8 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
         var fileName: String
         var serverUrl: String
     }
+
+    let networkingTasks = NetworkingTasks()
 
     let sessionDownload = NextcloudKit.shared.nkCommonInstance.identifierSessionDownload
     let sessionDownloadBackground = NextcloudKit.shared.nkCommonInstance.identifierSessionDownloadBackground
@@ -88,7 +251,6 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
 
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
-    let database = NCManageDatabase.shared
     let global = NCGlobal.shared
     let backgroundSession = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)
 
@@ -99,6 +261,7 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     var p12Data: Data?
     var p12Password: String?
     var tapHudStopDelete = false
+    var controller: UIViewController?
 
     var isOffline: Bool {
         return networkReachability == NKTypeReachability.notReachable || networkReachability == NKTypeReachability.unknown
@@ -107,6 +270,13 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
         return networkReachability == NKTypeReachability.reachableEthernetOrWiFi || networkReachability == NKTypeReachability.reachableCellular
     }
 
+    // Capabilities
+    var capabilities = ThreadSafeDictionary<String, NKCapabilities.Capabilities>()
+
+    let transferDispatcher = NCTransferDelegateDispatcher()
+
+    let progressQuantizer = ProgressQuantizer()
+
     // OPERATIONQUEUE
     let downloadThumbnailQueue = Queuer(name: "downloadThumbnailQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
     let downloadThumbnailActivityQueue = Queuer(name: "downloadThumbnailActivityQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
@@ -114,7 +284,6 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     let unifiedSearchQueue = Queuer(name: "unifiedSearchQueue", maxConcurrentOperationCount: 1, qualityOfService: .default)
     let saveLivePhotoQueue = Queuer(name: "saveLivePhotoQueue", maxConcurrentOperationCount: 1, qualityOfService: .default)
     let downloadAvatarQueue = Queuer(name: "downloadAvatarQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
-    let fileExistsQueue = Queuer(name: "fileExistsQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
 
     // MARK: - init
 
@@ -135,6 +304,7 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
             NCTransferProgress.shared.clearAllCountError()
         }
     }
+    init() { }
 
     // MARK: - Communication Delegate
 
@@ -149,6 +319,7 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
             lastReachability = false
         }
         networkReachability = typeReachability
+        NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterNetworkReachability, userInfo: nil)
     }
 
     func authenticationChallenge(_ session: URLSession,
@@ -200,7 +371,6 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
             return
         }
 
-        // Salvataggio asincrono → nessun rischio per il main thread
         DispatchQueue.global(qos: .utility).async {
             self.saveX509Certificate(certificate, host: host, directoryCertificate: directoryCertificate)
 
@@ -273,44 +443,8 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
         BIO_free(mem)
     }
 
-    func checkPushNotificationServerProxyCertificateUntrusted(viewController: UIViewController?,
-                                                              completion: @escaping (_ error: NKError) -> Void) {
-        guard let host = URL(string: NCBrandOptions.shared.pushNotificationServerProxy)?.host else {
-            return
-        }
-
-        NextcloudKit.shared.checkServer(serverUrl: NCBrandOptions.shared.pushNotificationServerProxy) { _, error in
-            guard error == .success else {
-                completion(.success)
-                return
-            }
-
-            if error == .success {
-                self.writeCertificate(host: host)
-                completion(error)
-            } else if error.errorCode == NSURLErrorServerCertificateUntrusted {
-                let alertController = UIAlertController(title: NSLocalizedString("_ssl_certificate_untrusted_", comment: ""), message: NSLocalizedString("_connect_server_anyway_", comment: ""), preferredStyle: .alert)
-                alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .default, handler: { _ in
-                    self.writeCertificate(host: host)
-                    completion(.success)
-                }))
-                alertController.addAction(UIAlertAction(title: NSLocalizedString("_no_", comment: ""), style: .default, handler: { _ in
-                    completion(error)
-                }))
-                alertController.addAction(UIAlertAction(title: NSLocalizedString("_certificate_details_", comment: ""), style: .default, handler: { _ in
-                    if let navigationController = UIStoryboard(name: "NCViewCertificateDetails", bundle: nil).instantiateInitialViewController() as? UINavigationController,
-                       let vcCertificateDetails = navigationController.topViewController as? NCViewCertificateDetails {
-                        vcCertificateDetails.host = host
-                        viewController?.present(navigationController, animated: true)
-                    }
-                }))
-                viewController?.present(alertController, animated: true)
-            }
-        }
-    }
-
-    private func getActiveAccountCertificate(account: String) {
-        (self.p12Data, self.p12Password) = NCKeychain().getClientCertificate(account: account)
+    func activeAccountCertificate(account: String) {
+        (self.p12Data, self.p12Password) = NCPreferences().getClientCertificate(account: account)
     }
 
     // MARK: - User Default Data Request

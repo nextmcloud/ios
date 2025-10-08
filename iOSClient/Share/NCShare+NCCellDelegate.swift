@@ -29,7 +29,8 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
     func copyInternalLink(sender: Any) {
         guard let metadata = self.metadata else { return }
 
-        NCNetworking.shared.readFile(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account) { _, metadata, error in
+        let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
+        NCNetworking.shared.readFile(serverUrlFileName: serverUrlFileName, account: metadata.account) { _, metadata, error in
             if error == .success, let metadata = metadata {
                 let internalLink = metadata.urlBase + "/index.php/f/" + metadata.fileId
                 self.shareCommon.copyLink(link: internalLink, viewController: self, sender: sender)
@@ -48,7 +49,6 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
 
     func tapMenu(with tableShare: tableShare?, sender: Any) {
         if let tableShare = tableShare {
-//            self.toggleShareMenu(for: tableShare, sender: sender)
             self.toggleShareMenu(for: tableShare, sendMail: (tableShare.shareType != NCShareCommon().SHARE_TYPE_LINK), folder: metadata?.directory ?? false, sender: sender)
         } else {
             self.makeNewLinkShare()

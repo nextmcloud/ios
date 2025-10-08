@@ -13,7 +13,14 @@ class NCNetworkingE2EEMarkFolder: NSObject {
         let serverUrlFileName = serverUrl + "/" + fileName
         let resultsReadFileOrFolder = await NCNetworking.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", account: account)
     func markFolderE2ee(account: String, serverUrlFileName: String, userId: String) async -> NKError {
-        let resultsReadFileOrFolder = await NextcloudKit.shared.readFileOrFolderAsync(serverUrlFileName: serverUrlFileName, depth: "0", account: account)
+        let resultsReadFileOrFolder = await NextcloudKit.shared.readFileOrFolderAsync(serverUrlFileName: serverUrlFileName, depth: "0", account: account) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                            path: serverUrlFileName,
+                                                                                            name: "readFileOrFolder")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
         guard resultsReadFileOrFolder.error == .success,
               var file = resultsReadFileOrFolder.files?.first else {
             return resultsReadFileOrFolder.error
@@ -21,18 +28,24 @@ class NCNetworkingE2EEMarkFolder: NSObject {
         let resultsMarkE2EEFolder = await NCNetworking.shared.markE2EEFolder(fileId: file.fileId, delete: false, account: account, options: NCNetworkingE2EE().getOptions(account: account))
         guard resultsMarkE2EEFolder.error == .success else { return resultsMarkE2EEFolder.error }
         let resultsMarkE2EEFolder = await NextcloudKit.shared.markE2EEFolderAsync(fileId: file.fileId, delete: false, account: account, options: NCNetworkingE2EE().getOptions(account: account))
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
+        let resultsMarkE2EEFolder = await NextcloudKit.shared.markE2EEFolderAsync(fileId: file.fileId, delete: false, account: account, options: NCNetworkingE2EE().getOptions(account: account, capabilities: capabilities)) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                            path: file.fileId,
+                                                                                            name: "markE2EEFolder")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
         guard resultsMarkE2EEFolder.error == .success else {
             return resultsMarkE2EEFolder.error
         }
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: account)
 
         file.e2eEncrypted = true
 
-        guard let metadata = await self.database.addAndReturnMetadataAsync(self.database.convertFileToMetadata(file, isDirectoryE2EE: false)) else {
-            return .invalidData
-        }
+        let metadata = await self.database.convertFileToMetadataAsync(file)
+        await self.database.createDirectory(metadata: metadata)
 
-        await self.database.addDirectoryAsync(e2eEncrypted: true, favorite: metadata.favorite, ocId: metadata.ocId, fileId: metadata.fileId, permissions: metadata.permissions, serverUrl: serverUrlFileName, account: metadata.account)
         await self.database.deleteE2eEncryptionAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", metadata.account, serverUrlFileName))
         if capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
             await self.database.updateCounterE2eMetadataAsync(account: account, ocIdServerUrl: metadata.ocId, counter: 0)
@@ -46,6 +59,7 @@ class NCNetworkingE2EEMarkFolder: NSObject {
 
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCreateFolder, userInfo: ["ocId": metadata.ocId, "serverUrl": serverUrl, "account": account, "withPush": true])
         NCNetworking.shared.notifyAllDelegates { delegate in
+        await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
             delegate.transferChange(status: NCGlobal.shared.networkingStatusCreateFolder,
                                     metadata: metadata.detachedCopy(),
                                     error: .success)

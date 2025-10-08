@@ -29,7 +29,7 @@ import UIKit
 import FloatingPanel
 
 extension Array where Element == NCMenuAction {
-    var listHeight: CGFloat { reduce(0, { $0 + $1.rowHeight }) }
+    var panelHeight: CGFloat { reduce(0, { $0 + $1.rowHeight }) }
 }
 
 class NCMenu: UITableViewController {
@@ -51,8 +51,6 @@ class NCMenu: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.contentInset.top = 10
-        tableView.estimatedRowHeight = 60
-        tableView.rowHeight = UITableView.automaticDimension
         self.view.backgroundColor = menuColor
     }
 
@@ -111,9 +109,9 @@ class NCMenu: UITableViewController {
             actionNameLabel?.lineBreakMode = .byTruncatingMiddle
 
             if action.boldTitle {
-                actionNameLabel?.font = .systemFont(ofSize: 18, weight: .medium)
+                actionNameLabel?.font = .systemFont(ofSize: 16, weight: .medium)
             } else {
-                actionNameLabel?.font = .systemFont(ofSize: 18, weight: .regular)
+                actionNameLabel?.font = .systemFont(ofSize: 16, weight: .regular)
             }
         }
 
@@ -131,7 +129,7 @@ class NCMenu: UITableViewController {
     // MARK: - Tabel View Layout
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        actions[indexPath.row].title == NCMenuAction.seperatorIdentifier ? NCMenuAction.seperatorHeight : UITableView.automaticDimension
+        return actions[indexPath.row].rowHeight
     }
 }
 extension NCMenu: FloatingPanelControllerDelegate {
@@ -142,6 +140,11 @@ extension NCMenu: FloatingPanelControllerDelegate {
 
     func floatingPanel(_ fpc: FloatingPanelController, layoutFor newCollection: UITraitCollection) -> FloatingPanelLayout {
         return NCMenuFloatingPanelLayout(actionsHeight: self.actions.listHeight)
+        return NCMenuFloatingPanelLayout(panelHeight: self.actions.panelHeight, controller: controller)
+    }
+
+    func floatingPanel(_ fpc: FloatingPanelController, layoutFor newCollection: UITraitCollection) -> FloatingPanelLayout {
+        return NCMenuFloatingPanelLayout(panelHeight: self.actions.panelHeight, controller: controller)
     }
 
     func floatingPanel(_ fpc: FloatingPanelController, animatorForDismissingWith velocity: CGVector) -> UIViewPropertyAnimator {

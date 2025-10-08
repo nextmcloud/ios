@@ -22,10 +22,11 @@ class NCNetworkingE2EECreateFolder: NSObject {
             return error
         }
     func createFolder(fileName: String, serverUrl: String, sceneIdentifier: String?, session: NCSession.Session) async -> NKError {
-        var fileNameFolder = FileAutoRenamer.rename(fileName, isFolderPath: true, account: session.account)
+        let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
+        var fileNameFolder = FileAutoRenamer.rename(fileName, isFolderPath: true, capabilities: capabilities)
 
         let fileNameIdentifier = networkingE2EE.generateRandomIdentifier()
-        let serverUrlFileName = serverUrl + "/" + fileNameIdentifier
+        let serverUrlFileName = utilityFileSystem.createServerUrl(serverUrl: serverUrl, fileName: fileNameIdentifier)
         fileNameFolder = utilityFileSystem.createFileName(fileNameFolder, serverUrl: serverUrl, account: session.account)
         if fileNameFolder.isEmpty {
             return NKError(errorCode: NCGlobal.shared.errorUnexpectedResponseFromDB, errorDescription: NSLocalizedString("_e2e_error_", comment: ""))
@@ -113,6 +114,14 @@ class NCNetworkingE2EECreateFolder: NSObject {
         // CREATE FOLDER
         //
         let resultsCreateFolder = await NCNetworking.shared.createFolder(serverUrlFileName: serverUrlFileName, account: session.account, options: NKRequestOptions(customHeader: ["e2e-token": e2eToken]))
+        let resultsCreateFolder = await NextcloudKit.shared.createFolderAsync(serverUrlFileName: serverUrlFileName, account: session.account, options: NKRequestOptions(customHeader: ["e2e-token": e2eToken])) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: session.account,
+                                                                                            path: serverUrlFileName,
+                                                                                            name: "createFolder")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
         guard resultsCreateFolder.error == .success, let ocId = resultsCreateFolder.ocId, let fileId = utility.ocIdToFileId(ocId: ocId) else {
             await networkingE2EE.unlock(account: session.account, serverUrl: serverUrl)
             return resultsCreateFolder.error
@@ -121,6 +130,14 @@ class NCNetworkingE2EECreateFolder: NSObject {
         // SET FOLDER AS E2EE
         //
         let resultsMarkE2EEFolder = await NCNetworking.shared.markE2EEFolder(fileId: fileId, delete: false, account: session.account, options: NCNetworkingE2EE().getOptions(account: session.account))
+        let resultsMarkE2EEFolder = await NextcloudKit.shared.markE2EEFolderAsync(fileId: fileId, delete: false, account: session.account, options: NCNetworkingE2EE().getOptions(account: session.account, capabilities: capabilities)) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: session.account,
+                                                                                            path: fileId,
+                                                                                            name: "markE2EEFolder")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
         guard resultsMarkE2EEFolder.error == .success  else {
             await networkingE2EE.unlock(account: session.account, serverUrl: serverUrl)
             return resultsMarkE2EEFolder.error
@@ -133,6 +150,14 @@ class NCNetworkingE2EECreateFolder: NSObject {
         // WRITE DB (DIRECTORY - METADATA)
         //
         let resultsReadFileOrFolder = await NCNetworking.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", account: session.account)
+        let resultsReadFileOrFolder = await NextcloudKit.shared.readFileOrFolderAsync(serverUrlFileName: serverUrlFileName, depth: "0", account: session.account) { task in
+            Task {
+                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: session.account,
+                                                                                            path: serverUrlFileName,
+                                                                                            name: "readFileOrFolder")
+                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+            }
+        }
         guard resultsReadFileOrFolder.error == .success, let file = resultsReadFileOrFolder.files?.first else {
             await networkingE2EE.unlock(account: session.account, serverUrl: serverUrl)
             return resultsReadFileOrFolder.error
@@ -145,8 +170,11 @@ class NCNetworkingE2EECreateFolder: NSObject {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCreateFolder, userInfo: ["ocId": ocId, "serverUrl": serverUrl, "account": session.account, "withPush": withPush, "sceneIdentifier": sceneIdentifier as Any])
         await self.database.addMetadataAsync(metadata)
         await self.database.addDirectoryAsync(e2eEncrypted: true, favorite: metadata.favorite, ocId: metadata.ocId, fileId: metadata.fileId, permissions: metadata.permissions, serverUrl: serverUrlFileName, account: metadata.account)
+        let metadata = await self.database.convertFileToMetadataAsync(file)
 
-        NCNetworking.shared.notifyAllDelegates { delegate in
+        await self.database.createDirectory(metadata: metadata)
+
+        await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
             delegate.transferChange(status: self.global.networkingStatusCreateFolder,
                                     metadata: metadata.detachedCopy(),
                                     error: .success)

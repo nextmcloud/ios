@@ -152,6 +152,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row.action.formSelector = #selector(changeDestinationFolder(_:))
         row.cellConfig["folderImage.image"] =  UIImage(named: "folder_nmcloud")?.image(color: NCBrandColor.shared.brandElement, size: 25)
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
+        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
         if(self.titleServerUrl == "/"){
@@ -191,6 +192,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
             if let fileNameNew = formRow.value as? String {
                 self.fileName = utility.removeForbiddenCharacters(fileNameNew)
+                self.fileName = FileAutoRenamer.rename(fileNameNew, account: session.account)
             } else {
                 self.fileName = ""
             }
@@ -252,6 +254,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 //        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "")
         let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate.sceneIdentifier)
         let metadataForUpload = NCManageDatabase.shared.createMetadata(account: self.appDelegate.account, user: self.appDelegate.user, userId: self.appDelegate.userId, fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: self.serverUrl, urlBase: self.appDelegate.urlBase, url: "", contentType: "")
+        let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate.sceneIdentifier)
 
         metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
         metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile

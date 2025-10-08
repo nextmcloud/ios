@@ -32,23 +32,6 @@ extension NCViewer {
         var actions = [NCMenuAction]()
         let localFile = self.database.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId))
         let isOffline = localFile?.offline == true
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: metadata.account)
-
-        //
-        // DETAIL
-        //
-        if !(!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty) {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_details_", comment: ""),
-                    icon: utility.loadImage(named: "info.circle", colors: [NCBrandColor.shared.iconImageColor]),
-                    sender: sender,
-                    action: { _ in
-                        NCDownloadAction.shared.openShare(viewController: controller, metadata: metadata, page: .activity)
-                    }
-                )
-            )
-        }
 
         //
         // VIEW IN FOLDER
@@ -203,22 +186,9 @@ extension NCViewer {
                             viewController.present(popup, animated: true)
                     action: { _ in
                         if self.utilityFileSystem.fileProviderStorageExists(metadata) {
-                            NCNetworking.shared.notifyAllDelegates { delegate in
-                                let metadata = metadata.detachedCopy()
-                                metadata.sessionSelector = NCGlobal.shared.selectorSaveAsScan
-                                delegate.transferChange(status: NCGlobal.shared.networkingStatusDownloaded,
-                                                        metadata: metadata,
-                                                        error: .success)
-                            }
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorPrint, "error": NKError(), "account": metadata.account, "ocIdTransfer": metadata.ocIdTransfer])
                         } else {
-                            Task {
-                                if let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
-                                                                                                            session: NCNetworking.shared.sessionDownload,
-                                                                                                            selector: NCGlobal.shared.selectorSaveAsScan,
-                                                                                                            sceneIdentifier: controller.sceneIdentifier) {
-                                    NCNetworking.shared.download(metadata: metadata)
-                                }
-                            }
+                            NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint))
                         }
                     }
                 )
@@ -337,6 +307,19 @@ extension NCViewer {
         if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
             actions.append(.copyAction(selectOcId: [metadata.ocId]))
         }
+        
+        //
+        // COPY - MOVE
+        //
+        if !webView, metadata.isCopyableMovable {
+            actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], controller: controller))
+        }
+        
+        // COPY IN PASTEBOARD
+        //
+        if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
+            actions.append(.copyAction(fileSelect: [metadata.ocId], controller: controller))
+        }
 
         //
         // PDF
@@ -393,22 +376,21 @@ extension NCViewer {
                     sender: sender,
                     action: { _ in
                         if self.utilityFileSystem.fileProviderStorageExists(metadata) {
-                            NCNetworking.shared.notifyAllDelegates { delegate in
-                                let metadata = metadata.detachedCopy()
-                                metadata.sessionSelector = NCGlobal.shared.selectorLoadFileQuickLook
-                                delegate.transferChange(status: NCGlobal.shared.networkingStatusDownloaded,
-                                                        metadata: metadata,
-                                                        error: .success)
-                            }
+                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile,
+                                                                        object: nil,
+                                                                        userInfo: ["ocId": metadata.ocId,
+                                                                                   "ocIdTransfer": metadata.ocIdTransfer,
+                                                                                   "session": metadata.session,
+                                                                                   "selector": NCGlobal.shared.selectorLoadFileQuickLook,
+                                                                                   "error": NKError(),
+                                                                                   "account": metadata.account],
+                                                                        second: 0.5)
                         } else {
-                            Task {
-                                if let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
-                                                                                                            session: NCNetworking.shared.sessionDownload,
-                                                                                                            selector: NCGlobal.shared.selectorLoadFileQuickLook,
-                                                                                                            sceneIdentifier: controller.sceneIdentifier) {
-                                    NCNetworking.shared.download(metadata: metadata)
-                                }
-                            }
+                            guard let metadata = self.database.setMetadatasSessionInWaitDownload(metadatas: [metadata],
+                                                                                                 session: NCNetworking.shared.sessionDownload,
+                                                                                                 selector: NCGlobal.shared.selectorLoadFileQuickLook,
+                                                                                                 sceneIdentifier: controller.sceneIdentifier) else { return }
+                            NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
                         }
                     }
                 )

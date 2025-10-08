@@ -47,14 +47,43 @@ class NCMenuFloatingPanelLayout: FloatingPanelLayout {
         : max(window.frame.size.width, window.frame.size.height)
         let bottomInset = window.rootViewController?.view.safeAreaInsets.bottom ?? 0
         let panelHeight = actionsHeight + bottomInset
+            [
+                .full: FloatingPanelLayoutAnchor(
+                    absoluteInset: finalPanelHeight,
+                    edge: .bottom,
+                    referenceGuide: .superview
+                )
+            ]
+        }
+    private let panelHeight: CGFloat
+    private let finalPanelHeight: CGFloat
 
-        topInset = max(48, screenHeight - panelHeight)
-     }
+    init(panelHeight: CGFloat, controller: NCMainTabBarController?) {
+        self.panelHeight = panelHeight
+        var window: UIWindow?
+
+        if let controller {
+            window = controller.window
+        } else if let windowScene = UIApplication.shared.connectedScenes.first(where: { $0 is UIWindowScene }) as? UIWindowScene {
+            window = windowScene.windows.first(where: { $0.isKeyWindow })
+        }
+
+        let safeBottom = controller?.viewIfLoaded?.safeAreaInsets.bottom ?? 0
+        let requestedHeight = panelHeight + safeBottom
+
+        // ✅ Limite massimo: finestra - topMargin
+        let topMargin: CGFloat = 64
+        let windowHeight = window?.bounds.height ?? UIScreen.main.bounds.height
+        let maxHeight = windowHeight - topMargin
+
+        // ✅ Imposta finalPanelHeight con limite
+        self.finalPanelHeight = min(requestedHeight, maxHeight)
+    }
 
     func prepareLayout(surfaceView: UIView, in view: UIView) -> [NSLayoutConstraint] {
         return [
-            surfaceView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 0),
-            surfaceView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: 0)
+            surfaceView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            surfaceView.rightAnchor.constraint(equalTo: view.rightAnchor)
         ]
     }
 
@@ -64,7 +93,6 @@ class NCMenuFloatingPanelLayout: FloatingPanelLayout {
 }
 
 class NCMenuPanelController: FloatingPanelController {
-
     var parentPresenter: UIViewController?
 
     // MARK: - View Life Cycle

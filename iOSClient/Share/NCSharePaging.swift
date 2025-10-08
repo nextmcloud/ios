@@ -107,9 +107,7 @@ class NCSharePaging: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: metadata.account)
-
-        if !capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty {
+        if NCCapabilities.shared.disableSharesView(account: metadata.account) {
             self.dismiss(animated: false, completion: nil)
         }
 
@@ -291,8 +289,6 @@ class NCShareHeaderView: UIView {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap(_:)))
-        path.addGestureRecognizer(longGesture)
         setupUI()
     }
 

@@ -104,6 +104,9 @@ extension NCManageDatabase {
     @discardableResult
     func setAvatarLoaded(fileName: String) -> UIImage? {
         let fileNameLocalPath = utilityFileSystem.directoryUserData + "/" + fileName
+    func setAvatarLoaded(fileName: String, sync: Bool = true) -> UIImage? {
+        let directoryUserData = utilityFileSystem.directoryUserData
+        let fileNameLocalPath = utilityFileSystem.createServerUrl(serverUrl: directoryUserData, fileName: fileName)
         var image: UIImage?
 
         do {
@@ -132,7 +135,8 @@ extension NCManageDatabase {
     /// - Returns: The `UIImage` if successfully loaded from disk, or `nil` if not found or deleted.
     @discardableResult
     func setAvatarLoadedAsync(fileName: String) async -> UIImage? {
-        let fileNameLocalPath = utilityFileSystem.directoryUserData + "/" + fileName
+        let directoryUserData = utilityFileSystem.directoryUserData
+        let fileNameLocalPath = utilityFileSystem.createServerUrl(serverUrl: directoryUserData, fileName: fileName)
         var image: UIImage?
 
         await performRealmWriteAsync { realm in
@@ -191,7 +195,8 @@ extension NCManageDatabase {
     }
 
     func getImageAvatarLoaded(fileName: String) -> (image: UIImage?, tblAvatar: tableAvatar?) {
-        let fileNameLocalPath = utilityFileSystem.directoryUserData + "/" + fileName
+        let directoryUserData = utilityFileSystem.directoryUserData
+        let fileNameLocalPath = utilityFileSystem.createServerUrl(serverUrl: directoryUserData, fileName: fileName)
         let image = UIImage(contentsOfFile: fileNameLocalPath)
         var tblAvatar: tableAvatar?
 
@@ -215,6 +220,16 @@ extension NCManageDatabase {
         do {
             let realm = try Realm()
             let result = realm.objects(tableAvatar.self).filter("fileName == %@", fileName).first
+        performRealmRead({ realm in
+            return realm.objects(tableAvatar.self)
+                .filter("fileName == %@", fileName)
+                .first
+                .map { tableAvatar(value: $0) }
+        }, sync: false) { result in
+            let directoryUserData = self.utilityFileSystem.directoryUserData
+            let fileNameLocalPath = self.utilityFileSystem.createServerUrl(serverUrl: directoryUserData, fileName: fileName)
+            let image = UIImage(contentsOfFile: fileNameLocalPath)
+
             if result == nil {
                 utilityFileSystem.removeFile(atPath: fileNameLocalPath)
             }

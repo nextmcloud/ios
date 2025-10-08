@@ -60,7 +60,7 @@ class NCViewerProviderContextMenu: UIViewController {
             imageView.image = image
             imageView.frame = resize(CGSize(width: sizeIcon, height: sizeIcon))
             // PREVIEW
-            if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt512) {
+            if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt512, userId: metadata.userId, urlBase: metadata.urlBase) {
                 imageView.image = image
                 imageView.frame = resize(image.size)
             }
@@ -74,7 +74,7 @@ class NCViewerProviderContextMenu: UIViewController {
             }
             // VIEW VIDEO
             if metadata.isVideo {
-                if !NCUtility().existsImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt512) {
+                if !NCUtility().existsImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt512, userId: metadata.userId, urlBase: metadata.urlBase) {
                     let newSize = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
                     imageView.image = nil
                     imageView.frame = newSize
@@ -102,7 +102,7 @@ class NCViewerProviderContextMenu: UIViewController {
                             if let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
                                                                                                                   session: self.networking.sessionDownload,
                                                                                                                   selector: "") {
-                                self.networking.download(metadata: metadata)
+                                await self.networking.downloadFile(metadata: metadata)
                             }
                         }
                     }
@@ -116,11 +116,12 @@ class NCViewerProviderContextMenu: UIViewController {
                                                                           session: NCNetworking.shared.sessionDownload,
                                                                           selector: "")
                 NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
+               metadata.contentType == "image/gif" || metadata.contentType == "image/svg+xml" {
                 Task {
                     if let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
                                                                                                           session: self.networking.sessionDownload,
                                                                                                           selector: "") {
-                        self.networking.download(metadata: metadata)
+                        await self.networking.downloadFile(metadata: metadata)
                     }
                 }
             }
@@ -136,7 +137,7 @@ class NCViewerProviderContextMenu: UIViewController {
                     if let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadataLivePhoto.ocId,
                                                                                                           session: self.networking.sessionDownload,
                                                                                                           selector: "") {
-                        self.networking.download(metadata: metadata)
+                        await self.networking.downloadFile(metadata: metadata)
                     }
                 }
             }
@@ -155,6 +156,9 @@ class NCViewerProviderContextMenu: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(downloadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(downloadCancelFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadCancelFile), object: nil)
         self.networking.addDelegate(self)
+        Task {
+            await NCNetworking.shared.transferDispatcher.addDelegate(self)
+        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -214,18 +218,27 @@ class NCViewerProviderContextMenu: UIViewController {
             NCActivityIndicator.shared.stop()
         }
         self.networking.removeDelegate(self)
+        Task {
+            await NCNetworking.shared.transferDispatcher.removeDelegate(self)
+        }
     }
 
     // MARK: - Viewer
 
     private func viewImage(metadata: tableMetadata) {
         var image: UIImage?
-        let filePath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)
+        let filePath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                         fileName: metadata.fileNameView,
+                                                                         userId: metadata.userId,
+                                                                         urlBase: metadata.urlBase)
 
         if metadata.contentType == "image/gif" {
             image = UIImage.animatedImage(withAnimatedGIFURL: URL(fileURLWithPath: filePath))
         } else if metadata.contentType == "image/svg+xml" {
-            let imagePath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, fileNameView: metadata.fileNameView)
+            let imagePath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                              fileName: metadata.fileNameView,
+                                                                              userId: metadata.userId,
+                                                                              urlBase: metadata.urlBase)
             if let svgImage = SVGKImage(contentsOfFile: imagePath) {
                 svgImage.size = NCGlobal.shared.size1024
                 image = svgImage.uiImage
@@ -333,5 +346,43 @@ extension NCViewerProviderContextMenu: VLCMediaPlayerDelegate {
 
     func mediaPlayer(_ player: VLCMediaPlayer, recordingStoppedAtPath path: String) {
         // Handle other states...
+    }
+}
+
+extension NCViewerProviderContextMenu: NCTransferDelegate {
+    func transferChange(status: String, metadata: tableMetadata, error: NKError) {
+        if error != .success {
+            NCContentPresenter().showError(error: error)
+        }
+
+        DispatchQueue.main.async {
+            switch status {
+            // DOWNLOAD
+            case self.global.networkingStatusDownloading:
+                if metadata.ocId == self.metadata?.ocId || metadata.ocId == self.metadataLivePhoto?.ocId {
+                    NCActivityIndicator.shared.start(backgroundView: self.view)
+                }
+            case self.global.networkingStatusDownloaded:
+                if error == .success, metadata.ocId == self.metadata?.ocId {
+                    if metadata.isImage {
+                        self.viewImage(metadata: metadata)
+                    } else if metadata.isVideo || metadata.isAudio {
+                        self.viewVideo(metadata: metadata)
+                    }
+                }
+                if error == .success && metadata.ocId == self.metadataLivePhoto?.ocId {
+                    self.viewVideo(metadata: metadata)
+                }
+                if metadata.ocId == self.metadata?.ocId || metadata.ocId == self.metadataLivePhoto?.ocId {
+                    NCActivityIndicator.shared.stop()
+                }
+            case self.global.networkingStatusDownloadCancel:
+                if metadata.ocId == self.metadata?.ocId || metadata.ocId == self.metadataLivePhoto?.ocId {
+                    NCActivityIndicator.shared.stop()
+                }
+            default:
+                break
+            }
+        }
     }
 }

@@ -1,25 +1,6 @@
-//
-//  NCCollectionViewCommon+CollectionViewDataSource.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 02/07/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import UIKit
@@ -381,6 +362,8 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             // Local image: offline
             if let tableDirectory, tableDirectory.offline {
                 cell.fileLocalImage?.image = imageCache.getImageOfflineFlag()
+            if let tblDirectory, tblDirectory.offline {
+                cell.fileLocalImage?.image = imageCache.getImageOfflineFlag(colors: [.systemBackground, .systemGreen])
             }
 
             // color folder
@@ -464,9 +447,9 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             // image local
             if let tableLocalFile, tableLocalFile.offline {
                 a11yValues.append(NSLocalizedString("_offline_", comment: ""))
-                cell.fileLocalImage?.image = imageCache.getImageOfflineFlag()
+                cell.fileLocalImage?.image = imageCache.getImageOfflineFlag(colors: [.systemBackground, .systemGreen])
             } else if utilityFileSystem.fileProviderStorageExists(metadata) {
-                cell.fileLocalImage?.image = imageCache.getImageLocal()
+                cell.fileLocalImage?.image = imageCache.getImageLocal(colors: [.systemBackground, .systemGreen])
             }
         }
 
@@ -531,13 +514,15 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.setButtonMore(named: NCGlobal.shared.buttonMoreMore, image: NCImageCache.images.buttonMore)
         }
 
-        // Staus
+        // Status
         if metadata.isLivePhoto {
             cell.fileStatusImage?.image = NCImageCache.shared.getImageLivePhoto()
+            cell.fileStatusImage?.image = utility.loadImage(named: "livephoto", colors: [NCBrandColor.shared.iconImageColor])
             a11yValues.append(NSLocalizedString("_upload_mov_livephoto_", comment: ""))
         } else if metadata.isVideo {
-            cell.fileStatusImage?.image = utility.loadImage(named: "play.circle", colors: NCBrandColor.shared.iconImageMultiColors)
+            cell.fileStatusImage?.image = utility.loadImage(named: "play.circle.fill", colors: [.systemBackgroundInverted, .systemGray5])
         }
+
         switch metadata.status {
         case NCGlobal.shared.metadataStatusWaitCreateFolder:
             cell.fileStatusImage?.image = utility.loadImage(named: "arrow.triangle.2.circlepath", colors: NCBrandColor.shared.iconImageMultiColors)

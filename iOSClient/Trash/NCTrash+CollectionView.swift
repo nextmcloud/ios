@@ -34,6 +34,10 @@ extension NCTrash: UICollectionViewDelegate {
 
         guard let resultTableTrash = datasource?[indexPath.item] else { return }
         let resultTableTrash = datasource[indexPath.item]
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+
+        guard let resultTableTrash = datasource?[indexPath.item] else { return }
 
         guard !isEditMode else {
             if let index = fileSelect.firstIndex(of: resultTableTrash.fileId) {
@@ -77,6 +81,7 @@ extension NCTrash: UICollectionViewDataSource {
             image = UIImage(named: "file")
         } else {
             image = UIImage(named: tableTrash.iconName)
+        emptyDataSet?.numberOfItemsInSection(datasource?.count ?? 0, section: section)
         setNavigationRightItems()
         return datasource?.count ?? 0
         let numberOfItems = datasource.count
@@ -101,6 +106,8 @@ extension NCTrash: UICollectionViewDataSource {
         }
         
         let resultTableTrash = datasource[indexPath.item]
+        guard let resultTableTrash = datasource?[indexPath.item] else { return cell }
+
         cell.imageItem.contentMode = .scaleAspectFit
 
         if resultTableTrash.iconName.isEmpty {
@@ -151,6 +158,7 @@ extension NCTrash: UICollectionViewDataSource {
         cell.objectId = resultTableTrash.fileId
         cell.setupCellUI(tableTrash: resultTableTrash, image: image)
         cell.selected(selectOcId.contains(resultTableTrash.fileId), isEditMode: isEditMode, account: resultTableTrash.account)
+        cell.selected(fileSelect.contains(resultTableTrash.fileId), isEditMode: isEditMode, account: resultTableTrash.account)
         return cell
     }
 
@@ -225,6 +233,10 @@ extension NCTrash: UICollectionViewDataSource {
             footer.setTitleLabel(setTextFooter(datasource: datasource))
             footer.separatorIsHidden(true)
             
+            if let datasource {
+                footer.setTitleLabel(setTextFooter(datasource: datasource))
+                footer.separatorIsHidden(true)
+            }
             return footer
         }
     }
@@ -235,6 +247,7 @@ extension NCTrash: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         if datasource.isEmpty {
+        if let datasource, datasource.isEmpty {
             let height = utility.getHeightHeaderEmptyData(view: view, portraitOffset: 0, landscapeOffset: -20)
             return CGSize(width: collectionView.frame.width, height: height)
         }
