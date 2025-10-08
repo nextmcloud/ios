@@ -51,8 +51,7 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
     internal let utilityFileSystem = NCUtilityFileSystem()
     internal let utility = NCUtility()
     internal let database = NCManageDatabase.shared
-    internal var filter: NCGlobal.TypeFilterScanDocument = NCPreferences().typeFilterScanDocument
-    @MainActor
+    internal var filter: NCGlobal.TypeFilterScanDocument = NCKeychain().typeFilterScanDocument
     internal var session: NCSession.Session {
         NCSession.shared.getSession(controller: controller)
     }
@@ -65,6 +64,7 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
         super.viewDidLoad()
 
         view.backgroundColor = .secondarySystemGroupedBackground
+//        navigationController?.navigationBar.tintColor = NCBrandColor.shared.iconImageColor
         navigationItem.title = NSLocalizedString("_scanned_images_", comment: "")
 
         collectionViewSource.dragInteractionEnabled = true
@@ -136,7 +136,7 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
     override var canBecomeFirstResponder: Bool { return true }
 
     override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        if action == #selector(pasteImage(_:)) {
+        if action == #selector(pasteImage) {
             return true
         }
         return false
@@ -174,7 +174,7 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
 
     @IBAction func transferDown(sender: UIButton) {
         for fileName in itemsSource where !itemsDestination.contains(fileName) {
-            let fileNamePathAt = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryScan, fileName: fileName)
+            let fileNamePathAt = utilityFileSystem.directoryScan + "/" + fileName
             guard let data = try? Data(contentsOf: URL(fileURLWithPath: fileNamePathAt)), let image = UIImage(data: data) else { return }
 
             imagesDestination.append(image)
@@ -193,7 +193,7 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
             break
         }
 
-        NCPreferences().typeFilterScanDocument = filter
+        NCKeychain().typeFilterScanDocument = filter
         collectionViewDestination.reloadData()
     }
 
@@ -269,7 +269,7 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
 
                 if collectionView === collectionViewDestination {
                     let fileName = (item.dragItem.localObject as? String)!
-                    let fileNamePathAt = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryScan, fileName: fileName)
+                    let fileNamePathAt = utilityFileSystem.directoryScan + "/" + fileName
                     guard let data = try? Data(contentsOf: URL(fileURLWithPath: fileNamePathAt)), let image = UIImage(data: data) else { return }
 
                     imagesDestination.insert(image, at: indexPath.row)
@@ -289,7 +289,7 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
             self.becomeFirstResponder()
             let pasteboard = UIPasteboard.general
             if let recognizerView = recognizer.view, let recognizerSuperView = recognizerView.superview, pasteboard.hasImages {
-                UIMenuController.shared.menuItems = [UIMenuItem(title: "Paste", action: #selector(pasteImage(_:)))]
+                UIMenuController.shared.menuItems = [UIMenuItem(title: "Paste", action: #selector(pasteImage))]
                 UIMenuController.shared.showMenu(from: recognizerSuperView, rect: recognizerView.frame)
             }
             // TIP
@@ -297,12 +297,12 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
         }
     }
 
-    @objc func pasteImage(_ sender: Any?) {
+    @objc func pasteImage() {
         let pasteboard = UIPasteboard.general
         if pasteboard.hasImages {
             guard let image = pasteboard.image?.fixedOrientation() else { return }
             let fileName = utilityFileSystem.createFileName("scan.png", fileDate: Date(), fileType: PHAssetMediaType.image, notUseMask: true)
-            let fileNamePath = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryScan, fileName: fileName)
+            let fileNamePath = utilityFileSystem.directoryScan + "/" + fileName
 
             do {
                 try image.pngData()?.write(to: NSURL.fileURL(withPath: fileNamePath), options: .atomic)
@@ -325,7 +325,7 @@ class NCScan: UIViewController, NCScanCellCellDelegate {
             return collectionViewSource.reloadData()
         }
         let fileName = self.itemsSource[index]
-        let fileNamePath = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryScan, fileName: fileName)
+        let fileNamePath = utilityFileSystem.directoryScan + "/" + fileName
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: fileNamePath)), let image = UIImage(data: data) else {
             return collectionViewSource.reloadData()
         }
@@ -341,7 +341,7 @@ extension NCScan: EasyTipViewDelegate {
         if !self.database.tipExists(NCGlobal.shared.tipScanAddImage) {
             var preferences = EasyTipView.Preferences()
             preferences.drawing.foregroundColor = .white
-            preferences.drawing.backgroundColor = .lightGray
+            preferences.drawing.backgroundColor = NCBrandColor.shared.customer
             preferences.drawing.textAlignment = .left
             preferences.drawing.arrowPosition = .left
             preferences.drawing.cornerRadius = 10
@@ -352,9 +352,9 @@ extension NCScan: EasyTipViewDelegate {
             preferences.animating.showDuration = 1.5
             preferences.animating.dismissDuration = 1.5
 
-            if tipView == nil, let view = self.view {
+            if tipView == nil {
                 tipView = EasyTipView(text: NSLocalizedString("_tip_addcopyimage_", comment: ""), preferences: preferences, delegate: self)
-                tipView?.show(forView: add, withinSuperview: view)
+                tipView?.show(forView: add, withinSuperview: self.view)
             }
         }
     }
@@ -377,7 +377,7 @@ extension NCScan: EasyTipViewDelegate {
 extension NCScan: NCViewerQuickLookDelegate {
     func dismissQuickLook(fileNameSource: String, hasChangesQuickLook: Bool) {
         let fileNameAtPath = NSTemporaryDirectory() + fileNameSource
-        let fileNameToPath = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryScan, fileName: fileNameSource)
+        let fileNameToPath = utilityFileSystem.directoryScan + "/" + fileNameSource
         utilityFileSystem.copyFile(atPath: fileNameAtPath, toPath: fileNameToPath)
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: fileNameToPath)), let image = UIImage(data: data) else { return }
         var index = 0
