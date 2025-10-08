@@ -468,6 +468,7 @@
 }
 
 - (void)dismissSelectWithServerUrl:(NSString * _Nullable)serverUrl metadata:(tableMetadata * _Nullable)metadata type:(NSString * _Nonnull)type items:(NSArray * _Nonnull)items overwrite:(BOOL)overwrite copy:(BOOL)copy move:(BOOL)move 
+- (void)dismissSelectWithServerUrl:(NSString * _Nullable)serverUrl metadata:(tableMetadata * _Nullable)metadata type:(NSString * _Nonnull)type items:(NSArray * _Nonnull)items overwrite:(BOOL)overwrite copy:(BOOL)copy move:(BOOL)move
 {
     if (serverUrl != nil) {
 
