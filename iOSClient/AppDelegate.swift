@@ -12,6 +12,7 @@ import WidgetKit
 import Queuer
 import EasyTipView
 import SwiftUI
+import RealmSwift
 import MoEngageInApps
 
 @UIApplicationMain
@@ -44,6 +45,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var timerErrorNetworking: Timer?
     var tipView: EasyTipView?
 
+    let database = NCManageDatabase.shared
+    var window: UIWindow?
+    @objc var sceneIdentifier: String = ""
+    @objc var activeViewController: UIViewController?
+    @objc var account: String = ""
+    @objc var urlBase: String = ""
+    @objc var user: String = ""
+    @objc var userId: String = ""
+    @objc var password: String = ""
+    var timerErrorNetworking: Timer?
+    var tipView: EasyTipView?
+
+    var pushSubscriptionTask: Task<Void, Never>?
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         if isUiTestingEnabled {
             NCAccount().deleteAllAccounts()
@@ -51,6 +66,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
         UIToolbar.appearance().tintColor = NCBrandColor.shared.customer
 
+        
+        UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
+        UIToolbar.appearance().tintColor = NCBrandColor.shared.customer
+        
         let utilityFileSystem = NCUtilityFileSystem()
         let utility = NCUtility()
         let versionNextcloudiOS = String(format: NCBrandOptions.shared.textCopyrightNextcloudiOS, utility.getVersionApp())
@@ -84,6 +103,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
 
         /// Push Notification & display notification
+        #if DEBUG
+//      For the tags look NCGlobal LOG TAG
+
+//      var black: [String] = []
+//      black.append("NETWORKING TASKS")
+//      NextcloudKit.configureLoggerBlacklist(blacklist: black)
+
+//      var white: [String] = []
+//      white.append("SYNC METADATA")
+//      NextcloudKit.configureLoggerWhitelist(whitelist: white)
+        #endif
+
+        nkLog(start: "Start session with level \(NCPreferences().log) " + versionNextcloudiOS)
+
+//        if NCBrandOptions.shared.disable_log {
+//            utilityFileSystem.removeFile(atPath: NextcloudKit.shared.nkCommonInstance.filenamePathLog)
+//            utilityFileSystem.removeFile(atPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first! + "/" + NextcloudKit.shared.nkCommonInstance.filenameLog)
+//        } else {
+//            NextcloudKit.shared.setupLog(pathLog: utilityFileSystem.directoryGroup,
+//                                         levelLog: NCKeychain().logLevel,
+//                                         copyLogToDocumentDirectory: true)
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start session with level \(NCKeychain().logLevel) " + versionNextcloudiOS)
+//        }
+        
+        // Push Notification & display notification
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             self.notificationSettings = settings
         }
@@ -116,6 +160,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         _ = NCTransferProgress.shared
         _ = NCActionCenter.shared
 
+        _ = NCAppStateManager.shared
+        _ = NCNetworking.shared
+        _ = NCDownloadAction.shared
+        _ = NCNetworkingProcess.shared
+        _ = NCTransferProgress.shared
+        _ = NCActionCenter.shared
+        
         NCTransferProgress.shared.setup()
         NCActionCenter.shared.setup()
         
@@ -325,6 +376,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             completion()
         }
     }
+    
+//    func handleAppRefreshProcessingTask(taskText: String, completion: @escaping () -> Void = {}) {
+//        Task {
+//            var numAutoUpload = 0
+//            guard let account = NCManageDatabase.shared.getActiveTableAccount()?.account else {
+//                return
+//            }
+//
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) start handle")
+//
+//            // Test every > 1 min
+//            if Date() > self.taskAutoUploadDate.addingTimeInterval(60) {
+//                self.taskAutoUploadDate = Date()
+//                numAutoUpload = await NCAutoUpload.shared.initAutoUpload(account: account)
+//                NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) auto upload with \(numAutoUpload) uploads")
+//            } else {
+//                NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) disabled auto upload")
+//            }
+//
+//            let results = await NCNetworkingProcess.shared.refreshProcessingTask()
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) networking process with download: \(results.counterDownloading) upload: \(results.counterUploading)")
+//
+//            if taskText == "ProcessingTask",
+//               numAutoUpload == 0,
+//               results.counterDownloading == 0,
+//               results.counterUploading == 0,
+//               let directories = NCManageDatabase.shared.getTablesDirectory(predicate: NSPredicate(format: "account == %@ AND offline == true", account), sorted: "offlineDate", ascending: true) {
+//                for directory: tableDirectory in directories {
+//                    // test only 3 time for day (every 8 h.)
+//                    if let offlineDate = directory.offlineDate, offlineDate.addingTimeInterval(28800) > Date() {
+//                        NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) skip synchronization for \(directory.serverUrl) in date \(offlineDate)")
+//                        continue
+//                    }
+//                    let results = await NCNetworking.shared.synchronization(account: account, serverUrl: directory.serverUrl, add: false)
+//                    NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) end synchronization for \(directory.serverUrl), errorCode: \(results.errorCode), item: \(results.num)")
+//                }
+//            }
+//
+//            let counter = NCManageDatabase.shared.getResultsMetadatas(predicate: NSPredicate(format: "account == %@ AND (session == %@ || session == %@) AND status != %d",
+//                                                                                   account,
+//                                                                                   NCNetworking.shared.sessionDownloadBackground,
+//                                                                                   NCNetworking.shared.sessionUploadBackground,
+//                                                                                   NCGlobal.shared.metadataStatusNormal))?.count ?? 0
+//            UIApplication.shared.applicationIconBadgeNumber = counter
+//
+//            NextcloudKit.shared.nkCommonInstance.writeLog("[DEBUG] \(taskText) completion handle")
+//            completion()
+//        }
+//    }
 
     // MARK: - Background Networking Session
 
@@ -376,6 +476,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 #endif
     }
 
+    #if !targetEnvironment(simulator)
+            NCNetworking.shared.checkPushNotificationServerProxyCertificateUntrusted(viewController: UIApplication.shared.firstWindow?.rootViewController) { error in
+                if error == .success {
+                    NCPushNotification.shared.subscribingNextcloudServerPushNotification(account: account, urlBase: urlBase, user: user, pushKitToken: self.pushKitToken)
+                }
+            }
+    #endif
+        }
+    
     func nextcloudPushNotificationAction(data: [String: AnyObject]) {
         guard let data = NCApplicationHandle().nextcloudPushNotificationAction(data: data)
         else {
@@ -654,6 +763,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         NCKeychain().removeAll()
         NCNetworking.shared.removeAllKeyUserDefaultsData(account: nil)
+        NCPreferences().removeAll()
+//        NCKeychain().removeAll()
+//        NCNetworking.shared.removeAllKeyUserDefaultsData(account: nil)
 
         exit(0)
     }
@@ -678,6 +790,13 @@ extension AppDelegate: NCCreateFormUploadConflictDelegate {
     func dismissCreateFormUploadConflict(metadatas: [tableMetadata]?) {
         guard let metadatas = metadatas, !metadatas.isEmpty else { return }
         NCNetworkingProcess.shared.createProcessUploads(metadatas: metadatas)
+    }
+}
+
+//MARK: NMC Customisation
+extension AppDelegate {
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        return self.orientationLock
     }
 }
 
