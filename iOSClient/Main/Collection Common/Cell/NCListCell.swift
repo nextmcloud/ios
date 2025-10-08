@@ -165,8 +165,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         imageShared.image = nil
         imageMore.image = nil
         separatorHeightConstraint.constant = 0.5
-        tag0.text = ""
-        tag1.text = ""
         titleInfoTrailingDefault()
         progressView.tintColor = NCBrandColor.shared.brand
         progressView.transform = CGAffineTransform(scaleX: 1.0, y: 0.5)
@@ -344,29 +342,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         accessibilityLabel = label
         accessibilityValue = value
     }
-
-    func setTags(tags: [String]) {
-        if tags.isEmpty {
-            tag0.isHidden = true
-            tag1.isHidden = true
-            labelInfo.isHidden = false
-            labelSubinfo.isHidden = false
-        } else {
-            tag0.isHidden = false
-            tag1.isHidden = true
-            labelInfo.isHidden = true
-            labelSubinfo.isHidden = true
-
-            if let tag = tags.first {
-                tag0.text = tag
-                if tags.count > 1 {
-                    tag1.isHidden = false
-                    tag1.text = "+\(tags.count - 1)"
-                }
-            }
-        }
-    }
-
+    
     func setIconOutlines() {
         [imageStatus, imageLocal].forEach { imageView in
             imageView.makeCircularBackground(withColor: imageView.image != nil ? .systemBackground : .clear)
