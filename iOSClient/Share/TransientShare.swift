@@ -22,23 +22,17 @@ class TransientShare: Shareable {
     var note: String = ""
     var expirationDate: NSDate?
     var shareWithDisplayname: String = ""
-    var downloadAndSync = false
-    var itemType: String = ""
 
     var attributes: String?
 
     private init(shareType: Int, metadata: tableMetadata, password: String?) {
-        let capabilities = NCNetworking.shared.capabilities[metadata.account] ?? NKCapabilities.Capabilities()
-
-        if metadata.e2eEncrypted, capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV12 {
-            self.permissions = NCSharePermissions.permissionCreateShare
+        if metadata.e2eEncrypted, NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityE2EEApiVersion == NCGlobal.shared.e2eeVersionV12 {
+            self.permissions = NCPermissions().permissionCreateShare
         } else {
-            self.permissions = capabilities.fileSharingDefaultPermission & metadata.sharePermissionsCollaborationServices
+            self.permissions = NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityFileSharingDefaultPermission & metadata.sharePermissionsCollaborationServices
         }
 
         self.shareType = shareType
-
-        self.itemType = metadata.isDirectory ? NCShareCommon.itemTypeFolder : NCShareCommon.itemTypeFile
 
         if let password = password {
             self.password = password
@@ -48,9 +42,10 @@ class TransientShare: Shareable {
     convenience init(sharee: NKSharee, metadata: tableMetadata, password: String?) {
         self.init(shareType: sharee.shareType, metadata: metadata, password: password)
         self.shareWith = sharee.shareWith
+        self.shareWithDisplayname = sharee.label
     }
 
     static func shareLink(metadata: tableMetadata, password: String?) -> TransientShare {
-        TransientShare(shareType: NCShareCommon.shareTypeLink, metadata: metadata, password: password)
+        TransientShare(shareType: NCShareCommon().SHARE_TYPE_LINK, metadata: metadata, password: password)
     }
 }

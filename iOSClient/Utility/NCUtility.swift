@@ -27,29 +27,40 @@ import PDFKit
 import Accelerate
 import CoreMedia
 import Photos
+import Alamofire
 
 final class NCUtility: NSObject, Sendable {
     let utilityFileSystem = NCUtilityFileSystem()
     let global = NCGlobal.shared
 
-    func isTypeFileRichDocument(_ metadata: tableMetadata) -> Bool {
-        let fileExtension = (metadata.fileNameView as NSString).pathExtension
-        guard let capabilities = NCNetworking.shared.capabilities[metadata.account],
-              !fileExtension.isEmpty,
-              let mimeType = UTType(tag: fileExtension.uppercased(), tagClass: .filenameExtension, conformingTo: nil)?.identifier else {
+    @objc func isSimulatorOrTestFlight() -> Bool {
+        guard let path = Bundle.main.appStoreReceiptURL?.path else {
             return false
         }
+        return path.contains("CoreSimulator") || path.contains("sandboxReceipt")
+    }
 
+    func isSimulator() -> Bool {
+        guard let path = Bundle.main.appStoreReceiptURL?.path else {
+            return false
+        }
+        return path.contains("CoreSimulator")
+    }
+
+    func isTypeFileRichDocument(_ metadata: tableMetadata) -> Bool {
+        guard metadata.fileNameView != "." else { return false }
+        let fileExtension = (metadata.fileNameView as NSString).pathExtension
+        guard !fileExtension.isEmpty else { return false }
+        guard let mimeType = UTType(tag: fileExtension.uppercased(), tagClass: .filenameExtension, conformingTo: nil)?.identifier else { return false }
         /// contentype
-        if !capabilities.richDocumentsMimetypes.filter({ $0.contains(metadata.contentType) || $0.contains("text/plain") }).isEmpty {
+        if !NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityRichDocumentsMimetypes.filter({ $0.contains(metadata.contentType) || $0.contains("text/plain") }).isEmpty {
             return true
         }
-
         /// mimetype
-        if !capabilities.richDocumentsMimetypes.isEmpty && mimeType.components(separatedBy: ".").count > 2 {
+        if !NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityRichDocumentsMimetypes.isEmpty && mimeType.components(separatedBy: ".").count > 2 {
             let mimeTypeArray = mimeType.components(separatedBy: ".")
             let mimeType = mimeTypeArray[mimeTypeArray.count - 2] + "." + mimeTypeArray[mimeTypeArray.count - 1]
-            if !capabilities.richDocumentsMimetypes.filter({ $0.contains(mimeType) }).isEmpty {
+            if !NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityRichDocumentsMimetypes.filter({ $0.contains(mimeType) }).isEmpty {
                 return true
             }
         }
@@ -57,32 +68,39 @@ final class NCUtility: NSObject, Sendable {
     }
 
     func editorsDirectEditing(account: String, contentType: String) -> [String] {
-        var names: [String] = []
-        let capabilities = NCNetworking.shared.capabilities[account]
+        var editor: [String] = []
+        guard let results = NCManageDatabase.shared.getDirectEditingEditors(account: account) else { return editor }
 
-        capabilities?.directEditingEditors.forEach { editor in
-            editor.mimetypes.forEach { mimetype in
+        for result: tableDirectEditingEditors in results {
+            for mimetype in result.mimetypes {
                 if mimetype == contentType {
-                    names.append(editor.name)
+                    editor.append(result.editor)
                 }
                 // HARDCODE
                 // https://github.com/nextcloud/text/issues/913
                 if mimetype == "text/markdown" && contentType == "text/x-markdown" {
-                    names.append(editor.name)
+                    editor.append(result.editor)
                 }
                 if contentType == "text/html" {
-                    names.append(editor.name)
+                    editor.append(result.editor)
                 }
             }
-
-            editor.optionalMimetypes.forEach { mimetype in
+            for mimetype in result.optionalMimetypes {
                 if mimetype == contentType {
-                    names.append(editor.name)
+                    editor.append(result.editor)
                 }
             }
         }
+        return Array(Set(editor))
+    }
 
-        return Array(Set(names))
+    func permissionsContainsString(_ metadataPermissions: String, permissions: String) -> Bool {
+        for char in permissions {
+            if metadataPermissions.contains(char) == false {
+                return false
+            }
+        }
+        return true
     }
 
     func getCustomUserAgentNCText() -> String {
@@ -106,11 +124,11 @@ final class NCUtility: NSObject, Sendable {
         }
     }
 
-    func isQuickLookDisplayable(metadata: tableMetadata) -> Bool {
+    @objc func isQuickLookDisplayable(metadata: tableMetadata) -> Bool {
         return true
     }
 
-    func ocIdToFileId(ocId: String?) -> String? {
+    @objc func ocIdToFileId(ocId: String?) -> String? {
         guard let ocId = ocId else { return nil }
         let items = ocId.components(separatedBy: "oc")
 
@@ -119,19 +137,15 @@ final class NCUtility: NSObject, Sendable {
         return String(intFileId)
     }
 
-    func getVersionBuild() -> String {
-        if let dictionary = Bundle.main.infoDictionary,
-           let version = dictionary["CFBundleShortVersionString"],
-           let build = dictionary["CFBundleVersion"] {
-            return "\(version).\(build)"
-        }
-        return ""
-    }
-
-    func getVersionMaintenance() -> String {
-        if let dictionary = Bundle.main.infoDictionary,
-           let version = dictionary["CFBundleShortVersionString"] {
-            return "\(version)"
+    @objc func getVersionApp(withBuild: Bool = true) -> String {
+        if let dictionary = Bundle.main.infoDictionary {
+            if let version = dictionary["CFBundleShortVersionString"], let build = dictionary["CFBundleVersion"] {
+                if withBuild {
+                    return "\(version).\(build)"
+                } else {
+                    return "\(version)"
+                }
+            }
         }
         return ""
     }
@@ -269,16 +283,91 @@ final class NCUtility: NSObject, Sendable {
         return (usedmegabytes, totalmegabytes)
     }
 
-    func getHeightHeaderEmptyData(view: UIView, portraitOffset: CGFloat, landscapeOffset: CGFloat) -> CGFloat {
+    func getHeightHeaderEmptyData(view: UIView, portraitOffset: CGFloat, landscapeOffset: CGFloat, isHeaderMenuTransferViewEnabled: Bool = false) -> CGFloat {
         var height: CGFloat = 0
         if UIDevice.current.orientation.isPortrait {
             height = (view.frame.height / 2) - (view.safeAreaInsets.top / 2) + portraitOffset
         } else {
-            height = (view.frame.height / 2) + landscapeOffset
+            height = (view.frame.height / 2) + landscapeOffset + CGFloat(isHeaderMenuTransferViewEnabled ? 35 : 0)
         }
         return height
     }
+        
+    // E-mail validations
+    // 1. Basic Email Validator (ASCII only)
+    func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}$"
+        let predicate = NSPredicate(format: "SELF MATCHES[c] %@", emailRegex)
+        return predicate.evaluate(with: email)
+    }
 
+    // 2. Manually Convert Unicode Domain to Punycode with German Char Support
+    func convertToPunycode(email: String) -> String? {
+        guard let atIndex = email.firstIndex(of: "@") else { return nil }
+        
+        let localPart = String(email[..<atIndex])
+        var domainPart = String(email[email.index(after: atIndex)...])
+        
+        // Normalize the domain part before converting to Punycode
+        let normalizedDomainPart = domainPart.precomposedStringWithCanonicalMapping
+        
+        // Attempt to convert Unicode to Punycode using a custom conversion function
+        if let punycodeDomain = punycodeEncode(normalizedDomainPart) {
+            return "\(localPart)@\(punycodeDomain)"
+        }
+        
+        return nil
+    }
+
+    // 3. Convert Unicode String to Punycode (Manually Handling German Characters)
+    func punycodeEncode(_ domain: String) -> String? {
+        // Mapping of common German characters to their corresponding Punycode equivalents
+        var punycodeDomain = domain.lowercased()
+        
+        let germanCharToPunycode: [String: String] = [
+            "ü": "xn--u-1fa",  // ü → xn--u-1fa
+            "ä": "xn--a-1fa",  // ä → xn--a-1fa
+            "ö": "xn--o-1fa",  // ö → xn--o-1fa
+            "ß": "xn--ss-1fa", // ß → xn--ss-1fa
+            "é": "xn--e-1fa",  // é → xn--e-1fa
+            "è": "xn--e-1f",   // è → xn--e-1f
+            "à": "xn--a-1f",   // à → xn--a-1f
+        ]
+        
+        // Replace each German character with the corresponding Punycode equivalent
+        for (char, punycode) in germanCharToPunycode {
+            punycodeDomain = punycodeDomain.replacingOccurrences(of: char, with: punycode)
+        }
+        
+        // If no change occurred, return the domain as it is (i.e., no Punycode needed)
+        return punycodeDomain
+    }
+
+    // 4. IDN Email Validator (handles Unicode domain by converting to Punycode)
+    func isValidIDNEmail(_ email: String) -> Bool {
+        // Convert domain part to Punycode and validate using basic email regex
+        guard let punycodeEmail = convertToPunycode(email: email) else {
+            return false
+        }
+        
+        return isValidEmail(punycodeEmail)
+    }
+
+    // 5. Unified Email Validation - Check for both basic and IDN emails
+    func validateEmail(_ email: String) -> Bool {
+        if isValidEmail(email) {
+            print("Valid ASCII email: \(email)")
+            return true
+        } else if isValidIDNEmail(email) {
+            print("Valid IDN email: \(email)")
+            return true
+        } else {
+            print("Invalid email: \(email)")
+            return false
+        }
+      
+    }
+  
     func formatBadgeCount(_ count: Int) -> String {
         if count <= 9999 {
             return "\(count)"
