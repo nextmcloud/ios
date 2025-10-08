@@ -717,8 +717,26 @@ extension NCManageDatabase {
         }
     }
 
-    func deleteMetadataOcId(_ ocId: String?) {
-        guard let ocId else { return }
+    func replaceMetadataAsync(ocIdTransfers: [String], metadatas: [tableMetadata]) async {
+        guard !ocIdTransfers.isEmpty else {
+            return
+        }
+
+        await performRealmWriteAsync { realm in
+            let result = realm.objects(tableMetadata.self)
+                .filter("ocIdTransfer IN %@", ocIdTransfers, ocIdTransfers)
+            realm.delete(result)
+            realm.add(metadatas, update: .all)
+        }
+    }
+
+    // Asynchronously deletes an array of `tableMetadata` entries from the Realm database.
+    /// - Parameter metadatas: The `tableMetadata` objects to be deleted.
+    func deleteMetadatasAsync(_ metadatas: [tableMetadata]) async {
+        guard !metadatas.isEmpty else {
+            return
+        }
+        let detached = metadatas.map { $0.detachedCopy() }
 
         do {
             let realm = try Realm()
