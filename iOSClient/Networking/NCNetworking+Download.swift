@@ -1,25 +1,6 @@
-//
-//  NCNetworking+Download.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 07/02/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import NextcloudKit
@@ -159,7 +140,7 @@ extension NCNetworking {
         return(error)
     }
 
-    // MARK: -
+    // MARK: - Download NextcloudKitDelegate
 
     func downloadComplete(fileName: String,
                           serverUrl: String,
@@ -191,6 +172,26 @@ extension NCNetworking {
             await NextcloudKit.shared.nkCommonInstance.appendServerErrorAccount(metadata.account, errorCode: error.errorCode)
 
             if error == .success {
+                /*
+                #if !EXTENSION
+                if error == .success {
+                    NCTransferStore.shared.addItem(TransferItem(completed: true,
+                                                                date: date,
+                                                                etag: etag,
+                                                                fileName: fileName,
+                                                                ocId: ocId,
+                                                                serverUrl: serverUrl,
+                                                                size: size,
+                                                                taskIdentifier: task.taskIdentifier))
+                    return
+                } else {
+                    NCTransferStore.shared.removeItem(serverUrl: serverUrl,
+                                                      fileName: fileName,
+                                                      taskIdentifier: task.taskIdentifier)
+                }
+                #endif
+                */
+
                 nkLog(success: "Downloaded file: " + metadata.serverUrlFileName)
                 #if !EXTENSION
                 if let result = await NCManageDatabase.shared.getE2eEncryptionAsync(predicate: NSPredicate(format: "fileNameIdentifier == %@ AND serverUrl == %@", metadata.fileName, metadata.serverUrl)) {
@@ -204,7 +205,7 @@ extension NCNetworking {
                                                               authenticationTag: result.authenticationTag)
                 }
                 #endif
-                await NCManageDatabase.shared.addLocalFileAsync(metadata: metadata)
+                await NCManageDatabase.shared.addLocalFilesAsync(metadatas: [metadata])
 
                 if let updatedMetadata = await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
                                                                                                session: "",
@@ -258,8 +259,6 @@ extension NCNetworking {
         }
     }
 
-    // MARK: - Download NextcloudKitDelegate
-
     func downloadingFinish(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         if let httpResponse = (downloadTask.response as? HTTPURLResponse) {
             if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300,
@@ -294,6 +293,16 @@ extension NCNetworking {
             guard await progressQuantizer.shouldEmit(serverUrlFileName: serverUrl + "/" + fileName, fraction: Double(progress)) else {
                 return
             }
+
+            /*
+            #if !EXTENSION
+            NCTransferStore.shared.transferProgress(serverUrl: serverUrl,
+                                                    fileName: fileName,
+                                                    taskIdentifier: task.taskIdentifier,
+                                                    progress: Double(progress))
+            #endif
+            */
+
             await NCManageDatabase.shared.setMetadataProgress(fileName: fileName, serverUrl: serverUrl, taskIdentifier: task.taskIdentifier, progress: Double(progress))
             await self.transferDispatcher.notifyAllDelegates { delegate in
                 delegate.transferProgressDidUpdate(progress: progress,
