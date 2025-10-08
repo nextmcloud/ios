@@ -191,14 +191,12 @@ struct NCViewE2EE: View {
                                 .foregroundColor(Color(NCBrandColor.shared.iconColor))
                                 .frame(width: 20, height: 30)
                         }
-                        Spacer()
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        if NCPreferences().passcode != nil {
-                            model.requestPasscodeType("readPassphrase")
-                        } else {
-                            NCContentPresenter().showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
+                        .onTapGesture {
+                            if NCKeychain().passcode != nil {
+                                manageE2EE.requestPasscodeType("readPassphrase")
+                            } else {
+                                NCContentPresenter().showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
+                            }
                         }
                     }
 
@@ -215,40 +213,9 @@ struct NCViewE2EE: View {
                                 .foregroundColor(Color(NCBrandColor.shared.iconColor))
                                 .frame(width: 20, height: 30)
                         }
-                        Spacer()
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        if NCPreferences().passcode != nil {
-                            model.requestPasscodeType("removeLocallyEncryption")
-                        } else {
-                            NCContentPresenter().showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
-                        }
-                    }
-#if DEBUG
-                    deleteCerificateSection
-#endif
-                }
-            } else {
-                List {
-                    Section(header: Text(""), footer: Text(model.statusOfService + "\n\n" + "End-to-End Encryption " + model.capabilities.e2EEApiVersion)) {
-                        HStack {
-                            Label {
-                                Text(NSLocalizedString("_e2e_settings_start_", comment: ""))
-                            } icon: {
-                                Image(systemName: "play.circle")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .font(Font.system(.body).weight(.light))
-                                    .frame(width: 25, height: 25)
-                                    .foregroundColor(.green)
-                            }
-                            Spacer()
-                        }
-                        .contentShape(Rectangle())
                         .onTapGesture {
-                            if NCPreferences().passcode != nil {
-                                model.requestPasscodeType("startE2E")
+                            if NCKeychain().passcode != nil {
+                                manageE2EE.requestPasscodeType("removeLocallyEncryption")
                             } else {
                                 NCContentPresenter().showInfo(error: NKError(errorCode: 0, errorDescription: "_e2e_settings_lock_not_active_"))
                             }
@@ -292,12 +259,6 @@ struct NCViewE2EE: View {
             }
         }
         .background(Color(UIColor.systemGroupedBackground))
-        .defaultViewModifier(model)
-        .onChange(of: model.navigateBack) { _, newValue in
-            if newValue {
-                presentationMode.wrappedValue.dismiss()
-            }
-        }
     }
 }
 
