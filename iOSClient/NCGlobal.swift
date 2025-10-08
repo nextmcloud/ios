@@ -233,6 +233,7 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let errorE2EEVersion: Int                   = -98001
     let errorE2EEKeyChecksums: Int              = -98002
     let errorE2EEKeyEncodeMetadata: Int         = -98003
+    let errorE2EEKeyDecodeMetadataV12: Int      = -98004
     let errorE2EEKeyDecodeMetadata: Int         = -98004
     let errorE2EEKeyVerifySignature: Int        = -98005
     let errorE2EEKeyCiphertext: Int             = -98006
@@ -294,6 +295,8 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let metadataStatusWaitMove: Int             = 15
     
     let metadataStatusUploadingAllMode          = [1,2,3]
+    let metadataStatusDownloadingAllMode        = [-1, -2, -3]
+    let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
     let metadataStatusInTransfer                = [-1, -2, 1, 2]
     let metadataStatusFileDown                  = [-1, -2, -3]
     let metadataStatusHideInView                = [1, 2, 3, 11]
@@ -370,6 +373,8 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     
     let notificationCenterServerDidUpdate                       = "serverDidUpdate"                 // userInfo: account
     let notificationCenterNetworkReachability                   = "networkReachability"
+    let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
+    let notificationCenterUpdateNotification                    = "updateNotification"
 
     let notificationCenterCreateMediaCacheEnded                 = "createMediaCacheEnded"
     let notificationCenterUpdateNotification                    = "updateNotification"
@@ -456,6 +461,9 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let tipMediaDetailView                                      = "tipMediaDetailView"
     let tipAutoUpload                                           = "tipAutoUpload"
     
+    let tipAutoUploadButton                                     = "tipAutoUploadButton"
+    let tipAutoUpload                                           = "tipAutoUpload"
+
     // ACTION
     //
     let actionNoAction                                          = "no-action"
@@ -551,6 +559,7 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     //
     let groupAdmin                          = "admin"
     
+
     // DATA TASK DESCRIPTION
     //
     let taskDescriptionRetrievesProperties  = "retrievesProperties"
