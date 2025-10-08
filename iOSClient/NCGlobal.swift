@@ -534,4 +534,23 @@ class NCGlobal: NSObject, @unchecked Sendable  {
     let keyFileNameOriginal                         = "fileNameOriginal"
     let keyFileNameOriginalAutoUpload               = "fileNameOriginalAutoUpload"
     
+
+    // LOG TAG
+    //
+    let logTagTask                          = "BGT"
+    let logTagLocation                      = "LOCATION"
+    let logTagBgSync                        = "BGSYNC"
+    let logTagE2EE                          = "E2EE"
+    let logTagPN                            = "PUSH NOTIFICATION"
+    let logTagSync                          = "SYNC"
+    let logTagServiceProficer               = "SERVICE PROVIDER"
+    let logTagDatabase                      = "DB"
+    let logTagSpeedUpSyncMetadata           = "SYNC METADATA"
+    let logTagNetworkingTasks               = "NETWORKING TASKS"
+    let logTagTransferStore                 = "TRANSFER STORE"
+
+    // USER DEFAULTS
+    //
+    let udMigrationMultiDomains             = "migrationMultiDomains"
+    let udLastVersion                       = "lastVersion"
 }
