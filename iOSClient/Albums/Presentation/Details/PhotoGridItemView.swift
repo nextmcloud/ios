@@ -14,11 +14,11 @@ struct PhotoGridItemView: View {
     @Environment(\.localAccount) var localAccount: String
     
     let photo: AlbumPhoto
-    let isVideo: Bool
     
     @State private var thumbnail: UIImage?
     
     var body: some View {
+        
         Group {
             if let thumbnail = thumbnail {
                 Image(uiImage: thumbnail)
@@ -33,21 +33,12 @@ struct PhotoGridItemView: View {
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         .clipped()
-        .overlay(
-            Group {
-                if isVideo {
-                    Image(systemName: "play.fill")
-                        .resizable()
-                        .frame(width: 10, height: 10)
-                        .foregroundColor(.white)
-                        .padding(8)
-                }
-            },
-            alignment: .bottomLeading
-        )
-        .cornerRadius(8)
         .task {
             await loadThumbnail()
+        }
+        .overlay {
+            Image(systemName: "play.fill")
+                .renderingMode(.original)
         }
     }
     
