@@ -109,6 +109,7 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
         requestAuthorization()
 
         if !autoUploadImage && !autoUploadVideo { autoUploadImage = true }
+        handleAutoUploadImageChange(newValue: autoUploadImage)
     }
 
     // MARK: - All functions
