@@ -39,25 +39,6 @@ class NCOperationSaveLivePhoto: ConcurrentOperation, @unchecked Sendable {
     }
 
     override func start() {
-        guard !isCancelled,
-            let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
-                                                                                     session: NCNetworking.shared.sessionDownload,
-                                                                                     selector: ""),
-            let metadataLive = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadataMOV],
-                                                                                         session: NCNetworking.shared.sessionDownload,
-                                                                                         selector: "") else { return self.finish() }
-
-        NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: false) {
-        } requestHandler: { _ in
-        } progressHandler: { progress in
-            self.hud?.progress(progress.fractionCompleted)
-        } completion: { _, error in
-            guard error == .success else {
-                self.hud?.error(text: NSLocalizedString("_livephoto_save_error_", comment: ""))
-                return self.finish()
-            }
-            NCNetworking.shared.download(metadata: metadataLive, withNotificationProgressTask: false) {
-                self.hud?.setText(text: NSLocalizedString("_download_video_", comment: ""), detailText: self.metadataMOV.fileName)
         Task {
             guard !isCancelled,
                   let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,

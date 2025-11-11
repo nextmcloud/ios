@@ -9,9 +9,6 @@ import NextcloudKit
 class NCNetworkingE2EEMarkFolder: NSObject {
     let database = NCManageDatabase.shared
 
-    func markFolderE2ee(account: String, fileName: String, serverUrl: String, userId: String) async -> NKError {
-        let serverUrlFileName = serverUrl + "/" + fileName
-        let resultsReadFileOrFolder = await NCNetworking.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", account: account)
     func markFolderE2ee(account: String, serverUrlFileName: String, userId: String) async -> NKError {
         let resultsReadFileOrFolder = await NextcloudKit.shared.readFileOrFolderAsync(serverUrlFileName: serverUrlFileName, depth: "0", account: account) { task in
             Task {
@@ -25,9 +22,6 @@ class NCNetworkingE2EEMarkFolder: NSObject {
               var file = resultsReadFileOrFolder.files?.first else {
             return resultsReadFileOrFolder.error
         }
-        let resultsMarkE2EEFolder = await NCNetworking.shared.markE2EEFolder(fileId: file.fileId, delete: false, account: account, options: NCNetworkingE2EE().getOptions(account: account))
-        guard resultsMarkE2EEFolder.error == .success else { return resultsMarkE2EEFolder.error }
-        let resultsMarkE2EEFolder = await NextcloudKit.shared.markE2EEFolderAsync(fileId: file.fileId, delete: false, account: account, options: NCNetworkingE2EE().getOptions(account: account))
         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
         let resultsMarkE2EEFolder = await NextcloudKit.shared.markE2EEFolderAsync(fileId: file.fileId, delete: false, account: account, options: NCNetworkingE2EE().getOptions(account: account, capabilities: capabilities)) { task in
             Task {
@@ -57,8 +51,6 @@ class NCNetworkingE2EEMarkFolder: NSObject {
             return errorUploadMetadata
         }
 
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCreateFolder, userInfo: ["ocId": metadata.ocId, "serverUrl": serverUrl, "account": account, "withPush": true])
-        NCNetworking.shared.notifyAllDelegates { delegate in
         await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
             delegate.transferChange(status: NCGlobal.shared.networkingStatusCreateFolder,
                                     metadata: metadata.detachedCopy(),

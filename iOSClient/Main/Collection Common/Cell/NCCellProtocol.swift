@@ -39,15 +39,11 @@ protocol NCCellProtocol {
     var fileSharedImage: UIImageView? { get set }
     var fileMoreImage: UIImageView? { get set }
     var cellSeparatorView: UIView? { get set }
-    var indexPath: IndexPath { get set }
-    var fileSharedLabel: UILabel? { get set }
-    var fileSharedLabel: UILabel? { get set }
-    var fileProgressView: UIProgressView? { get set }
 
     func titleInfoTrailingDefault()
     func titleInfoTrailingFull()
     func writeInfoDateSize(date: NSDate, size: Int64)
-    func setButtonMore(named: String, image: UIImage)
+    func setButtonMore(image: UIImage)
     func hideImageItem(_ status: Bool)
     func hideImageFavorite(_ status: Bool)
     func hideImageStatus(_ status: Bool)
@@ -57,8 +53,6 @@ protocol NCCellProtocol {
     func hideLabelSubinfo(_ status: Bool)
     func hideButtonShare(_ status: Bool)
     func hideButtonMore(_ status: Bool)
-    func selectMode(_ status: Bool)
-    func selected(_ status: Bool)
     func selected(_ status: Bool, isEditMode: Bool)
     func setAccessibility(label: String, value: String)
     func setTags(tags: [String])
@@ -121,24 +115,11 @@ extension NCCellProtocol {
         get { return nil }
         set {}
     }
-    var fileSharedLabel: UILabel? {
-        get { return nil }
-        set { }
-    }
 
-    var fileProgressView: UIProgressView? {
-        get { return nil }
-        set {}
-    }
-    var fileSelectImage: UIImageView? {
-        get { return nil }
-        set {}
-    }
-    
     func titleInfoTrailingDefault() {}
     func titleInfoTrailingFull() {}
     func writeInfoDateSize(date: NSDate, size: Int64) {}
-    func setButtonMore(named: String, image: UIImage) {}
+    func setButtonMore(image: UIImage) {}
     func hideImageItem(_ status: Bool) {}
     func hideImageFavorite(_ status: Bool) {}
     func hideImageStatus(_ status: Bool) {}
@@ -148,8 +129,6 @@ extension NCCellProtocol {
     func hideLabelSubinfo(_ status: Bool) {}
     func hideButtonShare(_ status: Bool) {}
     func hideButtonMore(_ status: Bool) {}
-    func selectMode(_ status: Bool) {}
-    func selected(_ status: Bool) {}
     func selected(_ status: Bool, isEditMode: Bool) {}
     func setAccessibility(label: String, value: String) {}
     func setTags(tags: [String]) {}

@@ -193,32 +193,6 @@ extension NCManageDatabase {
         }
     }
 
-    func setE2ETokenLock(account: String, serverUrl: String, fileId: String, e2eToken: String) {
-        do {
-            let realm = try Realm()
-            try realm.write {
-                let object = tableE2eEncryptionLock()
-                object.account = account
-                object.fileId = fileId
-                object.serverUrl = serverUrl
-                object.e2eToken = e2eToken
-                realm.add(object, update: .all)
-            }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
-        }
-    }
-
-    func deleteE2ETokenLock(account: String, serverUrl: String) {
-        do {
-            let realm = try Realm()
-            try realm.write {
-                if let result = realm.objects(tableE2eEncryptionLock.self).filter("account == %@ AND serverUrl == %@", account, serverUrl).first {
-                    realm.delete(result)
-                }
-            }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
     func getE2EAllTokenLockAsync(account: String) async -> [tableE2eEncryptionLock] {
         await performRealmReadAsync { realm in
             let results = realm.objects(tableE2eEncryptionLock.self)

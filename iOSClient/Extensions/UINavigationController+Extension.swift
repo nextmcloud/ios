@@ -31,7 +31,7 @@ extension UINavigationController {
         return self.visibleViewController!.topMostViewController()
     }
 
-    func setNavigationBarAppearance(textColor: UIColor = NCBrandColor.shared.iconImageColor, backgroundColor: UIColor? = .systemBackground) {
+    func setNavigationBarAppearance(textColor: UIColor = NCBrandColor.shared.brand, backgroundColor: UIColor? = .systemBackground) {
         let appearance = UINavigationBarAppearance()
 
         if #available(iOS 26.0, *) {

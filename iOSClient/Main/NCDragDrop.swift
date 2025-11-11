@@ -10,6 +10,7 @@ import Alamofire
 class NCDragDrop: NSObject {
     let utilityFileSystem = NCUtilityFileSystem()
     let database = NCManageDatabase.shared
+    let global = NCGlobal.shared
 
     func performDrag(metadata: tableMetadata? = nil, fileSelect: [String]? = nil) -> [UIDragItem] {
         var metadatas: [tableMetadata] = []
@@ -26,7 +27,7 @@ class NCDragDrop: NSObject {
 
         let dragItems = metadatas.map { metadata in
             let itemProvider = NSItemProvider()
-            itemProvider.registerDataRepresentation(forTypeIdentifier: NCGlobal.shared.metadataOcIdDataRepresentation, visibility: .all) { completion in
+            itemProvider.registerDataRepresentation(forTypeIdentifier: global.metadataOcIdDataRepresentation, visibility: .all) { completion in
                 let data = metadata.ocId.data(using: .utf8)
                 completion(data, nil)
                 return nil
@@ -44,9 +45,9 @@ class NCDragDrop: NSObject {
         DragDropHover.shared.sourceMetadatas = nil
 
         for item in coordinator.session.items {
-            if item.itemProvider.hasItemConformingToTypeIdentifier(NCGlobal.shared.metadataOcIdDataRepresentation) {
+            if item.itemProvider.hasItemConformingToTypeIdentifier(global.metadataOcIdDataRepresentation) {
                 let semaphore = DispatchSemaphore(value: 0)
-                item.itemProvider.loadDataRepresentation(forTypeIdentifier: NCGlobal.shared.metadataOcIdDataRepresentation) { data, error in
+                item.itemProvider.loadDataRepresentation(forTypeIdentifier: global.metadataOcIdDataRepresentation) { data, error in
                     if error == nil, let data, let ocId = String(data: data, encoding: .utf8),
                        let metadata = self.database.getMetadataFromOcId(ocId) {
                         if !isImageVideo {
@@ -115,28 +116,6 @@ class NCDragDrop: NSObject {
             let newFileName = FileAutoRenamer.rename(url.lastPathComponent, capabilities: capabilities)
             let fileNamePath = utilityFileSystem.getDirectoryProviderStorageOcId(ocId, fileName: newFileName, userId: session.userId, urlBase: session.urlBase)
 
-                if let fileNameError = FileNameValidator.checkFileName(newFileName, account: session.account, capabilities: capabilities) {
-                    await controller?.present(UIAlertController.warning(message: "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
-                    return
-                }
-
-                let fileName = await NCNetworking.shared.createFileName(fileNameBase: newFileName, account: session.account, serverUrl: serverUrl)
-
-                try data.write(to: URL(fileURLWithPath: fileNamePath))
-
-                let metadataForUpload = await database.createMetadata(fileName: fileName,
-                                                                      ocId: ocId,
-                                                                      serverUrl: serverUrl,
-                                                                      session: session,
-                                                                      sceneIdentifier: controller?.sceneIdentifier)
-
-                metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
-                metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
-                metadataForUpload.size = utilityFileSystem.getFileSize(filePath: fileNamePath)
-                metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-                metadataForUpload.sessionDate = Date()
-
-                database.addMetadata(metadataForUpload)
             if let fileNameError = FileNameValidator.checkFileName(newFileName, account: session.account, capabilities: capabilities),
                 let controller {
                 let message = "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"
@@ -169,8 +148,6 @@ class NCDragDrop: NSObject {
 
     func copyFile(metadatas: [tableMetadata], destination: String) async {
         for metadata in metadatas {
-            NCNetworking.shared.copyMetadata(metadata, serverUrlTo: serverUrl, overwrite: false)
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCopyMoveFile, userInfo: ["ocId": [metadata.ocId], "serverUrl": metadata.serverUrl, "account": metadata.account, "dragdrop": true, "type": "copy"])
             NCNetworking.shared.copyMetadata(metadata, destination: destination, overwrite: false)
             await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
                 delegate.transferCopy(metadata: metadata, destination: destination, error: .success)
@@ -180,8 +157,6 @@ class NCDragDrop: NSObject {
 
     func moveFile(metadatas: [tableMetadata], destination: String) async {
         for metadata in metadatas {
-            NCNetworking.shared.moveMetadata(metadata, serverUrlTo: serverUrl, overwrite: false)
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterCopyMoveFile, userInfo: ["ocId": [metadata.ocId], "serverUrl": metadata.serverUrl, "account": metadata.account, "dragdrop": true, "type": "move"])
             NCNetworking.shared.moveMetadata(metadata, destination: destination, overwrite: false)
             await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
                 delegate.transferMove(metadata: metadata, destination: destination, error: .success)

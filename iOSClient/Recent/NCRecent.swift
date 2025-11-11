@@ -78,9 +78,6 @@ class NCRecent: NCCollectionViewCommon {
         layoutForView?.sort = "date"
         layoutForView?.ascending = false
 
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView)
-
-        super.reloadDataSource()
         await super.reloadDataSource()
     }
 
@@ -163,10 +160,6 @@ class NCRecent: NCCollectionViewCommon {
         let requestBody = String(format: requestBodyRecent, "/files/" + session.userId, lessDateString)
         let showHiddenFiles = NCPreferences().getShowHiddenFiles(account: session.account)
 
-        NextcloudKit.shared.searchBodyRequest(serverUrl: session.urlBase,
-                                              requestBody: requestBody,
-                                              showHiddenFiles: NCKeychain().showHiddenFiles,
-                                              account: session.account) { task in
         showLoadingTitle()
 
         let resultsSearch = await NextcloudKit.shared.searchBodyRequestAsync(serverUrl: session.urlBase,
@@ -179,15 +172,6 @@ class NCRecent: NCCollectionViewCommon {
             if self.dataSource.isEmpty() {
                 self.collectionView.reloadData()
             }
-        } completion: { _, files, _, error in
-            if error == .success, let files {
-                self.database.convertFilesToMetadatas(files, useFirstAsMetadataFolder: false) { _, metadatas in
-                    // Add metadatas
-                    self.database.addMetadatas(metadatas)
-                    self.reloadDataSource()
-                }
-            }
-            self.refreshControl.endRefreshing()
         }
 
         guard resultsSearch.error == .success, let files = resultsSearch.files else {

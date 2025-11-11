@@ -12,7 +12,6 @@ class NCMainNavigationController: UINavigationController, UINavigationController
     let utility = NCUtility()
     let utilityFileSystem = NCUtilityFileSystem()
     let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    private var timer: Timer?
     let menuToolbar = UIToolbar()
 
     var controller: NCMainTabBarController? {
@@ -90,7 +89,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         setNavigationBarHidden(false, animated: true)
 
         Task {
-            menuButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+            menuButton.setImage(UIImage(systemName: "ellipsis.circle"), for: .normal)
             menuButton.tintColor = NCBrandColor.shared.iconImageColor
             menuButton.menu = await createRightMenu()
             menuButton.showsMenuAsPrimaryAction = true
@@ -126,37 +125,6 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             }
         }), for: .touchUpInside)
 
-        navigationBar.prefersLargeTitles = true
-        setNavigationBarHidden(false, animated: true)
-
-        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
-            self.timer?.invalidate()
-            self.timer = nil
-        }
-
-        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                if UIApplication.shared.applicationState == .active {
-                    self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { _ in
-                        self.updateRightBarButtonItems()
-                    })
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: self.global.notificationCenterUpdateNotification), object: nil, queue: nil) { _ in
-            let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: self.session.account)
-            if capabilities.notification.count > 0 {
-                NextcloudKit.shared.getNotifications(account: self.session.account) { _ in
-                } completion: { _, notifications, _, error in
-                    if error == .success,
-                       let notifications,
-                       notifications.count > 0 {
-                        if !self.isNotificationsButtonVisible() {
-                            self.controller?.availableNotifications = true
-                            self.updateRightBarButtonItems()
-                        }
-                    } else {
-                        if self.isNotificationsButtonVisible() {
-                            self.controller?.availableNotifications = false
-                            self.updateRightBarButtonItems()
-                        }
         // PLUS BUTTON ONLY IN FILES
         let widthAnchor: CGFloat
         let trailingAnchor: CGFloat
@@ -243,23 +211,17 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                 self.createPlusMenu(session: session, capabilities: capabilities)
             }
         }
-
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: self.global.notificationCenterNetworkReachability), object: nil, queue: .main) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-
-                // Menu Plus
-                let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
-                self.createPlusMenu(session: session, capabilities: capabilities)
-            }
-        }
     }
 
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         Task { @MainActor in
             // PLUS BUTTON
             if !(viewController is NCFiles) {
-                hiddenPlusButton(true, animation: false)
+                if #available(iOS 26.0, *) {
+                    hiddenPlusButton(true)
+                } else {
+                    hiddenPlusButton(true, animation: false)
+                }
             } else {
                 hiddenPlusButton(false)
             }
@@ -286,7 +248,6 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         let serverUrl = controller.currentServerUrl()
         let isDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(serverUrl: serverUrl, urlBase: session.urlBase, userId: session.userId, account: session.account)
         let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl))
-        let isNetworkReachable = NextcloudKit.shared.isNetworkReachable()
         let titleCreateFolder = isDirectoryE2EE ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
         let imageCreateFolder = isDirectoryE2EE ? NCImageCache.shared.getFolderEncrypted(account: session.account) : NCImageCache.shared.getFolder(account: session.account)
 
@@ -343,9 +304,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
         // ------------------------------- E2EE
 
-        if serverUrl == utilityFileSystem.getHomeServer(session: session),
-           NCPreferences().isEndToEndEnabled(account: session.account),
-           isNetworkReachable {
+        if serverUrl == utilityFileSystem.getHomeServer(session: session) && NCPreferences().isEndToEndEnabled(account: session.account) {
             menuE2EEElement.append(UIAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
                                             image: NCImageCache.shared.getFolderEncrypted(account: session.account)) { _ in
                 DispatchQueue.main.async {
@@ -360,7 +319,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         if capabilities.serverVersionMajor >= NCGlobal.shared.nextcloudVersion18,
            directory?.richWorkspace == nil,
            !isDirectoryE2EE,
-           isNetworkReachable {
+           NextcloudKit.shared.isNetworkReachable() {
             menuTextElement.append(UIAction(title: NSLocalizedString("_add_folder_info_", comment: ""),
                                             image: utility.loadImage(named: "list.dash.header.rectangle", colors: [NCBrandColor.shared.iconImageColor])) { _ in
                 DispatchQueue.main.async {
@@ -379,7 +338,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             })
         }
 
-        if isNetworkReachable,
+        if NextcloudKit.shared.isNetworkReachable(),
            let creator = capabilities.directEditingCreators.first(where: { $0.editor == "text" }),
            !isDirectoryE2EE {
             menuTextElement.append(UIAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""),
@@ -393,52 +352,52 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             })
         }
 
-        // ------------------------------- WEB EDITORS
+        // ------------------------------- COLLABORA
 
-        if isNetworkReachable,
+        if capabilities.richDocumentsEnabled,
+           NextcloudKit.shared.isNetworkReachable(),
            !isDirectoryE2EE {
 
-            // ------------------------------- COLLABORA
-            if capabilities.richDocumentsEnabled {
-                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_document_", comment: ""),
-                                                        image: utility.loadImage(named: "doc.richtext", colors: [NCBrandColor.shared.documentIconColor])) { _ in
-                    Task { @MainActor in
-                        let createDocument = NCCreateDocument()
-                        let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "document", account: session.account)
-                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
-                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+            menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_document_", comment: ""),
+                                                    image: utility.loadImage(named: "doc.richtext", colors: [NCBrandColor.shared.documentIconColor])) { _ in
+                Task { @MainActor in
+                    let createDocument = NCCreateDocument()
+                    let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "document", account: session.account)
+                    let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                    let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                        await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "collabora", templateId: templates.selectedTemplate.identifier, account: session.account)
-                    }
-                })
+                    await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "collabora", templateId: templates.selectedTemplate.identifier, account: session.account)
+                }
+            })
 
-                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_spreadsheet_", comment: ""),
-                                                        image: utility.loadImage(named: "tablecells", colors: [NCBrandColor.shared.spreadsheetIconColor])) { _ in
-                    Task { @MainActor in
-                        let createDocument = NCCreateDocument()
-                        let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "spreadsheet", account: session.account)
-                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
-                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+            menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_spreadsheet_", comment: ""),
+                                                    image: utility.loadImage(named: "tablecells", colors: [NCBrandColor.shared.spreadsheetIconColor])) { _ in
+                Task { @MainActor in
+                    let createDocument = NCCreateDocument()
+                    let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "spreadsheet", account: session.account)
+                    let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                    let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                        await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "collabora", templateId: templates.selectedTemplate.identifier, account: session.account)
-                    }
-                })
+                    await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "collabora", templateId: templates.selectedTemplate.identifier, account: session.account)
+                }
+            })
 
-                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_presentation_", comment: ""),
-                                                        image: utility.loadImage(named: "play.rectangle", colors: [NCBrandColor.shared.presentationIconColor])) { _ in
-                    Task { @MainActor in
-                        let createDocument = NCCreateDocument()
-                        let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "presentation", account: session.account)
-                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
-                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+            menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_presentation_", comment: ""),
+                                                    image: utility.loadImage(named: "play.rectangle", colors: [NCBrandColor.shared.presentationIconColor])) { _ in
+                Task { @MainActor in
+                    let createDocument = NCCreateDocument()
+                    let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "presentation", account: session.account)
+                    let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                    let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
-                        await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "collabora", templateId: templates.selectedTemplate.identifier, account: session.account)
-                    }
-                })
-            }
+                    await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "collabora", templateId: templates.selectedTemplate.identifier, account: session.account)
+                }
+            })
+        }
 
-            // ------------------------------- ONLY OFFICE
+        // ------------------------------- ONLY OFFICE
 
+        if NextcloudKit.shared.isNetworkReachable() {
             if let creator = capabilities.directEditingCreators.first(where: { $0.editor == "onlyoffice" && $0.identifier == "onlyoffice_docx"}) {
                 menuOnlyOfficeElement.append(UIAction(title: NSLocalizedString("_create_new_document_", comment: ""),
                                                       image: utility.loadImage(named: "doc.text", colors: [NCBrandColor.shared.documentIconColor])) { _ in
@@ -492,7 +451,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         let plusMenu = UIMenu(children: [menuAction, menuE2EE, menuText, menuRichDocument, menuOnlyOffice])
 
         let config = UIImage.SymbolConfiguration(pointSize: 25, weight: .thin)
-        let plusImage = UIImage(systemName: "plus.circle.fill", withConfiguration: config)
+        let plusImage = UIImage(named: "circleAdd") //UIImage(systemName: "plus.circle.fill", withConfiguration: config)
 
         if let plusItem = menuToolbar.items?.first {
             plusItem.menu = plusMenu
@@ -504,43 +463,30 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             menuToolbar.sizeToFit()
             isHidden ? (menuToolbar.alpha = 0) : (menuToolbar.alpha = 1)
         }
-
-        // E2EE Offile disable
-        if !isNetworkReachable, isDirectoryE2EE {
-            menuToolbar.items?.first?.isEnabled = false
-        } else {
-            menuToolbar.items?.first?.isEnabled = true
-        }
     }
 
     func hiddenPlusButton(_ isHidden: Bool, animation: Bool = true) {
-        let tx = 200.0
         if isHidden {
-            if menuToolbar.transform.tx == tx {
-                self.menuToolbar.alpha = 0
-                return
-            }
+            guard self.menuToolbar.alpha != 0 else { return }
             if animation {
                 UIView.animate(withDuration: 0.5, delay: 0.0, options: [], animations: {
-                    self.menuToolbar.transform = CGAffineTransform(translationX: tx, y: 0)
+                    self.menuToolbar.transform = CGAffineTransform(translationX: 100, y: 0)
                     self.menuToolbar.alpha = 0
                 })
             } else {
-                self.menuToolbar.transform = CGAffineTransform(translationX: tx, y: 0)
                 self.menuToolbar.alpha = 0
             }
         } else {
-            if menuToolbar.transform.tx == 0.0 {
-                self.menuToolbar.alpha = 1
-                return
-            }
+            guard self.menuToolbar.alpha != 1 else { return }
             if animation {
+                self.menuToolbar.transform = CGAffineTransform(translationX: 100, y: 0)
+                self.menuToolbar.alpha = 0
+
                 UIView.animate(withDuration: 0.5, delay: 0.3, options: [], animations: {
                     self.menuToolbar.transform = .identity
                     self.menuToolbar.alpha = 1
                 })
             } else {
-                self.menuToolbar.transform = .identity
                 self.menuToolbar.alpha = 1
             }
         }
@@ -557,20 +503,8 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
     }
 
-    func isEnablePlusButton(_ isEnable: Bool) {
-        menuToolbar.items?.forEach { $0.isEnabled = isEnable }
-    }
-
     // MARK: - Right
 
-    func setNavigationRightItems() {
-        guard let collectionViewCommon
-        else {
-            return
-        }
-
-        if collectionViewCommon.isEditMode {
-            collectionViewCommon.tabBarSelect?.update(fileSelect: collectionViewCommon.fileSelect, metadatas: collectionViewCommon.getSelectedMetadatas(), userId: session.userId)
     func setNavigationRightItems() async {
         if let collectionViewCommon, collectionViewCommon.isEditMode {
             collectionViewCommon.tabBarSelect?.update(fileSelect: collectionViewCommon.fileSelect,
@@ -580,15 +514,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
             let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .plain) {
                 collectionViewCommon.setEditMode(false)
-                collectionViewCommon.collectionView.reloadData()
             }
-
-            self.collectionViewCommon?.navigationItem.rightBarButtonItems = [select]
-
-        } else {
-
-            collectionViewCommon.tabBarSelect?.hide()
-            self.updateRightBarButtonItems()
 
             collectionViewCommon.navigationItem.rightBarButtonItems = [select]
 
@@ -607,18 +533,8 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             collectionViewCommon?.tabBarSelect?.hide()
             await self.updateRightBarButtonItems()
         }
-
-        // fix, if the tabbar was hidden before the update, set it in hidden
-        if self.tabBarController?.tabBar.isHidden ?? true,
-           collectionViewCommon.tabBarSelect?.isHidden() ?? true {
-            self.tabBarController?.tabBar.isHidden = true
-        }
     }
 
-    func updateRightBarButtonItems() {
-        guard let collectionViewCommon,
-              !collectionViewCommon.isEditMode,
-              let controller
     @discardableResult
     @MainActor
     func updateRightBarButtonItems(_ fileItem: UITabBarItem? = nil) async -> Int {
@@ -632,23 +548,6 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         else {
             return 0
         }
-        let capabilities = NCCapabilities.shared.getCapabilities(account: session.account)
-        let resultsCount = self.database.getResultsMetadatas(predicate: NSPredicate(format: "status != %i", NCGlobal.shared.metadataStatusNormal))?.count ?? 0
-        var tempRightBarButtonItems = [self.menuBarButtonItem]
-        var tempTotalTags = self.menuBarButtonItem.tag
-        var totalTags = 0
-
-        if let rightBarButtonItems = self.collectionViewCommon?.navigationItem.rightBarButtonItems,
-            let menuBarButtonItem = rightBarButtonItems.first(where: { $0.tag == menuButtonTag }),
-            let menuButton = menuBarButtonItem.customView as? UIButton {
-            menuButton.menu = createRightMenu()
-        }
-
-        if let rightBarButtonItems = collectionViewCommon.navigationItem.rightBarButtonItems {
-            for item in rightBarButtonItems {
-                totalTags = totalTags + item.tag
-            }
-        }
 
         let transferCount = await self.database.getMetadatasAsync(predicate: NSPredicate(format: "status != %i", self.global.metadataStatusNormal))?.count ?? 0
         let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
@@ -657,60 +556,6 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         var tempTotalTags = tempRightBarButtonItems.count == 0 ? 0 : self.menuBarButtonItem.tag
         var totalTags = 0
 
-            await MainActor.run {
-                let capabilities = NKCapabilities.shared.getCapabilitiesBlocking(for: session.account)
-                var tempRightBarButtonItems: [UIBarButtonItem] = createRightMenu() == nil ? [] : [self.menuBarButtonItem]
-                var tempTotalTags = tempRightBarButtonItems.count == 0 ? 0 : self.menuBarButtonItem.tag
-                var totalTags = 0
-
-                if let rightBarButtonItems = topViewController?.navigationItem.rightBarButtonItems {
-                    for item in rightBarButtonItems {
-                        totalTags += item.tag
-                    }
-                }
-
-        if controller.availableNotifications {
-            tempRightBarButtonItems.append(self.notificationsButtonItem)
-            tempTotalTags = tempTotalTags + self.notificationsButtonItem.tag
-        }
-                if capabilities.assistantEnabled {
-                    tempRightBarButtonItems.append(self.assistantButtonItem)
-                    tempTotalTags += self.assistantButtonItem.tag
-                }
-
-                if let controller, controller.availableNotifications {
-                    tempRightBarButtonItems.append(self.notificationsButtonItem)
-                    tempTotalTags += self.notificationsButtonItem.tag
-                }
-
-        if totalTags != tempTotalTags {
-            collectionViewCommon.navigationItem.rightBarButtonItems = tempRightBarButtonItems
-                if tranfersCount > 0 {
-                    tempRightBarButtonItems.append(self.transfersButtonItem)
-                    tempTotalTags += self.transfersButtonItem.tag
-                }
-
-                if totalTags != tempTotalTags {
-                    topViewController?.navigationItem.rightBarButtonItems = tempRightBarButtonItems
-                }
-
-                // Update App Icon badge / File Icon badge
-#if DEBUG
-                if UIApplication.shared.applicationIconBadgeNumber != tranfersCount {
-                    UIApplication.shared.applicationIconBadgeNumber = tranfersCount
-                }
-                fileItem?.badgeValue = tranfersCount == 0 ? nil : "\(tranfersCount)"
-#else
-                if tranfersCount > 999 {
-                    UIApplication.shared.applicationIconBadgeNumber = 999
-                    fileItem?.badgeValue = "999+"
-                } else {
-                    if UIApplication.shared.applicationIconBadgeNumber != tranfersCount {
-                        UIApplication.shared.applicationIconBadgeNumber = tranfersCount
-                    }
-                    fileItem?.badgeValue = tranfersCount == 0 ? nil : "\(tranfersCount)"
-                }
-#endif
         if let rightBarButtonItems = topViewController?.navigationItem.rightBarButtonItems {
             for item in rightBarButtonItems {
                 totalTags += item.tag
@@ -737,19 +582,24 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         // Update App Icon badge / File Icon badge
+#if DEBUG
         try? await UNUserNotificationCenter.current().setBadgeCount(transferCount)
-        fileItem?.badgeValue = transferCount == 0 ? nil : utility.formatBadgeCount(transferCount)
+        fileItem?.badgeValue = transferCount == 0 ? nil : "\(transferCount)"
+#else
+        if transferCount > 999 {
+            try? await UNUserNotificationCenter.current().setBadgeCount(999)
+            fileItem?.badgeValue = "999+"
+        } else {
+            try? await UNUserNotificationCenter.current().setBadgeCount(transferCount)
+            fileItem?.badgeValue = transferCount == 0 ? nil : "\(transferCount)"
+        }
+#endif
 
         return transferCount
     }
 
     func createRightMenu() async -> UIMenu? { return nil }
 
-    func createRightMenuActions() -> (select: UIAction, viewStyleSubmenu: UIMenu, sortSubmenu: UIMenu, personalFilesOnlyAction: UIAction, showDescription: UIAction, showRecommendedFiles: UIAction)? {
-        guard let collectionViewCommon,
-              let layoutForView = database.getLayoutForView(account: session.account, key: collectionViewCommon.layoutKey, serverUrl: collectionViewCommon.serverUrl) else { return nil }
-
-    func updateRightMenu() {
     func updateRightMenu() async {
         if let rightBarButtonItems = topViewController?.navigationItem.rightBarButtonItems,
             let menuBarButtonItem = rightBarButtonItems.first(where: { $0.tag == menuButtonTag }),
@@ -780,50 +630,8 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             }
         }
 
-        let list = UIAction(title: NSLocalizedString("_list_", comment: ""), image: utility.loadImage(named: "list.bullet"), state: layoutForView.layout == global.layoutList ? .on : .off) { _ in
-
-            layoutForView.layout = self.global.layoutList
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
-        }
-
-        let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""), image: utility.loadImage(named: "square.grid.2x2"), state: layoutForView.layout == global.layoutGrid ? .on : .off) { _ in
-
-            layoutForView.layout = self.global.layoutGrid
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
-        }
-
-        let mediaSquare = UIAction(title: NSLocalizedString("_media_square_", comment: ""), image: utility.loadImage(named: "square.grid.3x3"), state: layoutForView.layout == global.layoutPhotoSquare ? .on : .off) { _ in
-
-            layoutForView.layout = self.global.layoutPhotoSquare
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
-        }
-
-        let mediaRatio = UIAction(title: NSLocalizedString("_media_ratio_", comment: ""), image: utility.loadImage(named: "rectangle.grid.3x2"), state: layoutForView.layout == self.global.layoutPhotoRatio ? .on : .off) { _ in
-
-            layoutForView.layout = self.global.layoutPhotoRatio
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
         let list = UIAction(title: NSLocalizedString("_list_", comment: ""),
-                            image: utility.loadImage(named: "list.bullet"),
+                            image: UIImage(named: "Changelog")?.withTintColor(NCBrandColor.shared.iconImageColor), //utility.loadImage(named: "list.bullet"),
                             state: layoutForView.layout == global.layoutList ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutList
@@ -833,7 +641,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""),
-                            image: utility.loadImage(named: "square.grid.2x2"),
+                            image: UIImage(named: "Applications")?.withTintColor(NCBrandColor.shared.iconImageColor), //utility.loadImage(named: "square.grid.2x2"),
                             state: layoutForView.layout == global.layoutGrid ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutGrid
@@ -843,7 +651,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let mediaSquare = UIAction(title: NSLocalizedString("_media_square_", comment: ""),
-                                   image: utility.loadImage(named: "square.grid.3x3"),
+                                   image: utility.loadImage(named: "square-grid"),
                                    state: layoutForView.layout == global.layoutPhotoSquare ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutPhotoSquare
@@ -853,7 +661,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let mediaRatio = UIAction(title: NSLocalizedString("_media_ratio_", comment: ""),
-                                  image: utility.loadImage(named: "rectangle.grid.3x2"),
+                                  image: utility.loadImage(named: "ratio-grid"),
                                   state: layoutForView.layout == self.global.layoutPhotoRatio ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutPhotoRatio
@@ -870,73 +678,6 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         let isDate = layoutForView.sort == "date"
         let isSize = layoutForView.sort == "size"
 
-        let byName = UIAction(title: NSLocalizedString("_name_", comment: ""), image: isName ? ascendingChevronImage : nil, state: isName ? .on : .off) { _ in
-
-            if isName { // repeated press
-                layoutForView.ascending = !layoutForView.ascending
-            }
-            layoutForView.sort = "fileName"
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
-        }
-
-        let byNewest = UIAction(title: NSLocalizedString("_date_", comment: ""), image: isDate ? ascendingChevronImage : nil, state: isDate ? .on : .off) { _ in
-
-            if isDate { // repeated press
-                layoutForView.ascending = !layoutForView.ascending
-            }
-            layoutForView.sort = "date"
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
-        }
-
-        let byLargest = UIAction(title: NSLocalizedString("_size_", comment: ""), image: isSize ? ascendingChevronImage : nil, state: isSize ? .on : .off) { _ in
-
-            if isSize { // repeated press
-                layoutForView.ascending = !layoutForView.ascending
-            }
-            layoutForView.sort = "size"
-
-            NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterChangeLayout,
-                                                        object: nil,
-                                                        userInfo: ["account": self.session.account,
-                                                                   "serverUrl": collectionViewCommon.serverUrl,
-                                                                   "layoutForView": layoutForView])
-        }
-
-        let sortSubmenu = UIMenu(title: NSLocalizedString("_order_by_", comment: ""), options: .displayInline, children: [byName, byNewest, byLargest])
-
-        let favoriteOnTop = NCKeychain().getFavoriteOnTop(account: self.session.account)
-        let favoriteOnTopAction = UIAction(title: NSLocalizedString("_favorite_on_top_", comment: ""), state: favoriteOnTop ? .on : .off) { _ in
-            NCKeychain().setFavoriteOnTop(account: self.session.account, value: !favoriteOnTop)
-
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, status: nil)
-            }
-            self.updateRightMenu()
-        }
-
-        let directoryOnTop = NCKeychain().getDirectoryOnTop(account: self.session.account)
-        let directoryOnTopAction = UIAction(title: NSLocalizedString("_directory_on_top_", comment: ""), state: directoryOnTop ? .on : .off) { _ in
-            NCKeychain().setDirectoryOnTop(account: self.session.account, value: !directoryOnTop)
-
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, status: nil)
-            }
-            self.updateRightMenu()
-        }
-
-        let hiddenFiles = NCKeychain().getShowHiddenFiles(account: self.session.account)
-        let hiddenFilesAction = UIAction(title: NSLocalizedString("_show_hidden_files_", comment: ""), state: hiddenFiles ? .on : .off) { _ in
-            NCKeychain().setShowHiddenFiles(account: self.session.account, value: !hiddenFiles)
         let byName = UIAction(title: NSLocalizedString("_name_", comment: ""),
                               image: isName ? ascendingChevronImage : nil,
                               state: isName ? .on : .off) { _ in
@@ -950,15 +691,6 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             }
         }
 
-        let personalFilesOnly = NCKeychain().getPersonalFilesOnly(account: self.session.account)
-        let personalFilesOnlyAction = UIAction(title: NSLocalizedString("_personal_files_only_", comment: ""), image: utility.loadImage(named: "folder.badge.person.crop", colors: NCBrandColor.shared.iconImageMultiColors), state: personalFilesOnly ? .on : .off) { _ in
-
-            NCKeychain().setPersonalFilesOnly(account: self.session.account, value: !personalFilesOnly)
-
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": collectionViewCommon.serverUrl, "clearDataSource": true])
-            self.setNavigationRightItems()
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, status: nil)
         let byNewest = UIAction(title: NSLocalizedString("_date_", comment: ""),
                                 image: isDate ? ascendingChevronImage : nil,
                                 state: isDate ? .on : .off) { _ in
@@ -972,28 +704,6 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             }
         }
 
-        let showDescriptionKeychain = NCKeychain().showDescription
-        let showDescription = UIAction(title: NSLocalizedString("_show_description_", comment: ""), state: showDescriptionKeychain ? .on : .off) { _ in
-
-            NCKeychain().showDescription = !showDescriptionKeychain
-
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": collectionViewCommon.serverUrl, "clearDataSource": true])
-            self.setNavigationRightItems()
-        }
-
-        let showRecommendedFilesKeychain = NCKeychain().showRecommendedFiles
-        let capabilityRecommendations = NCCapabilities.shared.getCapabilities(account: session.account).capabilityRecommendations
-        let showRecommendedFiles = UIAction(title: NSLocalizedString("_show_recommended_files_", comment: ""), attributes: !capabilityRecommendations ? .disabled : [], state: showRecommendedFilesKeychain ? .on : .off) { _ in
-
-            NCKeychain().showRecommendedFiles = !showRecommendedFilesKeychain
-
-            collectionViewCommon.collectionView.reloadData()
-            self.setNavigationRightItems()
-        }
-
-        return (select, viewStyleSubmenu, sortSubmenu, personalFilesOnlyAction, showDescription, showRecommendedFiles)
-            NCNetworking.shared.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, status: nil)
         let byLargest = UIAction(title: NSLocalizedString("_size_", comment: ""),
                                  image: isSize ? ascendingChevronImage : nil,
                                  state: isSize ? .on : .off) { _ in

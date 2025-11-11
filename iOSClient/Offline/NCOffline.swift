@@ -34,10 +34,7 @@ class NCOffline: NCCollectionViewCommon {
         layoutKey = NCGlobal.shared.layoutViewOffline
         enableSearchBar = false
         headerRichWorkspaceDisable = true
-        emptyImageName = "icloud.and.arrow.down"
-        emptyImage = UIImage(named: "folder")
-        emptyImageName = "folder_nmcloud"
-        emptyImage = UIImage(named: "folder_nmcloud")
+        emptyImageName = "cloudDownload"
         emptyTitle = "_files_no_files_"
         emptyDescription = "_tutorial_offline_view_"
         emptyDataPortaitOffset = 30
@@ -58,8 +55,6 @@ class NCOffline: NCCollectionViewCommon {
 
     override func reloadDataSource() async {
         var ocIds: [String] = []
-        var metadatas: [tableMetadata] = []
-        var predicate: NSPredicate = defaultPredicate
         var predicate: NSPredicate?
 
         if self.serverUrl.isEmpty {
@@ -72,16 +67,6 @@ class NCOffline: NCCollectionViewCommon {
             for file in files {
                 ocIds.append(file.ocId)
             }
-            if let results = self.database.getResultsMetadatas(predicate: NSPredicate(format: "account == %@ AND ocId IN %@ AND NOT (status IN %@)", session.account, ocIds, global.metadataStatusHideInView)) {
-                metadatas = Array(results.freeze())
-            }
-        } else {
-            metadatas = self.database.getResultsMetadatasPredicate(self.defaultPredicate, layoutForView: layoutForView)
-        }
-
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView)
-
-        super.reloadDataSource()
 
             predicate = NSPredicate(format: "account == %@ AND ocId IN %@ AND NOT (status IN %@)", session.account, ocIds, global.metadataStatusHideInView)
         }

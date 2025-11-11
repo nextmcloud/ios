@@ -139,8 +139,6 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 
             bottomContraint?.constant = 150
         }
-
-        NotificationCenter.default.addObserver(self, selector: #selector(createFolder(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterCreateFolder), object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -155,8 +153,6 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
                 titleCurrentFolder = NCBrandOptions.shared.brand
             }
 
-        autoUploadFileName = self.database.getAccountAutoUploadFileName()
-        autoUploadDirectory = self.database.getAccountAutoUploadDirectory(session: session)
             autoUploadFileName = await self.database.getAccountAutoUploadFileNameAsync(account: session.account)
             autoUploadDirectory = await self.database.getAccountAutoUploadDirectoryAsync(account: session.account, urlBase: session.urlBase, userId: session.userId)
 
@@ -268,7 +264,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 
     func tapRichWorkspace(_ sender: Any) { }
 
-    func tapRecommendationsButtonMenu(with metadata: tableMetadata, image: UIImage?) { }
+    func tapRecommendationsButtonMenu(with metadata: tableMetadata, image: UIImage?, sender: Any?) { }
 
     func tapRecommendations(with metadata: tableMetadata) { }
 
@@ -313,12 +309,6 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 
 extension NCSelect: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else { return }
-
-        if metadata.directory {
-            pushMetadata(metadata)
-        } else {
-            delegate?.dismissSelect(serverUrl: serverUrl, metadata: metadata, type: type, items: items, overwrite: overwrite, copy: false, move: false, session: session)
         guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
             return
         }
@@ -334,11 +324,6 @@ extension NCSelect: UICollectionViewDelegate {
 
 extension NCSelect: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else { return }
-
-        // Thumbnail
-        if !metadata.directory {
-            if let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt512) {
         guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
             return
         }
@@ -351,7 +336,6 @@ extension NCSelect: UICollectionViewDataSource {
                 if metadata.iconName.isEmpty {
                     (cell as? NCCellProtocol)?.filePreviewImageView?.image = NCImageCache.shared.getImageFile()
                 } else {
-                    (cell as? NCCellProtocol)?.filePreviewImageView?.image = utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
                     (cell as? NCCellProtocol)?.filePreviewImageView?.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
                 }
                 if metadata.hasPreview,
@@ -376,7 +360,9 @@ extension NCSelect: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = (collectionView.dequeueReusableCell(withReuseIdentifier: "listCell", for: indexPath) as? NCListCell)!
-        guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else { return cell }
+        guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
+            return cell
+        }
 
         var isShare = false
         var isMounted = false
@@ -421,18 +407,18 @@ extension NCSelect: UICollectionViewDataSource {
                 cell.imageItem.image = NCImageCache.shared.getFolder(account: metadata.account)
             }
             cell.imageItem.image = cell.imageItem.image?.colorizeFolder(metadata: metadata)
-
             cell.labelInfo.text = utility.getRelativeDateTitle(metadata.date as Date)
 
         } else {
 
             cell.labelInfo.text = utility.getRelativeDateTitle(metadata.date as Date) + " · " + utilityFileSystem.transformedSize(metadata.size)
 
-            // image local
-            if self.database.getTableLocalFile(ocId: metadata.ocId) != nil {
-                cell.imageLocal.image = NCImageCache.shared.getImageOfflineFlag()
-            } else if utilityFileSystem.fileProviderStorageExists(metadata) {
-                cell.imageLocal.image = NCImageCache.shared.getImageLocal()
+            self.database.getTableLocal(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) { tblLocalFile in
+                if let tblLocalFile, tblLocalFile.offline {
+                    cell.imageLocal.image = NCImageCache.shared.getImageOfflineFlag()
+                } else if self.utilityFileSystem.fileProviderStorageExists(metadata) {
+                    cell.imageLocal.image = NCImageCache.shared.getImageLocal()
+                }
             }
         }
 
@@ -544,21 +530,6 @@ extension NCSelect {
             }
         }
 
-        NCNetworking.shared.readFolder(serverUrl: serverUrl,
-                                       account: session.account,
-                                       checkResponseDataChanged: false,
-                                       queue: .main) { task in
-            self.dataSourceTask = task
-            if self.dataSource.isEmpty() {
-                self.collectionView.reloadData()
-            }
-        } completion: { _, _, _, _, _ in
-            let metadatas = self.database.getResultsMetadatasPredicate(predicate, layoutForView: NCDBLayoutForView())
-
-            self.dataSource = NCCollectionViewDataSource(metadatas: metadatas)
-            self.collectionView.reloadData()
-
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource, userInfo: ["serverUrl": self.serverUrl])
         let metadatas = await self.database.getMetadatasAsync(predicate: predicate,
                                                               withLayout: NCDBLayoutForView(),
                                                               withAccount: session.account)

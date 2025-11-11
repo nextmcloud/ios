@@ -30,33 +30,48 @@ protocol NCTrashSelectTabBarDelegate: AnyObject {
 }
 
 class NCTrashSelectTabBar: ObservableObject {
-    var tabBarController: UITabBarController?
+    var controller: UITabBarController?
     var hostingController: UIViewController?
     open weak var delegate: NCTrashSelectTabBarDelegate?
 
     @Published var isSelectedEmpty = true
 
-    init(tabBarController: UITabBarController? = nil, delegate: NCTrashSelectTabBarDelegate? = nil) {
+    init(controller: UITabBarController? = nil, viewController: UIViewController, delegate: NCTrashSelectTabBarDelegate? = nil) {
+        guard let controller else {
+            return
+        }
         let rootView = NCTrashSelectTabBarView(tabBarSelect: self)
+        let bottomAreaInsets: CGFloat = controller.tabBar.safeAreaInsets.bottom == 0 ? 34 : 0
+        let height = controller.tabBar.frame.height + bottomAreaInsets
         hostingController = UIHostingController(rootView: rootView)
+        guard let hostingController else {
+            return
+        }
 
-        self.tabBarController = tabBarController
+        self.controller = controller
         self.delegate = delegate
 
-        guard let tabBarController, let hostingController else { return }
-
-        tabBarController.view.addSubview(hostingController.view)
-
-        hostingController.view.frame = tabBarController.tabBar.frame
-        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         hostingController.view.backgroundColor = .clear
         hostingController.view.isHidden = true
+
+        viewController.view.addSubview(hostingController.view)
+
+        NSLayoutConstraint.activate([
+            hostingController.view.leadingAnchor.constraint(equalTo: viewController.view.leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor),
+            hostingController.view.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor),
+            hostingController.view.heightAnchor.constraint(equalToConstant: height)
+        ])
     }
 
     func show() {
-        guard let tabBarController, let hostingController else { return }
+        guard let controller,
+              let hostingController else {
+            return
+        }
 
-        tabBarController.tabBar.isHidden = true
+        controller.tabBar.isHidden = true
 
         if hostingController.view.isHidden {
             hostingController.view.isHidden = false
@@ -70,10 +85,13 @@ class NCTrashSelectTabBar: ObservableObject {
     }
 
     func hide() {
-        guard let tabBarController, let hostingController else { return }
+        guard let controller,
+              let hostingController else {
+            return
+        }
 
         hostingController.view.isHidden = true
-        tabBarController.tabBar.isHidden = false
+        controller.tabBar.isHidden = false
     }
 
     func update(selectOcId: [String]) {
@@ -97,11 +115,11 @@ struct NCTrashSelectTabBarView: View {
                 Button {
                     tabBarSelect.delegate?.recover()
                 } label: {
-                    Image(systemName: "arrow.circlepath")
+                    Image(systemName: "arrow.counterclockwise")
                         .font(Font.system(.body).weight(.light))
                         .imageScale(sizeClass == .compact ? .medium : .large)
                 }
-//                .tint(Color(NCBrandColor.shared.iconImageColor))
+                .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)
                 .disabled(tabBarSelect.isSelectedEmpty)
 
@@ -112,7 +130,7 @@ struct NCTrashSelectTabBarView: View {
                         .font(Font.system(.body).weight(.light))
                         .imageScale(sizeClass == .compact ? .medium : .large)
                 }
-//                .tint(.red)
+                .tint(.red)
                 .frame(maxWidth: .infinity)
                 .disabled(tabBarSelect.isSelectedEmpty)
 
@@ -123,7 +141,7 @@ struct NCTrashSelectTabBarView: View {
                         .font(Font.system(.body).weight(.light))
                         .imageScale(sizeClass == .compact ? .medium : .large)
                 }
-//                .tint(Color(NCBrandColor.shared.iconImageColor))
+                .tint(Color(NCBrandColor.shared.iconImageColor))
                 .frame(maxWidth: .infinity)
             }
         }
@@ -134,5 +152,5 @@ struct NCTrashSelectTabBarView: View {
 }
 
 #Preview {
-    NCTrashSelectTabBarView(tabBarSelect: NCTrashSelectTabBar())
+    NCTrashSelectTabBarView(tabBarSelect: NCTrashSelectTabBar(viewController: UIViewController()))
 }

@@ -46,14 +46,6 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
         self.controller = controller
         self.delegate = delegate
 
-        guard let controller, let hostingController else { return }
-
-        controller.view.addSubview(hostingController.view)
-
-        hostingController.view.frame = controller.tabBar.frame
-        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        hostingController.view.backgroundColor = .clear
-        hostingController.view.isHidden = true
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         hostingController.view.backgroundColor = .clear
         hostingController.view.isHidden = true
@@ -74,12 +66,13 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
             return
         }
 
-        controller.tabBar.isHidden = true
+        controller.hide()
+
         if hostingController.view.isHidden {
             hostingController.view.isHidden = false
             hostingController.view.transform = .init(translationX: 0, y: hostingController.view.frame.height)
-            UIView.animate(withDuration: 0.2) {
-                hostingController.view.transform = .init(translationX: 0, y: 0)
+            UIView.animate(withDuration: 0.3) {
+                hostingController.view.transform = .identity
             }
         }
     }
@@ -91,10 +84,13 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
         }
 
         hostingController.view.isHidden = true
-        controller.tabBar.isHidden = false
+        controller.show()
     }
 
     func update(fileSelect: [String], metadatas: [tableMetadata]? = nil, userId: String? = nil) {
+        
+        var fileSelectArr = fileSelect
+
         if let metadatas {
             isAnyOffline = false
             canSetAsOffline = true

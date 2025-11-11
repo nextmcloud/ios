@@ -23,27 +23,26 @@
 import UIKit
 import DropDown
 
-class NCShareCommon: NSObject {
+enum NCShareCommon {
+    static let shareTypeUser = 0
+    static let shareTypeGroup = 1
+    static let shareTypeLink = 3
+    static let shareTypeEmail = 4
+    static let shareTypeContact = 5
+    static let shareTypeFederated = 6
+    static let shareTypeTeam = 7
+    static let shareTypeGuest = 8
+    static let shareTypeFederatedGroup = 9
+    static let shareTypeRoom = 10
 
-    // swiftlint:disable identifier_name
-    let SHARE_TYPE_USER = 0
-    let SHARE_TYPE_GROUP = 1
-    let SHARE_TYPE_LINK = 3
-    let SHARE_TYPE_EMAIL = 4
-    let SHARE_TYPE_CONTACT = 5
-    let SHARE_TYPE_REMOTE = 6
-    let SHARE_TYPE_CIRCLE = 7
-    let SHARE_TYPE_GUEST = 8
-    let SHARE_TYPE_REMOTE_GROUP = 9
-    let SHARE_TYPE_ROOM = 10
-    // swiftlint:enable identifier_name
+    static let itemTypeFile = "file"
+    static let itemTypeFolder = "folder"
 
-    func createLinkAvatar(imageName: String, colorCircle: UIColor) -> UIImage? {
-
+    static func createLinkAvatar(imageName: String, colorCircle: UIColor) -> UIImage? {
         let size: CGFloat = 200
 
         let bottomImage = UIImage(named: "circle_fill")!.image(color: colorCircle, size: size / 2)
-        let topImage = UIImage(named: imageName)!.image(color: .white, size: size / 2)
+        let topImage = NCUtility().loadImage(named: imageName, colors: [NCBrandColor.shared.iconImageColor])
         UIGraphicsBeginImageContextWithOptions(CGSize(width: size, height: size), false, UIScreen.main.scale)
         bottomImage.draw(in: CGRect(origin: CGPoint.zero, size: CGSize(width: size, height: size)))
         topImage.draw(in: CGRect(origin: CGPoint(x: size / 4, y: size / 4), size: CGSize(width: size / 2, height: size / 2)))
@@ -53,7 +52,7 @@ class NCShareCommon: NSObject {
         return image
     }
 
-    func copyLink(link: String, viewController: UIViewController, sender: Any) {
+    static func copyLink(link: String, viewController: UIViewController, sender: Any) {
         let objectsToShare = [link]
 
         let activityViewController = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
@@ -69,55 +68,47 @@ class NCShareCommon: NSObject {
         }
     }
 
-    func getImageShareType(shareType: Int, isDropDown:Bool = false) -> UIImage? {
-        
+    static func getImageShareType(shareType: Int) -> UIImage? {
+
         switch shareType {
-        case SHARE_TYPE_USER:
-            return UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.label)
-        case self.SHARE_TYPE_GROUP:
-            return UIImage(named: "shareTypeGroup")?.imageColor(NCBrandColor.shared.label)
-        case self.SHARE_TYPE_LINK:
-            return UIImage(named: "shareTypeLink")?.imageColor(NCBrandColor.shared.label)
-        case self.SHARE_TYPE_EMAIL:
-            return UIImage(named: isDropDown ? "email" : "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
-        case self.SHARE_TYPE_CONTACT:
-            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
+        case NCShareCommon.shareTypeUser:
             return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case self.SHARE_TYPE_FEDERATED:
-            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-//            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
-        case self.SHARE_TYPE_REMOTE:
-            return UIImage(named: isDropDown ? "shareTypeUser" : "shareTypeEmail")?.imageColor(NCBrandColor.shared.label)
-        case self.SHARE_TYPE_CIRCLE:
-            return UIImage(named: "shareTypeCircles")?.imageColor(NCBrandColor.shared.label)
-        case self.SHARE_TYPE_GUEST:
-            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
-            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-        case self.SHARE_TYPE_FEDERATED_GROUP:
+        case NCShareCommon.shareTypeGroup:
             return UIImage(named: "shareTypeGroup")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
-//            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
-        case self.SHARE_TYPE_REMOTE_GROUP:
-            return UIImage(named: "shareTypeGroup")?.imageColor(NCBrandColor.shared.label)
-        case self.SHARE_TYPE_ROOM:
-            return UIImage(named: "shareTypeRoom")?.imageColor(NCBrandColor.shared.label)
+        case NCShareCommon.shareTypeLink:
+            return UIImage(named: "shareTypeLink")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+        case NCShareCommon.shareTypeEmail:
+            return UIImage(named: "shareTypeEmail")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+        case NCShareCommon.shareTypeContact:
+            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+        case NCShareCommon.shareTypeFederated:
+            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+        case NCShareCommon.shareTypeTeam:
+            return UIImage(named: "shareTypeTeam")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+        case NCShareCommon.shareTypeGuest:
+            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+        case NCShareCommon.shareTypeFederatedGroup:
+            return UIImage(named: "shareTypeGroup")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+        case NCShareCommon.shareTypeRoom:
+            return UIImage(named: "shareTypeRoom")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         default:
-            return UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label)
+            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         }
     }
     
-    func isLinkShare(shareType: Int) -> Bool {
-        return shareType == SHARE_TYPE_LINK
+    static func isLinkShare(shareType: Int) -> Bool {
+        return shareType == NCShareCommon.shareTypeLink
     }
     
-    func isExternalUserShare(shareType: Int) -> Bool {
-        return shareType == SHARE_TYPE_EMAIL
+    static func isExternalUserShare(shareType: Int) -> Bool {
+        return shareType == NCShareCommon.shareTypeEmail
     }
     
-    func isInternalUser(shareType: Int) -> Bool {
-        return shareType == SHARE_TYPE_USER
+    static func isInternalUser(shareType: Int) -> Bool {
+        return shareType == NCShareCommon.shareTypeUser
     }
     
-    func isFileTypeAllowedForEditing(fileExtension: String, shareType: Int) -> Bool {
+    static func isFileTypeAllowedForEditing(fileExtension: String, shareType: Int) -> Bool {
         if fileExtension == "md" || fileExtension == "txt" {
             return true
         } else {
@@ -125,7 +116,7 @@ class NCShareCommon: NSObject {
         }
     }
     
-    func isEditingEnabled(isDirectory: Bool, fileExtension: String, shareType: Int) -> Bool {
+    static func isEditingEnabled(isDirectory: Bool, fileExtension: String, shareType: Int) -> Bool {
         if !isDirectory {//file
             return isFileTypeAllowedForEditing(fileExtension: fileExtension, shareType: shareType)
         } else {
@@ -133,19 +124,18 @@ class NCShareCommon: NSObject {
         }
     }
     
-    func isFileDropOptionVisible(isDirectory: Bool, shareType: Int) -> Bool {
+    static func isFileDropOptionVisible(isDirectory: Bool, shareType: Int) -> Bool {
         return (isDirectory && (isLinkShare(shareType: shareType) || isExternalUserShare(shareType: shareType)))
     }
     
-    func isCurrentUserIsFileOwner(fileOwnerId: String) -> Bool {
-        if let currentUser = NCManageDatabase.shared.getActiveAccount(), currentUser.userId == fileOwnerId {
+    static func isCurrentUserIsFileOwner(fileOwnerId: String) -> Bool {
         if let currentUser = NCManageDatabase.shared.getActiveTableAccount(), currentUser.userId == fileOwnerId {
             return true
         }
         return false
     }
     
-    func canReshare(withPermission permission: String) -> Bool {
+    static func canReshare(withPermission permission: String) -> Bool {
         return permission.contains(NCPermissions().permissionCanShare)
     }
 }

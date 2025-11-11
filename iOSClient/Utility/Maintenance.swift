@@ -47,7 +47,7 @@ struct Maintenance: View {
     ///
     private func startMaintenance() async {
         do {
-            try NCManageDatabase.shared.compactRealm()
+            try NCManageDatabase.shared.forceCompactRealm()
         } catch {
             nkLog(tag: NCGlobal.shared.logTagDatabase, emoji: .error, message: "Realm compaction failed: \(error.localizedDescription)")
         }

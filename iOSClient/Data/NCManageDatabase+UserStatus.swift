@@ -62,7 +62,7 @@ extension NCManageDatabase {
                 }
             }
         } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
+            nkLog(error: "Could not write to database: \(error)")
         }
     }
 }

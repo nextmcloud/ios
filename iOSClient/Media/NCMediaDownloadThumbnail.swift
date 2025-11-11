@@ -5,7 +5,6 @@
 import UIKit
 import NextcloudKit
 import Queuer
-import Alamofire
 
 class NCMediaDownloadThumbnail: ConcurrentOperation, @unchecked Sendable {
     var metadata: NCMediaDataSource.Metadata
@@ -22,16 +21,6 @@ class NCMediaDownloadThumbnail: ConcurrentOperation, @unchecked Sendable {
     }
 
     override func start() {
-        guard !isCancelled,
-              let tblMetadata = NCManageDatabase.shared.getResultMetadataFromOcId(self.metadata.ocId)?.freeze() else { return self.finish() }
-        var etagResource: String?
-        var image: UIImage?
-        Task {
-            guard !isCancelled,
-                  let tblMetadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(self.metadata.ocId) else {
-                return self.finish()
-            }
-            var image: UIImage?
        Task {
            guard !isCancelled,
                  let tblMetadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(self.metadata.ocId) else {

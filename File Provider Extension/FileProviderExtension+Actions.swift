@@ -8,18 +8,6 @@ import NextcloudKit
 
 extension FileProviderExtension {
     override func createDirectory(withName directoryName: String, inParentItemIdentifier parentItemIdentifier: NSFileProviderItemIdentifier, completionHandler: @escaping (NSFileProviderItem?, Error?) -> Void) {
-        guard let tableDirectory = providerUtility.getTableDirectoryFromParentItemIdentifier(parentItemIdentifier, account: fileProviderData.shared.session.account, homeServerUrl: utilityFileSystem.getHomeServer(session: fileProviderData.shared.session)) else {
-            return completionHandler(nil, NSFileProviderError(.noSuchItem))
-        }
-        let directoryName = utilityFileSystem.createFileName(directoryName, serverUrl: tableDirectory.serverUrl, account: fileProviderData.shared.session.account)
-        let serverUrlFileName = tableDirectory.serverUrl + "/" + directoryName
-
-        NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName, account: fileProviderData.shared.session.account) { _, ocId, _, _, error in
-            if error == .success {
-                NextcloudKit.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", showHiddenFiles: NCKeychain().showHiddenFiles, account: fileProviderData.shared.session.account) { _, files, _, error in
-                    if error == .success, let file = files?.first {
-                        let isDirectoryEncrypted = self.utilityFileSystem.isDirectoryE2EE(file: file)
-                        let metadata = self.database.convertFileToMetadata(file, isDirectoryE2EE: isDirectoryEncrypted)
         Task {
             guard let session = fileProviderData.session,
                   let tableDirectory = await providerUtility.getTableDirectoryFromParentItemIdentifierAsync(parentItemIdentifier, account: session.account, homeServerUrl: utilityFileSystem.getHomeServer(session: session)) else {

@@ -33,7 +33,6 @@ class NCViewerProviderContextMenu: UIViewController {
     private var image: UIImage?
     private let player = VLCMediaPlayer()
     private let utilityFileSystem = NCUtilityFileSystem()
-    private let sizeIcon: CGFloat = 150
     private let networking = NCNetworking.shared
     internal let global = NCGlobal.shared
     private let sizeIcon: CGFloat = 150
@@ -45,11 +44,12 @@ class NCViewerProviderContextMenu: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    init(metadata: tableMetadata, image: UIImage?) {
+    init(metadata: tableMetadata, image: UIImage?, sceneIdentifier: String) {
         super.init(nibName: nil, bundle: nil)
         self.metadata = metadata.detachedCopy()
         self.metadataLivePhoto = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
         self.image = image
+        self.sceneIdentifier = sceneIdentifier
 
         if metadata.directory {
             imageView.image = NCImageCache.shared.getFolder(account: metadata.account)
@@ -94,10 +94,6 @@ class NCViewerProviderContextMenu: UIViewController {
                         maxDownload = NCGlobal.shared.maxAutoDownload
                     }
                     if metadata.size <= maxDownload {
-                        NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
-                                                                                  session: NCNetworking.shared.sessionDownload,
-                                                                                  selector: "")
-                        NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
                         Task {
                             if let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
                                                                                                                   session: self.networking.sessionDownload,
@@ -111,11 +107,6 @@ class NCViewerProviderContextMenu: UIViewController {
             // DOWNLOAD IMAGE GIF SVG
             if !utilityFileSystem.fileProviderStorageExists(metadata),
                self.networking.isOnline,
-               (metadata.contentType == "image/gif" || metadata.contentType == "image/svg+xml") {
-                NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
-                                                                          session: NCNetworking.shared.sessionDownload,
-                                                                          selector: "")
-                NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true)
                metadata.contentType == "image/gif" || metadata.contentType == "image/svg+xml" {
                 Task {
                     if let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
@@ -129,10 +120,6 @@ class NCViewerProviderContextMenu: UIViewController {
             if let metadataLivePhoto = self.metadataLivePhoto,
                self.networking.isOnline,
                !utilityFileSystem.fileProviderStorageExists(metadataLivePhoto) {
-                NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadataLivePhoto],
-                                                                          session: NCNetworking.shared.sessionDownload,
-                                                                          selector: "")
-                NCNetworking.shared.download(metadata: metadataLivePhoto, withNotificationProgressTask: true)
                 Task {
                     if let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadataLivePhoto.ocId,
                                                                                                           session: self.networking.sessionDownload,
@@ -149,13 +136,9 @@ class NCViewerProviderContextMenu: UIViewController {
         imageView.contentMode = .scaleAspectFill
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(downloadStartFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadStartFile), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(downloadedFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(downloadCancelFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadCancelFile), object: nil)
-        self.networking.addDelegate(self)
         Task {
             await NCNetworking.shared.transferDispatcher.addDelegate(self)
         }
@@ -165,59 +148,11 @@ class NCViewerProviderContextMenu: UIViewController {
         super.viewWillDisappear(animated)
 
         player.stop()
-
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadStartFile), object: nil)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadedFile), object: nil)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDownloadCancelFile), object: nil)
     }
 
-    // MARK: - NotificationCenter
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
 
-    @objc func downloadStartFile(_ notification: NSNotification) {
-        guard let userInfo = notification.userInfo as NSDictionary?,
-              let ocId = userInfo["ocId"] as? String
-        else { return }
-
-        if ocId == self.metadata?.ocId || ocId == self.metadataLivePhoto?.ocId {
-            DispatchQueue.main.async { NCActivityIndicator.shared.start(backgroundView: self.view) }
-        }
-    }
-
-    @objc func downloadedFile(_ notification: NSNotification) {
-        guard let userInfo = notification.userInfo as NSDictionary?,
-              let ocId = userInfo["ocId"] as? String,
-              let error = userInfo["error"] as? NKError,
-              let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
-        else { return }
-
-        if error == .success && metadata.ocId == self.metadata?.ocId {
-            if metadata.isImage {
-                DispatchQueue.main.async {
-                    self.viewImage(metadata: metadata)
-                }
-            } else if metadata.isVideo {
-                viewVideo(metadata: metadata)
-            } else if metadata.isAudio {
-                viewVideo(metadata: metadata)
-            }
-        }
-        if error == .success && metadata.ocId == self.metadataLivePhoto?.ocId {
-            viewVideo(metadata: metadata)
-        }
-        if ocId == self.metadata?.ocId || ocId == self.metadataLivePhoto?.ocId {
-            NCActivityIndicator.shared.stop()
-        }
-    }
-
-    @objc func downloadCancelFile(_ notification: NSNotification) {
-        guard let userInfo = notification.userInfo as NSDictionary?,
-              let ocId = userInfo["ocId"] as? String
-        else { return }
-
-        if ocId == self.metadata?.ocId || ocId == self.metadataLivePhoto?.ocId {
-            NCActivityIndicator.shared.stop()
-        }
-        self.networking.removeDelegate(self)
         Task {
             await NCNetworking.shared.transferDispatcher.removeDelegate(self)
         }

@@ -1,6 +1,25 @@
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2019 Marino Faggiana
-// SPDX-License-Identifier: GPL-3.0-or-later
+//
+//  NCNetworking.swift
+//  Nextcloud
+//
+//  Created by Marino Faggiana on 23/10/19.
+//  Copyright © 2019 Marino Faggiana. All rights reserved.
+//
+//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 import UIKit
 import OpenSSL
@@ -148,11 +167,11 @@ actor NetworkingTasks {
             $0.identifier == identifier && $0.task.state == .running
         }
         active.append((identifier, task))
-        nkLog(tag: NCGlobal.shared.logTagNetworkingTasks, emoji: .start, message: "Start task for identifier: \(identifier)", consoleOnly: true)
+        nkLog(tag: NCGlobal.shared.logNetworkingTasks, emoji: .start, message: "Start task for identifier: \(identifier)", consoleOnly: true)
     }
 
     /// create a Identifier
-    /// 
+    ///
     func createIdentifier(account: String? = nil, path: String? = nil, name: String) -> String {
         if let account,
            let path {
@@ -173,7 +192,7 @@ actor NetworkingTasks {
 
         for element in active where element.identifier == identifier {
             element.task.cancel()
-            nkLog(tag: NCGlobal.shared.logTagNetworkingTasks, emoji: .cancel, message: "Cancel task for identifier: \(identifier)", consoleOnly: true)
+            nkLog(tag: NCGlobal.shared.logNetworkingTasks, emoji: .cancel, message: "Cancel task for identifier: \(identifier)", consoleOnly: true)
         }
         active.removeAll {
             $0.identifier == identifier
@@ -186,7 +205,7 @@ actor NetworkingTasks {
     func cancelAll() {
         active.forEach {
             $0.task.cancel()
-            nkLog(tag: NCGlobal.shared.logTagNetworkingTasks, emoji: .cancel, message: "Cancel task with identifier: \($0.identifier)", consoleOnly: true)
+            nkLog(tag: NCGlobal.shared.logNetworkingTasks, emoji: .cancel, message: "Cancel task with identifier: \($0.identifier)", consoleOnly: true)
         }
         active.removeAll()
     }
@@ -287,23 +306,6 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
 
     // MARK: - init
 
-    init() {
-        if let account = database.getActiveTableAccount()?.account {
-            getActiveAccountCertificate(account: account)
-        }
-
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterChangeUser), object: nil, queue: .main) { notification in
-            if let userInfo = notification.userInfo {
-                if let account = userInfo["account"] as? String {
-                    self.getActiveAccountCertificate(account: account)
-                }
-            }
-        }
-
-        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { _ in
-            NCTransferProgress.shared.clearAllCountError()
-        }
-    }
     init() { }
 
     // MARK: - Communication Delegate
@@ -319,7 +321,6 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
             lastReachability = false
         }
         networkReachability = typeReachability
-        NotificationCenter.default.postOnMainThread(name: self.global.notificationCenterNetworkReachability, userInfo: nil)
     }
 
     func authenticationChallenge(_ session: URLSession,
@@ -445,51 +446,5 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
 
     func activeAccountCertificate(account: String) {
         (self.p12Data, self.p12Password) = NCPreferences().getClientCertificate(account: account)
-    }
-
-    // MARK: - User Default Data Request
-
-    func isResponseDataChanged<T>(account: String, responseData: AFDataResponse<T>?) -> Bool {
-        guard let responseData,
-              let request = responseData.request else { return true }
-        let key = getResponseDataKey(account: account, request: request)
-        let retrievedData = UserDefaults.standard.data(forKey: key)
-
-        switch responseData.result {
-        case .success(let data):
-            if let data = data as? Data {
-                if retrievedData != data, let request = responseData.request {
-                    let key = getResponseDataKey(account: account, request: request)
-                    UserDefaults.standard.set(data, forKey: key)
-                }
-                return retrievedData != data
-            } else {
-                return true
-            }
-        case .failure(let error):
-            print("Errore: \(error.localizedDescription)")
-            return true
-        }
-    }
-
-    func removeAllKeyUserDefaultsData(account: String?) {
-        let userDefaults = UserDefaults.standard
-
-        for key in userDefaults.dictionaryRepresentation().keys {
-            if let account {
-                if key.hasPrefix(account) {
-                    userDefaults.removeObject(forKey: key)
-                }
-            } else {
-                userDefaults.removeObject(forKey: key)
-            }
-        }
-    }
-
-    private func getResponseDataKey(account: String, request: URLRequest) -> String {
-        let depth = request.allHTTPHeaderFields?["Depth"] ?? "none"
-        let key = account + "|" + (request.url?.absoluteString ?? "") + "|Depth=\(depth)|" + (request.httpMethod ?? "")
-
-        return key
     }
 }

@@ -22,6 +22,7 @@
 //
 
 import UIKit
+import NextcloudKit
 @preconcurrency import WebKit
 
 class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
@@ -33,6 +34,10 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     var imageIcon: UIImage?
     let utility = NCUtility()
     var items: [UIBarButtonItem] = []
+
+    var sceneIdentifier: String {
+        (self.tabBarController as? NCMainTabBarController)?.sceneIdentifier ?? ""
+    }
 
     // MARK: - View Life Cycle
 
@@ -109,8 +114,6 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(favoriteFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(viewUnload), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeUser), object: nil)
         tabBarController?.tabBar.isHidden = true
 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
@@ -138,9 +141,6 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
 
         webView.configuration.userContentController.removeScriptMessageHandler(forName: "DirectEditingMobileInterface")
 
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteFile), object: nil)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeUser), object: nil)
-
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
@@ -150,16 +150,6 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
     }
 
     // MARK: - NotificationCenter
-
-    @objc func favoriteFile(_ notification: NSNotification) {
-        guard let userInfo = notification.userInfo as NSDictionary?,
-              let ocId = userInfo["ocId"] as? String,
-              ocId == self.metadata.ocId,
-              let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
-        else { return }
-
-        self.metadata = metadata
-    }
 
     @objc func keyboardDidShow(notification: Notification) {
         guard let info = notification.userInfo else { return }
@@ -173,13 +163,6 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
         bottomConstraint?.constant = 0
     }
 
-    // MARK: - Action
-
-    @objc func openMenuMore() {
-        if imageIcon == nil { imageIcon = NCUtility().loadImage(named: "doc.text", colors: [NCBrandColor.shared.iconImageColor]) }
-        NCViewer().toggleMenu(controller: (self.tabBarController as? NCMainTabBarController), metadata: metadata, webView: true, imageIcon: imageIcon)
-    }
-
     // MARK: -
 
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -189,7 +172,7 @@ class NCViewerNextcloudText: UIViewController, WKNavigationDelegate, WKScriptMes
             }
 
             if message.body as? String == "share" {
-                NCActionCenter.shared.openShare(viewController: self, metadata: metadata, page: .sharing)
+                NCDownloadAction.shared.openShare(viewController: self, metadata: metadata, page: .sharing)
             }
 
             if message.body as? String == "loading" {
@@ -244,8 +227,6 @@ extension NCViewerNextcloudText: UINavigationControllerDelegate {
     override func didMove(toParent parent: UIViewController?) {
         super.didMove(toParent: parent)
 
-        if parent == nil {
-            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterGetServerData, userInfo: ["serverUrl": self.metadata.serverUrl])
         Task {
             if parent == nil {
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in

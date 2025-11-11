@@ -26,10 +26,10 @@ enum NCViewerContextMenu {
            //
            // DETAIL
            //
-           if !(!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty) {
+           if !(!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty), !metadata.isDirectoryE2EE, !metadata.e2eEncrypted {
                let action = UIAction(
                    title: NSLocalizedString("_details_", comment: ""),
-                   image: UIImage(systemName: "info")
+                   image: UIImage(systemName: "info")?.withTintColor(NCBrandColor.shared.iconImageColor)
                ) { _ in
                    NCDownloadAction.shared.openShare(viewController: controller,
                                                      metadata: metadata,
@@ -44,7 +44,7 @@ enum NCViewerContextMenu {
            if !webView {
                let action = UIAction(
                    title: NSLocalizedString("_view_in_folder_", comment: ""),
-                   image: UIImage(systemName: "questionmark.folder")
+                   image: UIImage(systemName: "questionmark.folder")?.withTintColor(NCBrandColor.shared.iconImageColor)
                ) { _ in
                    NCDownloadAction.shared.openFileViewInFolder(serverUrl: metadata.serverUrl,
                                                                 fileNameBlink: metadata.fileName,
@@ -57,7 +57,7 @@ enum NCViewerContextMenu {
            //
            // FAVORITE
            //
-           if !metadata.lock {
+           if !metadata.lock, !metadata.isDirectoryE2EE, !metadata.e2eEncrypted {
                let action = UIAction(
                    title: metadata.favorite
                    ? NSLocalizedString("_remove_favorites_", comment: "")
@@ -93,7 +93,7 @@ enum NCViewerContextMenu {
            if metadata.isPDF {
                menuElements.append(UIAction(
                    title: NSLocalizedString("_search_", comment: ""),
-                   image: UIImage(systemName: "magnifyingglass")) { _ in
+                   image: UIImage(systemName: "magnifyingglass")?.withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                        NotificationCenter.default.postOnMainThread(
                            name: NCGlobal.shared.notificationCenterMenuSearchTextPDF
                        )
@@ -101,7 +101,7 @@ enum NCViewerContextMenu {
 
                menuElements.append(UIAction(
                    title: NSLocalizedString("_go_to_page_", comment: ""),
-                   image: UIImage(systemName: "number.circle")) { _ in
+                   image: UIImage(systemName: "number.circle")?.withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                        NotificationCenter.default.postOnMainThread(
                            name: NCGlobal.shared.notificationCenterMenuGotToPageInPDF
                        )

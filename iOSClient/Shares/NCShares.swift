@@ -70,38 +70,6 @@ class NCShares: NCCollectionViewCommon {
 
     // MARK: - DataSource
 
-    override func reloadDataSource() {
-        var ocId: [String] = []
-        let sharess = self.database.getTableShares(account: session.account)
-
-        for share in sharess {
-            if let result = self.database.getResultMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", session.account, share.serverUrl, share.fileName)) {
-                if !(ocId.contains { $0 == result.ocId }) {
-                    ocId.append(result.ocId)
-                }
-            } else {
-                let serverUrlFileName = share.serverUrl + "/" + share.fileName
-                NCNetworking.shared.readFile(serverUrlFileName: serverUrlFileName, account: session.account) { task in
-                    self.dataSourceTask = task
-                    if self.dataSource.isEmpty() {
-                        self.collectionView.reloadData()
-                    }
-                } completion: { _, metadata, _ in
-                    if let metadata {
-                        self.database.addMetadata(metadata)
-                        if !(ocId.contains { $0 == metadata.ocId }) {
-                            ocId.append(metadata.ocId)
-                        }
-                    }
-                }
-            }
-        }
-
-        let metadatas = self.database.getResultsMetadatasPredicate(NSPredicate(format: "ocId IN %@", ocId), layoutForView: layoutForView)
-
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView)
-
-        super.reloadDataSource()
     override func reloadDataSource() async {
         let metadatas = await database.getMetadatasAsync(predicate: NSPredicate(format: "ocId IN %@", ocIdShares),
                                                          withLayout: layoutForView,
@@ -131,14 +99,6 @@ class NCShares: NCCollectionViewCommon {
             if self.dataSource.isEmpty() {
                 self.collectionView.reloadData()
             }
-        } completion: { account, shares, _, error in
-            if error == .success {
-                self.database.deleteTableShare(account: account)
-                if let shares = shares, !shares.isEmpty {
-                    let home = self.utilityFileSystem.getHomeServer(session: self.session)
-                    self.database.addShare(account: account, home: home, shares: shares)
-                }
-                self.reloadDataSource()
         }
 
         guard resultsReadShares.error == .success else {
@@ -187,7 +147,6 @@ class NCShares: NCCollectionViewCommon {
                 await self.restoreDefaultTitle()
                 await self.reloadDataSource()
             }
-            self.refreshControl.endRefreshing()
         }
     }
 }

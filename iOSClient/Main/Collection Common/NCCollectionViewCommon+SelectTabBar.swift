@@ -44,10 +44,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         let canDeleteServer = metadatas.allSatisfy { !$0.lock }
 
         if canDeleteServer {
-            alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { [self] _ in
-                NCNetworking.shared.deleteMetadatas(metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
-                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
-                toggleSelect()
+//            alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { [self] _ in
+//                NCNetworking.shared.deleteMetadatas(metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
+//                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterReloadDataSource)
+//                toggleSelect()
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { _ in
                 self.networking.setStatusWaitDelete(metadatas: metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
                 self.setEditMode(false)
@@ -107,9 +107,9 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
                 title: NSLocalizedString("_set_available_offline_", comment: ""),
                 message: NSLocalizedString("_select_offline_warning_", comment: ""),
                 preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { [self] _ in
-                metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
-                toggleSelect()
+//            alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { [self] _ in
+//                metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
+//                toggleSelect()
             alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { _ in
                 Task {
                     for metadata in metadatas {
@@ -165,9 +165,6 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         if editMode {
             navigationItem.leftBarButtonItems = nil
         } else {
-            ///Magentacloud branding changes hide user account button on left navigation bar
-           ///Magentacloud branding changes hide user account button on left navigation bar
-//            setNavigationLeftItems()
            ///Magentacloud branding changes hide user account button on left navigation bar
             setNavigationLeftItems()
         }
@@ -206,11 +203,11 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         actions.append(.cancelAction {
             self.toggleSelect()
         })
-        if selectOcId.count != dataSource.getMetadataSourceForAllSections().count {
-            actions.append(.selectAllAction(action: selectAll))
-        }
-
-        guard !selectOcId.isEmpty else { return actions }
+//        if selectOcId.count != dataSource.getMetadataSourceForAllSections().count {
+//            actions.append(.selectAllAction(action: selectAll))
+//        }
+//
+//        guard !selectOcId.isEmpty else { return actions }
         if fileSelect.count != selectableDataSource.count {
             actions.append(.selectAllAction(action: selectAll))
         }
@@ -228,10 +225,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
         var canOpenIn = false
         var isDirectoryE2EE = false
 
-        for ocId in selectOcId {
-            guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
-            if metadata.e2eEncrypted {
-                selectOcId.removeAll(where: {$0 == metadata.ocId})
+//        for ocId in selectOcId {
+//            guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
+//            if metadata.e2eEncrypted {
+//                selectOcId.removeAll(where: {$0 == metadata.ocId})
         for ocId in fileSelect {
             guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { continue }
             if metadata.e2eEncrypted {
@@ -246,7 +243,6 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
             if metadata.directory { isAnyFolder = true }
             if metadata.lock {
                 isAnyLocked = true
-                if metadata.lockOwner != appDelegate.userId {
                 if metadata.lockOwner != session.userId {
                     canUnlock = false
                 }
@@ -254,7 +250,6 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
 
             guard !isAnyOffline else { continue }
             if metadata.directory,
-               let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", appDelegate.account, metadata.serverUrl + "/" + metadata.fileName)) {
                let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, metadata.serverUrl + "/" + metadata.fileName)) {
                 isAnyOffline = directory.offline
             } else if let localFile = NCManageDatabase.shared.getTableLocalFile(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) {

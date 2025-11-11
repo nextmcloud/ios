@@ -59,8 +59,6 @@ extension UIViewController {
         }
     }
 
-    func showProfileMenu(userId: String, session: NCSession.Session) {
-        guard NCCapabilities.shared.getCapabilities(account: session.account).capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion23 else { return }
     func showProfileMenu(userId: String, session: NCSession.Session, sender: Any?) {
         let capabilities = NCNetworking.shared.capabilities[session.account] ?? NKCapabilities.Capabilities()
         guard capabilities.serverVersionMajor >= NCGlobal.shared.nextcloudVersion23 else {
@@ -80,6 +78,7 @@ extension UIViewController {
             let personHeader = NCMenuAction(
                 title: card.displayName,
                 icon: NCUtility().loadUserImage(for: userId, displayName: card.displayName, urlBase: session.urlBase),
+                sender: sender,
                 action: nil)
 
             let actions = card.actions.map { action -> NCMenuAction in
@@ -92,11 +91,12 @@ extension UIViewController {
                 return NCMenuAction(
                     title: action.title,
                     icon: image,
+                    sender: sender,
                     action: { _ in self.handleProfileAction(action, for: userId, session: session) })
             }
 
             let allActions = [personHeader] + actions
-            self.presentMenu(with: allActions)
+            self.presentMenu(with: allActions, sender: sender)
         }
     }
 
@@ -114,10 +114,10 @@ extension UIViewController {
         present(mail, animated: true)
     }
 
-    func presentMenu(with actions: [NCMenuAction], menuColor: UIColor = .systemBackground, textColor: UIColor = NCBrandColor.shared.textColor) {
+    func presentMenu(with actions: [NCMenuAction], menuColor: UIColor = .systemBackground, textColor: UIColor = NCBrandColor.shared.textColor, controller: NCMainTabBarController? = nil, sender: Any?) {
         guard !actions.isEmpty else { return }
         let actions = actions.sorted(by: { $0.order < $1.order })
-        guard let menuViewController = NCMenu.makeNCMenu(with: actions, menuColor: menuColor, textColor: textColor) else {
+        guard let menuViewController = NCMenu.makeNCMenu(with: actions, menuColor: menuColor, textColor: textColor, controller: controller) else {
             let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_internal_generic_error_")
             NCContentPresenter().showError(error: error)
             return

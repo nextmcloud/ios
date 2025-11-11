@@ -14,10 +14,6 @@
 -(void)configAdjust {
     self.yourAppToken = @"1zfaxn19pd7k";
     self.environment = ADJEnvironmentProduction;
-    self.adjustConfig = [ADJConfig configWithAppToken:self.yourAppToken
-                                                environment:self.environment];
-    [self.adjustConfig setLogLevel:ADJLogLevelVerbose];
-    [Adjust appDidLaunch:self.adjustConfig];
     self.adjustConfig = [[ADJConfig alloc] initWithAppToken:self.yourAppToken
                                                 environment:self.environment];
     [self.adjustConfig setLogLevel:ADJLogLevelVerbose];
@@ -33,7 +29,6 @@
 }
 
 - (void)trackLogin {
-    self.eventLogin = [ADJEvent eventWithEventToken:@"p8hl78"];
     self.eventLogin = [[ADJEvent alloc] initWithEventToken:@"p8hl78"];
 //    self.eventLogin = [ADJEvent eventWithEventToken:@"p8hl78"];
     [Adjust trackEvent: self.eventLogin];
@@ -49,7 +44,6 @@
     switch(event){
        case Login:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"p8hl78"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"p8hl78"];
 //            event = [ADJEvent eventWithEventToken:@"gb97gb"];
 //            self.event = [ADJEvent eventWithEventToken:@"gb97gb"];
@@ -58,7 +52,6 @@
           break;
         case LoginSuccessful:
          {
-             ADJEvent *event = [ADJEvent eventWithEventToken:@"dowf81"];
              ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"dowf81"];
  //            event = [ADJEvent eventWithEventToken:@"gb97gb"];
  //            self.event = [ADJEvent eventWithEventToken:@"gb97gb"];
@@ -67,7 +60,6 @@
            break;
        case Sharing:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"mbeoyd"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"mbeoyd"];
             [Adjust trackEvent:event];
             NSLog(@"%@", [event debugDescription]);
@@ -76,7 +68,6 @@
           break;
         case CreateLink:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"29b333"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"29b333"];
             [Adjust trackEvent:event];
         }
@@ -84,7 +75,6 @@
            break;
         case DocumentScan:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"im963g"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"im963g"];
             [Adjust trackEvent:event];
         }
@@ -92,7 +82,6 @@
            break;
         case CameraUpload:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"hf9paq"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"hf9paq"];
             [Adjust trackEvent:event];
         }
@@ -100,7 +89,6 @@
            break;
         case FileUpload:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"hsbk2m"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"hsbk2m"];
             [Adjust trackEvent:event];
         }
@@ -108,7 +96,6 @@
            break;
         case UseCamera:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"3czack"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"3czack"];
             [Adjust trackEvent:event];
         }
@@ -116,7 +103,6 @@
            break;
         case Logout:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"n5q2qu"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"n5q2qu"];
             [Adjust trackEvent:event];
         }
@@ -124,7 +110,6 @@
            break;
         case ResetsApp:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"3sj1xp"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"3sj1xp"];
             [Adjust trackEvent:event];
         }
@@ -132,7 +117,6 @@
            break;
         case AutomaticUploadPhotosOn:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"5lxz6h"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"5lxz6h"];
             [Adjust trackEvent:event];
         }
@@ -140,7 +124,6 @@
            break;
         case AutomaticUploadPhotosOff:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"176496"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"176496"];
             [Adjust trackEvent:event];
         }
@@ -148,7 +131,6 @@
            break;
         case ManualBackup:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"oojr4y"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"oojr4y"];
             [Adjust trackEvent:event];
         }
@@ -156,7 +138,6 @@
            break;
         case AutomaticBackup:
         {
-            ADJEvent *event = [ADJEvent eventWithEventToken:@"7dkhkx"];
             ADJEvent *event = [[ADJEvent alloc] initWithEventToken:@"7dkhkx"];
             [Adjust trackEvent:event];
         }

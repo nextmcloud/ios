@@ -77,40 +77,6 @@ extension NCShareExtension: NCAccountRequestDelegate {
             await reloadData()
             await loadFolder()
         }
-        self.account = account
-
-        // CAPABILITIES
-        database.setCapabilities(account: account)
-
-        // COLORS
-        NCBrandColor.shared.settingThemingColor(account: account)
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming, userInfo: ["account": account])
-
-        // NETWORKING
-        NextcloudKit.shared.setup(groupIdentifier: NCBrandOptions.shared.capabilitiesGroup, delegate: NCNetworking.shared)
-        NextcloudKit.shared.appendSession(account: tableAccount.account,
-                                          urlBase: tableAccount.urlBase,
-                                          user: tableAccount.user,
-                                          userId: tableAccount.userId,
-                                          password: NCKeychain().getPassword(account: tableAccount.account),
-                                          userAgent: userAgent,
-                                          nextcloudVersion: capabilities.capabilityServerVersionMajor,
-                                          httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
-                                          httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
-                                          httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
-                                          groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
-
-        // SESSION
-        NCSession.shared.appendSession(account: tableAccount.account, urlBase: tableAccount.urlBase, user: tableAccount.user, userId: tableAccount.userId)
-
-        // get auto upload folder
-        autoUploadFileName = self.database.getAccountAutoUploadFileName()
-        autoUploadDirectory = self.database.getAccountAutoUploadDirectory(session: session)
-
-        serverUrl = utilityFileSystem.getHomeServer(session: session)
-
-        reloadDatasource(withLoadFolder: true)
-        setNavigationBar(navigationTitle: NCBrandOptions.shared.brand)
     }
 }
 

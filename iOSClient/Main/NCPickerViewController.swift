@@ -15,6 +15,7 @@ class NCPhotosPickerViewController: NSObject {
     var controller: NCMainTabBarController
     var maxSelectedAssets = 1
     var singleSelectedMode = false
+    let global = NCGlobal.shared
 
     @discardableResult
     init(controller: NCMainTabBarController, maxSelectedAssets: Int, singleSelectedMode: Bool) {
@@ -56,16 +57,6 @@ class NCPhotosPickerViewController: NSObject {
                 completition(assets)
             }
         }, didCancel: nil)
-        viewController.didExceedMaximumNumberOfSelection = { _ in
-            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_limited_dimension_")
-            NCContentPresenter().showError(error: error)
-        }
-        viewController.handleNoAlbumPermissions = { _ in
-            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_denied_album_")
-            NCContentPresenter().showError(error: error)
-        }
-        viewController.handleNoCameraPermissions = { _ in
-            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_denied_camera_")
 
         pickerVC?.didExceedMaximumNumberOfSelection = { _ in
             let error = NKError(errorCode: self.global.errorInternalError, errorDescription: "_limited_dimension_")
@@ -144,39 +135,6 @@ class NCDocumentPickerViewController: NSObject, UIDocumentPickerDelegate {
             let session = NCSession.shared.getSession(controller: self.controller)
             let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
 
-        if isViewerMedia,
-           let urlIn = urls.first,
-           let url = self.copySecurityScopedResource(url: urlIn, urlOut: FileManager.default.temporaryDirectory.appendingPathComponent(urlIn.lastPathComponent)),
-           let viewController = self.viewController {
-            let ocId = NSUUID().uuidString
-            let fileName = url.lastPathComponent
-            let metadata = database.createMetadata(fileName: fileName,
-                                                   ocId: ocId,
-                                                   serverUrl: "",
-                                                   url: url.path,
-                                                   session: session,
-                                                   sceneIdentifier: self.controller.sceneIdentifier)
-
-            if metadata.classFile == NKTypeClassFile.unknow.rawValue {
-                metadata.classFile = NKTypeClassFile.video.rawValue
-            }
-
-            if let fileNameError = FileNameValidator.checkFileName(metadata.fileNameView, account: self.controller.account, capabilities: capabilities) {
-                self.controller.present(UIAlertController.warning(message: "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"), animated: true)
-            } else {
-                database.addMetadata(metadata)
-                NCViewer().view(viewController: viewController, metadata: metadata)
-                if let metadata = database.addAndReturnMetadata(metadata) {
-                    NCViewer().view(viewController: viewController, metadata: metadata)
-                }
-            }
-
-        } else {
-            let serverUrl = self.controller.currentServerUrl()
-            var metadatas = [tableMetadata]()
-            var metadatasInConflict = [tableMetadata]()
-
-            for urlIn in urls {
             if isViewerMedia,
                let urlIn = urls.first,
                let url = self.copySecurityScopedResource(url: urlIn, urlOut: FileManager.default.temporaryDirectory.appendingPathComponent(urlIn.lastPathComponent)),

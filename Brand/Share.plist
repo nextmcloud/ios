@@ -19,12 +19,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>25246</string>
-	<string>26881</string>
-	<string>28804</string>
-	<string>30156</string>
-	<string>32417</string>
-	<string>34247</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -36,41 +31,12 @@
 		<dict>
 			<key>NSExtensionActivationRule</key>
 			<string>SUBQUERY (extensionItems, $extensionItem, SUBQUERY ($extensionItem.attachments,$attachment,(ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.data")).@count == $extensionItem.attachments.@count).@count &gt; 0
-    <key>CFBundleDevelopmentRegion</key>
-    <string>en</string>
-    <key>CFBundleDisplayName</key>
-    <string>MagentaCLOUD</string>
-    <key>CFBundleExecutable</key>
-    <string>$(EXECUTABLE_NAME)</string>
-    <key>CFBundleIdentifier</key>
-    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-    <key>CFBundleInfoDictionaryVersion</key>
-    <string>6.0</string>
-    <key>CFBundleName</key>
-    <string>$(PRODUCT_NAME)</string>
-    <key>CFBundlePackageType</key>
-    <string>XPC!</string>
-    <key>CFBundleShortVersionString</key>
-    <string>$(MARKETING_VERSION)</string>
-    <key>CFBundleVersion</key>
-    <string>$(CURRENT_PROJECT_VERSION)</string>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <false/>
-    </dict>
-    <key>NSExtension</key>
-    <dict>
-        <key>NSExtensionAttributes</key>
-        <dict>
-            <key>NSExtensionActivationRule</key>
-            <string>SUBQUERY (extensionItems, $extensionItem, SUBQUERY ($extensionItem.attachments,$attachment,(ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.data")).@count == $extensionItem.attachments.@count).@count &gt; 0
             </string>
-        </dict>
-        <key>NSExtensionMainStoryboard</key>
-        <string>MainInterface</string>
-        <key>NSExtensionPointIdentifier</key>
-        <string>com.apple.share-services</string>
-    </dict>
+		</dict>
+		<key>NSExtensionMainStoryboard</key>
+		<string>MainInterface</string>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.share-services</string>
+	</dict>
 </dict>
 </plist>

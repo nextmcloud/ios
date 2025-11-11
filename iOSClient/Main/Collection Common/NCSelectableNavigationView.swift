@@ -102,7 +102,7 @@ extension NCSelectableNavigationView {
         
         fileSelect = selectableDataSource.compactMap({ $0.primaryKeyValue })
 //        fileSelect = NCCollectionViewDataSource().getMetadataSourceForAllSections().compactMap({ $0.primaryKeyValue })
-        selectOcId = selectableDataSource.compactMap({ $0.primaryKeyValue })
+//        selectOcId = selectableDataSource.compactMap({ $0.primaryKeyValue })
         collectionView.reloadData()
         setNavigationRightItems(enableMenu: false)
     }

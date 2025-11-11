@@ -25,8 +25,6 @@ import Queuer
 import RealmSwift
 
 extension NCTrash {
-    @objc func loadListingTrash() {
-        NextcloudKit.shared.listingTrash(filename: filename, showHiddenFiles: false, account: session.account) { task in
     func loadListingTrash() async {
         defer {
             self.refreshControl.endRefreshing()
@@ -52,18 +50,6 @@ extension NCTrash {
         await self.reloadDataSource()
     }
 
-    func restoreItem(with fileId: String) {
-        guard let resultTableTrash = self.database.getResultTrashItem(fileId: fileId, account: session.account) else { return }
-        let fileNameFrom = resultTableTrash.filePath + resultTableTrash.fileName
-        let fileNameTo = session.urlBase + "/remote.php/dav/trashbin/" + session.userId + "/restore/" + resultTableTrash.fileName
-
-        NextcloudKit.shared.moveFileOrFolder(serverUrlFileNameSource: fileNameFrom, serverUrlFileNameDestination: fileNameTo, overwrite: true, account: session.account) { account, _, error in
-            guard error == .success else {
-                NCContentPresenter().showError(error: error)
-                return
-            }
-            self.database.deleteTrash(fileId: fileId, account: account)
-            self.reloadDataSource()
     func restoreItem(with fileId: String) async {
         guard let result = await self.database.getTableTrashAsync(fileId: fileId, account: session.account) else {
             return
@@ -106,14 +92,6 @@ extension NCTrash {
         await self.reloadDataSource()
     }
 
-    func deleteItem(with fileId: String) {
-        guard let resultTableTrash = self.database.getResultTrashItem(fileId: fileId, account: session.account) else { return }
-        let serverUrlFileName = resultTableTrash.filePath + resultTableTrash.fileName
-
-        NextcloudKit.shared.deleteFileOrFolder(serverUrlFileName: serverUrlFileName, account: session.account) { account, _, error in
-            guard error == .success else {
-                NCContentPresenter().showError(error: error)
-                return
     func deleteItems(with filesId: [String]) async {
         for fileId in filesId {
             guard let result = await self.database.getTableTrashAsync(fileId: fileId, account: session.account) else {

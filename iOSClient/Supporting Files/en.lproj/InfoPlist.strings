@@ -6,3 +6,4 @@ NSPhotoLibraryAddUsageDescription = "Photo library access is required to upload 
 NSMicrophoneUsageDescription = "Microphone access is required to create voice notes.";
 NSLocationWhenInUseUsageDescription = "This app uses your location to detect movement and automatically upload files. It does not use GPS and does not store your location.";
 NSLocationAlwaysAndWhenInUseUsageDescription = "This app needs access to your location even in the background to automatically start uploading files when significant movement is detected. GPS is not used.";
+NSUserTrackingUsageDescription = "Telekom uses the Apple Advertising ID to optimize and further develop the functionality of the app based on user needs, to correct any errors and to show you targeted advertising in the app and on third-party sites. You can revoke your consent at any time in the operating system.";

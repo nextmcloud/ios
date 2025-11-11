@@ -7,7 +7,6 @@ import UIKit
 import NextcloudKit
 import FloatingPanel
 import Queuer
-import Alamofire
 
 class NCActivityCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
@@ -49,13 +48,13 @@ class NCActivityTableViewCell: UITableViewCell, NCCellProtocol {
     override func awakeFromNib() {
         super.awakeFromNib()
 
-        let avatarRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapAvatarImage))
+        let avatarRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapAvatarImage(_:)))
         avatar.addGestureRecognizer(avatarRecognizer)
     }
 
-    @objc func tapAvatarImage() {
+    @objc func tapAvatarImage(_ sender: Any?) {
         guard let fileUser = fileUser else { return }
-        viewController.showProfileMenu(userId: fileUser, session: NCSession.shared.getSession(account: account))
+        viewController.showProfileMenu(userId: fileUser, session: NCSession.shared.getSession(account: account), sender: sender)
     }
 }
 
@@ -80,9 +79,6 @@ extension NCActivityTableViewCell: UICollectionViewDelegate {
             }
             if (responder as? UIViewController)!.navigationController != nil {
                 if let viewController = UIStoryboard(name: "NCTrash", bundle: nil).instantiateInitialViewController() as? NCTrash {
-                    if let resultTableTrash = NCManageDatabase.shared.getResultTrashItem(fileId: String(activityPreview.fileId), account: activityPreview.account) {
-                        viewController.blinkFileId = resultTableTrash.fileId
-                        viewController.filePath = resultTableTrash.filePath
                     if let result = NCManageDatabase.shared.getTableTrash(fileId: String(activityPreview.fileId), account: activityPreview.account) {
                         viewController.blinkFileId = result.fileId
                         viewController.filePath = result.filePath
@@ -100,7 +96,6 @@ extension NCActivityTableViewCell: UICollectionViewDelegate {
             guard let activitySubjectRich = NCManageDatabase.shared.getActivitySubjectRich(account: activityPreview.account, idActivity: activityPreview.idActivity, id: String(activityPreview.fileId)) else {
                 return
             }
-            NCActionCenter.shared.viewerFile(account: account, fileId: activitySubjectRich.id, viewController: viewController)
             Task {
                 await NCDownloadAction.shared.viewerFile(account: account, fileId: activitySubjectRich.id, viewController: viewController)
             }
@@ -225,5 +220,5 @@ class NCOperationDownloadThumbnailActivity: ConcurrentOperation, @unchecked Send
             }
             self.finish()
         }
-            }
+    }
 }

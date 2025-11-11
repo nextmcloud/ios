@@ -45,6 +45,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var renameButton: UIButton!
     @IBOutlet weak var seperator: UIView!
+    let imageCache = NCImageCache.shared
 
     let width: CGFloat = 300
     let height: CGFloat = 350
@@ -89,7 +90,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             if metadata.directory {
 
                 if imagePreview == nil {
-                    previewFile.image = NCImageCache.images.folder
+                    previewFile.image = imageCache.getFolder(account: metadata.account)
                 }
 
                 ext.isHidden = true
@@ -99,7 +100,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             } else {
 
                 if imagePreview == nil {
-                    previewFile.image = NCImageCache.images.file
+                    previewFile.image = imageCache.getImageFile()
                 }
 
                 fileNameNoExtensionTrailingContraint.constant = 90
@@ -118,7 +119,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             ext.delegate = self
 
             if imagePreview == nil {
-                previewFile.image = NCImageCache.images.file
+                previewFile.image = imageCache.getImageFile()
             } else {
                 previewFile.image = imagePreview
             }
@@ -246,18 +247,19 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 
         NCActivityIndicator.shared.start()
 
-        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, indexPath: indexPath, viewController: self) { error in
-
-            NCActivityIndicator.shared.stop()
-
-            if error == .success {
-
-                self.dismiss(animated: true)
-
-            } else {
-
-                NCContentPresenter().showError(error: error)
-            }
-        }
+        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew)
+//        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, indexPath: indexPath, viewController: self) { error in
+//
+//            NCActivityIndicator.shared.stop()
+//
+//            if error == .success {
+//
+//                self.dismiss(animated: true)
+//
+//            } else {
+//
+//                NCContentPresenter().showError(error: error)
+//            }
+//        }
     }
 }

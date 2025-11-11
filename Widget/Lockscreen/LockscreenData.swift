@@ -79,15 +79,6 @@ func getLockscreenDataEntry(configuration: AccountIntent?, isPreview: Bool, fami
                                       groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
 
     let options = NKRequestOptions(timeout: 90, queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)
-    if #available(iOSApplicationExtension 16.0, *) {
-        if family == .accessoryCircular {
-            NextcloudKit.shared.getUserProfile(account: activeTableAccount.account, options: options) { _, userProfile, _, error in
-                if error == .success, let userProfile = userProfile {
-                    if userProfile.quotaRelative > 0 {
-                        quotaRelative = Float(userProfile.quotaRelative) / 100
-                    }
-                    let quotaUsed: String = utilityFileSystem.transformedSize(userProfile.quotaUsed)
-                    var quotaTotal: String = ""
 
     if family == .accessoryCircular {
         NextcloudKit.shared.getUserMetadata(account: activeTableAccount.account, userId: activeTableAccount.userId, options: options) { _, userProfile, _, error in

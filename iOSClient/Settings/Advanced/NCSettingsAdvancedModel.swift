@@ -14,9 +14,6 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
     var keychain = NCPreferences()
     // State variable for indicating if the user is in Admin group
     @Published var isAdminGroup: Bool = false
-    /// State variable for indicating whether hidden files are shown.
-    @Published var showHiddenFiles: Bool = false
-    /// State variable for indicating the most compatible format.
     // State variable for indicating the most compatible format.
     @Published var mostCompatible: Bool = false
     // State variable for enabling live photo uploads.
@@ -53,7 +50,6 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
     func onViewAppear() {
         let groups = NCManageDatabase.shared.getAccountGroups(account: session.account)
         isAdminGroup = groups.contains(NCGlobal.shared.groupAdmin)
-        showHiddenFiles = keychain.showHiddenFiles
 #if DEBUG
         isAdminGroup = true
 #endif
@@ -71,11 +67,6 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
     }
 
     // MARK: - All functions
-
-    /// Updates the value of `showHiddenFiles` in the keychain.
-    func updateShowHiddenFiles() {
-        keychain.showHiddenFiles = showHiddenFiles
-    }
 
     /// Updates the value of `mostCompatible` in the keychain.
     func updateMostCompatible() {
@@ -105,11 +96,15 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
 
     /// Updates the value of `selectedLogLevel` in the keychain and sets it for NextcloudKit.
     func updateSelectedLogLevel() {
-        keychain.logLevel = selectedLogLevel.rawValue
-        NextcloudKit.shared.nkCommonInstance.levelLog = selectedLogLevel.rawValue
-        exit(0)
         keychain.log = selectedLogLevel
         NKLogFileManager.shared.logLevel = selectedLogLevel
+    }
+    
+    /// Remove directory LOG
+    func clearLogFile() {
+        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
+        try? FileManager.default.removeItem(at: logsFolder)
     }
 
     /// Updates the value of `selectedInterval` in the keychain.
@@ -129,8 +124,6 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
 
             NCNetworking.shared.removeServerErrorAccount(self.session.account)
             NCManageDatabase.shared.clearDBCache()
-
-            NCNetworking.shared.removeAllKeyUserDefaultsData(account: nil)
 
             let ufs = NCUtilityFileSystem()
             ufs.removeGroupDirectoryProviderStorage()

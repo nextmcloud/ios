@@ -22,6 +22,7 @@ extension NCMedia {
                     self.collectionViewReloadData()
                 }
             }
+//            self.metadatas = self.imageCache.getMediaMetadatas(account: self.activeAccount.account, predicate: mediaPredicate)
         } else {
             await MainActor.run {
                 self.dataSource.clearMetadatas()

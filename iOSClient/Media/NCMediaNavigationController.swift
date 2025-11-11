@@ -37,7 +37,7 @@ class NCMediaNavigationController: NCMainNavigationController {
         }
         //
         let layoutTitle = (layout == global.mediaLayoutRatio) ? NSLocalizedString("_media_square_", comment: "") : NSLocalizedString("_media_ratio_", comment: "")
-        let layoutImage = (layout == global.mediaLayoutRatio) ? utility.loadImage(named: "square.grid.3x3") : utility.loadImage(named: "rectangle.grid.3x2")
+        let layoutImage = (layout == global.mediaLayoutRatio) ? utility.loadImage(named: "Applications") : utility.loadImage(named: "ratio-grid")
 
         let select = UIAction(title: NSLocalizedString("_select_", comment: ""),
                               image: utility.loadImage(named: "checkmark.circle")) { _ in
@@ -45,7 +45,7 @@ class NCMediaNavigationController: NCMainNavigationController {
         }
 
         let viewFilterMenu = UIMenu(title: "", options: .displayInline, children: [
-        UIAction(title: NSLocalizedString("_media_viewimage_show_", comment: ""), image: utility.loadImage(named: "photo")) { _ in
+        UIAction(title: NSLocalizedString("_media_viewimage_show_", comment: ""), image: UIImage(named: "photo")?.withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             media.showOnlyImages = true
             media.showOnlyVideos = false
             Task {
@@ -53,7 +53,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                 await media.networkRemoveAll()
             }
         },
-            UIAction(title: NSLocalizedString("_media_viewvideo_show_", comment: ""), image: utility.loadImage(named: "video")) { _ in
+            UIAction(title: NSLocalizedString("_media_viewvideo_show_", comment: ""), image: UIImage(named: "video")?.withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                 media.showOnlyImages = false
                 media.showOnlyVideos = true
                 Task {
@@ -61,7 +61,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                     await media.networkRemoveAll()
                 }
             },
-            UIAction(title: NSLocalizedString("_media_show_all_", comment: ""), image: utility.loadImage(named: "photo.on.rectangle")) { _ in
+            UIAction(title: NSLocalizedString("_media_show_all_", comment: ""), image: UIImage(named: "media")?.withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                 media.showOnlyImages = false
                 media.showOnlyVideos = false
                 Task {
@@ -88,7 +88,7 @@ class NCMediaNavigationController: NCMainNavigationController {
         ])
 
         let viewFolderMedia = UIMenu(title: "", options: .displayInline, children: [
-            UIAction(title: NSLocalizedString("_select_media_folder_", comment: ""), image: utility.loadImage(named: "folder"), handler: { _ in
+            UIAction(title: NSLocalizedString("_select_media_folder_", comment: ""), image: UIImage(named: "mediaFolder")?.withTintColor(NCBrandColor.shared.iconImageColor), handler: { _ in
                 guard let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as? UINavigationController,
                       let viewController = navigationController.topViewController as? NCSelect else { return }
                 viewController.delegate = media
@@ -98,13 +98,83 @@ class NCMediaNavigationController: NCMainNavigationController {
                 self.present(navigationController, animated: true)
             })
         ])
+        
+        let actions: [UIAction] = [
+            UIAction(
+                title: NSLocalizedString("_media_by_modified_date_", comment: ""),
+                image: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
+                state: NCPreferences().mediaSortDate == "date" ? .on : .off,
+                handler: { _ in
+                    NCPreferences().mediaSortDate = "date"
+                    Task {
+                        await media.loadDataSource()
+//                        await media.networkRemoveAll()
+                        media.collectionViewReloadData()
+                    }
+                }
+            ),
+            
+            UIAction(
+                title: NSLocalizedString("_media_by_created_date_", comment: ""),
+                image: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
+                state: NCPreferences().mediaSortDate == "creationDate" ? .on : .off,
+                handler: { _ in
+                    NCPreferences().mediaSortDate = "creationDate"
+                    Task {
+                        await media.loadDataSource()
+                        await media.networkRemoveAll()
+                    }
+                }
+            ),
+            
+            UIAction(
+                title: NSLocalizedString("_media_by_upload_date_", comment: ""),
+                image: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
+                state: NCPreferences().mediaSortDate == "uploadDate" ? .on : .off,
+                handler: { _ in
+                    NCPreferences().mediaSortDate = "uploadDate"
+                    Task {
+                        await media.loadDataSource()
+                        await media.networkRemoveAll()
+                    }
+                }
+            )
+        ]
 
-        let playFile = UIAction(title: NSLocalizedString("_play_from_files_", comment: ""), image: utility.loadImage(named: "play.circle")) { _ in
+//        let zoomViewMediaFolder = UIMenu(title: "", options: .displayInline, children: [
+//            UIMenu(title: NSLocalizedString("_zoom_", comment: ""), children: [
+//                UIAction(title: NSLocalizedString("_zoom_out_", comment: ""), image: UIImage(systemName: "minus.magnifyingglass"), attributes: self.attributesZoomOut) { _ in
+//                    UIView.animate(withDuration: 0.0, animations: {
+//                        NCKeychain().mediaColumnCount = columnCount + 1
+//                        self.createMenu()
+//                        self.collectionViewReloadData()
+//                    })
+//                },
+//                UIAction(title: NSLocalizedString("_zoom_in_", comment: ""), image: UIImage(systemName: "plus.magnifyingglass"), attributes: self.attributesZoomIn) { _ in
+//                    UIView.animate(withDuration: 0.0, animations: {
+//                        NCKeychain().mediaColumnCount = columnCount - 1
+//                        self.createMenu()
+//                        self.collectionViewReloadData()
+//                    })
+//                }
+//            ]),
+//            UIMenu(title: NSLocalizedString("_media_view_options_", comment: ""), children: [viewFilterMenu, viewLayoutMenu]),
+//            UIAction(title: NSLocalizedString("_select_media_folder_", comment: ""), image: UIImage(systemName: "folder"), handler: { _ in
+//                guard let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as? UINavigationController,
+//                      let viewController = navigationController.topViewController as? NCSelect else { return }
+//                viewController.delegate = self
+//                viewController.typeOfCommandView = .select
+//                viewController.type = "mediaFolder"
+//                self.present(navigationController, animated: true)
+//            })
+//        ])
+        
+        let playFile = UIAction(title: NSLocalizedString("_play_from_files_", comment: ""), image: utility.loadImage(named: "CirclePlay")) { _ in
             guard let controller = self.controller else { return }
             media.documentPickerViewController = NCDocumentPickerViewController(controller: controller, isViewerMedia: true, allowsMultipleSelection: false, viewController: media)
         }
 
-        let playURL = UIAction(title: NSLocalizedString("_play_from_url_", comment: ""), image: utility.loadImage(named: "link")) { _ in
+        let playURL = UIAction(title: NSLocalizedString("_play_from_url_", comment: ""), image: utility.loadImage(named: "Link")) { _ in
             let alert = UIAlertController(title: NSLocalizedString("_valid_video_url_", comment: ""), message: nil, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: nil))
             alert.addTextField(configurationHandler: { textField in
@@ -132,6 +202,11 @@ class NCMediaNavigationController: NCMainNavigationController {
             self.present(alert, animated: true)
         }
 
-        return UIMenu(title: "", children: [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, playFile, playURL])
+        let mediaSortMenu = UIMenu(
+            title: "",
+            options: .displayInline,
+            children: actions
+        )
+        return UIMenu(title: "", children: [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, mediaSortMenu, playFile, playURL])
     }
 }

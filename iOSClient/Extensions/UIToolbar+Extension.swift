@@ -37,7 +37,7 @@ extension UIToolbar {
             buttons.append(clearButton)
         }
         buttons.append(UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil))
-        let doneButton = UIBarButtonItem(title: NSLocalizedString("_done_", comment: ""), style: .done) {
+        let doneButton = UIBarButtonItem(title: NSLocalizedString("_done_", comment: ""), style: .plain) {
             onDone()
         }
         buttons.append(doneButton)
@@ -57,20 +57,6 @@ extension UIToolbar {
             self.rightAnchor.constraint(equalTo: view.rightAnchor)
         ])
         return view
-    }
-    
-    static func doneToolbar(completion: @escaping () -> Void) -> UIToolbar {
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
-        doneToolbar.barStyle = .default
-
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_done_", comment: ""), style: .done) {
-            completion()
-        }
-        let items = [flexSpace, done]
-        doneToolbar.items = items
-        doneToolbar.sizeToFit()
-        return doneToolbar
     }
 }
 

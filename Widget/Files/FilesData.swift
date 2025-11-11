@@ -195,7 +195,7 @@ func getFilesDataEntry(configuration: AccountIntent?, isPreview: Bool, displaySi
     nkLog(debug: "Start \(NCBrandOptions.shared.brand) widget session " + versionNextcloudiOS)
 
     let options = NKRequestOptions(timeout: 30, queue: NextcloudKit.shared.nkCommonInstance.backgroundQueue)
-    NextcloudKit.shared.searchBodyRequest(serverUrl: activeTableAccount.urlBase, requestBody: requestBody, showHiddenFiles: NCKeychain().showHiddenFiles, account: activeTableAccount.account, options: options) { _, files, data, error in
+    NextcloudKit.shared.searchBodyRequest(serverUrl: activeTableAccount.urlBase, requestBody: requestBody, showHiddenFiles: showHiddenFiles, account: activeTableAccount.account, options: options) { _, files, data, error in
         Task {
             var datas: [FilesData] = []
             let title = getTitleFilesWidget(tableAccount: activeTableAccount)
@@ -227,9 +227,6 @@ func getFilesDataEntry(configuration: AccountIntent?, isPreview: Bool, displaySi
                                          userId: activeTableAccount.userId,
                                          urlBase: activeTableAccount.urlBase)
                 if image == nil, file.hasPreview {
-                    let result = await NCNetworking.shared.downloadPreview(fileId: file.fileId,
-                                                                           account: activeTableAccount.account,
-                                                                           options: options)
                     let result = await NextcloudKit.shared.downloadPreviewAsync(fileId: file.fileId,
                                                                                 etag: file.etag,
                                                                                 account: activeTableAccount.account,

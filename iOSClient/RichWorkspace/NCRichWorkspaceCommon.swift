@@ -23,8 +23,6 @@ class NCRichWorkspaceCommon: NSObject {
         NCActivityIndicator.shared.start(backgroundView: viewController.view)
 
         let fileNamePath = utilityFileSystem.getFileNamePath(NCGlobal.shared.fileNameRichWorkspace, serverUrl: serverUrl, session: session)
-        NextcloudKit.shared.NCTextCreateFile(fileNamePath: fileNamePath, editorId: directEditingCreator.editor, creatorId: directEditingCreator.identifier, templateId: "", account: session.account) { _, url, _, error in
-        NextcloudKit.shared.textCreateFile(fileNamePath: fileNamePath, editorId: textCreators.editor, creatorId: textCreators.identifier, templateId: "", account: session.account) { _, url, _, error in
         NextcloudKit.shared.textCreateFile(fileNamePath: fileNamePath, editorId: textCreators.editor, creatorId: textCreators.identifier, templateId: "", account: session.account) { task in
             Task {
                 let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: session.account,
@@ -61,7 +59,6 @@ class NCRichWorkspaceCommon: NSObject {
                 NCActivityIndicator.shared.start(backgroundView: viewController.view)
 
                 let fileNamePath = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
-                NextcloudKit.shared.NCTextOpenFile(fileNamePath: fileNamePath, editor: "text", account: metadata.account) { _, url, _, error in
                 NextcloudKit.shared.textOpenFile(fileNamePath: fileNamePath, editor: "text", account: metadata.account) { task in
                     Task {
                         let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,

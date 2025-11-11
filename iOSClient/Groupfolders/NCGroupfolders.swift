@@ -26,7 +26,6 @@ import NextcloudKit
 import RealmSwift
 
 class NCGroupfolders: NCCollectionViewCommon {
-
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
 
@@ -67,20 +66,6 @@ class NCGroupfolders: NCCollectionViewCommon {
 
     // MARK: - DataSource
 
-    override func reloadDataSource() {
-        var metadatas: [tableMetadata] = []
-
-        if self.serverUrl.isEmpty {
-            if let results = database.getResultsMetadatasFromGroupfolders(session: session) {
-                metadatas = Array(results.freeze())
-            }
-        } else {
-            metadatas = self.database.getResultsMetadatasPredicate(self.defaultPredicate, layoutForView: layoutForView)
-        }
-
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView)
-
-        super.reloadDataSource()
     override func reloadDataSource() async {
         var metadatas: [tableMetadata] = []
 
@@ -124,14 +109,6 @@ class NCGroupfolders: NCCollectionViewCommon {
             if self.dataSource.isEmpty() {
                 self.collectionView.reloadData()
             }
-        } completion: { account, results, _, error in
-            if error == .success, let groupfolders = results {
-                self.database.addGroupfolders(account: account, groupfolders: groupfolders)
-                Task {
-                    for groupfolder in groupfolders {
-                        let mountPoint = groupfolder.mountPoint.hasPrefix("/") ? groupfolder.mountPoint : "/" + groupfolder.mountPoint
-                        let serverUrlFileName = homeServerUrl + mountPoint
-                        let results = await NCNetworking.shared.readFileOrFolder(serverUrlFileName: serverUrlFileName, depth: "0", showHiddenFiles: NCKeychain().showHiddenFiles, account: account)
         }
 
         guard resultsGroupfolders.error == .success, let groupfolders = resultsGroupfolders.results else {
@@ -157,7 +134,6 @@ class NCGroupfolders: NCCollectionViewCommon {
             guard resultsReadFile.error == .success, let file = resultsReadFile.files?.first else {
                 return
             }
-            self.refreshControl.endRefreshing()
 
             let metadata = await self.database.convertFileToMetadataAsync(file)
             await self.database.createDirectory(metadata: metadata)

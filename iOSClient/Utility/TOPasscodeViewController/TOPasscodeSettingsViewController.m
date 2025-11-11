@@ -188,7 +188,7 @@ const CGFloat kTOPasscodeKeypadMaxHeight = 330.0f;
     self.verticalMidPoint *= 0.5f;
 
     // Bar button items
-    self.nextBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Next", @"") style:UIBarButtonItemStylePlain target:self action:@selector(nextButtonTapped:)];
+    self.nextBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"_next_", @"") style:UIBarButtonItemStylePlain target:self action:@selector(nextButtonTapped:)];
     self.doneBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonTapped:)];
 
     // Apply light/dark mode
@@ -578,8 +578,8 @@ const CGFloat kTOPasscodeKeypadMaxHeight = 330.0f;
         [alertController addAction:[UIAlertAction actionWithTitle:titles[i] style:style handler:handler]];
     }
 
-    // Cancel button 
-    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"") style:UIAlertActionStyleCancel handler:nil]];
+    // Cancel button
+    [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"_cancel_", @"") style:UIAlertActionStyleCancel handler:nil]];
 
     alertController.modalPresentationStyle = UIModalPresentationPopover;
     alertController.popoverPresentationController.sourceView = self.optionsButton;

@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @optional
 
-/** 
+/**
  Return YES if the user entered the expected PIN code. Return NO if it was incorrect.
  (For security reasons, it is safer to fetch the saved PIN code only when this method is called, and
   then discard it immediately. This is why the view controller does not directly store it.)

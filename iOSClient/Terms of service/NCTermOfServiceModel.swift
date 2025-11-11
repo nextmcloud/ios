@@ -50,11 +50,6 @@ class NCTermOfServiceModel: ObservableObject {
             return
         }
 
-        NCNetworking.shared.signTermsOfService(account: controller.account, termId: termId) { error in
-            if error == .success {
-                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterGetServerData)
-            } else {
-                NCContentPresenter().showError(error: error)
         Task { @MainActor in
             let error = await  NCNetworking.shared.signTermsOfService(account: controller.account, termId: termId)
             if let error {

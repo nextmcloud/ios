@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import XLForm
 
 class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
     
@@ -23,7 +24,7 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
         super.awakeFromNib()
         self.cellTextField.delegate = self
         self.cellTextField.isEnabled = true
-        calendarImageView.image = UIImage(named: "calender")?.imageColor(NCBrandColor.shared.brandElement)
+        calendarImageView.image = UIImage(named: "calender")//?.imageColor(NCBrandColor.shared.brandElement)
         self.selectionStyle = .none
         self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         self.cellTextField.attributedPlaceholder = NSAttributedString(
@@ -88,7 +89,7 @@ class NCShareTextInputCell: XLFormBaseCell, UITextFieldDelegate {
 
     func setDatePicker(sender: UITextField) {
         datePicker.datePickerMode = .date
-        datePicker.minimumDate = Date.tomorrow
+        datePicker.minimumDate = Date()//.tomorrow
         if #available(iOS 13.4, *) {
             datePicker.preferredDatePickerStyle = .wheels
             datePicker.sizeToFit()

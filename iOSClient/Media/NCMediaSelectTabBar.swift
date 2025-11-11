@@ -10,15 +10,6 @@ protocol NCMediaSelectTabBarDelegate: AnyObject {
 }
 
 class NCMediaSelectTabBar: ObservableObject {
-    var hostingController: UIViewController!
-    var mediaTabBarController: UITabBarController?
-    open weak var delegate: NCMediaSelectTabBarDelegate?
-    @Published var selectCount: Int = 0
-
-    init(tabBarController: UITabBarController? = nil, delegate: NCMediaSelectTabBarDelegate? = nil) {
-        guard let tabBarController else { return }
-        let mediaTabBarSelectView = MediaTabBarSelectView(tabBarSelect: self)
-        hostingController = UIHostingController(rootView: mediaTabBarSelectView)
     var hostingController: UIViewController?
     var controller: UITabBarController?
     open weak var delegate: NCMediaSelectTabBarDelegate?
@@ -36,15 +27,9 @@ class NCMediaSelectTabBar: ObservableObject {
             return
         }
 
-        self.mediaTabBarController = tabBarController
+        self.controller = controller
         self.delegate = delegate
 
-        tabBarController.view.addSubview(hostingController.view)
-
-        hostingController.view.frame = tabBarController.tabBar.frame
-        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        hostingController.view.backgroundColor = .clear
-        hostingController.view.isHidden = true
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false
         hostingController.view.backgroundColor = .clear
         hostingController.view.isHidden = true
@@ -70,11 +55,6 @@ class NCMediaSelectTabBar: ObservableObject {
         UIView.animate(withDuration: 0.2) {
             hostingController.view.transform = .init(translationX: 0, y: 0)
         }
-        mediaTabBarController?.tabBar.isHidden = true
-    }
-
-    func hide() {
-        mediaTabBarController?.tabBar.isHidden = false
         controller.tabBar.isHidden = true
     }
 

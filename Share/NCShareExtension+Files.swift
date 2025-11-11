@@ -10,23 +10,6 @@ import NextcloudKit
 
 extension NCShareExtension {
     func reloadData() async {
-        let session = self.extensionData.getSession()
-        let layoutForView = await NCManageDatabase.shared.getLayoutForViewAsync(account: session.account, key: keyLayout, serverUrl: serverUrl)
-        let predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND directory == true", session.account, serverUrl)
-        let metadatas = self.database.getResultsMetadatasPredicate(predicate, layoutForView: layoutForView)
-
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas)
-
-        if withLoadFolder {
-            loadFolder()
-        } else {
-            self.refreshControl.endRefreshing()
-        }
-        collectionView.reloadData()
-        let metadatas = await self.database.getMetadatasAsync(predicate: predicate,
-                                                              withLayout: layoutForView,
-                                                              withAccount: session.account)
-        self.dataSource = NCCollectionViewDataSource(metadatas: metadatas, layoutForView: layoutForView, account: session.account)
         let session = NCShareExtensionData.shared.getSession()
         let layoutForView = NCManageDatabase.shared.getLayoutForView(account: session.account, key: keyLayout, serverUrl: serverUrl)
         let predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName != %@ AND directory == true", session.account, serverUrl, NextcloudKit.shared.nkCommonInstance.rootFileName)
@@ -52,21 +35,6 @@ extension NCShareExtension {
         }
     }
 
-    func loadFolder() {
-        NCNetworking.shared.readFolder(serverUrl: serverUrl,
-                                       account: session.account,
-                                       checkResponseDataChanged: false,
-                                       queue: .main) { task in
-            self.dataSourceTask = task
-            self.collectionView.reloadData()
-        } completion: { _, metadataFolder, _, _, error in
-            DispatchQueue.main.async {
-                if error != .success {
-                    self.showAlert(description: error.errorDescription)
-                }
-                self.metadataFolder = metadataFolder
-                self.reloadDatasource(withLoadFolder: false)
-            }
     func loadFolder() async {
         let session = NCShareExtensionData.shared.getSession()
         let resultsReadFolder = await NCNetworking.shared.readFolderAsync(serverUrl: serverUrl, account: session.account) { task in

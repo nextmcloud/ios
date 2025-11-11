@@ -29,11 +29,10 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
     func copyInternalLink(sender: Any) {
         guard let metadata = self.metadata else { return }
 
-        let serverUrlFileName = metadata.serverUrl + "/" + metadata.fileName
-        NCNetworking.shared.readFile(serverUrlFileName: serverUrlFileName, account: metadata.account) { _, metadata, error in
+        NCNetworking.shared.readFile(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account) { _, metadata, _, error in
             if error == .success, let metadata = metadata {
                 let internalLink = metadata.urlBase + "/index.php/f/" + metadata.fileId
-                self.shareCommon.copyLink(link: internalLink, viewController: self, sender: sender)
+                NCShareCommon.copyLink(link: internalLink, viewController: self, sender: sender)
             } else {
                 NCContentPresenter().showError(error: error)
             }
@@ -44,12 +43,12 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
         guard let tableShare = tableShare else {
             return copyInternalLink(sender: sender)
         }
-        shareCommon.copyLink(link: tableShare.url, viewController: self, sender: sender)
+        NCShareCommon.copyLink(link: tableShare.url, viewController: self, sender: sender)
     }
 
     func tapMenu(with tableShare: tableShare?, sender: Any) {
         if let tableShare = tableShare {
-            self.toggleShareMenu(for: tableShare, sendMail: (tableShare.shareType != NCShareCommon().SHARE_TYPE_LINK), folder: metadata?.directory ?? false, sender: sender)
+            self.toggleShareMenu(for: tableShare, sender: sender)
         } else {
             self.makeNewLinkShare()
         }
@@ -57,17 +56,11 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
 
     func showProfile(with tableShare: tableShare?, sender: Any) {
         guard let tableShare else { return }
-        showProfileMenu(userId: tableShare.shareWith, session: session)
+        showProfileMenu(userId: tableShare.shareWith, session: session, sender: sender)
     }
 
     func quickStatus(with tableShare: tableShare?, sender: Any) {
-        guard let tableShare = tableShare,
-              let metadata = metadata else { return }
-        self.toggleUserPermissionMenu(isDirectory: metadata.directory, tableShare: tableShare)
         guard let tableShare, let metadata else { return }
         self.toggleQuickPermissionsMenu(isDirectory: metadata.directory, share: tableShare, sender: sender)
-//        guard let tableShare = tableShare,
-//              let metadata = metadata else { return }
-//        self.toggleUserPermissionMenu(isDirectory: metadata.directory, tableShare: tableShare)
     }
 }

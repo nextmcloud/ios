@@ -32,7 +32,7 @@ enum ContextMenuActions {
 
          return UIAction(
              title: titleDelete,
-             image: UIImage(systemName: icon),
+             image: UIImage(systemName: icon)?.withTintColor(NCBrandColor.shared.iconImageColor),
              attributes: destructive ? [.destructive] : []
          ) { _ in
              let alert = UIAlertController.deleteFileOrFolder(
@@ -54,7 +54,7 @@ enum ContextMenuActions {
                        completion: (() -> Void)? = nil) -> UIAction {
          UIAction(
              title: NSLocalizedString("_share_", comment: ""),
-             image: UIImage(systemName: "square.and.arrow.up")
+             image: UIImage(named: "share")?.withTintColor(NCBrandColor.shared.iconImageColor)
          ) { _ in
              NCDownloadAction.shared.openActivityViewController(
                  selectedMetadata: selectedMetadatas,
@@ -73,7 +73,7 @@ enum ContextMenuActions {
              title: isAnyOffline
                  ? NSLocalizedString("_remove_available_offline_", comment: "")
                  : NSLocalizedString("_set_available_offline_", comment: ""),
-             image: UIImage(systemName: "icloud.and.arrow.down")
+             image: UIImage(named: "cloudDownload")?.withTintColor(NCBrandColor.shared.iconImageColor)
          ) { _ in
              if !isAnyOffline, selectedMetadatas.count > 3 {
                  let alert = UIAlertController(

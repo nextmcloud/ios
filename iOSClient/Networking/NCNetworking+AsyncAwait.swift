@@ -41,9 +41,9 @@ extension NCNetworking {
                       account: String,
                       options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.setLivephoto(serverUrlfileNamePath: serverUrlfileNamePath, livePhotoFile: livePhotoFile, account: account, options: options) { account, responseData, error in
-                continuation.resume(returning: (account: account, responseData: responseData, error: error))
-            }
+//            NextcloudKit.shared.setLivephoto(serverUrlfileNamePath: serverUrlfileNamePath, livePhotoFile: livePhotoFile, account: account, options: options) { account, responseData, error in
+//                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+//            }
         })
     }
 
@@ -60,9 +60,9 @@ extension NCNetworking {
                                               account: String,
                                               options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.sendClientDiagnosticsRemoteOperation(data: data, account: account, options: options) { account, responseData, error in
-                continuation.resume(returning: (account: account, responseData: responseData, error: error))
-            }
+//            NextcloudKit.shared.sendClientDiagnosticsRemoteOperation(data: data, account: account, options: options) { account, responseData, error in
+//                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+//            }
         })
     }
 
@@ -70,9 +70,9 @@ extension NCNetworking {
                          account: String,
                          options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.downloadPreview(url: url, account: account, options: options) { account, responseData, error in
-                continuation.resume(returning: (account: account, responseData: responseData, error: error))
-            }
+//            NextcloudKit.shared.downloadPreview(url: url, account: account, options: options) { account, responseData, error in
+//                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+//            }
         })
     }
 
@@ -81,9 +81,9 @@ extension NCNetworking {
                          account: String,
                          options: NKRequestOptions = NKRequestOptions()) async -> (account: String, width: Int, height: Int, etag: String?, responseData: AFDataResponse<Data?>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.downloadPreview(fileId: fileId, etag: etag, account: account, options: options) { account, width, height, etag, responseData, error in
-                continuation.resume(returning: (account: account, width: width, height: height, etag: etag, responseData: responseData, error: error))
-            }
+//            NextcloudKit.shared.downloadPreview(fileId: fileId, etag: etag, account: account, options: options) { account, width, height, etag, responseData, error in
+//                continuation.resume(returning: (account: account, width: width, height: height, etag: etag, responseData: responseData, error: error))
+//            }
         })
     }
 
@@ -91,9 +91,9 @@ extension NCNetworking {
                             account: String,
                             options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.deleteFileOrFolder(serverUrlFileName: serverUrlFileName, account: account, options: options) { account, responseData, error in
-                continuation.resume(returning: (account: account, responseData: responseData, error: error))
-            }
+//            NextcloudKit.shared.deleteFileOrFolder(serverUrlFileName: serverUrlFileName, account: account, options: options) { account, responseData, error in
+//                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+//            }
         })
     }
 
@@ -103,9 +103,9 @@ extension NCNetworking {
                           account: String,
                           options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: account, options: options) { account, responseData, error in
-                continuation.resume(returning: (account: account, responseData: responseData, error: error))
-            }
+//            NextcloudKit.shared.moveFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: account, options: options) { account, responseData, error in
+//                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+//            }
         })
     }
 
@@ -115,9 +115,9 @@ extension NCNetworking {
                           account: String,
                           options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.copyFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: account, options: options) { account, responseData, error in
-                continuation.resume(returning: (account: account, responseData: responseData, error: error))
-            }
+//            NextcloudKit.shared.copyFileOrFolder(serverUrlFileNameSource: serverUrlFileNameSource, serverUrlFileNameDestination: serverUrlFileNameDestination, overwrite: overwrite, account: account, options: options) { account, responseData, error in
+//                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+//            }
         })
     }
 
@@ -126,9 +126,9 @@ extension NCNetworking {
                       account: String,
                       options: NKRequestOptions = NKRequestOptions()) async -> (account: String, ocId: String?, date: Date?, responseData: AFDataResponse<Data?>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName, account: account, options: options) { account, ocId, date, responseData, error in
-                continuation.resume(returning: (account: account, ocId: ocId, date: date, responseData: responseData, error: error))
-            }
+//            NextcloudKit.shared.createFolder(serverUrlFileName: serverUrlFileName, account: account, options: options) { account, ocId, date, responseData, error in
+//                continuation.resume(returning: (account: account, ocId: ocId, date: date, responseData: responseData, error: error))
+//            }
         })
     }
 
@@ -270,18 +270,18 @@ extension NCNetworking {
     func deleteE2EECertificate(account: String,
                                options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.deleteE2EECertificate(account: account, options: options) { account, responseData, error in
-                continuation.resume(returning: (account: account, responseData: responseData, error: error))
-            }
+//            NextcloudKit.shared.deleteE2EECertificate(account: account, options: options) { account, responseData, error in
+//                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+//            }
         })
     }
 
     func deleteE2EEPrivateKey(account: String,
                               options: NKRequestOptions = NKRequestOptions()) async -> (account: String, responseData: AFDataResponse<Data?>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.deleteE2EEPrivateKey(account: account, options: options) { account, responseData, error in
-                continuation.resume(returning: (account: account, responseData: responseData, error: error))
-            }
+//            NextcloudKit.shared.deleteE2EEPrivateKey(account: account, options: options) { account, responseData, error in
+//                continuation.resume(returning: (account: account, responseData: responseData, error: error))
+//            }
         })
     }
 

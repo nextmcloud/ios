@@ -1,25 +1,6 @@
-//
-//  NCUploadAssetsModel.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 04/01/23.
-//  Copyright © 2023 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2023 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import SwiftUI
 import NextcloudKit
@@ -64,6 +45,7 @@ class NCUploadAssetsModel: ObservableObject, NCCreateFormUploadConflictDelegate 
         NCNetworking.shared.capabilities[controller?.account ?? ""] ?? NKCapabilities.Capabilities()
     }
     let database = NCManageDatabase.shared
+    let global = NCGlobal.shared
     var metadatasNOConflict: [tableMetadata] = []
     var metadatasUploadInConflict: [tableMetadata] = []
     var timer: Timer?
@@ -79,6 +61,8 @@ class NCUploadAssetsModel: ObservableObject, NCCreateFormUploadConflictDelegate 
         for asset in self.assets {
             var uti: String?
 
+            // Must be in primary Task
+            //
             if let phAsset = asset.phAsset,
                let resource = PHAssetResource.assetResources(for: phAsset).first(where: { $0.type == .photo }) {
                 uti = resource.uniformTypeIdentifier
@@ -112,14 +96,6 @@ class NCUploadAssetsModel: ObservableObject, NCCreateFormUploadConflictDelegate 
         }
     }
 
-    func getOriginalFilenameForPreview() -> NSString {
-        if let asset = assets.first?.phAsset {
-            return asset.originalFilename
-        } else {
-            return ""
-        }
-    }
-
     func lowResolutionImage(asset: PHAsset) -> UIImage? {
         let imageManager = PHImageManager.default()
         let options = PHImageRequestOptions()
@@ -130,6 +106,8 @@ class NCUploadAssetsModel: ObservableObject, NCCreateFormUploadConflictDelegate 
         let targetSize = CGSize(width: 80, height: 80)
         var thumbnail: UIImage?
 
+        // Must be in primary Task
+        //
         imageManager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options) { result, _ in
             thumbnail = result
         }
@@ -204,80 +182,17 @@ class NCUploadAssetsModel: ObservableObject, NCCreateFormUploadConflictDelegate 
 
         if useAutoUploadFolder {
             let assets = self.assets.compactMap { $0.phAsset }
-            NCNetworking.shared.createFolder(assets: assets, useSubFolder: self.useAutoUploadSubFolder, session: self.session)
-            self.showHUD = false
-            createProcessUploads()
+            self.database.createMetadatasFolder(assets: assets, useSubFolder: self.useAutoUploadSubFolder, session: self.session) { metadatasFolder in
+                self.database.addMetadatas(metadatasFolder)
+                self.showHUD = false
+                createProcessUploads()
+            }
         } else {
             createProcessUploads()
         }
     }
 
     func save(completion: @escaping (_ metadatasNOConflict: [tableMetadata], _ metadatasUploadInConflict: [tableMetadata]) -> Void) {
-        let utilityFileSystem = NCUtilityFileSystem()
-        var metadatasNOConflict: [tableMetadata] = []
-        var metadatasUploadInConflict: [tableMetadata] = []
-        let autoUploadPath = database.getAccountAutoUploadPath(session: self.session)
-        var serverUrl = useAutoUploadFolder ? autoUploadPath : serverUrl
-        let autoUploadServerUrlBase = database.getAccountAutoUploadServerUrlBase(session: self.session)
-        var serverUrl = useAutoUploadFolder ? autoUploadServerUrlBase : serverUrl
-        let isInDirectoryE2EE = NCUtilityFileSystem().isDirectoryE2EE(session: session, serverUrl: serverUrl)
-
-        for tlAsset in assets {
-            guard let asset = tlAsset.phAsset, let previewStore = previewStore.first(where: { $0.id == asset.localIdentifier }) else { continue }
-            let assetFileName = asset.originalFilename
-            var livePhoto: Bool = false
-            let creationDate = asset.creationDate ?? Date()
-            let ext = assetFileName.pathExtension.lowercased()
-            let fileName = previewStore.fileName.isEmpty ? utilityFileSystem.createFileName(assetFileName as String, fileDate: creationDate, fileType: asset.mediaType)
-            : (previewStore.fileName + "." + ext)
-
-            if previewStore.assetType == .livePhoto,
-               !isInDirectoryE2EE,
-               NCKeychain().livePhoto,
-               previewStore.data == nil {
-                livePhoto = true
-            }
-
-            // Auto upload with subfolder
-            if useAutoUploadSubFolder {
-                serverUrl = utilityFileSystem.createGranularityPath(asset: asset, serverUrl: autoUploadPath)
-            }
-
-            // Check if is in upload
-            let predicate = NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@ AND session != ''",
-                                        session.account,
-                                        serverUrl,
-                                        fileName)
-            if let results = database.getMetadatas(predicate: predicate,
-                                                   sortedByKeyPath: "fileName",
-                                                   ascending: false), !results.isEmpty {
-                continue
-            }
-
-            let metadataForUpload = database.createMetadata(fileName: fileName,
-                                                            ocId: NSUUID().uuidString,
-                                                            serverUrl: serverUrl,
-                                                            session: session,
-                                                            sceneIdentifier: controller?.sceneIdentifier)
-
-            if livePhoto {
-                metadataForUpload.livePhotoFile = (metadataForUpload.fileName as NSString).deletingPathExtension + ".mov"
-            }
-            metadataForUpload.assetLocalIdentifier = asset.localIdentifier
-            metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
-            metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
-            metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
-            metadataForUpload.sessionDate = Date()
-            metadataForUpload.nativeFormat = previewStore.nativeFormat
-
-            if let previewStore = self.previewStore.first(where: { $0.id == asset.localIdentifier }),
-                let data = previewStore.data {
-                if metadataForUpload.contentType == "image/heic" {
-                    let fileNameNoExtension = (fileName as NSString).deletingPathExtension
-                    metadataForUpload.contentType = "image/jpeg"
-                    metadataForUpload.fileName = fileNameNoExtension + ".jpg"
-                    metadataForUpload.fileNameView = fileNameNoExtension + ".jpg"
-                    metadataForUpload.nativeFormat = false
         Task { @MainActor in
             let utilityFileSystem = NCUtilityFileSystem()
             var metadatasNOConflict: [tableMetadata] = []

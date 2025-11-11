@@ -64,44 +64,6 @@ extension NCMedia {
                 titleDate?.textColor = .white
                 activityIndicator.color = .white
 
-    func createMenu() {
-        let layoutForView = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layout: global.mediaLayoutRatio)
-        var layout = layoutForView.layout
-        /// Overwrite default value
-        if layout == global.layoutList {
-            layout = global.mediaLayoutRatio
-        }
-        ///
-        let layoutTitle = (layout == global.mediaLayoutRatio) ? NSLocalizedString("_media_square_", comment: "") : NSLocalizedString("_media_ratio_", comment: "")
-        let layoutImage = (layout == global.mediaLayoutRatio) ? utility.loadImage(named: "square.grid.3x3") : utility.loadImage(named: "rectangle.grid.3x2")
-
-        let viewFilterMenu = UIMenu(title: "", options: .displayInline, children: [
-            UIAction(title: NSLocalizedString("_media_viewimage_show_", comment: ""), image: utility.loadImage(named: "photo")) { _ in
-                self.showOnlyImages = true
-                self.showOnlyVideos = false
-                self.loadDataSource()
-                self.networkRemoveAll()
-                Task {
-                    await self.loadDataSource()
-                    await self.networkRemoveAll()
-                }
-            },
-            UIAction(title: NSLocalizedString("_media_viewvideo_show_", comment: ""), image: utility.loadImage(named: "video")) { _ in
-                self.showOnlyImages = false
-                self.showOnlyVideos = true
-                self.loadDataSource()
-                self.networkRemoveAll()
-                Task {
-                    await self.loadDataSource()
-                    await self.networkRemoveAll()
-                }
-            },
-            UIAction(title: NSLocalizedString("_media_show_all_", comment: ""), image: utility.loadImage(named: "photo.on.rectangle")) { _ in
-                self.showOnlyImages = false
-                self.showOnlyVideos = false
-                Task {
-                    await self.loadDataSource()
-                    await self.networkRemoveAll()
                 if #unavailable(iOS 26.0) {
                     (self.navigationController as? NCMediaNavigationController)?.updateRightBarButtonsTint(to: .white)
                 }
@@ -131,22 +93,6 @@ extension NCMedia: NCMediaSelectTabBarDelegate {
                     for ocId in ocIds {
                         await self.deleteImage(with: ocId)
                     }
-                }
-
-                NCNetworking.shared.deleteMetadatas(metadatas, sceneIdentifier: self.controller?.sceneIdentifier)
-
-                for index in indices {
-                    let indexPath = IndexPath(row: index, section: 0)
-                    if let cell = self.collectionView.cellForItem(at: indexPath) as? NCMediaCell,
-                       self.dataSource.metadatas[index].ocId == cell.ocId {
-                        indexPaths.append(indexPath)
-                    }
-                }
-
-                self.dataSource.removeMetadata(ocIds)
-                if indexPaths.count == ocIds.count {
-                    self.collectionView.deleteItems(at: indexPaths)
-                } else {
                     self.collectionViewReloadData()
                 }
             })

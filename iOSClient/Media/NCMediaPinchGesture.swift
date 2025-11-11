@@ -42,7 +42,6 @@ extension NCMedia {
 
         switch gestureRecognizer.state {
         case .began:
-            networkRemoveAll()
             Task {
                 await self.networkRemoveAll()
             }

@@ -63,6 +63,7 @@ class NCCreateFormUploadConflict: UIViewController {
 
     let utility = NCUtility()
     let utilityFileSystem = NCUtilityFileSystem()
+    let global = NCGlobal.shared
 
     // MARK: - View Life Cycle
 
@@ -166,6 +167,11 @@ class NCCreateFormUploadConflict: UIViewController {
                 self.metadatasNOConflict.append(metadata)
             }
             self.buttonContinueTouch(action)
+        }))
+
+        // MORE
+        conflictAlert.addAction(UIAlertAction(title: NSLocalizedString("_more_action_title_", comment: ""), style: .default, handler: { _ in
+            self.blurView.removeFromSuperview()
         }))
 
         // CANCEL
@@ -316,10 +322,6 @@ extension NCCreateFormUploadConflict: UITableViewDataSource {
 
             // -----> Already Existing File
 
-            guard let metadataAlreadyExists = NCManageDatabase.shared.getMetadataConflict(account: metadataNewFile.account, serverUrl: metadataNewFile.serverUrl, fileNameView: metadataNewFile.fileNameView, nativeFormat: metadataNewFile.nativeFormat) else { return UITableViewCell() }
-            if utility.existsImage(ocId: metadataAlreadyExists.ocId, etag: metadataAlreadyExists.etag, ext: NCGlobal.shared.previewExt512) {
-                cell.imageAlreadyExistingFile.image = UIImage(contentsOfFile: utilityFileSystem.getDirectoryProviderStorageImageOcId(metadataAlreadyExists.ocId, etag: metadataAlreadyExists.etag, ext: NCGlobal.shared.previewExt512))
-            } else if FileManager().fileExists(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadataAlreadyExists.ocId, fileNameView: metadataAlreadyExists.fileNameView)) && metadataAlreadyExists.contentType == "application/pdf" {
             guard let metadataAlreadyExists = NCManageDatabase.shared.getMetadataConflict(account: metadataNewFile.account, serverUrl: metadataNewFile.serverUrl, fileNameView: metadataNewFile.fileNameView, nativeFormat: metadataNewFile.nativeFormat) else {
                 return UITableViewCell()
             }

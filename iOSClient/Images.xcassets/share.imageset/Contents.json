@@ -1,21 +1,20 @@
 {
   "images" : [
     {
-      "filename" : "share.pdf",
+      "filename" : "Share.svg",
       "idiom" : "universal"
-      "filename" : "shareNew.png",
-      "idiom" : "universal",
-      "scale" : "1x"
     },
     {
       "filename" : "shareNew@2x.png",
       "idiom" : "universal",
-      "scale" : "2x"
+      "scale" : "2x",
+      "unassigned" : true
     },
     {
       "filename" : "shareNew@3x.png",
       "idiom" : "universal",
-      "scale" : "3x"
+      "scale" : "3x",
+      "unassigned" : true
     }
   ],
   "info" : {

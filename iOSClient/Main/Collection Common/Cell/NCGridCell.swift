@@ -34,8 +34,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var labelSubinfo: UILabel!
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
-    @IBOutlet weak var iconsStackView: UIStackView!
-    
+
     var ocId = ""
     var ocIdTransfer = ""
     var account = ""
@@ -115,13 +114,6 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         imageVisualEffect.clipsToBounds = true
         imageVisualEffect.alpha = 0.5
 
-        iconsStackView.addBlurBackground(style: .systemMaterial)
-        iconsStackView.layer.cornerRadius = 8
-        iconsStackView.clipsToBounds = true
-//        iconsStackView.addVibrancyOverlay(using: blur, style: .fill)
-
-//        iconsStackView.addBlurBackground(style: .systemThinMaterialLight)
-
         let longPressedGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gestureRecognizer:)))
         longPressedGesture.minimumPressDuration = 0.5
         longPressedGesture.delegate = self
@@ -146,7 +138,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             UIAccessibilityCustomAction(
                 name: NSLocalizedString("_more_", comment: ""),
                 target: self,
-                selector: #selector(touchUpInsideMore))
+                selector: #selector(touchUpInsideMore(_:)))
         ]
     }
 
@@ -187,24 +179,52 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         buttonMore.isHidden = status
     }
 
+//    func selected(_ status: Bool, isEditMode: Bool) {
+//        if isEditMode {
+//            buttonMore.isHidden = true
+//            accessibilityCustomActions = nil
+//        } else {
+//            buttonMore.isHidden = false
+//            setA11yActions()
+//        }
+//        if status {
+//            imageSelect.isHidden = false
+//            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
+//            imageVisualEffect.isHidden = false
+//        } else {
+//            imageSelect.isHidden = true
+//            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
+//            imageVisualEffect.isHidden = true
+//        }
+//    }
+
     func selected(_ status: Bool, isEditMode: Bool) {
         if isEditMode {
+            imageSelect.isHidden = false
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
         } else {
+            imageSelect.isHidden = true
             buttonMore.isHidden = false
             setA11yActions()
         }
         if status {
-            imageSelect.isHidden = false
+//            var blurEffectView: UIView?
+//            blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
+//            blurEffectView?.backgroundColor = .lightGray
+//            blurEffectView?.frame = self.bounds
+//            blurEffectView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+//            backgroundView = blurEffectView
             imageSelect.image = NCImageCache.shared.getImageCheckedYes()
             imageVisualEffect.isHidden = false
+
         } else {
-            imageSelect.isHidden = true
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
+            backgroundView = nil
             imageVisualEffect.isHidden = true
         }
     }
-
+    
     func writeInfoDateSize(date: NSDate, size: Int64) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short
@@ -220,7 +240,13 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         accessibilityValue = value
     }
 
-    func setIconOutlines() {}
+    func setIconOutlines() {
+        if imageStatus.image != nil {
+            imageStatus.makeCircularBackground(withColor: .systemBackground)
+        } else {
+            imageStatus.backgroundColor = .clear
+        }
+    }
 }
 
 protocol NCGridCellDelegate: AnyObject {

@@ -113,7 +113,6 @@ class NCNetworkingE2EE: NSObject {
         }
 
         if let addUserId {
-            let results = await NCNetworking.shared.getE2EECertificate(user: addUserId, account: session.account, options: NCNetworkingE2EE().getOptions(account: account))
             let results = await NextcloudKit.shared.getE2EECertificateAsync(user: addUserId, account: session.account, options: NCNetworkingE2EE().getOptions(account: account, capabilities: capabilities)) {task in
                 Task {
                     let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
@@ -191,7 +190,6 @@ class NCNetworkingE2EE: NSObject {
         }
         let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
 
-        let putE2EEMetadataResults = await NCNetworking.shared.putE2EEMetadata(fileId: fileId, e2eToken: e2eToken, e2eMetadata: e2eMetadata, signature: resultsEncodeMetadata.signature, method: method, account: session.account, options: NCNetworkingE2EE().getOptions(account: session.account))
         let putE2EEMetadataResults = await NextcloudKit.shared.putE2EEMetadataAsync(fileId: fileId, e2eToken: e2eToken, e2eMetadata: e2eMetadata, signature: resultsEncodeMetadata.signature, method: method, account: session.account, options: NCNetworkingE2EE().getOptions(account: session.account, capabilities: capabilities)) { task in
             Task {
                 let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: session.account,
@@ -255,7 +253,6 @@ class NCNetworkingE2EE: NSObject {
             e2eCounter = "\(counter)"
         }
 
-        let resultsLockE2EEFolder = await NCNetworking.shared.lockE2EEFolder(fileId: directory.fileId, e2eToken: e2eToken, e2eCounter: e2eCounter, method: "POST", account: account, options: NCNetworkingE2EE().getOptions(account: account))
         let resultsLockE2EEFolder = await NextcloudKit.shared.lockE2EEFolderAsync(fileId: directory.fileId, e2eToken: e2eToken, e2eCounter: e2eCounter, method: "POST", account: account, options: NCNetworkingE2EE().getOptions(account: account, capabilities: capabilities)) { task in
             Task {
                 let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
@@ -275,8 +272,6 @@ class NCNetworkingE2EE: NSObject {
         guard let tableLock = await self.database.getE2ETokenLockAsync(account: account, serverUrl: serverUrl) else {
             return
         }
-
-        let resultsLockE2EEFolder = await NCNetworking.shared.lockE2EEFolder(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, e2eCounter: nil, method: "DELETE", account: account, options: NCNetworkingE2EE().getOptions(account: account))
         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
         let resultsLockE2EEFolder = await NextcloudKit.shared.lockE2EEFolderAsync(fileId: tableLock.fileId, e2eToken: tableLock.e2eToken, e2eCounter: nil, method: "DELETE", account: account, options: NCNetworkingE2EE().getOptions(account: account, capabilities: capabilities)) { task in
             Task {
@@ -293,15 +288,6 @@ class NCNetworkingE2EE: NSObject {
         return
     }
 
-    func unlockAll(account: String) {
-        guard NCKeychain().isEndToEndEnabled(account: account) else { return }
-
-        Task {
-            for result in self.database.getE2EAllTokenLock(account: account) {
-                let resultsLockE2EEFolder = await NCNetworking.shared.lockE2EEFolder(fileId: result.fileId, e2eToken: result.e2eToken, e2eCounter: nil, method: "DELETE", account: account, options: NCNetworkingE2EE().getOptions(account: account))
-                if resultsLockE2EEFolder.error == .success {
-                    self.database.deleteE2ETokenLock(account: account, serverUrl: result.serverUrl)
-                }
     func unlockAll(account: String) async {
         guard NCPreferences().isEndToEndEnabled(account: account) else { return }
         let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
