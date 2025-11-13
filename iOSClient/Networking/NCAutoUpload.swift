@@ -18,6 +18,16 @@ class NCAutoUpload: NSObject {
 
     func initAutoUpload(controller: NCMainTabBarController? = nil,
                         tblAccount: tableAccount) async -> Int {
+        
+        let accountAutoUploadFileName = NCManageDatabase.shared.getAccountAutoUploadFileName(account: tblAccount.account)
+        if(accountAutoUploadFileName == "Kamera-Medien" || accountAutoUploadFileName == "Camera-Media"){
+            //set autoupload folder as per locale
+            if(accountAutoUploadFileName != NCBrandOptions.shared.folderDefaultAutoUpload){
+                //set auto upload as per locale
+                print("auto upload folder set here....")
+                await NCManageDatabase.shared.setAccountAutoUploadFileNameAsync(NCBrandOptions.shared.folderDefaultAutoUpload)
+            }
+        }
         guard self.networking.isOnline,
               tblAccount.autoUploadStart,
               tblAccount.autoUploadOnlyNew else {

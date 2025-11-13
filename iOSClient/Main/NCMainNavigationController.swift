@@ -90,13 +90,13 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
         Task {
             menuButton.setImage(UIImage(systemName: "ellipsis.circle"), for: .normal)
-            menuButton.tintColor = NCBrandColor.shared.iconImageColor
+//            menuButton.tintColor = NCBrandColor.shared.iconImageColor
             menuButton.menu = await createRightMenu()
             menuButton.showsMenuAsPrimaryAction = true
         }
 
         assistantButton.setImage(UIImage(systemName: "sparkles"), for: .normal)
-        assistantButton.tintColor = NCBrandColor.shared.iconImageColor
+//        assistantButton.tintColor = NCBrandColor.shared.iconImageColor
         assistantButton.addAction(UIAction(handler: { _ in
             let assistant = NCAssistant()
                 .environmentObject(NCAssistantModel(controller: self.controller))
@@ -105,7 +105,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }), for: .touchUpInside)
 
         notificationsButton.setImage(UIImage(systemName: "bell.fill"), for: .normal)
-        notificationsButton.tintColor = NCBrandColor.shared.iconImageColor
+//        notificationsButton.tintColor = NCBrandColor.shared.iconImageColor
         notificationsButton.addAction(UIAction(handler: { _ in
             if let navigationController = UIStoryboard(name: "NCNotification", bundle: nil).instantiateInitialViewController() as? UINavigationController,
                let viewController = navigationController.topViewController as? NCNotification {
@@ -116,7 +116,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }), for: .touchUpInside)
 
         transfersButton.setImage(UIImage(systemName: "arrow.left.arrow.right.circle.fill"), for: .normal)
-        transfersButton.tintColor = NCBrandColor.shared.iconImageColor
+//        transfersButton.tintColor = NCBrandColor.shared.iconImageColor
         transfersButton.addAction(UIAction(handler: { _ in
             if let navigationController = UIStoryboard(name: "NCTransfers", bundle: nil).instantiateInitialViewController() as? UINavigationController,
                let viewController = navigationController.topViewController as? NCTransfers {
@@ -450,8 +450,11 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
         let plusMenu = UIMenu(children: [menuAction, menuE2EE, menuText, menuRichDocument, menuOnlyOffice])
 
-        let config = UIImage.SymbolConfiguration(pointSize: 25, weight: .thin)
-        let plusImage = UIImage(named: "circleAdd") //UIImage(systemName: "plus.circle.fill", withConfiguration: config)
+//        let config = UIImage.SymbolConfiguration(pointSize: 25, weight: .thin)
+//        let plusImage = UIImage(named: "circleAdd") //UIImage(systemName: "plus.circle.fill", withConfiguration: config)
+        let config = UIImage.SymbolConfiguration(pointSize: 25, weight: .medium)
+        let plusImage = UIImage(systemName: "plus.circle.fill", withConfiguration: config)?
+            .withRenderingMode(.alwaysTemplate)
 
         if let plusItem = menuToolbar.items?.first {
             plusItem.menu = plusMenu

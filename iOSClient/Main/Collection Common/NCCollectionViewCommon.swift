@@ -4,6 +4,7 @@
 
 import UIKit
 import SwiftUI
+import Realm
 import RealmSwift
 import NextcloudKit
 import EasyTipView
@@ -50,6 +51,7 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     var attributesZoomIn: UIMenuElement.Attributes = []
     var attributesZoomOut: UIMenuElement.Attributes = []
     var tipViewAccounts: EasyTipView?
+    var selectableDataSource: [RealmSwiftObject] { dataSource.getMetadataSourceForAllSections() }
 
     // DECLARE
     var layoutKey = ""

@@ -15,14 +15,13 @@ extension NCMedia {
                                                                mediaPath: tblAccount.mediaPath,
                                                                showOnlyImages: self.showOnlyImages,
                                                                showOnlyVideos: self.showOnlyVideos)
-        if let metadatas = await self.database.getMetadatasAsync(predicate: mediaPredicate, sortedByKeyPath: "datePhotosOriginal", ascending: false) {
+        if let metadatas = await self.database.getMetadatasAsync(predicate: mediaPredicate, sortedByKeyPath: NCPreferences().mediaSortDate, ascending: false) {
             self.database.filterAndNormalizeLivePhotos(from: metadatas) { metadatas in
                 Task { @MainActor in
                     self.dataSource = NCMediaDataSource(metadatas: metadatas)
                     self.collectionViewReloadData()
                 }
             }
-//            self.metadatas = self.imageCache.getMediaMetadatas(account: self.activeAccount.account, predicate: mediaPredicate)
         } else {
             await MainActor.run {
                 self.dataSource.clearMetadatas()

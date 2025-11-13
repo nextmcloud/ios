@@ -45,28 +45,37 @@ class NCMediaNavigationController: NCMainNavigationController {
         }
 
         let viewFilterMenu = UIMenu(title: "", options: .displayInline, children: [
-        UIAction(title: NSLocalizedString("_media_viewimage_show_", comment: ""), image: UIImage(named: "photo")?.withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
+        UIAction(title: NSLocalizedString("_media_viewimage_show_", comment: ""),
+                 image: UIImage(named: "photo")?.withTintColor(NCBrandColor.shared.iconImageColor),
+                 state: media.showOnlyImages ? .on : .off) { _ in
             media.showOnlyImages = true
             media.showOnlyVideos = false
             Task {
                 await media.loadDataSource()
                 await media.networkRemoveAll()
+                await self.updateRightMenu()
             }
         },
-            UIAction(title: NSLocalizedString("_media_viewvideo_show_", comment: ""), image: UIImage(named: "video")?.withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
+            UIAction(title: NSLocalizedString("_media_viewvideo_show_", comment: ""),
+                     image: UIImage(named: "video")?.withTintColor(NCBrandColor.shared.iconImageColor),
+                     state: media.showOnlyVideos ? .on : .off) { _ in
                 media.showOnlyImages = false
                 media.showOnlyVideos = true
                 Task {
                     await media.loadDataSource()
                     await media.networkRemoveAll()
+                    await self.updateRightMenu()
                 }
             },
-            UIAction(title: NSLocalizedString("_media_show_all_", comment: ""), image: UIImage(named: "media")?.withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
+            UIAction(title: NSLocalizedString("_media_show_all_", comment: ""),
+                     image: UIImage(named: "media")?.withTintColor(NCBrandColor.shared.iconImageColor),
+                     state: !media.showOnlyImages && !media.showOnlyVideos ? .on : .off) { _ in
                 media.showOnlyImages = false
                 media.showOnlyVideos = false
                 Task {
                     await media.loadDataSource()
                     await media.networkRemoveAll()
+                    await self.updateRightMenu()
                 }
             }
         ])
@@ -88,7 +97,8 @@ class NCMediaNavigationController: NCMainNavigationController {
         ])
 
         let viewFolderMedia = UIMenu(title: "", options: .displayInline, children: [
-            UIAction(title: NSLocalizedString("_select_media_folder_", comment: ""), image: UIImage(named: "mediaFolder")?.withTintColor(NCBrandColor.shared.iconImageColor), handler: { _ in
+            UIAction(title: NSLocalizedString("_select_media_folder_", comment: ""),
+                     image: UIImage(named: "mediaFolder")?.withTintColor(NCBrandColor.shared.iconImageColor), handler: { _ in
                 guard let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as? UINavigationController,
                       let viewController = navigationController.topViewController as? NCSelect else { return }
                 viewController.delegate = media
@@ -108,8 +118,8 @@ class NCMediaNavigationController: NCMainNavigationController {
                     NCPreferences().mediaSortDate = "date"
                     Task {
                         await media.loadDataSource()
-//                        await media.networkRemoveAll()
-                        media.collectionViewReloadData()
+                        await media.networkRemoveAll()
+                        await self.updateRightMenu()
                     }
                 }
             ),
@@ -123,6 +133,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                     Task {
                         await media.loadDataSource()
                         await media.networkRemoveAll()
+                        await self.updateRightMenu()
                     }
                 }
             ),
@@ -136,6 +147,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                     Task {
                         await media.loadDataSource()
                         await media.networkRemoveAll()
+                        await self.updateRightMenu()
                     }
                 }
             )
@@ -169,12 +181,14 @@ class NCMediaNavigationController: NCMainNavigationController {
 //            })
 //        ])
         
-        let playFile = UIAction(title: NSLocalizedString("_play_from_files_", comment: ""), image: utility.loadImage(named: "CirclePlay")) { _ in
+        let playFile = UIAction(title: NSLocalizedString("_play_from_files_", comment: ""),
+                                image: utility.loadImage(named: "CirclePlay")) { _ in
             guard let controller = self.controller else { return }
             media.documentPickerViewController = NCDocumentPickerViewController(controller: controller, isViewerMedia: true, allowsMultipleSelection: false, viewController: media)
         }
 
-        let playURL = UIAction(title: NSLocalizedString("_play_from_url_", comment: ""), image: utility.loadImage(named: "Link")) { _ in
+        let playURL = UIAction(title: NSLocalizedString("_play_from_url_", comment: ""),
+                               image: utility.loadImage(named: "Link")) { _ in
             let alert = UIAlertController(title: NSLocalizedString("_valid_video_url_", comment: ""), message: nil, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: nil))
             alert.addTextField(configurationHandler: { textField in

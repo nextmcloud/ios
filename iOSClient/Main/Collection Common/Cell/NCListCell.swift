@@ -242,6 +242,11 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             backgroundView = blurEffectView
             separator.isHidden = true
         } else {
+//            if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
+//                if !metadata.e2eEncrypted {
+//                    imageSelect.image = NCImageCache.shared.getImageCheckedNo()
+//                }
+//            }
             imageSelect.image = NCImageCache.shared.getImageCheckedNo()
             backgroundView = nil
             separator.isHidden = false

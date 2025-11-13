@@ -38,7 +38,10 @@ final class NCBrandOptions: @unchecked Sendable {
     var appStoreUrl: String = "https://apps.apple.com/in/app/nextcloud/id1125420102"
 
     // Auto Upload default folder
-    var folderDefaultAutoUpload: String = "Photos"
+//    var folderDefaultAutoUpload: String = Locale.current.language.languageCode?.identifier == "de" ? "Kamera-Medien" : "Camera-Media"
+    // Get the app's preferred language (the language the app is using, not the system language)
+    var folderDefaultAutoUpload: String = (Locale.preferredLanguages.first?.prefix(2) ?? "en") == "de" ? "Kamera-Medien" : "Camera-Media"
+    
 
     // Capabilities Group
 //    var capabilitiesGroup: String = "group.it.twsweb.Crypto-Cloud"

@@ -5,6 +5,7 @@
 import UIKit
 import Foundation
 import NextcloudKit
+import Realm
 
 extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
     func selectAll() {
@@ -13,6 +14,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         } else {
             fileSelect = self.dataSource.getMetadatas().compactMap({ $0.ocId })
         }
+//        fileSelect = selectableDataSource.compactMap({ $0.primaryKeyValue })
         tabBarSelect?.update(fileSelect: fileSelect, metadatas: getSelectedMetadatas(), userId: session.userId)
         self.collectionView.reloadData()
     }
@@ -102,12 +104,12 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         var selectedMetadatas: [tableMetadata] = []
         for ocId in fileSelect {
             guard let metadata = database.getMetadataFromOcId(ocId) else { continue }
-//            selectedMetadatas.append(metadata)
-            if metadata.e2eEncrypted {
-                fileSelect.removeAll(where: {$0 == metadata.ocId})
-            } else {
-                selectedMetadatas.append(metadata)
-            }
+            selectedMetadatas.append(metadata)
+//            if metadata.e2eEncrypted {
+//                fileSelect.removeAll(where: {$0 == metadata.ocId})
+//            } else {
+//                selectedMetadatas.append(metadata)
+//            }
         }
         return selectedMetadatas
     }
@@ -133,3 +135,10 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate {
         }
     }
 }
+
+//extension RealmSwiftObject {
+//    var primaryKeyValue: String? {
+//        guard let primaryKeyName = self.objectSchema.primaryKeyProperty?.name else { return nil }
+//        return value(forKey: primaryKeyName) as? String
+//    }
+//}

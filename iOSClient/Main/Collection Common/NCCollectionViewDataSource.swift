@@ -149,6 +149,15 @@ class NCCollectionViewDataSource: NSObject {
         metadatasForSection.append(metadataForSection)
     }
 
+    func getMetadataSourceForAllSections() -> [tableMetadata] {
+
+        var metadatas: [tableMetadata] = []
+        for section in metadatasForSection {
+            metadatas.append(contentsOf: section.metadatas)
+        }
+        return metadatas
+    }
+    
     // MARK: -
 
     func appendMetadatasToSection(_ metadatas: [tableMetadata], metadataForSection: NCMetadataForSection, lastSearchResult: NKSearchResult) {

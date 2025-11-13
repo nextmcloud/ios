@@ -311,7 +311,8 @@ class NCShare: UIViewController, NCSharePagingContent {
         shareEmails.removeAll()
 
         guard var allShares = shares.share else { return }
-
+        allShares = allShares.sorted(by: { $0.date?.compare($1.date as Date? ?? Date()) == .orderedAscending })
+//        (by: { $0.date?.compare($1.date ?? Date()) == .orderedAscending })
         if let firstLink = shares.firstShareLink {
             // Remove if already exists to avoid duplication
             allShares.removeAll { $0.idShare == firstLink.idShare }
@@ -400,20 +401,20 @@ class NCShare: UIViewController, NCSharePagingContent {
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .default) { (action:UIAlertAction) in })
             let okAction = UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default) {[weak self] (action:UIAlertAction) in
                 let password = alertController.textFields?.first?.text
-//                self?.networking?.createShareLink(password: password ?? "")
-                self?.makeNewLinkShare()
+                self?.networking?.createShareLink(password: password ?? "")
+//                self?.makeNewLinkShare()
             }
             
             alertController.addAction(okAction)
             
             present(alertController, animated: true, completion:nil)
         } else if shares.firstShareLink == nil {
-//            networking?.createShareLink(password: "")
-            self.makeNewLinkShare()
+            networking?.createShareLink(password: "")
+//            self.makeNewLinkShare()
 
         } else {
-//            networking?.createShareLink(password: "")
-            self.makeNewLinkShare()
+            networking?.createShareLink(password: "")
+//            self.makeNewLinkShare()
 
         }
         
@@ -493,7 +494,14 @@ extension NCShare: NCShareNetworkingDelegate {
         dropDown.bottomOffset = CGPoint(x: 10, y: textField?.bounds.height ?? 0)
         dropDown.width = (textField?.bounds.width ?? 0) - 20
         dropDown.direction = .bottom
-
+//        dropDown.width = textField?.bounds.width ?? 0
+//        if (UIDevice.current.userInterfaceIdiom == .phone || UIDevice.current.orientation.isLandscape), UIScreen.main.bounds.width < 1111  {
+//            dropDown.topOffset = CGPoint(x: 0, y: -(textField?.bounds.height ?? 0))
+//            dropDown.direction = .top
+//        } else {
+//            dropDown.bottomOffset = CGPoint(x: 0, y: (textField?.bounds.height ?? 0) - 80)
+//            dropDown.direction = .any
+//        }
         dropDown.cellNib = UINib(nibName: "NCSearchUserDropDownCell", bundle: nil)
         dropDown.customCellConfiguration = { (index: Index, _, cell: DropDownCell) in
             guard let cell = cell as? NCSearchUserDropDownCell else { return }
@@ -594,6 +602,7 @@ extension NCShare: UITableViewDataSource {
 
         case .links:
             let tableShare = shareLinks[indexPath.row]
+//            let orderedShares = shares.share?.sorted(by: { $0.date?.compare($1.date as Date? ?? Date()) == .orderedAscending })
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell else {
                 return UITableViewCell()
             }

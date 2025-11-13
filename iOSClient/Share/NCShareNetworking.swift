@@ -112,6 +112,37 @@ class NCShareNetworking: NSObject {
             }
         }
     }
+    
+    // MARK: - Create Share Link
+    func createShareLink(password: String?) {
+        NCActivityIndicator.shared.start(backgroundView: view)
+        let filenamePath = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
+
+        NextcloudKit.shared.createShare(path: filenamePath,
+                                        shareType: NCShareCommon.shareTypeLink,
+                                        shareWith: "",
+                                        account: metadata.account) { [weak self] account, share, _, error in
+            guard let self = self else { return }
+            NCActivityIndicator.shared.stop()
+
+            if error == .success, let share = share {
+                let home = self.utilityFileSystem.getHomeServer(session: self.session)
+                self.database.addShare(account: self.metadata.account, home: home, shares: [share])
+
+                if !self.metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__SHARE_FILE, metadata: self.metadata)
+                }
+
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDidCreateShareLink)
+                // 🔄 ensure we sync DB + UI with server
+                self.readShare(showLoadingIndicator: false)
+            } else {
+                NCContentPresenter().showError(error: error)
+            }
+
+            self.delegate?.shareCompleted()
+        }
+    }
 
     func createShare(_ shareable: Shareable, downloadLimit: DownloadLimitViewModel) {
         NCActivityIndicator.shared.start(backgroundView: view)

@@ -953,7 +953,7 @@ extension NCManageDatabase {
             let realm = try Realm()
             if let sorted {
                 var results: [tableMetadata] = []
-                switch NCPreferences().mediaSortDate {
+                switch sorted {//NCPreferences().mediaSortDate {
                 case "date":
                     results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.date as Date) > ($1.date as Date) }
                 case "creationDate":

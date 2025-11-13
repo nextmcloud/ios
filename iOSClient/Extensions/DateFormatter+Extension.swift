@@ -31,4 +31,31 @@ extension DateFormatter {
         dateFormatter.dateStyle = .medium
         return dateFormatter
     }()
+
+    static func formattedShareExpDate(from date: Date) -> String {
+        // Get the app language
+        let appLanguage = Locale.preferredLanguages.first?.prefix(2) ?? "en"
+        let locale = Locale(identifier: "\(appLanguage)_\(appLanguage.uppercased())")
+
+        // Extract components
+        let calendar = Calendar.current
+        let day = calendar.component(.day, from: date)
+
+        // Get month name abbreviation in the correct locale
+        let monthFormatter = DateFormatter()
+        monthFormatter.locale = locale
+        monthFormatter.dateFormat = "MMM" // abbreviated month
+        var month = monthFormatter.string(from: date)
+
+        // Capitalize first letter (German months are lowercase normally)
+        month = month.prefix(1).uppercased() + month.dropFirst()
+
+        // Remove trailing period if present (common in German abbreviations)
+        month = month.replacingOccurrences(of: ".", with: "")
+
+        // Get year
+        let year = calendar.component(.year, from: date)
+
+        return String(format: "%02d.%@.%d", day, month, year)
+    }
 }
