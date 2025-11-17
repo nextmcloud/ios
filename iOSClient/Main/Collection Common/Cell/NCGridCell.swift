@@ -34,6 +34,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var labelSubinfo: UILabel!
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
+    @IBOutlet weak var iconsStackView: UIStackView!
 
     var ocId = ""
     var ocIdTransfer = ""
@@ -114,6 +115,10 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         imageVisualEffect.clipsToBounds = true
         imageVisualEffect.alpha = 0.5
 
+        iconsStackView.addBlurBackground(style: .systemMaterial)
+        iconsStackView.layer.cornerRadius = 8
+        iconsStackView.clipsToBounds = true
+        
         let longPressedGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gestureRecognizer:)))
         longPressedGesture.minimumPressDuration = 0.5
         longPressedGesture.delegate = self
@@ -179,25 +184,6 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         buttonMore.isHidden = status
     }
 
-//    func selected(_ status: Bool, isEditMode: Bool) {
-//        if isEditMode {
-//            buttonMore.isHidden = true
-//            accessibilityCustomActions = nil
-//        } else {
-//            buttonMore.isHidden = false
-//            setA11yActions()
-//        }
-//        if status {
-//            imageSelect.isHidden = false
-//            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
-//            imageVisualEffect.isHidden = false
-//        } else {
-//            imageSelect.isHidden = true
-//            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
-//            imageVisualEffect.isHidden = true
-//        }
-//    }
-
     func selected(_ status: Bool, isEditMode: Bool) {
         if isEditMode {
             imageSelect.isHidden = false
@@ -209,12 +195,6 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             setA11yActions()
         }
         if status {
-//            var blurEffectView: UIView?
-//            blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
-//            blurEffectView?.backgroundColor = .lightGray
-//            blurEffectView?.frame = self.bounds
-//            blurEffectView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-//            backgroundView = blurEffectView
             imageSelect.image = NCImageCache.shared.getImageCheckedYes()
             imageVisualEffect.isHidden = false
 

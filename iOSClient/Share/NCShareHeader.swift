@@ -174,9 +174,8 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
                 Task {
                     guard let metadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(metadata.ocId) else { return }
                     self.updateFavoriteIcon(isFavorite: metadata.favorite)
+//                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterFavoriteStatusChanged, object: metadata)
                 }
-//                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-//                self.updateFavoriteIcon(isFavorite: metadata.favorite)
             } else {
                 NCContentPresenter().showError(error: error)
             }

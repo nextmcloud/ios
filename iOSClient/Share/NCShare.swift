@@ -123,6 +123,7 @@ class NCShare: UIViewController, NCSharePagingContent {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(reloadData), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDidCreateShareLink), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(handleFavoriteStatusChanged), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterFavoriteStatusChanged), object: nil)
 
         guard let metadata = metadata else { return }
         
@@ -157,6 +158,11 @@ class NCShare: UIViewController, NCSharePagingContent {
         navigationItem.largeTitleDisplayMode = .never
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+//        tableView.reloadData()
+    }
+    
     @objc func exitTapped() {
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateIcons)
         self.dismiss(animated: true, completion: nil)
@@ -326,6 +332,16 @@ class NCShare: UIViewController, NCSharePagingContent {
                 shareLinks.append(item)
             } else {
                 shareEmails.append(item)
+            }
+        }
+    }
+    
+    @objc func handleFavoriteStatusChanged(notification: Notification) {
+        // Retrieve the updated metadata from the notification object
+        if let updatedMetadata = notification.object as? tableMetadata {
+            // Update the table view header with the new metadata
+            if let headerView = tableView.tableHeaderView as? NCShareAdvancePermissionHeader {
+                headerView.setupUI(with: updatedMetadata, linkCount: shareLinks.count, emailCount: shareEmails.count)  // Update header UI with new metadata
             }
         }
     }

@@ -247,7 +247,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
             // Local image: offline
             if let tblDirectory, tblDirectory.offline {
-                cell.fileLocalImage?.image = imageCache.getImageOfflineFlag()
+                cell.fileLocalImage?.image = imageCache.getImageOfflineFlag(colors: [.systemBackground, .systemGreen])
             }
 
             // color folder
@@ -323,9 +323,9 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
             if let tableLocalFile, tableLocalFile.offline {
                 a11yValues.append(NSLocalizedString("_offline_", comment: ""))
-                cell.fileLocalImage?.image = imageCache.getImageOfflineFlag()
+                cell.fileLocalImage?.image = imageCache.getImageOfflineFlag(colors: [.systemBackground, .systemGreen])
             } else if utilityFileSystem.fileProviderStorageExists(metadata) {
-                cell.fileLocalImage?.image = imageCache.getImageLocal()
+                cell.fileLocalImage?.image = imageCache.getImageLocal(colors: [.systemBackground, .systemGreen])
             }
         }
 

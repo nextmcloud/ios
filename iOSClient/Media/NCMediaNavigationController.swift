@@ -37,7 +37,7 @@ class NCMediaNavigationController: NCMainNavigationController {
         }
         //
         let layoutTitle = (layout == global.mediaLayoutRatio) ? NSLocalizedString("_media_square_", comment: "") : NSLocalizedString("_media_ratio_", comment: "")
-        let layoutImage = (layout == global.mediaLayoutRatio) ? utility.loadImage(named: "Applications") : utility.loadImage(named: "ratio-grid")
+        let layoutImage = (layout == global.mediaLayoutRatio) ? utility.loadImage(named: "Applications") : utility.loadImage(named: "ratio-grid").withTintColor(NCBrandColor.shared.iconImageColor)
 
         let select = UIAction(title: NSLocalizedString("_select_", comment: ""),
                               image: utility.loadImage(named: "checkmark.circle")) { _ in
@@ -181,46 +181,46 @@ class NCMediaNavigationController: NCMainNavigationController {
 //            })
 //        ])
         
-        let playFile = UIAction(title: NSLocalizedString("_play_from_files_", comment: ""),
-                                image: utility.loadImage(named: "CirclePlay")) { _ in
-            guard let controller = self.controller else { return }
-            media.documentPickerViewController = NCDocumentPickerViewController(controller: controller, isViewerMedia: true, allowsMultipleSelection: false, viewController: media)
-        }
-
-        let playURL = UIAction(title: NSLocalizedString("_play_from_url_", comment: ""),
-                               image: utility.loadImage(named: "Link")) { _ in
-            let alert = UIAlertController(title: NSLocalizedString("_valid_video_url_", comment: ""), message: nil, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: nil))
-            alert.addTextField(configurationHandler: { textField in
-                textField.placeholder = "http://myserver.com/movie.mkv"
-            })
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in
-                guard let stringUrl = alert.textFields?.first?.text, !stringUrl.isEmpty, let url = URL(string: stringUrl) else {
-                    return
-                }
-                let fileName = url.lastPathComponent
-                Task {
-                    let metadata = await self.database.createMetadataAsync(fileName: fileName,
-                                                                           ocId: NSUUID().uuidString,
-                                                                           serverUrl: "",
-                                                                           url: stringUrl,
-                                                                           session: self.session,
-                                                                           sceneIdentifier: self.controller?.sceneIdentifier)
-                    await self.database.addMetadataAsync(metadata)
-
-                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self) {
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    }
-                }
-            }))
-            self.present(alert, animated: true)
-        }
+//        let playFile = UIAction(title: NSLocalizedString("_play_from_files_", comment: ""),
+//                                image: utility.loadImage(named: "CirclePlay").withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
+//            guard let controller = self.controller else { return }
+//            media.documentPickerViewController = NCDocumentPickerViewController(controller: controller, isViewerMedia: true, allowsMultipleSelection: false, viewController: media)
+//        }
+//
+//        let playURL = UIAction(title: NSLocalizedString("_play_from_url_", comment: ""),
+//                               image: utility.loadImage(named: "Link").withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
+//            let alert = UIAlertController(title: NSLocalizedString("_valid_video_url_", comment: ""), message: nil, preferredStyle: .alert)
+//            alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: nil))
+//            alert.addTextField(configurationHandler: { textField in
+//                textField.placeholder = "http://myserver.com/movie.mkv"
+//            })
+//            alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in
+//                guard let stringUrl = alert.textFields?.first?.text, !stringUrl.isEmpty, let url = URL(string: stringUrl) else {
+//                    return
+//                }
+//                let fileName = url.lastPathComponent
+//                Task {
+//                    let metadata = await self.database.createMetadataAsync(fileName: fileName,
+//                                                                           ocId: NSUUID().uuidString,
+//                                                                           serverUrl: "",
+//                                                                           url: stringUrl,
+//                                                                           session: self.session,
+//                                                                           sceneIdentifier: self.controller?.sceneIdentifier)
+//                    await self.database.addMetadataAsync(metadata)
+//
+//                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self) {
+//                        self.navigationController?.pushViewController(vc, animated: true)
+//                    }
+//                }
+//            }))
+//            self.present(alert, animated: true)
+//        }
 
         let mediaSortMenu = UIMenu(
             title: "",
             options: .displayInline,
             children: actions
         )
-        return UIMenu(title: "", children: [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, mediaSortMenu, playFile, playURL])
+        return UIMenu(title: "", children: [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, mediaSortMenu])//, playFile, playURL])
     }
 }

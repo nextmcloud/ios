@@ -654,7 +654,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let mediaSquare = UIAction(title: NSLocalizedString("_media_square_", comment: ""),
-                                   image: utility.loadImage(named: "square-grid"),
+                                   image: utility.loadImage(named: "square-grid").withTintColor(NCBrandColor.shared.iconImageColor),
                                    state: layoutForView.layout == global.layoutPhotoSquare ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutPhotoSquare
@@ -664,7 +664,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let mediaRatio = UIAction(title: NSLocalizedString("_media_ratio_", comment: ""),
-                                  image: utility.loadImage(named: "ratio-grid"),
+                                  image: utility.loadImage(named: "ratio-grid").withTintColor(NCBrandColor.shared.iconImageColor),
                                   state: layoutForView.layout == self.global.layoutPhotoRatio ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutPhotoRatio
@@ -676,7 +676,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         let viewStyleSubmenu = UIMenu(title: "", options: .displayInline, children: [list, grid, mediaSquare, mediaRatio])
 
         let ascending = layoutForView.ascending
-        let ascendingChevronImage = utility.loadImage(named: ascending ? "chevron.up" : "chevron.down")
+        let ascendingChevronImage = utility.loadImage(named: ascending ? "chevron.up" : "chevron.down").withTintColor(NCBrandColor.shared.iconImageColor)
         let isName = layoutForView.sort == "fileName"
         let isDate = layoutForView.sort == "date"
         let isSize = layoutForView.sort == "size"

@@ -52,7 +52,7 @@ extension NCUtility {
         }
 
 //        image = image?.withTintColor(NCBrandColor.shared.iconImageColor)
-        if let image { return image.withTintColor(NCBrandColor.shared.iconImageColor) }
+        if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
         // see https://stackoverflow.com/questions/71764255
         let sfSymbolName = imageName.replacingOccurrences(of: "_", with: ".")
         let color = colors?.first ?? UIColor.systemGray
@@ -80,7 +80,7 @@ extension NCUtility {
 //            image = UIImage(named: imageName)?.image(color: color, size: size ?? 50)
 //        }
 
-        if let image { return image.withTintColor(NCBrandColor.shared.iconImageColor) }
+        if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
 
         // IMAGES
         if let color = colors?.first, let size {
@@ -105,13 +105,13 @@ extension NCUtility {
 //            image = UIImage(named: imageName)?.image(color: color, size: size)
 //        }
         
-        if let image { return image.withTintColor(NCBrandColor.shared.iconImageColor) }
+        if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
 
         // NO IMAGES FOUND
         if let color = colors?.first, let size {
-            return UIImage(named: "file")!.image(color: color, size: size).withTintColor(NCBrandColor.shared.iconImageColor)
+            return UIImage(named: "file")!.image(color: color, size: size) //.withTintColor(NCBrandColor.shared.iconImageColor)
         } else {
-            return UIImage(named: "file")!.withTintColor(NCBrandColor.shared.iconImageColor)
+            return UIImage(named: "file")! //.withTintColor(NCBrandColor.shared.iconImageColor)
         }
     }
     

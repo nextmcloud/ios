@@ -76,6 +76,7 @@ extension NCMedia: UICollectionViewDataSource {
                 cell.imageStatus.image = livePhotoImage
             }
         }
+        cell.imageSelect.isHidden = !isEditMode ? true : false
 
         if isEditMode, fileSelect.contains(metadata.ocId) {
             cell.selected(true)
