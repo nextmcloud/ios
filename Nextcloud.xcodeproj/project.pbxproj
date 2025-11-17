@@ -108,6 +108,7 @@
 		B549DA702E9E5C9A003B2229 /* NCViewerRichWorkspace.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F7D1611F23CF19E30039EBBF /* NCViewerRichWorkspace.storyboard */; };
 		B549DA722E9E5D0F003B2229 /* TealiumHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566FCF572B3ECD3400168DEA /* TealiumHelper.swift */; };
 		B549DA732E9E6D9D003B2229 /* NCTrashGridCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F7CEE5FE2BA9A5C9003EFD89 /* NCTrashGridCell.xib */; };
+		B551ECA32ECB25960068CD66 /* NCViewerPDF.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F76D3CF42428D0C0005DFA87 /* NCViewerPDF.storyboard */; };
 		B556D5532E97ADC1009F6F35 /* NCPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B556D5522E97ADC1009F6F35 /* NCPreferences.swift */; };
 		B556D5542E97ADC1009F6F35 /* NCPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B556D5522E97ADC1009F6F35 /* NCPreferences.swift */; };
 		B556D5552E97ADC1009F6F35 /* NCPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B556D5522E97ADC1009F6F35 /* NCPreferences.swift */; };
@@ -4150,6 +4151,7 @@
 				F704B5E72430C06700632F5F /* NCCreateFormUploadConflictCell.xib in Resources */,
 				B5BEBDDF2E93B2450002C9E5 /* TextTableViewCell.xib in Resources */,
 				B5BEBDA72E93AF010002C9E5 /* NCEmptyView.xib in Resources */,
+				B551ECA32ECB25960068CD66 /* NCViewerPDF.storyboard in Resources */,
 				F7E402292BA85D1D007E5609 /* PrivacyInfo.xcprivacy in Resources */,
 				F7C9555321F0C4CA0024296E /* NCActivity.storyboard in Resources */,
 				F7BC287E26663F6C004D46C5 /* NCViewCertificateDetails.storyboard in Resources */,
