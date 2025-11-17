@@ -185,12 +185,18 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func selected(_ status: Bool, isEditMode: Bool) {
+        // E2EE - remove encrypt folder selection
+        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), metadata.e2eEncrypted {
+            imageSelect.isHidden = true
+        } else {
+            imageSelect.isHidden = isEditMode ? false : true
+        }
         if isEditMode {
-            imageSelect.isHidden = false
+//            imageSelect.isHidden = false
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
         } else {
-            imageSelect.isHidden = true
+//            imageSelect.isHidden = true
             buttonMore.isHidden = false
             setA11yActions()
         }

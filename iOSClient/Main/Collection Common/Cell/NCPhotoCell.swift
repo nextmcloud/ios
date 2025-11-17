@@ -122,13 +122,20 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProt
     }
 
     func selected(_ status: Bool, isEditMode: Bool) {
+        // E2EE - remove encrypt folder selection
+        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), metadata.e2eEncrypted {
+            imageSelect.isHidden = true
+        } else {
+            imageSelect.isHidden = isEditMode ? false : true
+        }
         if status {
-            imageSelect.isHidden = false
+//            imageSelect.isHidden = false
             imageVisualEffect.isHidden = false
             imageSelect.image = NCImageCache.shared.getImageCheckedYes()
         } else {
-            imageSelect.isHidden = true
+//            imageSelect.isHidden = true
             imageVisualEffect.isHidden = true
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
         }
     }
 

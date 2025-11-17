@@ -37,7 +37,7 @@ class NCMediaNavigationController: NCMainNavigationController {
         }
         //
         let layoutTitle = (layout == global.mediaLayoutRatio) ? NSLocalizedString("_media_square_", comment: "") : NSLocalizedString("_media_ratio_", comment: "")
-        let layoutImage = (layout == global.mediaLayoutRatio) ? utility.loadImage(named: "Applications") : utility.loadImage(named: "ratio-grid").withTintColor(NCBrandColor.shared.iconImageColor)
+        let layoutImage = (layout == global.mediaLayoutRatio) ? utility.loadImage(named: "Applications").withTintColor(NCBrandColor.shared.iconImageColor) : utility.loadImage(named: "ratio-grid").withTintColor(NCBrandColor.shared.iconImageColor)
 
         let select = UIAction(title: NSLocalizedString("_select_", comment: ""),
                               image: utility.loadImage(named: "checkmark.circle")) { _ in
