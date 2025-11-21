@@ -153,10 +153,24 @@ extension tableMetadata {
         return true
     }
 
+    var isPrintable: Bool {
+        if isDocumentViewableOnly {
+            return false
+        }
+        if ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/") || classFile == NKTypeClassFile.image.rawValue {
+            return true
+        }
+        return false
+    }
+    
     var isSavebleInCameraRoll: Bool {
         return (classFile == NKTypeClassFile.image.rawValue && contentType != "image/svg+xml") || classFile == NKTypeClassFile.video.rawValue
     }
 
+    var isDocumentViewableOnly: Bool {
+        sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKTypeClassFile.document.rawValue
+    }
+    
     var isAudioOrVideo: Bool {
         return classFile == NKTypeClassFile.audio.rawValue || classFile == NKTypeClassFile.video.rawValue
     }

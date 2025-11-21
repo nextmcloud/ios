@@ -69,7 +69,7 @@ enum NCSharePermissions {
         let canCreate = hasPermissionToCreate(permission)
         let canEdit = hasPermissionToEdit(permission)
         let canDelete = hasPermissionToDelete(permission)
-        return canCreate || canEdit || canDelete
+        return canCreate || canEdit //|| canDelete
     }
 
     /// "Can edit" means it has can read, create, edit, and delete.
@@ -78,7 +78,7 @@ enum NCSharePermissions {
         let canCreate = isDirectory ? hasPermissionToCreate(permission) : true
         let canEdit = hasPermissionToEdit(permission)
         let canDelete = isDirectory ? hasPermissionToDelete(permission) : true
-        return canCreate && canEdit && canRead && canDelete
+        return canCreate && canEdit && canRead //&& canDelete
     }
 
     /// Read permission is always true for a share, hence why it's not here.
@@ -95,9 +95,9 @@ enum NCSharePermissions {
         if canEdit {
             permission = permission + permissionEditShare
         }
-        if canDelete && isDirectory {
-            permission = permission + permissionDeleteShare
-        }
+//        if canDelete && isDirectory {
+//            permission = permission + permissionDeleteShare
+//        }
         if canShare {
             permission = permission + permissionReshareShare
         }

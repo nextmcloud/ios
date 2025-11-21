@@ -143,7 +143,7 @@ class NCShare: UIViewController, NCSharePagingContent {
 //                checkSharedWithYou()
             }
             
-            reloadData()
+//            reloadData()
 
             networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session)
             let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing
@@ -357,7 +357,8 @@ class NCShare: UIViewController, NCSharePagingContent {
             return emailPred.evaluate(with: email)
         }
         guard let searchString = textField.text, !searchString.isEmpty else { return }
-        if searchString.contains("@"), !isValidEmail(searchString) { return }
+//        if searchString.contains("@"), !isValidEmail(searchString) { return }
+        if searchString.contains("@"), !utility.validateEmail(searchString) { return }
         networking?.getSharees(searchString: searchString)
     }
 
@@ -473,15 +474,15 @@ extension NCShare: NCShareNetworkingDelegate {
         }
 
         // close keyboard
-        self.view.endEditing(true)
+//        self.view.endEditing(true)
 
         dropDown = DropDown()
         let appearance = DropDown.appearance()
 
-        // Setting up the blur effect
-        let blurEffect = UIBlurEffect(style: .light) // You can choose .dark, .extraLight, or .light
-        let blurEffectView = UIVisualEffectView(effect: blurEffect)
-        blurEffectView.frame = CGRect(x: 0, y: 0, width: 500, height: 20)
+//        // Setting up the blur effect
+//        let blurEffect = UIBlurEffect(style: .light) // You can choose .dark, .extraLight, or .light
+//        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+//        blurEffectView.frame = CGRect(x: 0, y: 0, width: 500, height: 20)
 
         appearance.backgroundColor = .systemBackground
         appearance.cornerRadius = 10
@@ -490,6 +491,7 @@ extension NCShare: NCShareNetworkingDelegate {
         appearance.shadowRadius = 30
         appearance.animationduration = 0.25
         appearance.textColor = .darkGray
+        appearance.setupMaskedCorners([.layerMaxXMaxYCorner, .layerMinXMaxYCorner])
 
         let account = NCManageDatabase.shared.getTableAccount(account: metadata.account)
         let existingShares = NCManageDatabase.shared.getTableShares(metadata: metadata)
@@ -510,6 +512,7 @@ extension NCShare: NCShareNetworkingDelegate {
         dropDown.bottomOffset = CGPoint(x: 10, y: textField?.bounds.height ?? 0)
         dropDown.width = (textField?.bounds.width ?? 0) - 20
         dropDown.direction = .bottom
+//        dropDown.bottomOffset = CGPoint(x: 0, y: textField?.bounds.height ?? 0)
 //        dropDown.width = textField?.bounds.width ?? 0
 //        if (UIDevice.current.userInterfaceIdiom == .phone || UIDevice.current.orientation.isLandscape), UIScreen.main.bounds.width < 1111  {
 //            dropDown.topOffset = CGPoint(x: 0, y: -(textField?.bounds.height ?? 0))
@@ -518,6 +521,7 @@ extension NCShare: NCShareNetworkingDelegate {
 //            dropDown.bottomOffset = CGPoint(x: 0, y: (textField?.bounds.height ?? 0) - 80)
 //            dropDown.direction = .any
 //        }
+
         dropDown.cellNib = UINib(nibName: "NCSearchUserDropDownCell", bundle: nil)
         dropDown.customCellConfiguration = { (index: Index, _, cell: DropDownCell) in
             guard let cell = cell as? NCSearchUserDropDownCell else { return }
@@ -526,6 +530,8 @@ extension NCShare: NCShareNetworkingDelegate {
         }
 
         dropDown.selectionAction = { index, _ in
+            self.textField?.text = ""
+            self.textField?.resignFirstResponder()
             let sharee = sharees[index]
             guard
                 let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
@@ -779,7 +785,7 @@ extension NCShare: UISearchBarDelegate {
         if searchText.isEmpty {
             dropDown.hide()
         } else {
-            perform(#selector(searchSharees(_:)), with: nil, afterDelay: 1)
+            perform(#selector(searchSharees(_:)), with: nil, afterDelay: 0.5)
         }
     }
 

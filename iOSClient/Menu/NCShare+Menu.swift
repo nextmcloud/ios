@@ -26,7 +26,7 @@ import UIKit
 import NextcloudKit
 
 extension NCShare {
-    func toggleShareMenu(for share: tableShare, sender: Any?) {
+    func toggleShareMenu(for share: tableShare, sendMail: Bool, folder: Bool, sender: Any) {
         let capabilities = NCNetworking.shared.capabilities[self.metadata.account] ?? NKCapabilities.Capabilities()
         var actions = [NCMenuAction]()
 
@@ -42,11 +42,26 @@ extension NCShare {
                 )
             )
         }
+        
+        if !folder {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_open_in_", comment: ""),
+                    icon: utility.loadImage(named: "viewInFolder", colors: [NCBrandColor.shared.brandElement]),
+                    sender: sender,
+                    action: { _ in
+                        NCShareCommon.copyLink(link: share.url, viewController: self, sender: sender)
+                    }
+                )
+            )
+        }
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_details_", comment: ""),
-                icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
+//                title: NSLocalizedString("_details_", comment: ""),
+//                icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
+                title: NSLocalizedString("_advance_permissions_", comment: ""),
+                icon: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.brandElement]),
                 accessibilityIdentifier: "shareMenu/details",
                 sender: sender,
                 action: { _ in
@@ -67,15 +82,33 @@ extension NCShare {
             )
         )
 
+        if sendMail {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_send_new_email_", comment: ""),
+                    icon: utility.loadImage(named: "email", colors: [NCBrandColor.shared.brandElement]),
+                    sender: sender,
+                    action: { menuAction in
+                        let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+                        guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
+                        viewNewUserComment.metadata = self.metadata
+                        viewNewUserComment.share = tableShare(value: share)
+//                        viewNewUserComment.networking = self.networking
+                        self.navigationController?.pushViewController(viewNewUserComment, animated: true)
+                    }
+                )
+            )
+        }
+        
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_share_unshare_", comment: ""),
-                destructive: true,
-                icon: utility.loadImage(named: "person.2.slash"),
+                icon: utility.loadImage(named: "trash", colors: [NCBrandColor.shared.brandElement]),
                 sender: sender,
                 action: { _ in
                     Task {
                         if share.shareType != NCShareCommon.shareTypeLink, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+                            let serverUrl = metadata.serverUrl + "/" + metadata.fileName
                             if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
                                 let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
                                 return NCContentPresenter().showInfo(error: error)
@@ -90,7 +123,30 @@ extension NCShare {
                 }
             )
         )
-
+//        actions.append(
+//            NCMenuAction(
+//                title: NSLocalizedString("_share_unshare_", comment: ""),
+//                destructive: true,
+//                icon: utility.loadImage(named: "person.2.slash"),
+//                sender: sender,
+//                action: { _ in
+//                    Task {
+//                        if share.shareType != NCShareCommon.shareTypeLink, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+//                            if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
+//                                let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
+//                                return NCContentPresenter().showInfo(error: error)
+//                            }
+//                            let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: metadata.serverUrlFileName, addUserId: nil, removeUserId: share.shareWith, account: metadata.account)
+//                            if error != .success {
+//                                return NCContentPresenter().showError(error: error)
+//                            }
+//                        }
+//                        self.networking?.unShare(idShare: share.idShare)
+//                    }
+//                }
+//            )
+//        )
+        
         self.presentMenu(with: actions, sender: sender)
     }
 
@@ -120,26 +176,27 @@ extension NCShare {
                     self.updateSharePermissions(share: share, permissions: permissions)
                 }
             ),
-            NCMenuAction(
-                title: NSLocalizedString("_custom_permissions_", comment: ""),
-                icon: utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor]),
-                sender: sender,
-                action: { _ in
-                    guard
-                        let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
-                        let navigationController = self.navigationController, !share.isInvalidated else { return }
-                    advancePermission.networking = self.networking
-                    advancePermission.share = tableShare(value: share)
-                    advancePermission.oldTableShare = tableShare(value: share)
-                    advancePermission.metadata = self.metadata
-
-                    if let downloadLimit = try? self.database.getDownloadLimit(byAccount: self.metadata.account, shareToken: share.token) {
-                        advancePermission.downloadLimit = .limited(limit: downloadLimit.limit, count: downloadLimit.count)
-                    }
-
-                    navigationController.pushViewController(advancePermission, animated: true)
-                }
-            )]
+//            NCMenuAction(
+//                title: NSLocalizedString("_custom_permissions_", comment: ""),
+//                icon: utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor]),
+//                sender: sender,
+//                action: { _ in
+//                    guard
+//                        let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
+//                        let navigationController = self.navigationController, !share.isInvalidated else { return }
+//                    advancePermission.networking = self.networking
+//                    advancePermission.share = tableShare(value: share)
+//                    advancePermission.oldTableShare = tableShare(value: share)
+//                    advancePermission.metadata = self.metadata
+//
+//                    if let downloadLimit = try? self.database.getDownloadLimit(byAccount: self.metadata.account, shareToken: share.token) {
+//                        advancePermission.downloadLimit = .limited(limit: downloadLimit.limit, count: downloadLimit.count)
+//                    }
+//
+//                    navigationController.pushViewController(advancePermission, animated: true)
+//                }
+//            )
+            ]
         )
 
         if isDirectory && (share.shareType == NCShareCommon.shareTypeLink /* public link */ || share.shareType == NCShareCommon.shareTypeEmail) {

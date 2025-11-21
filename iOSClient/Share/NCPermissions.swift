@@ -97,9 +97,9 @@ class NCPermissions: NSObject {
         if canChange && isDirectory {
             permission = permission + permissionUpdateShare
         }
-        if canDelete && isDirectory {
-            permission = permission + permissionDeleteShare
-        }
+//        if canDelete && isDirectory {
+//            permission = permission + permissionDeleteShare
+//        }
         if canShare {
             permission = permission + permissionShareShare
         }

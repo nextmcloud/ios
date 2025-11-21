@@ -40,7 +40,7 @@ class NCMediaNavigationController: NCMainNavigationController {
         let layoutImage = (layout == global.mediaLayoutRatio) ? utility.loadImage(named: "Applications").withTintColor(NCBrandColor.shared.iconImageColor) : utility.loadImage(named: "ratio-grid").withTintColor(NCBrandColor.shared.iconImageColor)
 
         let select = UIAction(title: NSLocalizedString("_select_", comment: ""),
-                              image: utility.loadImage(named: "checkmark.circle")) { _ in
+                              image: utility.loadImage(named: "selectFull")) { _ in
             media.setEditMode(true)
         }
 

@@ -71,7 +71,7 @@ extension NCTrash {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_restore_", comment: ""),
-                icon: utility.loadImage(named: "arrow.counterclockwise", colors: [NCBrandColor.shared.iconImageColor]),
+                icon: utility.loadImage(named: "restore", colors: [NCBrandColor.shared.iconImageColor]),
                 sender: sender,
                 action: { _ in
                     Task {
@@ -85,7 +85,7 @@ extension NCTrash {
             NCMenuAction(
                 title: NSLocalizedString("_delete_", comment: ""),
                 destructive: true,
-                icon: utility.loadImage(named: "trash", colors: [.red]),
+                icon: utility.loadImage(named: "trash", colors: [NCBrandColor.shared.iconColor]),
                 sender: sender,
                 action: { _ in
                     Task {

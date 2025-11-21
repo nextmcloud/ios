@@ -9,7 +9,7 @@ enum ContextMenuActions {
     static func deleteOrUnshare(selectedMetadatas: [tableMetadata], metadataFolder: tableMetadata? = nil, controller: NCMainTabBarController?, completion: (() -> Void)? = nil) -> UIAction {
          var titleDelete = NSLocalizedString("_delete_", comment: "")
          var message = NSLocalizedString("_want_delete_", comment: "")
-         var icon = "trash"
+//         var icon = "trash"
          var destructive = false
 
          if selectedMetadatas.count > 1 {
@@ -20,7 +20,7 @@ enum ContextMenuActions {
                                                                  metadataFolder: metadataFolder) {
                  titleDelete = NSLocalizedString("_leave_share_", comment: "")
                  message = NSLocalizedString("_want_leave_share_", comment: "")
-                 icon = "person.2.slash"
+//                 icon = "person.2.slash"
              } else if metadata.directory {
                  titleDelete = NSLocalizedString("_delete_folder_", comment: "")
                  destructive = true
@@ -32,7 +32,7 @@ enum ContextMenuActions {
 
          return UIAction(
              title: titleDelete,
-             image: UIImage(systemName: icon)?.withTintColor(NCBrandColor.shared.iconImageColor),
+             image: UIImage(named: "trash")!.withTintColor(NCBrandColor.shared.iconImageColor),
              attributes: destructive ? [.destructive] : []
          ) { _ in
              let alert = UIAlertController.deleteFileOrFolder(
@@ -157,4 +157,76 @@ enum ContextMenuActions {
              completion?()
          }
      }
+    
+    /// Save selected files to user's photo library
+    static func saveMediaAction(selectedMediaMetadatas: [tableMetadata], controller: NCMainTabBarController?, completion: (() -> Void)? = nil) -> UIAction {
+        var title: String = NSLocalizedString("_save_selected_files_", comment: "")
+        var icon = NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconColor])
+        if selectedMediaMetadatas.allSatisfy({ NCManageDatabase.shared.getMetadataLivePhoto(metadata: $0) != nil }) {
+            title = NSLocalizedString("_livephoto_save_", comment: "")
+            icon = NCUtility().loadImage(named: "livephoto")
+        }
+
+        return UIAction(
+            title: title,
+            image: icon,
+        ) { _ in
+            for metadata in selectedMediaMetadatas {
+                if let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) {
+                    NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: metadata, metadataMOV: metadataMOV, hudView: controller?.view ?? UIView()))
+                } else {
+                    if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
+                        NCDownloadAction.shared.saveAlbum(metadata: metadata, controller: controller)
+                    } else {
+                        if NCNetworking.shared.downloadQueue.operations.filter({ ($0 as? NCOperationDownload)?.metadata.ocId == metadata.ocId }).isEmpty {
+                            NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorSaveAlbum))
+                        }
+                    }
+                }
+            }
+            completion?()
+        }
+    }
+    
+    /// Copy files to pasteboard
+    static func copyAction(fileSelect: [String], controller: NCMainTabBarController?, completion: (() -> Void)? = nil) -> UIAction {
+        UIAction(
+            title: NSLocalizedString("_copy_file_", comment: ""),
+            image: NCUtility().loadImage(named: "copy", colors: [NCBrandColor.shared.iconColor])
+        ) { _ in
+                NCDownloadAction.shared.copyPasteboard(pasteboardOcIds: fileSelect, controller: controller)
+                completion?()
+        }
+    }
+    
+    /// Open view that lets the user move or copy the files within Nextcloud
+    static func moveOrCopyAction(selectedMetadatas: [tableMetadata], account: String, controller: NCMainTabBarController, completion: (() -> Void)? = nil) -> UIAction {
+        UIAction(
+            title: NSLocalizedString("_move_or_copy_", comment: ""),
+            image: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconImageColor])
+        ) { _ in
+                Task { @MainActor in
+                    var fileNameError: NKError?
+                    let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
+
+                    for metadata in selectedMetadatas {
+                        if let sceneIdentifier = metadata.sceneIdentifier,
+                           let controller = SceneManager.shared.getController(sceneIdentifier: sceneIdentifier),
+                           let checkError = FileNameValidator.checkFileName(metadata.fileNameView, account: controller.account, capabilities: capabilities) {
+
+                            fileNameError = checkError
+                            break
+                        }
+                    }
+
+                    if let fileNameError {
+                        let message = "\(fileNameError.errorDescription) \(NSLocalizedString("_please_rename_file_", comment: ""))"
+                        await UIAlertController.warningAsync( message: message, presenter: controller.topMostViewController())
+                    } else {
+                        NCDownloadAction.shared.openSelectView(items: selectedMetadatas, controller: controller)
+                    }
+                    completion?()
+                }
+        }
+    }
 }

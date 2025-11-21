@@ -770,7 +770,8 @@
 "_share_editing_"               = "Can edit";
 "_share_file_drop_"             = "Filedrop only";
 "_share_hide_download_"         = "Prevent download";
-"_share_note_recipient_"        = "YOUR MESSAGE";
+//"_share_note_recipient_"        = "YOUR MESSAGE";
+"_share_note_recipient_"        = "Note to recipient";
 "_shareLinksearch_placeholder_" = "Contact name or email address";
 "_shareLinksearch_mail_placeholder_" = "Type a name or an email and press Enter";
 "_new_comment_"                 = "New comment …";

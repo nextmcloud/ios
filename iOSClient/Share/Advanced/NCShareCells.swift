@@ -69,7 +69,7 @@ enum NCUserPermission: CaseIterable, NCPermission {
         case .reshare: NCSharePermissions.permissionReshareShare
         case .edit: NCSharePermissions.permissionEditShare
         case .create: NCSharePermissions.permissionCreateShare
-        case .delete: NCSharePermissions.permissionDeleteShare
+//        case .delete: NCSharePermissions.permissionDeleteShare
         }
     }
 
@@ -89,7 +89,7 @@ enum NCUserPermission: CaseIterable, NCPermission {
         return []
     }
 
-    case read, reshare, edit, create, delete
+    case read, reshare, edit, create//, delete
     static let forDirectory: [NCUserPermission] = NCUserPermission.allCases
     static let forFile: [NCUserPermission] = [.read, .reshare, .edit]
 
@@ -99,7 +99,7 @@ enum NCUserPermission: CaseIterable, NCPermission {
         case .reshare: return NSLocalizedString("_share_can_reshare_", comment: "")
         case .edit: return NSLocalizedString("_share_can_change_", comment: "")
         case .create: return NSLocalizedString("_share_can_create_", comment: "")
-        case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
+//        case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
         }
     }
 }
@@ -126,7 +126,7 @@ enum NCLinkEmailPermission: CaseIterable, NCPermission {
         case .read: NCSharePermissions.permissionReadShare
         case .edit: NCSharePermissions.permissionEditShare
         case .create: NCSharePermissions.permissionCreateShare
-        case .delete: NCSharePermissions.permissionDeleteShare
+//        case .delete: NCSharePermissions.permissionDeleteShare
         }
     }
 
@@ -143,11 +143,11 @@ enum NCLinkEmailPermission: CaseIterable, NCPermission {
         case .read: return NSLocalizedString("_share_can_read_", comment: "")
         case .edit: return NSLocalizedString("_share_can_change_", comment: "")
         case .create: return NSLocalizedString("_share_can_create_", comment: "")
-        case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
+//        case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
         }
     }
 
-    case edit, read, create, delete
+    case edit, read, create//, delete
     static let forDirectory: [NCLinkEmailPermission] = NCLinkEmailPermission.allCases
     static let forFile: [NCLinkEmailPermission] = [.read, .edit]
 }

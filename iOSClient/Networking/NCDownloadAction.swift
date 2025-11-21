@@ -120,6 +120,14 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
 
             self.openActivityViewController(selectedMetadata: [metadata], controller: controller, sender: nil)
 
+        case NCGlobal.shared.selectorPrint:
+            // waiting close menu
+            // https://github.com/nextcloud/ios/issues/2278
+//            DispatchQueue.main.async {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.printDocument(metadata: metadata)
+            }
+            
         case NCGlobal.shared.selectorSaveAlbum:
 
             self.saveAlbum(metadata: metadata, controller: controller)
@@ -721,5 +729,46 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
         if let navigationController = navigationController {
             controller?.present(navigationController, animated: true, completion: nil)
         }
+    }
+    
+    // MARK: - Print
+
+    func printDocument(metadata: tableMetadata) {
+
+        let fileNameURL = URL(fileURLWithPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                                 fileName: metadata.fileNameView,
+                                                                                                 userId: metadata.userId,
+                                                                                                 urlBase: metadata.urlBase))
+        let printController = UIPrintInteractionController.shared
+        let printInfo = UIPrintInfo(dictionary: nil)
+
+        printInfo.jobName = fileNameURL.lastPathComponent
+        printInfo.outputType = metadata.isImage ? .photo : .general
+        printController.printInfo = printInfo
+        printController.showsNumberOfCopies = true
+
+        guard !UIPrintInteractionController.canPrint(fileNameURL) else {
+            printController.printingItem = fileNameURL
+            printController.present(animated: true)
+            return
+        }
+
+        // can't print without data
+        guard let data = try? Data(contentsOf: fileNameURL) else { return }
+
+        if let svg = SVGKImage(data: data) {
+            printController.printingItem = svg.uiImage
+            printController.present(animated: true)
+            return
+        }
+
+        guard let text = String(data: data, encoding: .utf8) else { return }
+        let formatter = UISimpleTextPrintFormatter(text: text)
+        formatter.perPageContentInsets.top = 72
+        formatter.perPageContentInsets.bottom = 72
+        formatter.perPageContentInsets.left = 72
+        formatter.perPageContentInsets.right = 72
+        printController.printFormatter = formatter
+        printController.present(animated: true)
     }
 }

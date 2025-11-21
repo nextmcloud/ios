@@ -53,7 +53,7 @@ class NCContextMenu: NSObject {
         
         let titleOffline = isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: "")
 
-        let offline = UIAction(title: titleOffline, image: UIImage(systemName: "tray.and.arrow.down")) { _ in
+        let offline = UIAction(title: titleOffline, image: utility.loadImage(named: "cloudDownload", colors: [NCBrandColor.shared.iconImageColor])) { _ in
             Task {
                 await NCDownloadAction.shared.setMetadataAvalableOffline(self.metadata, isOffline: isOffline)
                 if let viewController = self.viewController as? NCCollectionViewCommon {
@@ -64,6 +64,8 @@ class NCContextMenu: NSObject {
         
         let print = UIAction(title: NSLocalizedString("_print_", comment: ""), image: UIImage(systemName: "printer") ) { _ in
 //            NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint))
+            NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: self.metadata, selector: NCGlobal.shared.selectorPrint))
+
         }
         
         let moveCopy = UIAction(title: NSLocalizedString("_move_or_copy_", comment: ""), image: UIImage(systemName: "arrow.up.right.square")) { action in
@@ -113,7 +115,7 @@ class NCContextMenu: NSObject {
         let favorite = UIAction(title: metadata.favorite ?
                                 NSLocalizedString("_remove_favorites_", comment: "") :
                                 NSLocalizedString("_add_favorites_", comment: ""),
-                                image: utility.loadImage(named: self.metadata.favorite ? "star.slash" : "star", colors: [NCBrandColor.shared.yellowFavorite])) { _ in
+                                image: utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])) { _ in
             self.networking.favoriteMetadata(self.metadata) { error in
                 if error != .success {
                     NCContentPresenter().showError(error: error)
@@ -163,7 +165,7 @@ class NCContextMenu: NSObject {
         }
 
         let viewInFolder = UIAction(title: NSLocalizedString("_view_in_folder_", comment: ""),
-                                    image: utility.loadImage(named: "questionmark.folder")) { _ in
+                                    image: UIImage(systemName: "arrow.forward.square")) { _ in
             NCDownloadAction.shared.openFileViewInFolder(serverUrl: self.metadata.serverUrl, fileNameBlink: self.metadata.fileName, fileNameOpen: nil, sceneIdentifier: self.sceneIdentifier)
         }
         

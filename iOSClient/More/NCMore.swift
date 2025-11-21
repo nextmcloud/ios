@@ -34,6 +34,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var progressQuota: UIProgressView!
     @IBOutlet weak var viewQuota: UIView!
 
+    private var userMenu: [NKExternalSite] = []
     private var functionMenu: [NKExternalSite] = []
     private var externalSiteMenu: [NKExternalSite] = []
     private var settingsMenu: [NKExternalSite] = []
@@ -110,6 +111,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         var quota: String = ""
 
         // Clear
+        userMenu.removeAll()
         functionMenu.removeAll()
         externalSiteMenu.removeAll()
         settingsMenu.removeAll()
@@ -118,6 +120,14 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         labelQuotaExternalSite.text = ""
         progressQuota.progressTintColor = NCBrandColor.shared.getElement(account: session.account)
 
+        // ITEM : User
+        item = NKExternalSite()
+        item.name = tableAccount.email
+        item.icon = "user"//utility.loadUserImage(for: tableAccount.user, displayName: tableAccount.displayName, urlBase: tableAccount.urlBase)
+//        item.url = "segueRecent"
+//        item.order = 10
+        userMenu.append(item)
+        
         // ITEM : Recent
         item = NKExternalSite()
         item.name = "_recent_"
@@ -257,6 +267,10 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         if !NCBrandOptions.shared.disable_show_more_nextcloud_apps_in_settings {
             sections.append(Section(items: [NKExternalSite()], type: .moreApps))
         }
+        
+        if !userMenu.isEmpty {
+            sections.append(Section(items: userMenu, type: .regular))
+        }
 
         if !functionMenu.isEmpty {
             sections.append(Section(items: functionMenu, type: .regular))
@@ -329,7 +343,12 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
             cell.labelText?.text = NSLocalizedString(item.name, comment: "")
             cell.labelText.textColor = NCBrandColor.shared.textColor
 
-            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account))
+            if item.name != tableAccount?.email {
+                cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            }
+            
+//            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
 
             cell.separator.backgroundColor = .separator
             cell.separatorHeigth.constant = 0.4

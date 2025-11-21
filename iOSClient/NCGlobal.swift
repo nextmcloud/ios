@@ -244,6 +244,8 @@ final class NCGlobal: Sendable {
     let selectorSaveAsScan                      = "saveAsScan"
     let selectorOpenDetail                      = "openDetail"
     let selectorSynchronizationOffline          = "synchronizationOffline"
+    let selectorPrint                           = "print"
+    let selectorDeleteFile                      = "deleteFile"
 
     // Metadata : Status
     //

@@ -68,23 +68,24 @@ enum NCShareCommon {
         }
     }
 
-    static func getImageShareType(shareType: Int) -> UIImage? {
+    static func getImageShareType(shareType: Int, isDropDown:Bool = false) -> UIImage? {
 
         switch shareType {
         case NCShareCommon.shareTypeUser:
-            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+            return UIImage(named: "shareTypeEmail")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         case NCShareCommon.shareTypeGroup:
             return UIImage(named: "shareTypeGroup")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         case NCShareCommon.shareTypeLink:
             return UIImage(named: "shareTypeLink")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         case NCShareCommon.shareTypeEmail:
-            return UIImage(named: "shareTypeEmail")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+            return UIImage(named: isDropDown ? "email" : "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         case NCShareCommon.shareTypeContact:
             return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         case NCShareCommon.shareTypeFederated:
             return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         case NCShareCommon.shareTypeTeam:
-            return UIImage(named: "shareTypeTeam")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+//            return UIImage(named: "shareTypeTeam")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+            return UIImage(named: "shareTypeCircles")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         case NCShareCommon.shareTypeGuest:
             return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         case NCShareCommon.shareTypeFederatedGroup:

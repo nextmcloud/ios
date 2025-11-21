@@ -81,7 +81,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_details_", comment: ""),
-                    icon: utility.loadImage(named: "share", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "info.circle", colors: [NCBrandColor.shared.iconImageColor]),
                     order: 10,
                     sender: sender,
                     action: { _ in
@@ -133,7 +133,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_view_in_folder_", comment: ""),
-                    icon: utility.loadImage(named: "questionmark.folder", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "arrow.forward.square", colors: [NCBrandColor.shared.iconImageColor]),
                     order: 21,
                     sender: sender,
                     action: { _ in
@@ -220,7 +220,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
-                    icon: utility.loadImage(named: metadata.favorite ? "star.slash" : "star", colors: [NCBrandColor.shared.yellowFavorite]),
+                    icon: utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite]),
                     order: 50,
                     sender: sender,
                     action: { _ in
@@ -251,6 +251,20 @@ extension NCCollectionViewCommon {
         //
         if (NCNetworking.shared.isOnline || (tableLocalFile != nil && fileExists)) && metadata.canShare {
             actions.append(.share(selectedMetadatas: [metadata], controller: self.controller, order: 80, sender: sender))
+        }
+        
+        //
+        // PRINT
+        //
+        if metadata.isPrintable {
+            actions.append(.printAction(metadata: metadata, order: 90, sender: sender))
+        }
+        
+        //
+        // SAVE CAMERA ROLL
+        //
+        if metadata.isSavebleInCameraRoll {
+            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller, order: 100, sender: sender))
         }
 
         //
@@ -314,7 +328,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
-                    icon: utility.loadImage(named: "RenameMenu", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.iconImageColor]),
                     order: 120,
                     sender: sender,
                     action: { _ in
@@ -340,6 +354,14 @@ extension NCCollectionViewCommon {
         if metadata.isCopyableMovable {
             actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], account: metadata.account, viewController: self, order: 130, sender: sender))
         }
+        
+        //
+        // COPY IN PASTEBOARD
+        //
+        if metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE  {
+            actions.append(.copyAction(fileSelect: [metadata.ocId], controller: self.controller, order: 140, sender: sender))
+        }
+        
 
         //
         // MODIFY WITH QUICK LOOK
