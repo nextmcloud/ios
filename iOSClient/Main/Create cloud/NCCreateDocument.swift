@@ -29,9 +29,10 @@ class NCCreateDocument: NSObject {
     let utility = NCUtility()
     let database = NCManageDatabase.shared
     let global = NCGlobal.shared
+//    var fileNameExtension = ""
 
     @MainActor
-    func createDocument(controller: NCMainTabBarController, fileNamePath: String, fileName: String, editorId: String, creatorId: String? = nil, templateId: String, account: String) async {
+    func createDocument(controller: NCMainTabBarController, fileNamePath: String, fileName: String, fileNameExtension: String = "", editorId: String, creatorId: String? = nil, templateId: String, account: String) async {
         let session = NCSession.shared.getSession(account: account)
         guard let viewController = controller.currentViewController() else {
             return
@@ -58,15 +59,24 @@ class NCCreateDocument: NSObject {
             guard results.error == .success, let url = results.url else {
                 return NCContentPresenter().showError(error: results.error)
             }
-            let metadata = await self.database.createMetadataAsync(fileName: fileName,
-                                                                   ocId: UUID,
-                                                                   serverUrl: serverUrl,
-                                                                   url: url,
-                                                                   session: session,
-                                                                   sceneIdentifier: controller.sceneIdentifier)
-            if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: viewController) {
-                viewController.navigationController?.pushViewController(vc, animated: true)
-            }
+            
+            var result = await NKTypeIdentifiers.shared.getInternalType(fileName: fileName, mimeType: "", directory: false, account: session.account)
+
+            controller.dismiss(animated: true, completion: {
+                
+                Task {
+                    let metadata = await self.database.createMetadataAsync(fileName: fileName,
+                                                                           ocId: UUID,
+                                                                           serverUrl: serverUrl,
+                                                                           url: url,
+                                                                           contentType: result.mimeType.isEmpty ? "text/x-markdown" : result.mimeType,
+                                                                           session: session,
+                                                                           sceneIdentifier: controller.sceneIdentifier)
+                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: viewController) {
+                        viewController.navigationController?.pushViewController(vc, animated: true)
+                    }
+                }
+            })
 
         } else if editorId == "collabora" {
 
@@ -82,16 +92,23 @@ class NCCreateDocument: NSObject {
                 return NCContentPresenter().showError(error: results.error)
             }
 
-            let metadata = await self.database.createMetadataAsync(fileName: fileName,
-                                                                   ocId: UUID,
-                                                                   serverUrl: serverUrl,
-                                                                   url: url,
-                                                                   session: session,
-                                                                   sceneIdentifier: controller.sceneIdentifier)
-
-            if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: viewController) {
-                viewController.navigationController?.pushViewController(vc, animated: true)
-            }
+            controller.dismiss(animated: true, completion: {
+                
+                Task {
+                    let createFileName = (fileName as NSString).deletingPathExtension + "." + fileNameExtension
+                    let metadata = await self.database.createMetadataAsync(fileName: createFileName,
+                                                                           ocId: UUID,
+                                                                           serverUrl: serverUrl,
+                                                                           url: url,
+                                                                           session: session,
+                                                                           sceneIdentifier: controller.sceneIdentifier)
+                    AnalyticsHelper.shared.trackCreateFile(metadata: metadata)
+                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: viewController) {
+                        viewController.navigationController?.pushViewController(vc, animated: true)
+                    }
+                }
+           })
+            
         }
     }
 

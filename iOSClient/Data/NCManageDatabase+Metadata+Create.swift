@@ -332,6 +332,7 @@ extension NCManageDatabase {
                              ocId: String,
                              serverUrl: String,
                              url: String = "",
+                             contentType: String? = "",
                              isUrl: Bool = false,
                              name: String = NCGlobal.shared.appName,
                              subline: String? = nil,
@@ -347,13 +348,18 @@ extension NCManageDatabase {
             metadata.typeIdentifier = "public.url"
         } else {
             let results = await NKTypeIdentifiers.shared.getInternalType(fileName: fileName,
-                                                                         mimeType: "",
+                                                                         mimeType: contentType ?? "",
                                                                          directory: false,
                                                                          account: session.account)
             metadata.classFile = results.classFile
             metadata.contentType = results.mimeType
             metadata.iconName = results.iconName
             metadata.typeIdentifier = results.typeIdentifier
+            // iOS 12.0,* don't detect UTI text/markdown, text/x-markdown
+            if metadata.classFile == NKTypeClassFile.unknow.rawValue && (results.mimeType == "text/x-markdown" || results.mimeType == "text/markdown") {
+                metadata.iconName = NKTypeIconFile.txt.rawValue
+                metadata.classFile = NKTypeClassFile.document.rawValue
+            }
         }
         if let iconUrl {
             metadata.iconUrl = iconUrl

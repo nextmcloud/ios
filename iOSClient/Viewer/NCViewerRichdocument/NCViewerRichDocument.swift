@@ -65,7 +65,9 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                     }
                 ]))
         }
-        navigationItem.hidesBackButton = true
+//        navigationItem.hidesBackButton = true
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.title = metadata.fileNameView
 
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()

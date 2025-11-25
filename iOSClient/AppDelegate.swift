@@ -486,6 +486,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         NCPreferences().removeAll()
 
+        // Reset App Icon badge / File Icon badge
+        if #available(iOS 17.0, *) {
+            UNUserNotificationCenter.current().setBadgeCount(0)
+        }
         exit(0)
     }
 

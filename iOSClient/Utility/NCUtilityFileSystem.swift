@@ -840,4 +840,12 @@ final class NCUtilityFileSystem: NSObject, @unchecked Sendable {
             return path
         }
     }
+    
+    func getTextServerUrl(session: NCSession.Session, serverUrl: String) -> String {
+        if let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl)), let metadata = NCManageDatabase.shared.getMetadataFromOcId(directory.ocId) {
+            return (metadata.fileNameView)
+        } else {
+            return (serverUrl as NSString).lastPathComponent
+        }
+    }
 }

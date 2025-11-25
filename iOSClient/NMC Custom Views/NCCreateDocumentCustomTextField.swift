@@ -68,4 +68,4 @@ class NCCreateDocumentCustomTextField: XLFormBaseCell,UITextFieldDelegate {
     override class func formDescriptorCellHeight(for rowDescriptor: XLFormRowDescriptor!) -> CGFloat {
         return 45
     }
-
+}

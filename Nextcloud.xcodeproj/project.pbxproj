@@ -86,6 +86,11 @@
 		AFCE353927E5DE0500FEA6C2 /* NCShare+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */; };
 		B52120672EC60C740025F008 /* UIView+BlurVibrancy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52120662EC60C740025F008 /* UIView+BlurVibrancy.swift */; };
 		B52120682EC60C740025F008 /* UIView+BlurVibrancy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52120662EC60C740025F008 /* UIView+BlurVibrancy.swift */; };
+		B52920B52ED4666A005467F8 /* NCCreateFormUploadDocuments.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E7252DAE880700AB2EDD /* NCCreateFormUploadDocuments.swift */; };
+		B52920B62ED47147005467F8 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566EB8152B3D861500FB7CAD /* FolderPathCustomCell.xib */; };
+		B52920B72ED47147005467F8 /* FolderPathCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8162B3D861500FB7CAD /* FolderPathCustomCell.swift */; };
+		B52920B82ED471A7005467F8 /* NCCreateDocumentCustomTextField.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566EB8132B3D861400FB7CAD /* NCCreateDocumentCustomTextField.xib */; };
+		B52920B92ED471A7005467F8 /* NCCreateDocumentCustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566EB8142B3D861500FB7CAD /* NCCreateDocumentCustomTextField.swift */; };
 		B53525862E99014800EBB4E8 /* NCMediaNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53525852E99014800EBB4E8 /* NCMediaNavigationController.swift */; };
 		B53525872E99014800EBB4E8 /* NCMedia+TransferDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53525842E99014800EBB4E8 /* NCMedia+TransferDelegate.swift */; };
 		B53525892E9908FE00EBB4E8 /* NCShareHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = AF93471727E2361E002537EE /* NCShareHeader.xib */; };
@@ -4091,6 +4096,7 @@
 				F7362A1F220C853A005101B5 /* LaunchScreen.storyboard in Resources */,
 				B5E2E7332DAE894C00AB2EDD /* NCSectionHeaderMenu.xib in Resources */,
 				B558286B2E9FAD7F00CFBA0F /* NCShareEmailFieldCell.xib in Resources */,
+				B52920B82ED471A7005467F8 /* NCCreateDocumentCustomTextField.xib in Resources */,
 				F761856D29E98543006EB3B0 /* NCIntroCollectionViewCell.xib in Resources */,
 				F78ACD4621903D010088454D /* NCGridCell.xib in Resources */,
 				F7F4F10827ECDBDB008676F9 /* Inconsolata-ExtraLight.ttf in Resources */,
@@ -4169,6 +4175,7 @@
 				F7CB689A2541676B0050EC94 /* NCMore.storyboard in Resources */,
 				F77B0F7D1D118A16002130FE /* Images.xcassets in Resources */,
 				F73CB3B222E072A000AD728E /* NCShareHeaderView.xib in Resources */,
+				B52920B62ED47147005467F8 /* FolderPathCustomCell.xib in Resources */,
 				F7AE00FA230E81EB007ACF8A /* NCBrowserWeb.storyboard in Resources */,
 				B558286F2E9FBFE400CFBA0F /* NCShareTextInputCell.xib in Resources */,
 				F7EDE514262DC2CD00414FE6 /* NCSelectCommandViewSelect+CreateFolder.xib in Resources */,
@@ -4639,6 +4646,7 @@
 				F70753F12542A9A200972D44 /* NCViewerMedia.swift in Sources */,
 				F799DF822C4B7DCC003410B5 /* NCSectionFooter.swift in Sources */,
 				F76B649C2ADFFAED00014640 /* NCImageCache.swift in Sources */,
+				B52920B72ED47147005467F8 /* FolderPathCustomCell.swift in Sources */,
 				F78A18B823CDE2B300F681F3 /* NCViewerRichWorkspace.swift in Sources */,
 				F768822E2C0DD1E7001CF441 /* NCSettingsBundleHelper.swift in Sources */,
 				F72408332B8A27C900F128E2 /* NCMedia+Command.swift in Sources */,
@@ -4812,6 +4820,7 @@
 				F3A0479B2BD2668800658E7B /* NCAssistant.swift in Sources */,
 				B5BEBD222E93A74C0002C9E5 /* CreateLinkFooterView.swift in Sources */,
 				B5BEBD232E93A74C0002C9E5 /* NCPermissions.swift in Sources */,
+				B52920B92ED471A7005467F8 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				B5BEBD242E93A74C0002C9E5 /* NCShareEmailLinkHeaderView.swift in Sources */,
 				B5BEBD252E93A74C0002C9E5 /* NoSharesFooterView.swift in Sources */,
 				F359D8672A7D03420023F405 /* NCUtility+Exif.swift in Sources */,
@@ -4902,6 +4911,7 @@
 				F78E2D6529AF02DB0024D4F3 /* Database.swift in Sources */,
 				F70CEF5623E9C7E50007035B /* UIColor+Extension.swift in Sources */,
 				F76882242C0DD1E7001CF441 /* NCSettingsAdvancedView.swift in Sources */,
+				B52920B52ED4666A005467F8 /* NCCreateFormUploadDocuments.swift in Sources */,
 				F785129C2D7989B30087DDD0 /* NCNetworking+TermsOfService.swift in Sources */,
 				F77C3F5B2D9BF8CD00F3C471 /* UITabBar+Extension.swift in Sources */,
 				F75CA1472962F13700B01130 /* NCHUDView.swift in Sources */,
@@ -5075,7 +5085,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Notification_Service_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5108,7 +5118,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Notification_Service_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5375,7 +5385,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Share.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5408,7 +5418,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Share.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5442,7 +5452,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/File_Provider_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5478,7 +5488,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/File_Provider_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (

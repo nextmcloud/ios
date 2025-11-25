@@ -192,7 +192,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
             if let fileNameNew = formRow.value as? String {
                 self.fileName = utility.removeForbiddenCharacters(fileNameNew)
-                self.fileName = FileAutoRenamer.rename(fileNameNew, account: session.account)
+                self.fileName = FileAutoRenamer.rename(filename: fileNameNew, isFolderPath: true)
             } else {
                 self.fileName = ""
             }
