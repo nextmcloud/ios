@@ -31,7 +31,7 @@ import SVGKit
 
 extension NCUtility {
     
-    func loadImage(named imageName: String, colors: [UIColor]? = nil, size: CGFloat? = nil, useTypeIconFile: Bool = false, account: String? = nil, symbolConfiguration: Any? = nil) -> UIImage {
+    func loadImage(named imageName: String, colors: [UIColor]? = nil, size: CGFloat? = 24, useTypeIconFile: Bool = false, account: String? = nil, symbolConfiguration: Any? = nil) -> UIImage {
         var image: UIImage?
 
         if useTypeIconFile {
@@ -86,9 +86,9 @@ extension NCUtility {
         if let color = colors?.first, let size {
             image = UIImage(named: imageName)?.image(color: color, size: size)
         } else if let color = colors?.first, size == nil {
-            image = UIImage(named: imageName)?.image(color: color, size: 50)
+            image = UIImage(named: imageName)?.image(color: color, size: 24)
         } else if colors == nil, size == nil {
-            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: 50, height: 50))
+            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: 24, height: 24))
         } else if colors == nil, let size {
             image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: size, height: size))
         }
@@ -106,12 +106,35 @@ extension NCUtility {
 //        }
         
         if let image { return image }//.withTintColor(NCBrandColor.shared.iconImageColor) }
+/*
+        if let image { return image }
 
+        // SF IMAGE
+        if let colors {
+            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: .light))?.applyingSymbolConfiguration(UIImage.SymbolConfiguration(paletteColors: colors))
+        } else {
+            image = UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(weight: .light))
+        }
+
+        if let image { return image }
+
+        // IMAGES
+        if let color = colors?.first, let size {
+            image = UIImage(named: imageName)?.image(color: color, size: size)
+        } else if let color = colors?.first, size == nil {
+            image = UIImage(named: imageName)?.image(color: color, size: 24)
+        } else if colors == nil, size == nil {
+            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: 24, height: 24))
+        } else if colors == nil, let size {
+            image = UIImage(named: imageName)?.resizeImage(size: CGSize(width: size, height: size))
+        }
+        if let image { return image }
+*/
         // NO IMAGES FOUND
         if let color = colors?.first, let size {
-            return UIImage(named: "file")!.image(color: color, size: size) //.withTintColor(NCBrandColor.shared.iconImageColor)
+            return UIImage(named: "file")!.image(color: color, size: size)
         } else {
-            return UIImage(named: "file")! //.withTintColor(NCBrandColor.shared.iconImageColor)
+            return UIImage(named: "file")!
         }
     }
     

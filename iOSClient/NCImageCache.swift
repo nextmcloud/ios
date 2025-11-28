@@ -189,20 +189,21 @@ final class NCImageCache: @unchecked Sendable {
 
     func getImageSharedWithMe(colors: [UIColor] = [NCBrandColor.shared.iconSystemGrayColor]) -> UIImage {
 //        return UIImage(named: "share")!.image(color: colors.first!, size: 24)
-        return UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)//50)
+//        return UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)//50)
 //        images.shared = UIImage(named: "share")!.image(color: .systemGray, size: 24)//50)
+        return utility.loadImage(named: "cloudUpload", colors: [NCBrandColor.shared.nmcIconSharedWithMe], size: 24)
     }
     
     func getImageFavorite(colors: [UIColor] = [NCBrandColor.shared.yellowFavorite]) -> UIImage {
-        return utility.loadImage(named: "star.fill", colors: colors)
+        return utility.loadImage(named: "star.fill", colors: colors, size: 24)
     }
 
     func getImageOfflineFlag(colors: [UIColor] = [.systemGreen]) -> UIImage {
-        return utility.loadImage(named: "arrow.down.circle.fill", colors: colors)
+        return utility.loadImage(named: "arrow.down.circle.fill", colors: colors, size: 24)
     }
 
     func getImageLocal(colors: [UIColor] = [.systemGreen]) -> UIImage {
-        return utility.loadImage(named: "checkmark.circle.fill", colors: colors)
+        return utility.loadImage(named: "checkmark.circle.fill", colors: colors, size: 24)
     }
 
     func getImageCheckedYes(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
@@ -210,7 +211,7 @@ final class NCImageCache: @unchecked Sendable {
     }
 
     func getImageCheckedNo(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-        return utility.loadImage(named: "circle", colors: colors)
+        return utility.loadImage(named: "circle", colors: colors, size: 24)
     }
 
     func getImageButtonMore(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
@@ -219,11 +220,11 @@ final class NCImageCache: @unchecked Sendable {
     }
 
     func getImageButtonStop(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-        return utility.loadImage(named: "stop.circle", colors: colors)
+        return utility.loadImage(named: "stop.circle", colors: colors, size: 24)
     }
 
     func getImageButtonMoreLock(colors: [UIColor] = [NCBrandColor.shared.iconImageColor]) -> UIImage {
-        return utility.loadImage(named: "lock.fill", colors: colors)
+        return utility.loadImage(named: "lock.fill", colors: colors, size: 24)
     }
 
     func getFolder(account: String) -> UIImage {

@@ -99,9 +99,9 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         // Status
         //
         if metadata.isLivePhoto {
-            cell.fileStatusImage?.image = utility.loadImage(named: "livephoto", colors: isLayoutPhoto ? [.white] : [NCBrandColor.shared.iconImageColor2])
+            cell.fileStatusImage?.image = utility.loadImage(named: "livephoto", colors: isLayoutPhoto ? [.white] : [NCBrandColor.shared.iconImageColor2], size: 24)
         } else if metadata.isVideo {
-            cell.fileStatusImage?.image = utility.loadImage(named: "play.circle", colors: NCBrandColor.shared.iconImageMultiColors)
+            cell.fileStatusImage?.image = utility.loadImage(named: "play.circle", colors: NCBrandColor.shared.iconImageMultiColors, size: 24)
         }
 
         // Edit mode

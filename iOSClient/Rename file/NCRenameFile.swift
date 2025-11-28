@@ -128,11 +128,11 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
         }
 
         cancelButton.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
-        cancelButton.setTitleColor(NCBrandColor.shared.iconColor, for: .normal)
+        cancelButton.setTitleColor(NCBrandColor.shared.iconImageColor, for: .normal)
         cancelButton.layer.cornerRadius = 5
         cancelButton.layer.masksToBounds = true
         cancelButton.layer.borderWidth = 0.3
-        cancelButton.layer.borderColor = NCBrandColor.shared.iconColor.cgColor
+        cancelButton.layer.borderColor = NCBrandColor.shared.iconImageColor.cgColor
         
         renameButton.setTitle(NSLocalizedString("_rename_", comment: ""), for: .normal)
         renameButton.setTitleColor(NCBrandColor.shared.brandText, for: .normal)

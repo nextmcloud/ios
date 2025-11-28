@@ -217,6 +217,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidBecomeActive(_ scene: UIScene) {
         hidePrivacyProtectionWindow()
+//        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+//            for window in windowScene.windows {
+//                let imageViews = window.allImageViews()
+//                // Do something with the imageViews
+//                for imageView in imageViews {
+//                    print("Found image view: \(imageView)")
+//                    imageView.tintColor = UITraitCollection.current.userInterfaceStyle == .dark  ? .white : .black
+//                }
+//            }
+//        }
     }
 
     func sceneWillResignActive(_ scene: UIScene) {

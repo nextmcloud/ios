@@ -29,7 +29,7 @@ class NCFilePermissionCell: XLFormButtonCell {
     @objc func changeTheming() {
         self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         self.titleLabel.textColor = NCBrandColor.shared.label
-        self.titleLabelBottom.textColor = NCBrandColor.shared.iconColor
+        self.titleLabelBottom.textColor = NCBrandColor.shared.iconImageColor
     }
     
     override func configure() {

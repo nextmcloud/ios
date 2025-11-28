@@ -95,6 +95,7 @@ class NCShare: UIViewController, NCSharePagingContent {
 
         navigationController?.setNavigationBarAppearance()
         view.backgroundColor = .systemBackground
+        title = NSLocalizedString("_details_", comment: "")
 
 //        viewContainerConstraint.constant = height
 //        searchFieldTopConstraint.constant = 0

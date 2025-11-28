@@ -40,13 +40,13 @@ class NCMediaNavigationController: NCMainNavigationController {
         let layoutImage = (layout == global.mediaLayoutRatio) ? utility.loadImage(named: "Applications").withTintColor(NCBrandColor.shared.iconImageColor) : utility.loadImage(named: "ratio-grid").withTintColor(NCBrandColor.shared.iconImageColor)
 
         let select = UIAction(title: NSLocalizedString("_select_", comment: ""),
-                              image: utility.loadImage(named: "selectFull")) { _ in
+                              image: utility.loadImage(named: "checkmark.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             media.setEditMode(true)
         }
 
         let viewFilterMenu = UIMenu(title: "", options: .displayInline, children: [
         UIAction(title: NSLocalizedString("_media_viewimage_show_", comment: ""),
-                 image: UIImage(named: "photo")?.withTintColor(NCBrandColor.shared.iconImageColor),
+                 image: UIImage(named: "photo")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                  state: media.showOnlyImages ? .on : .off) { _ in
             media.showOnlyImages = true
             media.showOnlyVideos = false
@@ -57,7 +57,7 @@ class NCMediaNavigationController: NCMainNavigationController {
             }
         },
             UIAction(title: NSLocalizedString("_media_viewvideo_show_", comment: ""),
-                     image: UIImage(named: "video")?.withTintColor(NCBrandColor.shared.iconImageColor),
+                     image: UIImage(named: "video")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                      state: media.showOnlyVideos ? .on : .off) { _ in
                 media.showOnlyImages = false
                 media.showOnlyVideos = true
@@ -68,7 +68,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                 }
             },
             UIAction(title: NSLocalizedString("_media_show_all_", comment: ""),
-                     image: UIImage(named: "media")?.withTintColor(NCBrandColor.shared.iconImageColor),
+                     image: UIImage(named: "media")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                      state: !media.showOnlyImages && !media.showOnlyVideos ? .on : .off) { _ in
                 media.showOnlyImages = false
                 media.showOnlyVideos = false
@@ -98,7 +98,7 @@ class NCMediaNavigationController: NCMainNavigationController {
 
         let viewFolderMedia = UIMenu(title: "", options: .displayInline, children: [
             UIAction(title: NSLocalizedString("_select_media_folder_", comment: ""),
-                     image: UIImage(named: "mediaFolder")?.withTintColor(NCBrandColor.shared.iconImageColor), handler: { _ in
+                     image: UIImage(named: "mediaFolder")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor), handler: { _ in
                 guard let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as? UINavigationController,
                       let viewController = navigationController.topViewController as? NCSelect else { return }
                 viewController.delegate = media
@@ -112,7 +112,7 @@ class NCMediaNavigationController: NCMainNavigationController {
         let actions: [UIAction] = [
             UIAction(
                 title: NSLocalizedString("_media_by_modified_date_", comment: ""),
-                image: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
+                image: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
                 state: NCPreferences().mediaSortDate == "date" ? .on : .off,
                 handler: { _ in
                     NCPreferences().mediaSortDate = "date"
@@ -126,7 +126,7 @@ class NCMediaNavigationController: NCMainNavigationController {
             
             UIAction(
                 title: NSLocalizedString("_media_by_created_date_", comment: ""),
-                image: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
+                image: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
                 state: NCPreferences().mediaSortDate == "creationDate" ? .on : .off,
                 handler: { _ in
                     NCPreferences().mediaSortDate = "creationDate"
@@ -140,7 +140,7 @@ class NCMediaNavigationController: NCMainNavigationController {
             
             UIAction(
                 title: NSLocalizedString("_media_by_upload_date_", comment: ""),
-                image: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
+                image: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
                 state: NCPreferences().mediaSortDate == "uploadDate" ? .on : .off,
                 handler: { _ in
                     NCPreferences().mediaSortDate = "uploadDate"

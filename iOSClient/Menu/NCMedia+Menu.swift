@@ -52,7 +52,7 @@ extension NCMedia {
 //                actions.append(
 //                    NCMenuAction(
 //                        title: NSLocalizedString("_select_", comment: ""),
-//                        icon: utility.loadImage(named: "selectFull", colors: [NCBrandColor.shared.iconColor]),
+//                        icon: utility.loadImage(named: "selectFull", colors: [NCBrandColor.shared.iconImageColor]),
 //                        action: { _ in
 //                            self.isEditMode = true
 //                            self.collectionView.reloadData()
@@ -66,7 +66,7 @@ extension NCMedia {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_media_viewimage_show_", comment: ""),
-//                    icon: utility.loadImage(named: showOnlyImages ? "nocamera" : "file_photo_menu", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: showOnlyImages ? "nocamera" : "file_photo_menu", colors: [NCBrandColor.shared.iconImageColor]),
 //                    selected: showOnlyImages,
 //                    on: true,
 //                    action: { _ in
@@ -80,7 +80,7 @@ extension NCMedia {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_media_viewvideo_show_", comment: ""),
-//                    icon: utility.loadImage(named: showOnlyVideos ? "videono" : "videoyes", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: showOnlyVideos ? "videono" : "videoyes", colors: [NCBrandColor.shared.iconImageColor]),
 //                    selected: showOnlyVideos,
 //                    on: true,
 //                    action: { _ in
@@ -94,7 +94,7 @@ extension NCMedia {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_media_show_all_", comment: ""),
-//                    icon: utility.loadImage(named: "photo.on.rectangle.angled", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "photo.on.rectangle.angled", colors: [NCBrandColor.shared.iconImageColor]),
 //                    selected: !showOnlyImages && !showOnlyVideos,
 //                    on: true,
 //                    action: { _ in
@@ -110,7 +110,7 @@ extension NCMedia {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_select_media_folder_", comment: ""),
-//                    icon: utility.loadImage(named: "folder", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "folder", colors: [NCBrandColor.shared.iconImageColor]),
 //                    action: { _ in
 //                        if let navigationController = UIStoryboard(name: "NCSelect", bundle: nil).instantiateInitialViewController() as? UINavigationController,
 //                           let viewController = navigationController.topViewController as? NCSelect {
@@ -128,7 +128,7 @@ extension NCMedia {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_media_by_modified_date_", comment: ""),
-//                    icon: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconImageColor]),
 //                    selected: NCKeychain().mediaSortDate == "date",
 //                    on: true,
 //                    action: { _ in
@@ -141,7 +141,7 @@ extension NCMedia {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_media_by_created_date_", comment: ""),
-//                    icon: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconImageColor]),
 //                    selected: NCKeychain().mediaSortDate == "creationDate",
 //                    on: true,
 //                    action: { _ in
@@ -154,7 +154,7 @@ extension NCMedia {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_media_by_upload_date_", comment: ""),
-//                    icon: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "sortFileNameAZ", colors: [NCBrandColor.shared.iconImageColor]),
 //                    selected: NCKeychain().mediaSortDate == "uploadDate",
 //                    on: true,
 //                    action: { _ in
@@ -172,7 +172,7 @@ extension NCMedia {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_cancel_", comment: ""),
-//                    icon: utility.loadImage(named: "xmark", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "xmark", colors: [NCBrandColor.shared.iconImageColor]),
 //                    action: { _ in self.tapSelect() }
 //                )
 //            )

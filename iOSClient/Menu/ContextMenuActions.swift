@@ -9,7 +9,7 @@ enum ContextMenuActions {
     static func deleteOrUnshare(selectedMetadatas: [tableMetadata], metadataFolder: tableMetadata? = nil, controller: NCMainTabBarController?, completion: (() -> Void)? = nil) -> UIAction {
          var titleDelete = NSLocalizedString("_delete_", comment: "")
          var message = NSLocalizedString("_want_delete_", comment: "")
-//         var icon = "trash"
+//         var icon = "trashIcon"
          var destructive = false
 
          if selectedMetadatas.count > 1 {
@@ -32,7 +32,7 @@ enum ContextMenuActions {
 
          return UIAction(
              title: titleDelete,
-             image: UIImage(named: "trash")!.withTintColor(NCBrandColor.shared.iconImageColor),
+             image: UIImage(named: "trashIcon")!.withTintColor(NCBrandColor.shared.iconImageColor),
              attributes: destructive ? [.destructive] : []
          ) { _ in
              let alert = UIAlertController.deleteFileOrFolder(
@@ -161,7 +161,7 @@ enum ContextMenuActions {
     /// Save selected files to user's photo library
     static func saveMediaAction(selectedMediaMetadatas: [tableMetadata], controller: NCMainTabBarController?, completion: (() -> Void)? = nil) -> UIAction {
         var title: String = NSLocalizedString("_save_selected_files_", comment: "")
-        var icon = NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconColor])
+        var icon = NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconImageColor])
         if selectedMediaMetadatas.allSatisfy({ NCManageDatabase.shared.getMetadataLivePhoto(metadata: $0) != nil }) {
             title = NSLocalizedString("_livephoto_save_", comment: "")
             icon = NCUtility().loadImage(named: "livephoto")
@@ -192,7 +192,7 @@ enum ContextMenuActions {
     static func copyAction(fileSelect: [String], controller: NCMainTabBarController?, completion: (() -> Void)? = nil) -> UIAction {
         UIAction(
             title: NSLocalizedString("_copy_file_", comment: ""),
-            image: NCUtility().loadImage(named: "copy", colors: [NCBrandColor.shared.iconColor])
+            image: NCUtility().loadImage(named: "copy", colors: [NCBrandColor.shared.iconImageColor])
         ) { _ in
                 NCDownloadAction.shared.copyPasteboard(pasteboardOcIds: fileSelect, controller: controller)
                 completion?()

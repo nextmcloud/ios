@@ -186,7 +186,7 @@ class NCEndToEndInitialize: NSObject {
                     }
                 })
 
-                let cancel = UIAlertAction(title: "Cancel", style: .cancel)
+                let cancel = UIAlertAction(title: "_cancel_", style: .cancel)
                 alertController.addAction(ok)
                 alertController.addAction(cancel)
                 alertController.addTextField { textField in

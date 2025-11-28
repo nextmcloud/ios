@@ -40,7 +40,7 @@ extension NCViewer {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_view_in_folder_", comment: ""),
-//                    icon: utility.loadImage(named: "arrow.forward.square", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "arrow.forward.square", colors: [NCBrandColor.shared.iconImageColor]),
 //                    action: { _ in
 //                        NCActionCenter.shared.openFileViewInFolder(serverUrl: metadata.serverUrl, fileNameBlink: metadata.fileName, fileNameOpen: nil, sceneIdentifier: controller.sceneIdentifier)
 //                    }
@@ -89,7 +89,7 @@ extension NCViewer {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_print_", comment: ""),
-//                    icon: utility.loadImage(named: "printer", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "printer", colors: [NCBrandColor.shared.iconImageColor]),
 //                    action: { _ in
 //                        if self.utilityFileSystem.fileProviderStorageExists(metadata) {
 //                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile, userInfo: ["ocId": metadata.ocId, "selector": NCGlobal.shared.selectorPrint, "error": NKError(), "account": metadata.account, "ocIdTransfer": metadata.ocIdTransfer])
@@ -116,7 +116,7 @@ extension NCViewer {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_rename_", comment: ""),
-//                    icon: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.iconImageColor]),
 //                    action: { _ in
 //
 //                        if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
@@ -155,7 +155,7 @@ extension NCViewer {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_search_", comment: ""),
-//                    icon: utility.loadImage(named: "search", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "search", colors: [NCBrandColor.shared.iconImageColor]),
 //                    action: { _ in
 //                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuSearchTextPDF)
 //                    }
@@ -165,7 +165,7 @@ extension NCViewer {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_go_to_page_", comment: ""),
-//                    icon: utility.loadImage(named: "go-to-page", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "go-to-page", colors: [NCBrandColor.shared.iconImageColor]),
 //                    action: { _ in
 //                        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterMenuGotToPageInPDF)
 //                    }
@@ -180,7 +180,7 @@ extension NCViewer {
 //            actions.append(
 //                NCMenuAction(
 //                    title: NSLocalizedString("_modify_", comment: ""),
-//                    icon: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconColor]),
+//                    icon: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor]),
 //                    action: { _ in
 //                        if self.utilityFileSystem.fileProviderStorageExists(metadata) {
 //                            NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDownloadedFile,

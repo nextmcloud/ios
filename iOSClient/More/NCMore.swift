@@ -93,7 +93,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         Task {
             let capabilities = await database.getCapabilities(account: self.session.account) ?? NKCapabilities.Capabilities()
-            mainNavigationController?.createPlusMenu(session: self.session, capabilities: capabilities, isHidden: true)
+            await mainNavigationController?.createPlusMenu(session: self.session, capabilities: capabilities, isHidden: true)
         }
 
         loadItems()
@@ -122,7 +122,14 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
         // ITEM : User
         item = NKExternalSite()
-        item.name = tableAccount.email
+//        item.name = tableAccount.email
+        if !tableAccount.email.isEmpty {
+            item.name = tableAccount.email
+        } else if tableAccount.email.isEmpty {//}|| tableAccount.alias.isEmpty {
+            item.name = tableAccount.displayName
+        } else {
+            item.name = tableAccount.alias
+        }
         item.icon = "user"//utility.loadUserImage(for: tableAccount.user, displayName: tableAccount.displayName, urlBase: tableAccount.urlBase)
 //        item.url = "segueRecent"
 //        item.order = 10
@@ -131,7 +138,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : Recent
         item = NKExternalSite()
         item.name = "_recent_"
-        item.icon = "clock.arrow.circlepath"
+        item.icon = "History" //"clock.arrow.circlepath"
         item.url = "segueRecent"
         item.order = 20
         functionMenu.append(item)
@@ -162,7 +169,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         if capabilities.fileSharingApiEnabled {
             item = NKExternalSite()
             item.name = "_list_shares_"
-            item.icon = "person.badge.plus"
+            item.icon = "share" //"person.badge.plus"
             item.url = "segueShares"
             item.order = 50
             functionMenu.append(item)
@@ -189,7 +196,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : Scan
         item = NKExternalSite()
         item.name = "_scanned_images_"
-        item.icon = "doc.text.viewfinder"
+        item.icon = "scan" //"doc.text.viewfinder"
         item.url = "openStoryboardNCScan"
         item.order = 70
         functionMenu.append(item)
@@ -197,7 +204,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : Trash
         item = NKExternalSite()
         item.name = "_trash_view_"
-        item.icon = "trash"
+        item.icon = "trashIcon"
         item.url = "segueTrash"
         item.order = 80
         functionMenu.append(item)
@@ -211,7 +218,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : Settings
         item = NKExternalSite()
         item.name = "_settings_"
-        item.icon = "gear"
+        item.icon = "settings"
         item.url = "openSettings"
         settingsMenu.append(item)
 
@@ -252,7 +259,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                         item.url = urlEncoded
                         item.icon = "network"
                         if externalSite.type == "settings" {
-                            item.icon = "gear"
+                            item.icon = "settings"
                         }
                         externalSiteMenu.append(item)
                     }
@@ -338,18 +345,19 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
             let item = sections[indexPath.section].items[indexPath.row]
 
-            cell.imageIcon?.image = utility.loadImage(named: item.icon, colors: [NCBrandColor.shared.iconImageColor])
+            cell.imageIcon?.image = utility.loadImage(named: item.icon, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
             cell.imageIcon?.contentMode = .scaleAspectFit
             cell.labelText?.text = NSLocalizedString(item.name, comment: "")
             cell.labelText.textColor = NCBrandColor.shared.textColor
 
-            let tableAccount = self.database.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account))
-            if item.name != tableAccount?.email {
+            if indexPath.section == 0 {
+                if indexPath.row == 0 {
+                    cell.accessoryType = UITableViewCell.AccessoryType.none
+                }
+            }
+            else {
                 cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
             }
-            
-//            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
-
             cell.separator.backgroundColor = .separator
             cell.separatorHeigth.constant = 0.4
 

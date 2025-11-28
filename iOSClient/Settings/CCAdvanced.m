@@ -334,7 +334,7 @@
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-    [row.cellConfig setObject:[[UIImage imageNamed:@"trash"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
+    [row.cellConfig setObject:[[UIImage imageNamed:@"trashIcon"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
     row.action.formSelector = @selector(clearCacheRequest:);
     [sectionSize addFormRow:row];
 

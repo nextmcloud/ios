@@ -298,7 +298,7 @@ class NCContextMenu: NSObject {
         }
 
         let deleteConfirmFile = UIAction(title: titleDeleteConfirmFile,
-                                         image: utility.loadImage(named: "trash"), attributes: .destructive) { _ in
+                                         image: utility.loadImage(named: "trashIcon"), attributes: .destructive) { _ in
 
             var alertStyle = UIAlertController.Style.actionSheet
             if UIDevice.current.userInterfaceIdiom == .pad {
@@ -323,7 +323,7 @@ class NCContextMenu: NSObject {
         }
 
         let deleteConfirmLocal = UIAction(title: NSLocalizedString("_remove_local_file_", comment: ""),
-                                          image: utility.loadImage(named: "trash"), attributes: .destructive) { _ in
+                                          image: utility.loadImage(named: "trashIcon"), attributes: .destructive) { _ in
             Task {
                 var metadatasError: [tableMetadata: NKError] = [:]
                 let error = await self.networking.deleteCache(self.metadata, sceneIdentifier: self.sceneIdentifier)
@@ -337,7 +337,7 @@ class NCContextMenu: NSObject {
         }
 
         let deleteSubMenu = UIMenu(title: NSLocalizedString("_delete_file_", comment: ""),
-                                   image: utility.loadImage(named: "trash"),
+                                   image: utility.loadImage(named: "trashIcon"),
                                    options: .destructive,
                                    children: [deleteConfirmLocal, deleteConfirmFile])
 

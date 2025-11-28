@@ -110,7 +110,7 @@ extension NCMenuAction {
     static func deleteOrUnshareAction(selectedMetadatas: [tableMetadata], metadataFolder: tableMetadata? = nil, controller: NCMainTabBarController?, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
         var titleDelete = NSLocalizedString("_delete_", comment: "")
         var message = NSLocalizedString("_want_delete_", comment: "")
-        var icon = "trash"
+        var icon = "trashIcon"
         var destructive = false
         var color = NCBrandColor.shared.iconImageColor
 
@@ -169,7 +169,7 @@ extension NCMenuAction {
 //            title: NSLocalizedString("_share_", comment: ""),
 //            icon: NCUtility().loadImage(named: "share", colors: [NCBrandColor.shared.iconImageColor]),
             title: NSLocalizedString("_open_in_", comment: ""),
-            icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconColor]),
+            icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconImageColor]),
             order: order,
             sender: sender,
             action: { _ in
@@ -220,7 +220,7 @@ extension NCMenuAction {
     static func copyAction(fileSelect: [String], controller: NCMainTabBarController?, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_copy_file_", comment: ""),
-            icon: NCUtility().loadImage(named: "copy", colors: [NCBrandColor.shared.iconColor]),
+            icon: NCUtility().loadImage(named: "copy", colors: [NCBrandColor.shared.iconImageColor]),
             order: order,
             sender: sender,
             action: { _ in
@@ -292,7 +292,7 @@ extension NCMenuAction {
     static func openInAction(selectedMetadatas: [tableMetadata], controller: NCMainTabBarController?, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_open_in_", comment: ""),
-            icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconColor]),
+            icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconImageColor]),
             order: order,
             sender: sender,
             action: { _ in
@@ -305,7 +305,7 @@ extension NCMenuAction {
     /// Save selected files to user's photo library
     static func saveMediaAction(selectedMediaMetadatas: [tableMetadata], controller: NCMainTabBarController?, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
         var title: String = NSLocalizedString("_save_selected_files_", comment: "")
-        var icon = NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconColor])
+        var icon = NCUtility().loadImage(named: "save_files",colors: [NCBrandColor.shared.iconImageColor])
         if selectedMediaMetadatas.allSatisfy({ NCManageDatabase.shared.getMetadataLivePhoto(metadata: $0) != nil }) {
             title = NSLocalizedString("_livephoto_save_", comment: "")
             icon = NCUtility().loadImage(named: "livephoto")
@@ -339,7 +339,7 @@ extension NCMenuAction {
     static func printAction(metadata: tableMetadata, order: Int = 0, sender: Any?) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_print_", comment: ""),
-            icon: NCUtility().loadImage(named: "print", colors: [NCBrandColor.shared.iconColor]),
+            icon: NCUtility().loadImage(named: "print", colors: [NCBrandColor.shared.iconImageColor]),
             order: order,
             sender: sender,
             action: { _ in

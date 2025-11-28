@@ -30,18 +30,18 @@ extension NCShare {
         let capabilities = NCNetworking.shared.capabilities[self.metadata.account] ?? NKCapabilities.Capabilities()
         var actions = [NCMenuAction]()
 
-        if share.shareType == NCShareCommon.shareTypeLink, canReshare {
-            actions.append(
-                NCMenuAction(
-                    title: NSLocalizedString("_share_add_sharelink_", comment: ""),
-                    icon: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor]),
-                    sender: sender,
-                    action: { _ in
-                        self.makeNewLinkShare()
-                    }
-                )
-            )
-        }
+//        if share.shareType == NCShareCommon.shareTypeLink, canReshare {
+//            actions.append(
+//                NCMenuAction(
+//                    title: NSLocalizedString("_share_add_sharelink_", comment: ""),
+//                    icon: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor]),
+//                    sender: sender,
+//                    action: { _ in
+//                        self.makeNewLinkShare()
+//                    }
+//                )
+//            )
+//        }
         
         if !folder {
             actions.append(
@@ -103,7 +103,7 @@ extension NCShare {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_share_unshare_", comment: ""),
-                icon: utility.loadImage(named: "trash", colors: [NCBrandColor.shared.brandElement]),
+                icon: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.brandElement]),
                 sender: sender,
                 action: { _ in
                     Task {

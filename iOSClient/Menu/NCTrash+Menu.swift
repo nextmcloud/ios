@@ -85,7 +85,7 @@ extension NCTrash {
             NCMenuAction(
                 title: NSLocalizedString("_delete_", comment: ""),
                 destructive: true,
-                icon: utility.loadImage(named: "trash", colors: [NCBrandColor.shared.iconColor]),
+                icon: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.iconImageColor]),
                 sender: sender,
                 action: { _ in
                     Task {

@@ -72,7 +72,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         self.title = NSLocalizedString("_voice_memo_title_", comment: "")
 
         // Button Play Stop
-        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
+        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconImageColor, size: 100), for: .normal)
 
         // Progress view
         progressView.progress = 0

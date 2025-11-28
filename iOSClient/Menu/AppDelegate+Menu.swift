@@ -39,7 +39,7 @@ extension AppDelegate {
 //
 //        actions.append(
 //            NCMenuAction(
-//                title: NSLocalizedString("_upload_photos_videos_", comment: ""), icon: UIImage(named: "file_photo_menu")!.image(color: NCBrandColor.shared.iconColor, size: 50),
+//                title: NSLocalizedString("_upload_photos_videos_", comment: ""), icon: UIImage(named: "file_photo_menu")!.image(color: NCBrandColor.shared.iconImageColor, size: 50),
 //                sender: sender,
 //                action: { _ in
 //                    NCAskAuthorization().askAuthorizationPhotoLibrary(controller: controller) { hasPermission in
@@ -52,7 +52,7 @@ extension AppDelegate {
 //
 //        actions.append(
 //            NCMenuAction(
-//                title: NSLocalizedString("_upload_file_", comment: ""), icon: UIImage(named: "uploadFile")!.image(color: NCBrandColor.shared.iconColor, size: 50),
+//                title: NSLocalizedString("_upload_file_", comment: ""), icon: UIImage(named: "uploadFile")!.image(color: NCBrandColor.shared.iconImageColor, size: 50),
 //                sender: sender,
 //                action: { _ in
 //                    controller.documentPickerViewController = NCDocumentPickerViewController(controller: controller, isViewerMedia: false, allowsMultipleSelection: true)
@@ -62,7 +62,7 @@ extension AppDelegate {
 //
 //        if NextcloudKit.shared.isNetworkReachable() && directEditingCreators != nil && directEditingCreators!.contains(where: { $0.editor == NCGlobal.shared.editorText}) && !isDirectoryE2EE {
 //            actions.append(
-//                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt_menu")!.image(color: NCBrandColor.shared.iconColor, size: 50),
+//                NCMenuAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""), icon: UIImage(named: "file_txt_menu")!.image(color: NCBrandColor.shared.iconImageColor, size: 50),
 //                             sender: sender,
 //                             action: { _ in
 //                    let directEditingCreator = directEditingCreators!.first(where: { $0.editor == NCGlobal.shared.editorText})!
@@ -84,7 +84,7 @@ extension AppDelegate {
 //
 //        actions.append(
 //            NCMenuAction(
-//                title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility().loadImage(named: "scan").image(color: NCBrandColor.shared.iconColor, size: 50),
+//                title: NSLocalizedString("_scans_document_", comment: ""), icon: NCUtility().loadImage(named: "scan").image(color: NCBrandColor.shared.iconImageColor, size: 50),
 //                sender: sender,
 //                action: { _ in
 //                    NCDocumentCamera.shared.openScannerDocument(viewController: controller)
@@ -94,7 +94,7 @@ extension AppDelegate {
 //
 //        actions.append(
 //            NCMenuAction(
-//                title: NSLocalizedString("_create_voice_memo_", comment: ""), icon: UIImage(named: "microphoneMenu")!.image(color: NCBrandColor.shared.iconColor, size: 50),
+//                title: NSLocalizedString("_create_voice_memo_", comment: ""), icon: UIImage(named: "microphoneMenu")!.image(color: NCBrandColor.shared.iconImageColor, size: 50),
 //                sender: sender,
 //                action: { _ in
 //                    NCAskAuthorization().askAuthorizationAudioRecord(viewController: controller) { hasPermission in
@@ -116,7 +116,7 @@ extension AppDelegate {
 //        }
 //
 //        let titleCreateFolder = isDirectoryE2EE ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
-//        let imageCreateFolder = isDirectoryE2EE ? UIImage(named: "encryptedfolder")!.image(color: NCBrandColor.shared.iconColor, size: 50) : UIImage(named: "addFolder")!
+//        let imageCreateFolder = isDirectoryE2EE ? UIImage(named: "encryptedfolder")!.image(color: NCBrandColor.shared.iconImageColor, size: 50) : UIImage(named: "addFolder")!
 //        actions.append(
 //            NCMenuAction(title: titleCreateFolder,
 //                         icon: imageCreateFolder,
@@ -132,7 +132,7 @@ extension AppDelegate {
 //        if !isDirectoryE2EE && NCKeychain().isEndToEndEnabled(account: session.account) && (NCUtilityFileSystem().getHomeServer(session: session) == serverUrl) {
 //            actions.append(
 //                NCMenuAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
-//                             icon: UIImage(named: "encryptedfolder")!.image(color: NCBrandColor.shared.iconColor, size: 50),
+//                             icon: UIImage(named: "encryptedfolder")!.image(color: NCBrandColor.shared.iconImageColor, size: 50),
 //                             sender: sender,
 //                             action: { _ in
 //                                 let alertController = UIAlertController.createFolder(serverUrl: serverUrl, session: session, markE2ee: true, sceneIdentifier: controller.sceneIdentifier)
@@ -148,7 +148,7 @@ extension AppDelegate {
 //        if NCCapabilities.shared.getCapabilities(account: session.account).capabilityServerVersionMajor >= NCGlobal.shared.nextcloudVersion18 && directory?.richWorkspace == nil && !isDirectoryE2EE && NextcloudKit.shared.isNetworkReachable() {
 //            actions.append(
 //                NCMenuAction(
-//                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: UIImage(named: "addFolderInfo")!.image(color: NCBrandColor.shared.iconColor, size: 50),
+//                    title: NSLocalizedString("_add_folder_info_", comment: ""), icon: UIImage(named: "addFolderInfo")!.image(color: NCBrandColor.shared.iconImageColor, size: 50),
 //                    sender: sender,
 //                    action: { _ in
 //                        let richWorkspaceCommon = NCRichWorkspaceCommon()

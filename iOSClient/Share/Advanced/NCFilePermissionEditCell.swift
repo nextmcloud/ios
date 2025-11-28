@@ -38,7 +38,7 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
     
     @objc func changeTheming() {
         self.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        self.titleLabel.textColor = NCBrandColor.shared.iconColor
+        self.titleLabel.textColor = NCBrandColor.shared.iconImageColor
     }
     
     override func configure() {

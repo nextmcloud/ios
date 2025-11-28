@@ -102,7 +102,7 @@ class NCFiles: NCCollectionViewCommon {
 
         Task {
             let capabilities = await database.getCapabilities(account: self.session.account) ?? NKCapabilities.Capabilities()
-            mainNavigationController?.createPlusMenu(session: self.session, capabilities: capabilities)
+            await mainNavigationController?.createPlusMenu(session: self.session, capabilities: capabilities)
 
             await self.reloadDataSource()
         }
