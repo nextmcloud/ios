@@ -1188,6 +1188,10 @@
 		AFCE353427E4ED5900FEA6C2 /* DateFormatter+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+Extension.swift"; sourceTree = "<group>"; };
 		AFCE353627E4ED7B00FEA6C2 /* NCShareCells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCShareCells.swift; sourceTree = "<group>"; };
 		AFCE353827E5DE0400FEA6C2 /* NCShare+Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCShare+Helper.swift"; sourceTree = "<group>"; };
+		B505CEAF2ED9A9EB00C3F68A /* NextcloudRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NextcloudRelease.entitlements; sourceTree = "<group>"; };
+		B505CEB02ED9AA1100C3F68A /* ShareRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ShareRelease.entitlements; sourceTree = "<group>"; };
+		B505CEB12ED9AA1C00C3F68A /* File Provider ExtensionRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "File Provider ExtensionRelease.entitlements"; sourceTree = "<group>"; };
+		B505CEB22ED9AA2400C3F68A /* Notification Service ExtensionRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Notification Service ExtensionRelease.entitlements"; sourceTree = "<group>"; };
 		B52120662EC60C740025F008 /* UIView+BlurVibrancy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+BlurVibrancy.swift"; sourceTree = "<group>"; };
 		B52FAEAD2DA8EF84001AB1BD /* FileNameInputTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileNameInputTextField.swift; sourceTree = "<group>"; };
 		B52FAEAE2DA8EF84001AB1BD /* FileNameInputTextField.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FileNameInputTextField.xib; sourceTree = "<group>"; };
@@ -1985,6 +1989,7 @@
 		2C33C48023E2C475005F963B /* Notification Service Extension */ = {
 			isa = PBXGroup;
 			children = (
+				B505CEB22ED9AA2400C3F68A /* Notification Service ExtensionRelease.entitlements */,
 				2C33C48123E2C475005F963B /* NotificationService.swift */,
 				2C33C48A23E2CC26005F963B /* Notification_Service_Extension-Bridging-Header.h */,
 			);
@@ -2917,6 +2922,7 @@
 		F771E3D120E2392D00AFB62D /* File Provider Extension */ = {
 			isa = PBXGroup;
 			children = (
+				B505CEB12ED9AA1C00C3F68A /* File Provider ExtensionRelease.entitlements */,
 				F771E3F220E239A600AFB62D /* FileProviderData.swift */,
 				F76673EC22C901F5007ED366 /* FileProviderDomain.swift */,
 				F771E3D620E2392D00AFB62D /* FileProviderEnumerator.swift */,
@@ -3213,6 +3219,7 @@
 		F7C0F46D1C8880540059EC54 /* Share */ = {
 			isa = PBXGroup;
 			children = (
+				B505CEB02ED9AA1100C3F68A /* ShareRelease.entitlements */,
 				F714803A262EBE3900693E51 /* MainInterface.storyboard */,
 				F7148040262EBE4000693E51 /* NCShareExtension.swift */,
 				F7A573682E190377009C9257 /* NCShareExtensionData.swift */,
@@ -3481,6 +3488,7 @@
 		F7F67B9F1A24D27800EE80DA = {
 			isa = PBXGroup;
 			children = (
+				B505CEAF2ED9A9EB00C3F68A /* NextcloudRelease.entitlements */,
 				AA8E041E2D3114E200E7E89C /* README.md */,
 				F7B8B82F25681C3400967775 /* GoogleService-Info.plist */,
 				F7C1CDD91E6DFC6F005D92BE /* Brand */,
@@ -5115,12 +5123,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Notification_Service_Extension.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = "Notification Service Extension/Notification Service ExtensionRelease.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					EXTENSION,
@@ -5130,10 +5138,10 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 10.1.7;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.notificationextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA NotificationServiceExtension Dist";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development NotificationExt 016";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5415,12 +5423,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Share.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = Share/ShareRelease.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					EXTENSION,
@@ -5430,10 +5438,10 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 10.1.7;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.documentproviderextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA Share Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development DocProvExt 016";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5485,12 +5493,12 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/File_Provider_Extension.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = "File Provider Extension/File Provider ExtensionRelease.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					EXTENSION,
@@ -5500,10 +5508,10 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 10.1.7;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.FileProviderExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA FileProviderExtension Dist";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development FileProvExt 016";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5550,21 +5558,21 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = NextcloudRelease.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 10.1.7;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
+				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCloud QA Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development App 016";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;

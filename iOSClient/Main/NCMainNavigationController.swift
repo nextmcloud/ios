@@ -326,7 +326,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
            NCPreferences().isEndToEndEnabled(account: session.account),
            isNetworkReachable {
             menuE2EEElement.append(UIAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
-                                            image: NCImageCache.shared.getFolderEncrypted(account: session.account).image(color: NCBrandColor.shared.iconImageColor, size: 24)) { _ in
+                                            image: NCImageCache.shared.getFolderEncrypted(account: session.account)) { _ in
                 DispatchQueue.main.async {
                     let alertController = UIAlertController.createFolder(serverUrl: serverUrl, session: session, markE2ee: true, sceneIdentifier: controller.sceneIdentifier, capabilities: capabilities)
                     controller.present(alertController, animated: true, completion: nil)
@@ -758,7 +758,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let mediaSquare = UIAction(title: NSLocalizedString("_media_square_", comment: ""),
-                                   image: utility.loadImage(named: "square-grid").image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
+                                   image: utility.loadImage(named: "square-grid", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                                    state: layoutForView.layout == global.layoutPhotoSquare ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutPhotoSquare
@@ -768,7 +768,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let mediaRatio = UIAction(title: NSLocalizedString("_media_ratio_", comment: ""),
-                                  image: utility.loadImage(named: "ratio-grid").image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
+                                  image: utility.loadImage(named: "ratio-grid", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                                   state: layoutForView.layout == self.global.layoutPhotoRatio ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutPhotoRatio

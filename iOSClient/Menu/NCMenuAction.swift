@@ -339,7 +339,7 @@ extension NCMenuAction {
     static func printAction(metadata: tableMetadata, order: Int = 0, sender: Any?) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_print_", comment: ""),
-            icon: NCUtility().loadImage(named: "print", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "printer", colors: [NCBrandColor.shared.iconImageColor]),
             order: order,
             sender: sender,
             action: { _ in
