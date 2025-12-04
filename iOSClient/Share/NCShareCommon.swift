@@ -82,7 +82,8 @@ enum NCShareCommon {
         case NCShareCommon.shareTypeContact:
             return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         case NCShareCommon.shareTypeFederated:
-            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+//            return UIImage(named: "shareTypeUser")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
+            return UIImage(named: isDropDown ? "shareTypeUser" : "shareTypeEmail")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
         case NCShareCommon.shareTypeTeam:
 //            return UIImage(named: "shareTypeTeam")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)
             return UIImage(named: "shareTypeCircles")?.withTintColor(NCBrandColor.shared.textColor, renderingMode: .alwaysOriginal)

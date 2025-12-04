@@ -298,6 +298,8 @@ final class NCGlobal: Sendable {
     let notificationCenterServerDidUpdate                       = "serverDidUpdate"                 // userInfo: account
     let notificationCenterNetworkReachability                   = "networkReachability"
 
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
 

@@ -228,7 +228,7 @@ final class NCImageCache: @unchecked Sendable {
     }
 
     func getFolder(account: String) -> UIImage {
-        return UIImage(named: "folder")!//.image(color: NCBrandColor.shared.systemBlueColor)
+        return UIImage(named: "folder")!.image(color: NCBrandColor.shared.systemBlueColor)
 //        return UIImage(named: "folder2")!.image(color: NCBrandColor.shared.systemBlueColor)
     }
 

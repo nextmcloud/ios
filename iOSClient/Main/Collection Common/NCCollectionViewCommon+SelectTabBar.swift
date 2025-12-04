@@ -57,7 +57,7 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
             })
         }
 
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { [self] (_: UIAlertAction) in
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .destructive) { [self] (_: UIAlertAction) in
             let copyMetadatas = metadatas
 
             Task {

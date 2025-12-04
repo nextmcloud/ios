@@ -53,7 +53,8 @@ class NCMainTabBarController: UITabBarController {
         // Favorite
         if let item = tabBar.items?[1] {
             item.title = NSLocalizedString("_favorites_", comment: "")
-            item.image = UIImage(named: "Star") // UIImage(systemName: "star.fill")
+            item.image = UIImage(named: "star") // UIImage(systemName: "star.fill")
+//            item.image = UIImage(systemName: "star.fill")
             item.selectedImage = item.image
             item.tag = 101
         }

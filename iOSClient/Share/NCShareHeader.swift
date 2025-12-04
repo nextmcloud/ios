@@ -163,8 +163,7 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
     }
     
     private func updateFavoriteIcon(isFavorite: Bool) {
-        let color = isFavorite ? NCBrandColor.shared.yellowFavorite : NCBrandColor.shared.textInfo
-        favorite.setImage(utility.loadImage(named: "star.fill", colors: [color], size: 24), for: .normal)
+        favorite.setImage(NCUtility().loadImage(named: isFavorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 24), for: .normal)
     }
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {

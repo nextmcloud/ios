@@ -47,7 +47,7 @@ extension NCShare {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_open_in_", comment: ""),
-                    icon: utility.loadImage(named: "viewInFolder", colors: [NCBrandColor.shared.brandElement]),
+                    icon: utility.loadImage(named: "open_file", colors: [NCBrandColor.shared.brandElement]),
                     sender: sender,
                     action: { _ in
                         NCShareCommon.copyLink(link: share.url, viewController: self, sender: sender)

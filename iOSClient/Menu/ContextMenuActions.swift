@@ -9,8 +9,9 @@ enum ContextMenuActions {
     static func deleteOrUnshare(selectedMetadatas: [tableMetadata], metadataFolder: tableMetadata? = nil, controller: NCMainTabBarController?, completion: (() -> Void)? = nil) -> UIAction {
          var titleDelete = NSLocalizedString("_delete_", comment: "")
          var message = NSLocalizedString("_want_delete_", comment: "")
-//         var icon = "trashIcon"
-         var destructive = false
+         var icon = "trashIcon"
+         var destructive = true
+        var color = NCBrandColor.shared.iconImageColor
 
          if selectedMetadatas.count > 1 {
              titleDelete = NSLocalizedString("_delete_selected_files_", comment: "")
@@ -20,7 +21,7 @@ enum ContextMenuActions {
                                                                  metadataFolder: metadataFolder) {
                  titleDelete = NSLocalizedString("_leave_share_", comment: "")
                  message = NSLocalizedString("_want_leave_share_", comment: "")
-//                 icon = "person.2.slash"
+                 icon = "person.2.slash"
              } else if metadata.directory {
                  titleDelete = NSLocalizedString("_delete_folder_", comment: "")
                  destructive = true
@@ -29,10 +30,11 @@ enum ContextMenuActions {
                  destructive = true
              }
          }
+        if destructive { color = .red }
 
          return UIAction(
              title: titleDelete,
-             image: UIImage(named: "trashIcon")!.withTintColor(NCBrandColor.shared.iconImageColor),
+             image: NCUtility().loadImage(named: icon, colors: [color]),
              attributes: destructive ? [.destructive] : []
          ) { _ in
              let alert = UIAlertController.deleteFileOrFolder(
@@ -108,7 +110,7 @@ enum ContextMenuActions {
                             completion: (() -> Void)? = nil) -> UIAction {
          UIAction(
              title: NSLocalizedString("_move_or_copy_", comment: ""),
-             image: UIImage(systemName: "rectangle.portrait.and.arrow.right")
+             image: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconImageColor])//UIImage(systemName: "rectangle.portrait.and.arrow.right")
          ) { _ in
              Task { @MainActor in
                  var fileNameError: NKError?

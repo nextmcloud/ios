@@ -154,9 +154,9 @@ class NCShare: UIViewController, NCSharePagingContent {
 //            searchField.delegate = self
         }
         
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
-        self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
-        navigationItem.largeTitleDisplayMode = .never
+//        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .done, target: self, action: #selector(exitTapped))
+////        self.navigationItem.leftBarButtonItem?.tintColor = NCBrandColor.shared.brand
+//        navigationItem.largeTitleDisplayMode = .never
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -689,7 +689,7 @@ extension NCShare: UITableViewDataSource {
 
         switch sectionType {
         case .header:
-            return 190
+            return 0//190
         case .linkByEmail:
             return 0
         case .links:

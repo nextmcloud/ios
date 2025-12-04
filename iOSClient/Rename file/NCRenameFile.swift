@@ -247,19 +247,21 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 
         NCActivityIndicator.shared.start()
 
-        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew)
-//        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, indexPath: indexPath, viewController: self) { error in
-//
-//            NCActivityIndicator.shared.stop()
-//
-//            if error == .success {
-//
-//                self.dismiss(animated: true)
-//
-//            } else {
-//
-//                NCContentPresenter().showError(error: error)
-//            }
-//        }
+//        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew)
+        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, indexPath: indexPath, viewController: self) { error in
+
+            NCActivityIndicator.shared.stop()
+
+            if error == .success {
+
+                DispatchQueue.main.async {
+                    self.dismiss(animated: true)
+                }
+
+            } else {
+
+                NCContentPresenter().showError(error: error)
+            }
+        }
     }
 }

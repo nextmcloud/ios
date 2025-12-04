@@ -68,12 +68,12 @@ class NCContextMenu: NSObject {
 
         }
         
-        let moveCopy = UIAction(title: NSLocalizedString("_move_or_copy_", comment: ""), image: UIImage(systemName: "arrow.up.right.square")) { action in
+        let moveCopy = UIAction(title: NSLocalizedString("_move_or_copy_", comment: ""), image: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconImageColor])) { action in
             let controller = self.viewController.tabBarController as? NCMainTabBarController
             NCDownloadAction.shared.openSelectView(items: [self.metadata], controller: controller)//viewController as? NCMainTabBarController)
         }
         
-        let rename = UIAction(title: NSLocalizedString("_rename_", comment: ""), image: UIImage(systemName: "pencil")) { action in
+        let rename = UIAction(title: NSLocalizedString("_rename_", comment: ""), image: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.iconImageColor])) { action in
             if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
                 vcRename.metadata = self.metadata
                 vcRename.imagePreview = self.image
@@ -115,7 +115,7 @@ class NCContextMenu: NSObject {
         let favorite = UIAction(title: metadata.favorite ?
                                 NSLocalizedString("_remove_favorites_", comment: "") :
                                 NSLocalizedString("_add_favorites_", comment: ""),
-                                image: utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])) { _ in
+                                image: NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite])) { _ in
             self.networking.favoriteMetadata(self.metadata) { error in
                 if error != .success {
                     NCContentPresenter().showError(error: error)
@@ -124,7 +124,7 @@ class NCContextMenu: NSObject {
         }
 
         let openIn = UIAction(title: NSLocalizedString("_open_in_", comment: ""),
-                             image: utility.loadImage(named: "square.and.arrow.up") ) { _ in
+                             image: utility.loadImage(named: "open_file",colors: [NCBrandColor.shared.iconImageColor]) ) { _ in
             if self.utilityFileSystem.fileProviderStorageExists(self.metadata) {
                 Task {
                     await self.networking.transferDispatcher.notifyAllDelegates { delegate in
@@ -298,7 +298,7 @@ class NCContextMenu: NSObject {
         }
 
         let deleteConfirmFile = UIAction(title: titleDeleteConfirmFile,
-                                         image: utility.loadImage(named: "trashIcon"), attributes: .destructive) { _ in
+                                         image: utility.loadImage(named: "trashIcon", colors: [.red]), attributes: .destructive) { _ in
 
             var alertStyle = UIAlertController.Style.actionSheet
             if UIDevice.current.userInterfaceIdiom == .pad {
@@ -323,7 +323,7 @@ class NCContextMenu: NSObject {
         }
 
         let deleteConfirmLocal = UIAction(title: NSLocalizedString("_remove_local_file_", comment: ""),
-                                          image: utility.loadImage(named: "trashIcon"), attributes: .destructive) { _ in
+                                          image: utility.loadImage(named: "trashIcon", colors: [.red]), attributes: .destructive) { _ in
             Task {
                 var metadatasError: [tableMetadata: NKError] = [:]
                 let error = await self.networking.deleteCache(self.metadata, sceneIdentifier: self.sceneIdentifier)
@@ -337,7 +337,7 @@ class NCContextMenu: NSObject {
         }
 
         let deleteSubMenu = UIMenu(title: NSLocalizedString("_delete_file_", comment: ""),
-                                   image: utility.loadImage(named: "trashIcon"),
+                                   image: utility.loadImage(named: "trashIcon", colors: [.red]),
                                    options: .destructive,
                                    children: [deleteConfirmLocal, deleteConfirmFile])
 

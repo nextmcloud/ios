@@ -159,12 +159,15 @@ class NCFilePermissionEditCell: XLFormBaseCell, UITextFieldDelegate {
     }
     
     @objc func doneDatePicker() {
-        let dateFormatter = DateFormatter()
-        dateFormatter.formatterBehavior = .behavior10_4
-        dateFormatter.dateStyle = .medium
-        self.expirationDateText = dateFormatter.string(from: datePicker.date as Date)
+//        let dateFormatter = DateFormatter()
+//        dateFormatter.formatterBehavior = .behavior10_4
+//        dateFormatter.dateStyle = .medium
+//        self.expirationDateText = dateFormatter.string(from: datePicker.date as Date)
+//        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
         
-        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
+        let expiryDateString = DateFormatter.formattedExpiryDate(datePicker.date)
+
+        self.expirationDateText = expiryDateString
         self.expirationDate = datePicker.date as NSDate
         self.cellTextField.text = self.expirationDateText
         self.rowDescriptor.value = self.expirationDate

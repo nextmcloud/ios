@@ -220,6 +220,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         } else {
             imageSelect.isHidden = isEditMode ? false : true
         }
+//        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
+////        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
+//            backgroundView = nil
+//            separator.isHidden = false
+//            imageSelect.isHidden = true
+//            return
+//        }
         if isEditMode {
             imageItemLeftConstraint.constant = 45
 //            imageSelect.isHidden = false
@@ -295,7 +302,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         if imageFavorite.image != nil {
             let outlineView = UIImageView()
             outlineView.translatesAutoresizingMaskIntoConstraints = false
-            outlineView.image = UIImage(systemName: "star")
+            outlineView.image = UIImage(systemName: "star.fill")
             outlineView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 16, weight: .thin)
             outlineView.tintColor = .systemBackground
 

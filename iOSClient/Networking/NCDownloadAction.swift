@@ -283,65 +283,65 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
             Task { @MainActor in
                 NCActivityIndicator.shared.stop()
 
-                if let metadata = metadata, error == .success {
-                    let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
-                    let shareViewController = shareNavigationController?.topViewController as? NCShare
-                    shareViewController?.metadata = metadata
-                    shareNavigationController?.modalPresentationStyle = .formSheet
-                    if let shareNavigationController = shareNavigationController {
-                        viewController.present(shareNavigationController, animated: true, completion: nil)
-                    }
-                }
-//                if let metadata = metadata, let file = file, error == .success {
-//                    // Remove all known download limits from shares related to the given file.
-//                    // This avoids obsolete download limit objects to stay around.
-//                    // Afterwards create new download limits, should any such be returned for the known shares.
-//                    let shares = await NCManageDatabase.shared.getTableSharesAsync(account: metadata.account,
-//                                                                                   serverUrl: metadata.serverUrl,
-//                                                                                   fileName: metadata.fileName)
-//                    for share in shares {
-//                        await NCManageDatabase.shared.deleteDownloadLimitAsync(byAccount: metadata.account, shareToken: share.token)
-//
-//                        if let receivedDownloadLimit = file.downloadLimits.first(where: { $0.token == share.token }) {
-//                            await NCManageDatabase.shared.createDownloadLimitAsync(account: metadata.account,
-//                                                                                   count: receivedDownloadLimit.count,
-//                                                                                   limit: receivedDownloadLimit.limit,
-//                                                                                   token: receivedDownloadLimit.token)
-//                        }
-//                    }
-//
-//                    var pages: [NCBrandOptions.NCInfoPagingTab] = []
+//                if let metadata = metadata, error == .success {
 //                    let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
-//                    let shareViewController = shareNavigationController?.topViewController as? NCSharePaging
-//
-//                    for value in NCBrandOptions.NCInfoPagingTab.allCases {
-//                        pages.append(value)
-//                    }
-//                    if capabilities.activity.isEmpty, let idx = pages.firstIndex(of: .activity) {
-//                        pages.remove(at: idx)
-//                    }
-//                    if !metadata.isSharable(), let idx = pages.firstIndex(of: .sharing) {
-//                        pages.remove(at: idx)
-//                    }
-//
-//                    (pages, page) = NCApplicationHandle().filterPages(pages: pages, page: page, metadata: metadata)
-//
-//                    shareViewController?.pages = pages
+//                    let shareViewController = shareNavigationController?.topViewController as? NCShare
 //                    shareViewController?.metadata = metadata
-//
-//                    if pages.contains(page) {
-//                        shareViewController?.page = page
-//                    } else if let page = pages.first {
-//                        shareViewController?.page = page
-//                    } else {
-//                        return
-//                    }
-//
 //                    shareNavigationController?.modalPresentationStyle = .formSheet
 //                    if let shareNavigationController = shareNavigationController {
 //                        viewController.present(shareNavigationController, animated: true, completion: nil)
 //                    }
 //                }
+                if let metadata = metadata, let file = file, error == .success {
+                    // Remove all known download limits from shares related to the given file.
+                    // This avoids obsolete download limit objects to stay around.
+                    // Afterwards create new download limits, should any such be returned for the known shares.
+                    let shares = await NCManageDatabase.shared.getTableSharesAsync(account: metadata.account,
+                                                                                   serverUrl: metadata.serverUrl,
+                                                                                   fileName: metadata.fileName)
+                    for share in shares {
+                        await NCManageDatabase.shared.deleteDownloadLimitAsync(byAccount: metadata.account, shareToken: share.token)
+
+                        if let receivedDownloadLimit = file.downloadLimits.first(where: { $0.token == share.token }) {
+                            await NCManageDatabase.shared.createDownloadLimitAsync(account: metadata.account,
+                                                                                   count: receivedDownloadLimit.count,
+                                                                                   limit: receivedDownloadLimit.limit,
+                                                                                   token: receivedDownloadLimit.token)
+                        }
+                    }
+
+                    var pages: [NCBrandOptions.NCInfoPagingTab] = []
+                    let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
+                    let shareViewController = shareNavigationController?.topViewController as? NCSharePaging
+
+                    for value in NCBrandOptions.NCInfoPagingTab.allCases {
+                        pages.append(value)
+                    }
+                    if capabilities.activity.isEmpty, let idx = pages.firstIndex(of: .activity) {
+                        pages.remove(at: idx)
+                    }
+                    if !metadata.isSharable(), let idx = pages.firstIndex(of: .sharing) {
+                        pages.remove(at: idx)
+                    }
+
+                    (pages, page) = NCApplicationHandle().filterPages(pages: pages, page: page, metadata: metadata)
+
+                    shareViewController?.pages = pages
+                    shareViewController?.metadata = metadata
+
+                    if pages.contains(page) {
+                        shareViewController?.page = page
+                    } else if let page = pages.first {
+                        shareViewController?.page = page
+                    } else {
+                        return
+                    }
+
+                    shareNavigationController?.modalPresentationStyle = .formSheet
+                    if let shareNavigationController = shareNavigationController {
+                        viewController.present(shareNavigationController, animated: true, completion: nil)
+                    }
+                }
             }
         }
     }
@@ -647,7 +647,7 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
 
     // MARK: - NCSelect + Delegate
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {//, session: NCSession.Session) {
         if let destination = serverUrl, !items.isEmpty {
             if copy {
                 for case let metadata as tableMetadata in items {

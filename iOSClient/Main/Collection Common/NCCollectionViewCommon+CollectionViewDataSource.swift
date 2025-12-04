@@ -96,14 +96,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             }
         }
 
-        // Status
-        //
-        if metadata.isLivePhoto {
-            cell.fileStatusImage?.image = utility.loadImage(named: "livephoto", colors: isLayoutPhoto ? [.white] : [NCBrandColor.shared.iconImageColor2], size: 24)
-        } else if metadata.isVideo {
-            cell.fileStatusImage?.image = utility.loadImage(named: "play.circle", colors: NCBrandColor.shared.iconImageMultiColors, size: 24)
-        }
-
         // Edit mode
         //
         if fileSelect.contains(metadata.ocId) {
@@ -334,23 +326,15 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.fileFavoriteImage?.image = imageCache.getImageFavorite()
             a11yValues.append(NSLocalizedString("_favorite_short_", comment: ""))
         }
-
-//        // Share image
-//        if isShare {
-//            cell.fileSharedImage?.image = imageCache.getImageShared()
-//        } else if !metadata.shareType.isEmpty {
-//            metadata.shareType.contains(NCShareCommon.shareTypeLink) ?
-//            (cell.fileSharedImage?.image = imageCache.getImageShareByLink()) :
-//            (cell.fileSharedImage?.image = imageCache.getImageShared())
-//        } else {
-//            cell.fileSharedImage?.image = imageCache.getImageCanShare()
-//        }
         
         // Share image
         if isShare || !metadata.shareType.isEmpty {
             cell.fileSharedImage?.image = imageCache.getImageShared()
         } else {
-            cell.fileSharedImage?.image = imageCache.getImageCanShare()
+            cell.fileSharedImage?.image = NCImageCache.shared.getImageCanShare().image(color: NCBrandColor.shared.gray60)
+        }
+        if session.account != metadata.account {
+            cell.fileSharedImage?.image = imageCache.getImageShared()
         }
         if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)){
             cell.fileSharedImage?.image = cell.fileSharedImage?.image?.image(color: NCBrandColor.shared.customer)
@@ -375,7 +359,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.fileStatusImage?.image = utility.loadImage(named: "livephoto", colors: isLayoutPhoto ? [.white] : [NCBrandColor.shared.iconImageColor2])
             a11yValues.append(NSLocalizedString("_upload_mov_livephoto_", comment: ""))
         } else if metadata.isVideo {
-            cell.fileStatusImage?.image = utility.loadImage(named: "play.circle", colors: NCBrandColor.shared.iconImageMultiColors)
+            cell.fileStatusImage?.image = utility.loadImage(named: "play.circle.fill", colors: [.systemBackgroundInverted, .systemGray5])
         }
         switch metadata.status {
         case global.metadataStatusWaitCreateFolder:
@@ -404,29 +388,29 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         }
 
         // AVATAR
-        if !metadata.ownerId.isEmpty, metadata.ownerId != metadata.userId {
-            let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: metadata.ownerId)
-            if let image = NCImageCache.shared.getImageCache(key: fileName) {
-                cell.fileAvatarImageView?.contentMode = .scaleAspectFill
-                cell.fileAvatarImageView?.image = image
-            } else {
-                self.database.getImageAvatarLoaded(fileName: fileName) { image, tblAvatar in
-                    if let image {
-                        cell.fileAvatarImageView?.contentMode = .scaleAspectFill
-                        cell.fileAvatarImageView?.image = image
-                        NCImageCache.shared.addImageCache(image: image, key: fileName)
-                    } else {
-                        cell.fileAvatarImageView?.contentMode = .scaleAspectFill
-                        cell.fileAvatarImageView?.image = self.utility.loadUserImage(for: metadata.ownerId, displayName: metadata.ownerDisplayName, urlBase: metadata.urlBase)
-                    }
-
-                    if !(tblAvatar?.loaded ?? false),
-                       self.networking.downloadAvatarQueue.operations.filter({ ($0 as? NCOperationDownloadAvatar)?.fileName == fileName }).isEmpty {
-                        self.networking.downloadAvatarQueue.addOperation(NCOperationDownloadAvatar(user: metadata.ownerId, fileName: fileName, account: metadata.account, view: collectionView))
-                    }
-                }
-            }
-        }
+//        if !metadata.ownerId.isEmpty, metadata.ownerId != metadata.userId {
+//            let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: metadata.ownerId)
+//            if let image = NCImageCache.shared.getImageCache(key: fileName) {
+//                cell.fileAvatarImageView?.contentMode = .scaleAspectFill
+//                cell.fileAvatarImageView?.image = image
+//            } else {
+//                self.database.getImageAvatarLoaded(fileName: fileName) { image, tblAvatar in
+//                    if let image {
+//                        cell.fileAvatarImageView?.contentMode = .scaleAspectFill
+//                        cell.fileAvatarImageView?.image = image
+//                        NCImageCache.shared.addImageCache(image: image, key: fileName)
+//                    } else {
+//                        cell.fileAvatarImageView?.contentMode = .scaleAspectFill
+//                        cell.fileAvatarImageView?.image = self.utility.loadUserImage(for: metadata.ownerId, displayName: metadata.ownerDisplayName, urlBase: metadata.urlBase)
+//                    }
+//
+//                    if !(tblAvatar?.loaded ?? false),
+//                       self.networking.downloadAvatarQueue.operations.filter({ ($0 as? NCOperationDownloadAvatar)?.fileName == fileName }).isEmpty {
+//                        self.networking.downloadAvatarQueue.addOperation(NCOperationDownloadAvatar(user: metadata.ownerId, fileName: fileName, account: metadata.account, view: collectionView))
+//                    }
+//                }
+//            }
+//        }
 
         // URL
         if metadata.classFile == NKTypeClassFile.url.rawValue {

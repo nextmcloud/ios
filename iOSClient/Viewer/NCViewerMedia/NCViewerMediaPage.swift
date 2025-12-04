@@ -139,6 +139,8 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(pageViewController.disableSwipeGesture), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDisableSwipeGesture), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: UIApplication.didBecomeActiveNotification, object: nil)
 
+        NotificationCenter.default.addObserver(self, selector: #selector(renameFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterRenameFile), object: nil)
+
         if currentViewController.metadata.isImage {
             navigationItem.rightBarButtonItems = [moreNavigationItem, imageDetailNavigationItem]
         } else {
@@ -308,6 +310,29 @@ class NCViewerMediaPage: UIViewController {
     @objc func applicationDidBecomeActive(_ notification: NSNotification) {
         progressView.progress = 0
         changeScreenMode(mode: .normal)
+    }
+    
+    @objc func renameFile(_ notification: NSNotification) {
+
+        guard let userInfo = notification.userInfo as NSDictionary?,
+              let ocId = userInfo["ocId"] as? String,
+//              let index = metadatas.firstIndex(where: {$0.ocId == ocId}),
+//              let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+                let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
+
+        else { return }
+
+        // Stop media
+        if let ncplayer = currentViewController.ncplayer, ncplayer.isPlaying() {
+            ncplayer.playerPause()
+        }
+
+//        metadatas[index] = metadata
+//        if index == currentIndex {
+            navigationItem.title = metadata.fileNameView
+            currentViewController.metadata = metadata
+            self.currentViewController.metadata = metadata
+//        }
     }
 
     // MARK: - Command Center

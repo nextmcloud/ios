@@ -175,6 +175,8 @@
 		B568C2B52DA7AADD0072FCB4 /* NCMoreUserCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B568C2B42DA7AADD0072FCB4 /* NCMoreUserCell.swift */; };
 		B56AAB362EC4944600570F8D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F72685E927C78E490019EF5E /* InfoPlist.strings */; };
 		B56AAB372EC4944600570F8D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F72685E927C78E490019EF5E /* InfoPlist.strings */; };
+		B57C1AB72EE004CC008D2BAF /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
+		B57C1AB82EE004CC008D2BAF /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
 		B5A779F02E967B5B00C0F616 /* MoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A779E52E967B5B00C0F616 /* MoreTests.swift */; };
 		B5A779F12E967B5B00C0F616 /* OnboardingTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A779E82E967B5B00C0F616 /* OnboardingTestCase.swift */; };
 		B5A779F22E967B5B00C0F616 /* AudioUploadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A779E22E967B5B00C0F616 /* AudioUploadTests.swift */; };
@@ -4463,6 +4465,7 @@
 				F78A10C229322E8A008499B8 /* NCManageDatabase+Directory.swift in Sources */,
 				B5EEC71B2E9CE868009296D9 /* NCKeychain.swift in Sources */,
 				F79FFB272A97C24A0055EEA4 /* NCNetworkingE2EEMarkFolder.swift in Sources */,
+				B57C1AB82EE004CC008D2BAF /* NCEmptyDataSet.swift in Sources */,
 				F7D68FCE28CB9051009139F3 /* NCManageDatabase+DashboardWidget.swift in Sources */,
 				AF22B217277D196700DAB0CC /* NCShareExtension+DataSource.swift in Sources */,
 				B535258A2E99095D00EBB4E8 /* NCAccountRequest.swift in Sources */,
@@ -4790,6 +4793,7 @@
 				F778231E2C42C07C001BB94F /* NCCollectionViewCommon+MediaLayout.swift in Sources */,
 				3781B9B023DB2B7E006B4B1D /* AppDelegate+Menu.swift in Sources */,
 				F710D1F52405770F00A6033D /* NCViewerPDF.swift in Sources */,
+				B57C1AB72EE004CC008D2BAF /* NCEmptyDataSet.swift in Sources */,
 				F389C9F52CEE383300049762 /* SelectAlbumView.swift in Sources */,
 				F7B6B70427C4E7FA00A7F6EB /* NCScan+CollectionView.swift in Sources */,
 				F7816EF22C2C3E1F00A52517 /* NCPushNotification.swift in Sources */,
@@ -5093,7 +5097,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Notification_Service_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5126,7 +5130,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Service Extension/Notification Service ExtensionRelease.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5393,7 +5397,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Share.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5426,7 +5430,7 @@
 				CODE_SIGN_ENTITLEMENTS = Share/ShareRelease.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5460,7 +5464,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/File_Provider_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5496,7 +5500,7 @@
 				CODE_SIGN_ENTITLEMENTS = "File Provider Extension/File Provider ExtensionRelease.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5531,7 +5535,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
@@ -5561,7 +5565,7 @@
 				CODE_SIGN_ENTITLEMENTS = NextcloudRelease.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S5724FNY84;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;

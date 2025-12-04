@@ -62,7 +62,8 @@ enum NCViewerContextMenu {
                    title: metadata.favorite
                    ? NSLocalizedString("_remove_favorites_", comment: "")
                    : NSLocalizedString("_add_favorites_", comment: ""),
-                   image: NCUtility().loadImage(named: metadata.favorite ? "star.slash" : "star", colors: [NCBrandColor.shared.yellowFavorite])
+                   image: NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
+//                   image: NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [metadata.favorite ? NCBrandColor.shared.yellowFavorite : NCBrandColor.shared.iconImageColor2])
                ) { _ in
                    NCNetworking.shared.favoriteMetadata(metadata) { error in
                        if error != .success {

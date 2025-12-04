@@ -448,6 +448,50 @@ extension NCNetworking {
             }
         }
     }
+    
+    func renameMetadata(_ metadata: tableMetadata,
+                        fileNameNew: String,
+                        indexPath: IndexPath,
+                        viewController: UIViewController?,
+                        completion: @escaping (_ error: NKError) -> Void) {
+        
+        let permission = NCMetadataPermissions.permissionsContainsString(metadata.permissions, permissions: NCMetadataPermissions.permissionCanRename)
+        if (!metadata.permissions.isEmpty && permission == false) ||
+            (metadata.status != global.metadataStatusNormal && metadata.status != global.metadataStatusWaitRename) {
+//            return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
+//            let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
+//            DispatchQueue.main.async { completion(error) }
+            completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_no_permission_modify_file_"))
+        }
+
+        if metadata.isDirectoryE2EE {
+#if !EXTENSION
+            if isOffline {
+//                return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
+                completion(NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
+            }
+            Task {
+                let error = await NCNetworkingE2EERename().rename(metadata: metadata, fileNameNew: fileNameNew)
+                if error != .success {
+//                    NCContentPresenter().showError(error: error)
+                    completion(error)
+                }
+            }
+#endif
+        } else {
+            Task {
+                await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
+                    let status = self.global.metadataStatusWaitRename
+                    await NCManageDatabase.shared.renameMetadata(fileNameNew: fileNameNew, ocId: metadata.ocId, status: status)
+                    delegate.transferReloadData(serverUrl: metadata.serverUrl, status: status)
+                }
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["serverUrl": metadata.serverUrl, "account": metadata.account, "error": NKError(errorCode: 0, errorDescription: ""), "ocId": metadata.ocId, "indexPath": indexPath])
+
+            }
+            
+            completion(NKError(errorCode: 0, errorDescription: ""))
+        }
+    }
 
     // MARK: - Move
 

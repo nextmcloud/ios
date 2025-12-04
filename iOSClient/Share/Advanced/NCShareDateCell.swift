@@ -31,7 +31,7 @@ class NCShareDateCell: UITableViewCell {
 
         picker.action(for: .valueChanged) { datePicker in
             guard let datePicker = datePicker as? UIDatePicker else { return }
-            self.detailTextLabel?.text = DateFormatter.formattedShareExpDate(from: datePicker.date)
+            self.detailTextLabel?.text = DateFormatter.formattedExpiryDate(datePicker.date)//DateFormatter.formattedShareExpDate(from: datePicker.date)
         }
         accessoryView = textField
 
@@ -51,7 +51,8 @@ class NCShareDateCell: UITableViewCell {
         textField.inputView = picker
 
         if let expDate = share.expirationDate {
-            detailTextLabel?.text = DateFormatter.formattedShareExpDate(from: expDate as Date)
+            print(DateFormatter.formattedExpiryDate(expDate as Date))
+            detailTextLabel?.text = DateFormatter.formattedExpiryDate(expDate as Date) //DateFormatter.formattedShareExpDate(from: expDate as Date)
         }
     }
 

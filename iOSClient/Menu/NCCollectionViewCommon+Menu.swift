@@ -220,7 +220,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: metadata.favorite ? NSLocalizedString("_remove_favorites_", comment: "") : NSLocalizedString("_add_favorites_", comment: ""),
-                    icon: utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite]),
+                    icon: utility.loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite]),
                     order: 50,
                     sender: sender,
                     action: { _ in
