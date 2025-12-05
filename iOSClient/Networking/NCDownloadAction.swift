@@ -283,60 +283,10 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
             Task { @MainActor in
                 NCActivityIndicator.shared.stop()
 
-//                if let metadata = metadata, error == .success {
-//                    let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
-//                    let shareViewController = shareNavigationController?.topViewController as? NCShare
-//                    shareViewController?.metadata = metadata
-//                    shareNavigationController?.modalPresentationStyle = .formSheet
-//                    if let shareNavigationController = shareNavigationController {
-//                        viewController.present(shareNavigationController, animated: true, completion: nil)
-//                    }
-//                }
-                if let metadata = metadata, let file = file, error == .success {
-                    // Remove all known download limits from shares related to the given file.
-                    // This avoids obsolete download limit objects to stay around.
-                    // Afterwards create new download limits, should any such be returned for the known shares.
-                    let shares = await NCManageDatabase.shared.getTableSharesAsync(account: metadata.account,
-                                                                                   serverUrl: metadata.serverUrl,
-                                                                                   fileName: metadata.fileName)
-                    for share in shares {
-                        await NCManageDatabase.shared.deleteDownloadLimitAsync(byAccount: metadata.account, shareToken: share.token)
-
-                        if let receivedDownloadLimit = file.downloadLimits.first(where: { $0.token == share.token }) {
-                            await NCManageDatabase.shared.createDownloadLimitAsync(account: metadata.account,
-                                                                                   count: receivedDownloadLimit.count,
-                                                                                   limit: receivedDownloadLimit.limit,
-                                                                                   token: receivedDownloadLimit.token)
-                        }
-                    }
-
-                    var pages: [NCBrandOptions.NCInfoPagingTab] = []
+                if let metadata = metadata, error == .success {
                     let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
-                    let shareViewController = shareNavigationController?.topViewController as? NCSharePaging
-
-                    for value in NCBrandOptions.NCInfoPagingTab.allCases {
-                        pages.append(value)
-                    }
-                    if capabilities.activity.isEmpty, let idx = pages.firstIndex(of: .activity) {
-                        pages.remove(at: idx)
-                    }
-                    if !metadata.isSharable(), let idx = pages.firstIndex(of: .sharing) {
-                        pages.remove(at: idx)
-                    }
-
-                    (pages, page) = NCApplicationHandle().filterPages(pages: pages, page: page, metadata: metadata)
-
-                    shareViewController?.pages = pages
+                    let shareViewController = shareNavigationController?.topViewController as? NCShare
                     shareViewController?.metadata = metadata
-
-                    if pages.contains(page) {
-                        shareViewController?.page = page
-                    } else if let page = pages.first {
-                        shareViewController?.page = page
-                    } else {
-                        return
-                    }
-
                     shareNavigationController?.modalPresentationStyle = .formSheet
                     if let shareNavigationController = shareNavigationController {
                         viewController.present(shareNavigationController, animated: true, completion: nil)
@@ -482,49 +432,47 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
     // MARK: - Copy & Paste
 
     func copyPasteboard(pasteboardOcIds: [String], controller: NCMainTabBarController?) {
-//        var items = [[String: Any]]()
-//        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-//        let hudView = controller
-//        var fractionCompleted: Float = 0
-//
-//        // getting file data can take some time and block the main queue
-//        DispatchQueue.global(qos: .userInitiated).async {
-//            var downloadMetadatas: [tableMetadata] = []
-//            for ocid in pasteboardOcIds {
-//                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocid) else { continue }
-//                if let pasteboardItem = metadata.toPasteBoardItem() {
-//                    items.append(pasteboardItem)
-//                } else {
-//                    downloadMetadatas.append(metadata)
-//                }
-//            }
-//
-//            // do 5 downloads in parallel to optimize efficiency
-//            let processor = ParallelWorker(n: 5, titleKey: "_downloading_", totalTasks: downloadMetadatas.count, controller: hudView)
-//
-//            for metadata in downloadMetadatas {
-//                processor.execute { completion in
-//                    guard let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
-//                                                                                                   session: NextcloudKit.shared.nkCommonInstance.identifierSessionDownload,
-//                                                                                                   selector: "") else { return completion() }
-//                    NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: false) {
-//                    } requestHandler: { _ in
-//                    } progressHandler: { progress in
-//                        if Float(progress.fractionCompleted) > fractionCompleted || fractionCompleted == 0 {
-//                            processor.hud.progress(progress.fractionCompleted)
-//                            fractionCompleted = Float(progress.fractionCompleted)
-//                        }
-//                    } completion: { _, _ in
-//                        fractionCompleted = 0
-//                        completion()
-//                    }
-//                }
-//            }
-//            processor.completeWork {
-//                items.append(contentsOf: downloadMetadatas.compactMap({ $0.toPasteBoardItem() }))
-//                UIPasteboard.general.setItems(items, options: [:])
-//            }
-//        }
+        var items = [[String: Any]]()
+        let hudView = controller
+
+        // getting file data can take some time and block the main queue
+        DispatchQueue.global(qos: .userInitiated).async {
+            var downloadMetadatas: [tableMetadata] = []
+            for ocid in pasteboardOcIds {
+                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocid) else { continue }
+                if let pasteboardItem = metadata.toPasteBoardItem() {
+                    items.append(pasteboardItem)
+                } else {
+                    downloadMetadatas.append(metadata)
+                }
+            }
+
+            let processor = ParallelWorker(n: 5, titleKey: "_downloading_", totalTasks: downloadMetadatas.count, controller: controller)
+            for metadata in downloadMetadatas {
+                processor.execute { completion in
+                    Task {
+                        guard let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
+                                                                                                                 session: NCNetworking.shared.sessionDownload,
+                                                                                                                 selector: "",
+                                                                                                                 sceneIdentifier: controller?.sceneIdentifier) else {
+                            return completion()
+                        }
+
+                        await NCNetworking.shared.downloadFile(metadata: metadata) { _ in
+                        } progressHandler: { progress in
+                            processor.hud.progress(progress.fractionCompleted)
+                        }
+                        
+                        completion()
+                    }
+                }
+            }
+
+            processor.completeWork {
+                items.append(contentsOf: downloadMetadatas.compactMap({ $0.toPasteBoardItem() }))
+                UIPasteboard.general.setItems(items, options: [:])
+            }
+        }
     }
     
     func pastePasteboard(serverUrl: String, account: String, controller: NCMainTabBarController?) async {
@@ -770,5 +718,23 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
         formatter.perPageContentInsets.right = 72
         printController.printFormatter = formatter
         printController.present(animated: true)
+    }
+}
+
+fileprivate extension tableMetadata {
+    func toPasteBoardItem() -> [String: Any]? {
+        // Get Data
+        let fileUrl = URL(fileURLWithPath: NCUtilityFileSystem().getDirectoryProviderStorageOcId(ocId,
+                                                                                                 fileName: fileNameView,
+                                                                                                 userId: userId,
+                                                                                                 urlBase: urlBase))
+        guard NCUtilityFileSystem().fileProviderStorageExists(self),
+              let data = try? Data(contentsOf: fileUrl) else { return nil }
+
+        // Determine the UTI for the file
+        guard let fileUTI = UTType(filenameExtension: fileExtension)?.identifier else { return nil }
+
+        // Pasteboard item
+        return [fileUTI: data]
     }
 }

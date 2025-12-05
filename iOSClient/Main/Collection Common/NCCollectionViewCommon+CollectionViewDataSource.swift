@@ -200,14 +200,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.writeInfoDateSize(date: metadata.date, size: metadata.size)
         }
 
-//        if cell is NCListCell && cell.fileTitleLabel is BidiFilenameLabel {
-//            (cell.fileTitleLabel as? BidiFilenameLabel)?.fullFilename = metadata.fileNameView
-//            (cell.fileTitleLabel as? BidiFilenameLabel)?.isFolder = metadata.directory
-//            (cell.fileTitleLabel as? BidiFilenameLabel)?.numberOfLines = 1
-//
-//        } else {
-            cell.fileTitleLabel?.text = metadata.fileNameView
-//        }
+        cell.fileTitleLabel?.text = metadata.fileNameView
 
         // Accessibility [shared] if metadata.ownerId != appDelegate.userId, appDelegate.account == metadata.account {
         if metadata.ownerId != metadata.userId {
@@ -219,12 +212,10 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
             if metadata.e2eEncrypted {
                 cell.filePreviewImageView?.image = imageCache.getFolderEncrypted(account: metadata.account)
-            } else if isShare {
-                cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe(account: metadata.account)
-            } else if !metadata.shareType.isEmpty {
-                metadata.shareType.contains(NCShareCommon.shareTypeLink) ?
-                (cell.filePreviewImageView?.image = imageCache.getFolderPublic(account: metadata.account)) :
-                (cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe(account: metadata.account))
+            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+                cell.filePreviewImageView?.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
+            } else if isShare || !metadata.shareType.isEmpty {
+                cell.filePreviewImageView?.image = NCImageCache.shared.getFolderPublic(account: metadata.account)
             } else if !metadata.shareType.isEmpty && metadata.shareType.contains(NCShareCommon.shareTypeLink) {
                 cell.filePreviewImageView?.image = imageCache.getFolderPublic(account: metadata.account)
             } else if metadata.mountType == "group" {
@@ -386,31 +377,6 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         default:
             break
         }
-
-        // AVATAR
-//        if !metadata.ownerId.isEmpty, metadata.ownerId != metadata.userId {
-//            let fileName = NCSession.shared.getFileName(urlBase: metadata.urlBase, user: metadata.ownerId)
-//            if let image = NCImageCache.shared.getImageCache(key: fileName) {
-//                cell.fileAvatarImageView?.contentMode = .scaleAspectFill
-//                cell.fileAvatarImageView?.image = image
-//            } else {
-//                self.database.getImageAvatarLoaded(fileName: fileName) { image, tblAvatar in
-//                    if let image {
-//                        cell.fileAvatarImageView?.contentMode = .scaleAspectFill
-//                        cell.fileAvatarImageView?.image = image
-//                        NCImageCache.shared.addImageCache(image: image, key: fileName)
-//                    } else {
-//                        cell.fileAvatarImageView?.contentMode = .scaleAspectFill
-//                        cell.fileAvatarImageView?.image = self.utility.loadUserImage(for: metadata.ownerId, displayName: metadata.ownerDisplayName, urlBase: metadata.urlBase)
-//                    }
-//
-//                    if !(tblAvatar?.loaded ?? false),
-//                       self.networking.downloadAvatarQueue.operations.filter({ ($0 as? NCOperationDownloadAvatar)?.fileName == fileName }).isEmpty {
-//                        self.networking.downloadAvatarQueue.addOperation(NCOperationDownloadAvatar(user: metadata.ownerId, fileName: fileName, account: metadata.account, view: collectionView))
-//                    }
-//                }
-//            }
-//        }
 
         // URL
         if metadata.classFile == NKTypeClassFile.url.rawValue {

@@ -86,7 +86,6 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
     let utilityFileSystem = NCUtilityFileSystem()
     
     func setupUI(with metadata: tableMetadata) {
-//        backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         fileName.textColor = NCBrandColor.shared.label
         info.textColor = NCBrandColor.shared.textInfo
 
@@ -100,12 +99,14 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
             imageView.isHidden = false
             if metadata.e2eEncrypted {
                 imageView.image = NCImageCache.shared.getFolderEncrypted(account: metadata.account)
-            } else if isShare {
-                imageView.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
+            } else if isShare || !metadata.shareType.isEmpty {
+                imageView.image = NCImageCache.shared.getFolderPublic(account: metadata.account)
             } else if !metadata.shareType.isEmpty {
                 imageView.image = metadata.shareType.contains(3)
                     ? NCImageCache.shared.getFolderPublic(account: metadata.account)
                     : NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
+            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+                imageView.image = NCImageCache.shared.getImageSharedWithMe()
             } else if metadata.directory {
                 imageView.image = NCImageCache.shared.getFolder(account: metadata.account)
             } else if !metadata.iconName.isEmpty {
@@ -123,11 +124,10 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
     }
     
     func setupUI(with metadata: tableMetadata, linkCount: Int, emailCount: Int) {
-//        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         fileName.textColor = NCBrandColor.shared.label
         info.textColor = NCBrandColor.shared.textInfo
         
-//        let isShare = metadata.permissions.contains(NCPermissions().permissionShared)
+        let isShare = metadata.permissions.contains(NCPermissions().permissionShared)
         let hasShares = (linkCount > 0 || emailCount > 0)
 
         if let image = NCUtility().getImage(ocId: metadata.ocId, etag: metadata.etag, ext: NCGlobal.shared.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase) {
@@ -138,18 +138,14 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
             imageView.isHidden = false
             if metadata.e2eEncrypted {
                 imageView.image = NCImageCache.shared.getFolderEncrypted(account: metadata.account)
-            } else if hasShares {
+            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
                 imageView.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
-            } else if !metadata.shareType.isEmpty {
-                imageView.image = metadata.shareType.contains(3)
-                    ? NCImageCache.shared.getFolderPublic(account: metadata.account)
-                    : NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
+            } else if isShare || !metadata.shareType.isEmpty {
+                imageView.image = NCImageCache.shared.getFolderPublic(account: metadata.account)
             } else if metadata.directory {
                 imageView.image = NCImageCache.shared.getFolder(account: metadata.account)
             } else if !metadata.iconName.isEmpty {
-                imageView.image = NCUtility().loadImage(named: metadata.iconName,
-                                                              useTypeIconFile: true,
-                                                              account: metadata.account)
+                imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
             } else {
                 imageView.image = NCImageCache.shared.getImageFile()
             }

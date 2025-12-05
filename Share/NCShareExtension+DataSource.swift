@@ -132,12 +132,10 @@ extension NCShareExtension: UICollectionViewDataSource {
 
         if metadata.e2eEncrypted {
             cell.imageItem.image = NCImageCache.shared.getFolderEncrypted(account: metadata.account)
-        } else if isShare {
+        } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
             cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
-        } else if !metadata.shareType.isEmpty {
-            metadata.shareType.contains(3) ?
-            (cell.imageItem.image = NCImageCache.shared.getFolderPublic(account: metadata.account)) :
-            (cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account))
+        } else if isShare || !metadata.shareType.isEmpty {
+            cell.imageItem.image = NCImageCache.shared.getFolderPublic(account: metadata.account)
         } else if metadata.mountType == "group" {
             cell.imageItem.image = NCImageCache.shared.getFolderGroup(account: metadata.account)
         } else if isMounted {
@@ -155,7 +153,9 @@ extension NCShareExtension: UICollectionViewDataSource {
 
         // Local image: offline
         if tableDirectory != nil && tableDirectory!.offline {
-            cell.imageLocal.image = NCImageCache.shared.getImageOfflineFlag()
+            cell.imageLocal.image = NCImageCache.shared.getImageOfflineFlag(colors: [.systemBackground, .systemGreen])
+        } else if utilityFileSystem.fileProviderStorageExists(metadata) {
+            cell.imageLocal.image = NCImageCache.shared.getImageLocal(colors: [.systemBackground, .systemGreen])
         }
     }
 }
