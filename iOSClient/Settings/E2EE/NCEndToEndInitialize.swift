@@ -149,6 +149,8 @@ class NCEndToEndInitialize: NSObject {
                        let privateKey = String(data: keyData, encoding: .utf8) {
                         NCPreferences().setEndToEndPrivateKey(account: account, privateKey: privateKey)
                     } else {
+//                        // Fix here for https://jira.telekom.de/browse/NMC-5056
+//                        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Passphrase ist nicht korrekt")
                         let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to decrypt Private Key")
                         NCContentPresenter().messageNotification("E2E decrypt privateKey", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
 

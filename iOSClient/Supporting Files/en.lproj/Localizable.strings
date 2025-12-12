@@ -905,7 +905,7 @@
 "_e2e_settings_read_passphrase_"    = "Read passphrase";
 "_e2e_settings_lock_not_active_"    = "Lock not active. Go to \"Settings\" and activate it.";
 "_e2e_settings_the_passphrase_is_"  = "The passphrase is:";
-"_e2e_passphrase_request_title_"    = "Request passphrase";
+"_e2e_passphrase_request_title_"    = "Enter passphrase"; //"Request passphrase";
 "_e2e_passphrase_request_message_"  = "Insert the 12 words";
 "_e2e_settings_remove_"             = "Remove the encryption locally";
 "_e2e_settings_remove_message_"     = "Confirm removal of encryption along with the passphrase.";
@@ -942,7 +942,8 @@
 "_e2e_error_incorrect_passphrase_"  = "Wrong password?";
 "_e2e_error_passphrase_title"       = "Error while decrypting.";
 "_scans_document_"                  = "Scan document";
-"_scanned_images_"                  = "Scanned images";
+//"_scanned_images_"                  = "Scanned images";
+"_scanned_images_"                  = "Scanned documents";
 "_scan_document_pdf_page_"          = "Page";
 "_scan_label_document_zone_"        = "Tap or drag images down for document creation";
 "_filter_document_"                 = "Document";
