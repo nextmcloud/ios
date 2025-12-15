@@ -48,10 +48,9 @@ extension NCTrashCellProtocol where Self: UICollectionViewCell {
             self.labelInfo?.text = dateFormatter.string(from: tableTrash.trashbinDeletionTime as Date)
         }
         if tableTrash.directory {
-            self.imageItem.image = NCImageCache.shared.getFolder()
+            self.imageItem.image = NCImageCache.shared.getFolder(account: tableTrash.account)
         } else {
             self.imageItem.image = image
-//            self.labelInfo?.text = (self.labelInfo?.text ?? "") + " · " + NCUtilityFileSystem().transformedSize(tableTrash.size)
         }
         self.labelInfo?.text = (self.labelInfo?.text ?? "") + " · " + NCUtilityFileSystem().transformedSize(tableTrash.size)
         self.accessibilityLabel = tableTrash.trashbinFileName + ", " + (self.labelInfo?.text ?? "")
