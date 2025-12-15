@@ -1,10 +1,11 @@
 // SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2025 Iva Horn
 // SPDX-FileCopyrightText: 2025 Milen Pivchev
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import AuthenticationServices
 import UIKit
-import WebKit
+@preconcurrency import WebKit
 import NextcloudKit
 
 protocol NCLoginProviderDelegate: AnyObject {
@@ -122,16 +123,11 @@ class NCLoginProvider: NSObject, ASWebAuthenticationPresentationContextProviding
 //        appDelegate.timerErrorNetworkingDisabled = false
     }
 
-    func loadWebPage(webView: WKWebView, url: URL) {
+    // MARK: - Navigation
+
+    private func loadWebPage(url: URL) {
         let language = NSLocale.preferredLanguages[0] as String
         var request = URLRequest(url: url)
-
-        if let deviceName = "\(UIDevice.current.name) (\(NCBrandOptions.shared.brand) iOS)".cString(using: .utf8),
-           let deviceUserAgent = String(cString: deviceName, encoding: .ascii) {
-            webView.customUserAgent = deviceUserAgent
-        } else {
-            webView.customUserAgent = userAgent
-        }
 
         request.addValue("true", forHTTPHeaderField: "OCS-APIRequest")
         request.addValue(language, forHTTPHeaderField: "Accept-Language")
@@ -243,7 +239,29 @@ class NCLoginProvider: NSObject, ASWebAuthenticationPresentationContextProviding
 
                 guard error == .success else {
                     continuation.resume(returning: nil)
+                    return
                 }
+
+                guard let urlBase = server else {
+                    nkLog(error: "Login poll response field for server for token \"\(token)\" is nil!")
+                    continuation.resume(returning: nil)
+                    return
+                }
+
+                guard let user = loginName else {
+                    nkLog(error: "Login poll response field for user name for token \"\(token)\" is nil!")
+                    continuation.resume(returning: nil)
+                    return
+                }
+
+                guard let appPassword = appPassword else {
+                    nkLog(error: "Login poll response field for app password for token \"\(token)\" is nil!")
+                    continuation.resume(returning: nil)
+                    return
+                }
+
+                nkLog(debug: "Returning login poll response for \"\(user)\" on \"\(urlBase)\" for token \"\(token)\".")
+                continuation.resume(returning: (urlBase, user, appPassword))
             }
         }
     }
@@ -265,9 +283,6 @@ class NCLoginProvider: NSObject, ASWebAuthenticationPresentationContextProviding
         if controller == nil {
             nkLog(debug: "View controller is still undefined, will resolve root view controller of first window.")
             controller = UIApplication.shared.mainAppWindow?.rootViewController as? NCMainTabBarController
-            NCAccount().createAccount(viewController: self, urlBase: urlBase, user: loginName, password: appPassword, controller: controller) {
-                continuation.resume()
-            }
         }
 
         guard let viewController = presentingViewController else {
@@ -287,7 +302,7 @@ class NCLoginProvider: NSObject, ASWebAuthenticationPresentationContextProviding
 
         var grantValues: (urlBase: String, loginName: String, appPassword: String)?
 
-        Task { @MainActor in
+        return Task { @MainActor in
             repeat {
                 try Task.checkCancellation()
 
@@ -303,6 +318,7 @@ class NCLoginProvider: NSObject, ASWebAuthenticationPresentationContextProviding
             self.pollingTask = nil
 
             await handleGrant(urlBase: grantValues.urlBase, loginName: grantValues.loginName, appPassword: grantValues.appPassword)
+            nkLog(debug: "Polling task completed.")
         }
     }
 }
@@ -399,6 +415,8 @@ class NCLoginProviderWebViewFallback: UIViewController, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        nkLog(debug: "Web view did receive authentication challenge.")
+
         DispatchQueue.global().async {
             if let serverTrust = challenge.protectionSpace.serverTrust {
                 completionHandler(.useCredential, URLCredential(trust: serverTrust))
@@ -409,6 +427,7 @@ class NCLoginProviderWebViewFallback: UIViewController, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        nkLog(debug: "Web view will allow navigation to \(navigationAction.request.url?.absoluteString ?? "nil")")
         decisionHandler(.allow)
     }
 
@@ -418,60 +437,7 @@ class NCLoginProviderWebViewFallback: UIViewController, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        nkLog(debug: "Web view did finish navigation to \(webView.url?.absoluteString ?? "nil")")
         NCActivityIndicator.shared.stop()
     }
-
-    // MARK: -
-
-//    func createAccount(server: String, username: String, password: String) {
-//        var urlBase = server
-//        if urlBase.last == "/" { urlBase = String(urlBase.dropLast()) }
-//        let account: String = "\(username) \(urlBase)"
-//        let user = username
-//
-////        NextcloudKit.shared.setup(account: account, user: user, userId: user, password: password, urlBase: urlBase)
-//        NextcloudKit.shared.getUserProfile(account: account) { _, userProfile, _, error in
-//            if error == .success, let userProfile {
-//                NextcloudKit.shared.appendSession(account: account,
-//                                                  urlBase: urlBase,
-//                                                  user: user,
-//                                                  userId: user,
-//                                                  password: password,
-//                                                  userAgent: userAgent,
-//                                                  nextcloudVersion: NCCapabilities.shared.getCapabilities(account: account).capabilityServerVersionMajor,
-//                                                  httpMaximumConnectionsPerHost: NCBrandOptions.shared.httpMaximumConnectionsPerHost,
-//                                                  httpMaximumConnectionsPerHostInDownload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload,
-//                                                  httpMaximumConnectionsPerHostInUpload: NCBrandOptions.shared.httpMaximumConnectionsPerHostInUpload,
-//                                                  groupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
-//                NCSession.shared.appendSession(account: account, urlBase: urlBase, user: user, userId: userProfile.userId)
-//                NCAccount().deleteAccount(account)
-//                NCManageDatabase.shared.addAccount(account, urlBase: urlBase, user: user, userId: userProfile.userId, password: password)
-//                NCAccount().changeAccount(account, userProfile: userProfile, controller: nil) { }
-//                let window = UIApplication.shared.firstWindow
-//                if window?.rootViewController is NCMainTabBarController {
-//                    self.dismiss(animated: true)
-//                } else {
-//                    if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController() as? NCMainTabBarController {
-//                        controller.modalPresentationStyle = .fullScreen
-//                        controller.view.alpha = 0
-//
-//                        window?.rootViewController = controller
-//                        window?.makeKeyAndVisible()
-//
-//                        if let scene = window?.windowScene {
-//                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
-//                        }
-//
-//                        UIView.animate(withDuration: 0.5) {
-//                            controller.view.alpha = 1
-//                        }
-//                    }
-//                }
-//            } else {
-//                let alertController = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: error.errorDescription, preferredStyle: .alert)
-//                alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
-//                self.present(alertController, animated: true)
-//            }
-//        }
-//    }
 }
