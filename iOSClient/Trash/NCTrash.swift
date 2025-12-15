@@ -25,59 +25,49 @@
 
 import UIKit
 import NextcloudKit
-import Realm
 import RealmSwift
 
-class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegate, NCSectionHeaderMenuDelegate, NCEmptyDataSetDelegate {
+class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegate {
     @IBOutlet weak var collectionView: UICollectionView!
 
     var filePath = ""
     var titleCurrentFolder = NSLocalizedString("_trash_view_", comment: "")
     var blinkFileId: String?
-    var dataSourceTask: URLSessionTask?
     let utilityFileSystem = NCUtilityFileSystem()
     let database = NCManageDatabase.shared
     let utility = NCUtility()
     var isEditMode = false
-    var fileSelect: [String] = []
+    var selectOcId: [String] = []
     var tabBarSelect: NCTrashSelectTabBar!
     var datasource: [tableTrash]?
     var layoutForView: NCDBLayoutForView?
     var listLayout: NCListLayout!
     var gridLayout: NCGridLayout!
     var layoutKey = NCGlobal.shared.layoutViewTrash
-    var layoutType = NCGlobal.shared.layoutList
     let refreshControl = UIRefreshControl()
     var filename: String?
+
+    @MainActor
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: tabBarController)
     }
-    
+
     var controller: NCMainTabBarController? {
         self.tabBarController as? NCMainTabBarController
     }
-
-    var serverUrl = ""
-    var selectableDataSource: [RealmSwiftObject] { datasource ?? [] }
-    private let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    var emptyDataSet: NCEmptyDataSet?
 
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        tabBarSelect = NCTrashSelectTabBar(tabBarController: tabBarController, delegate: self)
-        serverUrl = utilityFileSystem.getHomeServer(session: session)
+        navigationController?.setNavigationBarAppearance()
 
         view.backgroundColor = .systemBackground
-        self.navigationController?.navigationBar.prefersLargeTitles = true
 
         collectionView.register(UINib(nibName: "NCTrashListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
         collectionView.register(UINib(nibName: "NCTrashGridCell", bundle: nil), forCellWithReuseIdentifier: "gridCell")
 
-//        collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
-        collectionView.register(UINib(nibName: "NCSectionHeaderMenu", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionHeaderMenu")
+        collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
         collectionView.register(UINib(nibName: "NCSectionFooter", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "sectionFooter")
 
         collectionView.alwaysBounceVertical = true
@@ -88,26 +78,25 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
 
         // Add Refresh Control
         collectionView.refreshControl = refreshControl
-        refreshControl.tintColor = .gray
-        refreshControl.addTarget(self, action: #selector(loadListingTrash), for: .valueChanged)
-
-        // Empty
-        emptyDataSet = NCEmptyDataSet(view: collectionView, offset: NCGlobal.shared.heightButtonsView, delegate: self)
-
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadDataSource), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterReloadDataSource), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(changeLayout(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterChangeLayout), object: nil)
+        refreshControl.tintColor = NCBrandColor.shared.textColor2
+        refreshControl.action(for: .valueChanged) { _ in
+            Task {
+                await self.loadListingTrash()
+            }
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        appDelegate.activeViewController = self
+        if tabBarSelect == nil {
+            tabBarSelect = NCTrashSelectTabBar(controller: tabBarController, viewController: self, delegate: self)
+        }
 
         navigationController?.setNavigationBarAppearance()
         navigationItem.title = titleCurrentFolder
 
         layoutForView = self.database.getLayoutForView(account: session.account, key: NCGlobal.shared.layoutViewTrash, serverUrl: "")
-        gridLayout.column = CGFloat(layoutForView?.columnGrid ?? 3)
 
         if layoutForView?.layout == NCGlobal.shared.layoutList {
             collectionView.collectionViewLayout = listLayout
@@ -116,74 +105,32 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         }
 
         isEditMode = false
-        setNavigationRightItems()
 
-        reloadDataSource()
-        loadListingTrash(nil)
-        
-        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__DELETED_FILES)
-
+        Task {
+            await (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
+            await self.reloadDataSource()
+            await loadListingTrash()
+        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
+        Task {
+            await NCNetworking.shared.networkingTasks.cancel(identifier: "NCTrash")
+        }
+
         // Cancel Queue & Retrieves Properties
         NCNetworking.shared.downloadThumbnailTrashQueue.cancelAll()
-        dataSourceTask?.cancel()
-        isEditMode = false
-    }
-
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-
-        if let frame = tabBarController?.tabBar.frame {
-            tabBarSelect.hostingController?.view.frame = frame
-        }
-    }
-
-    // MARK: - Layout
-    
-    @objc func changeLayout(_ notification: NSNotification) {
-        guard let userInfo = notification.userInfo as NSDictionary?,
-              let account = userInfo["account"] as? String,
-              let serverUrl = userInfo["serverUrl"] as? String,
-              let layoutForView = userInfo["layoutForView"] as? NCDBLayoutForView,
-              account == session.account,
-              serverUrl == self.serverUrl
-        else { return }
-
-        self.layoutForView = self.database.setLayoutForView(layoutForView: layoutForView)
-        layoutForView.layout = layoutForView.layout
-        self.layoutType = layoutForView.layout
-//        self.reloadDataSource()
-        collectionView.reloadData()
-
-        switch layoutForView.layout {
-        case NCGlobal.shared.layoutList:
-            self.collectionView.setCollectionViewLayout(self.listLayout, animated: true)
-        case NCGlobal.shared.layoutGrid:
-            self.collectionView.setCollectionViewLayout(self.gridLayout, animated: true)
-        default:
-            break
-        }
-
-        self.collectionView.collectionViewLayout.invalidateLayout()
-    }
-
-    // MARK: - Empty
-
-    func emptyDataSetView(_ view: NCEmptyView) {
-        view.emptyImage.image = UIImage(named: "trash")?.image(color: .gray, size: UIScreen.main.bounds.width)
-        view.emptyTitle.text = NSLocalizedString("_trash_no_trash_", comment: "")
-        view.emptyDescription.text = NSLocalizedString("_trash_no_trash_description_", comment: "")
     }
 
     // MARK: TAP EVENT
 
-    func tapRestoreListItem(with ocId: String, image: UIImage?, sender: Any) {
+    func tapRestoreListItem(with id: String, image: UIImage?, sender: Any) {
         if !isEditMode {
-            restoreItem(with: ocId)
+            Task {
+                await restoreItem(with: id)
+            }
         } else if let button = sender as? UIView {
             let buttonPosition = button.convert(CGPoint.zero, to: collectionView)
             let indexPath = collectionView.indexPathForItem(at: buttonPosition)
@@ -211,53 +158,34 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         }
     }
 
-    func tapButtonSwitch(_ sender: Any) {
-        if layoutForView?.layout == NCGlobal.shared.layoutGrid {
-            onListSelected()
-        } else {
-            onGridSelected()
-        }
-    }
-    
-    func tapButtonOrder(_ sender: Any) {
-
-        let sortMenu = NCSortMenu()
-//        sortMenu.toggleMenu(viewController: self, account: appDelegate.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
-        sortMenu.toggleMenu(viewController: self, account: session.account, key: layoutKey, sortButton: sender as? UIButton, serverUrl: serverUrl)
-    }
-
     func longPressGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
     func longPressMoreGridItem(with objectId: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
     // MARK: - DataSource
 
-    @objc func reloadDataSource(withQueryDB: Bool = true) {
-        Task {
-            // Await async DB call off the main thread
-            let results = await self.database.getTableTrashAsync(filePath: getFilePath(), account: session.account)
+    func reloadDataSource(withQueryDB: Bool = true) async {
+        let results = await self.database.getTableTrashAsync(filePath: getFilePath(), account: session.account)
 
-            // Switch back to main thread for UI updates
-            await MainActor.run {
-                self.datasource = results
-                self.collectionView.reloadData()
-                setNavigationRightItems()
-//                (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
+        await (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
 
-                guard let blinkFileId = self.blinkFileId else { return }
+        await MainActor.run {
+            self.datasource = results
+            self.collectionView.reloadData()
 
-                for itemIx in 0..<results.count where results[itemIx].fileId.contains(blinkFileId) {
-                    let indexPath = IndexPath(item: itemIx, section: 0)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        UIView.animate(withDuration: 0.3) {
-                            self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
-                        } completion: { _ in
-                            guard let cell = self.collectionView.cellForItem(at: indexPath) else { return }
-                            cell.backgroundColor = .darkGray
-                            UIView.animate(withDuration: 2) {
-                                cell.backgroundColor = .clear
-                                self.blinkFileId = nil
-                            }
+            guard let blinkFileId = self.blinkFileId else { return }
+
+            for itemIx in 0..<results.count where results[itemIx].fileId.contains(blinkFileId) {
+                let indexPath = IndexPath(item: itemIx, section: 0)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    UIView.animate(withDuration: 0.3) {
+                        self.collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+                    } completion: { _ in
+                        guard let cell = self.collectionView.cellForItem(at: indexPath) else { return }
+                        cell.backgroundColor = .darkGray
+                        UIView.animate(withDuration: 2) {
+                            cell.backgroundColor = .clear
+                            self.blinkFileId = nil
                         }
                     }
                 }
@@ -273,5 +201,23 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         } else {
             return filePath + "/"
         }
+    }
+    
+    func getFooterInformation(datasource: [tableTrash]) -> (directories: Int, files: Int, size: Int64) {
+        let validMetadatas = datasource.filter { !$0.isInvalidated }
+        let directories = validMetadatas.filter({ $0.directory == true})
+        let files = validMetadatas.filter({ $0.directory == false})
+
+        var size: Int64 = 0
+
+        directories.forEach { metadata in
+            size += metadata.size
+        }
+        
+        files.forEach { metadata in
+            size += metadata.size
+        }
+
+        return (directories.count, files.count, size)
     }
 }

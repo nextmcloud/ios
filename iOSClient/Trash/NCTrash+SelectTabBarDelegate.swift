@@ -22,7 +22,7 @@
 import Foundation
 import UIKit
 
-extension NCTrash: NCTrashSelectTabBarDelegate, NCSelectableNavigationView {
+extension NCTrash: NCTrashSelectTabBarDelegate {
     func onListSelected() {
         if layoutForView?.layout == NCGlobal.shared.layoutGrid {
             layoutForView?.layout = NCGlobal.shared.layoutList
@@ -44,81 +44,51 @@ extension NCTrash: NCTrashSelectTabBarDelegate, NCSelectableNavigationView {
     }
 
     func selectAll() {
-        if !fileSelect.isEmpty, datasource?.count == fileSelect.count {
-            fileSelect = []
+        guard let datasource else { return }
+        if !selectOcId.isEmpty, datasource.count == selectOcId.count {
+            selectOcId = []
         } else {
-            fileSelect = (datasource?.compactMap({ $0.fileId }))!
+            selectOcId = datasource.compactMap({ $0.fileId })
         }
-        tabBarSelect.update(selectOcId: fileSelect)
+        tabBarSelect.update(selectOcId: selectOcId)
         collectionView.reloadData()
     }
 
     func recover() {
-        fileSelect.forEach(restoreItem)
-        setEditMode(false)
-    }
-
-    func delete() {
-        let ocIds = fileSelect.map { $0 }
+        let ids = selectOcId.map { $0 }
         setEditMode(false)
 
         Task {
-            if ocIds.count > 0, ocIds.count == datasource?.count {
+            for id in ids {
+                await restoreItem(with: id)
+            }
+        }
+    }
+
+    func delete() {
+        let ids = selectOcId.map { $0 }
+        setEditMode(false)
+
+        Task {
+            if ids.count > 0, ids.count == datasource?.count {
                 await emptyTrash()
             } else {
-                await self.deleteItems(with: ocIds)
+                await self.deleteItems(with: ids)
             }
         }
     }
 
     func setEditMode(_ editMode: Bool) {
-        isEditMode = editMode
-        fileSelect.removeAll()
+        Task {
+            isEditMode = editMode
+            selectOcId.removeAll()
 
-        navigationController?.interactivePopGestureRecognizer?.isEnabled = !editMode
-        navigationItem.hidesBackButton = editMode
-        DispatchQueue.main.async {
-            self.collectionView.reloadData()
-            self.setNavigationRightItems()
+            navigationItem.hidesBackButton = editMode
+            navigationController?.interactivePopGestureRecognizer?.isEnabled = !editMode
+
+            await (self.navigationController as? NCMainNavigationController)?.setNavigationRightItems()
+
+            collectionView.reloadData()
         }
-    }
-    
-    func setNavigationRightItems(enableMenu: Bool = false) {
-        if isEditMode {
-            let more = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain) { self.presentMenu(with: self.selectActions)}
-            navigationItem.rightBarButtonItems = [more]
-        } else {
-            let select = UIBarButtonItem(title: NSLocalizedString("_select_", comment: ""), style: UIBarButtonItem.Style.plain) { self.toggleSelect() }
-            let notification = UIBarButtonItem(image: UIImage(systemName: "bell"), style: .plain, action: tapNotification)
-            if layoutKey == NCGlobal.shared.layoutViewFiles {
-                navigationItem.rightBarButtonItems = [select, notification]
-            } else {
-                navigationItem.rightBarButtonItems = [select]
-            }
-        }
-        guard layoutKey == NCGlobal.shared.layoutViewFiles else { return }
-        navigationItem.title = titleCurrentFolder
-    }
-    
-    func createMenuActions() -> [NCMenuAction] {
-//        guard let layoutForView = NCManageDatabase.shared.getLayoutForView(account: session.account, key: layoutKey, serverUrl: "") else { return [] }
-//
-//        let select = UIAction(title: NSLocalizedString("_select_", comment: ""), image: .init(systemName: "checkmark.circle"), attributes: datasource.isEmpty ? .disabled : []) { _ in
-//            self.setEditMode(true)
-//        }
-//
-//        let list = UIAction(title: NSLocalizedString("_list_", comment: ""), image: .init(systemName: "list.bullet"), state: layoutForView.layout == NCGlobal.shared.layoutList ? .on : .off) { _ in
-//            self.onListSelected()
-////            self.setNavigationRightItems()
-//        }
-//
-//        let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""), image: .init(systemName: "square.grid.2x2"), state: layoutForView.layout == NCGlobal.shared.layoutGrid ? .on : .off) { _ in
-//            self.onGridSelected()
-////            self.setNavigationRightItems()
-//        }
-//
-//        let viewStyleSubmenu = UIMenu(title: "", options: .displayInline, children: [list, grid])
-//
-        return []//[select, viewStyleSubmenu]
     }
 }
