@@ -72,7 +72,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         self.title = NSLocalizedString("_voice_memo_title_", comment: "")
 
         // Button Play Stop
-        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconColor, size: 100), for: .normal)
+        buttonPlayStop.setImage(UIImage(named: "audioPlay")!.image(color: NCBrandColor.shared.iconImageColor, size: 100), for: .normal)
 
         // Progress view
         progressView.progress = 0
@@ -104,10 +104,14 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
 
     public func setup(serverUrl: String, fileNamePath: String, fileName: String) {
 
-        if serverUrl == utilityFileSystem.getHomeServer(session: session) {
+//        if serverUrl == utilityFileSystem.getHomeServer(session: session) {
+//            titleServerUrl = "/"
+//        } else {
+//            titleServerUrl = utilityFileSystem.getTextServerUrl(session: session, serverUrl: serverUrl)//(serverUrl as NSString).lastPathComponent
+        if serverUrl == utilityFileSystem.getHomeServer(urlBase: appDelegate.urlBase, userId: appDelegate.userId) {
             titleServerUrl = "/"
         } else {
-            titleServerUrl = utilityFileSystem.getTextServerUrl(session: session, serverUrl: serverUrl)//(serverUrl as NSString).lastPathComponent
+            titleServerUrl = (serverUrl as NSString).lastPathComponent
         }
 
         self.fileName = fileName
@@ -147,6 +151,7 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         row.cellConfig["backgroundColor"] = UIColor.secondarySystemGroupedBackground
         row.action.formSelector = #selector(changeDestinationFolder(_:))
         row.cellConfig["folderImage.image"] =  UIImage(named: "folder_nmcloud")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.right.rawValue
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
@@ -186,7 +191,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
             self.form.delegate = nil
 
             if let fileNameNew = formRow.value as? String {
-                self.fileName = FileAutoRenamer.rename(fileNameNew, account: session.account)
+                self.fileName = utility.removeForbiddenCharacters(fileNameNew)
+                self.fileName = FileAutoRenamer.rename(filename: fileNameNew, isFolderPath: true)
             } else {
                 self.fileName = ""
             }
@@ -250,7 +256,8 @@ class NCCreateFormUploadVoiceNote: XLFormViewController, NCSelectDelegate, AVAud
         metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
         metadataForUpload.size = utilityFileSystem.getFileSize(filePath: fileNamePath)
 
-        if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
+        if NCManageDatabase.shared.getMetadataConflict(account: appDelegate.account, serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
+
             guard let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
 
             conflict.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
