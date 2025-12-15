@@ -1,24 +1,7 @@
-//
-//  NCAudioRecorderViewController.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 08/03/19.
-//  Copyright (c) 2019 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2019 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //
 //  --------------------------------
 //  Based on code of Venkat Kukunuru
@@ -30,7 +13,6 @@ import QuartzCore
 import NextcloudKit
 
 class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
-
     @IBOutlet weak var contentContainerView: UIView!
     @IBOutlet weak var durationLabel: UILabel!
     @IBOutlet weak var startStopLabel: UILabel!
@@ -40,10 +22,12 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
     var startDate: Date = Date()
     var fileName: String = ""
     var controller: NCMainTabBarController!
+    let database = NCManageDatabase.shared
+
+    @MainActor
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: controller)
     }
-    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
 
     // MARK: - View Life Cycle
 
@@ -57,15 +41,17 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
         view.backgroundColor = .clear
         contentContainerView.backgroundColor = UIColor.lightGray
         voiceRecordHUD.fillColor = NCBrandColor.shared.progressColorGreen60
-
-        self.fileName = NCUtilityFileSystem().createFileNameDate(NSLocalizedString("_voice_memo_filename_", comment: ""), ext: "m4a")
-        recording = NCAudioRecorder(to: self.fileName)
-        recording.delegate = self
-        do {
-            try self.recording.prepare()
-            startStopLabel.text = NSLocalizedString("_voice_memo_start_", comment: "")
-        } catch {
-            print(error)
+        
+        Task {
+            self.fileName = NCUtilityFileSystem().createFileNameDate(NSLocalizedString("_voice_memo_filename_", comment: ""), ext: "m4a")
+            recording = NCAudioRecorder(to: self.fileName)
+            recording.delegate = self
+            do {
+                try self.recording.prepare()
+                startStopLabel.text = NSLocalizedString("_voice_memo_start_", comment: "")
+            } catch {
+                print(error)
+            }
         }
     }
 
@@ -83,12 +69,8 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
         if recording.state == .record {
             recording.stop()
             voiceRecordHUD.update(0.0)
-            dismiss(animated: true) { [self] in
-                guard let navigationController = UIStoryboard(name: "NCCreateFormUploadVoiceNote", bundle: nil).instantiateInitialViewController() as? UINavigationController,
-                      let viewController = navigationController.topViewController as? NCCreateFormUploadVoiceNote else { return }
-                navigationController.modalPresentationStyle = .formSheet
-                viewController.setup(serverUrl: controller.currentServerUrl(), fileNamePath: NSTemporaryDirectory() + self.fileName, fileName: self.fileName)
-                UIApplication.shared.firstWindow?.rootViewController?.present(navigationController, animated: true)
+            dismiss(animated: true) {
+                self.uploadMetadata()
             }
         } else {
             do {
@@ -156,8 +138,7 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
 }
 
 open class NCAudioRecorder: NSObject {
-
-    @objc public enum State: Int {
+    public enum State: Int {
         case none, record, play
     }
 
