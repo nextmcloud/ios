@@ -2,11 +2,11 @@
 //  FolderPathCustomCell.swift
 //  Nextcloud
 //
-//  Created by Sumit on 28/04/21.
-//  Copyright © 2021 Marino Faggiana. All rights reserved.
+//  Created by A200073704 on 04/05/23.
+//  Copyright © 2023 Marino Faggiana. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import XLForm
 
 class FolderPathCustomCell: XLFormButtonCell{
