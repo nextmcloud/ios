@@ -255,6 +255,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
 
         NCActivityIndicator.shared.start()
 
+//        NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew)
         NCNetworking.shared.renameMetadata(metadata, fileNameNew: fileNameNew, indexPath: indexPath, viewController: self) { error in
 
             NCActivityIndicator.shared.stop()
