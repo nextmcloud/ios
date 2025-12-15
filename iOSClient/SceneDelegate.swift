@@ -110,11 +110,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             NCPreferences().removeAll()
 
             if let bundleID = Bundle.main.bundleIdentifier {
-                let lastUpdateCheckDate = UserDefaults.standard.object(forKey: AppUpdaterKey.lastUpdateCheckDate)
                 UserDefaults.standard.removePersistentDomain(forName: bundleID)
-                if lastUpdateCheckDate != nil {
-                    UserDefaults.standard.setValue(lastUpdateCheckDate, forKey: AppUpdaterKey.lastUpdateCheckDate)
-                }
             }
 
             if NCBrandOptions.shared.disable_intro {
@@ -124,7 +120,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     window?.makeKeyAndVisible()
                 }
             } else {
-                if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+                if let viewController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? NCIntroViewController {
+                    let navigationController = UINavigationController(rootViewController: viewController)
                     window?.rootViewController = navigationController
                     window?.makeKeyAndVisible()
                 }
@@ -201,7 +198,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneWillEnterForeground(_ scene: UIScene) {
         hidePrivacyProtectionWindow()
-
+        
         if let rootHostingController = scene.rootHostingController() {
             if rootHostingController.anyRootView is Maintenance {
                 return
@@ -209,7 +206,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
         let session = SceneManager.shared.getSession(scene: scene)
         let controller = SceneManager.shared.getController(scene: scene)
-
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             Task {
                 if let tableAccount = await self.database.getTableAccountAsync(account: session.account) {
@@ -219,51 +216,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
         }
         AppUpdater().checkForUpdate()
-
+        
         NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRichdocumentGrabFocus)
+        activateSceneForAccount(scene, account: session.account, controller: controller)
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
-        let session = SceneManager.shared.getSession(scene: scene)
-        let controller = SceneManager.shared.getController(scene: scene)
-        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Scene did become active")
-
-        let oldVersion = UserDefaults.standard.value(forKey: NCSettingsBundleHelper.SettingsBundleKeys.BuildVersionKey) as? String
-        AppUpdater().checkForUpdate()
-        AnalyticsHelper.shared.trackAppVersion(oldVersion: oldVersion)
-        if let userAccount = NCManageDatabase.shared.getActiveTableAccount() {
-            AnalyticsHelper.shared.trackUsedStorageData(quotaUsed: userAccount.quotaUsed)
-        }
-
-        NCSettingsBundleHelper.setVersionAndBuildNumber()
-        NCSettingsBundleHelper.checkAndExecuteSettings(delay: 0.5)
-        
-//        if !NCAskAuthorization().isRequesting {
-//            NCPasscode.shared.hidePrivacyProtectionWindow()
-//        }
-        
         hidePrivacyProtectionWindow()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            NCService().startRequestServicesServer(account: session.account, controller: controller)
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            Task {
-                await NCNetworking.shared.verifyZombie()
-            }
-        }
-
-        NotificationCenter.default.postOnMainThread(name: global.notificationCenterRichdocumentGrabFocus)
-
+//        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+//            for window in windowScene.windows {
+//                let imageViews = window.allImageViews()
+//                // Do something with the imageViews
+//                for imageView in imageViews {
+//                    print("Found image view: \(imageView)")
+//                    imageView.tintColor = UITraitCollection.current.userInterfaceStyle == .dark  ? .white : .black
+//                }
+//            }
+//        }
     }
-
-//    func sceneDidBecomeActive(_ scene: UIScene) {
-//        let session = SceneManager.shared.getSession(scene: scene)
-//        guard !session.account.isEmpty else { return }
-//
-//        hidePrivacyProtectionWindow()
-//    }
 
     func sceneWillResignActive(_ scene: UIScene) {
         nkLog(debug: "Scene will resign active")
@@ -272,6 +242,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard !session.account.isEmpty else {
             return
         }
+
+        WidgetCenter.shared.reloadAllTimelines()
 
         if NCPreferences().privacyScreenEnabled {
             if SwiftEntryKit.isCurrentlyDisplaying {
@@ -288,6 +260,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let app = UIApplication.shared
         var bgID: UIBackgroundTaskIdentifier = .invalid
         let isBackgroundRefreshStatus = (UIApplication.shared.backgroundRefreshStatus == .available)
+        // Must be outside the Task otherwise isSuspendingDatabaseOperation suspends it
         let session = SceneManager.shared.getSession(scene: scene)
         guard let tblAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", session.account)) else {
             return
@@ -504,10 +477,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     private func showPrivacyProtectionWindow() {
-        guard privacyProtectionWindow == nil else {
-            privacyProtectionWindow?.isHidden = false
-            return
-        }
         guard let windowScene = self.window?.windowScene else {
             return
         }
@@ -544,9 +513,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         Task {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
-
-            let num = await NCAutoUpload.shared.initAutoUpload()
-            nkLog(start: "Auto upload with \(num) photo")
+            if let tblAccount = await NCManageDatabase.shared.getTableAccountAsync(account: account) {
+                let num = await NCAutoUpload.shared.initAutoUpload(tblAccount: tblAccount)
+                nkLog(start: "Auto upload with \(num) photo")
+            }
 
             try? await Task.sleep(nanoseconds: 1_500_000_000)
             await NCService().startRequestServicesServer(account: account, controller: controller)
