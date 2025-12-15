@@ -32,8 +32,6 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
         set { imageStatus = newValue }
     }
     var account = ""
-    var indexPath = IndexPath()
-    let utility = NCUtility()
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -60,8 +58,6 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
 
         ]
 
-//        imageRestore.image = NCUtility().loadImage(named: "arrow.counterclockwise", colors: [NCBrandColor.shared.iconImageColor])
-//        imageMore.image = NCUtility().loadImage(named: "trash", colors: [.red])
         imageRestore.image = NCUtility().loadImage(named: "restore", colors: [NCBrandColor.shared.iconImageColor])
         imageMore.image = NCUtility().loadImage(named: "trashIcon", colors: [NCBrandColor.shared.iconImageColor]) //NCUtility().loadImage(named: "trashIcon", colors: [.red])
         imageItem.layer.cornerRadius = 6
@@ -137,11 +133,8 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
         }
         if status {
             var blurEffectView: UIView?
-            var blurEffect: UIVisualEffect?
-            let traitCollectionUserInterfaceStyleDark = traitCollection.userInterfaceStyle == .dark
-            blurEffect = UIBlurEffect(style: traitCollectionUserInterfaceStyleDark ? .dark : .extraLight)
-            blurEffectView = UIVisualEffectView(effect: blurEffect)
-            blurEffectView?.backgroundColor = traitCollectionUserInterfaceStyleDark ? .black : .lightGray
+            blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
+            blurEffectView?.backgroundColor = .lightGray
             blurEffectView?.frame = self.bounds
             blurEffectView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
