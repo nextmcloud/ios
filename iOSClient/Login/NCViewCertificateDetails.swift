@@ -43,9 +43,10 @@ class NCViewCertificateDetails: UIViewController {
     var delegate: NCViewCertificateDetailsDelegate?
     let utilityFileSystem = NCUtilityFileSystem()
 
-    @objc public var host: String = ""
+    public var privateKeyString: String = ""
+    public var host: String = ""
     public var fileNamePath: String = ""
-    @objc public var certificateTitle = NSLocalizedString("_certificate_view_", comment: "")
+    public var certificateTitle = NSLocalizedString("_certificate_view_", comment: "")
 
     // MARK: - View Life Cycle
 
