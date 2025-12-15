@@ -11,7 +11,7 @@ enum NCShareExtensionError: Error {
     case cancel, fileUpload, noAccount, noFiles, versionMismatch
 }
 
-class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
+class NCShareExtension: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
@@ -32,7 +32,6 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
     var filesName: [String] = []
     // -------------------------------------------------------------
 
-    var emptyDataSet: NCEmptyDataSet?
     let keyLayout = NCGlobal.shared.layoutViewShareExtension
     var metadataFolder: tableMetadata?
     var dataSourceTask: URLSessionTask?
@@ -41,12 +40,9 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
     let heightCommandView: CGFloat = 170
     var autoUploadFileName = ""
     var autoUploadDirectory = ""
-    let refreshControl = UIRefreshControl()
     var progress: CGFloat = 0
     var counterUploaded: Int = 0
-    var uploadErrors: [tableMetadata] = []
     var uploadMetadata: [tableMetadata] = []
-    var uploadStarted = false
     let hud = NCHud()
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
@@ -73,13 +69,9 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.navigationController?.navigationBar.prefersLargeTitles = false
+        collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
         collectionView.register(UINib(nibName: "NCListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
         collectionView.collectionViewLayout = NCListLayout()
-        collectionView.refreshControl = refreshControl
-        refreshControl.tintColor = NCBrandColor.shared.brandText
-        refreshControl.backgroundColor = .systemBackground
-        refreshControl.addTarget(self, action: #selector(reloadDatasource), for: .valueChanged)
 
         commandView.backgroundColor = .secondarySystemBackground
         separatorView.backgroundColor = .separator
@@ -93,7 +85,7 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
         cancelButton.title = NSLocalizedString("_cancel_", comment: "")
 
         createFolderView.layer.cornerRadius = 10
-        createFolderImage.image = utility.loadImage(named: "folder.badge.plus", colors: [NCBrandColor.shared.iconColor])
+        createFolderImage.image = utility.loadImage(named: "folder.badge.plus", colors: [NCBrandColor.shared.iconImageColor])
         createFolderLabel.text = NSLocalizedString("_create_folder_", comment: "")
         let createFolderGesture = UITapGestureRecognizer(target: self, action: #selector(actionCreateFolder(_:)))
         createFolderView.addGestureRecognizer(createFolderGesture)
@@ -101,8 +93,8 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
         uploadView.layer.cornerRadius = 10
 
         uploadLabel.text = NSLocalizedString("_upload_", comment: "")
-        uploadLabel.textColor = NCBrandColor.shared.customer
-        let uploadGesture = UITapGestureRecognizer(target: self, action: #selector(actionUpload))
+        uploadLabel.textColor = .systemBlue
+        let uploadGesture = UITapGestureRecognizer(target: self, action: #selector(actionUpload(_:)))
         uploadView.addGestureRecognizer(uploadGesture)
 
         let versionNextcloudiOS = String(format: NCBrandOptions.shared.textCopyrightNextcloudiOS, utility.getVersionBuild())
@@ -110,21 +102,6 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
 
         nkLog(start: "Start Share session " + versionNextcloudiOS)
 
-        // LOG
-        let levelLog = NCKeychain().logLevel
-//
-//        NextcloudKit.shared.nkCommonInstance.levelLog = levelLog
-//        NextcloudKit.shared.nkCommonInstance.pathLog = utilityFileSystem.directoryGroup
-//        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO] Start Share session with level \(levelLog) " + versionNextcloudiOS)
-        NKLogFileManager.shared.logLevel = NKLogLevel(rawValue: levelLog) ?? .normal
-        NKLogFileManager.shared.logDirectory = URL(fileURLWithPath: utilityFileSystem.directoryGroup)
-        NextcloudKit.shared.nkCommonInstance.writeLog("[INFO]  Start Share session with level \(levelLog) " + versionNextcloudiOS)
-
-//        hud.indicatorView = JGProgressHUDRingIndicatorView()
-//        if let indicatorView = hud.indicatorView as? JGProgressHUDRingIndicatorView {
-//            indicatorView.ringWidth = 1.5
-//            indicatorView.ringColor = NCBrandColor.shared.brandElement
-//        }
         NCBrandColor.shared.createUserColors()
 
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { _ in
@@ -148,9 +125,6 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
         if let account = NCShareExtensionData.shared.getTblAccoun()?.account {
             accountRequestChangeAccount(account: account, controller: nil)
         }
-        NCImageCache.shared.createImagesCache()
-
-        NotificationCenter.default.addObserver(self, selector: #selector(didCreateFolder(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterCreateFolder), object: nil)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -169,8 +143,6 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
                 self.cancel(with: .noAccount)
             }
         }
-
-        accountRequestChangeAccount(account: account, controller: nil)
 
         guard let inputItems = extensionContext?.inputItems as? [NSExtensionItem] else {
             cancel(with: .noFiles)
@@ -210,26 +182,10 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
         }
     }
 
-    // MARK: - Empty
-
-    func emptyDataSetView(_ view: NCEmptyView) {
-
-        if self.dataSourceTask?.state == .running {
-            view.emptyImage.image = UIImage(named: "networkInProgress")?.image(color: .gray, size: UIScreen.main.bounds.width)
-            view.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
-            view.emptyDescription.text = ""
-        } else {
-            view.emptyImage.image = UIImage(named: "folder_nmcloud")
-            view.emptyTitle.text = NSLocalizedString("_files_no_folders_", comment: "")
-            view.emptyDescription.text = ""
-        }
-    }
-
     // MARK: -
 
     func cancel(with error: NCShareExtensionError) {
         // make sure no uploads are continued
-        uploadStarted = false
         extensionContext?.cancelRequest(withError: error)
     }
 
@@ -250,15 +206,14 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
 
         navigationItem.title = navigationTitle
         cancelButton.title = NSLocalizedString("_cancel_", comment: "")
-        cancelButton.tintColor = NCBrandColor.shared.customer
 
         // BACK BUTTON
         let backButton = UIButton(type: .custom)
-        backButton.setImage(UIImage(named: "back")?.imageColor(NCBrandColor.shared.customer), for: .normal)
-        backButton.tintColor = NCBrandColor.shared.customer
+        backButton.setImage(UIImage(named: "back"), for: .normal)
+        backButton.tintColor = .systemBlue
         backButton.semanticContentAttribute = .forceLeftToRight
         backButton.setTitle(" " + NSLocalizedString("_back_", comment: ""), for: .normal)
-        backButton.setTitleColor(NCBrandColor.shared.customer, for: .normal)
+        backButton.setTitleColor(.systemBlue, for: .normal)
         backButton.action(for: .touchUpInside) { _ in
             while self.serverUrl.last != "/" { self.serverUrl.removeLast() }
             self.serverUrl.removeLast()
@@ -271,11 +226,35 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
             }
             self.setNavigationBar(navigationTitle: navigationTitle)
         }
-        if serverUrl != utilityFileSystem.getHomeServer(session: session) {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
-        } else {
-            navigationItem.leftBarButtonItem = nil
+
+        let image = utility.loadUserImage(for: tblAccount.user, displayName: tblAccount.displayName, urlBase: tblAccount.urlBase)
+        let profileButton = UIButton(type: .custom)
+        profileButton.setImage(image, for: .normal)
+
+        if serverUrl == utilityFileSystem.getHomeServer(session: session) {
+            var title = "  "
+            if !tblAccount.alias.isEmpty {
+                title += tblAccount.alias
+            } else {
+                title += tblAccount.displayName
+            }
+
+            profileButton.setTitle(title, for: .normal)
+            profileButton.setTitleColor(.systemBlue, for: .normal)
         }
+
+        profileButton.semanticContentAttribute = .forceLeftToRight
+        profileButton.sizeToFit()
+        profileButton.action(for: .touchUpInside) { _ in
+            self.showAccountPicker()
+        }
+        var navItems = [UIBarButtonItem(customView: profileButton)]
+        if serverUrl != utilityFileSystem.getHomeServer(session: session) {
+            let space = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
+            space.width = 20
+            navItems.append(contentsOf: [UIBarButtonItem(customView: backButton), space])
+        }
+        navigationItem.setLeftBarButtonItems(navItems, animated: true)
     }
 
     func setCommandView() {
@@ -290,10 +269,6 @@ class NCShareExtension: UIViewController, NCEmptyDataSetDelegate {
             self.tableView.isScrollEnabled = false
         }
         uploadLabel.text = NSLocalizedString("_upload_", comment: "") + " \(filesName.count) " + NSLocalizedString("_files_", comment: "")
-        
-        // Empty
-        emptyDataSet = NCEmptyDataSet(view: collectionView, offset: -50 * counter, delegate: self)
-
         self.tableView.reloadData()
     }
 
@@ -516,16 +491,6 @@ extension NCShareExtension {
         }
 
         return error
-    }
-}
-
-extension NCShareExtension: uploadE2EEDelegate {
-    func start() {
-        self.hud.progress(0)
-    }
-
-    func uploadE2EEProgress(_ totalBytesExpected: Int64, _ totalBytes: Int64, _ fractionCompleted: Double) {
-        self.hud.progress(fractionCompleted)
     }
 }
 
