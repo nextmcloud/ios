@@ -298,7 +298,7 @@ import XLForm
          let section = XLFormSectionDescriptor.formSection()
          form.addFormSection(section)
          
-         let image = UIImage(named: "trash")
+         let image = UIImage(named: "trashIcon")
          
          let row = XLFormRowDescriptor(tag: "azzeracache", rowType:XLFormRowDescriptorTypeButton, title: NSLocalizedString("_clear_cache_", comment: ""))
          section.addFormRow(row)
