@@ -120,6 +120,14 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
 
             self.openActivityViewController(selectedMetadata: [metadata], controller: controller, sender: nil)
 
+        case NCGlobal.shared.selectorPrint:
+            // waiting close menu
+            // https://github.com/nextcloud/ios/issues/2278
+//            DispatchQueue.main.async {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.printDocument(metadata: metadata)
+            }
+            
         case NCGlobal.shared.selectorSaveAlbum:
 
             self.saveAlbum(metadata: metadata, controller: controller)
@@ -160,7 +168,7 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
             if let metadata = await NCManageDatabase.shared.getMetadataLivePhotoAsync(metadata: metadata) {
                 metadatasSynchronizationOffline.append(metadata)
             }
-            await NCManageDatabase.shared.addLocalFilesAsync(metadatas: [metadata], offline: true)
+            await NCManageDatabase.shared.addLocalFileAsync(metadata: metadata, offline: true)
             for metadata in metadatasSynchronizationOffline {
                 await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
                                                                                     session: NCNetworking.shared.sessionDownloadBackground,
@@ -257,7 +265,7 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
                                                               etag: download.etag)
 
         if download.nkError == .success {
-            await NCManageDatabase.shared.addLocalFilesAsync(metadatas: [metadata])
+            await NCManageDatabase.shared.addLocalFileAsync(metadata: metadata)
             if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: viewController) {
                 viewController.navigationController?.pushViewController(vc, animated: true)
             }
@@ -275,51 +283,10 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
             Task { @MainActor in
                 NCActivityIndicator.shared.stop()
 
-                if let metadata = metadata, let file = file, error == .success {
-                    // Remove all known download limits from shares related to the given file.
-                    // This avoids obsolete download limit objects to stay around.
-                    // Afterwards create new download limits, should any such be returned for the known shares.
-                    let shares = await NCManageDatabase.shared.getTableSharesAsync(account: metadata.account,
-                                                                                   serverUrl: metadata.serverUrl,
-                                                                                   fileName: metadata.fileName)
-                    for share in shares {
-                        await NCManageDatabase.shared.deleteDownloadLimitAsync(byAccount: metadata.account, shareToken: share.token)
-
-                        if let receivedDownloadLimit = file.downloadLimits.first(where: { $0.token == share.token }) {
-                            await NCManageDatabase.shared.createDownloadLimitAsync(account: metadata.account,
-                                                                                   count: receivedDownloadLimit.count,
-                                                                                   limit: receivedDownloadLimit.limit,
-                                                                                   token: receivedDownloadLimit.token)
-                        }
-                    }
-
-                    var pages: [NCBrandOptions.NCInfoPagingTab] = []
+                if let metadata = metadata, error == .success {
                     let shareNavigationController = UIStoryboard(name: "NCShare", bundle: nil).instantiateInitialViewController() as? UINavigationController
-                    let shareViewController = shareNavigationController?.topViewController as? NCSharePaging
-
-                    for value in NCBrandOptions.NCInfoPagingTab.allCases {
-                        pages.append(value)
-                    }
-                    if capabilities.activity.isEmpty, let idx = pages.firstIndex(of: .activity) {
-                        pages.remove(at: idx)
-                    }
-                    if !metadata.isSharable(), let idx = pages.firstIndex(of: .sharing) {
-                        pages.remove(at: idx)
-                    }
-
-                    (pages, page) = NCApplicationHandle().filterPages(pages: pages, page: page, metadata: metadata)
-
-                    shareViewController?.pages = pages
+                    let shareViewController = shareNavigationController?.topViewController as? NCShare
                     shareViewController?.metadata = metadata
-
-                    if pages.contains(page) {
-                        shareViewController?.page = page
-                    } else if let page = pages.first {
-                        shareViewController?.page = page
-                    } else {
-                        return
-                    }
-
                     shareNavigationController?.modalPresentationStyle = .formSheet
                     if let shareNavigationController = shareNavigationController {
                         viewController.present(shareNavigationController, animated: true, completion: nil)
@@ -461,14 +428,12 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
             }
         }
     }
-    
+
     // MARK: - Copy & Paste
 
-    func copyPasteboard(pasteboardOcIds: [String], viewController: UIViewController) {
+    func copyPasteboard(pasteboardOcIds: [String], controller: NCMainTabBarController?) {
         var items = [[String: Any]]()
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
-        let hudView = viewController.view
-        var fractionCompleted: Float = 0
+        let hudView = controller
 
         // getting file data can take some time and block the main queue
         DispatchQueue.global(qos: .userInitiated).async {
@@ -482,37 +447,34 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
                 }
             }
 
-            // do 5 downloads in parallel to optimize efficiency
-            let processor = ParallelWorker(n: 5, titleKey: "_downloading_", totalTasks: downloadMetadatas.count, hudView: hudView)
-
+            let processor = ParallelWorker(n: 5, titleKey: "_downloading_", totalTasks: downloadMetadatas.count, controller: controller)
             for metadata in downloadMetadatas {
                 processor.execute { completion in
-                    guard let metadata = NCManageDatabase.shared.setMetadatasSessionInWaitDownload(metadatas: [metadata],
-                                                                                                   session: NextcloudKit.shared.nkCommonInstance.sessionIdentifierDownload,
-                                                                                                   selector: "") else { return completion() }
-                    NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: false) {
-                    } requestHandler: { _ in
-                    } progressHandler: { progress in
-                        if Float(progress.fractionCompleted) > fractionCompleted || fractionCompleted == 0 {
-                            processor.hud?.progress = Float(progress.fractionCompleted)
-                            fractionCompleted = Float(progress.fractionCompleted)
+                    Task {
+                        guard let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
+                                                                                                                 session: NCNetworking.shared.sessionDownload,
+                                                                                                                 selector: "",
+                                                                                                                 sceneIdentifier: controller?.sceneIdentifier) else {
+                            return completion()
                         }
-                    } completion: { _, _ in
-                        fractionCompleted = 0
+
+                        await NCNetworking.shared.downloadFile(metadata: metadata) { _ in
+                        } progressHandler: { progress in
+                            processor.hud.progress(progress.fractionCompleted)
+                        }
+                        
                         completion()
                     }
                 }
             }
+
             processor.completeWork {
                 items.append(contentsOf: downloadMetadatas.compactMap({ $0.toPasteBoardItem() }))
                 UIPasteboard.general.setItems(items, options: [:])
             }
         }
     }
-
-
-    // MARK: - Copy & Paste
-
+    
     func pastePasteboard(serverUrl: String, account: String, controller: NCMainTabBarController?) async {
         var fractionCompleted: Float = 0
         let processor = ParallelWorker(n: 5, titleKey: "_status_uploading_", totalTasks: nil, controller: controller)
@@ -633,7 +595,7 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
 
     // MARK: - NCSelect + Delegate
 
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {//, session: NCSession.Session) {
         if let destination = serverUrl, !items.isEmpty {
             if copy {
                 for case let metadata as tableMetadata in items {
@@ -716,13 +678,56 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
             controller?.present(navigationController, animated: true, completion: nil)
         }
     }
-}
+    
+    // MARK: - Print
 
+    func printDocument(metadata: tableMetadata) {
+
+        let fileNameURL = URL(fileURLWithPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                                 fileName: metadata.fileNameView,
+                                                                                                 userId: metadata.userId,
+                                                                                                 urlBase: metadata.urlBase))
+        let printController = UIPrintInteractionController.shared
+        let printInfo = UIPrintInfo(dictionary: nil)
+
+        printInfo.jobName = fileNameURL.lastPathComponent
+        printInfo.outputType = metadata.isImage ? .photo : .general
+        printController.printInfo = printInfo
+        printController.showsNumberOfCopies = true
+
+        guard !UIPrintInteractionController.canPrint(fileNameURL) else {
+            printController.printingItem = fileNameURL
+            printController.present(animated: true)
+            return
+        }
+
+        // can't print without data
+        guard let data = try? Data(contentsOf: fileNameURL) else { return }
+
+        if let svg = SVGKImage(data: data) {
+            printController.printingItem = svg.uiImage
+            printController.present(animated: true)
+            return
+        }
+
+        guard let text = String(data: data, encoding: .utf8) else { return }
+        let formatter = UISimpleTextPrintFormatter(text: text)
+        formatter.perPageContentInsets.top = 72
+        formatter.perPageContentInsets.bottom = 72
+        formatter.perPageContentInsets.left = 72
+        formatter.perPageContentInsets.right = 72
+        printController.printFormatter = formatter
+        printController.present(animated: true)
+    }
+}
 
 fileprivate extension tableMetadata {
     func toPasteBoardItem() -> [String: Any]? {
         // Get Data
-        let fileUrl = URL(fileURLWithPath: NCUtilityFileSystem().getDirectoryProviderStorageOcId(ocId, fileNameView: fileNameView))
+        let fileUrl = URL(fileURLWithPath: NCUtilityFileSystem().getDirectoryProviderStorageOcId(ocId,
+                                                                                                 fileName: fileNameView,
+                                                                                                 userId: userId,
+                                                                                                 urlBase: urlBase))
         guard NCUtilityFileSystem().fileProviderStorageExists(self),
               let data = try? Data(contentsOf: fileUrl) else { return nil }
 
