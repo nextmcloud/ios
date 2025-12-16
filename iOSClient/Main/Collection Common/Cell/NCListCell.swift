@@ -17,6 +17,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!
     @IBOutlet weak var imageFavorite: UIImageView!
+//    @IBOutlet weak var imageFavoriteBackground: UIImageView!
     @IBOutlet weak var imageLocal: UIImageView!
 
     @IBOutlet weak var labelTitle: UILabel!
@@ -63,9 +64,17 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         set { labelInfo = newValue }
     }
 
-    var fileSharedLabel: UILabel? {
-        get { return labelShared }
-        set { labelShared = newValue }
+    override var accessibilityIdentifier: String? {
+        get {
+            super.accessibilityIdentifier
+        }
+        set {
+            super.accessibilityIdentifier = newValue
+
+            if let newValue {
+                buttonShared.accessibilityIdentifier = "\(newValue)/shareButton"
+            }
+        }
     }
 
     override func awakeFromNib() {
@@ -81,26 +90,10 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
 
     override func prepareForReuse() {
         super.prepareForReuse()
-
         initCell()
     }
 
     func initCell() {
-        
-        imageItem.layer.cornerRadius = 6
-        imageItem.layer.masksToBounds = true
-        imageStatus.image = nil
-        imageFavorite.image = nil
-        imageFavoriteBackground.isHidden = true
-        imageLocal.image = nil
-        labelTitle.text = ""
-        labelInfo.text = ""
-        labelSubinfo.text = ""
-        imageShared.image = nil
-        imageMore.image = nil
-
-        // use entire cell as accessibility element
-        
         accessibilityHint = nil
         accessibilityLabel = nil
         accessibilityValue = nil
@@ -111,6 +104,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         imageItem.layer.masksToBounds = true
         imageStatus.image = nil
         imageFavorite.image = nil
+//        imageFavoriteBackground.isHidden = true
         imageLocal.image = nil
 
         buttonShared.setImage(nil, for: .normal)
@@ -195,24 +189,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     override func snapshotView(afterScreenUpdates afterUpdates: Bool) -> UIView? {
         return nil
     }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        updateConstraintsForCurrentDevice()
-    }
 
-    func updateConstraintsForCurrentDevice() {
-        if labelShared?.isHidden == false {
-            iPhoneLabelTitleTrailingConstraint.isActive = false
-            iPadLabelTitleTrailingConstraint.isActive = true
-        } else {
-            iPhoneLabelTitleTrailingConstraint.isActive = true
-            iPadLabelTitleTrailingConstraint.isActive = false
-        }
-//        iPhoneLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? false : true
-//        iPadLabelTitleTrailingConstraint.isActive = UIDevice.current.userInterfaceIdiom == .pad ? true : false
-    }
-    
     @IBAction func touchUpInsideShare(_ sender: Any) {
         delegate?.tapShareListItem(with: metadata, button: buttonShared, sender: sender)
     }
@@ -265,47 +242,26 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             moreContainer.isHidden = false
             backgroundView = nil
         }
-    }
-    
-    func selected(_ status: Bool, isEditMode: Bool) {
-        // NMC-1190 - iOS - Files - Deleting files while files are still uploading won't delete properly : to fix this issue remove check for !metadata.isInTransfer in below line
-        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.isInTransfer, !metadata.e2eEncrypted else {
-//        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
-            backgroundView = nil
-            separator.isHidden = false
-            imageSelect.isHidden = true
-
-            return
-        }
-
         if status {
-            var blurEffect: UIVisualEffect?
             var blurEffectView: UIView?
-            if traitCollection.userInterfaceStyle == .dark {
-                blurEffect = UIBlurEffect(style: .dark)
-                blurEffectView = UIVisualEffectView(effect: blurEffect)
-                blurEffectView?.backgroundColor = .black
-            } else {
-                blurEffect = UIBlurEffect(style: .extraLight)
-                blurEffectView = UIVisualEffectView(effect: blurEffect)
-                blurEffectView?.backgroundColor = .lightGray
-            }
+            blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
+            blurEffectView?.backgroundColor = .lightGray
             blurEffectView?.frame = self.bounds
             blurEffectView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
             backgroundView = blurEffectView
-            imageSelect.image = NCImageCache.images.checkedYes
             separator.isHidden = true
         } else {
             imageSelect.image = NCImageCache.shared.getImageCheckedNo(color: color)
             backgroundView = nil
             separator.isHidden = false
         }
+
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
-        labelInfo.text = NCUtility().getRelativeDateTitle(date as Date) + " · " + NCUtilityFileSystem().transformedSize(size)
-        labelSubinfo.text = ""
+        labelInfo.text = NCUtility().getRelativeDateTitle(date as Date)
+        labelSubinfo.text = NCUtilityFileSystem().transformedSize(size)
     }
 
     func setAccessibility(label: String, value: String) {
@@ -404,7 +360,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
             }
         }
     }
-
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         // Keep the shadow path in sync with current bounds
@@ -419,9 +375,8 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
 
 protocol NCListCellDelegate: AnyObject {
     func tapShareListItem(with ocId: String, ocIdTransfer: String, sender: Any)
-    func tapMoreListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, image: UIImage?, sender: Any)
-    func longPressMoreListItem(with ocId: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
-    func longPressListItem(with ocId: String, ocIdTransfer: String, namedButtonMore: String, gestureRecognizer: UILongPressGestureRecognizer)
+    func tapMoreListItem(with ocId: String, ocIdTransfer: String, image: UIImage?, sender: Any)
+    func longPressListItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer)
 }
 
 // MARK: - List Layout
