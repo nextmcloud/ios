@@ -50,9 +50,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 await NCAccount().deleteAllAccounts()
             }
         }
-        UINavigationBar.appearance().tintColor = NCBrandColor.shared.customer
-        UIToolbar.appearance().tintColor = NCBrandColor.shared.customer
-
         let utilityFileSystem = NCUtilityFileSystem()
         let utility = NCUtility()
 
