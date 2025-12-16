@@ -6,6 +6,7 @@
 import Foundation
 import UIKit
 import KeychainAccess
+import NextcloudKit
 
 final class NCPreferences: NSObject {
     private static let userDefaultsMigrationKey = "NCPreferencesUserDefaultsMigrationVersion"
@@ -22,42 +23,33 @@ final class NCPreferences: NSObject {
 
     var showDescription: Bool {
         get {
-            if let value = try? keychain.get("showDescription"), let result = Bool(value) {
-                return result
-            }
-            return true
+            return getBoolPreference(key: "showDescription", defaultValue: true)
         }
         set {
-            keychain["showDescription"] = String(newValue)
+            setUserDefaults(newValue, forKey: "showDescription")
         }
     }
 
     var showRecommendedFiles: Bool {
         get {
-            if let value = try? keychain.get("showRecommendedFiles"), let result = Bool(value) {
-                return result
-            }
-            return true
+            return getBoolPreference(key: "showRecommendedFiles", defaultValue: true)
         }
         set {
-            keychain["showRecommendedFiles"] = String(newValue)
+            setUserDefaults(newValue, forKey: "showRecommendedFiles")
         }
     }
 
     var typeFilterScanDocument: NCGlobal.TypeFilterScanDocument {
         get {
-            if let rawValue = try? keychain.get("ScanDocumentTypeFilter"), let value = NCGlobal.TypeFilterScanDocument(rawValue: rawValue) {
-                return value
-            } else {
-                return .original
-            }
+            let rawValue = getStringPreference(key: "ScanDocumentTypeFilter", defaultValue: NCGlobal.TypeFilterScanDocument.original.rawValue)
+            return NCGlobal.TypeFilterScanDocument(rawValue: rawValue) ?? .original
         }
         set {
-            keychain["ScanDocumentTypeFilter"] = newValue.rawValue
+            setUserDefaults(newValue.rawValue, forKey: "ScanDocumentTypeFilter")
         }
     }
 
-    @objc var passcode: String? {
+    var passcode: String? {
         get {
             migrate(key: "passcodeBlock")
             if let value = try? keychain.get("passcodeBlock"), !value.isEmpty {
@@ -70,7 +62,7 @@ final class NCPreferences: NSObject {
         }
     }
 
-    @objc var resetAppCounterFail: Bool {
+    var resetAppCounterFail: Bool {
         get {
             if let value = try? keychain.get("resetAppCounterFail"), let result = Bool(value) {
                 return result
@@ -149,7 +141,7 @@ final class NCPreferences: NSObject {
         }
     }
 
-    @objc var touchFaceID: Bool {
+    var touchFaceID: Bool {
         get {
             migrate(key: "enableTouchFaceID")
             if let value = try? keychain.get("enableTouchFaceID"), let result = Bool(value) {
@@ -166,331 +158,264 @@ final class NCPreferences: NSObject {
         return passcode != nil && requestPasscodeAtStart
     }
 
-    @objc var incrementalNumber: String {
-        migrate(key: "incrementalnumber")
+    var incrementalNumber: String {
         var incrementalString = String(format: "%04ld", 0)
-        if let value = try? keychain.get("incrementalnumber"), var result = Int(value) {
-            result += 1
-            incrementalString = String(format: "%04ld", result)
+        let value = getStringPreference(key: "incrementalnumber", defaultValue: incrementalString)
+        if var intValue = Int(value) {
+            intValue += 1
+            incrementalString = String(format: "%04ld", intValue)
         }
-        keychain["incrementalnumber"] = incrementalString
+        setUserDefaults(incrementalString, forKey: "incrementalnumber")
         return incrementalString
     }
 
-    @objc var showHiddenFiles: Bool {
+    var formatCompatibility: Bool {
         get {
-            migrate(key: "showHiddenFiles")
-            if let value = try? keychain.get("showHiddenFiles"), let result = Bool(value) {
-                return result
-            }
-            return false
+            return getBoolPreference(key: "formatCompatibility", defaultValue: true)
         }
         set {
-            keychain["showHiddenFiles"] = String(newValue)
+            setUserDefaults(newValue, forKey: "formatCompatibility")
         }
     }
 
-    @objc var formatCompatibility: Bool {
+    var disableFilesApp: Bool {
         get {
-            migrate(key: "formatCompatibility")
-            if let value = try? keychain.get("formatCompatibility"), let result = Bool(value) {
-                return result
-            }
-            return true
+            return getBoolPreference(key: "disablefilesapp", defaultValue: false)
         }
         set {
-            keychain["formatCompatibility"] = String(newValue)
+            setUserDefaults(newValue, forKey: "disablefilesapp")
         }
     }
 
-    @objc var disableFilesApp: Bool {
+    var livePhoto: Bool {
         get {
-            migrate(key: "disablefilesapp")
-            if let value = try? keychain.get("disablefilesapp"), let result = Bool(value) {
-                return result
-            }
-            return false
+            return getBoolPreference(key: "livePhoto", defaultValue: true)
         }
         set {
-            keychain["disablefilesapp"] = String(newValue)
+            setUserDefaults(newValue, forKey: "livePhoto")
         }
     }
 
-    @objc var livePhoto: Bool {
+    var disableCrashservice: Bool {
         get {
-            migrate(key: "livePhoto")
-            if let value = try? keychain.get("livePhoto"), let result = Bool(value) {
-                return result
-            }
-            return true
+            return getBoolPreference(key: "crashservice", defaultValue: false)
         }
         set {
-            keychain["livePhoto"] = String(newValue)
+            setUserDefaults(newValue, forKey: "crashservice")
         }
     }
 
-    @objc var disableCrashservice: Bool {
+    /// Stores and retrieves the current log level from the keychain.
+    var log: NKLogLevel {
         get {
-            migrate(key: "crashservice")
-            if let value = try? keychain.get("crashservice"), let result = Bool(value) {
-                return result
-            }
-            return false
+            let value = getIntPreference(key: "logLevel", defaultValue: NKLogLevel.normal.rawValue)
+            return NKLogLevel(rawValue: value) ?? NKLogLevel.normal
         }
         set {
-            keychain["crashservice"] = String(newValue)
+            setUserDefaults(newValue.rawValue, forKey: "logLevel")
         }
     }
 
-    @objc var logLevel: Int {
+    var accountRequest: Bool {
         get {
-            migrate(key: "logLevel")
-            if let value = try? keychain.get("logLevel"), let result = Int(value) {
-                return result
-            }
-            return 1
+            return getBoolPreference(key: "accountRequest", defaultValue: false)
         }
         set {
-            keychain["logLevel"] = String(newValue)
+            setUserDefaults(newValue, forKey: "accountRequest")
         }
     }
 
-    @objc var accountRequest: Bool {
+    var removePhotoCameraRoll: Bool {
         get {
-            migrate(key: "accountRequest")
-            if let value = try? keychain.get("accountRequest"), let result = Bool(value) {
-                return result
-            }
-            return false
+            return getBoolPreference(key: "removePhotoCameraRoll", defaultValue: false)
         }
         set {
-            keychain["accountRequest"] = String(newValue)
-        }
-    }
-
-    @objc var removePhotoCameraRoll: Bool {
-        get {
-            migrate(key: "removePhotoCameraRoll")
-            if let value = try? keychain.get("removePhotoCameraRoll"), let result = Bool(value) {
-                return result
-            }
-            return false
-        }
-        set {
-            keychain["removePhotoCameraRoll"] = String(newValue)
-        }
-    }
-
-    var saveCameraMediaToCameraRoll: Bool {
-        get {
-            return getBoolPreference(key: "saveCameraMediaToCameraRoll", defaultValue: true)
-        }
-        set {
-            setUserDefaults(newValue, forKey: "saveCameraMediaToCameraRoll")
+            setUserDefaults(newValue, forKey: "removePhotoCameraRoll")
         }
     }
 
     var privacyScreenEnabled: Bool {
-//    @objc var privacyScreenEnabled: Bool {
         get {
-            migrate(key: "privacyScreen")
-            if let value = try? keychain.get("privacyScreen"), let result = Bool(value) {
-                return result
+            if NCBrandOptions.shared.enforce_privacyScreenEnabled {
+                return true
             }
-            return false
+            return getBoolPreference(key: "privacyScreen", defaultValue: false)
         }
         set {
-            keychain["privacyScreen"] = String(newValue)
+            setUserDefaults(newValue, forKey: "privacyScreen")
         }
     }
 
-    @objc var cleanUpDay: Int {
+    var cleanUpDay: Int {
         get {
-            migrate(key: "cleanUpDay")
-            if let value = try? keychain.get("cleanUpDay"), let result = Int(value) {
-                return result
-            }
-            return NCBrandOptions.shared.cleanUpDay
+            let value = getIntPreference(key: "cleanUpDay", defaultValue: NCBrandOptions.shared.cleanUpDay)
+            return value
         }
         set {
-            keychain["cleanUpDay"] = String(newValue)
+            setUserDefaults(newValue, forKey: "cleanUpDay")
         }
     }
 
     var mediaColumnCount: Int {
         get {
-            if let value = try? keychain.get("mediaColumnCount"), let result = Int(value) {
-                return result
-            }
-            return 3
+            let value = getIntPreference(key: "mediaColumnCount", defaultValue: 3)
+            return value
         }
         set {
-            keychain["mediaColumnCount"] = String(newValue)
+            setUserDefaults(newValue, forKey: "mediaColumnCount")
         }
     }
 
     var mediaTypeLayout: String {
         get {
-            if let value = try? keychain.get("mediaTypeLayout") {
-                return value
-            }
-            return NCGlobal.shared.mediaLayoutRatio
+            let value = getStringPreference(key: "mediaTypeLayout", defaultValue: NCGlobal.shared.mediaLayoutRatio)
+            return value
         }
         set {
-            keychain["mediaTypeLayout"] = String(newValue)
+            setUserDefaults(newValue, forKey: "mediaTypeLayout")
         }
     }
     
     var mediaSortDate: String {
         get {
-            migrate(key: "mediaSortDate")
-            if let value = try? keychain.get("mediaSortDate") {
-                return value
-            }
-            return "date"
+            let value = getStringPreference(key: "mediaSortDate", defaultValue: "date")
+            return value
         }
         set {
-            keychain["mediaSortDate"] = newValue
+            setUserDefaults(newValue, forKey: "mediaSortDate")
         }
     }
     
     var textRecognitionStatus: Bool {
         get {
-            migrate(key: "textRecognitionStatus")
-            if let value = try? keychain.get("textRecognitionStatus"), let result = Bool(value) {
-                return result
-            }
-            return false
+            return getBoolPreference(key: "textRecognitionStatus", defaultValue: false)
         }
         set {
-            keychain["textRecognitionStatus"] = String(newValue)
+            setUserDefaults(newValue, forKey: "textRecognitionStatus")
         }
     }
 
     var deleteAllScanImages: Bool {
         get {
-            migrate(key: "deleteAllScanImages")
-            if let value = try? keychain.get("deleteAllScanImages"), let result = Bool(value) {
-                return result
-            }
-            return false
+            return getBoolPreference(key: "deleteAllScanImages", defaultValue: false)
         }
         set {
-            keychain["deleteAllScanImages"] = String(newValue)
+            setUserDefaults(newValue, forKey: "deleteAllScanImages")
         }
     }
 
     var qualityScanDocument: Double {
         get {
-            migrate(key: "qualityScanDocument")
-            if let value = try? keychain.get("qualityScanDocument"), let result = Double(value) {
-                return result
-            }
-            return 2
+            let value = getIntPreference(key: "qualityScanDocument", defaultValue: 2)
+            return Double(value)
         }
         set {
-            keychain["qualityScanDocument"] = String(newValue)
+            setUserDefaults(newValue, forKey: "qualityScanDocument")
         }
     }
 
     var appearanceAutomatic: Bool {
         get {
-            if let value = try? keychain.get("appearanceAutomatic"), let result = Bool(value) {
-                return result
-            }
-            return true
+            let value = getBoolPreference(key: "appearanceAutomatic", defaultValue: true)
+            return value
         }
         set {
-            keychain["appearanceAutomatic"] = String(newValue)
+            setUserDefaults(newValue, forKey: "appearanceAutomatic")
         }
     }
 
     var appearanceInterfaceStyle: UIUserInterfaceStyle {
         get {
-            if let value = try? keychain.get("appearanceInterfaceStyle") {
-                if value == "light" {
-                    return .light
-                } else {
-                    return .dark
-                }
+            let value = getStringPreference(key: "appearanceInterfaceStyle", defaultValue: "light")
+            if value == "light" {
+                return .light
+            } else {
+                return .dark
             }
-            return .light
         }
         set {
             if newValue == .light {
-                keychain["appearanceInterfaceStyle"] = "light"
+                setUserDefaults("light", forKey: "appearanceInterfaceStyle")
             } else {
-                keychain["appearanceInterfaceStyle"] = "dark"
+                setUserDefaults("dark", forKey: "appearanceInterfaceStyle")
             }
         }
     }
 
     var screenAwakeMode: AwakeMode {
         get {
-            if let value = try? keychain.get("screenAwakeMode") {
-                if value == "off" {
-                    return .off
-                } else if value == "on" {
-                    return .on
-                } else {
-                    return .whileCharging
-                }
+            let value = getStringPreference(key: "screenAwakeMode", defaultValue: "off")
+            if value == "off" {
+                return .off
+            } else if value == "on" {
+                return .on
+            } else {
+                return .whileCharging
             }
-            return .off
         }
         set {
             if newValue == .off {
-                keychain["screenAwakeMode"] = "off"
+                setUserDefaults("off", forKey: "screenAwakeMode")
             } else if newValue == .on {
-                keychain["screenAwakeMode"] = "on"
+                setUserDefaults("on", forKey: "screenAwakeMode")
             } else {
-                keychain["screenAwakeMode"] = "whileCharging"
+                setUserDefaults("whileCharging", forKey: "screenAwakeMode")
             }
         }
     }
 
     var fileNameType: Bool {
         get {
-            if let value = try? keychain.get("fileNameType"), let result = Bool(value) {
-                return result
-            }
-            return false
+            return getBoolPreference(key: "fileNameType", defaultValue: false)
         }
         set {
-            keychain["fileNameType"] = String(newValue)
+            setUserDefaults(newValue, forKey: "fileNameType")
         }
     }
 
     var fileNameOriginal: Bool {
         get {
-            if let value = try? keychain.get("fileNameOriginal"), let result = Bool(value) {
-                return result
-            }
-            return false
+            return getBoolPreference(key: "fileNameOriginal", defaultValue: false)
         }
         set {
-            keychain["fileNameOriginal"] = String(newValue)
+            setUserDefaults(newValue, forKey: "fileNameOriginal")
         }
     }
 
     var fileNameMask: String {
         get {
-            if let value = try? keychain.get("fileNameMask") {
-                return value
-            }
-            return ""
+            return getStringPreference(key: "fileNameMask", defaultValue: "")
         }
         set {
-            keychain["fileNameMask"] = String(newValue)
+            setUserDefaults(newValue, forKey: "fileNameMask")
+        }
+    }
+
+    var location: Bool {
+        get {
+            return getBoolPreference(key: "location", defaultValue: false)
+        }
+        set {
+            setUserDefaults(newValue, forKey: "location")
+        }
+    }
+
+    var deviceTokenPushNotification: String {
+        get {
+            return getStringPreference(key: "deviceTokenPushNotification", defaultValue: "")
+        }
+        set {
+            setUserDefaults(newValue, forKey: "deviceTokenPushNotification")
         }
     }
 
     // MARK: -
 
-    @objc func getPassword(account: String) -> String {
+    func getPassword(account: String) -> String {
         let key = "password" + account
         migrate(key: key)
-        return (try? keychain.get(key)) ?? ""
+        let password = (try? keychain.get(key)) ?? ""
+        return password
     }
 
     func setPassword(account: String, password: String?) {
@@ -499,83 +424,41 @@ final class NCPreferences: NSObject {
     }
 
     func setPersonalFilesOnly(account: String, value: Bool) {
-        let key = "personalFilesOnly" + account
-        keychain[key] = String(value)
+        let userDefaultsKey = "personalfilesonly" + "_\(account)"
+        setUserDefaults(value, forKey: userDefaultsKey)
     }
 
     func getPersonalFilesOnly(account: String) -> Bool {
-        let key = "personalFilesOnly" + account
-        if let value = try? keychain.get(key), let result = Bool(value) {
-            return result
-        } else {
-            return false
-        }
+        return getBoolPreference(key: "personalfilesonly", account: account, defaultValue: false)
     }
 
-    /* OBSOLETE
+    func setFavoriteOnTop(account: String, value: Bool) {
+        let userDefaultsKey = "favoriteOnTop" + "_\(account)"
+        setUserDefaults(value, forKey: userDefaultsKey)
+    }
+
+    func getFavoriteOnTop(account: String) -> Bool {
+        return getBoolPreference(key: "favoriteOnTop", account: account, defaultValue: true)
+    }
+
     func setDirectoryOnTop(account: String, value: Bool) {
-        let key = "directoryOnTop" + account
-        keychain[key] = String(value)
+        let userDefaultsKey = "directoryOnTop" + "_\(account)"
+        setUserDefaults(value, forKey: userDefaultsKey)
     }
 
     func getDirectoryOnTop(account: String) -> Bool {
-        let key = "directoryOnTop" + account
-        if let value = try? keychain.get(key), let result = Bool(value) {
-            return result
-        } else {
-            return true
-        }
-    }
-    */
-
-    func setTitleButtonHeader(account: String, value: String?) {
-        let key = "titleButtonHeader" + account
-        keychain[key] = value
+        return getBoolPreference(key: "directoryOnTop", account: account, defaultValue: true)
     }
 
-    func getTitleButtonHeader(account: String) -> String? {
-        let key = "titleButtonHeader" + account
-        return (try? keychain.get(key)) ?? ""
-    }
-    
-    @objc func getOriginalFileName(key: String) -> Bool {
-        migrate(key: key)
-        if let value = try? keychain.get(key), let result = Bool(value) {
-            return result
-        }
-        return false
+    func setShowHiddenFiles(account: String, value: Bool) {
+        let userDefaultsKey = "showHiddenFiles" + "_\(account)"
+        setUserDefaults(value, forKey: userDefaultsKey)
     }
 
-    @objc func setOriginalFileName(key: String, value: Bool) {
-        keychain[key] = String(value)
+    func getShowHiddenFiles(account: String) -> Bool {
+        return getBoolPreference(key: "showHiddenFiles", account: account, defaultValue: false)
     }
 
-    @objc func getFileNameMask(key: String) -> String {
-        migrate(key: key)
-        if let value = try? keychain.get(key) {
-            return value
-        } else {
-            return ""
-        }
-    }
-
-    @objc func setFileNameMask(key: String, mask: String?) {
-        keychain[key] = mask
-    }
-
-    @objc func getFileNameType(key: String) -> Bool {
-        migrate(key: key)
-        if let value = try? keychain.get(key), let result = Bool(value) {
-            return result
-        } else {
-            return false
-        }
-    }
-
-    @objc func setFileNameType(key: String, prefix: Bool) {
-        keychain[key] = String(prefix)
-    }
-    
     // MARK: - E2EE
 
     func getEndToEndCertificate(account: String) -> String? {
@@ -623,12 +506,14 @@ final class NCPreferences: NSObject {
     }
 
     func isEndToEndEnabled(account: String) -> Bool {
-        let capabilities = NCCapabilities.shared.getCapabilities(account: account)
-        guard let certificate = getEndToEndCertificate(account: account), !certificate.isEmpty,
+        guard let capabilities = NCNetworking.shared.capabilities[account],
+              let certificate = getEndToEndCertificate(account: account), !certificate.isEmpty,
               let publicKey = getEndToEndPublicKey(account: account), !publicKey.isEmpty,
               let privateKey = getEndToEndPrivateKey(account: account), !privateKey.isEmpty,
               let passphrase = getEndToEndPassphrase(account: account), !passphrase.isEmpty,
-              NCGlobal.shared.e2eeVersions.contains(capabilities.capabilityE2EEApiVersion) else { return false }
+              NCGlobal.shared.e2eeVersions.contains(capabilities.e2EEApiVersion) else {
+            return false
+        }
         return true
     }
 
@@ -742,71 +627,60 @@ final class NCPreferences: NSObject {
 
     // MARK: - PUSH NOTIFICATION
 
-    @objc func getPushNotificationPublicKey(account: String) -> Data? {
-        let key = "PNPublicKey" + account
+    func getPushNotificationPrivateKey(account: String) -> Data? {
+        let key = "PushPrivateKey" + account
         return try? keychain.getData(key)
     }
 
-    @objc func setPushNotificationPublicKey(account: String, data: Data?) {
-        let key = "PNPublicKey" + account
+    func setPushNotificationPrivateKey(account: String, data: Data?) {
+        let key = "PushPrivateKey" + account
         keychain[data: key] = data
     }
 
-    @objc func getPushNotificationPrivateKey(account: String) -> Data? {
-        let key = "PNPrivateKey" + account
+    func getPushNotificationPublicKey(account: String) -> Data? {
+        let key = "PushPublicKey" + account
         return try? keychain.getData(key)
     }
 
-    @objc func setPushNotificationPrivateKey(account: String, data: Data?) {
-        let key = "PNPrivateKey" + account
+    func setPushNotificationPublicKey(account: String, data: Data?) {
+        let key = "PushPublicKey" + account
         keychain[data: key] = data
     }
 
-    @objc func getPushNotificationSubscribingPublicKey(account: String) -> String? {
-        let key = "PNSubscribingPublicKey" + account
+    func getPushNotificationSubscribingPublicKey(account: String) -> String? {
+        let key = "PushSubscribingPublicKey" + account
         return try? keychain.get(key)
     }
 
-    @objc func setPushNotificationSubscribingPublicKey(account: String, publicKey: String?) {
-        let key = "PNSubscribingPublicKey" + account
+    func setPushNotificationSubscribingPublicKey(account: String, publicKey: String?) {
+        let key = "PushSubscribingPublicKey" + account
         keychain[key] = publicKey
     }
 
-    @objc func getPushNotificationToken(account: String) -> String? {
-        let key = "PNToken" + account
+    func getPushNotificationDeviceIdentifier(account: String) -> String? {
+        let value = getStringPreference(key: "PushDeviceIdentifier", account: account, defaultValue: "")
+        return value
+    }
+
+    func setPushNotificationDeviceIdentifier(account: String, deviceIdentifier: String?) {
+        let userDefaultsKey = "PushDeviceIdentifier" + "_\(account)"
+        setUserDefaults(deviceIdentifier, forKey: userDefaultsKey)
+    }
+
+    func getPushNotificationDeviceIdentifierSignature(account: String) -> String? {
+        let key = "PushDeviceIdentifierSignature" + account
         return try? keychain.get(key)
     }
 
-    @objc func setPushNotificationToken(account: String, token: String?) {
-        let key = "PNToken" + account
-        keychain[key] = token
-    }
-
-    @objc func getPushNotificationDeviceIdentifier(account: String) -> String? {
-        let key = "PNDeviceIdentifier" + account
-        return try? keychain.get(key)
-    }
-
-    @objc func setPushNotificationDeviceIdentifier(account: String, deviceIdentifier: String?) {
-        let key = "PNDeviceIdentifier" + account
-        keychain[key] = deviceIdentifier
-    }
-
-    @objc func getPushNotificationDeviceIdentifierSignature(account: String) -> String? {
-        let key = "PNDeviceIdentifierSignature" + account
-        return try? keychain.get(key)
-    }
-
-    @objc func setPushNotificationDeviceIdentifierSignature(account: String, deviceIdentifierSignature: String?) {
-        let key = "PNDeviceIdentifierSignature" + account
+    func setPushNotificationDeviceIdentifierSignature(account: String, deviceIdentifierSignature: String?) {
+        let key = "PushDeviceIdentifierSignature" + account
         keychain[key] = deviceIdentifierSignature
     }
 
-    @objc func clearAllKeysPushNotification(account: String) {
+    func clearAllKeysPushNotification(account: String) {
+        setPushNotificationPrivateKey(account: account, data: nil)
         setPushNotificationPublicKey(account: account, data: nil)
         setPushNotificationSubscribingPublicKey(account: account, publicKey: nil)
-        setPushNotificationPrivateKey(account: account, data: nil)
-        setPushNotificationToken(account: account, token: nil)
         setPushNotificationDeviceIdentifier(account: account, deviceIdentifier: nil)
         setPushNotificationDeviceIdentifierSignature(account: account, deviceIdentifierSignature: nil)
     }
@@ -830,22 +704,13 @@ final class NCPreferences: NSObject {
 
         return (data, password)
     }
-    
-    @objc func setAccountName(account: String) {
-        let key = "AccountName"
-        keychain[key] = account
-    }
-
-    @objc func getAccountName() -> String? {
-        let key = "AccountName"
-        return try? keychain.get(key)
-    }
 
     // MARK: - Albums
 
     func setAutoUploadAlbumIds(account: String, albumIds: [String]) {
-        let key = "AlbumIds" + account
-        keychain[key] = albumIds.joined(separator: ",")
+        let userDefaultsKey = "AlbumIds" + "_\(account)"
+        let value = albumIds.joined(separator: ",")
+        setUserDefaults(value, forKey: userDefaultsKey)
     }
 
     func getAutoUploadAlbumIds(account: String) -> [String] {
@@ -1052,7 +917,69 @@ final class NCPreferences: NSObject {
         return defaultValue
     }
 
-    @objc func removeAll() {
+    func removeAll() {
         try? keychain.removeAll()
+    }
+
+    private func setUserDefaults(_ value: Any?, forKey key: String) {
+        let keyPreferences = "Preferences_\(key)"
+        UserDefaults.standard.set(value, forKey: keyPreferences)
+    }
+
+    private func getBoolPreference(key: String, account: String? = nil, defaultValue: Bool) -> Bool {
+        let suffix = account ?? ""
+        let userDefaultsKey = account != nil ? "Preferences_\(key)_\(suffix)" : "Preferences_\(key)"
+        let keychainKey = account != nil ? "\(key)\(suffix)" : key
+
+        if let value = UserDefaults.standard.object(forKey: userDefaultsKey) as? Bool {
+            return value
+        }
+
+        if let value = try? keychain.get(keychainKey), let boolValue = Bool(value) {
+            UserDefaults.standard.set(boolValue, forKey: userDefaultsKey)
+            try? keychain.remove(keychainKey)
+            return boolValue
+        }
+
+        UserDefaults.standard.set(defaultValue, forKey: userDefaultsKey)
+        return defaultValue
+    }
+
+    private func getStringPreference(key: String, account: String? = nil, defaultValue: String) -> String {
+        let suffix = account ?? ""
+        let userDefaultsKey = account != nil ? "Preferences_\(key)_\(suffix)" : "Preferences_\(key)"
+        let keychainKey = account != nil ? "\(key)\(suffix)" : key
+
+        if let value = UserDefaults.standard.object(forKey: userDefaultsKey) as? String {
+            return value
+        }
+
+        if let value = try? keychain.get(keychainKey) {
+            UserDefaults.standard.set(value, forKey: userDefaultsKey)
+            try? keychain.remove(keychainKey)
+            return value
+        }
+
+        UserDefaults.standard.set(defaultValue, forKey: userDefaultsKey)
+        return defaultValue
+    }
+
+    private func getIntPreference(key: String, account: String? = nil, defaultValue: Int) -> Int {
+        let suffix = account ?? ""
+        let userDefaultsKey = account != nil ? "Preferences_\(key)_\(suffix)" : "Preferences_\(key)"
+        let keychainKey = account != nil ? "\(key)\(suffix)" : key
+
+        if let value = UserDefaults.standard.object(forKey: userDefaultsKey) as? Int {
+            return value
+        }
+
+        if let value = try? keychain.get(keychainKey), let intValue = Int(value) {
+            UserDefaults.standard.set(intValue, forKey: userDefaultsKey)
+            try? keychain.remove(keychainKey)
+            return intValue
+        }
+
+        UserDefaults.standard.set(defaultValue, forKey: userDefaultsKey)
+        return defaultValue
     }
 }
