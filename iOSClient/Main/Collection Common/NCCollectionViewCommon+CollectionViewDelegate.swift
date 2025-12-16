@@ -128,15 +128,16 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         }
 
         if self.isEditMode {
-            if let index = self.fileSelect.firstIndex(of: metadata.ocId) {
-                self.fileSelect.remove(at: index)
-            } else {
-                self.fileSelect.append(metadata.ocId)
+            if !metadata.e2eEncrypted {
+                if let index = self.fileSelect.firstIndex(of: metadata.ocId) {
+                    self.fileSelect.remove(at: index)
+                } else {
+                    self.fileSelect.append(metadata.ocId)
+                }
+                self.collectionView.reloadItems(at: [indexPath])
+                self.tabBarSelect?.update(fileSelect: self.fileSelect, metadatas: self.getSelectedMetadatas(), userId: metadata.userId)
+                // self.collectionView.reloadSections(IndexSet(integer: indexPath.section))
             }
-            self.collectionView.reloadItems(at: [indexPath])
-            self.tabBarSelect?.update(fileSelect: self.fileSelect, metadatas: self.getSelectedMetadatas(), userId: metadata.userId)
-            // self.collectionView.reloadSections(IndexSet(integer: indexPath.section))
-
             self.collectionView.collectionViewLayout.invalidateLayout()
             return
         }
