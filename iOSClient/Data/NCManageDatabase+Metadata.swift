@@ -156,7 +156,7 @@ extension tableMetadata {
         if isDocumentViewableOnly {
             return false
         }
-        if ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/") || classFile == NKCommon.TypeClassFile.image.rawValue {
+        if ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/") || classFile == NKTypeClassFile.image.rawValue {
             return true
         }
         return false
@@ -165,11 +165,11 @@ extension tableMetadata {
     var isSavebleInCameraRoll: Bool {
         return (classFile == NKTypeClassFile.image.rawValue && contentType != "image/svg+xml") || classFile == NKTypeClassFile.video.rawValue
     }
-    
-    var isDocumentViewableOnly: Bool {
-        sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKCommon.TypeClassFile.document.rawValue
-    }
 
+    var isDocumentViewableOnly: Bool {
+        sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKTypeClassFile.document.rawValue
+    }
+    
     var isAudioOrVideo: Bool {
         return classFile == NKTypeClassFile.audio.rawValue || classFile == NKTypeClassFile.video.rawValue
     }
@@ -195,7 +195,7 @@ extension tableMetadata {
     }
 
     var isCopyableInPasteboard: Bool {
-        !isDocumentViewableOnly && !directory
+        !directory
     }
 
 #if !EXTENSION_FILE_PROVIDER_EXTENSION
@@ -204,11 +204,11 @@ extension tableMetadata {
     }
 
     var isCopyableMovable: Bool {
-        !isDocumentViewableOnly && !isDirectoryE2EE && !e2eEncrypted
+        !isDirectoryE2EE && !e2eEncrypted
     }
 
     var isModifiableWithQuickLook: Bool {
-        if directory || isDocumentViewableOnly || isDirectoryE2EE {
+        if directory || isDirectoryE2EE {
             return false
         }
         return isPDF || isImage
@@ -239,44 +239,21 @@ extension tableMetadata {
     }
 
     var canSetAsAvailableOffline: Bool {
-//        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
-        return session.isEmpty && !isDocumentViewableOnly
+        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
     }
 
     var canShare: Bool {
-        return session.isEmpty && !isDocumentViewableOnly && !directory && !NCBrandOptions.shared.disable_openin_file
+        return session.isEmpty && !directory && !NCBrandOptions.shared.disable_openin_file
+    }
+
+    var canSetDirectoryAsE2EE: Bool {
+        return directory && size == 0 && !e2eEncrypted && NCPreferences().isEndToEndEnabled(account: account)
     }
 
     var canUnsetDirectoryAsE2EE: Bool {
         return !isDirectoryE2EE && directory && size == 0 && e2eEncrypted && NCPreferences().isEndToEndEnabled(account: account)
     }
 
-    var canOpenExternalEditor: Bool {
-        if isDocumentViewableOnly {
-            return false
-        }
-        let utility = NCUtility()
-        let editors = utility.editorsDirectEditing(account: account, contentType: contentType)
-        let isRichDocument = utility.isTypeFileRichDocument(self)
-        return classFile == NKCommon.TypeClassFile.document.rawValue && editors.contains(NCGlobal.shared.editorText) && ((editors.contains(NCGlobal.shared.editorOnlyoffice) || isRichDocument))
-    }
-
-    var isWaitingTransfer: Bool {
-        status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusWaitUpload || status == NCGlobal.shared.metadataStatusUploadError
-    }
-
-    var isInTransfer: Bool {
-        status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusUploading
-    }
-
-    var isTransferInForeground: Bool {
-        (status > 0 && (chunk > 0 || e2eEncrypted))
-    }
-    
-    var isDownloadUpload: Bool {
-        status == NCGlobal.shared.metadataStatusDownloading || status == NCGlobal.shared.metadataStatusUploading
-    }
-    
     var isDownload: Bool {
         status == NCGlobal.shared.metadataStatusWaitDownload || status == NCGlobal.shared.metadataStatusDownloading
     }
@@ -417,7 +394,7 @@ extension tableMetadata {
         guard let capabilities = NCNetworking.shared.capabilities[account] else {
             return false
         }
-        if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE) {
+        if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE), !e2eEncrypted {
             return false
         }
         return !e2eEncrypted
@@ -965,6 +942,34 @@ extension NCManageDatabase {
                 .map { $0.detachedCopy() }
         } ?? []
     }
+    
+    func getMediaMetadatas(predicate: NSPredicate, sorted: String? = nil, ascending: Bool = false) -> ThreadSafeArray<tableMetadata>? {
+
+        do {
+            let realm = try Realm()
+            if let sorted {
+                var results: [tableMetadata] = []
+                switch sorted {//NCPreferences().mediaSortDate {
+                case "date":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.date as Date) > ($1.date as Date) }
+                case "creationDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.creationDate as Date) > ($1.creationDate as Date) }
+                case "uploadDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.uploadDate as Date) > ($1.uploadDate as Date) }
+                default:
+                    let results = realm.objects(tableMetadata.self).filter(predicate)
+                    return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+                }
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            } else {
+                let results = realm.objects(tableMetadata.self).filter(predicate)
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            }
+        } catch let error as NSError {
+//            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+        }
+        return nil
+    }
 
     func getMetadatas(predicate: NSPredicate,
                       sortedByKeyPath: String,
@@ -1208,22 +1213,10 @@ extension NCManageDatabase {
                 counter += 1
                 listIdentifierRank[item.ocId] = NSNumber(value: counter)
             }
-            
+
             return listIdentifierRank
         }
         return result ?? [:]
-    }
-
-    @objc func clearMetadatasUpload(account: String) {
-        do {
-            let realm = try Realm()
-            try realm.write {
-                let results = realm.objects(tableMetadata.self).filter("account == %@ AND (status == %d OR status == %d)", account, NCGlobal.shared.metadataStatusWaitUpload, NCGlobal.shared.metadataStatusUploadError)
-                realm.delete(results)
-            }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
-        }
     }
 
     func getAssetLocalIdentifiersUploadedAsync() async -> [String]? {
@@ -1334,41 +1327,17 @@ extension NCManageDatabase {
         } ?? false
     }
 
-    func createMetadatasFolder(assets: [PHAsset],
-                               useSubFolder: Bool,
-                               session: NCSession.Session, completion: @escaping ([tableMetadata]) -> Void) {
-        var foldersCreated: Set<String> = []
-        var metadatas: [tableMetadata] = []
-        let serverUrlBase = getAccountAutoUploadDirectory(session: session)
-        let fileNameBase = getAccountAutoUploadFileName(account: session.account)
-        let predicate = NSPredicate(format: "account == %@ AND serverUrl BEGINSWITH %@ AND directory == true", session.account, serverUrlBase)
-
-        func createMetadata(serverUrl: String, fileName: String, metadata: tableMetadata?) {
-            guard !foldersCreated.contains(serverUrl + "/" + fileName) else {
-                return
-            }
-            foldersCreated.insert(serverUrl + "/" + fileName)
-
-            if let metadata {
-                metadata.status = NCGlobal.shared.metadataStatusWaitCreateFolder
-                metadata.sessionSelector = NCGlobal.shared.selectorUploadAutoUpload
-                metadata.sessionDate = Date()
-                metadatas.append(tableMetadata(value: metadata))
-            } else {
-                let metadata = NCManageDatabase.shared.createMetadata(fileName: fileName,
-                                                                      fileNameView: fileName,
-                                                                      ocId: NSUUID().uuidString,
-                                                                      serverUrl: serverUrl,
-                                                                      url: "",
-                                                                      contentType: "httpd/unix-directory",
-                                                                      directory: true,
-                                                                      session: session,
-                                                                      sceneIdentifier: nil)
-                metadata.status = NCGlobal.shared.metadataStatusWaitCreateFolder
-                metadata.sessionSelector = NCGlobal.shared.selectorUploadAutoUpload
-                metadata.sessionDate = Date()
-                metadatas.append(metadata)
-            }
+    func getMetadataDirectoryAsync(serverUrl: String, account: String) async -> tableMetadata? {
+        guard let url = URL(string: serverUrl) else {
+            return nil
+        }
+        let fileName = url.lastPathComponent
+        var baseUrl = url.deletingLastPathComponent().absoluteString
+        if baseUrl.hasSuffix("/") {
+            baseUrl.removeLast()
+        }
+        guard let decodedBaseUrl = baseUrl.removingPercentEncoding else {
+            return nil
         }
 
         return await core.performRealmReadAsync { realm in
@@ -1378,7 +1347,7 @@ extension NCManageDatabase {
             return object?.detachedCopy()
         }
     }
-    
+
     func getMetadataDirectory(serverUrl: String, account: String) -> tableMetadata? {
         guard let url = URL(string: serverUrl) else {
             return nil
