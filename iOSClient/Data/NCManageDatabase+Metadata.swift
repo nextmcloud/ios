@@ -177,10 +177,6 @@ extension tableMetadata {
     var isSavebleInCameraRoll: Bool {
         return (classFile == NKTypeClassFile.image.rawValue && contentType != "image/svg+xml") || classFile == NKTypeClassFile.video.rawValue
     }
-    
-    var isDocumentViewableOnly: Bool {
-        sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKCommon.TypeClassFile.document.rawValue
-    }
 
     var isDocumentViewableOnly: Bool {
         sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKTypeClassFile.document.rawValue
@@ -211,7 +207,7 @@ extension tableMetadata {
     }
 
     var isCopyableInPasteboard: Bool {
-        !isDocumentViewableOnly && !directory
+        !directory
     }
 
 #if !EXTENSION_FILE_PROVIDER_EXTENSION
@@ -220,11 +216,11 @@ extension tableMetadata {
     }
 
     var isCopyableMovable: Bool {
-        !isDocumentViewableOnly && !isDirectoryE2EE && !e2eEncrypted
+        !isDirectoryE2EE && !e2eEncrypted
     }
 
     var isModifiableWithQuickLook: Bool {
-        if directory || isDocumentViewableOnly || isDirectoryE2EE {
+        if directory || isDirectoryE2EE {
             return false
         }
         return isPDF || isImage
@@ -255,8 +251,7 @@ extension tableMetadata {
     }
 
     var canSetAsAvailableOffline: Bool {
-//        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
-        return session.isEmpty && !isDocumentViewableOnly
+        return session.isEmpty && !isDirectoryE2EE && !e2eEncrypted
     }
 
     func isSharable() -> Bool {
@@ -1327,18 +1322,6 @@ extension NCManageDatabase {
         return result ?? [:]
     }
 
-    @objc func clearMetadatasUpload(account: String) {
-        do {
-            let realm = try Realm()
-            try realm.write {
-                let results = realm.objects(tableMetadata.self).filter("account == %@ AND (status == %d OR status == %d)", account, NCGlobal.shared.metadataStatusWaitUpload, NCGlobal.shared.metadataStatusUploadError)
-                realm.delete(results)
-            }
-        } catch let error {
-            NextcloudKit.shared.nkCommonInstance.writeLog("[ERROR] Could not write to database: \(error)")
-        }
-    }
-
     func getAssetLocalIdentifiersUploadedAsync() async -> [String]? {
         return await core.performRealmReadAsync { realm in
             let results = realm.objects(tableMetadata.self).filter("assetLocalIdentifier != ''")
@@ -1447,41 +1430,17 @@ extension NCManageDatabase {
         } ?? false
     }
 
-    func createMetadatasFolder(assets: [PHAsset],
-                               useSubFolder: Bool,
-                               session: NCSession.Session, completion: @escaping ([tableMetadata]) -> Void) {
-        var foldersCreated: Set<String> = []
-        var metadatas: [tableMetadata] = []
-        let serverUrlBase = getAccountAutoUploadDirectory(session: session)
-        let fileNameBase = getAccountAutoUploadFileName(account: session.account)
-        let predicate = NSPredicate(format: "account == %@ AND serverUrl BEGINSWITH %@ AND directory == true", session.account, serverUrlBase)
-
-        func createMetadata(serverUrl: String, fileName: String, metadata: tableMetadata?) {
-            guard !foldersCreated.contains(serverUrl + "/" + fileName) else {
-                return
-            }
-            foldersCreated.insert(serverUrl + "/" + fileName)
-
-            if let metadata {
-                metadata.status = NCGlobal.shared.metadataStatusWaitCreateFolder
-                metadata.sessionSelector = NCGlobal.shared.selectorUploadAutoUpload
-                metadata.sessionDate = Date()
-                metadatas.append(tableMetadata(value: metadata))
-            } else {
-                let metadata = NCManageDatabase.shared.createMetadata(fileName: fileName,
-                                                                      fileNameView: fileName,
-                                                                      ocId: NSUUID().uuidString,
-                                                                      serverUrl: serverUrl,
-                                                                      url: "",
-                                                                      contentType: "httpd/unix-directory",
-                                                                      directory: true,
-                                                                      session: session,
-                                                                      sceneIdentifier: nil)
-                metadata.status = NCGlobal.shared.metadataStatusWaitCreateFolder
-                metadata.sessionSelector = NCGlobal.shared.selectorUploadAutoUpload
-                metadata.sessionDate = Date()
-                metadatas.append(metadata)
-            }
+    func getMetadataDirectoryAsync(serverUrl: String, account: String) async -> tableMetadata? {
+        guard let url = URL(string: serverUrl) else {
+            return nil
+        }
+        let fileName = url.lastPathComponent
+        var baseUrl = url.deletingLastPathComponent().absoluteString
+        if baseUrl.hasSuffix("/") {
+            baseUrl.removeLast()
+        }
+        guard let decodedBaseUrl = baseUrl.removingPercentEncoding else {
+            return nil
         }
 
         return await core.performRealmReadAsync { realm in
@@ -1491,7 +1450,7 @@ extension NCManageDatabase {
             return object?.detachedCopy()
         }
     }
-    
+
     func getMetadataDirectory(serverUrl: String, account: String) -> tableMetadata? {
         guard let url = URL(string: serverUrl) else {
             return nil
