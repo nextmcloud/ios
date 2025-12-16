@@ -28,6 +28,10 @@ import XLForm
 // MARK: -
 
 @objc class NCCreateFormUploadDocuments: XLFormViewController, NCSelectDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, NCCreateFormUploadConflictDelegate {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+        
+    }
+    
 
     @IBOutlet weak var indicator: UIActivityIndicatorView!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -43,8 +47,8 @@ import XLForm
     var fileName = ""
     var fileNameExtension = ""
     var titleForm = ""
-    var listOfTemplate: [NKEditorTemplates] = []
-    var selectTemplate: NKEditorTemplates?
+    var listOfTemplate: [NKEditorTemplate] = []
+    var selectTemplate: NKEditorTemplate?
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
 
@@ -112,7 +116,7 @@ import XLForm
         XLFormViewController.cellClassesForRowDescriptorTypes()["kNMCFolderCustomCellType"] = FolderPathCustomCell.self
         row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "kNMCFolderCustomCellType", title: "")
         row.action.formSelector = #selector(changeDestinationFolder(_:))
-        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.imageColor(NCBrandColor.shared.customer)
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")!.withTintColor(NCBrandColor.shared.customer)
         row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
         row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
         row.cellConfig["photoLabel.textColor"] = UIColor.label //photos
@@ -275,58 +279,62 @@ import XLForm
 
     @objc func save() {
 
-        guard let selectTemplate = self.selectTemplate else { return }
-        templateIdentifier = selectTemplate.identifier
+        Task {
+            guard let selectTemplate = self.selectTemplate else { return }
+            templateIdentifier = selectTemplate.identifier
+            
+            let rowFileName: XLFormRowDescriptor = self.form.formRow(withTag: "fileName")!
+            var fileName = rowFileName.value as? String
+            if fileName?.isEmpty ?? false || fileName == nil {
+                fileName = NCUtilityFileSystem().createFileNameDate("Text", ext: getFileExtension())
+            } else if fileName?.trimmingCharacters(in: .whitespaces).isEmpty ?? false {
+                let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_file_name_", comment: ""), preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
+                self.present(alert, animated: true)
+                return
+            }
+            
+            // Ensure fileName is not nil or empty
+            guard var fileNameForm: String = fileName, !fileNameForm.isEmpty else { return }
+            
+            // Trim whitespaces and newlines
+            fileNameForm = fileNameForm.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            let fileAutoRenamer = FileAutoRenamer()
+            fileName = fileAutoRenamer.rename(filename: fileNameForm, isFolderPath: true)
 
-        let rowFileName: XLFormRowDescriptor = self.form.formRow(withTag: "fileName")!
-        var fileName = rowFileName.value as? String
-        if fileName?.isEmpty ?? false || fileName == nil {
-            fileName = NCUtilityFileSystem().createFileNameDate("Text", ext: getFileExtension())
-        } else if fileName?.trimmingCharacters(in: .whitespaces).isEmpty ?? false {
-            let alert = UIAlertController(title: "", message: NSLocalizedString("_please_enter_file_name_", comment: ""), preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .cancel, handler: nil))
-            self.present(alert, animated: true)
-            return
-        }
-
-        // Ensure fileName is not nil or empty
-        guard var fileNameForm: String = fileName, !fileNameForm.isEmpty else { return }
-
-        // Trim whitespaces and newlines
-        fileNameForm = fileNameForm.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        fileName = FileAutoRenamer.rename(fileNameForm, account: session.account)
-
-        let result = NextcloudKit.shared.nkCommonInstance.getInternalType(fileName: fileNameForm, mimeType: "", directory: false, account: session.account
-        )
-        if utility.editorsDirectEditing(account: session.account, contentType: result.mimeType).isEmpty {
-            fileNameForm = (fileNameForm as NSString).deletingPathExtension + "." + fileNameExtension
-        }
-
-        // verify if already exists
-        if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView == %@", session.account, self.serverUrl, fileNameForm)) != nil {
-            NCContentPresenter().showError(error: NKError(errorCode: 0, errorDescription: "_rename_already_exists_"))
-            return
-//        }
-//
-//        if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: String(describing: fileNameForm), nativeFormat: false) != nil {
-//
-//            let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: String(describing: fileNameForm), fileNameView: String(describing: fileNameForm), ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate.sceneIdentifier)
-//
-//            guard let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
-//
-//            conflict.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
-//            conflict.alwaysNewFileNameNumber = true
-//            conflict.serverUrl = serverUrl
-//            conflict.metadatasUploadInConflict = [metadataForUpload]
-//            conflict.delegate = self
-//
-//            self.present(conflict, animated: true, completion: nil)
-
-        } else {
-
-            let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileNameForm), serverUrl: serverUrl, session: session)
-            createDocument(fileNamePath: fileNamePath, fileName: String(describing: fileNameForm))
+            let result = await NKTypeIdentifiers.shared.getInternalType(fileName: fileNameForm, mimeType: "", directory: false, account: session.account)
+            
+            if utility.editorsDirectEditing(account: session.account, contentType: result.mimeType).isEmpty {
+                fileNameForm = (fileNameForm as NSString).deletingPathExtension + "." + fileNameExtension
+            }
+            
+            // verify if already exists
+            if NCManageDatabase.shared.getMetadata(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView == %@", session.account, self.serverUrl, fileNameForm)) != nil {
+                NCContentPresenter().showError(error: NKError(errorCode: 0, errorDescription: "_rename_already_exists_"))
+                return
+                //        }
+                //
+                //        if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: String(describing: fileNameForm), nativeFormat: false) != nil {
+                //
+                //            let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: String(describing: fileNameForm), fileNameView: String(describing: fileNameForm), ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate.sceneIdentifier)
+                //
+                //            guard let conflict = UIStoryboard(name: "NCCreateFormUploadConflict", bundle: nil).instantiateInitialViewController() as? NCCreateFormUploadConflict else { return }
+                //
+                //            conflict.textLabelDetailNewFile = NSLocalizedString("_now_", comment: "")
+                //            conflict.alwaysNewFileNameNumber = true
+                //            conflict.serverUrl = serverUrl
+                //            conflict.metadatasUploadInConflict = [metadataForUpload]
+                //            conflict.delegate = self
+                //
+                //            self.present(conflict, animated: true, completion: nil)
+                
+            } else {
+                
+                let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileNameForm), serverUrl: serverUrl, session: session)
+                await NCCreateDocument().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileNameForm), fileNameExtension: self.fileNameExtension, editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account)
+                
+            }
         }
     }
 
@@ -335,7 +343,11 @@ import XLForm
         if let metadatas, metadatas.count > 0 {
             let fileName = metadatas[0].fileName
             let fileNamePath = utilityFileSystem.getFileNamePath(fileName, serverUrl: serverUrl, session: session)
-            createDocument(fileNamePath: fileNamePath, fileName: fileName)
+//            createDocument(fileNamePath: fileNamePath, fileName: fileName)
+            Task {
+                await NCCreateDocument().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account)
+            }
+
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 self.cancel()
@@ -351,54 +363,62 @@ import XLForm
 
         if self.editorId == NCGlobal.shared.editorText || self.editorId == NCGlobal.shared.editorOnlyoffice {
 
-            var options = NKRequestOptions()
-            if self.editorId == NCGlobal.shared.editorOnlyoffice {
-                options = NKRequestOptions(customUserAgent: utility.getCustomUserAgentOnlyOffice())
-            } else if editorId == NCGlobal.shared.editorText {
-                options = NKRequestOptions(customUserAgent: utility.getCustomUserAgentNCText())
-            }
-
-            NextcloudKit.shared.textCreateFile(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account, options: options) { account, url, _, error in
-                guard error == .success, account == self.session.account, let url = url else {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = true
-                    NCContentPresenter().showError(error: error)
-                    return
+            Task {
+                var options = NKRequestOptions()
+                if self.editorId == NCGlobal.shared.editorOnlyoffice {
+                    options = NKRequestOptions(customUserAgent: utility.getCustomUserAgentOnlyOffice())
+                } else if editorId == NCGlobal.shared.editorText {
+                    options = NKRequestOptions(customUserAgent: utility.getCustomUserAgentNCText())
                 }
-
-                var results = NextcloudKit.shared.nkCommonInstance.getInternalType(fileName: fileName, mimeType: "", directory: false, account: self.session.account)
-                // FIXME: iOS 12.0,* don't detect UTI text/markdown, text/x-markdown
-                if results.mimeType.isEmpty {
-                    results.mimeType = "text/x-markdown"
-                }
-
-                self.dismiss(animated: true, completion: {
-                    let metadata = NCManageDatabase.shared.createMetadata(fileName: fileName, fileNameView: fileName, ocId: UUID, serverUrl: self.serverUrl, url: url, contentType: results.mimeType, session: self.session, sceneIdentifier: self.appDelegate.sceneIdentifier)
-                    if let viewController = self.appDelegate.activeViewController {
-//                        NCViewer().view(viewController: viewController, metadata: metadata)
-                        NCViewer().view(viewController: viewController, metadata: metadata, metadatas: [metadata])
+                
+                let results = await NextcloudKit.shared.textCreateFileAsync(fileNamePath: fileNamePath, editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account, options: options) { task in
+                    Task {
+                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
+                                                                                                    path: fileNamePath,
+                                                                                                    name: "textCreateFile")
+                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
                     }
-                })
+                }
+                guard results.error == .success, let url = results.url else {
+                    return NCContentPresenter().showError(error: results.error)
+                }
+                let metadata = await NCManageDatabase.shared.createMetadataAsync(fileName: fileName,
+                                                                                 ocId: UUID,
+                                                                                 serverUrl: serverUrl,
+                                                                                 url: url,
+                                                                                 session: session,
+                                                                                 sceneIdentifier: controller.sceneIdentifier)
+                if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: controller) {
+                    controller.navigationController?.pushViewController(vc, animated: true)
+                }
             }
         }
 
         if self.editorId == NCGlobal.shared.editorCollabora {
-
-            NextcloudKit.shared.createRichdocuments(path: fileNamePath, templateId: templateIdentifier, account: session.account) { account, url, _, error in
-                guard error == .success, account == self.session.account, let url = url else {
-                    self.navigationItem.rightBarButtonItem?.isEnabled = true
-                    NCContentPresenter().showError(error: error)
-                    return
-                }
-
-                self.dismiss(animated: true, completion: {
-                    let createFileName = (fileName as NSString).deletingPathExtension + "." + self.fileNameExtension
-                    let metadata = NCManageDatabase.shared.createMetadata(fileName: createFileName, fileNameView: createFileName, ocId: UUID, serverUrl: self.serverUrl, url: url, contentType: "", session: self.session, sceneIdentifier: self.appDelegate.sceneIdentifier)
-                    AnalyticsHelper.shared.trackCreateFile(metadata: metadata)
-                    if let viewController = self.appDelegate.activeViewController {
-//                        NCViewer().view(viewController: viewController, metadata: metadata)
-                        NCViewer().view(viewController: viewController, metadata: metadata, metadatas: [metadata])
+            Task {
+                
+                let results = await NextcloudKit.shared.createRichdocumentsAsync(path: fileNamePath, templateId: templateIdentifier, account: session.account) { task in
+                    Task {
+                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: self.session.account,
+                                                                                                    path: fileNamePath,
+                                                                                                    name: "CreateRichdocuments")
+                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
                     }
-               })
+                }
+                guard results.error == .success, let url = results.url else {
+                    return NCContentPresenter().showError(error: results.error)
+                }
+                
+                let metadata = await NCManageDatabase.shared.createMetadataAsync(fileName: fileName,
+                                                                                 ocId: UUID,
+                                                                                 serverUrl: serverUrl,
+                                                                                 url: url,
+                                                                                 session: session,
+                                                                                 sceneIdentifier: controller.sceneIdentifier)
+                
+                if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: controller) {
+                    controller.navigationController?.pushViewController(vc, animated: true)
+                }
             }
         }
     }
@@ -432,7 +452,7 @@ import XLForm
 
                     for template in templates {
 
-                        let temp = NKEditorTemplates()
+                        var temp = NKEditorTemplate()
 
                         temp.identifier = template.identifier
                         temp.ext = template.ext
@@ -452,7 +472,7 @@ import XLForm
 
                 if self.listOfTemplate.isEmpty {
 
-                    let temp = NKEditorTemplates()
+                    var temp = NKEditorTemplate()
 
                     temp.identifier = ""
                     if self.editorId == NCGlobal.shared.editorText {
@@ -489,14 +509,14 @@ import XLForm
 
                     for template in templates! {
 
-                        let temp = NKEditorTemplates()
+                        var temp = NKEditorTemplate()
 
                         temp.identifier = "\(template.templateId)"
-                        temp.delete = template.delete
+//                        temp.delete = template.delete
                         temp.ext = template.ext
                         temp.name = template.name
                         temp.preview = template.preview
-                        temp.type = template.type
+//                        temp.type = template.type
 
                         self.listOfTemplate.append(temp)
 
@@ -511,7 +531,7 @@ import XLForm
 
                 if self.listOfTemplate.isEmpty {
 
-                    let temp = NKEditorTemplates()
+                    var temp = NKEditorTemplate()
 
                     temp.identifier = ""
                     if self.typeTemplate == NCGlobal.shared.templateDocument {
