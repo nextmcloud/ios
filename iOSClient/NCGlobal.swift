@@ -51,6 +51,7 @@ final class NCGlobal: Sendable {
     // Intro selector
     //
     let introLogin: Int                             = 0
+    let introSignup: Int                            = 1
     let introSignUpWithProvider: Int                = 1
 
     // Avatar
@@ -58,7 +59,7 @@ final class NCGlobal: Sendable {
     // Shared download resolution for a 128-point avatar at 3x scale, also used without a UI context.
     let avatarSize: Int                             = 384
     let avatarSizeRounded: Int                      = 128
-
+    
     // Preview size
     //
     let size1024: CGSize                            = CGSize(width: 1024, height: 1024)
@@ -120,7 +121,35 @@ final class NCGlobal: Sendable {
     //
     let buttonMoreMore                              = "more"
     let buttonMoreLock                              = "moreLock"
+    let buttonMoreStop                              = "stop"
 
+    // Standard height sections header/footer
+    //
+    let heightButtonsView: CGFloat                  = 50
+    let heightHeaderTransfer: CGFloat               = 50
+    let heightSection: CGFloat                      = 30
+    let heightFooter: CGFloat                       = 1
+    let heightFooterButton: CGFloat                 = 30
+    let endHeightFooter: CGFloat                    = 85
+    
+
+    // Text -  OnlyOffice - Collabora - QuickLook
+    //
+    let editorText                                  = "text"
+    let editorOnlyoffice                            = "onlyoffice"
+    let editorCollabora                             = "collabora"
+    let editorQuickLook                             = "quicklook"
+    
+    let onlyofficeDocx                              = "onlyoffice_docx"
+    let onlyofficeXlsx                              = "onlyoffice_xlsx"
+    let onlyofficePptx                              = "onlyoffice_pptx"
+    
+    // Template
+    //
+    let templateDocument                            = "document"
+    let templateSpreadsheet                         = "spreadsheet"
+    let templatePresentation                        = "presentation"
+    
     // Rich Workspace
     //
     let fileNameRichWorkspace                       = "Readme.md"
@@ -208,6 +237,8 @@ final class NCGlobal: Sendable {
     let selectorSaveAsScan                      = "saveAsScan"
     let selectorOpenDetail                      = "openDetail"
     let selectorSynchronizationOffline          = "synchronizationOffline"
+    let selectorPrint                           = "print"
+    let selectorDeleteFile                      = "deleteFile"
 
     // Metadata : Status
     //
@@ -256,11 +287,15 @@ final class NCGlobal: Sendable {
     let notificationCenterChangeTheming                         = "changeTheming"                   // userInfo: account
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
+    let notificationCenterDidCreateShareLink                    = "didCreateShareLink"
+
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
     let notificationCenterReloadAvatar                          = "reloadAvatar"
     let notificationCenterCheckUserDelaultErrorDone             = "checkUserDelaultErrorDone"       // userInfo: account, controller
     let notificationCenterServerDidUpdate                       = "serverDidUpdate"                 // userInfo: account
     let notificationCenterNetworkReachability                   = "networkReachability"
+
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
 
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
@@ -279,6 +314,7 @@ final class NCGlobal: Sendable {
 
     let notificationCenterNetworkingProcess                     = "networkingProcess"
     let notificationCenterTransferCountChanged                  = "transferCountChanged"
+    let notificationCenterFavoriteStatusChanged                  = "favoriteStatusChanged"
 
     // Networking Status
     let networkingStatusCreateFolder                            = "statusCreateFolder"
@@ -295,6 +331,7 @@ final class NCGlobal: Sendable {
     let networkingStatusUploaded                                = "statusUploaded"
 
     let networkingStatusReloadAvatar                            = "statusReloadAvatar"
+    let notificationCenterUpdateIcons                           = "updateIcons"
 
     // TIP
     //
@@ -377,6 +414,20 @@ final class NCGlobal: Sendable {
     //
     let taskDescriptionRetrievesProperties  = "retrievesProperties"
     let taskDescriptionSynchronization      = "synchronization"
+    let taskDescriptionDeleteFileOrFolder   = "deleteFileOrFolder"
+    
+    // MoEngage App Version
+    //
+    let moEngageAppVersion                  = 854
+    
+    // Filename Mask and Type
+    //
+    let keyFileNameMask                             = "fileNameMask"
+    let keyFileNameType                             = "fileNameType"
+    let keyFileNameAutoUploadMask                   = "fileNameAutoUploadMask"
+    let keyFileNameAutoUploadType                   = "fileNameAutoUploadType"
+    let keyFileNameOriginal                         = "fileNameOriginal"
+    let keyFileNameOriginalAutoUpload               = "fileNameOriginalAutoUpload"
 
     // LOG TAG
     //
