@@ -139,10 +139,37 @@ extension tableMetadata {
         (fileNameView as NSString).deletingPathExtension
     }
 
+    var isRenameable: Bool {
+        if !NCMetadataPermissions.canRename(self) {
+            return false
+        }
+        if lock {
+            return false
+        }
+        if !isDirectoryE2EE && e2eEncrypted {
+            return false
+        }
+        return true
+    }
+
+    var isPrintable: Bool {
+        if isDocumentViewableOnly {
+            return false
+        }
+        if ["application/pdf", "com.adobe.pdf"].contains(contentType) || contentType.hasPrefix("text/") || classFile == NKTypeClassFile.image.rawValue {
+            return true
+        }
+        return false
+    }
+    
     var isSavebleInCameraRoll: Bool {
         return (classFile == NKTypeClassFile.image.rawValue && contentType != "image/svg+xml") || classFile == NKTypeClassFile.video.rawValue
     }
 
+    var isDocumentViewableOnly: Bool {
+        sharePermissionsCollaborationServices == NCPermissions().permissionReadShare && classFile == NKTypeClassFile.document.rawValue
+    }
+    
     var isAudioOrVideo: Bool {
         return classFile == NKTypeClassFile.audio.rawValue || classFile == NKTypeClassFile.video.rawValue
     }
@@ -331,6 +358,17 @@ extension tableMetadata {
     /// Returns false if the user is lokced out of the file. I.e. The file is locked but by somone else
     func canUnlock(as user: String) -> Bool {
         return !lock || (lockOwner == user && lockOwnerType == 0)
+    }
+
+    // Return if is sharable
+    func isSharable() -> Bool {
+        guard let capabilities = NCNetworking.shared.capabilities[account] else {
+            return false
+        }
+        if !capabilities.fileSharingApiEnabled || (capabilities.e2EEEnabled && isDirectoryE2EE), !e2eEncrypted {
+            return false
+        }
+        return !e2eEncrypted
     }
 
     /// Returns a detached (unmanaged) deep copy of the current `tableMetadata` object.
@@ -874,6 +912,34 @@ extension NCManageDatabase {
                 .filter(predicate)
                 .map { $0.detachedCopy() }
         } ?? []
+    }
+    
+    func getMediaMetadatas(predicate: NSPredicate, sorted: String? = nil, ascending: Bool = false) -> ThreadSafeArray<tableMetadata>? {
+
+        do {
+            let realm = try Realm()
+            if let sorted {
+                var results: [tableMetadata] = []
+                switch sorted {//NCPreferences().mediaSortDate {
+                case "date":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.date as Date) > ($1.date as Date) }
+                case "creationDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.creationDate as Date) > ($1.creationDate as Date) }
+                case "uploadDate":
+                    results = realm.objects(tableMetadata.self).filter(predicate).sorted { ($0.uploadDate as Date) > ($1.uploadDate as Date) }
+                default:
+                    let results = realm.objects(tableMetadata.self).filter(predicate)
+                    return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+                }
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            } else {
+                let results = realm.objects(tableMetadata.self).filter(predicate)
+                return ThreadSafeArray(results.map { tableMetadata.init(value: $0) })
+            }
+        } catch let error as NSError {
+//            NextcloudKit.shared.nkCommonInstance.writeLog("Could not access database: \(error)")
+        }
+        return nil
     }
 
     func getMetadatas(predicate: NSPredicate,
