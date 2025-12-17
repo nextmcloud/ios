@@ -232,8 +232,6 @@
 "_settings_account_request_" = "Request account at startup";
 "_print_"                   = "Print";
 "_alias_"                   = "Alias";
-//"_alias_placeholder_"       = "Write alias";
-//"_alias_footer_"            = "Give your accounts a descriptive name such as Home, Office, School…";
 "_alias_placeholder_"       = "Write the alias";
 "_alias_footer_"            = "Give your account names a descriptive name such as Home, Office, School …";
 "_chunk_size_mb_"           = "Chunk size in MB";
@@ -741,7 +739,6 @@
 "_share_link_"                  = "Share link";
 //"_share_link_"                  = "Share link";
 "_share_link_"                  = "Link";
-//"_share_link_"                  = "Share link";
 "_share_link_button_"           = "Send link to …";
 "_share_link_name_"             = "Link name";
 "_password_"                    = "Password";
@@ -1142,9 +1139,6 @@
 "_voice_memo_stop_"         = "Tap to stop";
 "_voice_memo_filename_"     = "Voice memo";
 "_voice_memo_title_"        = "Upload voice memo";
-//"Enter Passcode"            = "Enter Passcode";
-//"Enter a new passcode"      = "Enter a new passcode";
-//"Confirm new passcode"      = "Confirm new passcode";
 "_too_many_failed_passcode_attempts_error_" = "Too many failed passcode attempts. Please try again.";
 //"Passcodes didn't match. Try again." = "Passcodes didn't match. Try again.";
 "Delete"                    = "Delete";
