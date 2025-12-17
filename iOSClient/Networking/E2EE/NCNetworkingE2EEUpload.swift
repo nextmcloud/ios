@@ -218,6 +218,7 @@ class NCNetworkingE2EEUpload: NSObject {
 
             await self.database.addMetadataAsync(metadata)
             await self.database.addLocalFilesAsync(metadatas: [metadata])
+//            await self.database.addLocalFileAsync(metadata: metadata)
 
             utility.createImageFileFrom(metadata: metadata)
 
