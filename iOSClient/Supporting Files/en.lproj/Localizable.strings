@@ -129,8 +129,8 @@
 "_error_parameter_schema_"  = "Wrong parameters, impossible to continue";
 "_comments_"                = "Comments";
 "_sharing_"                 = "Sharing";
-"_details_"                 = "Share";
-//"_details_"                 = "Details";
+//"_details_"                 = "Share";
+"_details_"                 = "Details";
 "_sub_details_"             = "Subscription Details";
 "_subscriptions_"           = "Subscriptions";
 "_dark_mode_"               = "Dark mode";
@@ -236,8 +236,6 @@
 "_settings_account_request_" = "Request account at startup";
 "_print_"                   = "Print";
 "_alias_"                   = "Alias";
-//"_alias_placeholder_"       = "Write alias";
-//"_alias_footer_"            = "Give your accounts a descriptive name such as Home, Office, School…";
 "_alias_placeholder_"       = "Write the alias";
 "_alias_footer_"            = "Give your account names a descriptive name such as Home, Office, School …";
 "_chunk_size_mb_"           = "Chunk size in MB";
@@ -289,7 +287,7 @@
 
 //TOPasscodeSettingsWarningLabel.m
 "_1_failed_passcode_attempt" = "1 Failed Passcode Attempt";
-"_failed_passcode_attempts" = "%ld Failed Passcode Attempts";
+"_failed_passcode_attempts" = "%d Failed Passcode Attempts";
 
 /* Background of the file listing view */
 "_use_as_background_"       = "Use it as a background";
@@ -330,7 +328,6 @@
 "_status_message_"          = "Status message";
 "_status_message_placehorder_"  = "What is your status?";
 "_online_status_"           = "Online status";
-"_clear_status_message_"    = "Clear status message";
 "_set_status_message_"      = "Set status message";
 "_clear_status_message_after_"  = "Clear status after";
 
@@ -393,8 +390,8 @@
 "_username_"                    = "Username";
 "_change_credentials_"          = "Change your credentials";
 "_wifi_only_"                   = "Only use Wi-Fi connection";
-//"_settings_autoupload_"         = "Auto upload photos";
-"_settings_autoupload_"         = "Auto upload";
+"_settings_autoupload_"         = "Auto upload photos";
+//"_settings_autoupload_"         = "Auto upload";
 "_app_version_"                 = "Application version";
 "_app_in_use_"                  = "Application in use";
 "_contact_by_email_"            = "Contact us by email";
@@ -491,7 +488,6 @@
 "_autoupload_change_location_footer_" = "Change folder used for \"Automatic upload of camera photos\" (if the option is enabled)";
 "_autoupload_not_select_home_"      = "Select a folder";
 "_autoupload_save_album_"           = "Copy photo or video into the photo album";
-"_autoupload_description_"          = "Choose whether new photos or videos will be automatically uploaded to your account.";
 "_autoupload_fullphotos_"           = "Upload the whole camera roll";
 "_start_autoupload_"                = "Turn on auto upload";
 "_stop_autoupload_"                 = "Turn off auto upload";
@@ -635,11 +631,9 @@
 "_add_offline_"                 = "Add to offline";
 "_remove_passcode_"             = "Remove password protection";
 "_protect_passcode_"            = "Protect with password";
-"_remove_favorites_"            = "Unfavorite";
-"_add_favorites_"               = "Favorite";
 "_share_"                       = "Share";
 "_reload_"                      = "Reload";
-"_open_in_"                     = "Open with..."; //"Open in …";
+"_open_in_"                     = "Open in …";
 "_open_"                        = "Open …";
 "_remove_local_file_"           = "Remove locally";
 "_add_local_"                   = "Add to local storage";
@@ -726,7 +720,7 @@
 "_status_upload_error_"         = "Error, waiting to upload";
 "_select_media_folder_"         = "Set Media folder";
 "_media_viewimage_show_"        = "Show only images";
-"_media_viewvideo_show_"        = "Show only videos";
+"_media_viewvideo_show_"        = "Show only video";
 "_media_show_all_"              = "Show both";
 "_media_by_created_date_"       = "Sort by created date";
 "_media_by_upload_date_"        = "Sort by upload date";
@@ -747,12 +741,10 @@
 "_share_link_"                  = "Share link";
 //"_share_link_"                  = "Share link";
 "_share_link_"                  = "Link";
-//"_share_link_"                  = "Share link";
 "_share_link_button_"           = "Send link to …";
 "_share_link_name_"             = "Link name";
 "_password_"                    = "Password";
 "_share_password_"              = "Password protected link";
-"_share_password_must_be_at_least_6_chars"   = "Password must be at least 6 characters.";
 "_share_expirationdate_"        = "Set expiration date for link";
 "_date_"                        = "Date";
 "_share_title_"                 = "Share";
@@ -810,42 +802,6 @@
 "_new_comment_"                 = "New comment …";
 "_edit_comment_"                = "Edit comment";
 "_delete_comment_"              = "Delete comment";
-"_share_read_only_"             = "View only";
-"_share_reshare_allowed_"       = "Resharing is allowed.";
-"_share_reshare_not_allowed_"   = "Resharing is not allowed.";
-"_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
-"_create_link_"                 = "Create Link";
-"personal_share_by_mail"        = "Personal share by mail";
-"_your_shares_"                 = "Your Shares";
-"_share_linklabel_"             = "Link '%@'";
-"_share_link_folder_"           = "Link to folder";
-"_share_link_file_"             = "Link to file";
-"no_shares_created"             = "No shares created yet.";
-"_advance_permissions_"         = "Advanced permissions";
-"_send_new_email_"              = "Send new email";
-"_apply_changes_"               = "Apply changes";
-"_send_share_"                  = "Send share";
-"_PERMISSIONS_"                 = "PERMISSIONS";
-"share_editing_message"         = "There are no editing functions for files unless you share them with MagentaCLOUD users.";
-"_file_drop_message_"           = "With File drop, only uploading is allowed. Only you can see files and folders that have been uploaded.";
-"_custom_link_label"            = "Your custom link label";
-"_set_password_"                = "Set password";
-"_share_expiration_date_placeholder_"= "Expiration date for this share";
-"_share_download_limit_"             = "Download Limit";
-"_share_download_limit_placeholder_" = "Enter download limit";
-"_share_download_limit_alert_empty_" = "Download limit cannot be empty.";
-"_share_download_limit_alert_zero_"  = "Download limit should be greater than 0.";
-"_share_download_limit_alert_invalid_" = "Please enter a valid number for the download limit.";
-"_share_remaining_download_"    = "Downloads:";
-"_share_read_only_"             = "View only";
-"_share_remaining_download_"    = "Downloads:";
-"_share_editing_"               = "Can edit";
-"_share_file_drop_"             = "Filedrop only";
-"_share_hide_download_"         = "Prevent download";
-//"_share_note_recipient_"        = "YOUR MESSAGE";
-"_share_note_recipient_"        = "Note to recipient";
-"_shareLinksearch_placeholder_" = "Contact name or email address";
-"_shareLinksearch_mail_placeholder_" = "Type a name or an email and press Enter";
 "_share_reshare_allowed_"       = "Resharing is allowed.";
 "_share_reshare_not_allowed_"   = "Resharing is not allowed.";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";
@@ -915,7 +871,6 @@
 "_share_via_link_menu_password_label_" = "Password protect (%1$s)";
 "_share_link_empty_exp_date_" = "You must select expiration date.";
 "_share_link_empty_note_message_" = "Please enter note.";
-"_share_permission_should_not_be_empty_" = "Please select at least one permission.";
 "_remote_"                      = "Remote";
 "_remote_group_"                = "Remote group";
 "_conversation_"                = "Conversation";
@@ -1151,7 +1106,7 @@
 "_voice_memo_filename_"     = "Voice memo";
 "_voice_memo_title_"        = "Upload voice memo";
 "_too_many_failed_passcode_attempts_error_" = "Too many failed passcode attempts. Please try again.";
-//"Passcodes didn't match. Try again." = "Passcodes didn't match. Try again.";
+"Passcodes didn't match. Try again." = "Passcodes didn't match. Try again.";
 "Delete"                    = "Delete";
 "Cancel"                    = "Cancel";
 "_certificate_details_"     = "Certificate Server details";
@@ -1210,7 +1165,7 @@
 "_waiting_for_"             = "Waiting for:";
 "_waiting_"                 = "Waiting …";
 "_reachable_wifi_"          = "network reachable via Wi-Fi or cable";
-"_ITMS-90076_"              = "Due to a change in the MagentaCLOUD application identifier, the settings and password for accessing your cloud are reset, so please re-enter your account data and check your Settings. We are sorry about that.";
+"_ITMS-90076_"              = "Due to a change in the Nextcloud application identifier, the settings and password for accessing your cloud are reset, so please re-enter your account data and check your Settings. We are sorry about that.";
 "_password_not_present_"    = "Please re-insert your credentials.";
 "_copy_passphrase_"         = "Copy passphrase";
 "_ok_copy_passphrase_"      = "OK and copy passphrase";
@@ -1367,7 +1322,7 @@
 "_delete_in_progress_"      = "Delete in progress …";
 "_download_in_progress_"    = "Download in progress …";
 "_upload_in_progress_"      = "Upload in progress …";
-"_transfer_in_progress_"    = "Transfer in progress …";
+"_transfer_in_progress_"    = "Transfer in progress …"; 
 "_in_waiting_"              = "In waiting";
 "_in_progress_"             = "In progress";
 "_in_error_"                = "In error";
