@@ -32,7 +32,7 @@ class FileProviderData: NSObject {
         case workingSet
     }
 
-    // MARK: - 
+    // MARK: -
 
     @discardableResult
     func setupAccount(domain: NSFileProviderDomain? = nil,
