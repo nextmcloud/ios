@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import XLForm
 
 class AnalysisDataCollectionSwitch: XLFormBaseCell {
     

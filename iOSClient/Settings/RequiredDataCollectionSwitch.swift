@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+import XLForm
 
 class RequiredDataCollectionSwitch: XLFormBaseCell {
                 

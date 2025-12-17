@@ -1,6 +1,25 @@
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2019 Marino Faggiana
-// SPDX-License-Identifier: GPL-3.0-or-later
+//
+//  NCNetworking.swift
+//  Nextcloud
+//
+//  Created by Marino Faggiana on 23/10/19.
+//  Copyright © 2019 Marino Faggiana. All rights reserved.
+//
+//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
 #if !EXTENSION_FILE_PROVIDER_EXTENSION
 import OpenSSL
@@ -151,11 +170,11 @@ actor NetworkingTasks {
             $0.identifier == identifier && $0.task.state == .running
         }
         active.append((identifier, task))
-        nkLog(tag: NCGlobal.shared.logTagNetworkingTasks, emoji: .start, message: "Start task for identifier: \(identifier)", consoleOnly: true)
+        nkLog(tag: NCGlobal.shared.logNetworkingTasks, emoji: .start, message: "Start task for identifier: \(identifier)", consoleOnly: true)
     }
 
     /// create a Identifier
-    /// 
+    ///
     func createIdentifier(account: String? = nil, path: String? = nil, name: String) -> String {
         if let account,
            let path {
@@ -176,7 +195,7 @@ actor NetworkingTasks {
 
         for element in active where element.identifier == identifier {
             element.task.cancel()
-            nkLog(tag: NCGlobal.shared.logTagNetworkingTasks, emoji: .cancel, message: "Cancel task for identifier: \(identifier)", consoleOnly: true)
+            nkLog(tag: NCGlobal.shared.logNetworkingTasks, emoji: .cancel, message: "Cancel task for identifier: \(identifier)", consoleOnly: true)
         }
         active.removeAll {
             $0.identifier == identifier
@@ -189,7 +208,7 @@ actor NetworkingTasks {
     func cancelAll() {
         active.forEach {
             $0.task.cancel()
-            nkLog(tag: NCGlobal.shared.logTagNetworkingTasks, emoji: .cancel, message: "Cancel task with identifier: \($0.identifier)", consoleOnly: true)
+            nkLog(tag: NCGlobal.shared.logNetworkingTasks, emoji: .cancel, message: "Cancel task with identifier: \($0.identifier)", consoleOnly: true)
         }
         active.removeAll()
     }
@@ -289,6 +308,7 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     let saveLivePhotoQueue = Queuer(name: "saveLivePhotoQueue", maxConcurrentOperationCount: 1, qualityOfService: .default)
     let downloadAvatarQueue = Queuer(name: "downloadAvatarQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
 #endif
+    let downloadQueue = Queuer(name: "downloadQueue", maxConcurrentOperationCount: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload, qualityOfService: .default)
 
     // MARK: - init
 
