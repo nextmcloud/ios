@@ -1,6 +1,10 @@
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2025 Marino Faggiana
-// SPDX-License-Identifier: GPL-3.0-or-later
+//
+//  NCBackgroundLocationUploadManager.swift
+//  Nextcloud
+//
+//  Created by Marino Faggiana on 06/06/25.
+//  Copyright © 2025 Marino Faggiana. All rights reserved.
+//
 
 import CoreLocation
 import NextcloudKit
@@ -102,16 +106,15 @@ class NCBackgroundLocationUploadManager: NSObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        // Must work only in background
         guard isAppInBackground else {
             return
         }
 
         // Open Realm
-        guard NCManageDatabase.shared.openRealmBackground() else {
-            nkLog(tag: self.global.logTagLocation, emoji: .error, message: "Failed to open Realm in Location Manager")
-            return
-        }
+        if database.openRealmBackground() {
+            let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
+            let location = locations.last
+            nkLog(tag: self.global.logTagLocation, emoji: .start, message: "Triggered by location change: \(location?.coordinate.latitude ?? 0), \(location?.coordinate.longitude ?? 0)")
 
         let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
         let location = locations.last
