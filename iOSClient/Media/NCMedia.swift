@@ -183,6 +183,7 @@ class NCMedia: UIViewController {
                 await loadDataSource()
             }
         }
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__MEDIA)
     }
 
     override func viewDidAppear(_ animated: Bool) {

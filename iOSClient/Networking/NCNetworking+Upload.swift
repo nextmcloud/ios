@@ -290,6 +290,10 @@ extension NCNetworking {
                     await NCManageDatabase.shared.setLivePhotoImage(account: metadata.account, serverUrlFileName: metadata.serverUrlFileName, fileId: metadata.fileId)
                 }
                 await self.setLivePhoto(account: metadata.account)
+            } else {
+#if !EXTENSION
+                AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__UPLOAD_FILE ,metadata: metadata)
+#endif
             }
 
             await self.transferDispatcher.notifyAllDelegates { delegate in

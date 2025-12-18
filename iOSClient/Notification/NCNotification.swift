@@ -71,6 +71,11 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
             await getNetwokingNotification()
         }
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__NOTIFICATIONS)
+    }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)

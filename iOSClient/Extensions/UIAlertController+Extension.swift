@@ -62,6 +62,10 @@ extension UIAlertController {
                         let error = await NCNetworkingE2EEMarkFolder().markFolderE2ee(account: session.account, serverUrlFileName: serverUrlFileName, userId: session.userId)
                         if error != .success {
                             NCContentPresenter().showError(error: error)
+                        }else {
+#if !EXTENSION
+                            AnalyticsHelper.shared.trackCreateFolder(isEncrypted: true, creationDate: Date())
+#endif
                         }
                     } else {
                         NCContentPresenter().showError(error: createFolderResults.error)

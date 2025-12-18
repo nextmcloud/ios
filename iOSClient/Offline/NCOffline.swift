@@ -47,8 +47,10 @@ class NCOffline: NCCollectionViewCommon {
         super.viewWillAppear(animated)
 
         Task {
-            await self.reloadDataSource()
+//            await self.reloadDataSource()
+            await getServerData()
         }
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__OFFLINE_FILES)
     }
 
     // MARK: - DataSource
@@ -86,6 +88,9 @@ class NCOffline: NCCollectionViewCommon {
     }
 
     override func getServerData(forced: Bool = false) async {
+        defer {
+            stopGUIGetServerData()
+        }
         await self.reloadDataSource()
     }
 }

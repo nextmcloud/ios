@@ -44,6 +44,7 @@ extension NCNetworking {
                                                                                             name: "readFileOrFolder")
                 await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
             }
+            taskHandler(task)
         }
 
         guard resultsReadFolder.error == .success, let files = resultsReadFolder.files else {
@@ -543,6 +544,11 @@ extension NCNetworking {
             await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
                 let status = self.global.metadataStatusWaitFavorite
                 await NCManageDatabase.shared.setMetadataFavoriteAsync(ocId: metadata.ocId, favorite: !metadata.favorite, saveOldFavorite: metadata.favorite.description, status: status)
+#if !EXTENSION
+                if !metadata.favorite, !metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__ADD_FAVORITE ,metadata: metadata)
+                }
+#endif
                 delegate.transferReloadData(serverUrl: metadata.serverUrl, status: status)
             }
         }

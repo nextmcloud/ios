@@ -87,6 +87,7 @@ class NCShareExtension: UIViewController {
         nkLog(start: "Start Share session " + versionNextcloudiOS)
 
         NCBrandColor.shared.createUserColors()
+        NCImageCache.shared.createImagesCache()
 
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { _ in
             if NCPreferences().presentPasscode {

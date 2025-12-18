@@ -44,7 +44,7 @@ struct PrivacySettingsView: View {
                         .font(.system(size: 15))
                 }
                 .toggleStyle(SwitchToggleStyle(tint: Color(uiColor: NCBrandColor.shared.brand)))
-                .onChange(of: isAnalysisDataCollectionSwitchOn) { newValue in
+                .onChange(of: isAnalysisDataCollectionSwitchOn) { oldValue, newValue in
                     handleAnalysisDataCollectionSwitchChanged(newValue)
                 }
             }

@@ -70,7 +70,7 @@ class NCFavorite: NCCollectionViewCommon {
 
     override func getServerData(forced: Bool = false) async {
         defer {
-            restoreDefaultTitle()
+            stopGUIGetServerData()
         }
 
         // If is already in-flight, do nothing
@@ -78,8 +78,8 @@ class NCFavorite: NCCollectionViewCommon {
             return
         }
 
-        showLoadingTitle()
-
+        startGUIGetServerData()
+        
         let showHiddenFiles = NCPreferences().getShowHiddenFiles(account: session.account)
         let resultsListingFavorites = await NextcloudKit.shared.listingFavoritesAsync(showHiddenFiles: showHiddenFiles,
                                                                                       account: session.account) { task in

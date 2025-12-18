@@ -216,6 +216,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                 // Menu Plus
                 let session = NCSession.shared.getSession(account: account)
                 await self.createPlusMenu(session: session, capabilities: capabilities)
+                AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
             }
         }
         
@@ -226,6 +227,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                 // Menu Plus
                 let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
                 await self.createPlusMenu(session: session, capabilities: capabilities)
+                AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
             }
         }
     }

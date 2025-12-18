@@ -173,6 +173,7 @@ class NCDownloadAction: NSObject, UIDocumentInteractionControllerDelegate, NCSel
                 await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,
                                                                                     session: NCNetworking.shared.sessionDownloadBackground,
                                                                                     selector: NCGlobal.shared.selectorSynchronizationOffline)
+                AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__OFFLINE_AVAILABLE, metadata: metadata)
             }
         }
     }

@@ -111,9 +111,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             NCPreferences().removeAll()
 
             if let bundleID = Bundle.main.bundleIdentifier {
+                let lastUpdateCheckDate = UserDefaults.standard.object(forKey: AppUpdaterKey.lastUpdateCheckDate)
                 UserDefaults.standard.removePersistentDomain(forName: bundleID)
+                if lastUpdateCheckDate != nil {
+                    UserDefaults.standard.setValue(lastUpdateCheckDate, forKey: AppUpdaterKey.lastUpdateCheckDate)
+                }
             }
-
+            
             if NCBrandOptions.shared.disable_intro {
                 if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
                     let navigationController = UINavigationController(rootViewController: viewController)
@@ -216,17 +220,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
+        
+        let session = SceneManager.shared.getSession(scene: scene)
+        let controller = SceneManager.shared.getController(scene: scene)
+        nkLog(info: "Scene did become active")
+
+        let oldVersion = UserDefaults.standard.value(forKey: NCSettingsBundleHelper.SettingsBundleKeys.BuildVersionKey) as? String
+        AppUpdater().checkForUpdate()
+        AnalyticsHelper.shared.trackAppVersion(oldVersion: oldVersion)
+        if let userAccount = NCManageDatabase.shared.getActiveTableAccount() {
+            AnalyticsHelper.shared.trackUsedStorageData(quotaUsed: userAccount.quotaUsed)
+        }
+
+        NCSettingsBundleHelper.setVersionAndBuildNumber()
+        NCSettingsBundleHelper.checkAndExecuteSettings(delay: 0.5)
+        
         hidePrivacyProtectionWindow()
-//        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-//            for window in windowScene.windows {
-//                let imageViews = window.allImageViews()
-//                // Do something with the imageViews
-//                for imageView in imageViews {
-//                    print("Found image view: \(imageView)")
-//                    imageView.tintColor = UITraitCollection.current.userInterfaceStyle == .dark  ? .white : .black
-//                }
-//            }
-//        }
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
@@ -446,6 +455,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     private func showPrivacyProtectionWindow() {
+        guard privacyProtectionWindow == nil else {
+            privacyProtectionWindow?.isHidden = false
+            return
+        }
+        
         guard let windowScene = self.window?.windowScene else {
             return
         }

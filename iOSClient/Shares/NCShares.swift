@@ -49,6 +49,7 @@ class NCShares: NCCollectionViewCommon {
         Task {
             await reloadDataSource()
         }
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__SHARED)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -90,8 +91,8 @@ class NCShares: NCCollectionViewCommon {
             return
         }
 
-        showLoadingTitle()
-
+        startGUIGetServerData()
+        
         let resultsReadShares = await NextcloudKit.shared.readSharesAsync(parameters: NKShareParameter(), account: session.account) { task in
             Task {
                 await NCNetworking.shared.networkingTasks.track(identifier: "NCShares", task: task)
@@ -102,8 +103,8 @@ class NCShares: NCCollectionViewCommon {
         }
 
         guard resultsReadShares.error == .success else {
+            self.stopGUIGetServerData()
             await self.reloadDataSource()
-            self.restoreDefaultTitle()
             return
         }
 
@@ -144,8 +145,9 @@ class NCShares: NCCollectionViewCommon {
             }
 
             Task {
-                await self.restoreDefaultTitle()
+                await self.stopGUIGetServerData()
                 await self.reloadDataSource()
+//                await startSyncMetadata(metadatas: self.dataSource.getMetadatas())
             }
         }
     }

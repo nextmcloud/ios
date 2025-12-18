@@ -165,6 +165,103 @@ final class NCImageCache: @unchecked Sendable {
 
     // MARK: -
 
+    struct images {
+        static var file = UIImage()
+
+        static var shared = UIImage()
+        static var canShare = UIImage()
+        static var shareByLink = UIImage()
+        static var sharedWithMe = UIImage()
+
+        static var favorite = UIImage()
+        static var comment = UIImage()
+        static var livePhoto = UIImage()
+        static var offlineFlag = UIImage()
+        static var local = UIImage()
+
+        static var folderEncrypted = UIImage()
+        static var folderSharedWithMe = UIImage()
+        static var folderPublic = UIImage()
+        static var folderGroup = UIImage()
+        static var folderExternal = UIImage()
+        static var folderAutomaticUpload = UIImage()
+        static var folder = UIImage()
+
+        static var checkedYes = UIImage()
+        static var checkedNo = UIImage()
+
+        static var buttonMore = UIImage()
+        static var buttonStop = UIImage()
+        static var buttonMoreLock = UIImage()
+
+        static var buttonRestore = UIImage()
+        static var buttonTrash = UIImage()
+        
+        static var iconContacts = UIImage()
+        static var iconTalk = UIImage()
+        static var iconCalendar = UIImage()
+        static var iconDeck = UIImage()
+        static var iconMail = UIImage()
+        static var iconConfirm = UIImage()
+        static var iconPages = UIImage()
+        static var iconFile = UIImage()
+    }
+    
+    func createImagesCache() {
+        let utility = NCUtility()
+
+        images.file = UIImage(named: "file")!
+
+        images.shared = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.canShare = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.shareByLink = UIImage(named: "sharebylink")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)//50)
+        
+        images.favorite = utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
+        images.comment = UIImage(named: "comment")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
+        images.offlineFlag = utility.loadImage(named: "arrow.down.circle.fill", colors: [.systemGreen], size: 24)
+        images.local = utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen], size: 24)
+
+        images.checkedYes = UIImage(named: "checkedYes")!
+        images.checkedNo = utility.loadImage(named: "circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
+
+        images.buttonMore = UIImage(named: "more")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.buttonStop = utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
+        images.buttonMoreLock = utility.loadImage(named: "lock.fill", colors: [NCBrandColor.shared.iconImageColor], size: 24)
+        images.buttonRestore = UIImage(named: "restore")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+        images.buttonTrash = UIImage(named: "trashIcon")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+
+        createImagesBrandCache()
+    }
+
+    func createImagesBrandCache() {
+
+        let brandElement = NCBrandColor.shared.brandElement
+        guard brandElement != self.brandElementColor else { return }
+        self.brandElementColor = brandElement
+        
+        let folderWidth: CGFloat = UIScreen.main.bounds.width / 3
+        images.folderEncrypted = UIImage(named: "folderEncrypted")!
+        images.folderSharedWithMe = UIImage(named: "folder-share")!
+        images.folderPublic = UIImage(named: "folder-share")!
+        images.folderGroup = UIImage(named: "folder_group")!
+        images.folderExternal = UIImage(named: "folder_external")!
+        images.folderAutomaticUpload = UIImage(named: "folder-photo")!
+        images.folder = UIImage(named: "folder_nmcloud")!
+        
+        images.iconContacts = UIImage(named: "icon-contacts")!.image(color: brandElement, size: folderWidth)
+        images.iconTalk = UIImage(named: "icon-talk")!.image(color: brandElement, size: folderWidth)
+        images.iconCalendar = UIImage(named: "icon-calendar")!.image(color: brandElement, size: folderWidth)
+        images.iconDeck = UIImage(named: "icon-deck")!.image(color: brandElement, size: folderWidth)
+        images.iconMail = UIImage(named: "icon-mail")!.image(color: brandElement, size: folderWidth)
+        images.iconConfirm = UIImage(named: "icon-confirm")!.image(color: brandElement, size: folderWidth)
+        images.iconPages = UIImage(named: "icon-pages")!.image(color: brandElement, size: folderWidth)
+//        images.iconFile = UIImage(named: "icon-file")!.image(color: brandElement, size: folderWidth)
+        
+        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterChangeTheming)
+    }
+    
     func getImageFile(colors: [UIColor] = [NCBrandColor.shared.iconImageColor2]) -> UIImage {
         return UIImage(named: "file")!.image(color: colors.first!, size: 24)
     }

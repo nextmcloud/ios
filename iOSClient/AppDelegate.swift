@@ -13,6 +13,7 @@ import Queuer
 import EasyTipView
 import SwiftUI
 import RealmSwift
+import MoEngageInApps
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -75,6 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         #endif
 
         NCBrandColor.shared.createUserColors()
+        NCImageCache.shared.createImagesCache()
 
         NextcloudKit.shared.setup(groupIdentifier: NCBrandOptions.shared.capabilitiesGroup,
                                   delegate: NCNetworking.shared)
@@ -144,6 +146,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 //            }
 //        }
 
+        adjust.configAdjust()
+        adjust.subsessionStart()
+        TealiumHelper.shared.start()
+        FirebaseApp.configure()
+        
         return true
     }
 
@@ -672,5 +679,12 @@ extension AppDelegate: NCCreateFormUploadConflictDelegate {
                 await NCManageDatabase.shared.addMetadatasAsync(metadatas)
             }
         }
+    }
+}
+
+//MARK: NMC Customisation
+extension AppDelegate {
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        return self.orientationLock
     }
 }

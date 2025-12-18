@@ -107,9 +107,6 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
                 title: NSLocalizedString("_set_available_offline_", comment: ""),
                 message: NSLocalizedString("_select_offline_warning_", comment: ""),
                 preferredStyle: .alert)
-//            alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { [self] _ in
-//                metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
-//                toggleSelect()
             alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { _ in
                 Task {
                     for metadata in metadatas {
@@ -117,23 +114,20 @@ extension NCCollectionViewCommon: NCCollectionViewCommonSelectTabBarDelegate, NC
                     }
                 }
                 self.setEditMode(false)
-//            alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { [self] _ in
-//                metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
-//                toggleSelect()
+
             }))
             alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel))
             self.present(alert, animated: true)
         } else {
-            metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
-            toggleSelect()
+//            metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
+//            toggleSelect()
             Task {
                 for metadata in metadatas {
                     await NCDownloadAction.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
                 }
             }
             setEditMode(false)
-//            metadatas.forEach { NCActionCenter.shared.setMetadataAvalableOffline($0, isOffline: isAnyOffline) }
-//            toggleSelect()
+
         }
     }
 
