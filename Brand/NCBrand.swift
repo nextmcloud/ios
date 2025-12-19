@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
+import NextcloudKit
 
 let userAgent: String = {
     let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
@@ -56,29 +57,22 @@ struct NextcloudVersion: Comparable {
     }
 }
 
-@objc class NCBrandOptions: NSObject, @unchecked Sendable {
-    @objc static let shared: NCBrandOptions = {
-        let instance = NCBrandOptions()
-        return instance
-    }()
+final class NCBrandOptions: @unchecked Sendable {
+    static let shared = NCBrandOptions()
 
-    @objc public var brand:                           String = "MagentaCLOUD"
-    @objc public var textCopyrightNextcloudiOS:       String = "MagentaCLOUD for iOS %@"
-    @objc public var textCopyrightNextcloudServer:    String = "MagentaCLOUD Server %@"
-    @objc public var loginBaseUrl:                    String = "https://magentacloud.de"
-
-    @objc public var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
-    @objc public var linkLoginHost: String = "https://nextcloud.com/install"
-    @objc public var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
-    @objc public var webLoginAutenticationProtocol: String = "nc://"                                                // example "abc://"
-    @objc public var privacy: String = "https://nextcloud.com/privacy"
-    @objc public var sourceCode: String = "https://github.com/nextcloud/ios"
-    @objc public var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
-    @objc public var appStoreUrl: String = "https://apps.apple.com/de/app/magentacloud-cloud-speicher/id312838242"
-
-    // Personalized
-    @objc public var webCloseViewProtocolPersonalized: String = ""                                                  // example "abc://change/plan"      Don't touch me !!
-    @objc public var folderBrandAutoUpload: String = ""                                                             // example "_auto_upload_folder_"   Don't touch me !!
+    var brand:                           String = "MagentaCLOUD"
+    var brandUserAgent:             String = "MagentaCLOUD"
+    var textCopyrightNextcloudiOS:       String = "MagentaCLOUD for iOS %@"
+    var textCopyrightNextcloudServer:    String = "MagentaCLOUD Server %@"
+    var loginBaseUrl:                    String = "https://magentacloud.de"
+    var pushNotificationServerProxy: String = ""
+    var linkLoginHost: String = "https://nextcloud.com/install"
+    var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
+    var webLoginAutenticationProtocol: String = "nc://"                                        // example "abc://"
+    var privacy: String = "https://nextcloud.com/privacy"
+    var sourceCode: String = "https://github.com/nextcloud/ios"
+    var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
+    var appStoreUrl: String = "https://apps.apple.com/in/app/nextcloud/id1125420102"
 
     // Auto Upload default folder
 //    var folderDefaultAutoUpload: String = Locale.current.language.languageCode?.identifier == "de" ? "Kamera-Medien" : "Camera-Media"
@@ -86,6 +80,9 @@ struct NextcloudVersion: Comparable {
     var folderDefaultAutoUpload: String = (Locale.preferredLanguages.first?.prefix(2) ?? "en") == "de" ? "Kamera-Medien" : "Camera-Media"
     
 
+    // Capabilities Group
+//    var capabilitiesGroup: String = "group.it.twsweb.Crypto-Cloud"
+//    var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
 //#if DEBUG
     // QA :
     @objc public var capabilitiesGroup:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
@@ -103,12 +100,8 @@ struct NextcloudVersion: Comparable {
     
     var use_AppConfig: Bool = false                                                         // Don't touch me !!
 
-    @objc public var use_default_auto_upload: Bool = false
     // Use server theming color
-    @objc public var use_themingColor: Bool = false
-    @objc public var use_themingLogo: Bool = false
-    @objc public var use_storeLocalAutoUploadAll: Bool = false
-    @objc public var use_loginflowv2: Bool = false
+    var use_themingColor: Bool = true
 
     var disable_intro: Bool = false
     var disable_request_login_url: Bool = false
@@ -124,7 +117,7 @@ struct NextcloudVersion: Comparable {
     var enforce_passcode_lock = false
     var enforce_privacyScreenEnabled = false
 
-    // (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
+    // Example: (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
     var enforce_servers: [(name: String, url: String)] = []
 
     // Internal option behaviour
@@ -147,7 +140,7 @@ struct NextcloudVersion: Comparable {
         case activity, sharing
     }
 
-    override init() {
+    init() {
         // wrapper AppConfig
         if let configurationManaged = UserDefaults.standard.dictionary(forKey: "com.apple.configuration.managed"), use_AppConfig {
             if let str = configurationManaged[NCGlobal.shared.configuration_brand] as? String {
@@ -194,19 +187,12 @@ struct NextcloudVersion: Comparable {
     }
 }
 
-class NCBrandColor: NSObject, @unchecked Sendable  {
-    @objc static let shared: NCBrandColor = {
-        let instance = NCBrandColor()
-        return instance
-    }()
+final class NCBrandColor: @unchecked Sendable {
+    static let shared = NCBrandColor()
 
-    // Color
-    @objc let customer:              UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)
-    @objc var customerText: UIColor = .white
-
-    @objc var brand: UIColor                                                                                         // don't touch me
-    @objc var brandElement: UIColor                                                                                  // don't touch me
-    @objc var brandText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+    // This is rewrited from customet theme, default is Nextcloud color
+    let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // Nextcloud : #0082C9
+    var customerText: UIColor = .white
 
     var brand: UIColor                                                                                         // don't touch me
     var brandElement: UIColor                                                                                  // don't touch me
