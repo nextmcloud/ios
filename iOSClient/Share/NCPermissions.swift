@@ -38,6 +38,11 @@ class NCPermissions: NSObject {
     // Share permission
     // permissions - (int) 1 = read; 2 = update; 4 = create; 8 = delete; 16 = share; 31 = all
     //
+//    let permissionReadShare: Int = 1
+//    let permissionUpdateShare: Int = 2
+//    let permissionCreateShare: Int = 4
+//    let permissionDeleteShare: Int = 8
+//    let permissionShareShare: Int = 16
     @objc let permissionReadShare: Int = 1
     @objc let permissionUpdateShare: Int = 2
     @objc let permissionCreateShare: Int = 4
@@ -92,9 +97,9 @@ class NCPermissions: NSObject {
         if canChange && isDirectory {
             permission = permission + permissionUpdateShare
         }
-        if canDelete && isDirectory {
-            permission = permission + permissionDeleteShare
-        }
+//        if canDelete && isDirectory {
+//            permission = permission + permissionDeleteShare
+//        }
         if canShare {
             permission = permission + permissionShareShare
         }

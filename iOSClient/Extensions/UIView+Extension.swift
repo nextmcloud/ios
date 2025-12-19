@@ -24,11 +24,6 @@
 import Foundation
 import UIKit
 
-enum VerticalLocation: String {
-    case bottom
-    case top
-}
-
 extension UIView {
 
     // Source
@@ -74,21 +69,42 @@ extension UIView {
         self.layer.cornerRadius = self.frame.size.width / 2
         self.layer.masksToBounds = true
     }
-    
-    func addShadow(location: VerticalLocation, height: CGFloat = 2, color: UIColor = NCBrandColor.shared.customerDarkGrey, opacity: Float = 0.4, radius: CGFloat = 2) {
-        switch location {
-        case .bottom:
-             addShadow(offset: CGSize(width: 0, height: height), color: color, opacity: opacity, radius: radius)
-        case .top:
-            addShadow(offset: CGSize(width: 0, height: -height), color: color, opacity: opacity, radius: radius)
+
+    var parentTabBarController: UITabBarController? {
+        var responder: UIResponder? = self
+        while let nextResponder = responder?.next {
+            if let tabBarController = nextResponder as? UITabBarController {
+                return tabBarController
+            }
+            responder = nextResponder
         }
+        return nil
     }
 
-    func addShadow(offset: CGSize, color: UIColor = .black, opacity: Float = 0.5, radius: CGFloat = 5.0) {
-        self.layer.masksToBounds = false
-        self.layer.shadowColor = color.cgColor
-        self.layer.shadowOffset = offset
-        self.layer.shadowOpacity = opacity
-        self.layer.shadowRadius = radius
+    func addBlur(style: UIBlurEffect.Style, alpha: CGFloat = 1.0) {
+        let blurEffect = UIBlurEffect(style: style)
+        let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.frame = bounds
+        blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        blurView.alpha = alpha
+        blurView.layer.masksToBounds = true
+        insertSubview(blurView, at: 0)
+    }
+
+    func addBlurBackground(style: UIBlurEffect.Style, alpha: CGFloat = 1) {
+        let blur = UIBlurEffect(style: style)
+        let blurView = UIVisualEffectView(effect: blur)
+        blurView.isUserInteractionEnabled = false
+        blurView.alpha = alpha
+        blurView.layer.masksToBounds = true
+        blurView.translatesAutoresizingMaskIntoConstraints = false
+        insertSubview(blurView, at: 0)
+
+        NSLayoutConstraint.activate([
+            blurView.topAnchor.constraint(equalTo: topAnchor),
+            blurView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            blurView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            blurView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
     }
 }
