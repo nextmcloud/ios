@@ -1,25 +1,6 @@
-//
-//  NCCollectionViewCommon+CollectionViewDelegate.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 02/07/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import UIKit
@@ -41,9 +22,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                     return
                 }
             } else {
-                Task {
-                    await showInfoBanner(windowScene: windowScene, text: "_e2e_server_disabled_")
-                }
+                await showInfoBanner(windowScene: windowScene, text: "_e2e_server_disabled_")
                 return
             }
         }
@@ -78,11 +57,12 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                         for: token)
                 }
             }
+
             if let banner {
                 await banner.dismissAsync()
             }
 
-            if results.nkError == .success || results.afError?.isExplicitlyCancelledError ?? false {
+            if results.nkError == .success || results.nkError == .cancelled {
                 print("ok")
             } else {
                 await showErrorBanner(windowScene: windowScene, text: results.nkError.errorDescription, errorCode: results.nkError.errorCode)
@@ -90,7 +70,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         }
 
         if metadata.directory {
-            pushMetadata(metadata)
+            await pushMetadata(metadata)
         } else {
             Task { @MainActor in
                 let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: self.global.previewExt1024, userId: metadata.userId, urlBase: metadata.urlBase)
@@ -103,9 +83,8 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                         self.navigationController?.pushViewController(vc, animated: true)
                     }
                 } else {
-                    Task {
-                        await showErrorBanner(windowScene: windowScene, text: "_go_online_", errorCode: NCGlobal.shared.errorOfflineNotAllowed)
-                    }
+                    let error = NKError(errorCode: global.errorOffline, errorDescription: "_go_online_")
+                    NCContentPresenter().showInfo(error: error)
                 }
                 return
             }
@@ -145,9 +124,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
     }
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let metadata = self.dataSource.getMetadata(indexPath: indexPath),
-              !metadata.isInvalidated
-        else {
+        guard let metadata = self.dataSource.getMetadata(indexPath: indexPath) else {
             return
         }
         var viewerTransitionSource: NCMediaViewerTransitionSource?
@@ -178,7 +155,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         guard let metadata = self.dataSource.getMetadata(indexPath: indexPath),
-              metadata.classFile != NKCommon.TypeClassFile.url.rawValue,
+              metadata.classFile != NKTypeClassFile.url.rawValue,
               !isEditMode
         else {
             return nil
@@ -198,9 +175,9 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         }
 
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
-            return nil
+            return NCViewerProviderContextMenu(metadata: metadata, image: image, sceneIdentifier: self.sceneIdentifier)
         }, actionProvider: { _ in
-            let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: self, sceneIdentifier: self.sceneIdentifier, sender: cell)
+            let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: self, sceneIdentifier: self.sceneIdentifier, image: image)
             return contextMenu.viewMenu()
         })
     }

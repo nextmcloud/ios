@@ -94,10 +94,9 @@ class NCAccount: NSObject {
                 // set theming color
                 NCBrandColor.shared.settingThemingColor(account: account, capabilities: capabilities)
             }
-//            // Start the auto upload
-//            let num = await NCAutoUpload.shared.initAutoUpload(tblAccount: tblAccount)
-//            nkLog(start: "Auto upload with \(num) photo")
-            
+            // Start the auto upload
+            let num = await NCAutoUpload.shared.initAutoUpload(tblAccount: tblAccount)
+            nkLog(start: "Auto upload with \(num) photo")
             // Networking Process
             await NCNetworkingProcess.shared.setCurrentAccount(account)
 
@@ -202,18 +201,6 @@ class NCAccount: NSObject {
         guard let session = NextcloudKit.shared.nkCommonInstance.nksessions.session(forAccount: account),
               session.password == token else {
             return
-        }
-
-        let windowScene = SceneManager.shared.getWindowScene(controller: controller)
-        await showErrorBanner(windowScene: windowScene, text: String(format: NSLocalizedString("_account_unauthorized_", comment: ""), account), errorCode: NCGlobal.shared.errorUnauthorized401)
-
-        let resultsWipe = await NextcloudKit.shared.getRemoteWipeStatusAsync(serverUrl: tblAccount.urlBase, token: token, account: account) { task in
-            Task {
-                let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                            path: tblAccount.urlBase,
-                                                                                            name: "getRemoteWipeStatus")
-                await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-            }
         }
 
         // A stored 401 may belong to an inconsistent or outdated request. Verify with the server.
