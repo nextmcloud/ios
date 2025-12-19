@@ -127,11 +127,16 @@
         [section addFormRow:row];
     }
     
+#ifdef DEBUG
 //#ifdef DEBUG
     // Section DIAGNOSTICS -------------------------------------------------
 
     section = [XLFormSectionDescriptor formSectionWithTitle:NSLocalizedString(@"_diagnostics_", nil)];
     [form addFormSection:section];
+        
+//    if ([[NSFileManager defaultManager] fileExistsAtPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] && NCBrandOptions.shared.disable_log == false) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:@""] && NCBrandOptions.shared.disable_log == false) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] && NCBrandOptions.shared.disable_log == false) {
         
     if ([[NSFileManager defaultManager] fileExistsAtPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] && NCBrandOptions.shared.disable_log == false) {
     // with Nextcloudkit latest version will uncomment below line once updated to latest Nextcloudkit version
@@ -147,6 +152,9 @@
         row.action.formBlock = ^(XLFormRowDescriptor * sender) {
                     
             [self deselectFormRow:sender];
+//            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] fileNameSource:@"" isEditingEnabled:false metadata:nil];
+            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:@""] fileNameSource:@"" isEditingEnabled:false metadata:nil];
+            NCViewerQuickLook *viewerQuickLook = [[NCViewerQuickLook alloc] initWith:[NSURL fileURLWithPath:NextcloudKit.shared.nkCommonInstance.filenamePathLog] isEditingEnabled:false metadata:nil];
             
 //            NSURL *logFilePath = [self getLogFilePath];
 //            if (logFilePath) {
@@ -206,6 +214,8 @@
                     
             [self deselectFormRow:sender];
 
+//            [[[NextcloudKit shared] nkCommonInstance] clearFileLog];
+            [[[NextcloudKit shared] nkCommonInstance] clearFileLog];
             [[[NextcloudKit shared] nkCommonInstance] clearFileLog];
             // with Nextcloudkit latest version will uncomment below line once updated to latest Nextcloudkit version
 //            [[NKLogFileManager shared] clearLogFiles];
@@ -214,11 +224,32 @@
             NSInteger logLevel = [[NCKeychain alloc] init].logLevel;
             BOOL isSimulatorOrTestFlight = [[[NCUtility alloc] init] isSimulatorOrTestFlight];
             NSString *versionNextcloudiOS = [NSString stringWithFormat:[NCBrandOptions shared].textCopyrightNextcloudiOS, [[[NCUtility alloc] init] getVersionAppWithBuild:true]];
+//            if (isSimulatorOrTestFlight) {
+//                [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@ (Simulator / TestFlight)", (unsigned long)logLevel, versionNextcloudiOS]];
+//            } else {
+//                [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@", (unsigned long)logLevel, versionNextcloudiOS]];
+//            }
             if (isSimulatorOrTestFlight) {
                 [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@ (Simulator / TestFlight)", (unsigned long)logLevel, versionNextcloudiOS]];
             } else {
                 [[[NextcloudKit shared] nkCommonInstance] writeLog:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@", (unsigned long)logLevel, versionNextcloudiOS]];
             }
+        };
+        [section addFormRow:row];
+        
+        row = [XLFormRowDescriptor formRowDescriptorWithTag:@"logLevel" rowType:XLFormRowDescriptorTypeSlider title:NSLocalizedString(@"_level_log_", nil)];
+        row.cellConfigAtConfigure[@"backgroundColor"] = UIColor.secondarySystemGroupedBackgroundColor;
+        [row.cellConfig setObject:@(NSTextAlignmentCenter) forKey:@"textLabel.textAlignment"];
+        [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
+        [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
+        NSInteger logLevel = [[NCKeychain alloc] init].logLevel;
+        row.value = @(logLevel);
+        [row.cellConfigAtConfigure setObject:@(2) forKey:@"slider.maximumValue"];
+        [row.cellConfigAtConfigure setObject:@(0) forKey:@"slider.minimumValue"];
+        [row.cellConfigAtConfigure setObject:@(2) forKey:@"steps"];
+        [section addFormRow:row];
+    }
+    
             // with Nextcloudkit latest version will uncomment below line once updated to latest Nextcloudkit version
 //            if (isSimulatorOrTestFlight) {
 //                [[NKLogFileManager shared] writeLogWithInfo:[NSString stringWithFormat:@"[INFO] Clear log with level %lu %@ (Simulator / TestFlight)", (unsigned long)logLevel, versionNextcloudiOS]];
@@ -303,7 +334,7 @@
     [row.cellConfig setObject:[UIFont systemFontOfSize:15.0] forKey:@"textLabel.font"];
     [row.cellConfig setObject:UIColor.labelColor forKey:@"textLabel.textColor"];
     [row.cellConfig setObject:@(NSTextAlignmentLeft) forKey:@"textLabel.textAlignment"];
-    [row.cellConfig setObject:[[UIImage imageNamed:@"trash"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
+    [row.cellConfig setObject:[[UIImage imageNamed:@"trashIcon"] imageWithColor:UIColor.systemGrayColor size:25] forKey:@"imageView.image"];
     row.action.formSelector = @selector(clearCacheRequest:);
     [sectionSize addFormRow:row];
 
@@ -399,6 +430,7 @@
         
         NSInteger levelLog = [[rowDescriptor.value valueData] intValue];
         [[NCKeychain alloc] init].logLevel = levelLog;
+//        [[[NextcloudKit shared] nkCommonInstance] setLevelLog:levelLog];
         [[[NextcloudKit shared] nkCommonInstance] setLevelLog:levelLog];
     }
 
@@ -488,6 +520,7 @@
         [[NSURLCache sharedURLCache] setMemoryCapacity:0];
         [[NSURLCache sharedURLCache] setDiskCapacity:0];
 
+        [[NCManageDatabase shared] clearDatabaseWithAccount:account removeAccount:false];
         [[NCManageDatabase shared] clearDatabaseWithAccount:account removeAccount:false removeAutoUpload:false];
 //        [[NCManageDatabase shared] clearDatabaseWithAccount:account removeAccount:false];
 
@@ -500,6 +533,7 @@
         [ufs createDirectoryStandard];
 
         [[NCAutoUpload shared] alignPhotoLibraryWithController:self account:appDelegate.account];
+        [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
 //        [[NCAutoUpload shared] alignPhotoLibraryWithViewController:self];
 
         [[NCImageCache shared] createMediaCacheWithAccount:appDelegate.account withCacheSize:true];
