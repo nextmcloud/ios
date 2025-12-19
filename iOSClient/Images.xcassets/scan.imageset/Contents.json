@@ -1,17 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "default@500w.pdf",
-      "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "default copy@500w.pdf",
+      "filename" : "Scan.svg",
       "idiom" : "universal"
     }
   ],
