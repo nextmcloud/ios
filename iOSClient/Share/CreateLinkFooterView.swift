@@ -48,7 +48,7 @@ class CreateLinkFooterView: UITableViewHeaderFooterView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        createButton.layer.borderColor = UIColor.label.cgColor
+        createButton.layer.borderColor = NCBrandColor.shared.label.cgColor
     }
 
     private func setupUI() {
