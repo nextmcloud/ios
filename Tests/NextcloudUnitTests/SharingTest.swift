@@ -201,32 +201,32 @@ final class SharingTest: XCTestCase {
         }
     
     func testGetImageShareType() {
-        let sut = NCShareCommon() // Replace with the actual class containing the getImageShareType function
+        let sut = NCShareCommon // Replace with the actual class containing the getImageShareType function
         
         // Test case 1: SHARE_TYPE_USER
-        let shareType1 = sut.SHARE_TYPE_USER
+        let shareType1 = sut.shareTypeUser
         let result1 = sut.getImageShareType(shareType: shareType1)
         XCTAssertEqual(result1, UIImage(named: "shareTypeEmail")?.imageColor(NCBrandColor.shared.label))
         
         // Test case 2: SHARE_TYPE_GROUP
-        let shareType2 = sut.SHARE_TYPE_GROUP
+        let shareType2 = sut.shareTypeGroup
         let result2 = sut.getImageShareType(shareType: shareType2)
         XCTAssertEqual(result2, UIImage(named: "shareTypeGroup")?.imageColor(NCBrandColor.shared.label))
         
         // Test case 3: SHARE_TYPE_LINK
-        let shareType3 = sut.SHARE_TYPE_LINK
+        let shareType3 = sut.shareTypeLink
         let result3 = sut.getImageShareType(shareType: shareType3)
         XCTAssertEqual(result3, UIImage(named: "shareTypeLink")?.imageColor(NCBrandColor.shared.label))
         
         // Test case 4: SHARE_TYPE_EMAIL (with isDropDown=false)
-        let shareType4 = sut.SHARE_TYPE_EMAIL
+        let shareType4 = sut.shareTypeEmail
         let result4 = sut.getImageShareType(shareType: shareType4)
         XCTAssertEqual(result4, UIImage(named: "shareTypeUser")?.imageColor(NCBrandColor.shared.label))
         
         // Test case 5: SHARE_TYPE_EMAIL (with isDropDown=true)
-        let shareType5 = sut.SHARE_TYPE_EMAIL
+        let shareType5 = sut.shareTypeEmail
         let isDropDown5 = true
-        let result5 = sut.getImageShareType(shareType: shareType5, isDropDown: isDropDown5)
+        let result5 = sut.getImageShareType(shareType: shareType5)//, isDropDown: isDropDown5)
         XCTAssertEqual(result5, UIImage(named: "email")?.imageColor(NCBrandColor.shared.label))
         }
 }
