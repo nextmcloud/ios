@@ -77,11 +77,11 @@ class NCTableShareOptions: NCTableShareable {
 
     var attributes: String?
 
-    private init(shareType: Int, metadata: tableMetadata, password: String?) {
-        if metadata.e2eEncrypted, NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityE2EEApiVersion == NCGlobal.shared.e2eeVersionV12 {
+    private init(shareType: Int, metadata: tableMetadata, password: String?) async {
+        if metadata.e2eEncrypted, await NKCapabilities.shared.getCapabilities(for: metadata.account).e2EEApiVersion == NCGlobal.shared.e2eeVersionV12 {
             self.permissions = NCPermissions().permissionCreateShare
         } else {
-            self.permissions = NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityFileSharingDefaultPermission & metadata.sharePermissionsCollaborationServices
+            self.permissions = await NKCapabilities.shared.getCapabilities(for: metadata.account).fileSharingDefaultPermission & metadata.sharePermissionsCollaborationServices
         }
         self.shareType = shareType
         if let password = password {
@@ -89,14 +89,14 @@ class NCTableShareOptions: NCTableShareable {
         }
     }
 
-    convenience init(sharee: NKSharee, metadata: tableMetadata, password: String?) {
-        self.init(shareType: sharee.shareType, metadata: metadata, password: password)
+    convenience init(sharee: NKSharee, metadata: tableMetadata, password: String?) async {
+        await self.init(shareType: sharee.shareType, metadata: metadata, password: password)
         self.shareWith = sharee.shareWith
         self.shareWithDisplayname = sharee.label
     }
 
-    static func shareLink(metadata: tableMetadata, password: String?) -> NCTableShareOptions {
-        return NCTableShareOptions(shareType: NCShareCommon().SHARE_TYPE_LINK, metadata: metadata, password: password)
+    static func shareLink(metadata: tableMetadata, password: String?) async -> NCTableShareOptions {
+        return await NCTableShareOptions(shareType: NCShareCommon.shareTypeLink, metadata: metadata, password: password)
     }
 }
 
@@ -107,7 +107,7 @@ protocol NCShareDetail {
 extension NCShareDetail where Self: UIViewController {
     func setNavigationTitle() {
         title = NSLocalizedString("_sharing_", comment: "")
-        if share.shareType != NCShareCommon().SHARE_TYPE_LINK {
+        if share.shareType != NCShareCommon.shareTypeLink {
             title! = share.shareWithDisplayname.isEmpty ? share.shareWith : share.shareWithDisplayname
         }
     }
