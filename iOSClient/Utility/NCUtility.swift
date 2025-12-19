@@ -2,47 +2,35 @@
 // SPDX-FileCopyrightText: 2018 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import Foundation
 import UIKit
 import NextcloudKit
 import PDFKit
 import Accelerate
 import CoreMedia
 import Photos
-import Alamofire
 
 final class NCUtility: NSObject, Sendable {
     let utilityFileSystem = NCUtilityFileSystem()
     let global = NCGlobal.shared
 
-    @objc func isSimulatorOrTestFlight() -> Bool {
-        guard let path = Bundle.main.appStoreReceiptURL?.path else {
-            return false
-        }
-        return path.contains("CoreSimulator") || path.contains("sandboxReceipt")
-    }
-
-    func isSimulator() -> Bool {
-        guard let path = Bundle.main.appStoreReceiptURL?.path else {
-            return false
-        }
-        return path.contains("CoreSimulator")
-    }
-
     func isTypeFileRichDocument(_ metadata: tableMetadata) -> Bool {
-        guard metadata.fileNameView != "." else { return false }
         let fileExtension = (metadata.fileNameView as NSString).pathExtension
-        guard !fileExtension.isEmpty else { return false }
-        guard let mimeType = UTType(tag: fileExtension.uppercased(), tagClass: .filenameExtension, conformingTo: nil)?.identifier else { return false }
+        guard let capabilities = NCNetworking.shared.capabilities[metadata.account],
+              !fileExtension.isEmpty,
+              let mimeType = UTType(tag: fileExtension.uppercased(), tagClass: .filenameExtension, conformingTo: nil)?.identifier else {
+            return false
+        }
+
         /// contentype
-        if !NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityRichDocumentsMimetypes.filter({ $0.contains(metadata.contentType) || $0.contains("text/plain") }).isEmpty {
+        if !capabilities.richDocumentsMimetypes.filter({ $0.contains(metadata.contentType) || $0.contains("text/plain") }).isEmpty {
             return true
         }
+
         /// mimetype
-        if !NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityRichDocumentsMimetypes.isEmpty && mimeType.components(separatedBy: ".").count > 2 {
+        if !capabilities.richDocumentsMimetypes.isEmpty && mimeType.components(separatedBy: ".").count > 2 {
             let mimeTypeArray = mimeType.components(separatedBy: ".")
             let mimeType = mimeTypeArray[mimeTypeArray.count - 2] + "." + mimeTypeArray[mimeTypeArray.count - 1]
-            if !NCCapabilities.shared.getCapabilities(account: metadata.account).capabilityRichDocumentsMimetypes.filter({ $0.contains(mimeType) }).isEmpty {
+            if !capabilities.richDocumentsMimetypes.filter({ $0.contains(mimeType) }).isEmpty {
                 return true
             }
         }
@@ -53,8 +41,8 @@ final class NCUtility: NSObject, Sendable {
         var identifiers: [String] = []
         let capabilities = NCNetworking.shared.capabilities[account]
 
-        for result: tableDirectEditingEditors in results {
-            for mimetype in result.mimetypes {
+        capabilities?.directEditingEditors.forEach { editor in
+            editor.mimetypes.forEach { mimetype in
                 if mimetype == contentType {
                     identifiers.append(editor.identifier)
                 }
@@ -100,11 +88,11 @@ final class NCUtility: NSObject, Sendable {
         }
     }
 
-    @objc func isQuickLookDisplayable(metadata: tableMetadata) -> Bool {
+    func isQuickLookDisplayable(metadata: tableMetadata) -> Bool {
         return true
     }
 
-    @objc func ocIdToFileId(ocId: String?) -> String? {
+    func ocIdToFileId(ocId: String?) -> String? {
         guard let ocId = ocId else { return nil }
         let items = ocId.components(separatedBy: "oc")
 
@@ -127,6 +115,18 @@ final class NCUtility: NSObject, Sendable {
         let zeros = String(repeating: "0", count: 8 - fileId.count)
         return zeros + fileId
     }
+//    func getVersionApp(withBuild: Bool = true) -> String {
+//        if let dictionary = Bundle.main.infoDictionary {
+//            if let version = dictionary["CFBundleShortVersionString"], let build = dictionary["CFBundleVersion"] {
+//                if withBuild {
+//                    return "\(version).\(build)"
+//                } else {
+//                    return "\(version)"
+//                }
+//            }
+//        }
+//        return ""
+//    }
 
     func getVersionBuild() -> String {
         if let dictionary = Bundle.main.infoDictionary,
@@ -141,19 +141,6 @@ final class NCUtility: NSObject, Sendable {
         if let dictionary = Bundle.main.infoDictionary,
            let version = dictionary["CFBundleShortVersionString"] {
             return "\(version)"
-        }
-        return ""
-    }
-    
-    @objc func getVersionApp(withBuild: Bool = true) -> String {
-        if let dictionary = Bundle.main.infoDictionary {
-            if let version = dictionary["CFBundleShortVersionString"], let build = dictionary["CFBundleVersion"] {
-                if withBuild {
-                    return "\(version).\(build)"
-                } else {
-                    return "\(version)"
-                }
-            }
         }
         return ""
     }
@@ -241,7 +228,6 @@ final class NCUtility: NSObject, Sendable {
         return isEqual
     }
 
-    #if !EXTENSION_FILE_PROVIDER_EXTENSION
     func getLocation(latitude: Double, longitude: Double, completion: @escaping (String?) -> Void) {
         let geocoder = CLGeocoder()
         let llocation = CLLocation(latitude: latitude, longitude: longitude)
@@ -262,7 +248,6 @@ final class NCUtility: NSObject, Sendable {
             }
         }
     }
-    #endif
 
     // https://stackoverflow.com/questions/5887248/ios-app-maximum-memory-budget/19692719#19692719
     // https://stackoverflow.com/questions/27556807/swift-pointer-problems-with-mach-task-basic-info/27559770#27559770
@@ -293,26 +278,16 @@ final class NCUtility: NSObject, Sendable {
         return (usedmegabytes, totalmegabytes)
     }
 
-    func getHeightHeaderEmptyData(view: UIView, portraitOffset: CGFloat, landscapeOffset: CGFloat, isHeaderMenuTransferViewEnabled: Bool = false) -> CGFloat {
+    func getHeightHeaderEmptyData(view: UIView, portraitOffset: CGFloat, landscapeOffset: CGFloat) -> CGFloat {
         var height: CGFloat = 0
         if UIDevice.current.orientation.isPortrait {
             height = (view.frame.height / 2) - (view.safeAreaInsets.top / 2) + portraitOffset
         } else {
-            height = (view.frame.height / 2) + landscapeOffset + CGFloat(isHeaderMenuTransferViewEnabled ? 35 : 0)
+            height = (view.frame.height / 2) + landscapeOffset
         }
         return height
     }
-
-    func formatBadgeCount(_ count: Int) -> String {
-        if count <= 9999 {
-            return "\(count)"
-        } else {
-            return count.formatted(.number.notation(.compactName).locale(Locale(identifier: "en_US")))
-        }
-    }
     
-    func isValidEmail(_ email: String) -> Bool {
-        
     // E-mail validations
     // 1. Basic Email Validator (ASCII only)
     func isValidEmail(_ email: String) -> Bool {
