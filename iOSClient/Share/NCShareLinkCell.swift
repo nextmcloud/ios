@@ -145,16 +145,16 @@ class NCShareLinkCell: UITableViewCell {
     }
 
     private func setupCellAppearance(titleAppendString: String? = nil) {
-        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+//        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
         labelTitle.textColor = NCBrandColor.shared.label
         labelQuickStatus.textColor = NCBrandColor.shared.shareBlueColor
 
         buttonDetail.setTitleColor(NCBrandColor.shared.shareBlackColor, for: .normal)
         buttonCopy.setImage(UIImage(named: "share")?.image(color: NCBrandColor.shared.brand, size: 24), for: .normal)
 
-        imageRightArrow.image = UIImage(named: "rightArrow")?.imageColor(NCBrandColor.shared.shareBlueColor)
-        imageExpiredDateSet.image = UIImage(named: "calenderNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
-        imagePasswordSet.image = UIImage(named: "lockNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+        imageRightArrow.image = UIImage(named: "rightArrow")?.image(color: NCBrandColor.shared.shareBlueColor)
+        imageExpiredDateSet.image = UIImage(named: "calenderNew")?.image(color: NCBrandColor.shared.shareBlueColor)
+        imagePasswordSet.image = UIImage(named: "lockNew")?.image(color: NCBrandColor.shared.shareBlueColor)
 
         buttonDetail.setTitle(NSLocalizedString("_share_details_", comment: ""), for: .normal)
         labelTitle.text = NSLocalizedString("_share_link_", comment: "")
@@ -176,13 +176,13 @@ class NCShareLinkCell: UITableViewCell {
 
         if tableShare.permissions == permissions.permissionCreateShare {
             labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_just_upload_", comment: "")
-            imagePermissionType.image = UIImage(named: "upload")?.imageColor(NCBrandColor.shared.shareBlueColor)
+            imagePermissionType.image = UIImage(named: "upload")?.image(color: NCBrandColor.shared.shareBlueColor)
         } else if permissions.isAnyPermissionToEdit(tableShare.permissions) {
             labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_edit_", comment: "")
-            imagePermissionType.image = UIImage(named: "editNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+            imagePermissionType.image = UIImage(named: "editNew")?.image(color: NCBrandColor.shared.shareBlueColor)
         } else {
             labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_only_view_", comment: "")
-            imagePermissionType.image = UIImage(named: "showPasswordNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+            imagePermissionType.image = UIImage(named: "showPasswordNew")?.image(color: NCBrandColor.shared.shareBlueColor)
         }
 
         imagePasswordSet.isHidden = tableShare.password.isEmpty
