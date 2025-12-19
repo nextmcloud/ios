@@ -10,6 +10,7 @@ import Foundation
 import AppTrackingTransparency
 import AdSupport
 import UIKit
+import XLForm
 
 class InitialPrivacySettingsViewController: UIViewController {
     

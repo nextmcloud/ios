@@ -71,6 +71,10 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
         self.init()
 
+        if serverUrl == utilityFileSystem.getHomeServer(urlBase: appDelegate?.urlBase ?? "", userId: appDelegate?.userId ?? "") {
+            titleServerUrl = "/"
+        } else {
+            titleServerUrl = (serverUrl as NSString).lastPathComponent
         if serverUrl == utilityFileSystem.getHomeServer(session: session) {
             titleServerUrl = "/"
         } else {
@@ -141,6 +145,37 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
         var section: XLFormSectionDescriptor
         var row: XLFormRowDescriptor
+
+        // Section: Destination Folder
+
+        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_save_path_", comment: ""))
+        form.addFormSection(section)
+        
+        XLFormViewController.cellClassesForRowDescriptorTypes()["NMCScamFileNameCustomInputField"] = FileNameInputTextField.self
+        row = XLFormRowDescriptor(tag: "fileName", rowType: "NMCScamFileNameCustomInputField", title: NSLocalizedString("_filename_", comment: ""))
+        row.cellClass = FileNameInputTextField.self
+        row.cellConfig["fileNameInputTextField.placeholder"] = self.fileName
+        
+        row.cellConfig["fileNameInputTextField.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["fileNameInputTextField.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["fileNameInputTextField.textColor"] = NCBrandColor.shared.label
+        
+        
+        section.addFormRow(row)
+        //FileName custom view END
+        
+        section = XLFormSectionDescriptor.formSection(withTitle: NSLocalizedString("_location_", comment: ""))
+        form.addFormSection(section)
+        
+        //Scan documnet folder path
+        XLFormViewController.cellClassesForRowDescriptorTypes()["NMCScanFolderPathCustomCell"] = ScanDocumentPathView.self
+        row = XLFormRowDescriptor(tag: "ButtonDestinationFolder", rowType: "NMCScanFolderPathCustomCell", title: self.titleServerUrl)
+        row.action.formSelector = #selector(changeDestinationFolder(_:))
+        row.cellConfig["backgroundColor"] = cellBackgoundColor
+        row.cellConfig["folderImage.image"] =  UIImage(named: "folder")?.imageColor(NCBrandColor.shared.customer)
+        row.cellConfig["photoLabel.textAlignment"] = NSTextAlignment.left.rawValue
+        row.cellConfig["photoLabel.font"] = UIFont.systemFont(ofSize: 15.0)
+        row.cellConfig["photoLabel.textColor"] = NCBrandColor.shared.label
         
         // Section: Destination Folder
 
@@ -162,6 +197,10 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             row.cellConfig["photoLabel.text"] = self.titleServerUrl
         }
         row.cellConfig["textLabel.text"] = ""
+        
+        section.addFormRow(row)
+        // END of Scan documnet folder path
+        
         section.addFormRow(row)
 
         // Section: File Name
@@ -306,7 +345,8 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             let fileNameNew = newValue as? String
 
             if let fileNameNew = newValue as? String {
-                self.fileName = FileAutoRenamer.rename(fileNameNew, account: session.account)
+                self.fileName = utility.removeForbiddenCharacters(fileNameNew)
+                self.fileName = FileAutoRenamer.rename(filename: fileNameNew, isFolderPath: true)
             } else {
                 self.fileName = ""
             }
@@ -453,6 +493,7 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         var newFileName: String = ""
 
         if fileName == nil || fileName == "" {
+            name = utilityFileSystem.createFileNameDate("scan", ext: "pdf") 
             name = utilityFileSystem.createFileNameDate("scan", ext: "pdf")
         } else {
             name = fileName!
@@ -471,12 +512,18 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
 
     // MARK: - Action
     
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], indexPath: [IndexPath], overwrite: Bool, copy: Bool, move: Bool) {
+        
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
+        
+    
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
 
         if serverUrl != nil {
 
             self.serverUrl = serverUrl!
 
+            if serverUrl == utilityFileSystem.getHomeServer(urlBase: appDelegate?.urlBase ?? "", userId: appDelegate?.userId ?? "") {
             if serverUrl == utilityFileSystem.getHomeServer(session: session) {
                 self.titleServerUrl = "/"
             } else {
@@ -709,11 +756,18 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 }
             }
             
+            
+            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
+            
+//            let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
             let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate?.sceneIdentifier)
 
             metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
             metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
             metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
+            
+            if NCManageDatabase.shared.getMetadataConflict(account: appDelegate?.account ?? "", serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
+                
                             
             if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
                 
@@ -769,6 +823,10 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
             }
         }
         
+        
+        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
+        
+//        let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
         let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate?.sceneIdentifier)
 
         metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
@@ -841,11 +899,17 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
                 
                 let image = changeCompressionImage(arrayImages[count])
                 
+                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
+                
+//                let metadataForUpload = NCManageDatabase.shared.createMetadata(account: appDelegate?.account ?? "", user: appDelegate?.user ?? "", userId: appDelegate?.userId ?? "", fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, urlBase: appDelegate?.urlBase ?? "", url: "", contentType: "")
                 let metadataForUpload = NCManageDatabase.shared.createMetadata(fileName: fileNameSave, fileNameView: fileNameSave, ocId: UUID().uuidString, serverUrl: serverUrl, url: "", contentType: "", session: session, sceneIdentifier: self.appDelegate?.sceneIdentifier)
 
                 metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
                 metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile
                 metadataForUpload.status = NCGlobal.shared.metadataStatusWaitUpload
+                
+                if NCManageDatabase.shared.getMetadataConflict(account: appDelegate?.account ?? "", serverUrl: serverUrl, fileNameView: fileNameSave) != nil {
+                    
                                     
                 if NCManageDatabase.shared.getMetadataConflict(account: session.account, serverUrl: serverUrl, fileNameView: fileNameSave, nativeFormat: false) != nil {
                     
@@ -1267,3 +1331,4 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         return nil
     }
 }
+

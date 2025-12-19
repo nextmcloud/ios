@@ -109,7 +109,7 @@ extension MoEngageAnalytics: AnalyticsService {
         MoEngageSDKAnalytics.sharedInstance.setUserAttribute(storageCapacity, withAttributeName: AnalyticEvents.USER_PROPERTIES_STORAGE_CAPACITY.rawValue)
         
         // Track whether auto-upload is enabled for the user
-        trackAutoUpload(isEnable: user.autoUpload)
+        trackAutoUpload(isEnable: user.autoUploadStart)
     }
     
     // Method to track the used storage data
@@ -127,7 +127,7 @@ extension MoEngageAnalytics: AnalyticsService {
     // Method to track the app version
     func trackAppVersion(oldVersion: String?) {
         // Get the app version and set it as a user attribute
-        let version = NCUtility().getVersionApp() as String
+        let version = NCUtility().getVersionBuild() as String
         
         // Check if a build version key is present in UserDefaults
         if let oldVersion {

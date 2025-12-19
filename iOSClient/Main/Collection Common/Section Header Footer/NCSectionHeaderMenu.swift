@@ -61,11 +61,11 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
 
         backgroundColor = .clear
 
-        buttonSwitch.setImage(UIImage(systemName: "list.bullet")!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet")!.image(color: NCBrandColor.shared.iconImageColor, size: 25), for: .normal)
 
         buttonOrder.setTitle("", for: .normal)
         buttonOrder.setTitleColor(NCBrandColor.shared.brand, for: .normal)
-        buttonMore.setImage(UIImage(named: "more")!.image(color: NCBrandColor.shared.iconColor, size: 25), for: .normal)
+        buttonMore.setImage(UIImage(named: "more")!.image(color: NCBrandColor.shared.iconImageColor, size: 25), for: .normal)
 
         // Gradient
         gradient.startPoint = CGPoint(x: 0, y: 0.50)
@@ -132,12 +132,12 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
 
     func setImageSwitchList() {
 
-        buttonSwitch.setImage(UIImage(systemName: "list.bullet")!.image(color: NCBrandColor.shared.iconColor, width: 20, height: 15), for: .normal)
+        buttonSwitch.setImage(UIImage(systemName: "list.bullet")!.image(color: NCBrandColor.shared.iconImageColor, width: 20, height: 15), for: .normal)
     }
 
     func setImageSwitchGrid() {
 
-        buttonSwitch.setImage(UIImage(systemName: "square.grid.2x2")!.image(color: NCBrandColor.shared.iconColor, size: 20), for: .normal)
+        buttonSwitch.setImage(UIImage(systemName: "square.grid.2x2")!.image(color: NCBrandColor.shared.iconImageColor, size: 20), for: .normal)
     }
 
     func setButtonsView(height: CGFloat) {
@@ -200,7 +200,7 @@ class NCSectionHeaderMenu: UICollectionReusableView, UIGestureRecognizerDelegate
             var image: UIImage?
             if let ocId,
                let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) {
-                image = utility.createFilePreviewImage(ocId: metadata.ocId, etag: metadata.etag, fileNameView: metadata.fileNameView, classFile: metadata.classFile, status: metadata.status, createPreviewMedia: true)?.darken()
+                image = utility.createFilePreviewImage(ocId: metadata.ocId, etag: metadata.etag, fileNameView: metadata.fileNameView, classFile: metadata.classFile, status: metadata.status, createPreviewMedia: true)//?.darken()
                 if image == nil {
                     image = UIImage(named: metadata.iconName)
                     buttonTransfer.backgroundColor = .lightGray
