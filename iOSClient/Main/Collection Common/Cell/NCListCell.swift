@@ -28,6 +28,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!
     @IBOutlet weak var imageFavorite: UIImageView!
+//    @IBOutlet weak var imageFavoriteBackground: UIImageView!
     @IBOutlet weak var imageLocal: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var labelInfo: UILabel!
@@ -141,6 +142,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         imageItem.layer.masksToBounds = true
         imageStatus.image = nil
         imageFavorite.image = nil
+//        imageFavoriteBackground.isHidden = true
         imageLocal.image = nil
         labelTitle.text = ""
         labelInfo.text = ""
@@ -212,9 +214,22 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func selected(_ status: Bool, isEditMode: Bool) {
+        // E2EE - remove encrypt folder selection
+        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), metadata.e2eEncrypted {
+            imageSelect.isHidden = true
+        } else {
+            imageSelect.isHidden = isEditMode ? false : true
+        }
+//        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
+////        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
+//            backgroundView = nil
+//            separator.isHidden = false
+//            imageSelect.isHidden = true
+//            return
+//        }
         if isEditMode {
             imageItemLeftConstraint.constant = 45
-            imageSelect.isHidden = false
+//            imageSelect.isHidden = false
             imageShared.isHidden = true
             imageMore.isHidden = true
             buttonShared.isHidden = true
@@ -222,7 +237,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             accessibilityCustomActions = nil
         } else {
             imageItemLeftConstraint.constant = 10
-            imageSelect.isHidden = true
+//            imageSelect.isHidden = true
             imageShared.isHidden = false
             imageMore.isHidden = false
             buttonShared.isHidden = false
@@ -240,7 +255,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             backgroundView = blurEffectView
             separator.isHidden = true
         } else {
-            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
+           imageSelect.image = NCImageCache.shared.getImageCheckedNo()
             backgroundView = nil
             separator.isHidden = false
         }
@@ -308,7 +323,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         }
 
     }
-
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         // Keep the shadow path in sync with current bounds
