@@ -4,10 +4,12 @@
 
 import UIKit
 import SwiftUI
+import Realm
 import RealmSwift
 import NextcloudKit
 import EasyTipView
 import LucidBanner
+import MoEngageInApps
 
 class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UISearchResultsUpdating, UISearchControllerDelegate, UISearchBarDelegate, NCListCellDelegate, NCGridCellDelegate, NCPhotoCellDelegate, NCSectionFirstHeaderDelegate, NCSectionFooterDelegate, NCSectionFirstHeaderEmptyDataDelegate, NCAccountSettingsModelDelegate, NCTransferDelegate, UIAdaptivePresentationControllerDelegate, UIContextMenuInteractionDelegate {
 
@@ -52,6 +54,13 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
     var attributesZoomOut: UIMenuElement.Attributes = []
     var tipViewAccounts: EasyTipView?
     var syncMetadatasTask: Task<Void, Never>?
+    var tipViewAutoUpload: EasyTipView?
+    var headerMenu: NCSectionHeaderMenu?
+    var headerMenuTransferView = false
+    var headerMenuButtonsView: Bool = true
+    var headerRichWorkspaceDisable: Bool = false
+    
+    var selectableDataSource: [RealmSwiftObject] { dataSource.getMetadataSourceForAllSections() }
 
     // DECLARE
     var layoutKey = ""
@@ -227,6 +236,14 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         let dropInteraction = UIDropInteraction(delegate: self)
         self.navigationController?.navigationItem.leftBarButtonItems?.first?.customView?.addInteraction(dropInteraction)
 
+        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed") || isApplicationUpdated()){
+            redirectToPrivacyViewController()
+            
+            //set current app version
+            let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String
+            UserDefaults.standard.set(appVersion, forKey: "CurrentAppVersion")
+        }
+        
         registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: NCCollectionViewCommon, _) in
             guard let self else { return }
 
@@ -237,6 +254,8 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
             guard let self else { return }
             self.collectionView.reloadData()
         }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateIcons), name: NSNotification.Name(rawValue: global.notificationCenterUpdateIcons), object: nil)
 
         DispatchQueue.main.async {
             self.collectionView?.collectionViewLayout.invalidateLayout()
@@ -339,6 +358,23 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
 
     override var canBecomeFirstResponder: Bool {
         return true
+    }
+    
+    @objc func updateIcons() {
+        collectionView.reloadData()
+    }
+
+    func isApplicationUpdated() -> Bool {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String ?? ""
+        let currentVersion = UserDefaults.standard.string(forKey: "CurrentAppVersion")
+        return currentVersion != appVersion
+    }
+    
+    func redirectToPrivacyViewController() {
+        let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as? UINavigationController
+        newViewController?.modalPresentationStyle = .fullScreen
+        self.present(newViewController!, animated: true, completion: nil)
     }
 
     // MARK: - Transfer Delegate
@@ -621,6 +657,10 @@ class NCCollectionViewCommon: UIViewController, UIGestureRecognizerDelegate, UIS
         guard let metadata = self.database.getMetadataFromOcId(ocId) else { return }
 
         NCCreate().createShare(viewController: self, metadata: metadata, page: .sharing)
+//        NCDownloadAction.shared.openShare(viewController: self, metadata: metadata, page: .sharing)
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.filebrowser.sharing", data: ["": ""])
+        appDelegate.adjust.trackEvent(TriggerEvent(Sharing.rawValue))
+
     }
 
     func tapMoreGridItem(with ocId: String, ocIdTransfer: String, image: UIImage?, sender: Any) {
