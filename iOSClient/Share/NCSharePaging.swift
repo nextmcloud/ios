@@ -29,7 +29,7 @@ import MarqueeLabel
 import TagListView
 
 protocol NCSharePagingContent {
-    var textField: UIView? { get }
+    var textField: UITextField? { get }
 }
 
 class NCSharePaging: UIViewController {
@@ -126,7 +126,7 @@ class NCSharePaging: UIViewController {
         super.viewWillDisappear(animated)
         Task {
             await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                delegate.transferReloadData(serverUrl: metadata.serverUrl, requestData: false, status: nil)
+                delegate.transferReloadData(serverUrl: metadata.serverUrl, status: nil)
             }
         }
     }
@@ -319,13 +319,10 @@ class NCShareHeaderView: UIView {
 
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
-        NCNetworking.shared.setStatusWaitFavorite(metadata) { error in
+        NCNetworking.shared.favoriteMetadata(metadata) { error in
             if error == .success {
                 guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
-                self.favorite.setImage(NCUtility().loadImage(
-                    named: "star.fill",
-                    colors: metadata.favorite ? [NCBrandColor.shared.yellowFavorite] : [NCBrandColor.shared.iconImageColor2],
-                    size: 20), for: .normal)
+                self.favorite.setImage(NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 20), for: .normal)
             } else {
                 NCContentPresenter().showError(error: error)
             }
