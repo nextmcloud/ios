@@ -34,6 +34,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var progressQuota: UIProgressView!
     @IBOutlet weak var viewQuota: UIView!
 
+    private var userMenu: [NKExternalSite] = []
     private var functionMenu: [NKExternalSite] = []
     private var externalSiteMenu: [NKExternalSite] = []
     private var settingsMenu: [NKExternalSite] = []
@@ -110,6 +111,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         var quota: String = ""
 
         // Clear
+        userMenu.removeAll()
         functionMenu.removeAll()
         externalSiteMenu.removeAll()
         settingsMenu.removeAll()
@@ -118,10 +120,25 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         labelQuotaExternalSite.text = ""
         progressQuota.progressTintColor = NCBrandColor.shared.getElement(account: session.account)
 
+        // ITEM : User
+        item = NKExternalSite()
+//        item.name = tableAccount.email
+        if !tableAccount.email.isEmpty {
+            item.name = tableAccount.email
+        } else if tableAccount.email.isEmpty {//}|| tableAccount.alias.isEmpty {
+            item.name = tableAccount.displayName
+        } else {
+            item.name = tableAccount.alias
+        }
+        item.icon = "user"//utility.loadUserImage(for: tableAccount.user, displayName: tableAccount.displayName, urlBase: tableAccount.urlBase)
+//        item.url = "segueRecent"
+//        item.order = 10
+        userMenu.append(item)
+        
         // ITEM : Recent
         item = NKExternalSite()
         item.name = "_recent_"
-        item.icon = "clock.arrow.circlepath"
+        item.icon = "History" //"clock.arrow.circlepath"
         item.url = "segueRecent"
         item.order = 20
         functionMenu.append(item)
@@ -152,7 +169,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         if capabilities.fileSharingApiEnabled {
             item = NKExternalSite()
             item.name = "_list_shares_"
-            item.icon = "person.badge.plus"
+            item.icon = "share" //"person.badge.plus"
             item.url = "segueShares"
             item.order = 50
             functionMenu.append(item)
@@ -161,7 +178,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : Offline
         item = NKExternalSite()
         item.name = "_manage_file_offline_"
-        item.icon = "icloud.and.arrow.down"
+        item.icon = "cloudDownload"
         item.url = "segueOffline"
         item.order = 60
         functionMenu.append(item)
@@ -179,7 +196,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : Scan
         item = NKExternalSite()
         item.name = "_scanned_images_"
-        item.icon = "doc.text.viewfinder"
+        item.icon = "scan" //"doc.text.viewfinder"
         item.url = "openStoryboardNCScan"
         item.order = 70
         functionMenu.append(item)
@@ -187,7 +204,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : Trash
         item = NKExternalSite()
         item.name = "_trash_view_"
-        item.icon = "trash"
+        item.icon = "trashIcon"
         item.url = "segueTrash"
         item.order = 80
         functionMenu.append(item)
@@ -201,7 +218,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
         // ITEM : Settings
         item = NKExternalSite()
         item.name = "_settings_"
-        item.icon = "gear"
+        item.icon = "settings"
         item.url = "openSettings"
         settingsMenu.append(item)
 
@@ -242,7 +259,7 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
                         item.url = urlEncoded
                         item.icon = "network"
                         if externalSite.type == "settings" {
-                            item.icon = "gear"
+                            item.icon = "settings"
                         }
                         externalSiteMenu.append(item)
                     }
@@ -256,6 +273,10 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
     private func loadSections() {
         if !NCBrandOptions.shared.disable_show_more_nextcloud_apps_in_settings {
             sections.append(Section(items: [NKExternalSite()], type: .moreApps))
+        }
+        
+        if !userMenu.isEmpty {
+            sections.append(Section(items: userMenu, type: .regular))
         }
 
         if !functionMenu.isEmpty {
@@ -324,13 +345,19 @@ class NCMore: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
             let item = sections[indexPath.section].items[indexPath.row]
 
-            cell.imageIcon?.image = utility.loadImage(named: item.icon, colors: [NCBrandColor.shared.iconImageColor])
+            cell.imageIcon?.image = utility.loadImage(named: item.icon, colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)
             cell.imageIcon?.contentMode = .scaleAspectFit
             cell.labelText?.text = NSLocalizedString(item.name, comment: "")
             cell.labelText.textColor = NCBrandColor.shared.textColor
 
-            cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
-
+            if indexPath.section == 0 {
+                if indexPath.row == 0 {
+                    cell.accessoryType = UITableViewCell.AccessoryType.none
+                }
+            }
+            else {
+                cell.accessoryType = UITableViewCell.AccessoryType.disclosureIndicator
+            }
             cell.separator.backgroundColor = .separator
             cell.separatorHeigth.constant = 0.4
 
