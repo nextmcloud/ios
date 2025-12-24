@@ -5,6 +5,7 @@
 
 import UIKit
 import NextcloudKit
+import LucidBanner
 
 enum NCShareExtensionError: Error {
     case cancel, fileUpload, noAccount, noFiles, versionMismatch
@@ -42,11 +43,11 @@ class NCShareExtension: UIViewController {
     var progress: CGFloat = 0
     var counterUploaded: Int = 0
     var uploadMetadata: [tableMetadata] = []
-    let hud = NCHud()
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
     let global = NCGlobal.shared
     var maintenanceMode: Bool = false
+    var token: Int?
 
     // MARK: - View Life Cycle
 
@@ -363,7 +364,17 @@ extension NCShareExtension {
     @MainActor
     func uploadAndExit() async {
         var error: NKError?
+        token = showUploadBanner(scene: self.view.window?.windowScene, blocksTouches: true)
+
         for metadata in self.uploadMetadata {
+            // BANNER
+            LucidBanner.shared.update(
+                title: NSLocalizedString("_upload_file_", comment: "") + " \(self.counterUploaded + 1) " + NSLocalizedString("_of_", comment: "") + " \(self.filesName.count)",
+                systemImage: "arrowshape.up.circle",
+                imageAnimation: .breathe,
+                progress: 0
+            )
+
             error = await self.upload(metadata: metadata)
             if error != .success {
                 break
@@ -371,14 +382,14 @@ extension NCShareExtension {
         }
 
         if error == .success {
-            self.hud.success()
+            LucidBanner.shared.update(stage: .success, for: self.token)
         } else {
-            self.hud.error(text: error?.errorDescription)
+            LucidBanner.shared.update(subtitle: error?.errorDescription, stage: .error, for: self.token)
         }
 
-        try? await Task.sleep(nanoseconds: 1_500_000_000)
-
-        self.extensionContext?.completeRequest(returningItems: self.extensionContext?.inputItems, completionHandler: nil)
+        LucidBanner.shared.dismiss(after: 2) {
+            self.extensionContext?.completeRequest(returningItems: self.extensionContext?.inputItems, completionHandler: nil)
+        }
     }
 
     @MainActor
@@ -407,38 +418,43 @@ extension NCShareExtension {
         metadata.e2eEncrypted = metadata.isDirectoryE2EE
 
         self.counterUploaded += 1
-        hud.ringProgress(view: self.view, text: NSLocalizedString("_upload_file_", comment: "") + " \(self.counterUploaded) " + NSLocalizedString("_of_", comment: "") + " \(self.filesName.count)")
 
         if metadata.isDirectoryE2EE {
-            error = await NCNetworkingE2EEUpload().upload(metadata: metadata, session: session, controller: self)
+            error = await NCNetworkingE2EEUpload().upload(metadata: metadata, session: session, controller: self, stageBanner: nil, tokenBanner: self.token)
         } else if metadata.chunk > 0 {
-            var numChunks = 0
-            var countUpload: Int = 0
-            var taskHandler: URLSessionTask?
-
-            hud.pieProgress(text: NSLocalizedString("_wait_file_preparation_", comment: ""), tapToCancelDetailText: true) {
-                NotificationCenter.default.postOnMainThread(name: NextcloudKit.shared.nkCommonInstance.notificationCenterChunkedFileStop.rawValue)
-            }
-
-            let results = await NCNetworking.shared.uploadChunkFile(metadata: metadata) { num in
-                numChunks = num
-            } counterChunk: { counter in
-                self.hud.progress(num: Float(counter), total: Float(numChunks))
-            } startFilesChunk: { _ in
-                self.hud.pieProgress(text: NSLocalizedString("_keep_active_for_upload_", comment: ""), tapToCancelDetailText: true) {
-                    taskHandler?.cancel()
+            LucidBanner.shared.update(
+                systemImage: "gearshape.arrow.triangle.2.circlepath",
+                imageAnimation: .rotate,
+                for: self.token)
+            let task = Task { () -> (account: String, file: NKFile?, error: NKError) in
+                let results = await NCNetworking.shared.uploadChunkFile(metadata: metadata) { total, counter in
+                    Task {@MainActor in
+                        LucidBanner.shared.update(progress: Double(counter / total), for: self.token)
+                    }
+                } uploadStart: { _ in
+                    Task {@MainActor in
+                        LucidBanner.shared.update(
+                            systemImage: "arrowshape.up.circle",
+                            imageAnimation: .breathe,
+                            for: self.token)
+                    }
+                } uploadProgressHandler: { _, _, progress in
+                    Task {@MainActor in
+                        LucidBanner.shared.update(progress: progress, for: self.token)
+                    }
+                } assembling: {
+                    Task {@MainActor in
+                        LucidBanner.shared.update(
+                            systemImage: "gearshape.arrow.triangle.2.circlepath",
+                            imageAnimation: .rotate,
+                            for: self.token)
+                    }
                 }
-            } requestHandler: { _ in
-                self.hud.progress(num: Float(countUpload), total: Float(numChunks))
-                countUpload += 1
-            } taskHandler: { task in
-                taskHandler = task
-            } assembling: {
-                self.hud.setText(NSLocalizedString("_wait_", comment: ""))
+
+                return results
             }
 
-            hud.dismiss()
-
+            let results = await task.value
             error = results.error
         } else {
             let fileNameLocalPath = utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
@@ -446,14 +462,15 @@ extension NCShareExtension {
                                                                                       userId: metadata.userId,
                                                                                       urlBase: metadata.urlBase)
 
-            let results = await NCNetworking.shared.uploadFile(fileNameLocalPath: fileNameLocalPath,
+            let results = await NCNetworking.shared.uploadFile(account: metadata.account,
+                                                               fileNameLocalPath: fileNameLocalPath,
                                                                serverUrlFileName: metadata.serverUrlFileName,
                                                                creationDate: metadata.creationDate as Date,
-                                                               dateModificationFile: metadata.date as Date,
-                                                               account: metadata.account,
-                                                               metadata: metadata) { _ in
+                                                               dateModificationFile: metadata.date as Date) { _ in
             } progressHandler: { _, _, fractionCompleted in
-                self.hud.progress(fractionCompleted)
+                Task {@MainActor in
+                    LucidBanner.shared.update(progress: fractionCompleted, for: self.token)
+                }
             }
             error = results.error
         }

@@ -46,7 +46,7 @@ final class TransfersViewModel: ObservableObject, NCMetadataTransfersSuccessDele
     @MainActor
     func pollTransfers() async {
         while !Task.isCancelled {
-            if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" {
+            if !isXcodeRunningForPreviews {
                 isLoading = true
 
                 // Items

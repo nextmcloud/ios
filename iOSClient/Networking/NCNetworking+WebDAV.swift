@@ -6,6 +6,7 @@ import UIKit
 import NextcloudKit
 import Queuer
 import Photos
+import LucidBanner
 
 extension NCNetworking {
     // MARK: - Read file & folder
@@ -25,6 +26,7 @@ extension NCNetworking {
                                                                                             name: "readFileOrFolder")
                 await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
             }
+            taskHandler(task)
         }
 
         guard resultsReadFolder.error == .success, let files = resultsReadFolder.files else {
@@ -311,15 +313,9 @@ extension NCNetworking {
     // MARK: - Delete
 
     #if !EXTENSION
-    func tapHudDelete() {
-        tapHudStopDelete = true
-    }
-
     @MainActor
     func deleteCache(_ metadata: tableMetadata, sceneIdentifier: String?) async -> (NKError) {
-        let ncHud = NCHud()
         var num: Float = 0
-
         func numIncrement() -> Float {
             num += 1
             return num
@@ -337,26 +333,24 @@ extension NCNetworking {
             NCImageCache.shared.removeImageCache(ocIdPlusEtag: metadata.ocId + metadata.etag)
         }
 
-        self.tapHudStopDelete = false
-
         await NCManageDatabase.shared.cleanTablesOcIds(account: metadata.account, userId: metadata.userId, urlBase: metadata.urlBase)
 
         if metadata.directory {
-            if let controller = SceneManager.shared.getController(sceneIdentifier: sceneIdentifier) {
-                await MainActor.run {
-                    ncHud.ringProgress(view: controller.view, tapToCancelDetailText: true, tapOperation: tapHudDelete)
-                }
-            }
+            let token = showHudBanner(
+                scene: SceneManager.shared.getWindow(
+                sceneIdentifier: metadata.sceneIdentifier)?.windowScene,
+                title: NSLocalizedString("_delete_in_progress_", comment: "")
+            )
+
             if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl BEGINSWITH %@ AND directory == false", metadata.account, metadata.serverUrlFileName)) {
                 let total = Float(metadatas.count)
                 for metadata in metadatas {
                     await deleteLocalFile(metadata: metadata)
                     let num = numIncrement()
-                    ncHud.progress(num: num, total: total)
-                    if tapHudStopDelete { break }
+                    LucidBanner.shared.update(progress: Double(num) / Double(total), for: token)
+                }
             }
-        }
-            ncHud.dismiss()
+            LucidBanner.shared.dismiss()
         } else {
             await deleteLocalFile(metadata: metadata)
 
@@ -383,28 +377,29 @@ extension NCNetworking {
 
         if !metadatasE2EE.isEmpty {
 #if !EXTENSION
-
             if isOffline {
                 return NCContentPresenter().showInfo(error: NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_offline_not_allowed_"))
             }
 
             Task { @MainActor in
-                let ncHud = NCHud()
                 var num: Float = 0
                 let total = Float(metadatasE2EE.count)
+                var cancelOnTap = false
+                let scene = SceneManager.shared.getWindow(sceneIdentifier: sceneIdentifier)?.windowScene
 
-                self.tapHudStopDelete = false
-
-                if let controller = SceneManager.shared.getController(sceneIdentifier: sceneIdentifier) {
-                    await MainActor.run {
-                        ncHud.ringProgress(view: controller.view, tapToCancelDetailText: true, tapOperation: tapHudDelete)
-                    }
+                let token = showHudBanner(scene: scene,
+                                          title: NSLocalizedString("_delete_in_progress_", comment: ""),
+                                          stage: .button) {
+                    cancelOnTap = true
                 }
 
                 for metadata in metadatasE2EE {
                     let error = await NCNetworkingE2EEDelete().delete(metadata: metadata)
-                    num += 1
-                    ncHud.progress(num: num, total: total)
+
+                    Task {@MainActor in
+                        num += 1
+                        LucidBanner.shared.update(progress: Double(num) / Double(total), for: token)
+                    }
 
                     await self.transferDispatcher.notifyAllDelegates { delegate in
                         delegate.transferChange(status: NCGlobal.shared.networkingStatusDelete,
@@ -417,14 +412,13 @@ extension NCNetworking {
                                                 error: error)
                     }
 
-                    if tapHudStopDelete {
+                    if cancelOnTap {
                         break
                     }
                 }
 
-                ncHud.dismiss()
+                LucidBanner.shared.dismiss()
             }
-
 #endif
         } else {
             var ocIds = Set<String>()
