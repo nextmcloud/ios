@@ -5053,7 +5053,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Notification_Service_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "it.twsweb.Nextcloud.Notification-Service-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.magentacloud.next.dev2.client.staging.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5078,7 +5078,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Notification_Service_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "it.twsweb.Nextcloud.Notification-Service-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.magentacloud.next.dev2.client.staging.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5341,7 +5341,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "it.twsweb.Nextcloud.File-Provider-Extension-UI";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.magentacloud.next.dev2.client.staging.File-Provider-Extension-UI";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5369,7 +5369,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "it.twsweb.Nextcloud.File-Provider-Extension-UI";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.magentacloud.next.dev2.client.staging.File-Provider-Extension-UI";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5393,7 +5393,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Share.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = it.twsweb.Nextcloud.Share;
+				PRODUCT_BUNDLE_IDENTIFIER = de.magentacloud.next.dev2.client.staging.Share;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5418,7 +5418,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Share.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = it.twsweb.Nextcloud.Share;
+				PRODUCT_BUNDLE_IDENTIFIER = de.magentacloud.next.dev2.client.staging.Share;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5452,7 +5452,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = it.twsweb.Nextcloud.Widget;
+				PRODUCT_BUNDLE_IDENTIFIER = de.magentacloud.next.dev2.client.staging.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5487,7 +5487,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = it.twsweb.Nextcloud.Widget;
+				PRODUCT_BUNDLE_IDENTIFIER = de.magentacloud.next.dev2.client.staging.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5514,7 +5514,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/File_Provider_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "it.twsweb.Nextcloud.File-Provider-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.magentacloud.next.dev2.client.staging.File-Provider-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5538,7 +5538,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/File_Provider_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "it.twsweb.Nextcloud.File-Provider-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "de.magentacloud.next.dev2.client.staging.File-Provider-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5560,7 +5560,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "it.twsweb.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = de.magentacloud.next.dev2.client.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5583,7 +5583,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "it.twsweb.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = de.magentacloud.next.dev2.client.staging;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5623,7 +5623,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = it.twsweb.Nextcloud.WidgetDashboardIntentHandler;
+				PRODUCT_BUNDLE_IDENTIFIER = de.magentacloud.next.dev2.client.staging.WidgetDashboardIntentHandler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5664,7 +5664,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = it.twsweb.Nextcloud.WidgetDashboardIntentHandler;
+				PRODUCT_BUNDLE_IDENTIFIER = de.magentacloud.next.dev2.client.staging.WidgetDashboardIntentHandler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -5717,7 +5717,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					DEBUG,
-					NC,
+					CUSTOM_BUILD,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -5780,7 +5780,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
-					NC,
+					CUSTOM_BUILD,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
