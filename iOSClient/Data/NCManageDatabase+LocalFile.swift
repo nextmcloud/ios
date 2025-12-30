@@ -42,20 +42,16 @@ extension NCManageDatabase {
                 .map { tableLocalFile(value: $0) }
         }
 
-        // Extract ocIds for efficient lookup
-        let ocIds = metadatas.compactMap { $0.ocId }
-        guard !ocIds.isEmpty else {
-            return
-        }
+        await performRealmWriteAsync { realm in
+            let addObject = existing ?? tableLocalFile()
 
-        // Preload existing entries to avoid creating duplicates
-        let existingMap: [String: tableLocalFile] = await core.performRealmReadAsync { realm in
-                let existing = realm.objects(tableLocalFile.self)
-                    .filter(NSPredicate(format: "ocId IN %@", ocIds))
-                return Dictionary(uniqueKeysWithValues:
-                    existing.map { ($0.ocId, tableLocalFile(value: $0)) } // detached copy via value init
-                )
-            } ?? [:]
+            addObject.account = metadata.account
+            addObject.etag = metadata.etag
+            addObject.exifDate = NSDate()
+            addObject.exifLatitude = "-1"
+            addObject.exifLongitude = "-1"
+            addObject.ocId = metadata.ocId
+            addObject.fileName = metadata.fileName
 
         await core.performRealmWriteAsync { realm in
             for metadata in metadatas {

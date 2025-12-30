@@ -352,6 +352,7 @@ extension NCNetworking {
                                    sessionUploadBackground,
                                    sessionUploadBackgroundWWan,
                                    self.global.metadataStatusUploading)) {
+
             for metadata in metadatas {
                 guard var nkSession = NextcloudKit.shared.nkCommonInstance.nksessions.session(forAccount: metadata.account) else {
                     await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
