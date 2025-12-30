@@ -85,6 +85,7 @@ class AppUpdater {
 //                            completion(nil, nil)
 //                        }
 //                    }
+
                 }
             } else {
                 // Handle error
