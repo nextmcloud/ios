@@ -299,6 +299,10 @@ final class NCGlobal: Sendable {
     let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
     let metadatasStatusInProgress               = [-2, 2]
 
+    //  Hidden files included in the read
+    //
+    let includeHiddenFiles: [String] = [".LivePhoto"]
+    
     // Auto upload subfolder granularity
     //
     let subfolderGranularityDaily               = 2
