@@ -18,7 +18,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
@@ -44,6 +44,9 @@
 	<string>36215</string>
 	<key>ITSAppUsesNonExemptEncryption</key><false/>
 	
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>nextcloudtalk</string>
@@ -65,11 +68,11 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>Face ID is required to authenticate using face recognition.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>This app needs access to your location even in the background to automatically start uploading files when significant movement is detected. GPS is not used.</string>
+	<string>The app will show your location on a map.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>The app uses your location to automatically trigger file uploads when you move between areas.</string>
+	<string>The app will show your location on a map.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app uses your location to detect movement and automatically upload files. It does not use GPS and does not store your location.</string>
+	<string>The app will show your location on a map.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Microphone access is required to create voice notes.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
@@ -81,6 +84,8 @@
 		<string>AccountIntent</string>
 		<string>DashboardIntent</string>
 	</array>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>App would like to access IDFA for tracking purpose</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<true/>
 	<key>UIAppFonts</key>
