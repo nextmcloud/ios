@@ -296,6 +296,9 @@ final class NCGlobal: Sendable {
     let metadataStatusHideInView                = [1, 2, 3, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
 
+    let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadatasStatusInProgress               = [-2, 2]
+
     // Auto upload subfolder granularity
     //
     let subfolderGranularityDaily               = 2
@@ -464,6 +467,19 @@ final class NCGlobal: Sendable {
     let taskDescriptionRetrievesProperties  = "retrievesProperties"
     let taskDescriptionSynchronization      = "synchronization"
     let taskDescriptionDeleteFileOrFolder   = "deleteFileOrFolder"
+    
+    // MoEngage App Version
+    //
+    let moEngageAppVersion                  = 854
+    
+    // Filename Mask and Type
+    //
+    let keyFileNameMask                             = "fileNameMask"
+    let keyFileNameType                             = "fileNameType"
+    let keyFileNameAutoUploadMask                   = "fileNameAutoUploadMask"
+    let keyFileNameAutoUploadType                   = "fileNameAutoUploadType"
+    let keyFileNameOriginal                         = "fileNameOriginal"
+    let keyFileNameOriginalAutoUpload               = "fileNameOriginalAutoUpload"
 
     // LOG TAG
     //
