@@ -14,6 +14,7 @@ import XLForm
 class PrivacySettingsViewController: XLFormViewController{
     
    @objc public var isShowSettingsButton: Bool = false
+    @objc public var isShowSettingsButton: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()

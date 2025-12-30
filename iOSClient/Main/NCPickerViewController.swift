@@ -60,17 +60,29 @@ class NCPhotosPickerViewController: NSObject {
 
         pickerVC?.didExceedMaximumNumberOfSelection = { _ in
             let error = NKError(errorCode: self.global.errorInternalError, errorDescription: "_limited_dimension_")
-            NCContentPresenter().showError(error: error)
+            Task {@MainActor in
+                await showErrorBanner(controller: self.controller,
+                                      errorDescription: error.errorDescription,
+                                      errorCode: error.errorCode)
+            }
         }
 
         pickerVC?.handleNoAlbumPermissions = { _ in
             let error = NKError(errorCode: self.global.errorInternalError, errorDescription: "_denied_album_")
-            NCContentPresenter().showError(error: error)
+            Task {@MainActor in
+                await showErrorBanner(controller: self.controller,
+                                      errorDescription: error.errorDescription,
+                                      errorCode: error.errorCode)
+            }
         }
 
         pickerVC?.handleNoCameraPermissions = { _ in
             let error = NKError(errorCode: self.global.errorInternalError, errorDescription: "_denied_camera_")
-            NCContentPresenter().showError(error: error)
+            Task {@MainActor in
+                await showErrorBanner(controller: self.controller,
+                                      errorDescription: error.errorDescription,
+                                      errorCode: error.errorCode)
+            }
         }
 
         pickerVC?.configure = configure
@@ -141,12 +153,13 @@ class NCDocumentPickerViewController: NSObject, UIDocumentPickerDelegate {
                let viewController = self.viewController {
                 let ocId = NSUUID().uuidString
                 let fileName = url.lastPathComponent
-                let metadata = await database.createMetadataAsync(fileName: fileName,
-                                                                  ocId: ocId,
-                                                                  serverUrl: "",
-                                                                  url: url.path,
-                                                                  session: session,
-                                                                  sceneIdentifier: self.controller.sceneIdentifier)
+                let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
+                    fileName: fileName,
+                    ocId: ocId,
+                    serverUrl: "",
+                    url: url.path,
+                    session: session,
+                    sceneIdentifier: self.controller.sceneIdentifier)
 
                 if metadata.classFile == NKTypeClassFile.unknow.rawValue {
                     metadata.classFile = NKTypeClassFile.video.rawValue
@@ -179,12 +192,13 @@ class NCDocumentPickerViewController: NSObject, UIDocumentPickerDelegate {
                     guard self.copySecurityScopedResource(url: urlIn, urlOut: urlOut) != nil else {
                         continue
                     }
-                    let metadataForUpload = await database.createMetadataAsync(fileName: newFileName,
-                                                                               ocId: ocId,
-                                                                               serverUrl: serverUrl,
-                                                                               url: "",
-                                                                               session: session,
-                                                                               sceneIdentifier: self.controller.sceneIdentifier)
+                    let metadataForUpload = await NCManageDatabaseCreateMetadata().createMetadataAsync(
+                        fileName: newFileName,
+                        ocId: ocId,
+                        serverUrl: serverUrl,
+                        url: "",
+                        session: session,
+                        sceneIdentifier: self.controller.sceneIdentifier)
 
                     metadataForUpload.session = NCNetworking.shared.sessionUploadBackground
                     metadataForUpload.sessionSelector = NCGlobal.shared.selectorUploadFile

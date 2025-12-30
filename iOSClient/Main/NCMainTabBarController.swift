@@ -31,14 +31,20 @@ class NCMainTabBarController: UITabBarController {
         return SceneManager.shared.getWindow(controller: self)
     }
 
+    var barHeightBottom: CGFloat {
+        return tabBar.frame.height - tabBar.safeAreaInsets.bottom
+    }
+
+    var barHeightTop: CGFloat {
+        return tabBar.frame.height - tabBar.safeAreaInsets.top
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
 
         NCNetworking.shared.controller = self
         NCImageCache.shared.controller = self
-
-        NCDownloadAction.shared.setup(sceneIdentifier: sceneIdentifier)
 
         tabBar.tintColor = NCBrandColor.shared.getElement(account: account)
 
@@ -129,7 +135,7 @@ class NCMainTabBarController: UITabBarController {
 
     @MainActor
     private func timerCheck() async {
-        var nanoseconds: UInt64 = 3_000_000_000
+        let nanoseconds: UInt64 = 3_000_000_000
 
         while !Task.isCancelled {
             try? await Task.sleep(nanoseconds: nanoseconds)
@@ -145,8 +151,7 @@ class NCMainTabBarController: UITabBarController {
 
             // Update right bar button item
             if let navigationController = self.selectedViewController as? NCMainNavigationController {
-                let transferCount = await navigationController.updateRightBarButtonItems(self.tabBar.items?[0])
-                nanoseconds = transferCount == 0 ? 3_000_000_000 : 1_500_000_000
+                await navigationController.updateRightBarButtonItems(self.tabBar.items?[0])
             }
             // Update Activity tab bar
 //            if let item = self.tabBar.items?[3] {
@@ -157,6 +162,10 @@ class NCMainTabBarController: UITabBarController {
 
     func currentViewController() -> UIViewController? {
         return (selectedViewController as? UINavigationController)?.topViewController
+    }
+
+    func currentNavigationController() -> UINavigationController? {
+        return selectedViewController as? UINavigationController
     }
 
     func currentServerUrl() -> String {

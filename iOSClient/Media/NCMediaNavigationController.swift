@@ -122,6 +122,35 @@ class NCMediaNavigationController: NCMainNavigationController {
                         await media.loadDataSource()
                         await media.networkRemoveAll()
                         await self.updateRightMenu()
+
+        let playFile = UIAction(title: NSLocalizedString("_play_from_files_", comment: ""), image: utility.loadImage(named: "play.circle")) { _ in
+            guard let controller = self.controller else { return }
+            media.documentPickerViewController = NCDocumentPickerViewController(controller: controller, isViewerMedia: true, allowsMultipleSelection: false, viewController: media)
+        }
+
+        let playURL = UIAction(title: NSLocalizedString("_play_from_url_", comment: ""), image: utility.loadImage(named: "link")) { _ in
+            let alert = UIAlertController(title: NSLocalizedString("_valid_video_url_", comment: ""), message: nil, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel, handler: nil))
+            alert.addTextField(configurationHandler: { textField in
+                textField.placeholder = "http://myserver.com/movie.mkv"
+            })
+            alert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in
+                guard let stringUrl = alert.textFields?.first?.text, !stringUrl.isEmpty, let url = URL(string: stringUrl) else {
+                    return
+                }
+                let fileName = url.lastPathComponent
+                Task {
+                    let metadata = await NCManageDatabaseCreateMetadata().createMetadataAsync(
+                        fileName: fileName,
+                        ocId: NSUUID().uuidString,
+                        serverUrl: "",
+                        url: stringUrl,
+                        session: self.session,
+                        sceneIdentifier: self.controller?.sceneIdentifier)
+                    await self.database.addMetadataAsync(metadata)
+
+                    if let vc = await NCViewer().getViewerController(metadata: metadata, delegate: self) {
+                        self.navigationController?.pushViewController(vc, animated: true)
                     }
                 }
             ),

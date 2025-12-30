@@ -1,25 +1,6 @@
-//
-//  NCPlayerToolBar.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 01/07/21.
-//  Copyright © 2021 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2021 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import NextcloudKit
@@ -30,6 +11,7 @@ import MediaPlayer
 import MobileVLCKit
 import FloatingPanel
 import Alamofire
+import LucidBanner
 
 class NCPlayerToolBar: UIView {
     @IBOutlet weak var utilityView: UIView!
@@ -57,7 +39,6 @@ class NCPlayerToolBar: UIView {
     var isFullscreen: Bool = false
     var playRepeat: Bool = false
 
-    private let hud = NCHud()
     private var ncplayer: NCPlayer?
     private var metadata: tableMetadata?
     private let audioSession = AVAudioSession.sharedInstance()
@@ -450,12 +431,15 @@ extension NCPlayerToolBar: NCSelectDelegate {
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {//, session: NCSession.Session) {
         if let metadata = metadata, let viewerMediaPage = viewerMediaPage {
             let fileNameLocalPath = NCUtilityFileSystem().getDirectoryProviderStorageOcId(metadata.ocId, fileName: metadata.fileNameView, userId: metadata.userId, urlBase: metadata.urlBase)
+            let scene = SceneManager.shared.getWindow(controller: viewerMediaPage.tabBarController)?.windowScene
 
             if utilityFileSystem.fileProviderStorageExists(metadata) {
                 addPlaybackSlave(type: type, metadata: metadata)
             } else {
                 var downloadRequest: DownloadRequest?
-                hud.ringProgress(view: viewerMediaPage.view, text: NSLocalizedString("_downloading_", comment: ""), tapToCancelDetailText: true) {
+                let token = showHudBanner(scene: scene,
+                                          title: NSLocalizedString("_download_in_progress_", comment: ""),
+                                          stage: .button) {
                     if let request = downloadRequest {
                         request.cancel()
                     }
@@ -476,10 +460,13 @@ extension NCPlayerToolBar: NCSelectDelegate {
                                                                     status: self.global.metadataStatusDownloading)
                     }
                 }, progressHandler: { progress in
-                    self.hud.progress(progress.fractionCompleted)
+                    Task {@MainActor in
+                        LucidBanner.shared.update(progress: Double(progress.fractionCompleted), for: token)
+                    }
                 }) { _, etag, _, _, _, _, error in
-                    self.hud.dismiss()
                     Task {
+                        LucidBanner.shared.dismiss()
+
                         let ocId = metadata.ocId
                         await self.database.setMetadataSessionAsync(ocId: ocId,
                                                                     session: "",
@@ -487,12 +474,14 @@ extension NCPlayerToolBar: NCSelectDelegate {
                                                                     sessionError: "",
                                                                     status: self.global.metadataStatusNormal,
                                                                     etag: etag)
-                    }
-                    if error == .success {
-                        self.hud.success()
-                        self.addPlaybackSlave(type: type, metadata: metadata)
-                    } else if error.errorCode != 200 {
-                        self.hud.error(text: error.errorDescription)
+
+                        if error == .success {
+                            self.addPlaybackSlave(type: type, metadata: metadata)
+                        } else if error.errorCode != 200 {
+                            await showErrorBanner(scene: scene,
+                                                  errorDescription: error.errorDescription,
+                                                  errorCode: error.errorCode)
+                        }
                     }
                 }
             }

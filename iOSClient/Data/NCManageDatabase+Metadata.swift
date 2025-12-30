@@ -1371,5 +1371,6 @@ extension NCManageDatabase {
                 .first
             return object?.detachedCopy()
         }
+        return nil
     }
 }

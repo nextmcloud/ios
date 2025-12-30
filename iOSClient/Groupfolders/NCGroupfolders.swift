@@ -99,6 +99,7 @@ class NCGroupfolders: NCCollectionViewCommon {
 
         startGUIGetServerData()
         
+
         let homeServerUrl = utilityFileSystem.getHomeServer(session: session)
         let showHiddenFiles = NCPreferences().getShowHiddenFiles(account: session.account)
 
@@ -135,7 +136,7 @@ class NCGroupfolders: NCCollectionViewCommon {
                 return
             }
 
-            let metadata = await self.database.convertFileToMetadataAsync(file)
+            let metadata = await NCManageDatabaseCreateMetadata().convertFileToMetadataAsync(file)
             await self.database.createDirectory(metadata: metadata)
 
             await self.reloadDataSource()

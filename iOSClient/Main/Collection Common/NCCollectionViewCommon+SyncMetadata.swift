@@ -2,10 +2,10 @@
 // SPDX-FileCopyrightText: 2025 Marino Faggiana
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import UIKit
+import Foundation
 import NextcloudKit
 
-extension NCFiles {
+extension NCCollectionViewCommon {
     /// Starts a detached task that accelerates metadata synchronization for the provided items.
     ///
     /// If a previous sync is still running, this method exits without starting a new one.
@@ -27,7 +27,10 @@ extension NCFiles {
 
         // Create a detached task and keep reference for manual cancellation
         syncMetadatasTask = Task.detached { [weak self] in
-            guard let self else { return }
+            guard let self,
+                  !isAppInBackground else {
+                return
+            }
             await self.networkSyncMetadata(metadatas: metadatas)
             // Once finished, clear the reference
             await MainActor.run {
@@ -93,11 +96,6 @@ extension NCFiles {
         guard let account = metadatas.first?.account else {
             return
         }
-        let resultsReadFile = await NCNetworking.shared.readFileAsync(serverUrlFileName: serverUrl, account: account) { task in
-            Task {
-                await self.networking.networkingTasks.track(identifier: identifier, task: task)
-            }
-        }
 
         // Validate outcome and skip E2EE items
         guard resultsReadFile.error == .success,
@@ -105,6 +103,20 @@ extension NCFiles {
               !metadata.e2eEncrypted else {
             nkLog(tag: global.logSpeedUpSyncMetadata, emoji: .info, message: "Exit: result error \(resultsReadFile.error.errorDescription) or e2ee directory \(resultsReadFile.metadata?.e2eEncrypted ?? false). Skipping this one.")
             return
+        if !serverUrl.isEmpty {
+            let resultsReadFile = await NCNetworking.shared.readFileAsync(serverUrlFileName: serverUrl, account: account) { task in
+                Task {
+                    await self.networking.networkingTasks.track(identifier: identifier, task: task)
+                }
+            }
+
+            // Validate outcome and skip E2EE items
+            guard resultsReadFile.error == .success,
+                  let metadata = resultsReadFile.metadata,
+                  !metadata.e2eEncrypted else {
+                nkLog(tag: global.logTagSpeedUpSyncMetadata, emoji: .info, message: "Exit: result error \(resultsReadFile.error.errorDescription) or e2ee directory \(resultsReadFile.metadata?.e2eEncrypted ?? false). Skipping this one.")
+                return
+            }
         }
 
         // Iterate directories and fetch only when ETag changed
@@ -118,11 +130,25 @@ extension NCFiles {
             }
 
             let directory = await database.getTableDirectoryAsync(ocId: metadata.ocId)
-            guard directory?.etag != metadata.etag else {
+
+            // Skips processing the current directory if it has not changed recently.
+            // The loop continues only when both the ETag matches the metadata (indicating no content change)
+            // and the last synchronization date is within the last 3 hours.
+            // This prevents redundant work on directories that were already synced recently.
+            //
+            // - Conditions:
+            //   - `directory?.etag == metadata.etag`: the directory content has not changed.
+            //   - `let lastSyncDate = directory?.lastSyncDate as? Date`: ensures the last sync date exists and is convertible to `Date`.
+            //   - `lastSyncDate >= Date().addingTimeInterval(-3 * 3600)`: skips only if the last sync occurred less than 3 hours ago.
+            //
+            // In all other cases (different ETag, missing date, or sync older than 3 hours), the loop proceeds normally.
+            if directory?.etag == metadata.etag,
+               let lastSyncDate = directory?.lastSyncDate as? Date,
+               lastSyncDate >= Date().addingTimeInterval(-3 * 3600) {
                 continue
             }
-            let serverUrl = metadata.serverUrlFileName
 
+            let serverUrl = metadata.serverUrlFileName
             let resultsReadFolder = await NCNetworking.shared.readFolderAsync(serverUrl: serverUrl, account: metadata.account) { task in
                 Task {
                     await self.networking.networkingTasks.track(identifier: identifier, task: task)

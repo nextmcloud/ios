@@ -217,6 +217,14 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             } else if isShare || !metadata.shareType.isEmpty {
                 cell.filePreviewImageView?.image = NCImageCache.shared.getFolderPublic(account: metadata.account)
             } else if !metadata.shareType.isEmpty && metadata.shareType.contains(NCShareCommon.shareTypeLink) {
+                cell.filePreviewImageView?.image = imageCache.getFolderEncrypted()
+            } else if isShare {
+                cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe()
+            } else if !metadata.shareType.isEmpty {
+                metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
+                (cell.filePreviewImageView?.image = imageCache.getFolderPublic(account: metadata.account)) :
+                (cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe(account: metadata.account))
+            } else if !metadata.shareType.isEmpty && metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) {
                 cell.filePreviewImageView?.image = imageCache.getFolderPublic(account: metadata.account)
             } else if metadata.mountType == "group" {
                 cell.filePreviewImageView?.image = imageCache.getFolderGroup(account: metadata.account)
@@ -321,6 +329,10 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         // Share image
         if isShare || !metadata.shareType.isEmpty {
             cell.fileSharedImage?.image = imageCache.getImageShared()
+        } else if !metadata.shareType.isEmpty {
+            metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
+            (cell.fileSharedImage?.image = imageCache.getImageShareByLink()) :
+            (cell.fileSharedImage?.image = imageCache.getImageShared())
         } else {
             cell.fileSharedImage?.image = NCImageCache.shared.getImageCanShare().image(color: NCBrandColor.shared.gray60)
         }
@@ -496,6 +508,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
                     }
                     emptyDescription = NSLocalizedString("_search_instruction_", comment: "")
                 } else if self.searchDataSourceTask?.state == .running || !self.dataSource.getGetServerData(){
+                } else if self.searchDataSourceTask?.state == .running || !self.dataSource.getGetServerData() {
                     emptyImage = utility.loadImage(named: "wifi", colors: [NCBrandColor.shared.getElement(account: session.account)])
                     emptyTitle = NSLocalizedString("_request_in_progress_", comment: "")
                     emptyDescription = ""

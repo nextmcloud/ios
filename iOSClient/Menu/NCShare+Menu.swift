@@ -44,6 +44,7 @@ extension NCShare {
 //        }
         
         if !folder {
+        if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_open_in_", comment: ""),
@@ -109,6 +110,7 @@ extension NCShare {
                     Task {
                         if share.shareType != NCShareCommon.shareTypeLink, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
                             let serverUrl = metadata.serverUrl + "/" + metadata.fileName
+                        if share.shareType != NKShare.ShareType.publicLink.rawValue, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
                             if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
                                 let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
                                 return NCContentPresenter().showInfo(error: error)
@@ -157,7 +159,7 @@ extension NCShare {
             [NCMenuAction(
                 title: NSLocalizedString("_share_read_only_", comment: ""),
                 icon: utility.loadImage(named: "eye", colors: [NCBrandColor.shared.iconImageColor]),
-                selected: share.permissions == (NCSharePermissions.permissionReadShare + NCSharePermissions.permissionReshareShare) || share.permissions == NCSharePermissions.permissionReadShare,
+                selected: share.permissions == (NKShare.Permission.read.rawValue + NKShare.Permission.share.rawValue) || share.permissions == NKShare.Permission.read.rawValue,
                 on: false,
                 sender: sender,
                 action: { _ in
@@ -199,11 +201,11 @@ extension NCShare {
             ]
         )
 
-        if isDirectory && (share.shareType == NCShareCommon.shareTypeLink /* public link */ || share.shareType == NCShareCommon.shareTypeEmail) {
+        if isDirectory && (share.shareType == NKShare.ShareType.publicLink.rawValue /* public link */ || share.shareType == NKShare.ShareType.email.rawValue) {
             actions.insert(NCMenuAction(
                        title: NSLocalizedString("_share_file_drop_", comment: ""),
                        icon: utility.loadImage(named: "arrow.up.document", colors: [NCBrandColor.shared.iconImageColor]),
-                       selected: share.permissions == NCSharePermissions.permissionCreateShare,
+                       selected: share.permissions == NKShare.Permission.create.rawValue,
                        on: false,
                        sender: sender,
                        action: { _ in

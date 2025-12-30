@@ -356,6 +356,14 @@ extension NCLoginWeb: WKNavigationDelegate {
 //                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
 //                        }
 //                        
+//
+//                        window?.rootViewController = controller
+//                        window?.makeKeyAndVisible()
+//
+//                        if let scene = window?.windowScene {
+//                            SceneManager.shared.register(scene: scene, withRootViewController: controller)
+//                        }
+//
 //                        UIView.animate(withDuration: 0.5) {
 //                            controller.view.alpha = 1
 //                        }

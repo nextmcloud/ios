@@ -22,6 +22,7 @@ class NCCollectionViewDataSource: NSObject {
     private var favoriteOnTop: Bool = true
     private var hasGetServerData: Bool = true
     
+
     override init() { super.init() }
 
     init(metadatas: [tableMetadata],

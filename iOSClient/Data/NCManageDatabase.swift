@@ -17,19 +17,16 @@ protocol DateCompareable {
 final class NCManageDatabase: @unchecked Sendable {
     static let shared = NCManageDatabase()
 
+    internal let core: NCManageDatabaseCore
     internal let utilityFileSystem = NCUtilityFileSystem()
-    internal static let realmQueueKey = DispatchSpecificKey<Void>()
-    internal let realmQueue: DispatchQueue = {
-        let queue = DispatchQueue(label: "com.nextcloud.realmQueue", qos: .userInitiated)
-        queue.setSpecific(key: realmQueueKey, value: ())
-        return queue
-    }()
 
     init() {
         let dirGroup = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
         let bundleUrl: URL = Bundle.main.bundleURL
         let bundlePathExtension: String = bundleUrl.pathExtension
         let isAppex: Bool = bundlePathExtension == "appex"
+
+        self.core = NCManageDatabaseCore()
 
         // Disable file protection for directory DB
         if let folderPathURL = dirGroup?.appendingPathComponent(NCGlobal.shared.appDatabaseNextcloud) {
@@ -57,6 +54,10 @@ final class NCManageDatabase: @unchecked Sendable {
                                                                        schemaVersion: databaseSchemaVersion,
                                                                        migrationBlock: { migration, oldSchemaVersion in
             self.migrationSchema(migration, oldSchemaVersion)
+        let configuration = Realm.Configuration(fileURL: databaseFileUrl,
+                                                schemaVersion: databaseSchemaVersion,
+                                                migrationBlock: { migration, oldSchemaVersion in
+            self.core.migrationSchema(migration, oldSchemaVersion)
         })
 
         do {
@@ -143,6 +144,14 @@ final class NCManageDatabase: @unchecked Sendable {
                                                                        schemaVersion: databaseSchemaVersion,
                                                                        migrationBlock: { migration, oldSchemaVersion in
             self.migrationSchema(migration, oldSchemaVersion)
+    @discardableResult
+    func openRealmBackground() -> Bool {
+        let dirGroup = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: NCBrandOptions.shared.capabilitiesGroup)
+        let databaseFileUrl = dirGroup?.appendingPathComponent(NCGlobal.shared.appDatabaseNextcloud + "/" + databaseName)
+        let configuration = Realm.Configuration(fileURL: databaseFileUrl,
+                                                schemaVersion: databaseSchemaVersion,
+                                                migrationBlock: { migration, oldSchemaVersion in
+            self.core.migrationSchema(migration, oldSchemaVersion)
         })
 
         do {
@@ -181,6 +190,30 @@ final class NCManageDatabase: @unchecked Sendable {
         }
 
         let configuration = Realm.Configuration(fileURL: databaseFileUrl, schemaVersion: databaseSchemaVersion, objectTypes: objectTypes)
+        guard let dirGroup = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: NCBrandOptions.shared.capabilitiesGroup) else {
+            return
+        }
+        let databaseFileUrl = dirGroup.appendingPathComponent(NCGlobal.shared.appDatabaseNextcloud + "/" + databaseName)
+        let objectTypes = [
+            NCKeyValue.self, tableMetadata.self, tableLocalFile.self,
+            tableDirectory.self, tableTag.self, tableAccount.self,
+            tableCapabilities.self, tableE2eEncryption.self, tableE2eEncryptionLock.self,
+            tableE2eMetadata12.self, tableE2eMetadata.self, tableE2eUsers.self,
+            tableE2eCounter.self, tableShare.self, tableChunk.self, tableAvatar.self,
+            tableDashboardWidget.self, tableDashboardWidgetButton.self,
+            NCDBLayoutForView.self, TableSecurityGuardDiagnostics.self, tableLivePhoto.self
+        ]
+
+        do {
+            // Migration configuration
+            let migrationCfg = Realm.Configuration(fileURL: databaseFileUrl,
+                                                   schemaVersion: databaseSchemaVersion,
+                                                   migrationBlock: { migration, oldSchemaVersion in
+                self.core.migrationSchema(migration, oldSchemaVersion)
+            })
+            try autoreleasepool {
+                _ = try Realm(configuration: migrationCfg)
+            }
 
         realmQueue.async(qos: .userInitiated, flags: .enforceQoS) {
             do {
@@ -368,17 +401,20 @@ final class NCManageDatabase: @unchecked Sendable {
             return
         }
         #endif
+    // MARK: -
 
+    /// Forces a Realm flush by refreshing the latest state from disk.
+    /// This ensures that the current thread has the most recent version
+    /// of all committed transactions.
+    func flushRealmAsync() async {
         await withCheckedContinuation { continuation in
-            realmQueue.async(qos: .userInitiated, flags: .enforceQoS) {
+            core.realmQueue.async(qos: .utility) {
                 autoreleasepool {
                     do {
                         let realm = try Realm()
-                        try realm.write {
-                            try block(realm)
-                        }
+                        _ = realm.refresh()
                     } catch {
-                        nkLog(tag: NCGlobal.shared.logTagDatabase, emoji: .error, message: "Realm write async error: \(error)")
+                        nkLog(tag: NCGlobal.shared.logTagDatabase, emoji: .error, message: "Realm flush error: \(error)")
                     }
                     continuation.resume()
                 }
@@ -386,10 +422,8 @@ final class NCManageDatabase: @unchecked Sendable {
         }
     }
 
-    // MARK: -
-
     func clearTable(_ table: Object.Type, account: String? = nil) {
-        performRealmWrite { realm in
+        core.performRealmWrite { realm in
             var results: Results<Object>
             if let account = account {
                 results = realm.objects(table).filter("account == %@", account)
@@ -402,7 +436,7 @@ final class NCManageDatabase: @unchecked Sendable {
     }
 
     func clearTableAsync(_ table: Object.Type, account: String? = nil) async {
-        await performRealmWriteAsync { realm in
+        await core.performRealmWriteAsync { realm in
             var results: Results<Object>
             if let account = account {
                 results = realm.objects(table).filter("account == %@", account)
@@ -638,10 +672,49 @@ final class NCManageDatabase: @unchecked Sendable {
         }
     }
 
+    /// Compacts the Realm database by writing a compacted copy and replacing the original.
+    /// Must be called when no Realm instances are open.
+    func compactRealm() throws {
+        nkLog(tag: NCGlobal.shared.logTagDatabase, emoji: .start, message: "Start Compact Realm")
+
+        guard let dirGroup = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: NCBrandOptions.shared.capabilitiesGroup) else {
+            throw NSError(domain: "RealmMaintenance", code: 1, userInfo: [NSLocalizedDescriptionKey: "App Group container URL not found"])
+        }
+        let url = dirGroup.appendingPathComponent(NCGlobal.shared.appDatabaseNextcloud + "/" + databaseName)
+        let fileManager = FileManager.default
+        let compactedURL = url.deletingLastPathComponent()
+            .appendingPathComponent(url.lastPathComponent + ".compact.realm")
+        let backupURL = url.appendingPathExtension("bak")
+
+        // Write a compacted copy inside an autoreleasepool to ensure file handles are closed
+        try autoreleasepool {
+            let configuration = Realm.Configuration(fileURL: url,
+                                                    schemaVersion: databaseSchemaVersion,
+                                                    migrationBlock: { migration, oldSchemaVersion in
+                self.core.migrationSchema(migration, oldSchemaVersion)
+            })
+            Realm.Configuration.defaultConfiguration = configuration
+
+            // Writes a compacted copy of the Realm to the given destination
+            let realm = try Realm(configuration: configuration)
+            try realm.writeCopy(toFile: compactedURL)
+        }
+
+        // Atomic-ish swap: old → .bak, compacted → original path
+        if fileManager.fileExists(atPath: backupURL.path) {
+            try? fileManager.removeItem(at: backupURL)
+        }
+        if fileManager.fileExists(atPath: url.path) {
+            try fileManager.moveItem(at: url, to: backupURL)
+        }
+        try fileManager.moveItem(at: compactedURL, to: url)
+        try? fileManager.removeItem(at: backupURL)
+    }
+
     // MARK: -
     // MARK: SWIFTUI PREVIEW
 
-    func previewCreateDB() async {
+    func createDBForPreview() async {
         // Account
         let account = "marinofaggiana https://cloudtest.nextcloud.com"
         let account2 = "mariorossi https://cloudtest.nextcloud.com"
@@ -658,9 +731,4 @@ final class NCManageDatabase: @unchecked Sendable {
         userProfile2.email = "cloudtest@nextcloud.com"
         await setAccountUserProfileAsync(account: account2, userProfile: userProfile2)
     }
-}
-
-class NCKeyValue: Object {
-    @Persisted var key: String = ""
-    @Persisted var value: String?
 }

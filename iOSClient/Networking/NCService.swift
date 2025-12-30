@@ -235,8 +235,6 @@ class NCService: NSObject {
 
         nkLog(tag: self.global.logTagSync, emoji: .start, message: "Synchronize favorite for account: \(account)")
 
-        await self.database.cleanTablesOcIds(account: tblAccount.account, userId: tblAccount.userId, urlBase: tblAccount.urlBase)
-
         let resultsFavorite = await NextcloudKit.shared.listingFavoritesAsync(showHiddenFiles: showHiddenFiles, account: account) { task in
             Task {
                 let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
@@ -245,7 +243,7 @@ class NCService: NSObject {
             }
         }
         if resultsFavorite.error == .success, let files = resultsFavorite.files {
-            let (_, metadatas) = await self.database.convertFilesToMetadatasAsync(files)
+            let (_, metadatas) = await NCManageDatabaseCreateMetadata().convertFilesToMetadatasAsync(files)
             await self.database.updateMetadatasFavoriteAsync(account: account, metadatas: metadatas)
         }
 
@@ -257,11 +255,11 @@ class NCService: NSObject {
         // Synchronize Directory
         let directories = await self.database.getTablesDirectoryAsync(predicate: NSPredicate(format: "account == %@ AND offline == true", account), sorted: "serverUrl", ascending: true)
         for directory in directories {
-            await NCNetworking.shared.synchronization(account: account,
-                                                      serverUrl: directory.serverUrl,
-                                                      userId: tblAccount.userId,
-                                                      urlBase: tblAccount.urlBase,
-                                                      metadatasInDownload: metadatasInDownload)
+            await NCNetworking.shared.synchronizationDownload(account: account,
+                                                              serverUrl: directory.serverUrl,
+                                                              userId: tblAccount.userId,
+                                                              urlBase: tblAccount.urlBase,
+                                                              metadatasInDownload: metadatasInDownload)
         }
 
         // Synchronize Files

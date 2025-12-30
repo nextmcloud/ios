@@ -108,7 +108,12 @@ extension NCNetworking {
                 }
                 await networking.transferDispatcher.notifyAllDelegates { delegate in
                     delegate.transferChange(status: self.global.networkingStatusDownloadCancel,
-                                            metadata: metadata.detachedCopy(),
+                                            account: metadata.account,
+                                            fileName: metadata.fileName,
+                                            serverUrl: metadata.serverUrl,
+                                            selector: metadata.sessionSelector,
+                                            ocId: metadata.ocId,
+                                            destination: nil,
                                             error: .success)
                 }
             // UPLOAD
@@ -119,17 +124,12 @@ extension NCNetworking {
                     cancelUploadBackgroundTask(metadata: metadata)
                 }
                 utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, userId: metadata.userId, urlBase: metadata.urlBase))
-                await networking.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferChange(status: self.global.networkingStatusUploadCancel,
-                                            metadata: metadata.detachedCopy(),
-                                            error: .success)
-                }
             }
         }
 
         await networking.transferDispatcher.notifyAllDelegates { delegate in
             serverUrls.forEach { serverUrl in
-                delegate.transferReloadData(serverUrl: serverUrl, status: nil)
+                delegate.transferReloadData(serverUrl: serverUrl, requestData: false, status: nil)
             }
         }
     }
@@ -306,15 +306,24 @@ extension NCNetworking {
     func verifyZombie() async {
         // UPLOADING-FOREGROUND
         //
-        if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(predicate: NSPredicate(format: "session == %@ AND status == %d",
-                                                                                                  sessionUpload,
-                                                                                                  self.global.metadataStatusUploading)) {
+        if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(
+            predicate: NSPredicate(format: "session == %@ AND status == %d",
+                                   sessionUpload,
+                                   self.global.metadataStatusUploading)) {
             for metadata in metadatas {
                 guard let nkSession = NextcloudKit.shared.nkCommonInstance.nksessions.session(forAccount: metadata.account) else {
                     await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, userId: metadata.userId, urlBase: metadata.urlBase))
+                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                                           userId: metadata.userId,
+                                                                                                           urlBase: metadata.urlBase))
                     continue
                 }
+
+                // Verify in Metadata Transfer Success
+                guard await !metadataTranfersSuccess.exists(serverUrlFileName: metadata.serverUrlFileName) else {
+                    continue
+                }
+
                 var foundTask = false
                 let tasks = await nkSession.sessionData.session.tasks
 
@@ -341,10 +350,18 @@ extension NCNetworking {
         if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(predicate: NSPredicate(format: "(session == %@ OR session == %@) AND status == %d",
                                                                                                   sessionUploadBackground,
                                                                                                   sessionUploadBackgroundWWan)) {
+        if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(
+            predicate: NSPredicate(format: "(session == %@ OR session == %@) AND status == %d",
+                                   sessionUploadBackground,
+                                   sessionUploadBackgroundWWan,
+                                   self.global.metadataStatusUploading)) {
+
             for metadata in metadatas {
                 guard var nkSession = NextcloudKit.shared.nkCommonInstance.nksessions.session(forAccount: metadata.account) else {
                     await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, userId: metadata.userId, urlBase: metadata.urlBase))
+                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                                           userId: metadata.userId,
+                                                                                                           urlBase: metadata.urlBase))
                     continue
                 }
                 var session: URLSession?
@@ -360,7 +377,9 @@ extension NCNetworking {
                 var foundTask = false
                 guard let tasks = await session?.allTasks else {
                     await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, userId: metadata.userId, urlBase: metadata.urlBase))
+                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                                           userId: metadata.userId,
+                                                                                                           urlBase: metadata.urlBase))
                     continue
                 }
 
@@ -384,14 +403,16 @@ extension NCNetworking {
 
         // DOWNLOADING-FOREGROUND
         //
-        if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(predicate: NSPredicate(format: "session == %@ AND status IN %@",
-                                                                                                  sessionDownload,
-                                                                                                  self.global.metadataStatusDownloadingAllMode)) {
-
+        if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(
+            predicate: NSPredicate(format: "session == %@ AND status IN %@",
+                                   sessionDownload,
+                                   self.global.metadataStatusDownloadingAllMode)) {
             for metadata in metadatas {
                 guard let nkSession = NextcloudKit.shared.nkCommonInstance.nksessions.session(forAccount: metadata.account) else {
                     await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, userId: metadata.userId, urlBase: metadata.urlBase))
+                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                                           userId: metadata.userId,
+                                                                                                           urlBase: metadata.urlBase))
                     continue
                 }
                 var foundTask = false
@@ -415,13 +436,16 @@ extension NCNetworking {
 
         // DOWNLOADING-BACKGROUND
         //
-        if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(predicate: NSPredicate(format: "session == %@ AND status == %d",
-                                                                                                  sessionDownloadBackground,
-                                                                                                  self.global.metadataStatusDownloading)) {
+        if let metadatas = await NCManageDatabase.shared.getMetadatasAsync(
+            predicate: NSPredicate(format: "session == %@ AND status == %d",
+                                   sessionDownloadBackground,
+                                   self.global.metadataStatusDownloading)) {
             for metadata in metadatas {
                 guard let nkSession = NextcloudKit.shared.nkCommonInstance.nksessions.session(forAccount: metadata.account) else {
                     await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId, userId: metadata.userId, urlBase: metadata.urlBase))
+                    utilityFileSystem.removeFile(atPath: utilityFileSystem.getDirectoryProviderStorageOcId(metadata.ocId,
+                                                                                                           userId: metadata.userId,
+                                                                                                           urlBase: metadata.urlBase))
                     continue
                 }
                 var foundTask = false

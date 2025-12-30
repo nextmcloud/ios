@@ -162,6 +162,7 @@ class NCRecent: NCCollectionViewCommon {
 
         startGUIGetServerData()
         
+
         let resultsSearch = await NextcloudKit.shared.searchBodyRequestAsync(serverUrl: session.urlBase,
                                                                              requestBody: requestBody,
                                                                              showHiddenFiles: showHiddenFiles,
@@ -178,7 +179,7 @@ class NCRecent: NCCollectionViewCommon {
             return
         }
 
-        let (_, metadatas) = await self.database.convertFilesToMetadatasAsync(files)
+        let (_, metadatas) = await NCManageDatabaseCreateMetadata().convertFilesToMetadatasAsync(files)
 
         await self.database.addMetadatasAsync(metadatas)
         await self.reloadDataSource()

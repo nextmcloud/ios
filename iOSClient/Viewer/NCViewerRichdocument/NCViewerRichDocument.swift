@@ -1,25 +1,6 @@
-//
-//  NCViewerRichdocument.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 06/09/18.
-//  Copyright © 2018 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2018 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 @preconcurrency import WebKit
@@ -107,7 +88,11 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        tabBarController?.tabBar.isHidden = true
+        if #available(iOS 18.0, *) {
+            tabBarController?.setTabBarHidden(true, animated: true)
+        } else {
+            tabBarController?.tabBar.isHidden = true
+        }
 
         NotificationCenter.default.addObserver(self, selector: #selector(self.grabFocus), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterRichdocumentGrabFocus), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
@@ -129,7 +114,11 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        tabBarController?.tabBar.isHidden = false
+        if #available(iOS 18.0, *) {
+            tabBarController?.setTabBarHidden(false, animated: true)
+        } else {
+            tabBarController?.tabBar.isHidden = false
+        }
 
         Task {
             await NCNetworking.shared.transferDispatcher.removeDelegate(self)
@@ -190,7 +179,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
             }
 
             if message.body as? String == "share" {
-                NCDownloadAction.shared.openShare(viewController: self, metadata: metadata, page: .sharing)
+                NCCreate().createShare(viewController: self, metadata: metadata, page: .sharing)
             }
 
             if let param = message.body as? [AnyHashable: Any] {
@@ -199,7 +188,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                         guard let type = values["Type"] as? String else { return }
                         guard let urlString = values["URL"] as? String else { return }
                         guard let url = URL(string: urlString) else { return }
-                        let fileName = (metadata.fileName as NSString).deletingPathExtension
+                        var fileName = (metadata.fileName as NSString).deletingPathExtension
                         let fileNameLocalPath = utilityFileSystem.createServerUrl(serverUrl: utilityFileSystem.directoryUserData, fileName: fileName)
 
                         if type == "slideshow" {
@@ -242,12 +231,11 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                                     var item = fileNameLocalPath
 
                                     if let headers {
-                                        if let disposition = headers["Content-Disposition"] as? String {
-                                            let components = disposition.components(separatedBy: "filename=")
-                                            if components.last?.replacingOccurrences(of: "\"", with: "") != nil {
-                                                item = self.utilityFileSystem.createServerUrl(serverUrl: self.utilityFileSystem.directoryUserData, fileName: fileName)
-                                                _ = self.utilityFileSystem.moveFile(atPath: fileNameLocalPath, toPath: item)
-                                            }
+                                        if let disposition = headers["Content-Disposition"] as? String,
+                                           let filenameContentDisposition = self.filenameFromContentDisposition(disposition) {
+                                            fileName = filenameContentDisposition
+                                            item = self.utilityFileSystem.createServerUrl(serverUrl: self.utilityFileSystem.directoryUserData, fileName: fileName)
+                                            _ = self.utilityFileSystem.moveFile(atPath: fileNameLocalPath, toPath: item)
                                         }
                                     }
 
@@ -376,6 +364,22 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         NCActivityIndicator.shared.stop()
     }
+
+    // MARK: - Hekper
+
+    func filenameFromContentDisposition(_ disposition: String) -> String? {
+        if let range = disposition.range(of: "filename=") {
+            var value = String(disposition[range.upperBound...]).trimmingCharacters(in: .whitespaces)
+            // Cut at next ';' if present
+            if let semi = value.firstIndex(of: ";") {
+                value = String(value[..<semi])
+            }
+            // Remove optional quotes
+            value = value.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+            return value.isEmpty ? nil : value
+        }
+        return nil
+    }
 }
 
 extension NCViewerRichDocument: UINavigationControllerDelegate {
@@ -385,7 +389,7 @@ extension NCViewerRichDocument: UINavigationControllerDelegate {
         Task {
             if parent == nil {
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferReloadData(serverUrl: metadata.serverUrl, status: nil)
+                    delegate.transferReloadData(serverUrl: metadata.serverUrl, requestData: false, status: nil)
                 }
             }
         }
@@ -393,16 +397,19 @@ extension NCViewerRichDocument: UINavigationControllerDelegate {
 }
 
 extension NCViewerRichDocument: NCTransferDelegate {
-    func transferChange(status: String, metadata: tableMetadata, error: NKError) {
-        DispatchQueue.main.async {
-            switch status {
-            // FAVORITE
-            case NCGlobal.shared.networkingStatusFavorite:
-                if self.metadata.ocId == metadata.ocId {
-                    self.metadata = metadata
-                }
-            default:
-                break
+    func transferChange(status: String,
+                        account: String,
+                        fileName: String,
+                        serverUrl: String,
+                        selector: String?,
+                        ocId: String,
+                        destination: String?,
+                        error: NKError) {
+        Task {@MainActor in
+            if status == NCGlobal.shared.networkingStatusFavorite,
+               self.metadata.ocId == ocId,
+               let metadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(ocId) {
+                self.metadata = metadata
             }
         }
     }

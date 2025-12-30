@@ -31,9 +31,9 @@ enum NCViewerContextMenu {
                    title: NSLocalizedString("_details_", comment: ""),
                    image: UIImage(systemName: "info")?.withTintColor(NCBrandColor.shared.iconImageColor)
                ) { _ in
-                   NCDownloadAction.shared.openShare(viewController: controller,
-                                                     metadata: metadata,
-                                                     page: .activity)
+                   NCCreate().createShare(viewController: controller,
+                                          metadata: metadata,
+                                          page: .activity)
                }
                menuElements.append(action)
            }
@@ -46,10 +46,10 @@ enum NCViewerContextMenu {
                    title: NSLocalizedString("_view_in_folder_", comment: ""),
                    image: UIImage(systemName: "arrow.forward.square")?.withTintColor(NCBrandColor.shared.iconImageColor)
                ) { _ in
-                   NCDownloadAction.shared.openFileViewInFolder(serverUrl: metadata.serverUrl,
-                                                                fileNameBlink: metadata.fileName,
-                                                                fileNameOpen: nil,
-                                                                sceneIdentifier: controller.sceneIdentifier)
+                   NCNetworking.shared.openFileViewInFolder(serverUrl: metadata.serverUrl,
+                                                            fileNameBlink: metadata.fileName,
+                                                            fileNameOpen: nil,
+                                                            sceneIdentifier: controller.sceneIdentifier)
                }
                menuElements.append(action)
            }
@@ -65,7 +65,7 @@ enum NCViewerContextMenu {
                    image: NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
 //                   image: NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [metadata.favorite ? NCBrandColor.shared.yellowFavorite : NCBrandColor.shared.iconImageColor2])
                ) { _ in
-                   NCNetworking.shared.favoriteMetadata(metadata) { error in
+                   NCNetworking.shared.setStatusWaitFavorite(metadata) { error in
                        if error != .success {
                            NCContentPresenter().showError(error: error)
                        }

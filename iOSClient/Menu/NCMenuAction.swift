@@ -173,8 +173,10 @@ extension NCMenuAction {
             order: order,
             sender: sender,
             action: { _ in
-                NCDownloadAction.shared.openActivityViewController(selectedMetadata: selectedMetadatas, controller: controller, sender: sender)
-                completion?()
+                Task {
+                    await NCCreate().createActivityViewController(selectedMetadata: selectedMetadatas, controller: controller, sender: sender)
+                    completion?()
+                }
             }
         )
     }
@@ -195,7 +197,7 @@ extension NCMenuAction {
                     alert.addAction(UIAlertAction(title: NSLocalizedString("_continue_", comment: ""), style: .default, handler: { _ in
                         Task {
                             for metadata in selectedMetadatas {
-                                await NCDownloadAction.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
+                                await NCNetworking.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
 
                             }
                             completion?()
@@ -206,7 +208,7 @@ extension NCMenuAction {
                 } else {
                     Task {
                         for metadata in selectedMetadatas {
-                            await NCDownloadAction.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
+                            await NCNetworking.shared.setMetadataAvalableOffline(metadata, isOffline: isAnyOffline)
 
                         }
                         completion?()
@@ -257,7 +259,7 @@ extension NCMenuAction {
                         await UIAlertController.warningAsync( message: message, presenter: viewController)
                     } else {
                         let controller = viewController.tabBarController as? NCMainTabBarController
-                        NCDownloadAction.shared.openSelectView(items: selectedMetadatas, controller: controller)
+                        NCSelectOpen.shared.openView(items: selectedMetadatas, controller: controller)
                     }
                     completion?()
                 }

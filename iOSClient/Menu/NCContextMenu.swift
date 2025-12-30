@@ -6,6 +6,7 @@ import Foundation
 import UIKit
 import Alamofire
 import NextcloudKit
+import LucidBanner
 
 class NCContextMenu: NSObject {
     let utilityFileSystem = NCUtilityFileSystem()
@@ -18,12 +19,14 @@ class NCContextMenu: NSObject {
     let sceneIdentifier: String
     let viewController: UIViewController
     let image: UIImage?
+    let sender: Any?
 
-    init(metadata: tableMetadata, viewController: UIViewController, sceneIdentifier: String, image: UIImage?) {
+    init(metadata: tableMetadata, viewController: UIViewController, sceneIdentifier: String, image: UIImage?, sender: Any?) {
         self.metadata = metadata
         self.viewController = viewController
         self.sceneIdentifier = sceneIdentifier
         self.image = image
+        self.sender = sender
     }
 
     func viewMenu() -> UIMenu {
@@ -35,6 +38,7 @@ class NCContextMenu: NSObject {
         if metadataMOV != nil { titleSave = NSLocalizedString("_livephoto_save_", comment: "") }
         let serverUrl = metadata.serverUrl + "/" + metadata.fileName
         var isOffline: Bool = false
+        let scene = SceneManager.shared.getWindow(sceneIdentifier: sceneIdentifier)?.windowScene
 
         if metadata.directory, let directory = NCManageDatabase.shared.getTableDirectory(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", metadata.account, serverUrl)) {
             isOffline = directory.offline
@@ -48,7 +52,7 @@ class NCContextMenu: NSObject {
 
         let detail = UIAction(title: NSLocalizedString("_details_", comment: ""),
                               image: utility.loadImage(named: "info.circle")) { _ in
-            NCDownloadAction.shared.openShare(viewController: self.viewController, metadata: self.metadata, page: .activity)
+            NCCreate().createShare(viewController: self.viewController, metadata: self.metadata, page: .activity)
         }
         
         let titleOffline = isOffline ? NSLocalizedString("_remove_available_offline_", comment: "") :  NSLocalizedString("_set_available_offline_", comment: "")
@@ -117,6 +121,8 @@ class NCContextMenu: NSObject {
                                 NSLocalizedString("_add_favorites_", comment: ""),
                                 image: NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite])) { _ in
             self.networking.favoriteMetadata(self.metadata) { error in
+                                image: utility.loadImage(named: self.metadata.favorite ? "star.slash" : "star", colors: [NCBrandColor.shared.yellowFavorite])) { _ in
+            self.networking.setStatusWaitFavorite(self.metadata) { error in
                 if error != .success {
                     NCContentPresenter().showError(error: error)
                 }
@@ -213,42 +219,11 @@ class NCContextMenu: NSObject {
 
         let share = UIAction(title: NSLocalizedString("_share_", comment: ""),
                              image: utility.loadImage(named: "square.and.arrow.up") ) { _ in
-            if self.utilityFileSystem.fileProviderStorageExists(self.metadata) {
-                Task {
-                    await self.networking.transferDispatcher.notifyAllDelegates { delegate in
-                        let metadata = self.metadata.detachedCopy()
-                        metadata.sessionSelector = self.global.selectorOpenIn
-                        delegate.transferChange(status: self.global.networkingStatusDownloaded,
-                                                metadata: metadata,
-                                                error: .success)
-                    }
-                }
-            } else {
-                Task { @MainActor in
-                    guard let metadata = await self.database.setMetadataSessionInWaitDownloadAsync(ocId: self.metadata.ocId,
-                                                                                                   session: self.networking.sessionDownload,
-                                                                                                   selector: self.global.selectorOpenIn,
-                                                                                                   sceneIdentifier: self.sceneIdentifier) else {
-                        return
-                    }
-
-                    hud.ringProgress(text: NSLocalizedString("_downloading_", comment: ""), tapToCancelDetailText: true) {
-                        if let request = downloadRequest {
-                            request.cancel()
-                        }
-                    }
-
-                    let results = await self.networking.downloadFile(metadata: metadata) { request in
-                        downloadRequest = request
-                    } progressHandler: { progress in
-                        hud.progress(progress.fractionCompleted)
-                    }
-                    if results.nkError == .success || results.afError?.isExplicitlyCancelledError ?? false {
-                        hud.dismiss()
-                    } else {
-                        hud.error(text: results.nkError.errorDescription)
-                    }
-                }
+            Task {@MainActor in
+                let controller = self.viewController.tabBarController as? NCMainTabBarController
+                await NCCreate().createActivityViewController(selectedMetadata: [self.metadata],
+                                                              controller: controller,
+                                                              sender: self.sender)
             }
         }
 
@@ -257,16 +232,29 @@ class NCContextMenu: NSObject {
 //                self.networking.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: self.metadata, metadataMOV: metadataMOV, hudView: self.viewController.view))
 //            }
 //        }
+        let viewInFolder = UIAction(title: NSLocalizedString("_view_in_folder_", comment: ""),
+                                    image: utility.loadImage(named: "questionmark.folder")) { _ in
+            NCNetworking.shared.openFileViewInFolder(serverUrl: self.metadata.serverUrl, fileNameBlink: self.metadata.fileName, fileNameOpen: nil, sceneIdentifier: self.sceneIdentifier)
+        }
+
+        let livePhotoSave = UIAction(title: NSLocalizedString("_livephoto_save_", comment: ""), image: utility.loadImage(named: "livephoto")) { _ in
+            if let metadataMOV = metadataMOV {
+                self.networking.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: self.metadata, metadataMOV: metadataMOV, controller: self.viewController.tabBarController))
+            }
+        }
 
         let modify = UIAction(title: NSLocalizedString("_modify_", comment: ""),
                               image: utility.loadImage(named: "pencil.tip.crop.circle")) { _ in
             Task { @MainActor in
                 if self.utilityFileSystem.fileProviderStorageExists(self.metadata) {
                     await self.networking.transferDispatcher.notifyAllDelegates { delegate in
-                        let metadata = self.metadata.detachedCopy()
-                        metadata.sessionSelector = self.global.selectorLoadFileQuickLook
                         delegate.transferChange(status: self.global.networkingStatusDownloaded,
-                                                metadata: metadata,
+                                                account: self.metadata.account,
+                                                fileName: self.metadata.fileName,
+                                                serverUrl: self.metadata.serverUrl,
+                                                selector: self.global.selectorLoadFileQuickLook,
+                                                ocId: self.metadata.ocId,
+                                                destination: nil,
                                                 error: .success)
                     }
                 } else {
@@ -277,7 +265,9 @@ class NCContextMenu: NSObject {
                         return
                     }
 
-                    hud.ringProgress(text: NSLocalizedString("_downloading_", comment: "")) {
+                    let token = showHudBanner(scene: scene,
+                                              title: NSLocalizedString("_download_in_progress_", comment: ""),
+                                              stage: .button) {
                         if let request = downloadRequest {
                             request.cancel()
                         }
@@ -286,12 +276,16 @@ class NCContextMenu: NSObject {
                     let results = await self.networking.downloadFile(metadata: metadata) { request in
                         downloadRequest = request
                     } progressHandler: { progress in
-                        hud.progress(progress.fractionCompleted)
+                        Task {@MainActor in
+                            LucidBanner.shared.update(progress: progress.fractionCompleted, for: token)
+                        }
                     }
+                    LucidBanner.shared.dismiss()
+
                     if results.nkError == .success || results.afError?.isExplicitlyCancelledError ?? false {
-                        hud.dismiss()
+                        //
                     } else {
-                        hud.error(text: results.nkError.errorDescription)
+                        await showErrorBanner(scene: scene, errorDescription: results.nkError.errorDescription, errorCode: results.nkError.errorCode)
                     }
                 }
             }
@@ -325,13 +319,17 @@ class NCContextMenu: NSObject {
         let deleteConfirmLocal = UIAction(title: NSLocalizedString("_remove_local_file_", comment: ""),
                                           image: utility.loadImage(named: "trashIcon", colors: [.red]), attributes: .destructive) { _ in
             Task {
-                var metadatasError: [tableMetadata: NKError] = [:]
                 let error = await self.networking.deleteCache(self.metadata, sceneIdentifier: self.sceneIdentifier)
-                metadatasError[self.metadata.detachedCopy()] = error
 
                 await self.networking.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferChange(status: self.global.networkingStatusDelete,
-                                            metadatasError: metadatasError)
+                    delegate.transferChange(status: NCGlobal.shared.networkingStatusDelete,
+                                            account: self.metadata.account,
+                                            fileName: self.metadata.fileName,
+                                            serverUrl: self.metadata.serverUrl,
+                                            selector: self.metadata.sessionSelector,
+                                            ocId: self.metadata.ocId,
+                                            destination: nil,
+                                            error: error)
                 }
             }
         }

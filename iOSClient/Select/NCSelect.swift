@@ -132,6 +132,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
         buttonCancel.title = NSLocalizedString("_cancel_", comment: "")
         buttonCancel.tintColor = NCBrandColor.shared.customer
         bottomContraint?.constant = UIApplication.shared.firstWindow?.rootViewController?.view.safeAreaInsets.bottom ?? 0
+        bottomContraint?.constant = UIApplication.shared.mainAppWindow?.rootViewController?.view.safeAreaInsets.bottom ?? 0
 
         // Empty
         emptyDataSet = NCEmptyDataSet(view: collectionView, offset: NCGlobal.shared.heightButtonsView, delegate: self)
@@ -240,22 +241,28 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
 
     // MARK: - NotificationCenter
 
-    func transferChange(status: String, metadata: tableMetadata, error: NKError) {
-        guard session.account == metadata.account else { return }
-
+    func transferChange(status: String,
+                        account: String,
+                        fileName: String,
+                        serverUrl: String,
+                        selector: String?,
+                        ocId: String,
+                        destination: String?,
+                        error: NKError) {
         if error != .success {
             NCContentPresenter().showError(error: error)
         }
 
-        DispatchQueue.main.async {
-            switch status {
-            case self.global.networkingStatusCreateFolder:
-                if metadata.serverUrl == self.serverUrl {
-                    self.pushMetadata(metadata)
-                }
-            default:
-                break
+        Task { @MainActor in
+            guard session.account == account,
+                  status == self.global.networkingStatusCreateFolder,
+                  self.serverUrl == serverUrl,
+                  let metadata = await NCManageDatabase.shared.getMetadataAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileName == %@", account, serverUrl, fileName))
+            else {
+                return
             }
+
+            self.pushMetadata(metadata)
         }
     }
     

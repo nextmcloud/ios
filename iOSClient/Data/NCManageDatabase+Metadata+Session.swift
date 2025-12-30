@@ -24,7 +24,6 @@ extension NCManageDatabase {
     ///   - etag: Optional ETag string.
     ///   - errorCode: Optional error code to persist.
     /// - Returns: A detached copy of the updated `tableMetadata` object, or `nil` if not found.
-    @discardableResult
     func setMetadataSessionAsync(account: String? = nil,
                                  ocId: String? = nil,
                                  serverUrlFileName: String? = nil,
@@ -35,23 +34,24 @@ extension NCManageDatabase {
                                  selector: String? = nil,
                                  status: Int? = nil,
                                  etag: String? = nil,
-                                 errorCode: Int? = nil,
-                                 progress: Double? = nil) async -> tableMetadata? {
+                                 errorCode: Int? = nil) async {
         var query: NSPredicate = NSPredicate()
         if let ocId {
             query = NSPredicate(format: "ocId == %@", ocId)
         } else if let account, let serverUrlFileName {
             query = NSPredicate(format: "account == %@ AND serverUrlFileName == %@", account, serverUrlFileName)
         } else {
-            return nil
+            return
         }
 
-        await performRealmWriteAsync { realm in
+        await core.performRealmWriteAsync { realm in
             guard let metadata = realm.objects(tableMetadata.self)
                 .filter(query)
                 .first else {
                     return
             }
+
+            metadata.sessionDate = Date()
 
             if let name = newFileName {
                 metadata.fileName = name
@@ -156,24 +156,23 @@ extension NCManageDatabase {
                                                session: String,
                                                selector: String,
                                                sceneIdentifier: String? = nil) async -> tableMetadata? {
-        await performRealmWriteAsync { realm in
+        await core.performRealmWriteAsync { realm in
             guard let metadata = realm.objects(tableMetadata.self)
                 .filter("ocId == %@", ocId)
                 .first else {
                 return
             }
 
+            metadata.sessionDate = Date()
             metadata.sceneIdentifier = sceneIdentifier
             metadata.session = session
             metadata.sessionTaskIdentifier = 0
             metadata.sessionError = ""
             metadata.sessionSelector = selector
             metadata.status = NCGlobal.shared.metadataStatusWaitDownload
-            metadata.sessionDate = Date()
-            metadata.progress = 0
         }
 
-        return await performRealmReadAsync { realm in
+        return await core.performRealmReadAsync { realm in
             realm.objects(tableMetadata.self)
                 .filter("ocId == %@", ocId)
                 .first?
@@ -193,19 +192,18 @@ extension NCManageDatabase {
 
         // Apply modifications
         detachedMetadatas = detachedMetadatas.map { metadata in
+            metadata.sessionDate = nil
             metadata.sceneIdentifier = nil
             metadata.session = ""
             metadata.sessionTaskIdentifier = 0
             metadata.sessionError = ""
             metadata.sessionSelector = ""
-            metadata.sessionDate = nil
             metadata.status = NCGlobal.shared.metadataStatusNormal
-            metadata.progress = 0
             return metadata
         }
 
         // Write to Realm asynchronously
-        await performRealmWriteAsync { realm in
+        await core.performRealmWriteAsync { realm in
             detachedMetadatas.forEach { metadata in
                 realm.add(metadata, update: .all)
             }
@@ -229,5 +227,14 @@ extension NCManageDatabase {
             }
         }
         #endif
+    func clearMetadatasSessionAsync(ocId: String) async {
+        await core.performRealmWriteAsync { realm in
+            guard let object = realm.object(ofType: tableMetadata.self, forPrimaryKey: ocId) else { return }
+
+            object.session = ""
+            object.sessionError = ""
+            object.sessionTaskIdentifier = 0
+            object.status = NCGlobal.shared.metadataStatusNormal
+        }
     }
 }

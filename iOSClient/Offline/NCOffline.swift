@@ -91,6 +91,7 @@ class NCOffline: NCCollectionViewCommon {
         defer {
             stopGUIGetServerData()
         }
+
         await self.reloadDataSource()
     }
 }

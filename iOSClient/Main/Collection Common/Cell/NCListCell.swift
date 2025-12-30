@@ -278,11 +278,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             tag1.isHidden = true
             labelInfo.isHidden = false
             labelSubinfo.isHidden = false
+            labelInfoSeparator.isHidden = false
         } else {
             tag0.isHidden = false
             tag1.isHidden = true
             labelInfo.isHidden = true
             labelSubinfo.isHidden = true
+            labelInfoSeparator.isHidden = true
 
             if let tag = tags.first {
                 tag0.text = tag
@@ -319,6 +321,24 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
                 view.removeFromSuperview()
             }
         }
+            outlineView.image = UIImage(systemName: "star")
+            outlineView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 16, weight: .thin)
+            outlineView.tintColor = .systemBackground
+
+            imageFavorite.addSubview(outlineView)
+            NSLayoutConstraint.activate([
+                outlineView.leadingAnchor.constraint(equalTo: imageFavorite.leadingAnchor, constant: -1),
+                outlineView.trailingAnchor.constraint(equalTo: imageFavorite.trailingAnchor, constant: 1),
+                outlineView.topAnchor.constraint(equalTo: imageFavorite.topAnchor, constant: -1),
+                outlineView.bottomAnchor.constraint(equalTo: imageFavorite.bottomAnchor, constant: 1)
+            ])
+            imageFavorite.sendSubviewToBack(outlineView)
+        } else {
+            imageFavorite.subviews.forEach { view in
+                view.removeFromSuperview()
+            }
+        }
+
     }
     
     override func layoutSubviews() {

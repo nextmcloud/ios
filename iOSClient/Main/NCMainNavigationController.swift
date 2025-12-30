@@ -130,6 +130,13 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 //            hosting.modalPresentationStyle = .pageSheet
 //
 //            self.present(hosting, animated: true)
+            let rootView = TransfersView(session: self.session, onClose: { [weak self] in
+                self?.dismiss(animated: true)
+            })
+            let hosting = UIHostingController(rootView: rootView)
+            hosting.modalPresentationStyle = .pageSheet
+
+            self.present(hosting, animated: true)
         }), for: .touchUpInside)
 
         // PLUS BUTTON ONLY IN FILES
@@ -364,6 +371,15 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                                                                                       session.account,
                                                                                       serverUrl,
                                                                                       NCGlobal.shared.fileNameRichWorkspace.lowercased())) == nil {
+                                            image: utility.loadImage(named: "list.dash.header.rectangle", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                Task { @MainActor in
+                    let richWorkspaceCommon = NCRichWorkspaceCommon()
+                    if let viewController = controller.currentViewController() {
+                        if await NCManageDatabase.shared.getMetadataAsync(
+                            predicate: NSPredicate(format: "account == %@ AND serverUrl == %@ AND fileNameView LIKE[c] %@",
+                                                   session.account,
+                                                   serverUrl,
+                                                   NCGlobal.shared.fileNameRichWorkspace.lowercased())) == nil {
                             richWorkspaceCommon.createViewerNextcloudText(serverUrl: serverUrl, viewController: viewController, session: session)
                         } else {
                             richWorkspaceCommon.openViewerNextcloudText(serverUrl: serverUrl, viewController: viewController, session: session)
@@ -392,6 +408,10 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                         viewController.controller = controller
                         controller.present(navigationController, animated: true, completion: nil)
                     }
+                    let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + creator.ext, account: session.account, serverUrl: serverUrl)
+                    let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+
+                    await NCCreate().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "text", creatorId: creator.identifier, templateId: "document", account: session.account)
                 }
             })
         }
@@ -409,6 +429,15 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                     return
                 }
                 navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+            // ------------------------------- COLLABORA
+            if capabilities.richDocumentsEnabled {
+                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_document_", comment: ""),
+                                                        image: utility.loadImage(named: "doc.richtext", colors: [NCBrandColor.shared.documentIconColor])) { _ in
+                    Task { @MainActor in
+                        let createDocument = NCCreate()
+                        let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "document", account: session.account)
+                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                 if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
                     viewController.editorId = NCGlobal.shared.editorCollabora
@@ -428,6 +457,13 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                     return
                 }
                 navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_spreadsheet_", comment: ""),
+                                                        image: utility.loadImage(named: "tablecells", colors: [NCBrandColor.shared.spreadsheetIconColor])) { _ in
+                    Task { @MainActor in
+                        let createDocument = NCCreate()
+                        let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "spreadsheet", account: session.account)
+                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                 if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
                     viewController.editorId = NCGlobal.shared.editorCollabora
@@ -446,6 +482,13 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                     return
                 }
                 navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_presentation_", comment: ""),
+                                                        image: utility.loadImage(named: "play.rectangle", colors: [NCBrandColor.shared.presentationIconColor])) { _ in
+                    Task { @MainActor in
+                        let createDocument = NCCreate()
+                        let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "presentation", account: session.account)
+                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                 if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
                     viewController.editorId = NCGlobal.shared.editorCollabora
@@ -466,6 +509,12 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                                                       image: UIImage(named: "create_file_document")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
                     
                     let directEditingCreator = capabilities.directEditingCreators.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeDocx})!
+                                                      image: utility.loadImage(named: "doc.text", colors: [NCBrandColor.shared.documentIconColor])) { _ in
+                    Task { @MainActor in
+                        let createDocument = NCCreate()
+                        let templates = await createDocument.getTemplate(editorId: "onlyoffice", templateId: "document", account: session.account)
+                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                     guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
                         return
@@ -487,6 +536,12 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             if let creator = capabilities.directEditingCreators.first(where: { $0.editor == "onlyoffice" && $0.identifier == "onlyoffice_xlsx"}) {
                 menuOnlyOfficeElement.append(UIAction(title: NSLocalizedString("_create_new_spreadsheet_", comment: ""),
                                                       image: UIImage(named: "create_file_xls")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
+                                                      image: utility.loadImage(named: "tablecells", colors: [NCBrandColor.shared.spreadsheetIconColor])) { _ in
+                    Task { @MainActor in
+                        let createDocument = NCCreate()
+                        let templates = await createDocument.getTemplate(editorId: "onlyoffice", templateId: "spreadsheet", account: session.account)
+                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                     let directEditingCreator = capabilities.directEditingCreators.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeXlsx})!
 
@@ -510,6 +565,12 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             if let creator = capabilities.directEditingCreators.first(where: { $0.editor == "onlyoffice" && $0.identifier == "onlyoffice_pptx"}) {
                 menuOnlyOfficeElement.append(UIAction(title: NSLocalizedString("_create_new_presentation_", comment: ""),
                                                       image: UIImage(named: "create_file_ppt")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
+                                                      image: utility.loadImage(named: "play.rectangle", colors: [NCBrandColor.shared.presentationIconColor])) { _ in
+                    Task { @MainActor in
+                        let createDocument = NCCreate()
+                        let templates = await createDocument.getTemplate(editorId: "onlyoffice", templateId: "presentation", account: session.account)
+                        let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
+                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                     let directEditingCreator = capabilities.directEditingCreators.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficePptx})!
 
@@ -549,7 +610,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             plusItem.menu = plusMenu
         } else {
             let plusItem = UIBarButtonItem(image: plusImage, style: .plain, target: nil, action: nil)
-            plusItem.tintColor = NCBrandColor.shared.customer
+            plusItem.tintColor = NCBrandColor.shared.getElement(account: session.account)
             plusItem.menu = plusMenu
             menuToolbar.setItems([plusItem], animated: false)
             menuToolbar.sizeToFit()
@@ -622,7 +683,9 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             collectionViewCommon.tabBarSelect?.show()
 
             let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .plain) {
-                collectionViewCommon.setEditMode(false)
+                Task {
+                    await collectionViewCommon.setEditMode(false)
+                }
             }
 
             collectionViewCommon.navigationItem.rightBarButtonItems = [select]
@@ -644,9 +707,8 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
     }
 
-    @discardableResult
     @MainActor
-    func updateRightBarButtonItems(_ fileItem: UITabBarItem? = nil) async -> Int {
+    func updateRightBarButtonItems(_ fileItem: UITabBarItem? = nil) async {
         guard !(collectionViewCommon?.isEditMode ?? false),
               !(trashViewController?.isEditMode ?? false),
               !(mediaViewController?.isEditMode ?? false),
@@ -655,15 +717,18 @@ class NCMainNavigationController: UINavigationController, UINavigationController
               !(topViewController is NCViewerRichDocument),
               !(topViewController is NCViewerNextcloudText)
         else {
-            return 0
+            return
         }
 
-        let transferCount = await self.database.getMetadatasAsync(predicate: NSPredicate(format: "status != %i", self.global.metadataStatusNormal))?.count ?? 0
         let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
         let rightmenu = await createRightMenu()
-        var tempRightBarButtonItems: [UIBarButtonItem] = rightmenu == nil ? [] : [self.menuBarButtonItem]
-        var tempTotalTags = tempRightBarButtonItems.count == 0 ? 0 : self.menuBarButtonItem.tag
+        var tempRightBarButtonItems: [UIBarButtonItem] = rightmenu == nil ? [self.transfersButtonItem] : [self.menuBarButtonItem, self.transfersButtonItem]
+        var tempTotalTags = 0
         var totalTags = 0
+
+        for item in tempRightBarButtonItems {
+            tempTotalTags = tempTotalTags + item.tag
+        }
 
         if let rightBarButtonItems = topViewController?.navigationItem.rightBarButtonItems {
             for item in rightBarButtonItems {
@@ -679,11 +744,6 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         if let controller, controller.availableNotifications {
             tempRightBarButtonItems.append(self.notificationsButtonItem)
             tempTotalTags += self.notificationsButtonItem.tag
-        }
-
-        if transferCount > 0 {
-            tempRightBarButtonItems.append(self.transfersButtonItem)
-            tempTotalTags += self.transfersButtonItem.tag
         }
 
         if totalTags != tempTotalTags {
@@ -736,6 +796,12 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             if !collectionViewCommon.dataSource.isEmpty() {
                 collectionViewCommon.setEditMode(true)
                 collectionViewCommon.collectionView.reloadData()
+                              image: utility.loadImage(named: "checkmark.circle")) { _ in
+            Task {
+                if !collectionViewCommon.dataSource.isEmpty() {
+                    await collectionViewCommon.setEditMode(true)
+                    collectionViewCommon.collectionView.reloadData()
+                }
             }
         }
 
@@ -836,7 +902,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             Task {
                 NCPreferences().setFavoriteOnTop(account: self.session.account, value: !favoriteOnTop)
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, status: nil)
+                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
                 }
                 await self.updateRightMenu()
             }
@@ -848,7 +914,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             Task {
                 NCPreferences().setDirectoryOnTop(account: self.session.account, value: !directoryOnTop)
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, status: nil)
+                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
                 }
                 await self.updateRightMenu()
             }
@@ -871,7 +937,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             Task {
                 NCPreferences().setPersonalFilesOnly(account: self.session.account, value: !personalFilesOnly)
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, status: nil)
+                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
                 }
                 await self.updateRightMenu()
             }
@@ -883,7 +949,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             NCPreferences().showDescription = !showDescriptionKeychain
             Task {
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, status: nil)
+                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
                 }
                 await self.updateRightMenu()
             }
@@ -952,13 +1018,6 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
     func isNotificationsButtonVisible() -> Bool {
         if topViewController?.navigationItem.rightBarButtonItems?.first(where: { $0.tag == notificationsButtonTag }) != nil {
-            return true
-        }
-        return false
-    }
-
-    func isTransfersButtonVisible() -> Bool {
-        if topViewController?.navigationItem.rightBarButtonItems?.first(where: { $0.tag == transfersButtonTag }) != nil {
             return true
         }
         return false

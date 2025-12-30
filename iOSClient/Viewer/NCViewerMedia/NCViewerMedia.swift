@@ -1,25 +1,6 @@
-//
-//  NCViewerMedia.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 24/10/2020.
-//  Copyright © 2020 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2020 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import SVGKit
@@ -28,6 +9,7 @@ import EasyTipView
 import SwiftUI
 import MobileVLCKit
 import Alamofire
+import LucidBanner
 
 public protocol NCViewerMediaViewDelegate: AnyObject {
     func didOpenDetail()
@@ -132,7 +114,12 @@ class NCViewerMedia: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        tabBarController?.tabBar.isHidden = true
+        if #available(iOS 18.0, *) {
+            tabBarController?.setTabBarHidden(true, animated: true)
+        } else {
+            tabBarController?.tabBar.isHidden = true
+        }
+
         viewerMediaPage?.navigationItem.title = (metadata.fileNameView as NSString).deletingPathExtension
 
         if metadata.isImage, let viewerMediaPage = self.viewerMediaPage {
@@ -167,9 +154,11 @@ class NCViewerMedia: UIViewController {
                                                                                                                selector: "") else {
                                     return
                                 }
+                                let scene = SceneManager.shared.getWindow(controller: self.tabBarController)?.windowScene
                                 var downloadRequest: DownloadRequest?
-                                let hud = NCHud(self.tabBarController?.view)
-                                hud.ringProgress(text: NSLocalizedString("_downloading_", comment: ""), tapToCancelDetailText: true) {
+                                let token = showHudBanner(scene: scene,
+                                                          title: NSLocalizedString("_download_in_progress_", comment: ""),
+                                                          stage: .button) {
                                     if let request = downloadRequest {
                                         request.cancel()
                                     }
@@ -178,16 +167,17 @@ class NCViewerMedia: UIViewController {
                                 let results = await self.networking.downloadFile(metadata: metadata) { request in
                                     downloadRequest = request
                                 } progressHandler: { progress in
-                                    hud.progress(progress.fractionCompleted)
+                                    Task {@MainActor in
+                                        LucidBanner.shared.update(progress: Double(progress.fractionCompleted), for: token)
+                                    }
                                 }
+                                LucidBanner.shared.dismiss()
+
                                 if results.nkError == .success {
-                                    hud.success()
                                     if self.utilityFileSystem.fileProviderStorageExists(self.metadata) {
                                         let url = URL(fileURLWithPath: self.utilityFileSystem.getDirectoryProviderStorageOcId(self.metadata.ocId, fileName: self.metadata.fileNameView, userId: self.metadata.userId, urlBase: self.metadata.urlBase))
                                         ncplayer.openAVPlayer(url: url, autoplay: autoplay)
                                     }
-                                } else {
-                                    hud.error(text: error.errorDescription)
                                 }
                             }
                         }
@@ -536,7 +526,6 @@ extension NCViewerMedia {
         self.detailView.show(
             metadata: self.metadata,
             image: self.image,
-            textColor: self.viewerMediaPage?.textColor,
             exif: exif,
             ncplayer: self.ncplayer,
             delegate: self)
@@ -625,16 +614,18 @@ extension NCViewerMedia: EasyTipViewDelegate {
 }
 
 extension NCViewerMedia: NCTransferDelegate {
-    func transferChange(status: String, metadata: tableMetadata, error: NKError) {
-        switch status {
-        // DOWNLOAD
-        case self.global.networkingStatusDownloaded:
+    func transferChange(status: String,
+                        account: String,
+                        fileName: String,
+                        serverUrl: String,
+                        selector: String?,
+                        ocId: String,
+                        destination: String?,
+                        error: NKError) {
+        if status == self.global.networkingStatusDownloaded {
             DispatchQueue.main.async {
                 self.closeDetail()
             }
-        default:
-            break
         }
     }
-
 }

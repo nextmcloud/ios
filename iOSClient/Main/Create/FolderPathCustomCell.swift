@@ -7,6 +7,11 @@
 //
 
 import Foundation
+//  Created by A200073704 on 04/05/23.
+//  Copyright © 2023 Marino Faggiana. All rights reserved.
+//
+
+import UIKit
 import XLForm
 
 class FolderPathCustomCell: XLFormButtonCell{
