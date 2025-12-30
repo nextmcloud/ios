@@ -7,8 +7,9 @@ import NextcloudKit
 
 let userAgent: String = {
     let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-    // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
-    return "Mozilla/5.0 (iOS) Magenta-iOS/\(appVersion)"
+    // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)-Nextcloud"
+    let suffixBrand = NCBrandOptions.shared.brandUserAgent.isEmpty ? "" : "-\(NCBrandOptions.shared.brandUserAgent)"
+    return "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)\(suffixBrand)"
 }()
 
  /*
@@ -103,28 +104,21 @@ final class NCBrandOptions: @unchecked Sendable {
     
     var use_AppConfig: Bool = false                                                         // Don't touch me !!
 
-    // Options
     // Use server theming color
-    @objc public var use_default_auto_upload: Bool = false
-    @objc public var use_themingColor: Bool = false
-    @objc public var use_themingLogo: Bool = false
-    @objc public var use_storeLocalAutoUploadAll: Bool = false
-    @objc public var use_loginflowv2: Bool = false
+    var use_themingColor: Bool = true
 
-    @objc var disable_intro:       Bool = false//true
-    @objc var disable_request_login_url:       Bool = false//true
-    @objc public var disable_multiaccount:            Bool = true
-    @objc public var disable_manage_account:          Bool = false
-    @objc var disable_more_external_site: Bool = false
-    @objc var disable_openin_file: Bool = false                                          // Don't touch me !!
-    @objc var disable_crash_service:             Bool = true
-    @objc var disable_log: Bool = false
-    @objc var disable_mobileconfig: Bool = false
-    @objc var disable_show_more_nextcloud_apps_in_settings:         Bool = true
-    @objc var doNotAskPasscodeAtStartup: Bool = false
-    @objc var disable_source_code_in_settings: Bool = false
-    @objc var enforce_passcode_lock = false
-    @objc var use_in_app_browser_for_login = false
+    var disable_intro: Bool = false
+    var disable_request_login_url: Bool = false
+    var disable_multiaccount: Bool = false
+    var disable_more_external_site: Bool = false
+    var disable_openin_file: Bool = false                                                       // Don't touch me !!
+    var disable_crash_service: Bool = false
+    var disable_log: Bool = false
+    var disable_mobileconfig: Bool = false
+    var disable_show_more_nextcloud_apps_in_settings: Bool = true
+    var doNotAskPasscodeAtStartup: Bool = false
+    var disable_source_code_in_settings: Bool = false
+    var enforce_passcode_lock = false
     var enforce_privacyScreenEnabled = false
 
     // Example: (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
@@ -168,9 +162,6 @@ final class NCBrandOptions: @unchecked Sendable {
             if let str = configurationManaged[NCGlobal.shared.configuration_disable_log] as? String {
                 disable_log = (str as NSString).boolValue
             }
-            if let str = configurationManaged[NCGlobal.shared.configuration_disable_manage_account] as? String {
-                disable_manage_account = (str as NSString).boolValue
-            }
             if let str = configurationManaged[NCGlobal.shared.configuration_disable_more_external_site] as? String {
                 disable_more_external_site = (str as NSString).boolValue
             }
@@ -211,11 +202,8 @@ final class NCBrandOptions: @unchecked Sendable {
     }
 }
 
-class NCBrandColor: NSObject, @unchecked Sendable  {
-    static let shared: NCBrandColor = {
-        let instance = NCBrandColor()
-        return instance
-    }()
+final class NCBrandColor: @unchecked Sendable {
+    static let shared = NCBrandColor()
 
     // This is rewrited from customet theme, default is Nextcloud color
     let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // Nextcloud : #0082C9
@@ -269,7 +257,7 @@ class NCBrandColor: NSObject, @unchecked Sendable  {
         }
     }
 
-    override init() {
+    init() {
         brand = customer
         brandElement = customer
         brandText = customerText
