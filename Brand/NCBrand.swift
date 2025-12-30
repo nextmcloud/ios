@@ -38,7 +38,10 @@ final class NCBrandOptions: @unchecked Sendable {
     var appStoreUrl: String = "https://apps.apple.com/in/app/nextcloud/id1125420102"
 
     // Auto Upload default folder
-    var folderDefaultAutoUpload: String = "Photos"
+//    var folderDefaultAutoUpload: String = Locale.current.language.languageCode?.identifier == "de" ? "Kamera-Medien" : "Camera-Media"
+    // Get the app's preferred language (the language the app is using, not the system language)
+    var folderDefaultAutoUpload: String = (Locale.preferredLanguages.first?.prefix(2) ?? "en") == "de" ? "Kamera-Medien" : "Camera-Media"
+    
 
     // Capabilities Group
     var capabilitiesGroup:              String = "group.de.magentacloud.next.dev2.client"
@@ -46,6 +49,24 @@ final class NCBrandOptions: @unchecked Sendable {
 
     // BRAND ONLY
     var use_AppConfig: Bool = false
+//    var capabilitiesGroup: String = "group.it.twsweb.Crypto-Cloud"
+//    var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
+//#if DEBUG
+    // QA :
+    @objc public var capabilitiesGroup:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
+    @objc public var capabilitiesGroupApps:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
+//#else
+//    // PROD :
+//    @objc public var capabilitiesGroup:              String = "group.de.telekom.Mediencenter"
+//    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
+//#endif
+    
+    // BRAND ONLY
+    // Set use_login_web_personalized to true for prod and false for configurable path
+    var use_login_web_personalized: Bool = true                               // Don't touch me !!
+    var use_GroupApps: Bool = true
+    
+    var use_AppConfig: Bool = false                                                         // Don't touch me !!
 
     // Use server theming color
     var use_themingColor:                Bool = false
@@ -59,6 +80,8 @@ final class NCBrandOptions: @unchecked Sendable {
     var disable_log: Bool = false
     var disable_mobileconfig: Bool = false  
     var disable_show_more_nextcloud_apps_in_settings:         Bool = true
+    var disable_mobileconfig: Bool = false
+    var disable_show_more_nextcloud_apps_in_settings: Bool = true
     var doNotAskPasscodeAtStartup: Bool = false
     var disable_source_code_in_settings: Bool = false
     var enforce_passcode_lock = false
@@ -151,20 +174,33 @@ final class NCBrandColor: @unchecked Sendable {
     // This is rewrited from customet theme, default is Nextcloud color
     let customer:              UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)
     var customerText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+    let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // Nextcloud : #0082C9
+    var customerText: UIColor = .white
 
+    var brand: UIColor                                                                                         // don't touch me
+    var brandElement: UIColor                                                                                  // don't touch me
+    var brandText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+    
     // INTERNAL DEFINE COLORS
     private var themingColor = ThreadSafeDictionary<String, UIColor>()
     private var themingColorElement = ThreadSafeDictionary<String, UIColor>()
     private var themingColorText = ThreadSafeDictionary<String, UIColor>()
 
     var userColors: [CGColor] = []
-    let yellowFavorite: UIColor = UIColor(red: 0.6118, green: 0.4549, blue: 0.1451, alpha: 1.0)
+    let yellowFavorite: UIColor = UIColor(red: 248.0 / 255.0, green: 205.0 / 255.0, blue: 70.0 / 255.0, alpha: 1.0)
     let iconImageColor: UIColor = .label
     let iconImageColor2: UIColor = .secondaryLabel
     let iconImageMultiColors: [UIColor] = [.secondaryLabel, .label]
     let textColor: UIColor = .label
     let textColor2: UIColor = .secondaryLabel
+    let iconSystemGrayColor: UIColor = .systemGray
 
+    var systemBlueColor: UIColor {
+        get {
+            return UIColor(hex: "#84B0F5")!
+        }
+    }
+    
     var systemMint: UIColor {
         get {
             return UIColor(red: 0.0 / 255.0, green: 199.0 / 255.0, blue: 190.0 / 255.0, alpha: 1.0)
@@ -189,7 +225,11 @@ final class NCBrandColor: @unchecked Sendable {
         }
     }
 
-    init() { }
+    init() {
+        brand = customer
+        brandElement = customer
+        brandText = customerText
+    }
 
     /**
      Generate colors from the official nextcloud color.
@@ -345,5 +385,79 @@ final class NCBrandColor: @unchecked Sendable {
             return color
         }
         return .white
+    }
+    
+    @objc public var iconColor: UIColor{
+        if #available(iOS 13.0, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                return  UIColor(displayP3Red: 204.0/255.0, green: 204.0/255.0, blue: 204.0/255.0, alpha: 1.0)
+            }else {
+                return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+            }
+        } else {
+            return  UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+        }
+    }
+    
+    @objc public var notificationAction: UIColor {
+        return UIColor(red: 0/255.0, green: 153/255.0, blue: 255/255.0, alpha: 1.0)
+    }
+
+    @objc public var secondarySystemGroupedBackground: UIColor = UIColor.secondarySystemGroupedBackground
+    @objc public var label: UIColor = UIColor.label
+    @objc public var backgroundForm: UIColor = UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
+    @objc public let graySoft: UIColor = UIColor(red: 162.0/255.0, green: 162.0/255.0, blue: 162.0/255.0, alpha: 0.5)
+    @objc public let systemGray4: UIColor = UIColor.systemGray4
+    @objc public let systemBackground: UIColor = UIColor.systemBackground
+    @objc public let textInfo: UIColor = UIColor(red: 153.0/255.0, green: 153.0/255.0, blue: 153.0/255.0, alpha: 1.0)
+    @objc public let systemGray: UIColor = UIColor.systemGray
+    @objc public let customerDarkGrey: UIColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1.0)
+    @objc public var fileFolderName: UIColor = UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+    @objc public let optionItem: UIColor = UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
+    @objc public var singleTitleColorButton: UIColor = UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
+    @objc public var shareCellTitleColor: UIColor = UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+    @objc public var gray60: UIColor {
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return  UIColor(red: 178.0/255.0, green: 178.0/255.0, blue: 178.0/255.0, alpha: 1.0)
+        } else {
+            return  UIColor(red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+        }
+    }
+    @objc public var systemGray2: UIColor = UIColor.systemGray2
+    @objc public var shareByEmailTextColor: UIColor = UIColor(displayP3Red: 13.0/255.0, green: 57.0/255.0, blue: 223.0/255.0, alpha: 1.0)
+    @objc public var memoryConsuptionBackground: UIColor {
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return  UIColor(red: 25.0/255.0, green: 25.0/255.0, blue: 25.0/255.0, alpha: 1.0)
+        } else {
+            return  UIColor(red: 244.0/255.0, green: 244.0/255.0, blue: 244.0/255.0, alpha: 1.0)
+        }
+    }
+    @objc public var nmcGray0: UIColor{
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return  UIColor(displayP3Red: 242.0/255.0, green: 242.0/255.0, blue: 242.0/255.0, alpha: 1.0)
+        }else {
+            return  UIColor(red: 19.0/255.0, green: 19.0/255.0, blue: 19.0/255.0, alpha: 1.0)
+        }
+    }
+    @objc public var commonViewInfoText: UIColor =  UIColor(displayP3Red: 102.0/255.0, green: 102.0/255.0, blue: 102.0/255.0, alpha: 1.0)
+    @objc public let progressColorGreen60: UIColor = UIColor(red: 115.0/255.0, green: 195.0/255.0, blue: 84.0/255.0, alpha: 1.0)
+    @objc public var seperatorRename: UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
+    @objc public let gray: UIColor = UIColor(red: 104.0/255.0, green: 104.0/255.0, blue: 104.0/255.0, alpha: 1.0)
+    @objc public var nmcIconSharedWithMe: UIColor = UIColor(displayP3Red: 0.0/255.0, green: 153.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+    
+    var shareBlueColor: UIColor{
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return UIColor(hex: "#7d94f9")!
+        }else {
+            return UIColor(hex: "#2238df")!
+        }
+    }
+    
+    var shareBlackColor: UIColor{
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return UIColor.white
+        }else {
+            return UIColor.black
+        }
     }
 }
