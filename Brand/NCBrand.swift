@@ -7,8 +7,9 @@ import NextcloudKit
 
 let userAgent: String = {
     let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-    // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
-    return "Mozilla/5.0 (iOS) Magenta-iOS/\(appVersion)"
+    // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)-Nextcloud"
+    let suffixBrand = NCBrandOptions.shared.brandUserAgent.isEmpty ? "" : "-\(NCBrandOptions.shared.brandUserAgent)"
+    return "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)\(suffixBrand)"
 }()
 
  /*
@@ -19,13 +20,8 @@ let userAgent: String = {
  The codename embodies the concept of dynamic, living matter — reflecting our vision of a platform that is not only powerful and reliable, but also capable of continuous transformation and intelligent adaptation.
  */
 
-//final class NCBrandOptions: @unchecked Sendable {
-//    static let shared = NCBrandOptions()
-@objc class NCBrandOptions: NSObject, @unchecked Sendable {
-    @objc static let shared: NCBrandOptions = {
-        let instance = NCBrandOptions()
-        return instance
-    }()
+final class NCBrandOptions: @unchecked Sendable {
+    static let shared = NCBrandOptions()
 
     var brand:                           String = "MagentaCLOUD"
     var brandUserAgent:             String = "MagentaCLOUD"
@@ -67,13 +63,8 @@ let userAgent: String = {
     
     var use_AppConfig: Bool = false                                                         // Don't touch me !!
 
-    // Options
     // Use server theming color
-    @objc public var use_default_auto_upload: Bool = false
-    @objc public var use_themingColor: Bool = false
-    @objc public var use_themingLogo: Bool = false
-    @objc public var use_storeLocalAutoUploadAll: Bool = false
-    @objc public var use_loginflowv2: Bool = false
+    var use_themingColor: Bool = true
 
     var disable_intro: Bool = false
     var disable_request_login_url: Bool = false
@@ -130,9 +121,6 @@ let userAgent: String = {
             if let str = configurationManaged[NCGlobal.shared.configuration_disable_log] as? String {
                 disable_log = (str as NSString).boolValue
             }
-            if let str = configurationManaged[NCGlobal.shared.configuration_disable_manage_account] as? String {
-                disable_manage_account = (str as NSString).boolValue
-            }
             if let str = configurationManaged[NCGlobal.shared.configuration_disable_more_external_site] as? String {
                 disable_more_external_site = (str as NSString).boolValue
             }
@@ -173,11 +161,8 @@ let userAgent: String = {
     }
 }
 
-class NCBrandColor: NSObject, @unchecked Sendable  {
-    static let shared: NCBrandColor = {
-        let instance = NCBrandColor()
-        return instance
-    }()
+final class NCBrandColor: @unchecked Sendable {
+    static let shared = NCBrandColor()
 
     // This is rewrited from customet theme, default is Nextcloud color
     let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // Nextcloud : #0082C9
@@ -231,7 +216,7 @@ class NCBrandColor: NSObject, @unchecked Sendable  {
         }
     }
 
-    override init() {
+    init() {
         brand = customer
         brandElement = customer
         brandText = customerText
