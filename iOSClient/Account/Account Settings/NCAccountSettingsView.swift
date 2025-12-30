@@ -9,6 +9,7 @@ struct NCAccountSettingsView: View {
     @ObservedObject var model: NCAccountSettingsModel
 
     @State private var isExpanded: Bool = false
+    @State private var showUserStatus = false
     @State private var showServerCertificate = false
     @State private var showPushCertificate = false
     @State private var showDeleteAccountAlert: Bool = false
@@ -161,8 +162,8 @@ struct NCAccountSettingsView: View {
                                 }
                             }
                         }
+                        .onChange(of: showUserStatus) { }
                     }
-
                     //
                     // Certificate server
                     if model.isAdminGroup() {
