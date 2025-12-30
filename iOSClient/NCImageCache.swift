@@ -5,8 +5,8 @@
 import Foundation
 import UIKit
 
-@objc class NCImageCache: NSObject, @unchecked Sendable {
-    @objc static let shared = NCImageCache()
+final class NCImageCache: @unchecked Sendable {
+    static let shared = NCImageCache()
 
     private let utility = NCUtility()
     private let cache = NSCache<NSString, UIImage>()
@@ -82,9 +82,6 @@ import UIKit
             self.countLimit = self.countLimit - 500
             if self.countLimit <= 0 { self.countLimit = 100 }
             self.cache = LRUCache<String, UIImage>(countLimit: self.countLimit)
-#if DEBUG
-        NCContentPresenter().messageNotification("Cache image memory warning \(self.countLimit)", error: .success, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
-#endif
         }
 #if DEBUG
         NCContentPresenter().messageNotification("Cache image memory warning \(self.countLimit)", error: .success, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
@@ -434,6 +431,7 @@ import UIKit
         static var buttonMore = UIImage()
         static var buttonStop = UIImage()
         static var buttonMoreLock = UIImage()
+
         static var buttonRestore = UIImage()
         static var buttonTrash = UIImage()
         
@@ -446,31 +444,31 @@ import UIKit
         static var iconPages = UIImage()
         static var iconFile = UIImage()
     }
-
+    
     func createImagesCache() {
         let utility = NCUtility()
 
-        images.file = UIImage(named: "file")!
-
-        images.shared = UIImage(named: "share")!.image(color: .systemGray, size: 24)//50)
-        images.canShare = UIImage(named: "share")!.image(color: .systemGray, size: 24)//50)
-        images.shareByLink = UIImage(named: "sharebylink")!.image(color: .systemGray, size: 24)//50)
-        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)//50)
-        
-        images.favorite = utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
-        images.comment = UIImage(named: "comment")!.image(color: .systemGray, size: 24)//50)
-        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
-        images.offlineFlag = UIImage(named: "offlineFlag")!
-        images.local = UIImage(named: "local")!
-
-        images.checkedYes = UIImage(named: "checkedYes")!
-        images.checkedNo = utility.loadImage(named: "circle")
-
-        images.buttonMore = UIImage(named: "more")!.image(color: .systemGray, size: 24)//50)
-        images.buttonStop = UIImage(named: "stop")!.image(color: .systemGray, size: 24)//50)
-        images.buttonMoreLock = UIImage(named: "moreLock")!.image(color: .systemGray, size: 24)//50)
-        images.buttonRestore = UIImage(named: "restore")!.image(color: .systemGray, size: 24)//50)
-        images.buttonTrash = UIImage(named: "trash")!.image(color: .systemGray, size: 24)//50)
+//        images.file = UIImage(named: "file")!
+//
+//        images.shared = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+//        images.canShare = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+//        images.shareByLink = UIImage(named: "sharebylink")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+//        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)//50)
+//
+////        images.favorite = utility.loadImage(named: "star", colors: [NCBrandColor.shared.yellowFavorite]) //utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
+//        images.comment = UIImage(named: "comment")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+//        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
+//        images.offlineFlag = utility.loadImage(named: "arrow.down.circle.fill", colors: [.systemGreen], size: 24)
+//        images.local = utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen], size: 24)
+//
+//        images.checkedYes = UIImage(named: "checkedYes")!
+//        images.checkedNo = utility.loadImage(named: "circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
+//
+//        images.buttonMore = UIImage(named: "more")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+//        images.buttonStop = utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
+//        images.buttonMoreLock = utility.loadImage(named: "lock.fill", colors: [NCBrandColor.shared.iconImageColor], size: 24)
+//        images.buttonRestore = UIImage(named: "restore")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
+//        images.buttonTrash = UIImage(named: "trashIcon")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
 
         createImagesBrandCache()
     }
@@ -768,10 +766,6 @@ private actor MediaWindowCache {
     
     func getImageFavorite(colors: [UIColor] = [NCBrandColor.shared.yellowFavorite]) -> UIImage {
         return utility.loadImage(named: "star.fill", colors: colors, size: 24)
-    }
-            
-    func getImageShared() -> UIImage {
-        return NCImageCache.images.shared
     }
 
     func getImageOfflineFlag(colors: [UIColor] = [.systemGreen]) -> UIImage {
