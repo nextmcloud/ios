@@ -7,8 +7,9 @@ import NextcloudKit
 
 let userAgent: String = {
     let appVersion: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-    // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)"
-    return "Mozilla/5.0 (iOS) Magenta-iOS/\(appVersion)"
+    // Original Nextcloud useragent "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)-Nextcloud"
+    let suffixBrand = NCBrandOptions.shared.brandUserAgent.isEmpty ? "" : "-\(NCBrandOptions.shared.brandUserAgent)"
+    return "Mozilla/5.0 (iOS) Nextcloud-iOS/\(appVersion)\(suffixBrand)"
 }()
 
  /*
@@ -19,73 +20,71 @@ let userAgent: String = {
  The codename embodies the concept of dynamic, living matter — reflecting our vision of a platform that is not only powerful and reliable, but also capable of continuous transformation and intelligent adaptation.
  */
 
-//final class NCBrandOptions: @unchecked Sendable {
-//    static let shared = NCBrandOptions()
-@objc class NCBrandOptions: NSObject, @unchecked Sendable {
-    @objc static let shared: NCBrandOptions = {
-        let instance = NCBrandOptions()
-        return instance
-    }()
+final class NCBrandOptions: @unchecked Sendable {
+    static let shared = NCBrandOptions()
 
-    @objc public var brand:                           String = "MagentaCLOUD"
-    @objc public var textCopyrightNextcloudiOS:       String = "MagentaCLOUD for iOS %@"
-    @objc public var textCopyrightNextcloudServer:    String = "MagentaCLOUD Server %@"
-    @objc public var loginBaseUrl:                    String = "https://magentacloud.de"
-    @objc public var pushNotificationServerProxy: String = "https://push-notifications.nextcloud.com"
-    @objc public var linkLoginHost: String = "https://nextcloud.com/install"
-    @objc public var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
-    @objc public var webLoginAutenticationProtocol: String = "nc://"                                                // example "abc://"
-    @objc public var privacy: String = "https://nextcloud.com/privacy"
-    @objc public var sourceCode: String = "https://github.com/nextcloud/ios"
-    @objc public var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
-    @objc public var appStoreUrl: String = "https://apps.apple.com/de/app/magentacloud-cloud-speicher/id312838242"
-
-    // Personalized
-    @objc public var webCloseViewProtocolPersonalized: String = ""                                                  // example "abc://change/plan"      Don't touch me !!
-    @objc public var folderBrandAutoUpload: String = ""                                                             // example "_auto_upload_folder_"   Don't touch me !!
+    var brand:                           String = "MagentaCLOUD"
+    var brandUserAgent:             String = "MagentaCLOUD"
+    var textCopyrightNextcloudiOS:       String = "MagentaCLOUD for iOS %@"
+    var textCopyrightNextcloudServer:    String = "MagentaCLOUD Server %@"
+    var loginBaseUrl:                    String = "https://magentacloud.de"
+    var pushNotificationServerProxy: String = ""
+    var linkLoginHost: String = "https://nextcloud.com/install"
+    var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
+    var webLoginAutenticationProtocol: String = "nc://"                                        // example "abc://"
+    var privacy: String = "https://nextcloud.com/privacy"
+    var sourceCode: String = "https://github.com/nextcloud/ios"
+    var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
+    var appStoreUrl: String = "https://apps.apple.com/in/app/nextcloud/id1125420102"
 
     // Auto Upload default folder
-    @objc public var folderDefaultAutoUpload: String = Locale.current.languageCode == "de" ? "Kamera-Medien" : "Camera-Media"
+//    var folderDefaultAutoUpload: String = Locale.current.language.languageCode?.identifier == "de" ? "Kamera-Medien" : "Camera-Media"
+    // Get the app's preferred language (the language the app is using, not the system language)
+    var folderDefaultAutoUpload: String = (Locale.preferredLanguages.first?.prefix(2) ?? "en") == "de" ? "Kamera-Medien" : "Camera-Media"
+    
 
     // Capabilities Group
-    @objc public var capabilitiesGroup:              String = "group.de.telekom.Mediencenter"
-    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
-
+//    var capabilitiesGroup: String = "group.it.twsweb.Crypto-Cloud"
+//    var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
+//#if DEBUG
+    // QA :
+    @objc public var capabilitiesGroup:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
+    @objc public var capabilitiesGroupApps:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
+//#else
+//    // PROD :
+//    @objc public var capabilitiesGroup:              String = "group.de.telekom.Mediencenter"
+//    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
+//#endif
+    
     // BRAND ONLY
     // Set use_login_web_personalized to true for prod and false for configurable path
-    @objc public var use_login_web_personalized: Bool = true                               // Don't touch me !!
-    @objc public var use_AppConfig: Bool = false                                                // Don't touch me !!
-    @objc public var use_GroupApps: Bool = true                                                 // Don't touch me !!
+    var use_login_web_personalized: Bool = true                               // Don't touch me !!
+    var use_GroupApps: Bool = true
+    
+    var use_AppConfig: Bool = false                                                         // Don't touch me !!
 
-    // Options
     // Use server theming color
-    @objc public var use_default_auto_upload: Bool = false
-    @objc public var use_themingColor: Bool = false
-    @objc public var use_themingLogo: Bool = false
-    @objc public var use_storeLocalAutoUploadAll: Bool = false
-    @objc public var use_loginflowv2: Bool = false
+    var use_themingColor: Bool = true
 
-    @objc var disable_intro:       Bool = false//true
-    @objc var disable_request_login_url:       Bool = false//true
-    @objc public var disable_multiaccount:            Bool = true
-    @objc public var disable_manage_account:          Bool = false
-    @objc var disable_more_external_site: Bool = false
-    @objc var disable_openin_file: Bool = false                                          // Don't touch me !!
-    @objc var disable_crash_service:             Bool = true
-    @objc var disable_log: Bool = false
-    @objc var disable_mobileconfig: Bool = false
-    @objc var disable_show_more_nextcloud_apps_in_settings:         Bool = true
-    @objc var doNotAskPasscodeAtStartup: Bool = false
-    @objc var disable_source_code_in_settings: Bool = false
-    @objc var enforce_passcode_lock = false
-    @objc var use_in_app_browser_for_login = false
+    var disable_intro: Bool = false
+    var disable_request_login_url: Bool = false
+    var disable_multiaccount: Bool = false
+    var disable_more_external_site: Bool = false
+    var disable_openin_file: Bool = false                                                       // Don't touch me !!
+    var disable_crash_service: Bool = false
+    var disable_log: Bool = false
+    var disable_mobileconfig: Bool = false
+    var disable_show_more_nextcloud_apps_in_settings: Bool = true
+    var doNotAskPasscodeAtStartup: Bool = false
+    var disable_source_code_in_settings: Bool = false
+    var enforce_passcode_lock = false
     var enforce_privacyScreenEnabled = false
 
     // Example: (name: "Name 1", url: "https://cloud.nextcloud.com"),(name: "Name 2", url: "https://cloud.nextcloud.com")
     var enforce_servers: [(name: String, url: String)] = []
 
     // Internal option behaviour
-    @objc var cleanUpDay: Int = 0                                                                     // Set default "Delete all cached files older than" possible days value are: 0, 1, 7, 30, 90, 180, 365
+    var cleanUpDay: Int = 0                                                                     // Set default "Delete all cached files older than" possible days value are: 0, 1, 7, 30, 90, 180, 365
 
     // Max request/download/upload concurrent
     let httpMaximumConnectionsPerHost: Int = 8
@@ -96,7 +95,7 @@ let userAgent: String = {
     let numMaximumProcess: Int = 20
 
     // Number of failed attempts after reset app
-    @objc let resetAppPasscodeAttempts: Int = 10
+    let resetAppPasscodeAttempts: Int = 10
     let passcodeSecondsFail: Int = 60
 
     // Info Paging
@@ -121,9 +120,6 @@ let userAgent: String = {
             }
             if let str = configurationManaged[NCGlobal.shared.configuration_disable_log] as? String {
                 disable_log = (str as NSString).boolValue
-            }
-            if let str = configurationManaged[NCGlobal.shared.configuration_disable_manage_account] as? String {
-                disable_manage_account = (str as NSString).boolValue
             }
             if let str = configurationManaged[NCGlobal.shared.configuration_disable_more_external_site] as? String {
                 disable_more_external_site = (str as NSString).boolValue
@@ -165,35 +161,38 @@ let userAgent: String = {
     }
 }
 
-class NCBrandColor: NSObject, @unchecked Sendable  {
-    static let shared: NCBrandColor = {
-        let instance = NCBrandColor()
-        return instance
-    }()
+final class NCBrandColor: @unchecked Sendable {
+    static let shared = NCBrandColor()
 
-    /// This is rewrited from customet theme, default is Nextcloud color
-    ///
-    @objc let customer:              UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)
-    @objc var customerText: UIColor = .white
+    // This is rewrited from customet theme, default is Nextcloud color
+    let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // Nextcloud : #0082C9
+    var customerText: UIColor = .white
 
-    @objc var brand: UIColor                                                                                         // don't touch me
-    @objc var brandElement: UIColor                                                                                  // don't touch me
-    @objc var brandText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
-
+    var brand: UIColor                                                                                         // don't touch me
+    var brandElement: UIColor                                                                                  // don't touch me
+    var brandText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+    
     // INTERNAL DEFINE COLORS
     private var themingColor = ThreadSafeDictionary<String, UIColor>()
     private var themingColorElement = ThreadSafeDictionary<String, UIColor>()
     private var themingColorText = ThreadSafeDictionary<String, UIColor>()
 
     var userColors: [CGColor] = []
-    let yellowFavorite: UIColor = UIColor(red: 0.6118, green: 0.4549, blue: 0.1451, alpha: 1.0)
+    let yellowFavorite: UIColor = UIColor(red: 248.0 / 255.0, green: 205.0 / 255.0, blue: 70.0 / 255.0, alpha: 1.0)
     let iconImageColor: UIColor = .label
     let iconImageColor2: UIColor = .secondaryLabel
     let iconImageMultiColors: [UIColor] = [.secondaryLabel, .label]
     let textColor: UIColor = .label
     let textColor2: UIColor = .secondaryLabel
+    let iconSystemGrayColor: UIColor = .systemGray
 
-    @objc var systemMint: UIColor {
+    var systemBlueColor: UIColor {
+        get {
+            return UIColor(hex: "#84B0F5")!
+        }
+    }
+    
+    var systemMint: UIColor {
         get {
             return UIColor(red: 0.0 / 255.0, green: 199.0 / 255.0, blue: 190.0 / 255.0, alpha: 1.0)
         }
@@ -217,7 +216,7 @@ class NCBrandColor: NSObject, @unchecked Sendable  {
         }
     }
 
-    override init() {
+    init() {
         brand = customer
         brandElement = customer
         brandText = customerText
@@ -436,4 +435,20 @@ class NCBrandColor: NSObject, @unchecked Sendable  {
     @objc public var seperatorRename: UIColor = UIColor(red: 235.0/255.0, green: 235.0/255.0, blue: 235.0/255.0, alpha: 1.0)
     @objc public let gray: UIColor = UIColor(red: 104.0/255.0, green: 104.0/255.0, blue: 104.0/255.0, alpha: 1.0)
     @objc public var nmcIconSharedWithMe: UIColor = UIColor(displayP3Red: 0.0/255.0, green: 153.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+    
+    var shareBlueColor: UIColor{
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return UIColor(hex: "#7d94f9")!
+        }else {
+            return UIColor(hex: "#2238df")!
+        }
+    }
+    
+    var shareBlackColor: UIColor{
+        if UITraitCollection.current.userInterfaceStyle == .dark {
+            return UIColor.white
+        }else {
+            return UIColor.black
+        }
+    }
 }
