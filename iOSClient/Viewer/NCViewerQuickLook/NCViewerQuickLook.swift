@@ -198,6 +198,16 @@ extension NCViewerQuickLook: QLPreviewControllerDataSource, QLPreviewControllerD
         return isEditingEnabled ? .createCopy : .disabled // File is in private storage, so .updateContents is not possible and will still act as .createCopy.
     }
 
+//    func previewController(_ controller: QLPreviewController, editingModeFor previewItem: QLPreviewItem) -> QLPreviewItemEditingMode {
+//        // Check if the editing mode allows updating the original contents
+//        if isEditingEnabled {
+//            hasChangesQuickLook = true  // Mark changes if editing is enabled
+//            return .createCopy // Allows editing and overwriting the original file
+//        }
+//
+//        return .disabled // Disable editing if not enabled
+//    }
+
     fileprivate func saveModifiedFile(override: Bool) {
         guard let metadata = self.metadata else { return }
         let session = NCSession.shared.getSession(account: metadata.account)
@@ -244,6 +254,23 @@ extension NCViewerQuickLook: QLPreviewControllerDataSource, QLPreviewControllerD
         guard utilityFileSystem.copyFile(atPath: modifiedContentsURL.path, toPath: url.path) else { return }
         hasChangesQuickLook = true
     }
+
+//    func previewController(_ controller: QLPreviewController, didSaveEditedContentsOf previewItem: QLPreviewItem, at modifiedURL: URL) {
+//        // This method is called if the user saves a *new* copy of the edited file.
+//        print("Content was saved to a new URL: \(modifiedURL)")
+//        hasChangesQuickLook = true
+//        // You might need to update your internal fileURL reference here if you want to use the new file.
+//    }
+//
+//    func previewController(_ controller: QLPreviewController, didUpdateContentsOf previewItem: QLPreviewItem) {
+//        // Check if the file contents have actually been updated
+//        if let fileURL = previewItem.previewItemURL {
+//            // Custom logic to check if contents have been modified
+//            print("File contents updated at: \(fileURL)")
+//            hasChangesQuickLook = true // Mark as changed
+//        }
+//    }
+
 }
 
 extension NCViewerQuickLook: CropViewControllerDelegate {

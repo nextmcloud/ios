@@ -225,6 +225,36 @@ final class NCPreferences: NSObject {
         }
     }
 
+    var mediaColumnCount: Int {
+        get {
+            let value = getIntPreference(key: "mediaColumnCount", defaultValue: 3)
+            return value
+        }
+        set {
+            setUserDefaults(newValue, forKey: "mediaColumnCount")
+        }
+    }
+
+    var mediaTypeLayout: String {
+        get {
+            let value = getStringPreference(key: "mediaTypeLayout", defaultValue: NCGlobal.shared.mediaLayoutRatio)
+            return value
+        }
+        set {
+            setUserDefaults(newValue, forKey: "mediaTypeLayout")
+        }
+    }
+    
+    var mediaSortDate: String {
+        get {
+            let value = getStringPreference(key: "mediaSortDate", defaultValue: "date")
+            return value
+        }
+        set {
+            setUserDefaults(newValue, forKey: "mediaSortDate")
+        }
+    }
+    
     var textRecognitionStatus: Bool {
         get {
             return getBoolPreference(key: "textRecognitionStatus", defaultValue: false)
