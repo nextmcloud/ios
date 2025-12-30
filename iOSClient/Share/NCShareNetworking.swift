@@ -36,7 +36,6 @@ class NCShareNetworking: NSObject {
         self.view = view
         self.delegate = delegate
         self.session = session
-
         super.init()
     }
 
@@ -113,6 +112,37 @@ class NCShareNetworking: NSObject {
             }
         }
     }
+    
+    // MARK: - Create Share Link
+    func createShareLink(password: String?) {
+        NCActivityIndicator.shared.start(backgroundView: view)
+        let filenamePath = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
+
+        NextcloudKit.shared.createShare(path: filenamePath,
+                                        shareType: NCShareCommon.shareTypeLink,
+                                        shareWith: "",
+                                        account: metadata.account) { [weak self] account, share, _, error in
+            guard let self = self else { return }
+            NCActivityIndicator.shared.stop()
+
+            if error == .success, let share = share {
+                let home = self.utilityFileSystem.getHomeServer(session: self.session)
+                self.database.addShare(account: self.metadata.account, home: home, shares: [share])
+
+                if !self.metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__SHARE_FILE, metadata: self.metadata)
+                }
+
+                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterDidCreateShareLink)
+                // 🔄 ensure we sync DB + UI with server
+                self.readShare(showLoadingIndicator: false)
+            } else {
+                NCContentPresenter().showError(error: error)
+            }
+
+            self.delegate?.shareCompleted()
+        }
+    }
 
     func createShare(_ shareable: Shareable, downloadLimit: DownloadLimitViewModel) {
         NCActivityIndicator.shared.start(backgroundView: view)
@@ -144,20 +174,24 @@ class NCShareNetworking: NSObject {
                 self.database.addShare(account: self.metadata.account, home: home, shares: [share])
 
                 if shareable.hasChanges(comparedTo: share) {
-                    self.updateShare(shareable, downloadLimit: downloadLimit, changeDownloadLimit: true)
+                    self.updateShare(shareable, downloadLimit: downloadLimit)
                     // Download limit update should happen implicitly on share update.
                 } else {
                     if case let .limited(limit, _) = downloadLimit,
                        capabilities.fileSharingDownloadLimit,
-                       shareable.shareType == NKShare.ShareType.publicLink.rawValue,
+                       shareable.shareType == NCShareCommon.shareTypeLink,
                        shareable.itemType == NCShareCommon.itemTypeFile {
                         self.setShareDownloadLimit(limit, token: share.token)
                     }
                 }
+                
+                if !self.metadata.contentType.contains("directory") {
+                    AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__SHARE_FILE, metadata: self.metadata)
+                }
 
                 Task {
                     await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                        delegate.transferReloadData(serverUrl: self.metadata.serverUrl, requestData: true, status: nil)
+                        delegate.transferRequestData(serverUrl: self.metadata.serverUrl)
                     }
                 }
             } else {
@@ -186,7 +220,7 @@ class NCShareNetworking: NSObject {
 
                 Task {
                     await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                        delegate.transferReloadData(serverUrl: self.metadata.serverUrl, requestData: true, status: nil)
+                        delegate.transferRequestData(serverUrl: self.metadata.serverUrl)
                     }
                 }
             } else {
@@ -195,7 +229,7 @@ class NCShareNetworking: NSObject {
         }
     }
 
-    func updateShare(_ shareable: Shareable, downloadLimit: DownloadLimitViewModel, changeDownloadLimit: Bool = false) {
+    func updateShare(_ shareable: Shareable, downloadLimit: DownloadLimitViewModel) {
         NCActivityIndicator.shared.start(backgroundView: view)
         NextcloudKit.shared.updateShare(idShare: shareable.idShare, password: shareable.password, expireDate: shareable.formattedDateString, permissions: shareable.permissions, note: shareable.note, label: shareable.label, hideDownload: shareable.hideDownload, attributes: shareable.attributes, account: metadata.account) { task in
             Task {
@@ -215,9 +249,8 @@ class NCShareNetworking: NSObject {
                 self.delegate?.readShareCompleted()
 
                 if capabilities.fileSharingDownloadLimit,
-                   shareable.shareType == NKShare.ShareType.publicLink.rawValue,
-                   shareable.itemType == NCShareCommon.itemTypeFile,
-                   changeDownloadLimit {
+                   shareable.shareType == NCShareCommon.shareTypeLink,
+                   shareable.itemType == NCShareCommon.itemTypeFile {
                     if case let .limited(limit, _) = downloadLimit {
                         self.setShareDownloadLimit(limit, token: share.token)
                     } else {
@@ -227,7 +260,7 @@ class NCShareNetworking: NSObject {
 
                 Task {
                     await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                        delegate.transferReloadData(serverUrl: self.metadata.serverUrl, requestData: true, status: nil)
+                        delegate.transferRequestData(serverUrl: self.metadata.serverUrl)
                     }
                 }
             } else {
