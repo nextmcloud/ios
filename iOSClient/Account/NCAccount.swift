@@ -74,10 +74,10 @@ class NCAccount: NSObject {
             controller.modalPresentationStyle = .fullScreen
             controller.view.alpha = 0
 
-            UIApplication.shared.mainAppWindow?.rootViewController = controller
-            UIApplication.shared.mainAppWindow?.makeKeyAndVisible()
+            UIApplication.shared.firstWindow?.rootViewController = controller
+            UIApplication.shared.firstWindow?.makeKeyAndVisible()
 
-            if let scene = UIApplication.shared.mainAppWindow?.windowScene {
+            if let scene = UIApplication.shared.firstWindow?.windowScene {
                 SceneManager.shared.register(scene: scene, withRootViewController: controller)
             }
 
@@ -108,6 +108,9 @@ class NCAccount: NSObject {
                 // set theming color
                 NCBrandColor.shared.settingThemingColor(account: account, capabilities: capabilities)
             }
+            // Start the auto upload
+            let num = await NCAutoUpload.shared.initAutoUpload(tblAccount: tblAccount)
+            nkLog(start: "Auto upload with \(num) photo")
             // Networking Process
             await NCNetworkingProcess.shared.setCurrentAccount(account)
 
