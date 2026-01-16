@@ -12,7 +12,6 @@ import Photos
 import SVGKit
 
 extension NCUtility {
-    
     func loadImage(named imageName: String, colors: [UIColor]? = nil, size: CGFloat? = 24, useTypeIconFile: Bool = false, account: String? = nil, symbolConfiguration: Any? = nil) -> UIImage {
         var image: UIImage?
 

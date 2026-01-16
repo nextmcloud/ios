@@ -11,7 +11,7 @@ enum ContextMenuActions {
          var message = NSLocalizedString("_want_delete_", comment: "")
          var icon = "trashIcon"
          var destructive = true
-        var color = NCBrandColor.shared.iconImageColor
+         var color = NCBrandColor.shared.iconImageColor
 
          if selectedMetadatas.count > 1 {
              titleDelete = NSLocalizedString("_delete_selected_files_", comment: "")
@@ -162,6 +162,7 @@ enum ContextMenuActions {
          }
      }
     
+    /*
     /// Save selected files to user's photo library
     static func saveMediaAction(selectedMediaMetadatas: [tableMetadata], controller: NCMainTabBarController?, completion: (() -> Void)? = nil) -> UIAction {
         var title: String = NSLocalizedString("_save_selected_files_", comment: "")
@@ -233,4 +234,5 @@ enum ContextMenuActions {
                 }
         }
     }
+     */
 }

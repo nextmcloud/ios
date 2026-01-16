@@ -155,7 +155,7 @@ class NCLoginWeb: UIViewController {
         super.viewDidAppear(animated)
 
         // Stop timer error network
-        appDelegate.timerErrorNetworking?.invalidate()
+//        appDelegate.timerErrorNetworking?.invalidate()
 
         if let account = NCManageDatabase.shared.getActiveTableAccount(), NCPreferences().getPassword(account: account.account).isEmpty {
 
@@ -176,7 +176,7 @@ class NCLoginWeb: UIViewController {
         super.viewDidDisappear(animated)
 
         // Start timer error network
-        appDelegate.startTimerErrorNetworking()
+//        appDelegate.startTimerErrorNetworking()
     }
 
     func loadWebPage(webView: WKWebView, url: URL) {

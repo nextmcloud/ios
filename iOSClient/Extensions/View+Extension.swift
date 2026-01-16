@@ -72,26 +72,3 @@ struct ViewFirstAppearModifier: ViewModifier {
         }
     }
 }
-
-var isRunningForPreviews: Bool {
-    return ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
-}
-
-extension UIView {
-    func allImageViews() -> [UIImageView] {
-        var result = [UIImageView]()
-
-        // Check if the current view is an UIImageView
-        if let imageView = self as? UIImageView {
-            result.append(imageView)
-        }
-
-        // Recursively check all subviews
-        for subview in subviews {
-            result.append(contentsOf: subview.allImageViews())
-        }
-
-        return result
-    }
-}
-

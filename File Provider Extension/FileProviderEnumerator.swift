@@ -11,8 +11,6 @@ class FileProviderEnumerator: NSObject, NSFileProviderEnumerator {
     var enumeratedItemIdentifier: NSFileProviderItemIdentifier
     var serverUrl: String?
     var anchor: UInt64 = 0
-    // X-NC-PAGINATE
-    var recordsPerPage: Int = 100
     var readCapabilities: Bool = false
 
     // X-NC-PAGINATE

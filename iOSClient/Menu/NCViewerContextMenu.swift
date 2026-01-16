@@ -91,27 +91,27 @@ enum NCViewerContextMenu {
             //
             // PRINT
             //
-            if !webView, metadata.isPrintable {
-                let action = UIAction(
-                    title: NSLocalizedString("_print_", comment: ""),
-                    image: NCUtility().loadImage(named: "printer", colors: [NCBrandColor.shared.iconImageColor])
-                ) { _ in
-                    if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
-                        metadata.sessionSelector = NCGlobal.shared.selectorPrint
-                        NCDownloadAction.shared.downloadedFile(metadata: metadata, error: NKError())
-                    } else {
-                        NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint))
-
-                    }
-                }
-                menuElements.append(action)
-            }
+//            if !webView, metadata.isPrintable {
+//                let action = UIAction(
+//                    title: NSLocalizedString("_print_", comment: ""),
+//                    image: NCUtility().loadImage(named: "printer", colors: [NCBrandColor.shared.iconImageColor])
+//                ) { _ in
+//                    if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
+//                        metadata.sessionSelector = NCGlobal.shared.selectorPrint
+//                        NCDownloadAction.shared.downloadedFile(metadata: metadata, error: NKError())
+//                    } else {
+//                        NCNetworking.shared.downloadQueue.addOperation(NCOperationDownload(metadata: metadata, selector: NCGlobal.shared.selectorPrint))
+//
+//                    }
+//                }
+//                menuElements.append(action)
+//            }
         
             //
             // SAVE CAMERA ROLL
             //
             if !webView, metadata.isSavebleInCameraRoll {
-                menuElements.append(ContextMenuActions.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller))
+//                menuElements.append(ContextMenuActions.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller))
             }
 
 
@@ -144,13 +144,13 @@ enum NCViewerContextMenu {
             // COPY - MOVE
             //
             if !webView, metadata.isCopyableMovable {
-                menuElements.append(ContextMenuActions.moveOrCopyAction(selectedMetadatas: [metadata], account: metadata.account, controller: controller))
+//                menuElements.append(ContextMenuActions.moveOrCopyAction(selectedMetadatas: [metadata], account: metadata.account, controller: controller))
             }
             
             // COPY IN PASTEBOARD
             //
             if !webView, metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE {
-                menuElements.append(ContextMenuActions.copyAction(fileSelect: [metadata.ocId], controller: controller))
+//                menuElements.append(ContextMenuActions.copyAction(fileSelect: [metadata.ocId], controller: controller))
             }
            //
            // PDF EXAMPLES
@@ -186,9 +186,9 @@ enum NCViewerContextMenu {
                                     await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
                                         let metadata = metadata.detachedCopy()
                                         metadata.sessionSelector = NCGlobal.shared.selectorLoadFileQuickLook
-                                        delegate.transferChange(status: NCGlobal.shared.networkingStatusDownloaded,
-                                                                metadata: metadata,
-                                                                error: .success)
+//                                        delegate.transferChange(status: NCGlobal.shared.networkingStatusDownloaded,
+//                                                                metadata: metadata,
+//                                                                error: .success)
                                     }
                                 } else {
                                     if let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: metadata.ocId,

@@ -13,7 +13,7 @@ class NCDisplayModel: ObservableObject, ViewOnAppearHandling {
     // State variable for enabling the automatic appreance
     @Published var appearanceAutomatic: Bool = false
 
-    // State variable for keeping the screen on or off during file transfering
+    // State variable for keeping the screen on or off during file transfering 
     @Published var screenAwakeState = AwakeMode.off {
         didSet {
             keychain.screenAwakeMode = screenAwakeState

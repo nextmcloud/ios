@@ -43,27 +43,12 @@ class NCShareExtension: UIViewController {
     var progress: CGFloat = 0
     var counterUploaded: Int = 0
     var uploadMetadata: [tableMetadata] = []
-    let hud = NCHud()
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
     let global = NCGlobal.shared
     var maintenanceMode: Bool = false
     var token: Int?
 
-    let database = NCManageDatabase.shared
-    var account: String = ""
-    var session: NCSession.Session {
-        if !account.isEmpty,
-           let tableAccount = self.database.getTableAccount(account: account) {
-            return NCSession.Session(account: tableAccount.account, urlBase: tableAccount.urlBase, user: tableAccount.user, userId: tableAccount.userId)
-        } else if let activeTableAccount = self.database.getActiveTableAccount() {
-            self.account = activeTableAccount.account
-            return NCSession.Session(account: activeTableAccount.account, urlBase: activeTableAccount.urlBase, user: activeTableAccount.user, userId: activeTableAccount.userId)
-        } else {
-            return NCSession.Session(account: "", urlBase: "", user: "", userId: "")
-        }
-    }
-    
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -103,7 +88,6 @@ class NCShareExtension: UIViewController {
         nkLog(start: "Start Share session " + versionNextcloudiOS)
 
         NCBrandColor.shared.createUserColors()
-        NCImageCache.shared.createImagesCache()
 
         NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: nil) { _ in
             if NCPreferences().presentPasscode {

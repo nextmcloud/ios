@@ -30,28 +30,14 @@ extension NCShare {
         let capabilities = NCNetworking.shared.capabilities[self.metadata.account] ?? NKCapabilities.Capabilities()
         var actions = [NCMenuAction]()
 
-//        if share.shareType == NCShareCommon.shareTypeLink, canReshare {
-//            actions.append(
-//                NCMenuAction(
-//                    title: NSLocalizedString("_share_add_sharelink_", comment: ""),
-//                    icon: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor]),
-//                    sender: sender,
-//                    action: { _ in
-//                        self.makeNewLinkShare()
-//                    }
-//                )
-//            )
-//        }
-        
-        if !folder {
         if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_open_in_", comment: ""),
-                    icon: utility.loadImage(named: "open_file", colors: [NCBrandColor.shared.brandElement]),
+                    title: NSLocalizedString("_share_add_sharelink_", comment: ""),
+                    icon: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor]),
                     sender: sender,
                     action: { _ in
-                        NCShareCommon.copyLink(link: share.url, viewController: self, sender: sender)
+                        self.makeNewLinkShare()
                     }
                 )
             )
@@ -108,8 +94,6 @@ extension NCShare {
                 sender: sender,
                 action: { _ in
                     Task {
-                        if share.shareType != NCShareCommon.shareTypeLink, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
-                            let serverUrl = metadata.serverUrl + "/" + metadata.fileName
                         if share.shareType != NKShare.ShareType.publicLink.rawValue, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
                             if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
                                 let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
@@ -125,30 +109,7 @@ extension NCShare {
                 }
             )
         )
-//        actions.append(
-//            NCMenuAction(
-//                title: NSLocalizedString("_share_unshare_", comment: ""),
-//                destructive: true,
-//                icon: utility.loadImage(named: "person.2.slash"),
-//                sender: sender,
-//                action: { _ in
-//                    Task {
-//                        if share.shareType != NCShareCommon.shareTypeLink, let metadata = self.metadata, metadata.e2eEncrypted && capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
-//                            if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
-//                                let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
-//                                return NCContentPresenter().showInfo(error: error)
-//                            }
-//                            let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: metadata.serverUrlFileName, addUserId: nil, removeUserId: share.shareWith, account: metadata.account)
-//                            if error != .success {
-//                                return NCContentPresenter().showError(error: error)
-//                            }
-//                        }
-//                        self.networking?.unShare(idShare: share.idShare)
-//                    }
-//                }
-//            )
-//        )
-        
+
         self.presentMenu(with: actions, sender: sender)
     }
 

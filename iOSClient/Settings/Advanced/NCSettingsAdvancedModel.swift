@@ -93,13 +93,6 @@ class NCSettingsAdvancedModel: ObservableObject, ViewOnAppearHandling {
         keychain.log = selectedLogLevel
         NKLogFileManager.shared.logLevel = selectedLogLevel
     }
-    
-    /// Remove directory LOG
-    func clearLogFile() {
-        let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let logsFolder = documents.appendingPathComponent("Logs", isDirectory: true)
-        try? FileManager.default.removeItem(at: logsFolder)
-    }
 
     /// Remove directory LOG
     func clearLogFile() {

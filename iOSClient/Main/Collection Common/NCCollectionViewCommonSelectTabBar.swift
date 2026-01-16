@@ -88,7 +88,6 @@ class NCCollectionViewCommonSelectTabBar: ObservableObject {
     }
 
     func update(fileSelect: [String], metadatas: [tableMetadata]? = nil, userId: String? = nil) {
-        
         if let metadatas {
             isAnyOffline = false
             canSetAsOffline = true

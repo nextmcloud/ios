@@ -19,6 +19,8 @@ final class NCImageCache: @unchecked Sendable {
     private let allowExtensions = [NCGlobal.shared.previewExt256]
     private var brandElementColor: UIColor?
 
+    private var observerToken: NSObjectProtocol?
+
     public var countLimit: Int = 2000
     lazy var cache: LRUCache<String, UIImage> = {
         return LRUCache<String, UIImage>(countLimit: countLimit)
@@ -27,25 +29,14 @@ final class NCImageCache: @unchecked Sendable {
     public var isLoadingCache: Bool = false
     public var controller: UITabBarController?
 
-    let showBothPredicateMediaString = "account == %@ AND serverUrl BEGINSWITH %@ AND (classFile == '\(NKTypeClassFile.image.rawValue)' OR classFile == '\(NKTypeClassFile.video.rawValue)') AND NOT (session CONTAINS[c] 'upload') AND NOT (livePhotoFile != '' AND classFile == '\(NKTypeClassFile.video.rawValue)')"
-
     init() {
         observerToken = NotificationCenter.default.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: nil) { _ in
             self.cache.removeAll()
-
-        countLimit = calculateMaxImages(percentage: 5.0, imageSizeKB: 30.0) // 5% of cache = 20
-        NextcloudKit.shared.nkCommonInstance.writeLog("Counter cache image: \(countLimit)")
-
-        NotificationCenter.default.addObserver(forName: LRUCacheMemoryWarningNotification, object: nil, queue: nil) { _ in
-            self.cache.removeAllValues()
-//            self.countLimit = self.countLimit - 500
-//            if self.countLimit <= 0 { self.countLimit = 100 }
             self.cache = LRUCache<String, UIImage>(countLimit: self.countLimit)
         }
 
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
-            self.cache.removeAllValues()
-//            self.cache.removeAll()
+            self.cache.removeAll()
             self.cache = LRUCache<String, UIImage>(countLimit: self.countLimit)
         }
 
@@ -72,10 +63,10 @@ final class NCImageCache: @unchecked Sendable {
                     self.isLoadingCache = true
                     self.database.filterAndNormalizeLivePhotos(from: metadatas) { metadatas in
                         autoreleasepool {
-                            self.cache.removeAllValues()
+                            self.cache.removeAll()
                             for metadata in metadatas {
                                 guard !isAppInBackground else {
-                                    self.cache.removeAllValues()
+                                    self.cache.removeAll()
                                     break
                                 }
                                 if let image = self.utility.getImage(ocId: metadata.ocId,
@@ -97,16 +88,11 @@ final class NCImageCache: @unchecked Sendable {
     }
 
     deinit {
-        NotificationCenter.default.removeObserver(self, name: LRUCacheMemoryWarningNotification, object: nil)
+        if let token = observerToken {
+            NotificationCenter.default.removeObserver(token)
+        }
     }
 
-    func getMediaMetadatas(account: String, predicate: NSPredicate? = nil) -> ThreadSafeArray<tableMetadata>? {
-        guard let tableAccount = NCManageDatabase.shared.getTableAccount(predicate: NSPredicate(format: "account == %@", account)) else { return nil }
-        let startServerUrl = NCUtilityFileSystem().getHomeServer(urlBase: tableAccount.urlBase, userId: tableAccount.userId) + tableAccount.mediaPath
-        let predicateBoth = NSPredicate(format: showBothPredicateMediaString, account, startServerUrl)
-        return NCManageDatabase.shared.getMediaMetadatas(predicate: predicate ?? predicateBoth, sorted: "date")
-    }
-    
     func allowExtensions(ext: String) -> Bool {
         return allowExtensions.contains(ext)
     }
@@ -143,8 +129,7 @@ final class NCImageCache: @unchecked Sendable {
     }
 
     func removeAll() {
-//        cache.removeAll()
-        self.cache.removeAllValues()
+        cache.removeAll()
     }
 
     // MARK: - MEDIA -
@@ -238,27 +223,6 @@ final class NCImageCache: @unchecked Sendable {
         images.buttonMoreLock = utility.loadImage(named: "lock.fill", colors: [NCBrandColor.shared.iconImageColor], size: 24)
         images.buttonRestore = UIImage(named: "restore")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
         images.buttonTrash = UIImage(named: "trashIcon")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.file = UIImage(named: "file")!
-//
-//        images.shared = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.canShare = UIImage(named: "share")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.shareByLink = UIImage(named: "sharebylink")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.sharedWithMe = UIImage.init(named: "cloudUpload")!.image(color: NCBrandColor.shared.nmcIconSharedWithMe, size: 24)//50)
-//
-////        images.favorite = utility.loadImage(named: "star", colors: [NCBrandColor.shared.yellowFavorite]) //utility.loadImage(named: "star.fill", colors: [NCBrandColor.shared.yellowFavorite])
-//        images.comment = UIImage(named: "comment")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.livePhoto = utility.loadImage(named: "livephoto", colors: [.label])
-//        images.offlineFlag = utility.loadImage(named: "arrow.down.circle.fill", colors: [.systemGreen], size: 24)
-//        images.local = utility.loadImage(named: "checkmark.circle.fill", colors: [.systemGreen], size: 24)
-//
-//        images.checkedYes = UIImage(named: "checkedYes")!
-//        images.checkedNo = utility.loadImage(named: "circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
-//
-//        images.buttonMore = UIImage(named: "more")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.buttonStop = utility.loadImage(named: "stop.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24)
-//        images.buttonMoreLock = utility.loadImage(named: "lock.fill", colors: [NCBrandColor.shared.iconImageColor], size: 24)
-//        images.buttonRestore = UIImage(named: "restore")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
-//        images.buttonTrash = UIImage(named: "trashIcon")!.image(color: NCBrandColor.shared.iconImageColor, size: 24)//50)
 
         createImagesBrandCache()
     }
@@ -342,31 +306,31 @@ final class NCImageCache: @unchecked Sendable {
         return utility.loadImage(named: "lock.fill", colors: colors, size: 24)
     }
 
-    func getFolder(account: String) -> UIImage {
+    func getFolder() -> UIImage {
         return UIImage(named: "folder")!
     }
 
-    func getFolderEncrypted(account: String) -> UIImage {
+    func getFolderEncrypted() -> UIImage {
         return UIImage(named: "folderEncrypted")!
     }
 
-    func getFolderSharedWithMe(account: String) -> UIImage {
+    func getFolderSharedWithMe() -> UIImage {
         return UIImage(named: "folder_shared_with_me")!
     }
 
-    func getFolderPublic(account: String) -> UIImage {
+    func getFolderPublic() -> UIImage {
         return UIImage(named: "folder_public")!
     }
 
-    func getFolderGroup(account: String) -> UIImage {
+    func getFolderGroup() -> UIImage {
         return UIImage(named: "folder_group")!
     }
 
-    func getFolderExternal(account: String) -> UIImage {
+    func getFolderExternal() -> UIImage {
         return UIImage(named: "folder_external")!
     }
 
-    func getFolderAutomaticUpload(account: String) -> UIImage {
+    func getFolderAutomaticUpload() -> UIImage {
         return UIImage(named: "folderAutomaticUpload")!
     }
 }

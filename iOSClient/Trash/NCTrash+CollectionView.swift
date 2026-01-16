@@ -101,6 +101,44 @@ extension NCTrash: UICollectionViewDataSource {
 
         return cell
     }
+
+    func setTextFooter(datasource: [tableTrash]) -> String {
+        var folders: Int = 0, foldersText = ""
+        var files: Int = 0, filesText = ""
+        var size: Int64 = 0
+        var text = ""
+
+        for record: tableTrash in datasource {
+            if record.directory {
+                folders += 1
+            } else {
+                files += 1
+                size += record.size
+            }
+        }
+
+        if folders > 1 {
+            foldersText = "\(folders) " + NSLocalizedString("_folders_", comment: "")
+        } else if folders == 1 {
+            foldersText = "1 " + NSLocalizedString("_folder_", comment: "")
+        }
+
+        if files > 1 {
+            filesText = "\(files) " + NSLocalizedString("_files_", comment: "") + " " + utilityFileSystem.transformedSize(size)
+        } else if files == 1 {
+            filesText = "1 " + NSLocalizedString("_file_", comment: "") + " " + utilityFileSystem.transformedSize(size)
+        }
+
+        if foldersText.isEmpty {
+            text = filesText
+        } else if filesText.isEmpty {
+            text = foldersText
+        } else {
+            text = foldersText + ", " + filesText
+        }
+
+        return text
+    }
     
     func setTitleLabel(directories: Int, files: Int, size: Int64) -> String {
         var foldersText = ""
@@ -141,8 +179,9 @@ extension NCTrash: UICollectionViewDataSource {
             guard let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFooter", for: indexPath) as? NCSectionFooter
             else { return NCSectionFooter() }
             if let datasource {
-                let info = self.getFooterInformation(datasource: datasource)
-                footer.setTitleLabel(directories: info.directories, files: info.files, size: info.size)
+                footer.setTitleLabel(setTextFooter(datasource: datasource))
+//                let info = self.getFooterInformation(datasource: datasource)
+//                footer.setTitleLabel(directories: info.directories, files: info.files, size: info.size)
             }
             return footer
         }

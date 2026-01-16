@@ -316,6 +316,7 @@
 "_status_message_"          = "Status message";
 "_status_message_placehorder_"  = "What is your status?";
 "_online_status_"           = "Online status";
+"_clear_status_message_"    = "Clear status message";
 "_set_status_message_"      = "Set status message";
 "_clear_status_message_after_"  = "Clear status after";
 
@@ -706,7 +707,7 @@
 "_status_upload_error_"         = "Error, waiting to upload";
 "_select_media_folder_"         = "Set Media folder";
 "_media_viewimage_show_"        = "Show only images";
-"_media_viewvideo_show_"        = "Show only video";
+"_media_viewvideo_show_"        = "Show only videos";
 "_media_show_all_"              = "Show both";
 "_media_by_created_date_"       = "Sort by created date";
 "_media_by_upload_date_"        = "Sort by upload date";
@@ -789,12 +790,6 @@
 "_new_comment_"                 = "New comment …";
 "_edit_comment_"                = "Edit comment";
 "_delete_comment_"              = "Delete comment";
-"_new_comment_"                 = "New comment …";
-"_edit_comment_"                = "Edit comment";
-"_delete_comment_"              = "Delete comment";
-"_new_comment_"                 = "New comment …";
-"_edit_comment_"                = "Edit comment";
-"_delete_comment_"              = "Delete comment";
 "_share_read_only_"             = "View only";
 "_share_reshare_allowed_"       = "Resharing is allowed.";
 "_share_reshare_not_allowed_"   = "Resharing is not allowed.";
@@ -831,9 +826,6 @@
 "_share_note_recipient_"        = "Note to recipient";
 "_shareLinksearch_placeholder_" = "Contact name or email address";
 "_shareLinksearch_mail_placeholder_" = "Type a name or an email and press Enter";
-"_new_comment_"                 = "New comment …";
-"_edit_comment_"                = "Edit comment";
-"_delete_comment_"              = "Delete comment";
 "_share_reshare_allowed_"       = "Resharing is allowed.";
 "_share_reshare_not_allowed_"   = "Resharing is not allowed.";
 "_sharing_message_"             = "You can create links or send shares by mail. If you invite MagentaCLOUD users, you have more opportunities for collaboration.";

@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: 2022 Henrik Storch
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import NextcloudKit
+
 ///
 /// Table view cell to manage the expiration date on a share in its details.
 ///
@@ -10,7 +12,6 @@ class NCShareDateCell: UITableViewCell {
     let textField = UITextField()
     var shareType: Int
     var onReload: (() -> Void)?
-    let shareCommon = NCShareCommon()
 
     init(share: Shareable) {
         self.shareType = share.shareType
@@ -30,7 +31,7 @@ class NCShareDateCell: UITableViewCell {
 
         picker.action(for: .valueChanged) { datePicker in
             guard let datePicker = datePicker as? UIDatePicker else { return }
-            self.detailTextLabel?.text = DateFormatter.formattedExpiryDate(datePicker.date)//DateFormatter.formattedShareExpDate(from: datePicker.date)
+            self.detailTextLabel?.text = DateFormatter.formattedExpiryDate(datePicker.date)//DateFormatter.shareExpDate.string(from: datePicker.date)
         }
         accessoryView = textField
 
@@ -50,8 +51,7 @@ class NCShareDateCell: UITableViewCell {
         textField.inputView = picker
 
         if let expDate = share.expirationDate {
-            print(DateFormatter.formattedExpiryDate(expDate as Date))
-            detailTextLabel?.text = DateFormatter.formattedExpiryDate(expDate as Date) //DateFormatter.formattedShareExpDate(from: expDate as Date)
+            detailTextLabel?.text = DateFormatter.formattedExpiryDate(expDate as Date) //DateFormatter.shareExpDate.string(from: expDate as Date)
         }
     }
 
@@ -68,6 +68,8 @@ class NCShareDateCell: UITableViewCell {
     }
 
     private func isExpireDateEnforced(account: String) -> Bool {
+        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
+
         switch self.shareType {
         case NKShare.ShareType.publicLink.rawValue,
             NKShare.ShareType.email.rawValue,
@@ -87,6 +89,8 @@ class NCShareDateCell: UITableViewCell {
     }
 
     private func defaultExpirationDays(account: String) -> Int {
+        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
+
         switch self.shareType {
         case NKShare.ShareType.publicLink.rawValue,
             NKShare.ShareType.email.rawValue,

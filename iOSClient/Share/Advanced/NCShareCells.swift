@@ -22,6 +22,8 @@
 //
 
 import UIKit
+import OSLog
+import NextcloudKit
 
 protocol NCShareCellConfig {
     var title: String { get }
@@ -48,27 +50,21 @@ protocol NCPermission: NCToggleCellConfig {
     static var forDirectory: [Self] { get }
     static var forFile: [Self] { get }
     static func forDirectoryE2EE(account: String) -> [NCPermission]
-    func hasResharePermission(for parentPermission: Int) -> Bool
-    func hasDownload() -> Bool
+    func hasPermission(for parentPermission: Int) -> Bool
+    func hasReadPermission() -> Bool
 }
 
 enum NCUserPermission: CaseIterable, NCPermission {
-    func hasResharePermission(for parentPermission: Int) -> Bool {
-        if self == .download { return true }
+    func hasPermission(for parentPermission: Int) -> Bool {
         return ((permissionBitFlag & parentPermission) != 0)
     }
 
-    func hasDownload() -> Bool {
-        return self == .download
+    func hasReadPermission() -> Bool {
+        return self == .read
     }
 
     var permissionBitFlag: Int {
         return switch self {
-        case .read: NCSharePermissions.permissionReadShare
-        case .reshare: NCSharePermissions.permissionReshareShare
-        case .edit: NCSharePermissions.permissionEditShare
-        case .create: NCSharePermissions.permissionCreateShare
-//        case .delete: NCSharePermissions.permissionDeleteShare
         case .read: NKShare.Permission.read.rawValue
         case .reshare: NKShare.Permission.share.rawValue
         case .edit: NKShare.Permission.update.rawValue
@@ -78,41 +74,32 @@ enum NCUserPermission: CaseIterable, NCPermission {
     }
 
     func didChange(_ share: Shareable, to newValue: Bool) {
-        if self == .download {
-            share.attributes = NCManageDatabase.shared.setAttibuteDownload(state: newValue)
-        } else {
-            share.permissions ^= permissionBitFlag
-        }
+        share.permissions ^= permissionBitFlag
     }
 
     func isOn(for share: Shareable) -> Bool {
-        if self == .download {
-            return NCManageDatabase.shared.isAttributeDownloadEnabled(attributes: share.attributes)
-        } else {
-            return (share.permissions & permissionBitFlag) != 0
-        }
+        return (share.permissions & permissionBitFlag) != 0
     }
 
     static func forDirectoryE2EE(account: String) -> [NCPermission] {
-        if NCCapabilities.shared.getCapabilities(account: account).capabilityE2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
+        let capabilities = NCNetworking.shared.capabilities[account] ?? NKCapabilities.Capabilities()
+        if capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 {
             return NCUserPermission.allCases
         }
         return []
     }
 
-    case read, reshare, edit, create//, delete
-    case reshare, edit, create, delete, download
+    case read, reshare, edit, create, delete
     static let forDirectory: [NCUserPermission] = NCUserPermission.allCases
-    static let forFile: [NCUserPermission] = [.reshare, .edit]
+    static let forFile: [NCUserPermission] = [.read, .reshare, .edit]
 
     var title: String {
         switch self {
+        case .read: return NSLocalizedString("_share_can_read_", comment: "")
         case .reshare: return NSLocalizedString("_share_can_reshare_", comment: "")
         case .edit: return NSLocalizedString("_share_can_change_", comment: "")
         case .create: return NSLocalizedString("_share_can_create_", comment: "")
-//        case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
         case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
-        case .download: return NSLocalizedString("_share_can_download_", comment: "")
         }
     }
 }
@@ -136,10 +123,6 @@ enum NCLinkEmailPermission: CaseIterable, NCPermission {
 
     var permissionBitFlag: Int {
         return switch self {
-        case .read: NCSharePermissions.permissionReadShare
-        case .edit: NCSharePermissions.permissionEditShare
-        case .create: NCSharePermissions.permissionCreateShare
-//        case .delete: NCSharePermissions.permissionDeleteShare
         case .read: NKShare.Permission.read.rawValue
         case .edit: NKShare.Permission.update.rawValue
         case .create: NKShare.Permission.create.rawValue
@@ -148,69 +131,11 @@ enum NCLinkEmailPermission: CaseIterable, NCPermission {
     }
 
     func didChange(_ share: Shareable, to newValue: Bool) {
-        guard self != .allowEdit || newValue else {
-            share.permissions = NCPermissions().permissionReadShare
-            return
-        }
-        share.permissions = permissionValue
-    }
-
-    func hasResharePermission(for parentPermission: Int) -> Bool {
-        permissionValue & parentPermission == permissionValue
-    }
-
-    func hasDownload() -> Bool {
-        return false
-    }
-
-    var permissionValue: Int {
-        switch self {
-        case .allowEdit:
-            return NCPermissions().getPermission(
-                canEdit: true,
-                canCreate: true,
-                canChange: true,
-                canDelete: true,
-                canShare: false,
-                isDirectory: false)
-        case .viewOnly:
-            return NCPermissions().getPermission(
-                canEdit: false,
-                canCreate: false,
-                canChange: false,
-                canDelete: false,
-                // not possible to create "read-only" shares without reshare option
-                // https://github.com/nextcloud/server/blame/f99876997a9119518fe5f7ad3a3a51d33459d4cc/apps/files_sharing/lib/Controller/ShareAPIController.php#L1104-L1107
-                canShare: true,
-                isDirectory: true)
-        case .uploadEdit:
-            return NCPermissions().getPermission(
-                canEdit: true,
-                canCreate: true,
-                canChange: true,
-                canDelete: true,
-                canShare: false,
-                isDirectory: true)
-        case .fileDrop:
-            return NCPermissions().permissionCreateShare
-        case .secureFileDrop:
-            return NCPermissions().permissionCreateShare
-        }
+        share.permissions ^= permissionBitFlag
     }
 
     func isOn(for share: Shareable) -> Bool {
-        let permissions = NCPermissions()
-        switch self {
-        case .allowEdit: return permissions.isAnyPermissionToEdit(share.permissions)
-        case .viewOnly: return !permissions.isAnyPermissionToEdit(share.permissions) && share.permissions != permissions.permissionCreateShare
-        case .uploadEdit: return permissions.isAnyPermissionToEdit(share.permissions) && share.permissions != permissions.permissionCreateShare
-        case .fileDrop: return share.permissions == permissions.permissionCreateShare
-        case .secureFileDrop: return share.permissions == permissions.permissionCreateShare
-        }
-    }
-
-    static func forDirectoryE2EE(account: String) -> [NCPermission] {
-        return [NCLinkPermission.secureFileDrop]
+        return (share.permissions & permissionBitFlag) != 0
     }
 
     var title: String {
@@ -218,30 +143,19 @@ enum NCLinkEmailPermission: CaseIterable, NCPermission {
         case .read: return NSLocalizedString("_share_can_read_", comment: "")
         case .edit: return NSLocalizedString("_share_can_change_", comment: "")
         case .create: return NSLocalizedString("_share_can_create_", comment: "")
-//        case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
+        case .delete: return NSLocalizedString("_share_can_delete_", comment: "")
         }
     }
 
-    case edit, read, create//, delete
+    case edit, read, create, delete
     static let forDirectory: [NCLinkEmailPermission] = NCLinkEmailPermission.allCases
     static let forFile: [NCLinkEmailPermission] = [.read, .edit]
-        case .allowEdit: return NSLocalizedString("_share_can_change_", comment: "")
-        case .viewOnly: return NSLocalizedString("_share_read_only_", comment: "")
-        case .uploadEdit: return NSLocalizedString("_share_allow_upload_", comment: "")
-        case .fileDrop: return NSLocalizedString("_share_file_drop_", comment: "")
-        case .secureFileDrop: return NSLocalizedString("_share_secure_file_drop_", comment: "")
-        }
-    }
-
-    case allowEdit, viewOnly, uploadEdit, fileDrop, secureFileDrop
-    static let forDirectory: [NCLinkPermission] = [.viewOnly, .uploadEdit, .fileDrop]
-    static let forFile: [NCLinkPermission] = [.allowEdit]
 }
 
 ///
 /// Individual aspects of share.
 ///
-enum NCShareDetails: CaseIterable, NCShareCellConfig {
+enum NCAdvancedPermission: CaseIterable, NCShareCellConfig {
     func didSelect(for share: Shareable) {
         switch self {
         case .hideDownload: share.hideDownload.toggle()
@@ -250,6 +164,7 @@ enum NCShareDetails: CaseIterable, NCShareCellConfig {
         case .password: return
         case .note: return
         case .label: return
+        case .downloadAndSync: return
         }
     }
 
@@ -274,6 +189,8 @@ enum NCShareDetails: CaseIterable, NCShareCellConfig {
             let cell = UITableViewCell(style: .value1, reuseIdentifier: "shareLabel")
             cell.detailTextLabel?.text = share.label
             return cell
+        case .downloadAndSync:
+            return NCShareToggleCell(isOn: share.downloadAndSync)
         }
     }
 
@@ -285,20 +202,23 @@ enum NCShareDetails: CaseIterable, NCShareCellConfig {
         case .password: return NSLocalizedString("_share_password_protect_", comment: "")
         case .note: return NSLocalizedString("_share_note_recipient_", comment: "")
         case .label: return NSLocalizedString("_share_link_name_", comment: "")
+        case .downloadAndSync: return NSLocalizedString("_share_can_download_", comment: "")
         }
     }
 
-    case label, hideDownload, limitDownload, expirationDate, password, note
-    static let forLink: [NCShareDetails] = NCShareDetails.allCases
-    static let forUser: [NCShareDetails] = [.expirationDate, .note]
+    case label, hideDownload, limitDownload, expirationDate, password, note, downloadAndSync
+    static let forLink: [NCAdvancedPermission] = [.expirationDate, .hideDownload, .label, .limitDownload, .note, .password]
+    static let forUser: [NCAdvancedPermission] = [.expirationDate, .note, .downloadAndSync]
 }
 
 struct NCShareConfig {
     let permissions: [NCPermission]
-    let advanced: [NCShareDetails]
-    let share: Shareable
-    let resharePermission: Int
+    let advanced: [NCAdvancedPermission]
+    let shareable: Shareable
+    let sharePermission: Int
+    let isDirectory: Bool
 
+    /// There are many share types, but we only classify them as a link share (link type, email type) and a user share (every other share type).
     init(parentMetadata: tableMetadata, share: Shareable) {
         self.shareable = share
         self.sharePermission = parentMetadata.sharePermissionsCollaborationServices
@@ -311,29 +231,44 @@ struct NCShareConfig {
             let hasDownloadLimitCapability = capabilities.fileSharingDownloadLimit
 
             if parentMetadata.isDirectory || hasDownloadLimitCapability == false {
-                self.advanced = NCShareDetails.forLink.filter { $0 != .limitDownload }
+                self.advanced = NCAdvancedPermission.forLink.filter { $0 != .limitDownload }
             } else {
-                self.advanced = NCShareDetails.forLink
+                self.advanced = NCAdvancedPermission.forLink
             }
         } else {
-            self.advanced = NCShareDetails.forUser
+            self.advanced = NCAdvancedPermission.forUser
         }
     }
 
     func cellFor(indexPath: IndexPath) -> UITableViewCell? {
         let cellConfig = config(for: indexPath)
-        let cell = cellConfig?.getCell(for: share)
+        let cell = cellConfig?.getCell(for: shareable)
         cell?.textLabel?.text = cellConfig?.title
-        if let cellConfig = cellConfig as? NCPermission, !cellConfig.hasResharePermission(for: resharePermission), !cellConfig.hasDownload() {
+        Logger().info("\(cellConfig?.title ?? "")")
+
+        if let cellConfig = cellConfig as? NCPermission, !cellConfig.hasPermission(for: sharePermission) {
             cell?.isUserInteractionEnabled = false
             cell?.textLabel?.isEnabled = false
         }
+
+        // For user permissions: Read permission is always enabled and we show it as a non-interactable permission for brevity.
+        if let cellConfig = cellConfig as? NCUserPermission, cellConfig.hasReadPermission() {
+            cell?.isUserInteractionEnabled = false
+            cell?.textLabel?.isEnabled = false
+        }
+
+        // For link permissions: Read permission is always enabled and we show it as a non-interactable permission in files only for brevity.
+        if let cellConfig = cellConfig as? NCLinkEmailPermission, cellConfig.hasReadPermission(), !isDirectory {
+            cell?.isUserInteractionEnabled = false
+            cell?.textLabel?.isEnabled = false
+        }
+
         return cell
     }
 
     func didSelectRow(at indexPath: IndexPath) {
         let cellConfig = config(for: indexPath)
-        cellConfig?.didSelect(for: share)
+        cellConfig?.didSelect(for: shareable)
     }
 
     func config(for indexPath: IndexPath) -> NCShareCellConfig? {

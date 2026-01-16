@@ -90,7 +90,7 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
             if metadata.directory {
 
                 if imagePreview == nil {
-                    previewFile.image = imageCache.getFolder(account: metadata.account)
+                    previewFile.image = imageCache.getFolder()
                 }
 
                 ext.isHidden = true

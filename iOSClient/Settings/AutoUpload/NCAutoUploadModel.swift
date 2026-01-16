@@ -32,9 +32,7 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     // A state variable that indicates the granularity of the subfolders, either daily, monthly, or yearly
     @Published var autoUploadSubfolderGranularity: Granularity = .monthly
     // A state variable that indicates the date from when new photos/videos will be uploaded.
-    @Published var autoUploadOnlyNewSinceDate: Date?
-    // A state variable that indicates from whether new photos only or all photos will be uploaded.
-    @Published var autoUploadOnlyNew: Bool = false
+    @Published var autoUploadSinceDate: Date?
     // A state variable that indicates whether a warning should be shown if all photos must be uploaded.
     @Published var showUploadAllPhotosWarning = false
     // A state variable that indicates whether Photos permissions have been granted or not.
@@ -50,8 +48,6 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     @Published var error: String = ""
     let database = NCManageDatabase.shared
 
-    // Tip
-    var tip: EasyTipView?
     // Root View Controller
     var controller: NCMainTabBarController?
     // A variable user for change the auto upload directory
@@ -64,17 +60,6 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     /// Initialization code to set up the ViewModel with the active account
     init(controller: NCMainTabBarController?) {
         self.controller = controller
-
-        NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification,
-                                               object: nil,
-                                               queue: .main) { _ in
-            self.tip?.dismiss()
-            self.tip = nil
-        }
-    }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self)
     }
 
     /// Triggered when the view appears.
@@ -88,8 +73,7 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
             autoUploadStart = tableAccount.autoUploadStart
             autoUploadCreateSubfolder = tableAccount.autoUploadCreateSubfolder
             autoUploadSubfolderGranularity = Granularity(rawValue: tableAccount.autoUploadSubfolderGranularity) ?? .monthly
-            autoUploadOnlyNewSinceDate = tableAccount.autoUploadOnlyNewSinceDate
-            autoUploadOnlyNew = tableAccount.autoUploadOnlyNew
+            autoUploadSinceDate = tableAccount.autoUploadSinceDate
         }
 
         serverUrl = NCUtilityFileSystem().getHomeServer(session: session)
@@ -144,8 +128,13 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
     }
 
     func handleAutoUploadOnlyNew(newValue: Bool) {
+        if newValue {
+            autoUploadSinceDate = Date.now
+        } else {
+            autoUploadSinceDate = nil
+        }
         Task {
-            await database.updateAccountPropertyAsync(\.autoUploadOnlyNew, value: newValue, account: session.account)
+            await database.updateAccountPropertyAsync(\.autoUploadSinceDate, value: autoUploadSinceDate, account: session.account)
         }
     }
 
@@ -160,10 +149,6 @@ class NCAutoUploadModel: ObservableObject, ViewOnAppearHandling {
             await database.updateAccountPropertyAsync(\.autoUploadStart, value: newValue, account: session.account)
 
             if newValue {
-                if autoUploadOnlyNew {
-                    await database.updateAccountPropertyAsync(\.autoUploadOnlyNewSinceDate, value: Date.now, account: session.account)
-                }
-
                 _ = await NCAutoUpload.shared.startManualAutoUploadForAlbums(controller: self.controller,
                                                                              model: self,
                                                                              assetCollections: assetCollections,

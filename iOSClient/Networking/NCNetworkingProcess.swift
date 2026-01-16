@@ -245,6 +245,7 @@ actor NCNetworkingProcess {
                     await startTimer(interval: minInterval)
                 }
             } else {
+                // Remove upload asset
                 await removeUploadedAssetsIfNeeded()
 
                 // Set Live Photo
@@ -285,17 +286,6 @@ actor NCNetworkingProcess {
         var availableProcess = NCBrandOptions.shared.numMaximumProcess - (countDownloading + countUploading)
         let isWiFi = self.networking.networkReachability == NKTypeReachability.reachableEthernetOrWiFi
 
-        let counterDownloading = metadatas.filter { $0.status == self.global.metadataStatusDownloading }.count
-        let counterUploading = metadatas.filter { $0.status == self.global.metadataStatusUploading }.count
-        let processRate: Double = Double(counterDownloading + counterUploading) / Double(NCBrandOptions.shared.numMaximumProcess)
-        // if less than 20% exit
-        if processRate > 0.2 {
-            nkLog(debug: "Process rate \(processRate)")
-            return
-        }
-        var availableProcess = NCBrandOptions.shared.numMaximumProcess - (counterDownloading + counterUploading)
-
-        /// ------------------------ WEBDAV
         // WEBDAV
         //
         let waitWebDav = metadatas.filter { self.global.metadataStatusWaitWebDav.contains($0.status) }
@@ -379,63 +369,6 @@ actor NCNetworkingProcess {
                     continue
                 }
 
-                for metadata in metadatas {
-                    guard timer != nil else {
-                        return
-                    }
-
-                    /// NO WiFi
-                    if !isWiFi && metadata.session == networking.sessionUploadBackgroundWWan { continue }
-
-                    await database.setMetadataSessionAsync(ocId: metadata.ocId,
-                                                           status: global.metadataStatusUploading)
-
-                    /// find controller
-                    var controller: NCMainTabBarController?
-                    if let sceneIdentifier = metadata.sceneIdentifier, !sceneIdentifier.isEmpty {
-                        controller = SceneManager.shared.getController(sceneIdentifier: sceneIdentifier)
-                    } else {
-                        for ctlr in SceneManager.shared.getControllers() {
-                            let account = await ctlr.account
-                            if account == metadata.account {
-                                controller = ctlr
-                            }
-                        }
-
-                        if controller == nil {
-                            controller = await UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
-                        }
-                    }
-
-                    // With E2EE or CHUNK upload and exit
-                    if metadata.isDirectoryE2EE {
-                        await NCNetworkingE2EEUpload().upload(metadata: metadata, controller: controller)
-                        return
-                    } else if metadata.chunk > 0 {
-                        let controller = controller
-
-                        Task { @MainActor in
-                            var numChunks = 0
-                            var counterUpload: Int = 0
-                            let hud = NCHud(controller?.view)
-                            hud.pieProgress(text: NSLocalizedString("_wait_file_preparation_", comment: ""))
-
-                            await NCNetworking.shared.uploadChunkFile(metadata: metadata) { num in
-                                numChunks = num
-                            } counterChunk: { counter in
-                                hud.progress(num: Float(counter), total: Float(numChunks))
-                            } startFilesChunk: { _ in
-                                hud.setText(NSLocalizedString("_keep_active_for_upload_", comment: ""))
-                            } requestHandler: { _ in
-                                hud.progress(num: Float(counterUpload), total: Float(numChunks))
-                                counterUpload += 1
-                            } assembling: {
-                                hud.setText(NSLocalizedString("_wait_", comment: ""))
-                            }
-
-                            hud.dismiss()
-                        }
-                        return
                 // AUTO-UPLOAD: CHECK FILE EXISTS
                 if metadata.sessionSelector == global.selectorUploadAutoUpload {
                     let existsResult = await networking.fileExists(serverUrlFileName: metadata.serverUrlFileName, account: metadata.account)

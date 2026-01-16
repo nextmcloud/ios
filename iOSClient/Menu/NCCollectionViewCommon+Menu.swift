@@ -54,7 +54,7 @@ extension NCCollectionViewCommon {
             iconHeader = image
         } else {
             if metadata.directory {
-                iconHeader = imageCache.getFolder(account: metadata.account)
+                iconHeader = imageCache.getFolder()
             } else {
                 iconHeader = imageCache.getImageFile()
             }
@@ -252,20 +252,6 @@ extension NCCollectionViewCommon {
         if (NCNetworking.shared.isOnline || (tableLocalFile != nil && fileExists)) && metadata.canShare {
             actions.append(.share(selectedMetadatas: [metadata], controller: self.controller, order: 80, sender: sender))
         }
-        
-        //
-        // PRINT
-        //
-        if metadata.isPrintable {
-            actions.append(.printAction(metadata: metadata, order: 90, sender: sender))
-        }
-        
-        //
-        // SAVE CAMERA ROLL
-        //
-        if metadata.isSavebleInCameraRoll {
-            actions.append(.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller, order: 100, sender: sender))
-        }
 
         //
         // SAVE LIVE PHOTO
@@ -356,14 +342,6 @@ extension NCCollectionViewCommon {
         if metadata.isCopyableMovable {
             actions.append(.moveOrCopyAction(selectedMetadatas: [metadata], account: metadata.account, viewController: self, order: 130, sender: sender))
         }
-        
-        //
-        // COPY IN PASTEBOARD
-        //
-        if metadata.isCopyableInPasteboard, !metadata.isDirectoryE2EE  {
-            actions.append(.copyAction(fileSelect: [metadata.ocId], controller: self.controller, order: 140, sender: sender))
-        }
-        
 
         //
         // MODIFY WITH QUICK LOOK

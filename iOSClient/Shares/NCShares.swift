@@ -78,7 +78,6 @@ class NCShares: NCCollectionViewCommon {
         }
 
         startGUIGetServerData()
-        
 
         let resultsReadShares = await NextcloudKit.shared.readSharesAsync(parameters: NKShareParameter(), account: session.account) { task in
             Task {
@@ -138,7 +137,6 @@ class NCShares: NCCollectionViewCommon {
             Task {
                 await self.stopGUIGetServerData()
                 await self.reloadDataSource()
-//                await startSyncMetadata(metadatas: self.dataSource.getMetadatas())
                 await self.startSyncMetadata(metadatas: self.dataSource.getMetadatas())
             }
         }

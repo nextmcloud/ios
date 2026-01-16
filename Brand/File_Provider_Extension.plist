@@ -28,7 +28,6 @@
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionFileProviderDocumentGroup</key>
-		<string>group.de.magentacloud.next.dev2.client</string>
 		<string>group.de.telekom.Mediencenter</string>
 		<key>NSExtensionFileProviderSupportsEnumeration</key>
 		<true/>

@@ -29,107 +29,131 @@ struct NCUploadAssetsView: View {
 
     @Environment(\.presentationMode) var presentationMode
 
+    private struct AssetsHorizontalSection: View {
+        @ObservedObject var model: NCUploadAssetsModel
+        @Binding var showQuickLook: Bool
+        @Binding var renameFileName: String
+        @Binding var renameError: String
+        @Binding var showRenameAlert: Bool
+        @Binding var renameIndex: Int
+        @Binding var selectedIndex: Int
+        let fileNamePath: String
+
+        var body: some View {
+            ScrollView(.horizontal) {
+                LazyHGrid(rows: [GridItem()], alignment: .center, spacing: 10) {
+                    ForEach(0..<model.previewStore.count, id: \.self) { index in
+                        let item = model.previewStore[index]
+                        Menu {
+                            Button(action: {
+                                renameFileName = model.previewStore[index].fileName
+                                renameIndex = index
+                                showRenameAlert = true
+                            }) {
+                                Label(NSLocalizedString("_rename_", comment: ""), systemImage: "pencil")
+                            }
+                            if item.asset.type == .photo || item.asset.type == .livePhoto {
+                                Button(action: {
+                                    if model.presentedQuickLook(index: index, fileNamePath: fileNamePath) {
+                                        selectedIndex = index
+                                        showQuickLook = true
+                                    }
+                                }) {
+                                    Label(NSLocalizedString("_modify_", comment: ""), systemImage: "pencil.tip.crop.circle")
+                                }
+                            }
+                            if item.data != nil {
+                                Button(action: {
+                                    if let image = model.previewStore[index].asset.fullResolutionImage?.resizeImage(size: CGSize(width: 240, height: 240), isAspectRation: true) {
+                                        model.previewStore[index].image = image
+                                        model.previewStore[index].data = nil
+                                        model.previewStore[index].assetType = model.previewStore[index].asset.type
+                                    }
+                                }) {
+                                    Label(NSLocalizedString("_undo_modify_", comment: ""), systemImage: "arrow.uturn.backward.circle")
+                                }
+                            }
+                            if item.data == nil && item.asset.type == .livePhoto && item.assetType == .livePhoto {
+                                Button(action: {
+                                    model.previewStore[index].assetType = .photo
+                                }) {
+                                    Label(NSLocalizedString("_disable_livephoto_", comment: ""), systemImage: "livephoto.slash")
+                                }
+                            } else if item.data == nil && item.asset.type == .livePhoto && item.assetType == .photo {
+                                Button(action: {
+                                    model.previewStore[index].assetType = .livePhoto
+                                }) {
+                                    Label(NSLocalizedString("_enable_livephoto_", comment: ""), systemImage: "livephoto")
+                                }
+                            }
+                            if item.data == nil && (item.uti == UTType.heic.identifier || item.uti == UTType.heif.identifier) {
+                                if model.previewStore[index].nativeFormat {
+                                    Button(action: {
+                                        model.previewStore[index].nativeFormat = false
+                                    }) {
+                                        Label(NSLocalizedString("_Upload_native_format_yes_", comment: ""), systemImage: "eye")
+                                    }
+                                } else {
+                                    Button(action: {
+                                        model.previewStore[index].nativeFormat = true
+                                    }) {
+                                        Label(NSLocalizedString("_Upload_native_format_no_", comment: ""), systemImage: "eye.slash")
+                                    }
+                                }
+                            }
+                            Button(role: .destructive, action: {
+                                model.deleteAsset(index: index)
+                            }) {
+                                Label(NSLocalizedString("_remove_", comment: ""), systemImage: "trash")
+                            }
+                        } label: {
+                            ImageAsset(model: model, index: index)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     var body: some View {
         NavigationView {
             ZStack(alignment: .top) {
                 List {
                     Section(footer: Text(NSLocalizedString("_modify_image_desc_", comment: ""))) {
-                        ScrollView(.horizontal) {
-                            LazyHGrid(rows: gridItems, alignment: .center, spacing: 10) {
-                                ForEach(0..<model.previewStore.count, id: \.self) { index in
-                                    let item = model.previewStore[index]
-                                    Menu {
-                                        Button(action: {
-                                            renameFileName = model.previewStore[index].fileName
-                                            renameIndex = index
-                                            showRenameAlert = true
-                                        }) {
-                                            Label(NSLocalizedString("_rename_", comment: ""), systemImage: "pencil")
-                                        }
-                                        if item.asset.type == .photo || item.asset.type == .livePhoto {
-                                            Button(action: {
-                                                if model.presentedQuickLook(index: index, fileNamePath: fileNamePath) {
-                                                    self.index = index
-                                                    showQuickLook = true
-                                                }
-                                            }) {
-                                                Label(NSLocalizedString("_modify_", comment: ""), systemImage: "pencil.tip.crop.circle")
-                                            }
-                                        }
-                                        if item.data != nil {
-                                            Button(action: {
-                                                if let image = model.previewStore[index].asset.fullResolutionImage?.resizeImage(size: CGSize(width: 240, height: 240), isAspectRation: true) {
-                                                    model.previewStore[index].image = image
-                                                    model.previewStore[index].data = nil
-                                                    model.previewStore[index].assetType = model.previewStore[index].asset.type
-                                                }
-                                            }) {
-                                                Label(NSLocalizedString("_undo_modify_", comment: ""), systemImage: "arrow.uturn.backward.circle")
-                                            }
-                                        }
-                                        if item.data == nil && item.asset.type == .livePhoto && item.assetType == .livePhoto {
-                                            Button(action: {
-                                                model.previewStore[index].assetType = .photo
-                                            }) {
-                                                Label(NSLocalizedString("_disable_livephoto_", comment: ""), systemImage: "livephoto.slash")
-                                            }
-                                        } else if item.data == nil && item.asset.type == .livePhoto && item.assetType == .photo {
-                                            Button(action: {
-                                                model.previewStore[index].assetType = .livePhoto
-                                            }) {
-                                                Label(NSLocalizedString("_enable_livephoto_", comment: ""), systemImage: "livephoto")
-                                            }
-                                        }
-                                        if item.data == nil && (item.uti == UTType.heic.identifier || item.uti == UTType.heif.identifier) {
-                                            if model.previewStore[index].nativeFormat {
-                                                Button(action: {
-                                                    model.previewStore[index].nativeFormat = false
-                                                }) {
-                                                    Label(NSLocalizedString("_Upload_native_format_yes_", comment: ""), systemImage: "eye")
-                                                }
-                                            } else {
-                                                Button(action: {
-                                                    model.previewStore[index].nativeFormat = true
-                                                }) {
-                                                    Label(NSLocalizedString("_Upload_native_format_no_", comment: ""), systemImage: "eye.slash")
-                                                }
-                                            }
-                                        }
-                                        Button(role: .destructive, action: {
-                                            model.deleteAsset(index: index)
-                                        }) {
-                                            Label(NSLocalizedString("_remove_", comment: ""), systemImage: "trash")
-                                        }
-                                    } label: {
-                                        ImageAsset(model: model, index: index)
-                                            .alert(NSLocalizedString("_rename_", comment: ""), isPresented: $showRenameAlert) {
-                                                TextField("", text: $renameFileName)
-                                                    .autocapitalization(.none)
-                                                    .autocorrectionDisabled()
+                        AssetsHorizontalSection(
+                            model: model,
+                            showQuickLook: $showQuickLook,
+                            renameFileName: $renameFileName,
+                            renameError: $renameError,
+                            showRenameAlert: $showRenameAlert,
+                            renameIndex: $renameIndex,
+                            selectedIndex: $index,
+                            fileNamePath: fileNamePath
+                        )
+                        .alert(NSLocalizedString("_rename_", comment: ""), isPresented: $showRenameAlert) {
+                            TextField("", text: $renameFileName)
+                                .autocapitalization(.none)
+                                .autocorrectionDisabled()
 
-                                                Button(NSLocalizedString("_rename_", comment: ""), action: {
-                                                    if !renameError.isEmpty {
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                                            showRenameAlert = true
-                                                        }
-                                                    } else {
-                                                        model.previewStore[renameIndex].fileName = renameFileName.trimmingCharacters(in: .whitespacesAndNewlines)
-                                                    }
-                                                })
-
-                                                Button(NSLocalizedString("_cancel_", comment: ""), role: .cancel, action: {})
-                                            } message: {
-                                                Text(renameError)
-                                            }
+                            Button(NSLocalizedString("_rename_", comment: ""), action: {
+                                if !renameError.isEmpty {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        showRenameAlert = true
                                     }
-                                    .onChange(of: renameFileName) { _, newValue in
-                                        if let error = FileNameValidator.checkFileName(newValue, account: model.controller?.account, capabilities: model.capabilities) {
-                                            renameError = error.errorDescription
-                                        } else {
-                                            renameError = ""
-                                        }
-                                    }
+                                } else {
+                                    model.previewStore[renameIndex].fileName = renameFileName.trimmingCharacters(in: .whitespacesAndNewlines)
                                 }
+                            })
+
+                            Button(NSLocalizedString("_cancel_", comment: ""), role: .cancel, action: {})
+                        } message: {
+                            Text(renameError)
+                        }
+                        .onChange(of: renameFileName) { _, newValue in
+                            if let error = FileNameValidator.checkFileName(newValue, account: model.controller?.account, capabilities: model.capabilities) {
+                                renameError = error.errorDescription
+                            } else {
+                                renameError = ""
                             }
                         }
                     }
@@ -172,7 +196,7 @@ struct NCUploadAssetsView: View {
                                             .frame(maxWidth: .infinity, alignment: .trailing)
                                     }
                                 } icon: {
-                                    Image(uiImage: NCImageCache.shared.getFolder(account: model.session.account))
+                                    Image(uiImage: NCImageCache.shared.getFolder())
                                         .resizable()
                                         .scaledToFit()
                                 }

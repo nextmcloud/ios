@@ -53,7 +53,7 @@ extension NCTrash {
             iconHeader = icon
         } else {
             if tblTrash.directory {
-                iconHeader = NCImageCache.shared.getFolder(account: tblTrash.account)
+                iconHeader = NCImageCache.shared.getFolder()
             } else {
                 iconHeader = NCImageCache.shared.getImageFile()
             }

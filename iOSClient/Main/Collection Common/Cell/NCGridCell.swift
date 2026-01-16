@@ -118,7 +118,6 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         iconsStackView.addBlurBackground(style: .systemMaterial)
         iconsStackView.layer.cornerRadius = 8
         iconsStackView.clipsToBounds = true
-        
 
         let longPressedGesture = UILongPressGestureRecognizer(target: self, action: #selector(longPress(gestureRecognizer:)))
         longPressedGesture.minimumPressDuration = 0.5
@@ -193,25 +192,22 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             imageSelect.isHidden = isEditMode ? false : true
         }
         if isEditMode {
-//            imageSelect.isHidden = false
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
         } else {
-//            imageSelect.isHidden = true
             buttonMore.isHidden = false
             setA11yActions()
         }
         if status {
             imageSelect.image = NCImageCache.shared.getImageCheckedYes()
             imageVisualEffect.isHidden = false
-
         } else {
             imageSelect.image = NCImageCache.shared.getImageCheckedNo()
             backgroundView = nil
             imageVisualEffect.isHidden = true
         }
     }
-    
+
     func writeInfoDateSize(date: NSDate, size: Int64) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short

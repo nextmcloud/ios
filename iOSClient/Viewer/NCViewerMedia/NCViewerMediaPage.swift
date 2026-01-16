@@ -34,6 +34,7 @@ class NCViewerMediaPage: UIViewController {
     let utilityFileSystem = NCUtilityFileSystem()
     let global = NCGlobal.shared
     let database = NCManageDatabase.shared
+    var textColor: UIColor = NCBrandColor.shared.textColor
 
     // This prevents the scroll views to scroll when you drag and drop files/images/subjects (from this or other apps)
     // https://forums.developer.apple.com/forums/thread/89396 and https://forums.developer.apple.com/forums/thread/115736
@@ -118,8 +119,6 @@ class NCViewerMediaPage: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(pageViewController.enableSwipeGesture), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterEnableSwipeGesture), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(pageViewController.disableSwipeGesture), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterDisableSwipeGesture), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: UIApplication.didBecomeActiveNotification, object: nil)
-
-        NotificationCenter.default.addObserver(self, selector: #selector(renameFile(_:)), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterRenameFile), object: nil)
 
         if currentViewController.metadata.isImage {
             navigationItem.rightBarButtonItems = [moreNavigationItem, imageDetailNavigationItem]
@@ -245,10 +244,12 @@ class NCViewerMediaPage: UIViewController {
                 navigationController?.setNavigationBarAppearance(textColor: .white, backgroundColor: .black)
                 currentViewController.playerToolBar?.show()
                 view.backgroundColor = .black
+                textColor = .white
                 moreNavigationItem.image = NCImageCache.shared.getImageButtonMore(colors: [.white])
             } else {
                 navigationController?.setNavigationBarAppearance()
                 view.backgroundColor = .systemBackground
+                textColor = NCBrandColor.shared.textColor
                 moreNavigationItem.image = NCImageCache.shared.getImageButtonMore()
             }
 
@@ -263,6 +264,7 @@ class NCViewerMediaPage: UIViewController {
             }
 
             view.backgroundColor = .black
+            textColor = .white
         }
 
         if fullscreen {
@@ -297,29 +299,6 @@ class NCViewerMediaPage: UIViewController {
     @objc func applicationDidBecomeActive(_ notification: NSNotification) {
         progressView.progress = 0
         changeScreenMode(mode: .normal)
-    }
-    
-    @objc func renameFile(_ notification: NSNotification) {
-
-        guard let userInfo = notification.userInfo as NSDictionary?,
-              let ocId = userInfo["ocId"] as? String,
-//              let index = metadatas.firstIndex(where: {$0.ocId == ocId}),
-//              let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
-                let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId)
-
-        else { return }
-
-        // Stop media
-        if let ncplayer = currentViewController.ncplayer, ncplayer.isPlaying() {
-            ncplayer.playerPause()
-        }
-
-//        metadatas[index] = metadata
-//        if index == currentIndex {
-            navigationItem.title = metadata.fileNameView
-            currentViewController.metadata = metadata
-            self.currentViewController.metadata = metadata
-//        }
     }
 
     // MARK: - Command Center

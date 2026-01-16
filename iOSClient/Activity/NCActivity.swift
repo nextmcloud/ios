@@ -600,7 +600,7 @@ extension NCActivity: NCShareCommentsCellDelegate {
             NCMenuAction(
                 title: NSLocalizedString("_delete_comment_", comment: ""),
                 destructive: true,
-                icon: utility.loadImage(named: "trashIcon", colors: [.red]),
+                icon: utility.loadImage(named: "trash", colors: [.red]),
                 sender: sender,
                 action: { _ in
                     guard let metadata = self.metadata, let tableComments = tableComments else { return }

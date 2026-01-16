@@ -174,10 +174,8 @@ class FileProviderData: NSObject {
                                                               etag: etag)
 
         if error == .success {
-            if let metadata = await self.database.getMetadataFromOcIdAsync(ocId) {
-                await self.database.addLocalFileAsync(metadata: metadata)
             if let metadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(ocId) {
-                await NCManageDatabase.shared.addLocalFileAsync(metadata: metadata)
+                await NCManageDatabase.shared.addLocalFilesAsync(metadatas: [metadata])
             }
         }
 
@@ -240,8 +238,6 @@ class FileProviderData: NSObject {
             metadata.sessionTaskIdentifier = 0
             metadata.status = NCGlobal.shared.metadataStatusNormal
 
-            await self.database.addMetadataAsync(metadata)
-            await self.database.addLocalFileAsync(metadata: metadata)
             await NCManageDatabase.shared.addMetadataAsync(metadata)
             await NCManageDatabase.shared.addLocalFilesAsync(metadatas: [metadata])
 

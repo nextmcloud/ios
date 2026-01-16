@@ -1,12 +1,9 @@
 //
-//
 //  NCShareNewUserAddComment.swift
 //  Nextcloud
 //
 //  Created by TSI-mc on 21/06/21.
-//  Copyright © 2022 Henrik Storch. All rights reserved.
-//
-//  Author Henrik Storch <henrik.storch@nextcloud.com>
+//  Copyright © 2022 All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -28,69 +25,39 @@ import NextcloudKit
 class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting {
 
     @IBOutlet weak var headerContainerView: UIView!
-    @IBOutlet weak var labelSharing: UILabel!
-    @IBOutlet weak var labelNote: UILabel!
-    @IBOutlet weak var commentTextView: UITextView!
-    @IBOutlet weak var btnCancel: UIButton!
-    @IBOutlet weak var btnSendShare: UIButton!
-    @IBOutlet weak var buttonContainerView: UIView!
+    @IBOutlet weak var sharingLabel: UILabel!
+    @IBOutlet weak var noteTextField: UITextView!
+
     let contentInsets: CGFloat = 16
+    var onDismiss: (() -> Void)?
+
     public var share: Shareable!
     public var metadata: tableMetadata!
-    var isNewShare: Bool { share is TransientShare }
-    var networking: NCShareNetworking?
-
-    ///
-    /// The possible download limit associated with this share.
-    ///
-    /// This can only be created after the share has been actually created due to its requirement of the share token provided by the server.
-    ///
-    var downloadLimit: DownloadLimitViewModel = .unlimited
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setNavigationTitle()
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(handleShareCountsUpdate), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterShareCountsUpdated), object: nil)
 
-        changeTheming()
-        setupHeader()
-    }
-    
-    @objc func changeTheming() {
-        self.view.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        self.commentTextView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        commentTextView.textColor = NCBrandColor.shared.label
-        btnCancel.setTitleColor(NCBrandColor.shared.label, for: .normal)
-        btnCancel.layer.borderColor = NCBrandColor.shared.label.cgColor
-        btnCancel.backgroundColor = .clear
-        buttonContainerView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
-        btnSendShare.setBackgroundColor(NCBrandColor.shared.customer, for: .normal)
-        btnSendShare.setTitleColor(.white, for: .normal)
-        commentTextView.layer.borderColor = NCBrandColor.shared.label.cgColor
-        commentTextView.layer.borderWidth = 1
-        commentTextView.layer.cornerRadius = 4.0
-        commentTextView.showsVerticalScrollIndicator = false
-        commentTextView.textContainerInset = UIEdgeInsets(top: contentInsets, left: contentInsets, bottom: contentInsets, right: contentInsets)
-        btnCancel.setTitle(NSLocalizedString("_cancel_", comment: ""), for: .normal)
-        btnCancel.layer.cornerRadius = 10
-        btnCancel.layer.masksToBounds = true
-        btnCancel.layer.borderWidth = 1
-        btnSendShare.setTitle(NSLocalizedString("_send_share_", comment: ""), for: .normal)
-        btnSendShare.layer.cornerRadius = 10
-        btnSendShare.layer.masksToBounds = true
-        labelSharing.text = NSLocalizedString("_sharing_", comment: "")
-        labelNote.text = NSLocalizedString("_share_note_recipient_", comment: "")
-        commentTextView.inputAccessoryView = UIToolbar.doneToolbar { [weak self] in
-            self?.commentTextView.resignFirstResponder()
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+
+        sharingLabel.text = NSLocalizedString("_share_note_recipient_", comment: "")
+
+        noteTextField.textContainerInset = UIEdgeInsets(top: contentInsets, left: contentInsets, bottom: contentInsets, right: contentInsets)
+        noteTextField.text = share.note
+        let toolbar = UIToolbar.toolbar {
+            self.noteTextField.resignFirstResponder()
+            self.noteTextField.text = ""
+            self.share.note = ""
+        } onDone: {
+            self.noteTextField.resignFirstResponder()
+            self.share.note = self.noteTextField.text
+            self.navigationController?.popViewController(animated: true)
         }
-    }
-    
-    func setupHeader(){
-        guard let headerView = (Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?.first as? NCShareAdvancePermissionHeader) else { return }
-        headerView.ocId = metadata.ocId
+
+        noteTextField.inputAccessoryView = toolbar.wrappedSafeAreaContainer
+
+        guard let headerView = (Bundle.main.loadNibNamed("NCShareHeader", owner: self, options: nil)?.first as? NCShareHeader) else { return }
         headerContainerView.addSubview(headerView)
         headerView.frame = headerContainerView.frame
         headerView.translatesAutoresizingMaskIntoConstraints = false
@@ -98,92 +65,29 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
         headerView.bottomAnchor.constraint(equalTo: headerContainerView.bottomAnchor).isActive = true
         headerView.leftAnchor.constraint(equalTo: headerContainerView.leftAnchor).isActive = true
         headerView.rightAnchor.constraint(equalTo: headerContainerView.rightAnchor).isActive = true
+
         headerView.setupUI(with: metadata)
     }
-    
-//    @objc private func handleShareCountsUpdate(notification: Notification) {
-//        guard let userInfo = notification.userInfo,
-//              let links = userInfo["links"] as? Int,
-//              let emails = userInfo["emails"] as? Int else {
-//            return
-//        }
-//
-//        updateHeader(linkCount: links, emailCount: emails)
-//    }
-//
-//    private func updateHeader(linkCount: Int, emailCount: Int) {
-//        // If header already exists, just update it
-//        if let header = headerContainerView.subviews.first(where: { $0 is NCShareAdvancePermissionHeader }) as? NCShareAdvancePermissionHeader {
-//            header.setupUI(with: metadata, linkCount: linkCount, emailCount: emailCount)
-//        } else {
-//            // Otherwise create and attach
-//            setupHeader(linkCount: linkCount, emailCount: emailCount)
-//        }
-//    }
-//
-//    private func setupHeader(linkCount: Int = 0, emailCount: Int = 0) {
-//        // Clear old header if any
-//        headerContainerView.subviews.forEach { $0.removeFromSuperview() }
-//
-//        guard let headerView = Bundle.main.loadNibNamed("NCShareAdvancePermissionHeader", owner: self, options: nil)?
-//            .first as? NCShareAdvancePermissionHeader else {
-//            return
-//        }
-//
-//        headerView.ocId = metadata.ocId
-//        headerContainerView.addSubview(headerView)
-//
-//        headerView.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            headerView.topAnchor.constraint(equalTo: headerContainerView.topAnchor),
-//            headerView.bottomAnchor.constraint(equalTo: headerContainerView.bottomAnchor),
-//            headerView.leadingAnchor.constraint(equalTo: headerContainerView.leadingAnchor),
-//            headerView.trailingAnchor.constraint(equalTo: headerContainerView.trailingAnchor)
-//        ])
-//
-//        // Initial setup
-//        headerView.setupUI(with: metadata, linkCount: linkCount, emailCount: emailCount)
-//    }
 
-    @IBAction func cancelClicked(_ sender: Any) {
-        self.navigationController?.popToRootViewController(animated: true)
-    }
-
-    @IBAction func sendShareClicked(_ sender: Any) {
-        share.note = commentTextView.text
-        if isNewShare {
-            networking?.createShare(share, downloadLimit: downloadLimit)
-        } else {
-            networking?.updateShare(share, downloadLimit: downloadLimit)
-        }
-        self.navigationController?.popToRootViewController(animated: true)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        share.note = noteTextField.text
+        onDismiss?()
     }
 
     @objc func adjustForKeyboard(notification: Notification) {
         guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue,
-              let globalTextViewFrame = commentTextView.superview?.convert(commentTextView.frame, to: nil) else { return }
+              let globalTextViewFrame = noteTextField.superview?.convert(noteTextField.frame, to: nil) else { return }
+
         let keyboardScreenEndFrame = keyboardValue.cgRectValue
         let portionCovoredByLeyboard = globalTextViewFrame.maxY - keyboardScreenEndFrame.minY
 
         if notification.name == UIResponder.keyboardWillHideNotification || portionCovoredByLeyboard < 0 {
-            commentTextView.contentInset = .zero
+            noteTextField.contentInset = .zero
         } else {
-            commentTextView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: portionCovoredByLeyboard, right: 0)
+            noteTextField.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: portionCovoredByLeyboard, right: 0)
         }
-        commentTextView.scrollIndicatorInsets = commentTextView.contentInset
-    }
 
-    @objc func keyboardWillShow(notification: Notification) {
-        if UIScreen.main.bounds.width <= 375 {
-            if view.frame.origin.y == 0 {
-                self.view.frame.origin.y -= 200
-            }
-        }
-    }
-    
-    @objc func keyboardWillHide(notification: Notification) {
-        if view.frame.origin.y != 0 {
-            self.view.frame.origin.y = 0
-        }
+        noteTextField.scrollIndicatorInsets = noteTextField.contentInset
     }
 }

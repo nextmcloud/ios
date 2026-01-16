@@ -62,8 +62,7 @@ class NCShare: UIViewController, NCSharePagingContent {
 
     var canReshare: Bool {
         guard let metadata = metadata else { return true }
-        return ((metadata.sharePermissionsCollaborationServices & NCPermissions().permissionShareShare) != 0)
-//        return ((metadata.sharePermissionsCollaborationServices & NCSharePermissions.permissionReshareShare) != 0)
+        return ((metadata.sharePermissionsCollaborationServices & NKShare.Permission.share.rawValue) != 0)
     }
 
     var session: NCSession.Session {
@@ -130,10 +129,16 @@ class NCShare: UIViewController, NCSharePagingContent {
                 let metadataDirectory = await self.database.getMetadataDirectoryAsync(serverUrl: metadata.serverUrl, account: metadata.account)
                 if capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV12 ||
                     (capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 && metadataDirectory?.e2eEncrypted ?? false) {
+//                    searchFieldTopConstraint.constant = -50
+//                    searchField.alpha = 0
+//                    btnContact.alpha = 0
                 }
             } else {
+//                checkSharedWithYou()
             }
-            
+
+//            reloadData()
+
             networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session)
             let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing
             networking?.readShare(showLoadingIndicator: isVisible)
@@ -147,7 +152,7 @@ class NCShare: UIViewController, NCSharePagingContent {
     }
     
     @objc func exitTapped() {
-        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateIcons)
+//        NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterUpdateIcons)
         self.dismiss(animated: true, completion: nil)
     }
     
@@ -155,7 +160,7 @@ class NCShare: UIViewController, NCSharePagingContent {
         guard
             let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
             let navigationController = self.navigationController else { return }
-        self.checkEnforcedPassword(shareType: NCShareCommon.shareTypeLink) { password in
+        self.checkEnforcedPassword(shareType: NKShare.ShareType.publicLink.rawValue) { password in
             advancePermission.networking = self.networking
             advancePermission.share = TransientShare.shareLink(metadata: self.metadata, password: password)
             advancePermission.metadata = self.metadata
@@ -276,8 +281,7 @@ class NCShare: UIViewController, NCSharePagingContent {
             return emailPred.evaluate(with: email)
         }
         guard let searchString = textField.text, !searchString.isEmpty else { return }
-//        if searchString.contains("@"), !isValidEmail(searchString) { return }
-        if searchString.contains("@"), !utility.validateEmail(searchString) { return }
+        if searchString.contains("@"), !isValidEmail(searchString) { return }
         networking?.getSharees(searchString: searchString)
     }
     
@@ -293,7 +297,7 @@ class NCShare: UIViewController, NCSharePagingContent {
     
     func checkEnforcedPassword(shareType: Int, completion: @escaping (String?) -> Void) {
         guard capabilities.fileSharingPubPasswdEnforced,
-              shareType == NCShareCommon.shareTypeLink || shareType == NCShareCommon.shareTypeEmail
+              shareType == NKShare.ShareType.publicLink.rawValue || shareType == NKShare.ShareType.email.rawValue
         else { return completion(nil) }
 
         self.present(UIAlertController.password(titleKey: "_enforce_password_protection_", completion: completion), animated: true)
@@ -401,7 +405,7 @@ extension NCShare: NCShareNetworkingDelegate {
             if let shares = existingShares.share, shares.contains(where: {$0.shareWith == sharee.shareWith}) { continue } // do not show already existing sharees
             if metadata.ownerDisplayName == sharee.shareWith { continue } // do not show owner of the share
             var label = sharee.label
-            if sharee.shareType == NCShareCommon.shareTypeTeam {
+            if sharee.shareType == NKShare.ShareType.team.rawValue {
                 label += " (\(sharee.circleInfo), \(sharee.circleOwner))"
             }
 
@@ -684,7 +688,7 @@ extension NCShare: UISearchBarDelegate {
         if searchText.isEmpty {
             dropDown.hide()
         } else {
-            perform(#selector(searchSharees(_:)), with: nil, afterDelay: 0.5)
+            perform(#selector(searchSharees(_:)), with: nil, afterDelay: 1)
         }
     }
 

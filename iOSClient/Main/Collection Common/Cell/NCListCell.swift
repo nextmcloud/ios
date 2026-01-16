@@ -28,7 +28,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageStatus: UIImageView!
     @IBOutlet weak var imageFavorite: UIImageView!
-//    @IBOutlet weak var imageFavoriteBackground: UIImageView!
     @IBOutlet weak var imageLocal: UIImageView!
     @IBOutlet weak var labelTitle: UILabel!
     @IBOutlet weak var labelInfo: UILabel!
@@ -142,7 +141,6 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         imageItem.layer.masksToBounds = true
         imageStatus.image = nil
         imageFavorite.image = nil
-//        imageFavoriteBackground.isHidden = true
         imageLocal.image = nil
         labelTitle.text = ""
         labelInfo.text = ""
@@ -220,13 +218,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         } else {
             imageSelect.isHidden = isEditMode ? false : true
         }
-//        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
-////        guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), !metadata.e2eEncrypted else {
-//            backgroundView = nil
-//            separator.isHidden = false
-//            imageSelect.isHidden = true
-//            return
-//        }
+
         if isEditMode {
             imageItemLeftConstraint.constant = 45
 //            imageSelect.isHidden = false
@@ -255,7 +247,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             backgroundView = blurEffectView
             separator.isHidden = true
         } else {
-           imageSelect.image = NCImageCache.shared.getImageCheckedNo()
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
             backgroundView = nil
             separator.isHidden = false
         }
@@ -278,13 +270,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             tag1.isHidden = true
             labelInfo.isHidden = false
             labelSubinfo.isHidden = false
-            labelInfoSeparator.isHidden = false
+//            labelInfoSeparator.isHidden = false
         } else {
             tag0.isHidden = false
             tag1.isHidden = true
             labelInfo.isHidden = true
             labelSubinfo.isHidden = true
-            labelInfoSeparator.isHidden = true
+//            labelInfoSeparator.isHidden = true
 
             if let tag = tags.first {
                 tag0.text = tag
@@ -321,26 +313,9 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
                 view.removeFromSuperview()
             }
         }
-            outlineView.image = UIImage(systemName: "star")
-            outlineView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 16, weight: .thin)
-            outlineView.tintColor = .systemBackground
-
-            imageFavorite.addSubview(outlineView)
-            NSLayoutConstraint.activate([
-                outlineView.leadingAnchor.constraint(equalTo: imageFavorite.leadingAnchor, constant: -1),
-                outlineView.trailingAnchor.constraint(equalTo: imageFavorite.trailingAnchor, constant: 1),
-                outlineView.topAnchor.constraint(equalTo: imageFavorite.topAnchor, constant: -1),
-                outlineView.bottomAnchor.constraint(equalTo: imageFavorite.bottomAnchor, constant: 1)
-            ])
-            imageFavorite.sendSubviewToBack(outlineView)
-        } else {
-            imageFavorite.subviews.forEach { view in
-                view.removeFromSuperview()
-            }
-        }
 
     }
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
         // Keep the shadow path in sync with current bounds

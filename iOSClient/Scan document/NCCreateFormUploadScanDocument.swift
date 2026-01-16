@@ -493,7 +493,6 @@ class NCCreateFormUploadScanDocument: XLFormViewController, NCSelectDelegate, NC
         var newFileName: String = ""
 
         if fileName == nil || fileName == "" {
-            name = utilityFileSystem.createFileNameDate("scan", ext: "pdf") 
             name = utilityFileSystem.createFileNameDate("scan", ext: "pdf")
             name = utilityFileSystem.createFileNameDate("scan", ext: "pdf")
         } else {

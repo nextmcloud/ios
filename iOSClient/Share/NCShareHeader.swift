@@ -44,7 +44,7 @@ class NCShareHeader: UIView {
             imageView.isHidden = true
         } else {
             if metadata.directory {
-                imageView.image = metadata.e2eEncrypted ? NCImageCache.shared.getFolderEncrypted(account: metadata.account) : NCImageCache.shared.getFolder(account: metadata.account)
+                imageView.image = metadata.e2eEncrypted ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
             } else if !metadata.iconName.isEmpty {
                 imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
             } else {
@@ -98,17 +98,17 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
         } else {
             imageView.isHidden = false
             if metadata.e2eEncrypted {
-                imageView.image = NCImageCache.shared.getFolderEncrypted(account: metadata.account)
+                imageView.image = NCImageCache.shared.getFolderEncrypted()
             } else if isShare || !metadata.shareType.isEmpty {
-                imageView.image = NCImageCache.shared.getFolderPublic(account: metadata.account)
+                imageView.image = NCImageCache.shared.getFolderPublic()
             } else if !metadata.shareType.isEmpty {
                 imageView.image = metadata.shareType.contains(3)
-                    ? NCImageCache.shared.getFolderPublic(account: metadata.account)
-                    : NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
+                    ? NCImageCache.shared.getFolderPublic()
+                    : NCImageCache.shared.getFolderSharedWithMe()
             } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
                 imageView.image = NCImageCache.shared.getImageSharedWithMe()
             } else if metadata.directory {
-                imageView.image = NCImageCache.shared.getFolder(account: metadata.account)
+                imageView.image = NCImageCache.shared.getFolder()
             } else if !metadata.iconName.isEmpty {
                 imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
             } else {
@@ -137,13 +137,13 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
         } else {
             imageView.isHidden = false
             if metadata.e2eEncrypted {
-                imageView.image = NCImageCache.shared.getFolderEncrypted(account: metadata.account)
+                imageView.image = NCImageCache.shared.getFolderEncrypted()
             } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
-                imageView.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
+                imageView.image = NCImageCache.shared.getFolderSharedWithMe()
             } else if isShare || !metadata.shareType.isEmpty {
-                imageView.image = NCImageCache.shared.getFolderPublic(account: metadata.account)
+                imageView.image = NCImageCache.shared.getFolderPublic()
             } else if metadata.directory {
-                imageView.image = NCImageCache.shared.getFolder(account: metadata.account)
+                imageView.image = NCImageCache.shared.getFolder()
             } else if !metadata.iconName.isEmpty {
                 imageView.image = NCUtility().loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
             } else {
@@ -164,13 +164,11 @@ class NCShareAdvancePermissionHeader: UITableViewHeaderFooterView {
     
     @IBAction func touchUpInsideFavorite(_ sender: UIButton) {
         guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId) else { return }
-        NCNetworking.shared.favoriteMetadata(metadata) { error in
+        NCNetworking.shared.setStatusWaitFavorite(metadata) { error in
             if error == .success {
-                Task {
-                    guard let metadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(metadata.ocId) else { return }
-                    self.updateFavoriteIcon(isFavorite: metadata.favorite)
-//                    NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterFavoriteStatusChanged, object: metadata)
-                }
+                guard let metadata = NCManageDatabase.shared.getMetadataFromOcId(metadata.ocId) else { return }
+//                self.favorite.setImage(NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite], size: 20), for: .normal)
+                self.updateFavoriteIcon(isFavorite: metadata.favorite)
             } else {
                 NCContentPresenter().showError(error: error)
             }

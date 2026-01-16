@@ -22,6 +22,7 @@
 //
 
 import UIKit
+import NextcloudKit
 
 // MARK: - NCCell Delegates
 extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
@@ -48,7 +49,7 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
 
     func tapMenu(with tableShare: tableShare?, sender: Any) {
         if let tableShare = tableShare {
-            self.toggleShareMenu(for: tableShare, sendMail: (tableShare.shareType != NCShareCommon.shareTypeLink), folder: metadata?.directory ?? false, sender: sender)
+            self.toggleShareMenu(for: tableShare, sendMail: (tableShare.shareType != NKShare.ShareType.publicLink.rawValue), folder: metadata?.directory ?? false, sender: sender)
         } else {
             self.makeNewLinkShare()
         }

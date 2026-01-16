@@ -37,15 +37,7 @@ final class NCManageDatabaseCreateMetadata {
             let results = await NKTypeIdentifiers.shared.getInternalType(fileName: metadata.fileNameView, mimeType: file.contentType, directory: file.directory, account: file.account)
 
             metadata.contentType = results.mimeType
-//            metadata.iconName = results.iconName
-            switch (file.fileName as NSString).pathExtension {
-            case "odg":
-                metadata.iconName = "diagram"
-            case "csv", "xlsm" :
-                metadata.iconName = "file_xls"
-            default:
-                metadata.iconName = file.iconName
-            }
+            metadata.iconName = results.iconName
             metadata.classFile = results.classFile
             metadata.typeIdentifier = results.typeIdentifier
             metadata.mediaSearch = mediaSearch
@@ -77,15 +69,7 @@ final class NCManageDatabaseCreateMetadata {
             let results = NKTypeIdentifiersHelper.shared.getInternalType(fileName: metadata.fileNameView, mimeType: file.contentType, directory: file.directory, capabilities: capabilities ?? NKCapabilities.Capabilities())
 
             metadata.contentType = results.mimeType
-//            metadata.iconName = results.iconName
-            switch (file.fileName as NSString).pathExtension {
-            case "odg":
-                metadata.iconName = "diagram"
-            case "csv", "xlsm" :
-                metadata.iconName = "file_xls"
-            default:
-                metadata.iconName = file.iconName
-            }
+            metadata.iconName = results.iconName
             metadata.classFile = results.classFile
             metadata.typeIdentifier = results.typeIdentifier
         }
@@ -189,15 +173,7 @@ final class NCManageDatabaseCreateMetadata {
         metadata.fileNameView = file.fileName
         metadata.hasPreview = file.hasPreview
         metadata.hidden = file.hidden
-//        metadata.iconName = file.iconName
-        switch (file.fileName as NSString).pathExtension {
-        case "odg":
-            metadata.iconName = "diagram"
-        case "csv", "xlsm" :
-            metadata.iconName = "file_xls"
-        default:
-            metadata.iconName = file.iconName
-        }
+        metadata.iconName = file.iconName
         metadata.mountType = file.mountType
         metadata.name = file.name
         metadata.note = file.note
@@ -284,15 +260,7 @@ final class NCManageDatabaseCreateMetadata {
                 let results = await NKTypeIdentifiers.shared.getInternalType(fileName: fileName, mimeType: "", directory: false, account: session.account)
                 metadata.classFile = results.classFile
                 metadata.contentType = results.mimeType
-//                metadata.iconName = results.iconName
-                switch (fileName as NSString).pathExtension {
-                case "odg":
-                    metadata.iconName = "diagram"
-                case "csv", "xlsm" :
-                    metadata.iconName = "file_xls"
-                default:
-                    metadata.iconName = results.iconName
-                }
+                metadata.iconName = results.iconName
                 metadata.typeIdentifier = results.typeIdentifier
             }
             if let iconUrl {
@@ -336,7 +304,6 @@ final class NCManageDatabaseCreateMetadata {
                              ocId: String,
                              serverUrl: String,
                              url: String = "",
-                             contentType: String? = "",
                              isUrl: Bool = false,
                              name: String = NCGlobal.shared.appName,
                              subline: String? = nil,
@@ -352,18 +319,13 @@ final class NCManageDatabaseCreateMetadata {
             metadata.typeIdentifier = "public.url"
         } else {
             let results = await NKTypeIdentifiers.shared.getInternalType(fileName: fileName,
-                                                                         mimeType: contentType ?? "",
+                                                                         mimeType: "",
                                                                          directory: false,
                                                                          account: session.account)
             metadata.classFile = results.classFile
             metadata.contentType = results.mimeType
             metadata.iconName = results.iconName
             metadata.typeIdentifier = results.typeIdentifier
-            // iOS 12.0,* don't detect UTI text/markdown, text/x-markdown
-            if metadata.classFile == NKTypeClassFile.unknow.rawValue && (results.mimeType == "text/x-markdown" || results.mimeType == "text/markdown") {
-                metadata.iconName = NKTypeIconFile.txt.rawValue
-                metadata.classFile = NKTypeClassFile.document.rawValue
-            }
         }
         if let iconUrl {
             metadata.iconUrl = iconUrl

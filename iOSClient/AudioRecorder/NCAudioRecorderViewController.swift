@@ -40,8 +40,8 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
 
         view.backgroundColor = .clear
         contentContainerView.backgroundColor = UIColor.lightGray
-        voiceRecordHUD.fillColor = NCBrandColor.shared.progressColorGreen60
-        
+        voiceRecordHUD.fillColor = UIColor.green
+
         Task {
             self.fileName = NCUtilityFileSystem().createFileNameDate(NSLocalizedString("_voice_memo_filename_", comment: ""), ext: "m4a")
             recording = NCAudioRecorder(to: self.fileName)
@@ -124,7 +124,7 @@ class NCAudioRecorderViewController: UIViewController, NCAudioRecorderDelegate {
         }
 
         voiceRecordHUD.update(CGFloat(rate))
-        voiceRecordHUD.fillColor = NCBrandColor.shared.progressColorGreen60
+        voiceRecordHUD.fillColor = UIColor.green
 
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.second]

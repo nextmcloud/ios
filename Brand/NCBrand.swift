@@ -32,7 +32,8 @@ final class NCBrandOptions: @unchecked Sendable {
     var linkLoginHost: String = "https://nextcloud.com/install"
     var linkloginPreferredProviders: String = "https://nextcloud.com/signup-ios"
     var webLoginAutenticationProtocol: String = "nc://"                                        // example "abc://"
-    var privacy: String = "https://static.magentacloud.de/privacy/datenschutzhinweise_app.htm"
+//    var privacy: String = "https://static.magentacloud.de/privacy/datenschutzhinweise_app.htm"
+    var privacy: String = "https://nextcloud.com/privacy"
     var sourceCode: String = "https://github.com/nextcloud/ios"
     var mobileconfig: String = "/remote.php/dav/provisioning/apple-provisioning.mobileconfig"
     var appStoreUrl: String = "https://apps.apple.com/in/app/nextcloud/id1125420102"
@@ -57,24 +58,6 @@ final class NCBrandOptions: @unchecked Sendable {
 //#endif
     
     // BRAND ONLY
-    var capabilitiesGroup:              String = "group.de.magentacloud.next.dev2.client"
-    var capabilitiesGroupApps:              String = "group.de.magentacloud.next.dev2.client.apps"
-
-    // BRAND ONLY
-    var use_AppConfig: Bool = false
-//    var capabilitiesGroup: String = "group.it.twsweb.Crypto-Cloud"
-//    var capabilitiesGroupApps: String = "group.com.nextcloud.apps"
-//#if DEBUG
-    // QA :
-    @objc public var capabilitiesGroup:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
-    @objc public var capabilitiesGroupApps:              String = "group.com.t-systems.pu-ds.magentacloud.qa"
-//#else
-//    // PROD :
-//    @objc public var capabilitiesGroup:              String = "group.de.telekom.Mediencenter"
-//    @objc public var capabilitiesGroupApps:              String = "group.de.telekom.Mediencenter"
-//#endif
-    
-    // BRAND ONLY
     // Set use_login_web_personalized to true for prod and false for configurable path
     var use_login_web_personalized: Bool = true                               // Don't touch me !!
     var use_GroupApps: Bool = true
@@ -82,17 +65,15 @@ final class NCBrandOptions: @unchecked Sendable {
     var use_AppConfig: Bool = false                                                         // Don't touch me !!
 
     // Use server theming color
-    var use_themingColor:                Bool = false
+    var use_themingColor: Bool = true
 
-    var disable_intro:       Bool = true
-    var disable_request_login_url:       Bool = true
-    var disable_multiaccount:            Bool = true
+    var disable_intro: Bool = false
+    var disable_request_login_url: Bool = false
+    var disable_multiaccount: Bool = false
     var disable_more_external_site: Bool = false
     var disable_openin_file: Bool = false                                                       // Don't touch me !!
-    var disable_crash_service:             Bool = true
+    var disable_crash_service: Bool = false
     var disable_log: Bool = false
-    var disable_mobileconfig: Bool = false  
-    var disable_show_more_nextcloud_apps_in_settings:         Bool = true
     var disable_mobileconfig: Bool = false
     var disable_show_more_nextcloud_apps_in_settings: Bool = true
     var doNotAskPasscodeAtStartup: Bool = false
@@ -185,8 +166,6 @@ final class NCBrandColor: @unchecked Sendable {
     static let shared = NCBrandColor()
 
     // This is rewrited from customet theme, default is Nextcloud color
-    let customer:              UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)
-    var customerText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
     let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // Nextcloud : #0082C9
     var customerText: UIColor = .white
 

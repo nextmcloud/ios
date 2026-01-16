@@ -58,121 +58,15 @@ class NCFilesNavigationController: NCMainNavigationController {
     override func setNavigationLeftItems() async {
         self.collectionViewCommon?.navigationItem.leftBarButtonItems = nil
         return
-//        guard let tableAccount = database.getTableAccount(predicate: NSPredicate(format: "account == %@", self.session.account))
-//        else {
-//            self.collectionViewCommon?.navigationItem.leftBarButtonItems = nil
-//            return
-//        }
-//        let image = utility.loadUserImage(for: tableAccount.user, displayName: tableAccount.displayName, urlBase: tableAccount.urlBase)
-//
-//        class AccountSwitcherButton: UIButton {
-//            var onMenuOpened: (() -> Void)?
-//
-//            override func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willDisplayMenuFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
-//                super.contextMenuInteraction(interaction, willDisplayMenuFor: configuration, animator: animator)
-//                onMenuOpened?()
-//            }
-//        }
-//
-//        @MainActor
-//        func createLeftMenu() async -> UIMenu? {
-//            var childrenAccountSubmenu: [UIMenuElement] = []
-//            let accounts = await database.getAllAccountOrderAliasAsync()
-//            guard !accounts.isEmpty,
-//                  let controller = collectionViewCommon?.controller
-//            else {
-//                return nil
-//            }
-//
-//            let accountActions: [UIAction] = accounts.map { account in
-//                let image = utility.loadUserImage(for: account.user, displayName: account.displayName, urlBase: account.urlBase)
-//                var name: String = ""
-//                var url: String = ""
-//
-//                if account.alias.isEmpty {
-//                    name = account.displayName
-//                    url = (URL(string: account.urlBase)?.host ?? "")
-//                } else {
-//                    name = account.alias
-//                }
-//
-//                let attributes: UIMenuElement.Attributes = account.account == controller.account ? [.disabled] : []
-//                let action = UIAction(title: name, image: image, attributes: attributes, state: account.account == controller.account ? .on : .off) { _ in
-//                    Task { @MainActor in
-//                        await NCAccount().changeAccount(account.account, userProfile: nil, controller: self.controller)
-//                        self.collectionViewCommon?.setEditMode(false)
-//                    }
-//                }
-//
-//                action.subtitle = url
-//                return action
-//            }
-//
-//            let addAccountAction = UIAction(title: NSLocalizedString("_add_account_", comment: ""), image: utility.loadImage(named: "person.crop.circle.badge.plus", colors: NCBrandColor.shared.iconImageMultiColors)) { _ in
-//                if NCBrandOptions.shared.disable_intro {
-//                    if let viewController = UIStoryboard(name: "NCLogin", bundle: nil).instantiateViewController(withIdentifier: "NCLogin") as? NCLogin {
-//                        viewController.controller = self.controller
-//                        let navigationController = UINavigationController(rootViewController: viewController)
-//                        navigationController.modalPresentationStyle = .fullScreen
-//                        self.present(navigationController, animated: true)
-//                    }
-//                } else {
-//                    if let navigationController = UIStoryboard(name: "NCIntro", bundle: nil).instantiateInitialViewController() as? UINavigationController {
-//                        if let viewController = navigationController.topViewController as? NCIntroViewController {
-//                            viewController.controller = nil
-//                        }
-//                        navigationController.modalPresentationStyle = .fullScreen
-//                        self.present(navigationController, animated: true)
-//                    }
-//                }
-//            }
-//
-//            let settingsAccountAction = UIAction(title: NSLocalizedString("_account_settings_", comment: ""), image: utility.loadImage(named: "gear", colors: [NCBrandColor.shared.iconImageColor])) { _ in
-//                let accountSettingsModel = NCAccountSettingsModel(controller: self.controller, delegate: self.collectionViewCommon)
-//                let accountSettingsView = NCAccountSettingsView(model: accountSettingsModel)
-//                let accountSettingsController = UIHostingController(rootView: accountSettingsView)
-//
-//                self.present(accountSettingsController, animated: true, completion: nil)
-//            }
-//
-//            if !NCBrandOptions.shared.disable_multiaccount {
-//                childrenAccountSubmenu.append(addAccountAction)
-//            }
-//            childrenAccountSubmenu.append(settingsAccountAction)
-//
-//            let addAccountSubmenu = UIMenu(title: "", options: .displayInline, children: childrenAccountSubmenu)
-//            let menu = UIMenu(children: accountActions + [addAccountSubmenu])
-//
-//            return menu
-//        }
+        
+        /*
+        guard let tableAccount = database.getTableAccount(predicate: NSPredicate(format: "account == %@", self.session.account))
+        else {
+            self.collectionViewCommon?.navigationItem.leftBarButtonItems = nil
+            return
+        }
+        let image = utility.loadUserImage(for: tableAccount.user, displayName: tableAccount.displayName, urlBase: tableAccount.urlBase)
 
-//        if self.topViewController != self.viewControllers.first {
-//            return
-//        }
-//
-//        if self.collectionViewCommon?.navigationItem.leftBarButtonItems == nil {
-//            let accountButton = AccountSwitcherButton(type: .custom)
-//
-//            accountButton.accessibilityIdentifier = "accountSwitcher"
-//            accountButton.setImage(image, for: .normal)
-//            accountButton.semanticContentAttribute = .forceLeftToRight
-//            accountButton.sizeToFit()
-//
-//            accountButton.menu = await createLeftMenu()
-//            accountButton.showsMenuAsPrimaryAction = true
-//
-//            accountButton.onMenuOpened = {
-//                self.collectionViewCommon?.dismissTip()
-//            }
-//
-//            self.collectionViewCommon?.navigationItem.setLeftBarButtonItems([UIBarButtonItem(customView: accountButton)], animated: true)
-//
-//        } else {
-//
-//            let accountButton = self.collectionViewCommon?.navigationItem.leftBarButtonItems?.first?.customView as? UIButton
-//            accountButton?.setImage(image, for: .normal)
-//            accountButton?.menu = await createLeftMenu()
-//        }
         class AccountSwitcherButton: UIButton {
             var onMenuOpened: (() -> Void)?
 
@@ -281,5 +175,6 @@ class NCFilesNavigationController: NCMainNavigationController {
             accountButton?.setImage(image, for: .normal)
             accountButton?.menu = await createLeftMenu()
         }
+         */
     }
 }

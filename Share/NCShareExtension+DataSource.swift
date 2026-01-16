@@ -45,7 +45,7 @@ extension NCShareExtension: UICollectionViewDelegate {
                 header.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
                 header.emptyDescription.text = ""
             } else {
-                header.emptyImage.image = NCImageCache.shared.getFolder(account: session.account)
+                header.emptyImage.image = NCImageCache.shared.getFolder()
                 header.emptyTitle.text = NSLocalizedString("_files_no_folders_", comment: "")
                 header.emptyDescription.text = ""
             }
@@ -131,19 +131,19 @@ extension NCShareExtension: UICollectionViewDataSource {
         }
 
         if metadata.e2eEncrypted {
-            cell.imageItem.image = NCImageCache.shared.getFolderEncrypted(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolderEncrypted()
         } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
-            cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe()
         } else if isShare || !metadata.shareType.isEmpty {
-            cell.imageItem.image = NCImageCache.shared.getFolderPublic(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolderPublic()
         } else if metadata.mountType == "group" {
-            cell.imageItem.image = NCImageCache.shared.getFolderGroup(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolderGroup()
         } else if isMounted {
-            cell.imageItem.image = NCImageCache.shared.getFolderExternal(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolderExternal()
         } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
-            cell.imageItem.image = NCImageCache.shared.getFolderAutomaticUpload(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolderAutomaticUpload()
         } else {
-            cell.imageItem.image = NCImageCache.shared.getFolder(account: metadata.account)
+            cell.imageItem.image = NCImageCache.shared.getFolder()
         }
 
         cell.labelInfo.text = utility.getRelativeDateTitle(metadata.date as Date)
