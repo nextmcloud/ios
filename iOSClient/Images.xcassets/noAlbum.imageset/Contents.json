@@ -1,15 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "mediaSelected.pdf",
+      "filename" : "bg-image-albums.png",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true
   }
 }

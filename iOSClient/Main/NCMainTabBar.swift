@@ -144,17 +144,25 @@ class NCMainTabBar: UITabBar {
         }
 
         // Media
-        if let item = items?[3] {
+        if let item = items?[2] {
             item.title = NSLocalizedString("_media_", comment: "")
             item.image = UIImage(systemName: "photo")
             item.selectedImage = item.image
+            item.tag = 102
+        }
+        
+        // Album
+        if let item = items?[3] {
+            item.title = NSLocalizedString("_albums_", comment: "")
+            item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.brandElement, size: 25)
+            item.isEnabled = true
             item.tag = 103
         }
 
         // More
         if let item = items?[4] {
             item.title = NSLocalizedString("_more_", comment: "")
-            item.image = UIImage(systemName: "line.3.horizontal")
+//            item.image = UIImage(systemName: "line.3.horizontal")
             item.image = UIImage(systemName: "ellipsis")
             item.selectedImage = item.image
             item.tag = 104
