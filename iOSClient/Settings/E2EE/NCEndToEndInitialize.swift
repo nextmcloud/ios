@@ -169,15 +169,15 @@ class NCEndToEndInitialize: NSObject {
                         if error == .success, let publicKey {
 
                             // Verify Certificate
-                            var verifyCertificate: Bool = false
-                            if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
-                                verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
-                            }
-                            if verifyCertificate == false {
-                                let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to verify certificate")
-                                NCContentPresenter().messageNotification("E2E verify certificate server", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
-                                return
-                            }
+//                            var verifyCertificate: Bool = false
+//                            if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
+//                                verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
+//                            }
+//                            if verifyCertificate == false {
+//                                let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to verify certificate")
+//                                NCContentPresenter().messageNotification("E2E verify certificate server", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
+//                                return
+//                            }
 
                             NCPreferences().setEndToEndPublicKey(account: account, publicKey: publicKey)
                             NCManageDatabase.shared.clearTablesE2EE(account: account)
@@ -275,15 +275,15 @@ class NCEndToEndInitialize: NSObject {
                 } completion: { account, publicKey, _, error in
                     if error == .success, let publicKey {
 
-                        var verifyCertificate: Bool = false
-                        if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
-                            verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
-                        }
-                        if verifyCertificate == false {
-                            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to verify certificate")
-                            NCContentPresenter().messageNotification("E2E verify certificate server", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
-                            return
-                        }
+//                        var verifyCertificate: Bool = false
+//                        if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
+//                            verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
+//                        }
+//                        if verifyCertificate == false {
+//                            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to verify certificate")
+//                            NCContentPresenter().messageNotification("E2E verify certificate server", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
+//                            return
+//                        }
 
                         NCPreferences().setEndToEndPublicKey(account: account, publicKey: publicKey)
                         NCManageDatabase.shared.clearTablesE2EE(account: account)

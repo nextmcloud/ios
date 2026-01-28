@@ -29,7 +29,7 @@ enum NCViewerContextMenu {
            if !(!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty), !metadata.isDirectoryE2EE, !metadata.e2eEncrypted {
                let action = UIAction(
                    title: NSLocalizedString("_details_", comment: ""),
-                   image: UIImage(systemName: "info")?.withTintColor(NCBrandColor.shared.iconImageColor)
+                   image: UIImage(systemName: "square.and.arrow.up")?.withTintColor(NCBrandColor.shared.iconImageColor)
                ) { _ in
                    NCCreate().createShare(viewController: controller,
                                           metadata: metadata,
@@ -84,9 +84,9 @@ enum NCViewerContextMenu {
            //
            // SHARE
            //
-           if !webView, metadata.canShare {
-               menuElements.append(ContextMenuActions.share(selectedMetadatas: [metadata], controller: controller, sender: sender))
-           }
+//           if !webView, metadata.canShare {
+//               menuElements.append(ContextMenuActions.share(selectedMetadatas: [metadata], controller: controller, sender: sender))
+//           }
 
             //
             // PRINT
@@ -158,7 +158,7 @@ enum NCViewerContextMenu {
            if metadata.isPDF {
                menuElements.append(UIAction(
                    title: NSLocalizedString("_search_", comment: ""),
-                   image: UIImage(systemName: "search")?.withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
+                   image: UIImage(named: "search")?.withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                        NotificationCenter.default.postOnMainThread(
                            name: NCGlobal.shared.notificationCenterMenuSearchTextPDF
                        )
@@ -166,7 +166,7 @@ enum NCViewerContextMenu {
 
                menuElements.append(UIAction(
                    title: NSLocalizedString("_go_to_page_", comment: ""),
-                   image: UIImage(systemName: "go-to-page")?.withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
+                   image: UIImage(named: "go-to-page")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                        NotificationCenter.default.postOnMainThread(
                            name: NCGlobal.shared.notificationCenterMenuGotToPageInPDF
                        )

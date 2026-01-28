@@ -81,7 +81,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_details_", comment: ""),
-                    icon: utility.loadImage(named: "info.circle", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "square.and.arrow.up", colors: [NCBrandColor.shared.iconImageColor]),
                     order: 10,
                     sender: sender,
                     action: { _ in
@@ -249,9 +249,9 @@ extension NCCollectionViewCommon {
         //
         // SHARE
         //
-        if (NCNetworking.shared.isOnline || (tableLocalFile != nil && fileExists)) && metadata.canShare {
-            actions.append(.share(selectedMetadatas: [metadata], controller: self.controller, order: 80, sender: sender))
-        }
+//        if (NCNetworking.shared.isOnline || (tableLocalFile != nil && fileExists)) && metadata.canShare {
+//            actions.append(.share(selectedMetadatas: [metadata], controller: self.controller, order: 80, sender: sender))
+//        }
 
         //
         // SAVE LIVE PHOTO

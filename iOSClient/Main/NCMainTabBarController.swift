@@ -82,16 +82,16 @@ class NCMainTabBarController: UITabBarController {
 //        }
 
         // Album
-        if let item = tabBar.items?[3] {
-            item.title = NSLocalizedString("_albums_", comment: "")
-            item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.textColor, size: 25)
-//            item.isEnabled = true
-            item.selectedImage = item.image
-            item.tag = 103
-        }
+//        if let item = tabBar.items?[3] {
+//            item.title = NSLocalizedString("_albums_", comment: "")
+//            item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.textColor, size: 25)
+////            item.isEnabled = true
+//            item.selectedImage = item.image
+//            item.tag = 103
+//        }
         
         // More
-        if let item = tabBar.items?[4] {
+        if let item = tabBar.items?[3] {
 //        if let item = tabBar.items?[4] {
             item.title = NSLocalizedString("_more_", comment: "")
             item.image = UIImage(named: "more") // UIImage(systemName: "ellipsis")

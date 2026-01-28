@@ -506,7 +506,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             cell.hideButtonMore(true)
         }
 
-        cell.setIconOutlines()
+//        cell.setIconOutlines()
 
         return cell
     }

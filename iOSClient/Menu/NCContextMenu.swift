@@ -40,7 +40,7 @@ class NCContextMenu: NSObject {
         // MENU ITEMS
 
         let detail = UIAction(title: NSLocalizedString("_details_", comment: ""),
-                              image: utility.loadImage(named: "info.circle")) { _ in
+                              image: utility.loadImage(named: "square.and.arrow.up")) { _ in
             NCCreate().createShare(viewController: self.viewController, metadata: self.metadata, page: .activity)
         }
 
@@ -55,15 +55,15 @@ class NCContextMenu: NSObject {
             }
         }
 
-        let share = UIAction(title: NSLocalizedString("_share_", comment: ""),
-                             image: utility.loadImage(named: "square.and.arrow.up") ) { _ in
-            Task {@MainActor in
-                let controller = self.viewController.tabBarController as? NCMainTabBarController
-                await NCCreate().createActivityViewController(selectedMetadata: [self.metadata],
-                                                              controller: controller,
-                                                              sender: self.sender)
-            }
-        }
+//        let share = UIAction(title: NSLocalizedString("_share_", comment: ""),
+//                             image: utility.loadImage(named: "square.and.arrow.up") ) { _ in
+//            Task {@MainActor in
+//                let controller = self.viewController.tabBarController as? NCMainTabBarController
+//                await NCCreate().createActivityViewController(selectedMetadata: [self.metadata],
+//                                                              controller: controller,
+//                                                              sender: self.sender)
+//            }
+//        }
 
         let viewInFolder = UIAction(title: NSLocalizedString("_view_in_folder_", comment: ""),
                                     image: utility.loadImage(named: "questionmark.folder")) { _ in
@@ -188,14 +188,14 @@ class NCContextMenu: NSObject {
             } else {
                 if metadata.lock {
                     menu.append(favorite)
-                    menu.append(share)
+//                    menu.append(share)
 
                     if self.database.getMetadataLivePhoto(metadata: metadata) != nil {
                         menu.append(livePhotoSave)
                     }
                 } else {
                     menu.append(favorite)
-                    menu.append(share)
+//                    menu.append(share)
 
                     if self.database.getMetadataLivePhoto(metadata: metadata) != nil {
                         menu.append(livePhotoSave)
