@@ -169,6 +169,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                     viewController.includeImages = true
                     viewController.type = ""
                     viewController.session = session
+                    viewController.controller = self.tabBarController as? NCMainTabBarController
 
                     self.present(navigationController, animated: true, completion: nil)
                 }
@@ -250,8 +251,9 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                                         self.documentController?.presentOptionsMenu(from: CGRect.zero, in: self.view, animated: true)
                                     }
                                 } else {
-
-                                    NCContentPresenter().showError(error: error)
+                                    Task {
+                                        await showErrorBanner(sceneIdentifier: self.sceneIdentifier, text: error.errorDescription)
+                                    }
                                 }
                             })
                         }
@@ -297,7 +299,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
 
     func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
         if let serverUrl, let metadata {
-            let path = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: serverUrl, session: session)
+            let path = utilityFileSystem.getRelativeFilePath(metadata.fileName, serverUrl: serverUrl, session: session)
 
             NextcloudKit.shared.createAssetRichdocuments(path: path, account: metadata.account) { task in
                 Task {
@@ -311,14 +313,15 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                     let functionJS = "OCA.RichDocuments.documentsMain.postAsset('\(metadata.fileNameView)', '\(url)')"
                     self.webView.evaluateJavaScript(functionJS, completionHandler: { _, _ in })
                 } else {
-                    NCContentPresenter().showError(error: error)
-                }
+                    Task {
+                        await showErrorBanner(sceneIdentifier: self.sceneIdentifier, text: error.errorDescription)
+                    }                }
             }
         }
     }
 
     func select(_ metadata: tableMetadata!, serverUrl: String!) {
-        let path = utilityFileSystem.getFileNamePath(metadata!.fileName, serverUrl: serverUrl!, session: session)
+        let path = utilityFileSystem.getRelativeFilePath(metadata!.fileName, serverUrl: serverUrl!, session: session)
 
         NextcloudKit.shared.createAssetRichdocuments(path: path, account: metadata.account) { task in
             Task {
@@ -332,7 +335,9 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                 let functionJS = "OCA.RichDocuments.documentsMain.postAsset('\(metadata.fileNameView)', '\(url)')"
                 self.webView.evaluateJavaScript(functionJS, completionHandler: { _, _ in })
             } else {
-                NCContentPresenter().showError(error: error)
+                Task {
+                    await showErrorBanner(sceneIdentifier: self.sceneIdentifier, text: error.errorDescription)
+                }
             }
         }
     }
@@ -361,7 +366,7 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
         NCActivityIndicator.shared.stop()
     }
 
-    // MARK: - Hekper
+    // MARK: - Helper
 
     func filenameFromContentDisposition(_ disposition: String) -> String? {
         if let range = disposition.range(of: "filename=") {
@@ -385,7 +390,7 @@ extension NCViewerRichDocument: UINavigationControllerDelegate {
         Task {
             if parent == nil {
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferReloadData(serverUrl: metadata.serverUrl, requestData: false, status: nil)
+                    delegate.transferReloadDataSource(serverUrl: self.metadata.serverUrl, requestData: false, status: nil)
                 }
             }
         }
@@ -393,6 +398,12 @@ extension NCViewerRichDocument: UINavigationControllerDelegate {
 }
 
 extension NCViewerRichDocument: NCTransferDelegate {
+    func transferReloadData(serverUrl: String?) { }
+
+    func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?) { }
+
+    func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) { }
+
     func transferChange(status: String,
                         account: String,
                         fileName: String,
