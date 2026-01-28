@@ -246,7 +246,6 @@ actor NCNetworkingProcess {
                     await startTimer(interval: minInterval)
                 }
             } else {
-                // Remove upload asset
                 await removeUploadedAssetsIfNeeded()
 
                 // Set Live Photo
