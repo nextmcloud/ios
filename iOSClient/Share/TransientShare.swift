@@ -51,6 +51,6 @@ class TransientShare: Shareable {
     }
 
     static func shareLink(metadata: tableMetadata, password: String?) -> TransientShare {
-        TransientShare(shareType: NKShare.ShareType.publicLink.rawValue, metadata: metadata, password: password)
+        TransientShare(shareType: NCShareCommon.shareTypeLink, metadata: metadata, password: password)
     }
 }
