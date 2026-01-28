@@ -200,4 +200,22 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
             return filePath + "/"
         }
     }
+    
+    func getFooterInformation(datasource: [tableTrash]) -> (directories: Int, files: Int, size: Int64) {
+        let validMetadatas = datasource.filter { !$0.isInvalidated }
+        let directories = validMetadatas.filter({ $0.directory == true})
+        let files = validMetadatas.filter({ $0.directory == false})
+
+        var size: Int64 = 0
+
+        directories.forEach { metadata in
+            size += metadata.size
+        }
+        
+        files.forEach { metadata in
+            size += metadata.size
+        }
+
+        return (directories.count, files.count, size)
+    }
 }

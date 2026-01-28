@@ -72,8 +72,8 @@ class NCTrashListCell: UICollectionViewCell, NCTrashCellProtocol {
 
         ]
 
-        imageRestore.image = NCUtility().loadImage(named: "arrow.counterclockwise", colors: [NCBrandColor.shared.iconImageColor])
-        imageMore.image = NCUtility().loadImage(named: "trash", colors: [.red])
+        imageRestore.image = NCUtility().loadImage(named: "restore", colors: [NCBrandColor.shared.iconImageColor])
+        imageMore.image = NCUtility().loadImage(named: "trashIcon", colors: [NCBrandColor.shared.iconImageColor]) //NCUtility().loadImage(named: "trashIcon", colors: [.red])
         imageItem.layer.cornerRadius = 6
         imageItem.layer.masksToBounds = true
 
