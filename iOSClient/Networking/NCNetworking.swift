@@ -31,7 +31,7 @@ import UIKit
 import NextcloudKit
 import Alamofire
 
-@objc protocol ClientCertificateDelegate {
+protocol ClientCertificateDelegate: AnyObject {
     func onIncorrectPassword()
     func didAskForClientCertificate()
 }
@@ -47,7 +47,8 @@ protocol NCTransferDelegate: AnyObject {
                         ocId: String,
                         destination: String?,
                         error: NKError)
-    func transferReloadData(serverUrl: String?, requestData: Bool, status: Int?)
+    func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?)
+    func transferReloadData(serverUrl: String?)
     func transferProgressDidUpdate(progress: Float,
                                    totalBytes: Int64,
                                    totalBytesExpected: Int64,
@@ -273,14 +274,15 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     let global = NCGlobal.shared
     let backgroundSession = NKBackground(nkCommonInstance: NextcloudKit.shared.nkCommonInstance)
 
-    let sceneIdentifier: String = ""
     var requestsUnifiedSearch: [DataRequest] = []
     var lastReachability: Bool = true
     var networkReachability: NKTypeReachability?
     weak var certificateDelegate: ClientCertificateDelegate?
     var p12Data: Data?
     var p12Password: String?
-    var controller: UIViewController?
+
+    internal var sceneIdentifier: String = ""
+    internal var controller: UIViewController?
 
     var isOffline: Bool {
         return networkReachability == NKTypeReachability.notReachable || networkReachability == NKTypeReachability.unknown
@@ -313,6 +315,11 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
     // MARK: - init
 
     init() { }
+
+    func setupScene(sceneIdentifier: String, controller: UIViewController?) {
+        self.sceneIdentifier = sceneIdentifier
+        self.controller = controller
+    }
 
     func authenticationChallenge(_ session: URLSession,
                                  didReceive challenge: URLAuthenticationChallenge,
