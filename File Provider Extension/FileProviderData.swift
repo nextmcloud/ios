@@ -32,7 +32,7 @@ class FileProviderData: NSObject {
         case workingSet
     }
 
-    // MARK: - 
+    // MARK: -
 
     @discardableResult
     func setupAccount(domain: NSFileProviderDomain? = nil,
@@ -175,7 +175,7 @@ class FileProviderData: NSObject {
 
         if error == .success {
             if let metadata = await NCManageDatabase.shared.getMetadataFromOcIdAsync(ocId) {
-                await NCManageDatabase.shared.addLocalFilesAsync(metadatas: [metadata])
+                await NCManageDatabase.shared.addLocalFileAsync(metadata: metadata)
             }
         }
 
