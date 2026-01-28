@@ -128,8 +128,13 @@ class NCShare: UIViewController, NCSharePagingContent {
             self.capabilities = await NKCapabilities.shared.getCapabilities(for: metadata.account)
             if metadata.e2eEncrypted {
                 let metadataDirectory = await self.database.getMetadataDirectoryAsync(serverUrl: metadata.serverUrl, account: metadata.account)
-                if capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV12 ||
-                    (capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 && metadataDirectory?.e2eEncrypted ?? false) {
+//                 if capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV12 ||
+//                     (capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 && metadataDirectory?.e2eEncrypted ?? false) {
+                if capabilities.e2EEApiVersion == "1.2" ||
+                    (NCGlobal.shared.isE2eeVersion2(capabilities.e2EEApiVersion) && metadataDirectory?.e2eEncrypted ?? false) {
+//                     searchFieldTopConstraint.constant = -50
+//                     searchField.alpha = 0
+//                     btnContact.alpha = 0
                 }
             } else {
             }
@@ -137,6 +142,8 @@ class NCShare: UIViewController, NCSharePagingContent {
             networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session)
             let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing
             networking?.readShare(showLoadingIndicator: isVisible)
+//             searchField.searchTextField.font = .systemFont(ofSize: 14)
+//             searchField.delegate = self
         }
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_close_", comment: ""), style: .plain, target: self, action: #selector(exitTapped))
@@ -268,13 +275,6 @@ class NCShare: UIViewController, NCSharePagingContent {
     // MARK: - IBAction
 
     @IBAction func searchFieldDidEndOnExit(textField: UITextField) {
-        // https://stackoverflow.com/questions/25471114/how-to-validate-an-e-mail-address-in-swift
-        func isValidEmail(_ email: String) -> Bool {
-
-            let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-            let emailPred = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
-            return emailPred.evaluate(with: email)
-        }
         guard let searchString = textField.text, !searchString.isEmpty else { return }
 //        if searchString.contains("@"), !isValidEmail(searchString) { return }
         if searchString.contains("@"), !utility.validateEmail(searchString) { return }
@@ -689,15 +689,16 @@ extension NCShare: UISearchBarDelegate {
     }
 
     @objc private func searchSharees(_ sender: Any?) {
-        // https://stackoverflow.com/questions/25471114/how-to-validate-an-e-mail-address-in-swift
-        func isValidEmail(_ email: String) -> Bool {
-
-            let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-            let emailPred = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
-            return emailPred.evaluate(with: email)
-        }
-        guard let searchString = textField?.text, !searchString.isEmpty else { return }
+        guard let searchString = textField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !searchString.isEmpty else { return }
         if searchString.contains("@"), !isValidEmail(searchString) { return }
         networking?.getSharees(searchString: searchString)
+    }
+}
+
+extension NCShare {
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegEx = "^[\u{0021}-\u{007E}\\p{L}\\p{M}\\p{N}._%+\\-]+@([\\p{L}\\p{M}\\p{N}0-9\\-]+\\.)+[\\p{L}\\p{M}]{2,64}$" // Unicode regex allows for all unicode chars, ex. ß, ü, and more.
+        let emailPred = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
+        return emailPred.evaluate(with: email)
     }
 }

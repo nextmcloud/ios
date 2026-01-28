@@ -356,7 +356,7 @@ class NCViewerMediaPage: UIViewController {
     func clearCommandCenter() {
 
         UIApplication.shared.endReceivingRemoteControlEvents()
-        MPNowPlayingInfoCenter.default().nowPlayingInfo = [:]
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
 
         MPRemoteCommandCenter.shared().playCommand.isEnabled = false
         MPRemoteCommandCenter.shared().pauseCommand.isEnabled = false
@@ -569,6 +569,10 @@ extension NCViewerMediaPage: UIScrollViewDelegate {
 }
 
 extension NCViewerMediaPage: NCTransferDelegate {
+    func transferReloadData(serverUrl: String?) { }
+
+    func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?) { }
+
     func transferChange(status: String,
                         account: String,
                         fileName: String,

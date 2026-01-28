@@ -168,7 +168,9 @@ class NCViewerMedia: UIViewController {
                                     downloadRequest = request
                                 } progressHandler: { progress in
                                     Task {@MainActor in
-                                        LucidBanner.shared.update(progress: Double(progress.fractionCompleted), for: token)
+                                        LucidBanner.shared.update(
+                                            payload: LucidBannerPayload.Update(progress: progress.fractionCompleted),
+                                            for: token)
                                     }
                                 }
                                 LucidBanner.shared.dismiss()
@@ -614,6 +616,12 @@ extension NCViewerMedia: EasyTipViewDelegate {
 }
 
 extension NCViewerMedia: NCTransferDelegate {
+    func transferReloadData(serverUrl: String?) { }
+
+    func transferReloadDataSource(serverUrl: String?, requestData: Bool, status: Int?) { }
+
+    func transferProgressDidUpdate(progress: Float, totalBytes: Int64, totalBytesExpected: Int64, fileName: String, serverUrl: String) { }
+
     func transferChange(status: String,
                         account: String,
                         fileName: String,
