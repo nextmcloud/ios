@@ -60,13 +60,14 @@ final class NCGlobal: Sendable {
     // Intro selector
     //
     let introLogin: Int                             = 0
+    let introSignup: Int                            = 1
     let introSignUpWithProvider: Int                = 1
 
     // Avatar
     //
     let avatarSize: Int                             = 128 * Int(UIScreen.main.scale)
     let avatarSizeRounded: Int                      = 128
-
+    
     // Preview size
     //
     let size1024: CGSize                            = CGSize(width: 1024, height: 1024)
@@ -138,7 +139,35 @@ final class NCGlobal: Sendable {
     //
     let buttonMoreMore                              = "more"
     let buttonMoreLock                              = "moreLock"
+    let buttonMoreStop                              = "stop"
 
+    // Standard height sections header/footer
+    //
+    let heightButtonsView: CGFloat                  = 50
+    let heightHeaderTransfer: CGFloat               = 50
+    let heightSection: CGFloat                      = 30
+    let heightFooter: CGFloat                       = 1
+    let heightFooterButton: CGFloat                 = 30
+    let endHeightFooter: CGFloat                    = 85
+    
+
+    // Text -  OnlyOffice - Collabora - QuickLook
+    //
+    let editorText                                  = "text"
+    let editorOnlyoffice                            = "onlyoffice"
+    let editorCollabora                             = "collabora"
+    let editorQuickLook                             = "quicklook"
+    
+    let onlyofficeDocx                              = "onlyoffice_docx"
+    let onlyofficeXlsx                              = "onlyoffice_xlsx"
+    let onlyofficePptx                              = "onlyoffice_pptx"
+    
+    // Template
+    //
+    let templateDocument                            = "document"
+    let templateSpreadsheet                         = "spreadsheet"
+    let templatePresentation                        = "presentation"
+    
     // Rich Workspace
     //
     let fileNameRichWorkspace                       = "Readme.md"
@@ -221,6 +250,8 @@ final class NCGlobal: Sendable {
     let selectorSaveAsScan                      = "saveAsScan"
     let selectorOpenDetail                      = "openDetail"
     let selectorSynchronizationOffline          = "synchronizationOffline"
+    let selectorPrint                           = "print"
+    let selectorDeleteFile                      = "deleteFile"
 
     // Metadata : Status
     //
@@ -245,16 +276,27 @@ final class NCGlobal: Sendable {
     let metadataStatusWaitFavorite: Int         = 13
     let metadataStatusWaitCopy: Int             = 14
     let metadataStatusWaitMove: Int             = 15
+    
+    let metadataStatusUploadingAllMode          = [1,2,3]
+    let metadataStatusInTransfer                = [-1, -2, 1, 2]
+    let metadataStatusFileDown                  = [-1, -2, -3]
+    let metadataStatusHideInView                = [1, 2, 3, 11]
+    let metadataStatusHideInFileExtension       = [1, 2, 3, 10, 11]
+    let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
+    let metadataStatusTransfers                 = [-2, -3, 2, 3, 10, 11, 12, 13, 14, 15]
+
+    let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadatasStatusInProgress               = [-2, 2]
+
+    
+    let metadataStatusObserveNetworkingProcess  = [-1, 1, 10, 11, 12, 13, 14, 15]
+    let metadataStatusObserveTrasfers           = [-2, 2, 10, 11, 12, 13, 14, 15]
 
     let metadataStatusUploadingAllMode          = [1,2,3]
     let metadataStatusDownloadingAllMode        = [-1, -2, -3]
     let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
     let metadataStatusHideInView                = [1, 2, 3, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
-    let metadataStatusTransfers                 = [-2, -3, 2, 3, 10, 11, 12, 13, 14, 15]
-
-    let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
-    let metadatasStatusInProgress               = [-2, 2]
 
     // Auto upload subfolder granularity
     //
@@ -268,12 +310,16 @@ final class NCGlobal: Sendable {
     let notificationCenterChangeTheming                         = "changeTheming"                   // userInfo: account
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
+    let notificationCenterDidCreateShareLink                    = "didCreateShareLink"
+
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
     let notificationCenterReloadAvatar                          = "reloadAvatar"
     let notificationCenterClearCache                            = "clearCache"
     let notificationCenterCheckUserDelaultErrorDone             = "checkUserDelaultErrorDone"       // userInfo: account, controller
     let notificationCenterServerDidUpdate                       = "serverDidUpdate"                 // userInfo: account
     let notificationCenterNetworkReachability                   = "networkReachability"
+
+    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
 
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
@@ -288,6 +334,7 @@ final class NCGlobal: Sendable {
     let notificationCenterPlayerIsPlaying                       = "playerIsPlaying"
     let notificationCenterPlayerStoppedPlaying                  = "playerStoppedPlaying"
 
+    let notificationCenterFavoriteStatusChanged                  = "favoriteStatusChanged"
     let notificationCenterUserInteractionMonitor                = "serInteractionMonitor"
 
     // Networking Status
@@ -304,8 +351,9 @@ final class NCGlobal: Sendable {
     let networkingStatusUploading                               = "statusUploading"
     let networkingStatusUploaded                                = "statusUploaded"
 
-    let networkingStatusReloadAvatar                            = "statusReloadAvatar"
 
+    let networkingStatusReloadAvatar                            = "statusReloadAvatar"
+    let notificationCenterUpdateIcons                           = "updateIcons"
 
     // TIP
     //
@@ -388,6 +436,7 @@ final class NCGlobal: Sendable {
     //
     let taskDescriptionRetrievesProperties  = "retrievesProperties"
     let taskDescriptionSynchronization      = "synchronization"
+    let taskDescriptionDeleteFileOrFolder   = "deleteFileOrFolder"
 
     // LOG TAG
     //
@@ -402,6 +451,37 @@ final class NCGlobal: Sendable {
     let logTagSpeedUpSyncMetadata           = "SYNC METADATA"
     let logTagNetworkingTasks               = "NETWORKING TASKS"
     let logTagMetadataTransfers             = "METADATA TRANSFERS"
+
+    // USER DEFAULTS
+    //
+    let udMigrationMultiDomains             = "migrationMultiDomains"
+    let udLastVersion                       = "lastVersion"
+
+    // MoEngage App Version
+    //
+    let moEngageAppVersion                  = 854
+    
+    // Filename Mask and Type
+    //
+    let keyFileNameMask                             = "fileNameMask"
+    let keyFileNameType                             = "fileNameType"
+    let keyFileNameAutoUploadMask                   = "fileNameAutoUploadMask"
+    let keyFileNameAutoUploadType                   = "fileNameAutoUploadType"
+    let keyFileNameOriginal                         = "fileNameOriginal"
+    let keyFileNameOriginalAutoUpload               = "fileNameOriginalAutoUpload"
+
+    // LOG TAG
+    //
+    let logTagTask                          = "BGT"
+    let logTagLocation                      = "LOCATION"
+    let logTagBgSync                        = "BGSYNC"
+    let logTagE2EE                          = "E2EE"
+    let logTagPN                            = "PUSH NOTIFICATION"
+    let logTagSync                          = "SYNC"
+    let logTagServiceProficer               = "SERVICE PROVIDER"
+    let logTagDatabase                      = "DB"
+    let logSpeedUpSyncMetadata              = "SYNC METADATA"
+    let logNetworkingTasks                  = "NETWORKING TASKS"
 
     // USER DEFAULTS
     //
