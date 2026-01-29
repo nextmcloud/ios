@@ -256,7 +256,7 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
     @IBOutlet weak var imageStatus: UIImageView!
     @IBOutlet weak var status: UILabel!
     @IBOutlet weak var imageShareeType: UIImageView!
-    @IBOutlet weak var centerTitle: NSLayoutConstraint!
+    @IBOutlet weak var centerTitleConstraint: NSLayoutConstraint!
 
     private var user: String = ""
     private var index = IndexPath()
@@ -277,7 +277,7 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
     func setupCell(sharee: NKSharee, session: NCSession.Session) {
         let utility = NCUtility()
 //        imageItem.image = NCShareCommon.getImageShareType(shareType: sharee.shareType)
-        imageShareeType.image = NCShareCommon.getImageShareType(shareType: sharee.shareType)
+        imageShareeType.image = NCShareCommon.getImageShareType(shareType: sharee.shareType, isDropDown: true)
         let status = utility.getUserStatus(userIcon: sharee.userIcon, userStatus: sharee.userStatus, userMessage: sharee.userMessage)
 
         if let statusImage = status.statusImage {
@@ -287,9 +287,9 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
 
         self.status.text = status.statusMessage
         if self.status.text?.count ?? 0 > 0 {
-            centerTitle.constant = -5
+            centerTitleConstraint.constant = -5
         } else {
-            centerTitle.constant = 0
+            centerTitleConstraint.constant = 0
         }
 
         /*

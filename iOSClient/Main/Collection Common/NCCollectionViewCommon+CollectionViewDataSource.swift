@@ -360,11 +360,11 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         if session.account != metadata.account {
             cell.shareImageView?.image = imageCache.getImageShared()
         }
-//        if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)){
-//            cell.fileSharedImage?.image = cell.fileSharedImage?.image?.image(color: NCBrandColor.shared.customer)
-//        } else {
-//            cell.fileSharedImage?.image = NCImageCache.shared.getImageCanShare().image(color: NCBrandColor.shared.gray60)
-//        }
+        if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)){
+            cell.shareImageView?.image = cell.shareImageView?.image?.image(color: NCBrandColor.shared.customer)
+        } else {
+            cell.shareImageView?.image = NCImageCache.shared.getImageCanShare().image(color: NCBrandColor.shared.gray60)
+        }
         
         if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
             cell.shareImageView?.image = NCImageCache.shared.getImageSharedWithMe()

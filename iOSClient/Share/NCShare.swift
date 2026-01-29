@@ -546,9 +546,9 @@ extension NCShare: UITableViewDataSource {
 //                    cell.tableShare = shares.firstShareLink
 //                }
 //            }
-//            cell.searchField.addTarget(self, action: #selector(searchFieldDidEndOnExit(textField:)), for: .editingDidEndOnExit)
-//            cell.searchField.addTarget(self, action: #selector(searchFieldDidChange(textField:)), for: .editingChanged)
-//            cell.btnContact.addTarget(self, action: #selector(selectContactClicked(_:)), for: .touchUpInside)
+            cell.searchField.addTarget(self, action: #selector(searchFieldDidEndOnExit(textField:)), for: .editingDidEndOnExit)
+            cell.searchField.addTarget(self, action: #selector(searchFieldDidChange(textField:)), for: .editingChanged)
+            cell.btnContact.addTarget(self, action: #selector(selectContactClicked(_:)), for: .touchUpInside)
             cell.setupCell(with: metadata)
             return cell
 
@@ -714,7 +714,7 @@ extension NCShare: UISearchBarDelegate {
         if searchText.isEmpty {
             dropDown.hide()
         } else {
-            perform(#selector(searchSharees(_:)), with: nil, afterDelay: 1)
+            perform(#selector(searchSharees(_:)), with: nil, afterDelay: 0.5)
         }
     }
 
