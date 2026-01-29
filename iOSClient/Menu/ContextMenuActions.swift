@@ -155,16 +155,16 @@ enum ContextMenuActions {
             image = UIImage(systemName: isLocked ? "lock.open" : "lock")
             subtitleKey = !metadata.lockOwnerDisplayName.isEmpty ? String(format: NSLocalizedString("_locked_by_", comment: ""), metadata.lockOwnerDisplayName) : ""
         }
-
-         return UIAction(
-             title: NSLocalizedString(titleKey, comment: ""),
-             image: UIImage(systemName: shouldLock ? "lock" : "lock.open")
-         ) { _ in
-             for metadata in metadatas where metadata.lock != shouldLock {
-                 NCNetworking.shared.lockUnlockFile(metadata, shoulLock: shouldLock)
-             }
-             completion?()
-         }
+        
+        return UIAction(
+            title: NSLocalizedString(titleKey, comment: ""),
+            subtitle: subtitleKey,
+            image: image,
+            attributes: metadata.canUnlock(as: metadata.userId) ? [] : [.disabled]
+        ) { _ in
+            NCNetworking.shared.lockUnlockFile(metadata, shouldLock: !isLocked)
+            completion?()
+        }
      }
     
     /*
@@ -240,14 +240,4 @@ enum ContextMenuActions {
         }
     }
      */
-        return UIAction(
-            title: NSLocalizedString(titleKey, comment: ""),
-            subtitle: subtitleKey,
-            image: image,
-            attributes: metadata.canUnlock(as: metadata.userId) ? [] : [.disabled]
-        ) { _ in
-            NCNetworking.shared.lockUnlockFile(metadata, shouldLock: !isLocked)
-            completion?()
-        }
-    }
 }

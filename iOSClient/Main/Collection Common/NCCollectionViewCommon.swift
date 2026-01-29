@@ -564,30 +564,30 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         toggleMenu(metadata: metadata, image: image, sender: sender)
     }
 
-    func tapRichWorkspace(_ sender: Any) {
-        if let navigationController = UIStoryboard(name: "NCViewerRichWorkspace", bundle: nil).instantiateInitialViewController() as? UINavigationController {
-            if let viewerRichWorkspace = navigationController.topViewController as? NCViewerRichWorkspace {
-                viewerRichWorkspace.richWorkspaceText = richWorkspaceText ?? ""
-                viewerRichWorkspace.serverUrl = serverUrl
-                viewerRichWorkspace.delegate = self
+//    func tapRichWorkspace(_ sender: Any) {
+//        if let navigationController = UIStoryboard(name: "NCViewerRichWorkspace", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+//            if let viewerRichWorkspace = navigationController.topViewController as? NCViewerRichWorkspace {
+//                viewerRichWorkspace.richWorkspaceText = richWorkspaceText ?? ""
+//                viewerRichWorkspace.serverUrl = serverUrl
+//                viewerRichWorkspace.delegate = self
+//
+//                navigationController.modalPresentationStyle = .fullScreen
+//                self.present(navigationController, animated: true, completion: nil)
+//            }
+//        }
+//    }
 
-                navigationController.modalPresentationStyle = .fullScreen
-                self.present(navigationController, animated: true, completion: nil)
-            }
-        }
-    }
+//    func tapRecommendationsButtonMenu(with metadata: tableMetadata, image: UIImage?, sender: Any?) {
+//        toggleMenu(metadata: metadata, image: image, sender: sender)
+//    }
 
-    func tapRecommendationsButtonMenu(with metadata: tableMetadata, image: UIImage?, sender: Any?) {
-        toggleMenu(metadata: metadata, image: image, sender: sender)
-    }
+//    func tapButtonSection(_ sender: Any, metadataForSection: NCMetadataForSection?) {
+//        unifiedSearchMore(metadataForSection: metadataForSection)
+//    }
 
-    func tapButtonSection(_ sender: Any, metadataForSection: NCMetadataForSection?) {
-        unifiedSearchMore(metadataForSection: metadataForSection)
-    }
-
-    func tapRecommendations(with metadata: tableMetadata) {
-        didSelectMetadata(metadata, withOcIds: false)
-    }
+//    func tapRecommendations(with metadata: tableMetadata) {
+//        didSelectMetadata(metadata, withOcIds: false)
+//    }
 
     func longPressListItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 

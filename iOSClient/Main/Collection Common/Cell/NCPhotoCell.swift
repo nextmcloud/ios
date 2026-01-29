@@ -16,6 +16,7 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProt
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
 
+    private var ocId = ""
     weak var delegate: NCPhotoCellDelegate?
 
     var metadata: tableMetadata? {

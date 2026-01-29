@@ -329,7 +329,7 @@ import XLForm
                 
             } else {
                 
-                let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileNameForm), serverUrl: serverUrl, session: session)
+                let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileNameForm), serverUrl: serverUrl, session: session)
                 await NCCreateDocument().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileNameForm), fileNameExtension: self.fileNameExtension, editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account)
                 
             }
@@ -340,7 +340,7 @@ import XLForm
 
         if let metadatas, metadatas.count > 0 {
             let fileName = metadatas[0].fileName
-            let fileNamePath = utilityFileSystem.getFileNamePath(fileName, serverUrl: serverUrl, session: session)
+            let fileNamePath = utilityFileSystem.getRelativeFilePath(fileName, serverUrl: serverUrl, session: session)
 //            createDocument(fileNamePath: fileNamePath, fileName: fileName)
             Task {
                 await NCCreateDocument().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: editorId, creatorId: creatorId, templateId: templateIdentifier, account: session.account)

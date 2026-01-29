@@ -61,9 +61,9 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     var titleCurrentFolder = NCBrandOptions.shared.brand
     var serverUrl = ""
     var session: NCSession.Session!
-    var controller: NCMainTabBarController? {
-        self.tabBarController as? NCMainTabBarController
-    }
+//    var controller: NCMainTabBarController? {
+//        self.tabBarController as? NCMainTabBarController
+//    }
     var controller: NCMainTabBarController?
     // -------------------------------------------------------------
 

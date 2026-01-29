@@ -1181,7 +1181,7 @@
 "_copied_path_"             = "Copied path";
 "_copy_path_"               = "Copy path";
 "_certificates_"            = "Certificates";
-"_privacy_screen_"          = "Splash screen when app inactive";
+//"_privacy_screen_"          = "Splash screen when app inactive";
 "_saving_"                  = "Saving …";
 "_video_not_streamed_"      = "The server does not allow video streaming, do you want to download it?";
 "_video_not_streamed_e2ee_" = "The server does not allow video streaming because it is encrypted, do you want to download it?";
@@ -1282,9 +1282,9 @@
 "_use_system_style_"        = "Use system style";
 "_account_settings_"        = "Account settings";
 "_users_"                   = "Users";
-"_users_footer_"            = "Every time the app is reactivated, the account will be requested.";
-"_additional_view_options_" = "Additional view options";
+//"_users_footer_"            = "Every time the app is reactivated, the account will be requested.";
 "_users_footer_"            = "Allows you to select an account every time you open the app.";
+"_additional_view_options_" = "Additional view options";
 "_while_charging_"          = "While charging";
 "_downloading_"             = "Downloading";
 "_additional_options_"      = "Additional options";

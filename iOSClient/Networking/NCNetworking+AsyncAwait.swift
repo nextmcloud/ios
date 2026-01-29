@@ -164,9 +164,9 @@ extension NCNetworking {
                      account: String,
                      options: NKRequestOptions = NKRequestOptions()) async -> (account: String, files: [NKFile]?, responseData: AFDataResponse<Data>?, error: NKError) {
         await withUnsafeContinuation({ continuation in
-            NextcloudKit.shared.searchMedia(path: path, lessDate: lessDate, greaterDate: greaterDate, elementDate: elementDate, limit: limit, account: account, options: options) { account, files, responseData, error in
-                continuation.resume(returning: (account, files, responseData, error))
-            }
+//            NextcloudKit.shared.searchMedia(path: path, lessDate: lessDate, greaterDate: greaterDate, elementDate: elementDate, limit: limit, account: account, options: options) { account, files, responseData, error in
+//                continuation.resume(returning: (account, files, responseData, error))
+//            }
         })
     }
 

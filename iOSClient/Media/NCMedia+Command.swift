@@ -46,8 +46,9 @@ extension NCMedia {
     }
 
     func setElements() {
-        let highTextTitle = titleDate.frame.height
-        let isOver = self.collectionView.contentOffset.y + highTextTitle <= -view.safeAreaInsets.top && self.collectionView.contentOffset.y != -view.safeAreaInsets.top
+//        let highTextTitle = titleDate.frame.height
+//        let isOver = self.collectionView.contentOffset.y + highTextTitle <= -view.safeAreaInsets.top && self.collectionView.contentOffset.y != -view.safeAreaInsets.top
+        let isOver = self.collectionView.contentOffset.y <= -view.safeAreaInsets.top - titleConstraint.constant
 
         if isOver || dataSource.metadatas.isEmpty {
             UIView.animate(withDuration: 0.3) { [self] in

@@ -117,7 +117,7 @@ class NCShareNetworking: NSObject {
     // MARK: - Create Share Link
     func createShareLink(password: String?) {
         NCActivityIndicator.shared.start(backgroundView: view)
-        let filenamePath = utilityFileSystem.getFileNamePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
+        let filenamePath = utilityFileSystem.getRelativeFilePath(metadata.fileName, serverUrl: metadata.serverUrl, session: session)
 
         NextcloudKit.shared.createShare(path: filenamePath,
                                         shareType: NCShareCommon.shareTypeLink,

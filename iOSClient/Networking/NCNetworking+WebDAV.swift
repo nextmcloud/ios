@@ -613,10 +613,11 @@ extension NCNetworking {
 #endif
         } else {
             Task {
+                let ocId = metadata.ocId
+                let serverUrl = metadata.serverUrl
                 await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
-                    let status = self.global.metadataStatusWaitRename
-                    await NCManageDatabase.shared.renameMetadata(fileNameNew: fileNameNew, ocId: metadata.ocId, status: status)
-                    delegate.transferReloadData(serverUrl: metadata.serverUrl, requestData: false, status: status)
+                    await NCManageDatabase.shared.renameMetadata(fileNameNew: fileNameNew, ocId: ocId, status: self.global.metadataStatusWaitRename)
+                    delegate.transferReloadDataSource(serverUrl: serverUrl, requestData: false, status: self.global.metadataStatusWaitRename)
                 }
 //                NotificationCenter.default.postOnMainThread(name: NCGlobal.shared.notificationCenterRenameFile, userInfo: ["serverUrl": metadata.serverUrl, "account": metadata.account, "error": NKError(errorCode: 0, errorDescription: ""), "ocId": metadata.ocId, "indexPath": indexPath])
 
@@ -767,13 +768,11 @@ extension NCNetworking {
             let serverUrl = metadata.serverUrl
             let favorite = metadata.favorite
             await self.transferDispatcher.notifyAllDelegatesAsync { delegate in
-                await NCManageDatabase.shared.setMetadataFavoriteAsync(ocId: metadata.ocId, favorite: !metadata.favorite, saveOldFavorite: metadata.favorite.description, status: self.global.metadataStatusWaitFavorite)
 #if !EXTENSION
                 if !metadata.favorite, !metadata.contentType.contains("directory") {
                     AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__ADD_FAVORITE ,metadata: metadata)
                 }
 #endif
-                delegate.transferReloadData(serverUrl: metadata.serverUrl, requestData: false, status: self.global.metadataStatusWaitFavorite)
                 await NCManageDatabase.shared.setMetadataFavoriteAsync(ocId: ocId, favorite: !favorite, saveOldFavorite: favorite.description, status: self.global.metadataStatusWaitFavorite)
                 delegate.transferReloadDataSource(serverUrl: serverUrl, requestData: false, status: self.global.metadataStatusWaitFavorite)
             }

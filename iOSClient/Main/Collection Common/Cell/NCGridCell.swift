@@ -22,6 +22,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
     @IBOutlet weak var iconsStackView: UIStackView!
 
+    private var ocId = ""
     weak var delegate: NCGridCellDelegate?
 
     var metadata: tableMetadata? {

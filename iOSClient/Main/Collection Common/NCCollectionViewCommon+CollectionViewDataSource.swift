@@ -205,44 +205,44 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             let tblDirectory = database.getTableDirectory(ocId: metadata.ocId)
 
             if metadata.e2eEncrypted {
-                cell.filePreviewImageView?.image = imageCache.getFolderEncrypted()
-            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
-                cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe()
-            } else if isShare || !metadata.shareType.isEmpty {
-                cell.filePreviewImageView?.image = imageCache.getFolderPublic()
-//            } else if isShare {
-//                cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe()
-//            } else if !metadata.shareType.isEmpty {
-//                metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
-//                (cell.filePreviewImageView?.image = imageCache.getFolderPublic()) :
-//                (cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe())
-            } else if !metadata.shareType.isEmpty && metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) {
-                cell.filePreviewImageView?.image = imageCache.getFolderPublic()
-            } else if metadata.mountType == "group" {
-                cell.filePreviewImageView?.image = imageCache.getFolderGroup()
-            } else if isMounted {
-                cell.filePreviewImageView?.image = imageCache.getFolderExternal()
-            } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
-                cell.filePreviewImageView?.image = imageCache.getFolderAutomaticUpload()
-            } else {
-                cell.filePreviewImageView?.image = imageCache.getFolder()
-                cell.previewImageView?.image = imageCache.getFolderEncrypted(account: metadata.account)
+//                cell.previewImageView?.image = imageCache.getFolderEncrypted()
+//            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+//                cell.previewImageView?.image = imageCache.getFolderSharedWithMe()
+//            } else if isShare || !metadata.shareType.isEmpty {
+//                cell.previewImageView?.image = imageCache.getFolderPublic()
+////            } else if isShare {
+////                cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe()
+////            } else if !metadata.shareType.isEmpty {
+////                metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
+////                (cell.filePreviewImageView?.image = imageCache.getFolderPublic()) :
+////                (cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe())
+//            } else if !metadata.shareType.isEmpty && metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) {
+//                cell.previewImageView?.image = imageCache.getFolderPublic()
+//            } else if metadata.mountType == "group" {
+//                cell.previewImageView?.image = imageCache.getFolderGroup()
+//            } else if isMounted {
+//                cell.previewImageView?.image = imageCache.getFolderExternal()
+//            } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
+//                cell.previewImageView?.image = imageCache.getFolderAutomaticUpload()
+//            } else {
+//                cell.previewImageView?.image = imageCache.getFolder()
+                cell.previewImageView?.image = imageCache.getFolderEncrypted()
             } else if isShare {
-                cell.previewImageView?.image = imageCache.getFolderSharedWithMe(account: metadata.account)
+                cell.previewImageView?.image = imageCache.getFolderSharedWithMe()
             } else if !metadata.shareType.isEmpty {
                 metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
-                (cell.previewImageView?.image = imageCache.getFolderPublic(account: metadata.account)) :
-                (cell.previewImageView?.image = imageCache.getFolderSharedWithMe(account: metadata.account))
+                (cell.previewImageView?.image = imageCache.getFolderPublic()) :
+                (cell.previewImageView?.image = imageCache.getFolderSharedWithMe())
             } else if !metadata.shareType.isEmpty && metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) {
-                cell.previewImageView?.image = imageCache.getFolderPublic(account: metadata.account)
+                cell.previewImageView?.image = imageCache.getFolderPublic()
             } else if metadata.mountType == "group" {
-                cell.previewImageView?.image = imageCache.getFolderGroup(account: metadata.account)
+                cell.previewImageView?.image = imageCache.getFolderGroup()
             } else if isMounted {
-                cell.previewImageView?.image = imageCache.getFolderExternal(account: metadata.account)
+                cell.previewImageView?.image = imageCache.getFolderExternal()
             } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
-                cell.previewImageView?.image = imageCache.getFolderAutomaticUpload(account: metadata.account)
+                cell.previewImageView?.image = imageCache.getFolderAutomaticUpload()
             } else {
-                cell.previewImageView?.image = imageCache.getFolder(account: metadata.account)
+                cell.previewImageView?.image = imageCache.getFolder()
             }
 
             // Local image: offline
@@ -353,30 +353,31 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         
         // Share image
         if isShare || !metadata.shareType.isEmpty {
-            cell.fileSharedImage?.image = imageCache.getImageShared()
+            cell.shareImageView?.image = imageCache.getImageShared()
         } else {
-            cell.fileSharedImage?.image = NCImageCache.shared.getImageCanShare().image(color: NCBrandColor.shared.gray60)
+            cell.shareImageView?.image = NCImageCache.shared.getImageCanShare().image(color: NCBrandColor.shared.gray60)
         }
         if session.account != metadata.account {
-            cell.fileSharedImage?.image = imageCache.getImageShared()
+            cell.shareImageView?.image = imageCache.getImageShared()
         }
-        if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)){
-            cell.fileSharedImage?.image = cell.fileSharedImage?.image?.image(color: NCBrandColor.shared.customer)
-        } else {
-            cell.fileSharedImage?.image = NCImageCache.shared.getImageCanShare().image(color: NCBrandColor.shared.gray60)
-        }
+//        if (!metadata.shareType.isEmpty || !(shares.share?.isEmpty ?? true) || (shares.firstShareLink != nil)){
+//            cell.fileSharedImage?.image = cell.fileSharedImage?.image?.image(color: NCBrandColor.shared.customer)
+//        } else {
+//            cell.fileSharedImage?.image = NCImageCache.shared.getImageCanShare().image(color: NCBrandColor.shared.gray60)
+//        }
         
         if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
-            cell.fileSharedImage?.image = NCImageCache.shared.getImageSharedWithMe()
-        if isShare {
-            cell.shareImageView?.image = imageCache.getImageShared()
-        } else if !metadata.shareType.isEmpty {
-            metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
-            (cell.shareImageView?.image = imageCache.getImageShareByLink()) :
-            (cell.shareImageView?.image = imageCache.getImageShared())
-        } else {
-            cell.shareImageView?.image = imageCache.getImageCanShare()
+            cell.shareImageView?.image = NCImageCache.shared.getImageSharedWithMe()
         }
+//        if isShare {
+//            cell.shareImageView?.image = imageCache.getImageShared()
+//        } else if !metadata.shareType.isEmpty {
+//            metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
+//            (cell.shareImageView?.image = imageCache.getImageShareByLink()) :
+//            (cell.shareImageView?.image = imageCache.getImageShared())
+//        } else {
+//            cell.shareImageView?.image = imageCache.getImageCanShare()
+//        }
 
         // Button More
         if metadata.lock == true {
@@ -388,7 +389,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 
         // Status
         if metadata.isLivePhoto {
-            cell.fileStatusImage?.image = utility.loadImage(named: "livephoto", colors: isLayoutPhoto ? [.white] : [NCBrandColor.shared.iconImageColor2])
+//            cell.fileStatusImage?.image = utility.loadImage(named: "livephoto", colors: isLayoutPhoto ? [.white] : [NCBrandColor.shared.iconImageColor2])
             cell.statusImageView?.image = utility.loadImage(named: "livephoto", colors: [NCBrandColor.shared.iconImageColor])
             a11yValues.append(NSLocalizedString("_upload_mov_livephoto_", comment: ""))
         } else if metadata.isVideo {

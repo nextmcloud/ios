@@ -32,6 +32,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var separatorHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var titleTrailingConstraint: NSLayoutConstraint!
 
+    private var ocId = ""
     weak var delegate: NCListCellDelegate?
 
     var metadata: tableMetadata? {

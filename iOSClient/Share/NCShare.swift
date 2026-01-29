@@ -127,16 +127,12 @@ class NCShare: UIViewController, NCSharePagingContent {
             self.capabilities = await NKCapabilities.shared.getCapabilities(for: metadata.account)
             if metadata.e2eEncrypted {
                 let metadataDirectory = await self.database.getMetadataDirectoryAsync(serverUrl: metadata.serverUrl, account: metadata.account)
-                if capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV12 ||
-                    (capabilities.e2EEApiVersion == NCGlobal.shared.e2eeVersionV20 && metadataDirectory?.e2eEncrypted ?? false) {
+               
+                if capabilities.e2EEApiVersion == "1.2" ||
+                    (NCGlobal.shared.isE2eeVersion2(capabilities.e2EEApiVersion) && metadataDirectory?.e2eEncrypted ?? false) {
 //                    searchFieldTopConstraint.constant = -50
 //                    searchField.alpha = 0
 //                    btnContact.alpha = 0
-                if capabilities.e2EEApiVersion == "1.2" ||
-                    (NCGlobal.shared.isE2eeVersion2(capabilities.e2EEApiVersion) && metadataDirectory?.e2eEncrypted ?? false) {
-                    searchFieldTopConstraint.constant = -50
-                    searchField.alpha = 0
-                    btnContact.alpha = 0
                 }
             } else {
 //                checkSharedWithYou()
@@ -147,8 +143,8 @@ class NCShare: UIViewController, NCSharePagingContent {
             networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session)
             let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing
             networking?.readShare(showLoadingIndicator: isVisible)
-            searchField.searchTextField.font = .systemFont(ofSize: 14)
-            searchField.delegate = self
+//            searchField.searchTextField.font = .systemFont(ofSize: 14)
+//            searchField.delegate = self
         }
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("_close_", comment: ""), style: .plain, target: self, action: #selector(exitTapped))
@@ -514,15 +510,16 @@ extension NCShare: UITableViewDataSource {
             return shareLinks.count
         case .emails:
             return shareEmails.count
-        var numRows = shares.share?.count ?? 0
-        if section == 0 {
-            if metadata.e2eEncrypted, capabilities.e2EEApiVersion == "1.2" {
-                numRows = 1
-            } else {
-                // don't allow link creation if reshare is disabled
-                numRows = shares.firstShareLink != nil || canReshare ? 2 : 1
-            }
         }
+//        var numRows = shares.share?.count ?? 0
+//        if section == 0 {
+//            if metadata.e2eEncrypted, capabilities.e2EEApiVersion == "1.2" {
+//                numRows = 1
+//            } else {
+//                // don't allow link creation if reshare is disabled
+//                numRows = shares.firstShareLink != nil || canReshare ? 2 : 1
+//            }
+//        }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -534,23 +531,24 @@ extension NCShare: UITableViewDataSource {
         case .linkByEmail:
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "NCShareEmailFieldCell", for: indexPath) as? NCShareEmailFieldCell else {
                 return UITableViewCell()
-        // Setup default share cells
-        guard indexPath.section != 0 else {
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell
-            else { return UITableViewCell() }
-            cell.delegate = self
-            if metadata.e2eEncrypted, capabilities.e2EEApiVersion == "1.2" {
-                cell.tableShare = shares.firstShareLink
-            } else {
-                if indexPath.row == 0 {
-                    cell.isInternalLink = true
-                } else if shares.firstShareLink?.isInvalidated != true {
-                    cell.tableShare = shares.firstShareLink
-                }
             }
-            cell.searchField.addTarget(self, action: #selector(searchFieldDidEndOnExit(textField:)), for: .editingDidEndOnExit)
-            cell.searchField.addTarget(self, action: #selector(searchFieldDidChange(textField:)), for: .editingChanged)
-            cell.btnContact.addTarget(self, action: #selector(selectContactClicked(_:)), for: .touchUpInside)
+//        // Setup default share cells
+//        guard indexPath.section != 0 else {
+//            guard let cell = tableView.dequeueReusableCell(withIdentifier: "cellLink", for: indexPath) as? NCShareLinkCell
+//            else { return UITableViewCell() }
+//            cell.delegate = self
+//            if metadata.e2eEncrypted, capabilities.e2EEApiVersion == "1.2" {
+//                cell.tableShare = shares.firstShareLink
+//            } else {
+//                if indexPath.row == 0 {
+//                    cell.isInternalLink = true
+//                } else if shares.firstShareLink?.isInvalidated != true {
+//                    cell.tableShare = shares.firstShareLink
+//                }
+//            }
+//            cell.searchField.addTarget(self, action: #selector(searchFieldDidEndOnExit(textField:)), for: .editingDidEndOnExit)
+//            cell.searchField.addTarget(self, action: #selector(searchFieldDidChange(textField:)), for: .editingChanged)
+//            cell.btnContact.addTarget(self, action: #selector(selectContactClicked(_:)), for: .touchUpInside)
             cell.setupCell(with: metadata)
             return cell
 
@@ -730,7 +728,7 @@ extension NCShare: UISearchBarDelegate {
 //        }
 //        guard let searchString = textField?.text, !searchString.isEmpty else { return }
         guard let searchString = textField?.text?.trimmingCharacters(in: .whitespacesAndNewlines), !searchString.isEmpty else { return }
-        guard let searchString = searchField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !searchString.isEmpty else { return }
+//        guard let searchString = searchField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !searchString.isEmpty else { return }
         if searchString.contains("@"), !isValidEmail(searchString) { return }
         networking?.getSharees(searchString: searchString)
     }
