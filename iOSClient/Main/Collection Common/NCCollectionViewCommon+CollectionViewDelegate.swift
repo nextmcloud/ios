@@ -20,7 +20,9 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                     return
                 }
             } else {
-                NCContentPresenter().showInfo(error: NKError(errorCode: global.errorE2EENotEnabled, errorDescription: "_e2e_server_disabled_"))
+                Task {
+                    await showInfoBanner(controller: self.controller, text: "_e2e_server_disabled_")
+                }
                 return
             }
         }
@@ -51,7 +53,9 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                 downloadRequest = request
             } progressHandler: { progress in
                 Task {@MainActor in
-                    LucidBanner.shared.update(progress: Double(progress.fractionCompleted), for: tokenBanner)
+                    LucidBanner.shared.update(
+                        payload: LucidBannerPayload.Update(progress: Double(progress.fractionCompleted)),
+                        for: tokenBanner)
                 }
             }
             await MainActor.run {
@@ -61,9 +65,7 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
             if results.nkError == .success || results.afError?.isExplicitlyCancelledError ?? false {
                 print("ok")
             } else {
-                await showErrorBanner(scene: scene,
-                                      errorDescription: results.nkError.errorDescription,
-                                      errorCode: results.nkError.errorCode)
+                await showErrorBanner(scene: scene, text: results.nkError.errorDescription)
             }
         }
 
@@ -115,8 +117,9 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
                         self.navigationController?.pushViewController(vc, animated: true)
                     }
                 } else {
-                    let error = NKError(errorCode: global.errorOffline, errorDescription: "_go_online_")
-                    NCContentPresenter().showInfo(error: error)
+                    Task {
+                        await showErrorBanner(controller: controller, text: "_go_online_")
+                    }
                 }
             }
         }
@@ -167,9 +170,9 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         }
 
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
-            return NCViewerProviderContextMenu(metadata: metadata, image: image, sceneIdentifier: self.sceneIdentifier)
+            return nil
         }, actionProvider: { _ in
-            let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: self, sceneIdentifier: self.sceneIdentifier, image: image, sender: cell)
+            let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: self, sceneIdentifier: self.sceneIdentifier, sender: cell)
             return contextMenu.viewMenu()
         })
     }

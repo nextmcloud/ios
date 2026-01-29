@@ -106,6 +106,7 @@ class NCMediaNavigationController: NCMainNavigationController {
                 viewController.typeOfCommandView = .select
                 viewController.type = "mediaFolder"
                 viewController.session = self.session
+                viewController.controller = self.controller
                 self.present(navigationController, animated: true)
             })
         ])

@@ -37,7 +37,7 @@ class NCActivityTableViewCell: UITableViewCell, NCCellProtocol {
         get { return index }
         set { index = newValue }
     }
-    var fileAvatarImageView: UIImageView? {
+    var avatarImageView: UIImageView? {
         return avatar
     }
     var fileUser: String? {
@@ -84,11 +84,8 @@ extension NCActivityTableViewCell: UICollectionViewDelegate {
                         viewController.filePath = result.filePath
                         (responder as? UIViewController)!.navigationController?.pushViewController(viewController, animated: true)
                     } else {
-                        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_trash_file_not_found_")
-                        Task {@MainActor in
-                            await showErrorBanner(controller: viewController.controller,
-                                                  errorDescription: error.errorDescription,
-                                                  errorCode: error.errorCode)
+                        Task {
+                            await showErrorBanner(controller: viewController.controller, text: "_trash_file_not_found_")
                         }
                     }
                 }

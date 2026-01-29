@@ -147,9 +147,9 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
             let results = NCManageDatabase.shared.getImageAvatarLoaded(fileName: fileName)
 
             if results.image == nil {
-                cell.fileAvatarImageView?.image = utility.loadUserImage(for: user, displayName: json["user"]?["name"].string, urlBase: session.urlBase)
+                cell.avatarImageView?.image = utility.loadUserImage(for: user, displayName: json["user"]?["name"].string, urlBase: session.urlBase)
             } else {
-                cell.fileAvatarImageView?.image = results.image
+                cell.avatarImageView?.image = results.image
             }
 
             if !(results.tblAvatar?.loaded ?? false),
@@ -258,7 +258,9 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
                 }
                 self.tableView.reloadData()
             } else if error != .success {
-                NCContentPresenter().showError(error: error)
+                Task {
+                    await showErrorBanner(controller: self.controller, text: error.errorDescription)
+                }
             } else {
                 print("[Error] The user has been changed during networking process.")
             }
@@ -303,7 +305,9 @@ class NCNotification: UITableViewController, NCNotificationCellDelegate {
                     self.dismiss(animated: true)
                 }
             } else if error != .success {
-                NCContentPresenter().showError(error: error)
+                Task {
+                    await showErrorBanner(controller: self.controller, text: error.errorDescription)
+                }
             } else {
                 print("[Error] The user has been changed during networking process.")
             }
@@ -376,7 +380,7 @@ class NCNotificationCell: UITableViewCell, NCCellProtocol {
         get { return index }
         set { index = newValue }
     }
-    var fileAvatarImageView: UIImageView? {
+    var avatarImageView: UIImageView? {
         return avatar
     }
     var fileUser: String? {

@@ -15,7 +15,6 @@ import SwiftUI
 import RealmSwift
 import MoEngageInApps
 
-@UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var backgroundSessionCompletionHandler: (() -> Void)?
     var activeLogin: NCLogin?
@@ -436,7 +435,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 Task {
                     await NCNetworking.shared.transferDispatcher.notifyAllDelegatesAsync { delegate in
                         try? await Task.sleep(nanoseconds: 500_000_000)
-                        delegate.transferReloadData(serverUrl: nil, requestData: true, status: nil)
+                        delegate.transferReloadDataSource(serverUrl: nil, requestData: true, status: nil)
                     }
                 }
             } else if let navigationController = UIStoryboard(name: "NCNotification", bundle: nil).instantiateInitialViewController() as? UINavigationController,

@@ -60,4 +60,11 @@ extension UIApplication {
         return keyWindow
     }
     
+
+    /// Returns all foreground-active window scenes.
+    var foregroundActiveScenes: [UIWindowScene] {
+        connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .filter { $0.activationState == .foregroundActive }
+    }
 }

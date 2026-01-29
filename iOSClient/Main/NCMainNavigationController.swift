@@ -178,37 +178,25 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
             Task { @MainActor in
                 let capabilities = await NKCapabilities.shared.getCapabilities(for: account)
-                guard capabilities.notification.count > 0 else {
-                    if self.isNotificationsButtonVisible() {
-                        self.controller?.availableNotifications = false
-                        await self.updateRightBarButtonItems()
-                    }
-                    return
-                }
 
                 // Notification
-                let resultsNotification = await NextcloudKit.shared.getNotificationsAsync(account: account) { task in
-                    Task {
-                        let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
-                                                                                                    name: "getNotifications")
-                        await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
-                    }
-                }
-                if resultsNotification.error == .success,
-                    let notifications = resultsNotification.notifications,
-                    notifications.count > 0 {
-                    if !self.isNotificationsButtonVisible() {
-                        self.controller?.availableNotifications = true
-                        await self.updateRightBarButtonItems()
-                    }
+                //
+                if capabilities.notification.count == 0 {
+                    self.controller?.availableNotifications = false
                 } else {
-                    if self.isNotificationsButtonVisible() {
-                        self.controller?.availableNotifications = false
-                        await self.updateRightBarButtonItems()
+                    _ = await NextcloudKit.shared.getNotificationsAsync(account: account) { task in
+                        Task {
+                            let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: account,
+                                                                                                        name: "getNotifications")
+                            await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                        }
                     }
+                    self.controller?.availableNotifications = true
                 }
+                await self.updateRightBarButtonItems()
 
                 // Menu Plus
+                //
                 let session = NCSession.shared.getSession(account: account)
                 await self.createPlusMenu(session: session, capabilities: capabilities)
                 AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
@@ -308,7 +296,12 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         menuActionElement.append(UIAction(title: titleCreateFolder,
                                           image: imageCreateFolder) { _ in
             DispatchQueue.main.async {
-                let alertController = UIAlertController.createFolder(serverUrl: serverUrl, session: session, sceneIdentifier: controller.sceneIdentifier, capabilities: capabilities)
+                let alertController = UIAlertController.createFolder(
+                    serverUrl: serverUrl,
+                    session: session,
+                    sceneIdentifier: controller.sceneIdentifier,
+                    capabilities: capabilities,
+                    scene: SceneManager.shared.getWindow(controller: self.controller)?.windowScene)
                 controller.present(alertController, animated: true, completion: nil)
             }
         })
@@ -321,7 +314,13 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             menuE2EEElement.append(UIAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
                                             image: NCImageCache.shared.getFolderEncrypted()) { _ in
                 DispatchQueue.main.async {
-                    let alertController = UIAlertController.createFolder(serverUrl: serverUrl, session: session, markE2ee: true, sceneIdentifier: controller.sceneIdentifier, capabilities: capabilities)
+                    let alertController = UIAlertController.createFolder(
+                        serverUrl: serverUrl,
+                        session: session,
+                        markE2ee: true,
+                        sceneIdentifier: controller.sceneIdentifier,
+                        capabilities: capabilities,
+                        scene: SceneManager.shared.getWindow(controller: self.controller)?.windowScene)
                     controller.present(alertController, animated: true, completion: nil)
                 }
             })
@@ -343,9 +342,9 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                                                    session.account,
                                                    serverUrl,
                                                    NCGlobal.shared.fileNameRichWorkspace.lowercased())) == nil {
-                            richWorkspaceCommon.createViewerNextcloudText(serverUrl: serverUrl, viewController: viewController, session: session)
+                            richWorkspaceCommon.createViewerNextcloudText(serverUrl: serverUrl, viewController: viewController, controller: self.controller, session: session)
                         } else {
-                            richWorkspaceCommon.openViewerNextcloudText(serverUrl: serverUrl, viewController: viewController, session: session)
+                            richWorkspaceCommon.openViewerNextcloudText(serverUrl: serverUrl, viewController: viewController, controller: controller, session: session)
                         }
                     }
                 }
@@ -375,6 +374,10 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 //                    let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 //
 //                    await NCCreate().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "text", creatorId: creator.identifier, templateId: "document", account: session.account)
+                    let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + creator.ext, account: session.account, serverUrl: serverUrl)
+                    let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+
+                    await NCCreate().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "text", creatorId: creator.identifier, templateId: "document", account: session.account)
                 }
             })
         }
@@ -393,7 +396,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                         let createDocument = NCCreate()
                         let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "document", account: session.account)
                         let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
-                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+                        let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                         await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "collabora", templateId: templates.selectedTemplate.identifier, account: session.account)
                     }
@@ -405,7 +408,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                         let createDocument = NCCreate()
                         let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "spreadsheet", account: session.account)
                         let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
-                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+                        let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                         await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "collabora", templateId: templates.selectedTemplate.identifier, account: session.account)
                     }
@@ -417,7 +420,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                         let createDocument = NCCreate()
                         let templates = await createDocument.getTemplate(editorId: "collabora", templateId: "presentation", account: session.account)
                         let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
-                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+                        let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                         await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "collabora", templateId: templates.selectedTemplate.identifier, account: session.account)
                     }
@@ -490,7 +493,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                         let createDocument = NCCreate()
                         let templates = await createDocument.getTemplate(editorId: "onlyoffice", templateId: "document", account: session.account)
                         let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
-                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+                        let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                         await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "onlyoffice", creatorId: creator.identifier, templateId: templates.selectedTemplate.identifier, account: session.account)
                     }
@@ -504,7 +507,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                         let createDocument = NCCreate()
                         let templates = await createDocument.getTemplate(editorId: "onlyoffice", templateId: "spreadsheet", account: session.account)
                         let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
-                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+                        let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                         await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "onlyoffice", creatorId: creator.identifier, templateId: templates.selectedTemplate.identifier, account: session.account)
                     }
@@ -519,7 +522,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                         let createDocument = NCCreate()
                         let templates = await createDocument.getTemplate(editorId: "onlyoffice", templateId: "presentation", account: session.account)
                         let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + templates.ext, account: session.account, serverUrl: serverUrl)
-                        let fileNamePath = utilityFileSystem.getFileNamePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+                        let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
 
                         await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "onlyoffice", creatorId: creator.identifier, templateId: templates.selectedTemplate.identifier, account: session.account)
                     }
@@ -901,7 +904,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             Task {
                 NCPreferences().setFavoriteOnTop(account: self.session.account, value: !favoriteOnTop)
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
+                    delegate.transferReloadDataSource(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
                 }
                 await self.updateRightMenu()
             }
@@ -913,7 +916,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             Task {
                 NCPreferences().setDirectoryOnTop(account: self.session.account, value: !directoryOnTop)
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
+                    delegate.transferReloadDataSource(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
                 }
                 await self.updateRightMenu()
             }
@@ -936,7 +939,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             Task {
                 NCPreferences().setPersonalFilesOnly(account: self.session.account, value: !personalFilesOnly)
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
+                    delegate.transferReloadDataSource(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
                 }
                 await self.updateRightMenu()
             }
@@ -948,7 +951,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             NCPreferences().showDescription = !showDescriptionKeychain
             Task {
                 await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferReloadData(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
+                    delegate.transferReloadDataSource(serverUrl: collectionViewCommon.serverUrl, requestData: false, status: nil)
                 }
                 await self.updateRightMenu()
             }

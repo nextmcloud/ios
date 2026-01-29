@@ -141,15 +141,20 @@ enum ContextMenuActions {
          }
      }
 
-     static func lockUnlock(shouldLock: Bool,
-                            metadatas: [tableMetadata],
-                            completion: (() -> Void)? = nil) -> UIAction {
-         let titleKey: String
-         if metadatas.count == 1 {
-             titleKey = shouldLock ? "_lock_file_" : "_unlock_file_"
-         } else {
-             titleKey = shouldLock ? "_lock_selected_files_" : "_unlock_selected_files_"
-         }
+    static func lockUnlock(isLocked: Bool,
+                           metadata: tableMetadata,
+                           completion: (() -> Void)? = nil) -> UIAction {
+        let titleKey: String
+        var subtitleKey: String = ""
+        let image: UIImage?
+        if !metadata.canUnlock(as: metadata.userId), isLocked {
+            titleKey = String(format: NSLocalizedString("_locked_by_", comment: ""), metadata.lockOwnerDisplayName)
+            image = UIImage(systemName: "lock")
+        } else {
+            titleKey = isLocked ? "_unlock_file_" : "_lock_file_"
+            image = UIImage(systemName: isLocked ? "lock.open" : "lock")
+            subtitleKey = !metadata.lockOwnerDisplayName.isEmpty ? String(format: NSLocalizedString("_locked_by_", comment: ""), metadata.lockOwnerDisplayName) : ""
+        }
 
          return UIAction(
              title: NSLocalizedString(titleKey, comment: ""),
@@ -235,4 +240,14 @@ enum ContextMenuActions {
         }
     }
      */
+        return UIAction(
+            title: NSLocalizedString(titleKey, comment: ""),
+            subtitle: subtitleKey,
+            image: image,
+            attributes: metadata.canUnlock(as: metadata.userId) ? [] : [.disabled]
+        ) { _ in
+            NCNetworking.shared.lockUnlockFile(metadata, shouldLock: !isLocked)
+            completion?()
+        }
+    }
 }

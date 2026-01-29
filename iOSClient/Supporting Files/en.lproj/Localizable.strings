@@ -479,6 +479,7 @@
 "_autoupload_change_location_footer_" = "Change folder used for \"Automatic upload of camera photos\" (if the option is enabled)";
 "_autoupload_not_select_home_"      = "Select a folder";
 "_autoupload_save_album_"           = "Copy photo or video into the photo album";
+"_autoupload_description_"          = "Choose whether new photos or videos will be automatically uploaded to your account.";
 "_autoupload_fullphotos_"           = "Upload the whole camera roll";
 "_start_autoupload_"                = "Turn on auto upload";
 "_stop_autoupload_"                 = "Turn off auto upload";
@@ -618,6 +619,8 @@
 "_add_offline_"                 = "Add to offline";
 "_remove_passcode_"             = "Remove password protection";
 "_protect_passcode_"            = "Protect with password";
+"_remove_favorites_"            = "Unfavorite";
+"_add_favorites_"               = "Favorite";
 "_share_"                       = "Share";
 "_reload_"                      = "Reload";
 "_open_in_"                     = "Open in …";
@@ -1183,6 +1186,8 @@
 "_video_not_streamed_"      = "The server does not allow video streaming, do you want to download it?";
 "_video_not_streamed_e2ee_" = "The server does not allow video streaming because it is encrypted, do you want to download it?";
 "_scan_"                    = "Scan";
+"_privacy_screen_"          = "Hide content when app is inactive";
+"_privacy_screen_footer_"   = "Hide the content in the app and show a splash screen when the app is inactive.";
 "_in_"                      = "in";
 "_enter_passphrase_"        = "Enter passphrase (12 words)";
 "_show_more_results_"       = "Show more results";
@@ -1256,8 +1261,8 @@
 "_download_image_"          = "Download image";
 "_download_video_"          = "Download video";
 "_reset_wrong_passcode_"    = "Reset application";
-"_reset_wrong_passcode_option_" = "Reset application after failed attempts";
-"_reset_wrong_passcode_desc_" = "Use \"Reset application\" to remove all accounts and local data after %d failed code entry attempts.";
+"_reset_wrong_passcode_option_" = "Reset application after 10 failed attempts";
+"_reset_wrong_passcode_desc_" = "Enabling this will remove all accounts and local data after %d failed passcode entry attempts.";
 "_deviceOwnerAuthentication_" = "The biometric sensor has been temporarily disabled due to multiple failed attempts. Enter the device passcode to re-enable the sensor.";
 "_virus_detect_"            = "Virus detected. Upload cannot be completed!";
 "_zoom_"                    = "Zoom";
@@ -1279,6 +1284,7 @@
 "_users_"                   = "Users";
 "_users_footer_"            = "Every time the app is reactivated, the account will be requested.";
 "_additional_view_options_" = "Additional view options";
+"_users_footer_"            = "Allows you to select an account every time you open the app.";
 "_while_charging_"          = "While charging";
 "_downloading_"             = "Downloading";
 "_additional_options_"      = "Additional options";
@@ -1325,7 +1331,7 @@
 "_rename_file_error_"       = "An error has occurred while renaming the file:\n%@.";
 "_creating_dir_progress_"   = "Creating directories in progress … keep the application active.";
 "_creating_db_photo_progress_" = "Creating photo archive in progress … keep the application active.";
-"_account_unauthorized_"    = "Warning, %@, you are not authorized, your account has been deleted, if you have changed your password, re-authenticate.";
+"_account_unauthorized_"    = "There was an issue authorizing the account %@. Please log in again.";
 "_folder_offline_desc_"     = "Even without an internet connection, you can organize your folders, create files. Once you're back online, your pending actions will automatically sync.";
 "_offline_not_allowed_"     = "This operation is not allowed in offline mode";
 "_Upload_native_format_yes_"= "Upload in native format: yes";
