@@ -16,7 +16,6 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProt
     @IBOutlet weak var buttonMore: UIButton!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
 
-    private var ocId = ""
     weak var delegate: NCPhotoCellDelegate?
 
     var metadata: tableMetadata? {
@@ -94,7 +93,7 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProt
 
     func selected(_ status: Bool, isEditMode: Bool) {
         // E2EE - remove encrypt folder selection
-        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), metadata.e2eEncrypted {
+        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
             imageSelect.isHidden = true
         } else {
             imageSelect.isHidden = isEditMode ? false : true

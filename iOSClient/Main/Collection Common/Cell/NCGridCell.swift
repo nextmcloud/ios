@@ -22,7 +22,6 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
     @IBOutlet weak var iconsStackView: UIStackView!
 
-    private var ocId = ""
     weak var delegate: NCGridCellDelegate?
 
     var metadata: tableMetadata? {
@@ -153,7 +152,7 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
 
     func selected(_ status: Bool, isEditMode: Bool) {
         // E2EE - remove encrypt folder selection
-        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(ocId), metadata.e2eEncrypted {
+        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
             imageSelect.isHidden = true
         } else {
             imageSelect.isHidden = isEditMode ? false : true

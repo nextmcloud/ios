@@ -178,6 +178,7 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
             isMounted = metadata.permissions.contains(NCMetadataPermissions.permissionMounted) && !metadataFolder!.permissions.contains(NCMetadataPermissions.permissionMounted)
         }
 
+        cell.metadata = metadata
         if isSearchingMode {
             if metadata.name == global.appName {
                 cell.info?.text = NSLocalizedString("_in_", comment: "") + " " + utilityFileSystem.getPath(path: metadata.path, user: metadata.user)

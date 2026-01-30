@@ -28,195 +28,7 @@ class NCContextMenu: NSObject {
     }
 
     func viewMenu() -> UIMenu {
-//        var downloadRequest: DownloadRequest?
-//        var titleDeleteConfirmFile = NSLocalizedString("_delete_file_", comment: "")
-//        let metadataMOV = NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata)
-//        let scene = SceneManager.shared.getWindow(sceneIdentifier: sceneIdentifier)?.windowScene
-//
-//        if metadata.directory { titleDeleteConfirmFile = NSLocalizedString("_delete_folder_", comment: "") }
-//
-//        // MENU ITEMS
-//
-//        let detail = UIAction(title: NSLocalizedString("_details_", comment: ""),
-//                              image: utility.loadImage(named: "square.and.arrow.up")) { _ in
-//            NCCreate().createShare(viewController: self.viewController, metadata: self.metadata, page: .activity)
-//        }
-//
-//        let favorite = UIAction(title: metadata.favorite ?
-//                                NSLocalizedString("_remove_favorites_", comment: "") :
-//                                NSLocalizedString("_add_favorites_", comment: ""),
-//                                image: NCUtility().loadImage(named: metadata.favorite ? "star" : "star.fill", colors: [NCBrandColor.shared.yellowFavorite])) { _ in
-//            NCNetworking.shared.setStatusWaitFavorite(self.metadata) { error in
-//                if error != .success {
-//                    NCContentPresenter().showError(error: error)
-//                }
-//            }
-//        }
-//
-////        let share = UIAction(title: NSLocalizedString("_share_", comment: ""),
-////                             image: utility.loadImage(named: "square.and.arrow.up") ) { _ in
-////            Task {@MainActor in
-////                let controller = self.viewController.tabBarController as? NCMainTabBarController
-////                await NCCreate().createActivityViewController(selectedMetadata: [self.metadata],
-////                                                              controller: controller,
-////                                                              sender: self.sender)
-////            }
-////        }
-//
-//        let viewInFolder = UIAction(title: NSLocalizedString("_view_in_folder_", comment: ""),
-//                                    image: utility.loadImage(named: "questionmark.folder")) { _ in
-//            NCNetworking.shared.openFileViewInFolder(serverUrl: self.metadata.serverUrl, fileNameBlink: self.metadata.fileName, fileNameOpen: nil, sceneIdentifier: self.sceneIdentifier)
-//        }
-//
-//        let livePhotoSave = UIAction(title: NSLocalizedString("_livephoto_save_", comment: ""), image: utility.loadImage(named: "livephoto")) { _ in
-//            if let metadataMOV = metadataMOV {
-//                NCNetworking.shared.saveLivePhotoQueue.addOperation(NCOperationSaveLivePhoto(metadata: self.metadata, metadataMOV: metadataMOV, controller: self.viewController.tabBarController))
-//            }
-//        }
-//
-//        let modify = UIAction(title: NSLocalizedString("_modify_", comment: ""),
-//                              image: utility.loadImage(named: "pencil.tip.crop.circle")) { _ in
-//            Task { @MainActor in
-//                if self.utilityFileSystem.fileProviderStorageExists(self.metadata) {
-//                    await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-//                        delegate.transferChange(status: NCGlobal.shared.networkingStatusDownloaded,
-//                                                account: self.metadata.account,
-//                                                fileName: self.metadata.fileName,
-//                                                serverUrl: self.metadata.serverUrl,
-//                                                selector: NCGlobal.shared.selectorLoadFileQuickLook,
-//                                                ocId: self.metadata.ocId,
-//                                                destination: nil,
-//                                                error: .success)
-//                    }
-//                } else {
-//                    guard let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(ocId: self.metadata.ocId,
-//                                                                                                   session: NCNetworking.shared.sessionDownload,
-//                                                                                                   selector: NCGlobal.shared.selectorLoadFileQuickLook,
-//                                                                                                   sceneIdentifier: self.sceneIdentifier) else {
-//                        return
-//                    }
-//
-//                    let token = showHudBanner(scene: scene,
-//                                              title: NSLocalizedString("_download_in_progress_", comment: ""),
-//                                              stage: .button) {
-//                        if let request = downloadRequest {
-//                            request.cancel()
-//                        }
-//                    }
-//
-//                    let results = await NCNetworking.shared.downloadFile(metadata: metadata) { request in
-//                        downloadRequest = request
-//                    } progressHandler: { progress in
-//                        Task {@MainActor in
-//                            LucidBanner.shared.update(progress: progress.fractionCompleted, for: token)
-//                        }
-//                    }
-//                    LucidBanner.shared.dismiss()
-//
-//                    if results.nkError == .success || results.afError?.isExplicitlyCancelledError ?? false {
-//                        //
-//                    } else {
-//                        await showErrorBanner(scene: scene, errorDescription: results.nkError.errorDescription, errorCode: results.nkError.errorCode)
-//                    }
-//                }
-//            }
-//        }
-//
-//        let deleteConfirmFile = UIAction(title: titleDeleteConfirmFile,
-//                                         image: utility.loadImage(named: "trashIcon", colors: [.red]), attributes: .destructive) { _ in
-//
-//            var alertStyle = UIAlertController.Style.actionSheet
-//            if UIDevice.current.userInterfaceIdiom == .pad {
-//                alertStyle = .alert
-//            }
-//            let alertController = UIAlertController(title: nil, message: nil, preferredStyle: alertStyle)
-//            alertController.addAction(UIAlertAction(title: NSLocalizedString("_delete_file_", comment: ""), style: .destructive) { _ in
-//                if let viewController = self.viewController as? NCCollectionViewCommon {
-//                    Task {
-//                        await NCNetworking.shared.setStatusWaitDelete(metadatas: [self.metadata], sceneIdentifier: self.sceneIdentifier)
-//                        await viewController.reloadDataSource()
-//                    }
-//                }
-//                if let viewController = self.viewController as? NCMedia {
-//                    Task {
-//                        await viewController.deleteImage(with: self.metadata.ocId)
-//                    }
-//                }
-//            })
-//            alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel) { _ in })
-//            self.viewController.present(alertController, animated: true, completion: nil)
-//        }
-//
-//        let deleteConfirmLocal = UIAction(title: NSLocalizedString("_remove_local_file_", comment: ""),
-//                                          image: utility.loadImage(named: "trashIcon", colors: [.red]), attributes: .destructive) { _ in
-//            Task {
-//                let error = await NCNetworking.shared.deleteCache(self.metadata, sceneIdentifier: self.sceneIdentifier)
-//
-//                await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-//                    delegate.transferChange(status: NCGlobal.shared.networkingStatusDelete,
-//                                            account: self.metadata.account,
-//                                            fileName: self.metadata.fileName,
-//                                            serverUrl: self.metadata.serverUrl,
-//                                            selector: self.metadata.sessionSelector,
-//                                            ocId: self.metadata.ocId,
-//                                            destination: nil,
-//                                            error: error)
-//                }
-//            }
-//        }
-//
-//        let deleteSubMenu = UIMenu(title: NSLocalizedString("_delete_file_", comment: ""),
-//                                   image: utility.loadImage(named: "trashIcon", colors: [.red]),
-//                                   options: .destructive,
-//                                   children: [deleteConfirmLocal, deleteConfirmFile])
-//
-//        // ------ MENU -----
-//
-//        var menu: [UIMenuElement] = []
-//
-//        if NCNetworking.shared.isOnline {
-//            if metadata.directory {
-//                if metadata.isDirectoryE2EE || metadata.e2eEncrypted {
-//                    menu.append(favorite)
-//                } else {
-//                    menu.append(favorite)
-//                    menu.append(deleteConfirmFile)
-//                }
-//                return UIMenu(title: "", children: [detail, UIMenu(title: "", options: .displayInline, children: menu)])
-//            } else {
-//                if metadata.lock {
-//                    menu.append(favorite)
-////                    menu.append(share)
-//
-//                    if NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) != nil {
-//                        menu.append(livePhotoSave)
-//                    }
-//                } else {
-//                    menu.append(favorite)
-////                    menu.append(share)
-//
-//                    if NCManageDatabase.shared.getMetadataLivePhoto(metadata: metadata) != nil {
-//                        menu.append(livePhotoSave)
-//                    }
-//
-//                    if viewController is NCMedia {
-//                        menu.append(viewInFolder)
-//                    }
-//
-//                    // MODIFY WITH QUICK LOOK
-//                    if metadata.isModifiableWithQuickLook {
-//                        menu.append(modify)
-//                    }
-//
-//                    if viewController is NCMedia {
-//                        menu.append(deleteConfirmFile)
-//                    } else {
-//                        menu.append(deleteSubMenu)
-//                    }
-//                }
-//                return UIMenu(title: "", children: [detail, UIMenu(title: "", options: .displayInline, children: menu)])
-//            }
-//        } else {
+
         guard let capabilities = NCNetworking.shared.capabilities[metadata.account] else {
             return UIMenu()
         }
@@ -256,14 +68,19 @@ class NCContextMenu: NSObject {
 
     private func buildTopMenuItems(metadata: tableMetadata, appending items: [UIMenuElement] = []) -> [UIMenuElement] {
         var topActionsMenu: [UIMenuElement] = []
-
+        guard let capabilities = NCNetworking.shared.capabilities[metadata.account] else {
+            return topActionsMenu
+        }
 //        if metadata.canShare {
 //            topActionsMenu.append(makeShareAction())
 //        }
 
-        topActionsMenu.append(makeDetailAction(metadata: metadata))
+        if NCNetworking.shared.isOnline,
+           !(!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty), !metadata.isDirectoryE2EE, !metadata.e2eEncrypted {
+            topActionsMenu.append(makeDetailAction(metadata: metadata))
+        }
 
-        if !metadata.lock {
+        if !metadata.lock, !metadata.isDirectoryE2EE, !metadata.e2eEncrypted {
             topActionsMenu.append(makeFavoriteAction(metadata: metadata))
         }
 
@@ -275,7 +92,7 @@ class NCContextMenu: NSObject {
     private func makeDetailAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_details_", comment: ""),
-            image: utility.loadImage(named: "square.and.arrow.up")
+            image: UIImage(named: "share")
         ) { _ in
             NCCreate().createShare(viewController: self.viewController, metadata: metadata, page: .activity)
         }
@@ -287,7 +104,7 @@ class NCContextMenu: NSObject {
             NSLocalizedString("_remove_favorites_", comment: "") :
                 NSLocalizedString("_add_favorites_", comment: ""),
             image: utility.loadImage(
-                named: metadata.favorite ? "star.slash.fill" : "star.fill",
+                named: metadata.favorite ? "star" : "star.fill",
                 colors: [NCBrandColor.shared.yellowFavorite]
             )
         ) { _ in
@@ -304,7 +121,7 @@ class NCContextMenu: NSObject {
     private func makeShareAction() -> UIAction {
         return UIAction(
             title: NSLocalizedString("_share_", comment: ""),
-            image: utility.loadImage(named: "square.and.arrow.up.fill")
+            image: UIImage(named: "share")
         ) { _ in
             Task { @MainActor in
                 let controller = self.viewController.tabBarController as? NCMainTabBarController
@@ -337,8 +154,8 @@ class NCContextMenu: NSObject {
         addE2EEActions(metadata: metadata, capabilities: capabilities, mainActionsMenu: &mainActionsMenu)
 
         // Offline
-        if NCNetworking.shared.isOnline,
-           metadata.canSetAsAvailableOffline {
+        if NCNetworking.shared.isOnline {
+//           metadata.canSetAsAvailableOffline {
             mainActionsMenu.append(
                 ContextMenuActions.setAvailableOffline(
                     selectedMetadatas: [metadata],
@@ -376,11 +193,11 @@ class NCContextMenu: NSObject {
             mainActionsMenu.append(makeModifyWithQuickLookAction(metadata: metadata))
         }
 
-        // Color folder
-        if viewController is NCFiles,
-           metadata.directory {
-            mainActionsMenu.append(makeColorFolderAction(metadata: metadata))
-        }
+//        // Color folder
+//        if viewController is NCFiles,
+//           metadata.directory {
+//            mainActionsMenu.append(makeColorFolderAction(metadata: metadata))
+//        }
 
         return mainActionsMenu
     }
@@ -505,7 +322,7 @@ class NCContextMenu: NSObject {
     private func makeRenameAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_rename_", comment: ""),
-            image: utility.loadImage(named: "text.cursor", colors: [NCBrandColor.shared.iconImageColor])
+            image: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.iconImageColor])
         ) { _ in
             Task { @MainActor in
                 let capabilities = await NKCapabilities.shared.getCapabilities(for: metadata.account)
@@ -597,7 +414,7 @@ class NCContextMenu: NSObject {
 
         let deleteSubMenu = UIMenu(
             title: NSLocalizedString("_delete_", comment: ""),
-            image: utility.loadImage(named: "trash"),
+            image: utility.loadImage(named: "trashIcon"),
             options: .destructive,
             children: [deleteConfirmLocal, deleteConfirmFile]
         )
@@ -621,7 +438,7 @@ class NCContextMenu: NSObject {
                 metadata.directory ? "_delete_folder_" : "_delete_file_",
                 comment: ""
             ),
-            image: utility.loadImage(named: "trash"),
+            image: utility.loadImage(named: "trashIcon"),
             attributes: .destructive
         ) { _ in
             if let viewController = self.viewController as? NCCollectionViewCommon {
@@ -643,7 +460,7 @@ class NCContextMenu: NSObject {
     private func makeDeleteLocalAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_remove_local_file_", comment: ""),
-            image: utility.loadImage(named: "trash"),
+            image: utility.loadImage(named: "trashIcon"),
             attributes: .destructive
         ) { _ in
             Task {
