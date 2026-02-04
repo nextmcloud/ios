@@ -275,7 +275,7 @@
 
 //TOPasscodeSettingsWarningLabel.m
 "_1_failed_passcode_attempt" = "1 Failed Passcode Attempt";
-"_failed_passcode_attempts" = "%d Failed Passcode Attempts";
+"_failed_passcode_attempts" = "%ld Failed Passcode Attempts";
 
 /* Background of the file listing view */
 "_use_as_background_"       = "Use it as a background";
@@ -379,8 +379,6 @@
 "_username_"                    = "Username";
 "_change_credentials_"          = "Change your credentials";
 "_wifi_only_"                   = "Only use Wi-Fi connection";
-"_settings_autoupload_"         = "Auto upload photos";
-//"_settings_autoupload_"         = "Auto upload";
 //"_settings_autoupload_"         = "Auto upload photos";
 "_settings_autoupload_"         = "Auto upload";
 "_app_version_"                 = "Application version";
@@ -736,6 +734,7 @@
 "_share_link_name_"             = "Link name";
 "_password_"                    = "Password";
 "_share_password_"              = "Password protected link";
+"_share_password_must_be_at_least_6_chars"   = "Password must be at least 6 characters.";
 "_share_expirationdate_"        = "Set expiration date for link";
 "_date_"                        = "Date";
 "_share_title_"                 = "Share";
@@ -1131,11 +1130,11 @@
 "_voice_memo_stop_"         = "Tap to stop";
 "_voice_memo_filename_"     = "Voice memo";
 "_voice_memo_title_"        = "Upload voice memo";
-"Enter Passcode"            = "Enter Passcode";
-"Enter a new passcode"      = "Enter a new passcode";
-"Confirm new passcode"      = "Confirm new passcode";
+//"Enter Passcode"            = "Enter Passcode";
+//"Enter a new passcode"      = "Enter a new passcode";
+//"Confirm new passcode"      = "Confirm new passcode";
 "_too_many_failed_passcode_attempts_error_" = "Too many failed passcode attempts. Please try again.";
-"Passcodes didn't match. Try again." = "Passcodes didn't match. Try again.";
+//"Passcodes didn't match. Try again." = "Passcodes didn't match. Try again.";
 "Delete"                    = "Delete";
 "Cancel"                    = "Cancel";
 "_certificate_details_"     = "Certificate Server details";

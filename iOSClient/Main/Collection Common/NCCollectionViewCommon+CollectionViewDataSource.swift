@@ -205,18 +205,14 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
         if metadata.directory {
             let tblDirectory = database.getTableDirectory(ocId: metadata.ocId)
 
-            if metadata.e2eEncrypted {
+//            if metadata.e2eEncrypted {
 //                cell.previewImageView?.image = imageCache.getFolderEncrypted()
-//            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+//            } else if isShare {
 //                cell.previewImageView?.image = imageCache.getFolderSharedWithMe()
-//            } else if isShare || !metadata.shareType.isEmpty {
-//                cell.previewImageView?.image = imageCache.getFolderPublic()
-////            } else if isShare {
-////                cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe()
-////            } else if !metadata.shareType.isEmpty {
-////                metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
-////                (cell.filePreviewImageView?.image = imageCache.getFolderPublic()) :
-////                (cell.filePreviewImageView?.image = imageCache.getFolderSharedWithMe())
+//            } else if !metadata.shareType.isEmpty {
+//                metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
+//                (cell.previewImageView?.image = imageCache.getFolderPublic()) :
+//                (cell.previewImageView?.image = imageCache.getFolderSharedWithMe())
 //            } else if !metadata.shareType.isEmpty && metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) {
 //                cell.previewImageView?.image = imageCache.getFolderPublic()
 //            } else if metadata.mountType == "group" {
@@ -227,9 +223,13 @@ extension NCCollectionViewCommon: UICollectionViewDataSource {
 //                cell.previewImageView?.image = imageCache.getFolderAutomaticUpload()
 //            } else {
 //                cell.previewImageView?.image = imageCache.getFolder()
-                cell.previewImageView?.image = imageCache.getFolderEncrypted()
-            } else if isShare {
-                cell.previewImageView?.image = imageCache.getFolderSharedWithMe()
+//            }
+            if metadata.e2eEncrypted {
+                cell.previewImageView?.image = NCImageCache.shared.getFolderEncrypted()
+            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+                cell.previewImageView?.image = NCImageCache.shared.getFolderSharedWithMe()
+            } else if isShare || !metadata.shareType.isEmpty {
+                cell.previewImageView?.image = NCImageCache.shared.getFolderPublic()
             } else if !metadata.shareType.isEmpty {
                 metadata.shareType.contains(NKShare.ShareType.publicLink.rawValue) ?
                 (cell.previewImageView?.image = imageCache.getFolderPublic()) :

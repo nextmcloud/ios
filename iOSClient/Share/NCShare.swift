@@ -397,7 +397,7 @@ extension NCShare: NCShareNetworkingDelegate {
         appearance.shadowOpacity = 0.2
         appearance.shadowRadius = 30
         appearance.animationduration = 0.25
-        appearance.textColor = .darkGray
+        appearance.textColor = NCBrandColor.shared.label
         appearance.setupMaskedCorners([.layerMaxXMaxYCorner, .layerMinXMaxYCorner])
 
         let account = NCManageDatabase.shared.getTableAccount(account: metadata.account)

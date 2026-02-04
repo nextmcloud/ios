@@ -25,6 +25,7 @@
 #import "TOPasscodeViewControllerAnimatedTransitioning.h"
 #import "TOPasscodeKeypadView.h"
 #import "TOPasscodeInputField.h"
+//#import "NCBridgeSwift.h"
 
 @interface TOPasscodeViewController () <UIViewControllerTransitioningDelegate>
 
@@ -188,6 +189,7 @@
     if (!self.rightAccessoryButton && !self.cancelButton) {
         self.cancelButton = [UIButton buttonWithType:UIButtonTypeSystem];
         [self.cancelButton setTitle:NSLocalizedString(@"_cancel_", @"Cancel") forState:UIControlStateNormal];
+//        [self.cancelButton setTitleColor: NCBrandColor.shared.brand forState:UIControlStateNormal];
         self.cancelButton.titleLabel.font = buttonFont;
         [self.cancelButton addTarget:self action:@selector(accessoryButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
         // If cancelling is disabled, we hide the cancel button but we still create it, because it can
@@ -329,6 +331,7 @@
     self.cancelButton.tintColor = accessoryTintColor;
     self.leftAccessoryButton.tintColor = accessoryTintColor;
     self.rightAccessoryButton.tintColor = accessoryTintColor;
+    self.cancelButton.tintColor = accessoryTintColor;
 
     self.backgroundView.backgroundColor = isDark ? [UIColor colorWithWhite:0.1f alpha:1.0f] : [UIColor whiteColor];
 }

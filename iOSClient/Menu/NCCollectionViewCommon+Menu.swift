@@ -81,7 +81,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_details_", comment: ""),
-                    icon: utility.loadImage(named: "square.and.arrow.up", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: UIImage(named: "share")!.withTintColor(NCBrandColor.shared.iconImageColor),
                     order: 10,
                     sender: sender,
                     action: { _ in

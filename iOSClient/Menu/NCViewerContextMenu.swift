@@ -29,7 +29,7 @@ enum NCViewerContextMenu {
            if !(!capabilities.fileSharingApiEnabled && !capabilities.filesComments && capabilities.activity.isEmpty), !metadata.isDirectoryE2EE, !metadata.e2eEncrypted {
                let action = UIAction(
                    title: NSLocalizedString("_details_", comment: ""),
-                   image: UIImage(systemName: "square.and.arrow.up")?.withTintColor(NCBrandColor.shared.iconImageColor)
+                   image: UIImage(named: "share")?.withTintColor(NCBrandColor.shared.iconImageColor)
                ) { _ in
                    NCCreate().createShare(viewController: controller,
                                           metadata: metadata,

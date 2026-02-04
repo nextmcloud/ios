@@ -92,7 +92,7 @@ class NCContextMenu: NSObject {
     private func makeDetailAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_details_", comment: ""),
-            image: UIImage(named: "share")
+            image: UIImage(named: "share")?.withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             NCCreate().createShare(viewController: self.viewController, metadata: metadata, page: .activity)
         }
@@ -121,7 +121,7 @@ class NCContextMenu: NSObject {
     private func makeShareAction() -> UIAction {
         return UIAction(
             title: NSLocalizedString("_share_", comment: ""),
-            image: UIImage(named: "share")
+            image: UIImage(named: "share")?.withTintColor(NCBrandColor.shared.iconImageColor)
         ) { _ in
             Task { @MainActor in
                 let controller = self.viewController.tabBarController as? NCMainTabBarController
@@ -414,7 +414,7 @@ class NCContextMenu: NSObject {
 
         let deleteSubMenu = UIMenu(
             title: NSLocalizedString("_delete_", comment: ""),
-            image: utility.loadImage(named: "trashIcon"),
+            image: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.iconImageColor]),
             options: .destructive,
             children: [deleteConfirmLocal, deleteConfirmFile]
         )
@@ -438,7 +438,7 @@ class NCContextMenu: NSObject {
                 metadata.directory ? "_delete_folder_" : "_delete_file_",
                 comment: ""
             ),
-            image: utility.loadImage(named: "trashIcon"),
+            image: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.iconImageColor]),
             attributes: .destructive
         ) { _ in
             if let viewController = self.viewController as? NCCollectionViewCommon {
@@ -460,7 +460,7 @@ class NCContextMenu: NSObject {
     private func makeDeleteLocalAction(metadata: tableMetadata) -> UIAction {
         return UIAction(
             title: NSLocalizedString("_remove_local_file_", comment: ""),
-            image: utility.loadImage(named: "trashIcon"),
+            image: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.iconImageColor]),
             attributes: .destructive
         ) { _ in
             Task {
