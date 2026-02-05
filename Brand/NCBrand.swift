@@ -162,14 +162,15 @@ final class NCBrandOptions: @unchecked Sendable {
     }
 }
 
-final class NCBrandColor: @unchecked Sendable {
-    static let shared = NCBrandColor()
+@objc final class NCBrandColor: NSObject, @unchecked Sendable {
+//final class NCBrandColor: @unchecked Sendable {
+    @objc static let shared = NCBrandColor()
 
     // This is rewrited from customet theme, default is Nextcloud color
     let customer: UIColor = UIColor(red: 226.0/255.0, green: 0.0/255.0, blue: 116.0/255.0, alpha: 1.0)         // Nextcloud : #0082C9
     var customerText: UIColor = .white
 
-    var brand: UIColor                                                                                         // don't touch me
+    @objc var brand: UIColor                                                                                         // don't touch me
     var brandElement: UIColor                                                                                  // don't touch me
     var brandText:             UIColor = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
     
@@ -217,7 +218,7 @@ final class NCBrandColor: @unchecked Sendable {
         }
     }
 
-    init() {
+    override init() {
         brand = customer
         brandElement = customer
         brandText = customerText

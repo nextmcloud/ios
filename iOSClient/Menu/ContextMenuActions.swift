@@ -34,7 +34,7 @@ enum ContextMenuActions {
 
          return UIAction(
              title: titleDelete,
-             image: NCUtility().loadImage(named: icon, colors: [color]),
+             image: NCUtility().loadImage(named: icon, colors: [color]).withTintColor(NCBrandColor.shared.iconImageColor),
              attributes: destructive ? [.destructive] : []
          ) { _ in
              let alert = UIAlertController.deleteFileOrFolder(
@@ -112,7 +112,7 @@ enum ContextMenuActions {
                             completion: (() -> Void)? = nil) -> UIAction {
          UIAction(
              title: NSLocalizedString("_move_or_copy_", comment: ""),
-             image: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconImageColor])//UIImage(systemName: "rectangle.portrait.and.arrow.right")
+             image: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor)//UIImage(systemName: "rectangle.portrait.and.arrow.right")
          ) { _ in
              Task { @MainActor in
                  var fileNameError: NKError?
@@ -149,10 +149,10 @@ enum ContextMenuActions {
         let image: UIImage?
         if !metadata.canUnlock(as: metadata.userId), isLocked {
             titleKey = String(format: NSLocalizedString("_locked_by_", comment: ""), metadata.lockOwnerDisplayName)
-            image = UIImage(systemName: "lock")
+            image = UIImage(systemName: "lock")?.withTintColor(NCBrandColor.shared.iconImageColor)
         } else {
             titleKey = isLocked ? "_unlock_file_" : "_lock_file_"
-            image = UIImage(systemName: isLocked ? "lock.open" : "lock")
+            image = UIImage(systemName: isLocked ? "lock.open" : "lock")?.withTintColor(NCBrandColor.shared.iconImageColor)
             subtitleKey = !metadata.lockOwnerDisplayName.isEmpty ? String(format: NSLocalizedString("_locked_by_", comment: ""), metadata.lockOwnerDisplayName) : ""
         }
         

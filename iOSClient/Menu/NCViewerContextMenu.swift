@@ -124,7 +124,7 @@ enum NCViewerContextMenu {
                 menuElements.append(
                     UIAction(
                         title: NSLocalizedString("_rename_", comment: ""),
-                        image: NCUtility().loadImage(named: "rename", colors: [NCBrandColor.shared.iconImageColor]),
+                        image: NCUtility().loadImage(named: "rename", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
                         ) { _ in
 
                             if let vcRename = UIStoryboard(name: "NCRenameFile", bundle: nil).instantiateInitialViewController() as? NCRenameFile {
@@ -182,7 +182,7 @@ enum NCViewerContextMenu {
                 menuElements.append(
                     UIAction(
                         title: NSLocalizedString("_modify_", comment: ""),
-                        image: NCUtility().loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                        image: NCUtility().loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                             Task {
                                 if NCUtilityFileSystem().fileProviderStorageExists(metadata) {
                                     await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in

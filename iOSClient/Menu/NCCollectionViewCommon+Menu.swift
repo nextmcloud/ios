@@ -133,7 +133,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_view_in_folder_", comment: ""),
-                    icon: utility.loadImage(named: "arrow.forward.square", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "arrow.forward.square", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
                     order: 21,
                     sender: sender,
                     action: { _ in
@@ -165,7 +165,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_e2e_set_folder_encrypted_", comment: ""),
-                    icon: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
                     order: 30,
                     sender: sender,
                     action: { _ in
@@ -188,7 +188,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_e2e_remove_folder_encrypted_", comment: ""),
-                    icon: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "lock", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
                     order: 30,
                     sender: sender,
                     action: { _ in
@@ -261,7 +261,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_livephoto_save_", comment: ""),
-                    icon: NCUtility().loadImage(named: "livephoto", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: NCUtility().loadImage(named: "livephoto", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
                     order: 100,
                     sender: sender,
                     action: { _ in
@@ -279,7 +279,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_save_as_scan_", comment: ""),
-                    icon: utility.loadImage(named: "doc.viewfinder", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "doc.viewfinder", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
                     order: 110,
                     sender: sender,
                     action: { _ in
@@ -316,7 +316,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_rename_", comment: ""),
-                    icon: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
                     order: 120,
                     sender: sender,
                     action: { _ in
@@ -351,7 +351,7 @@ extension NCCollectionViewCommon {
             actions.append(
                 NCMenuAction(
                     title: NSLocalizedString("_modify_", comment: ""),
-                    icon: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor]),
+                    icon: utility.loadImage(named: "pencil.tip.crop.circle", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
                     order: 150,
                     sender: sender,
                     action: { _ in

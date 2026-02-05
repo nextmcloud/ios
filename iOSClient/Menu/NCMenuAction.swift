@@ -90,7 +90,7 @@ extension NCMenuAction {
     static func selectAllAction(sender: Any?, action: @escaping () -> Void) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_select_all_", comment: ""),
-            icon: NCUtility().loadImage(named: "checkmark.circle.fill", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "checkmark.circle.fill", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             sender: sender,
             action: { _ in action() }
         )
@@ -100,7 +100,7 @@ extension NCMenuAction {
     static func cancelAction(sender: Any?, action: @escaping () -> Void) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_cancel_", comment: ""),
-            icon: NCUtility().loadImage(named: "xmark", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "xmark", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             sender: sender,
             action: { _ in action() }
         )
@@ -151,7 +151,7 @@ extension NCMenuAction {
         return NCMenuAction(
             title: titleDelete,
             destructive: destructive,
-            icon: NCUtility().loadImage(named: icon, colors: [color]),
+            icon: NCUtility().loadImage(named: icon, colors: [color]).withTintColor(NCBrandColor.shared.iconImageColor),
             order: order,
             sender: sender,
             action: { _ in
@@ -169,7 +169,7 @@ extension NCMenuAction {
 //            title: NSLocalizedString("_share_", comment: ""),
 //            icon: NCUtility().loadImage(named: "share", colors: [NCBrandColor.shared.iconImageColor]),
             title: NSLocalizedString("_open_in_", comment: ""),
-            icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "open_file",colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             order: order,
             sender: sender,
             action: { _ in
@@ -185,7 +185,7 @@ extension NCMenuAction {
     static func setAvailableOfflineAction(selectedMetadatas: [tableMetadata], isAnyOffline: Bool, viewController: UIViewController, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: isAnyOffline ? NSLocalizedString("_remove_available_offline_", comment: "") : NSLocalizedString("_set_available_offline_", comment: ""),
-            icon: NCUtility().loadImage(named: "cloudDownload", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "cloudDownload", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             order: order,
             sender: sender,
             action: { _ in
@@ -221,7 +221,7 @@ extension NCMenuAction {
     static func moveOrCopyAction(selectedMetadatas: [tableMetadata], account: String, viewController: UIViewController, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(
             title: NSLocalizedString("_move_or_copy_", comment: ""),
-            icon: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: "move", colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             order: order,
             sender: sender,
             action: { _ in
@@ -263,7 +263,7 @@ extension NCMenuAction {
         let imageName = !shouldLock ? "lock_open" : "lock"
         return NCMenuAction(
             title: NSLocalizedString(titleKey, comment: ""),
-            icon: NCUtility().loadImage(named: imageName, colors: [NCBrandColor.shared.iconImageColor]),
+            icon: NCUtility().loadImage(named: imageName, colors: [NCBrandColor.shared.iconImageColor]).withTintColor(NCBrandColor.shared.iconImageColor),
             order: order,
             sender: sender,
             action: { _ in
