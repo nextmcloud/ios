@@ -134,7 +134,7 @@ final class NCBrandOptions: @unchecked Sendable {
         }
 
         if pushNotificationServerProxy.isEmpty,
-            brand == "Nextcloud" {
+            brand == "Nextcloud" ||  brand == "MagentaCLOUD" {
             pushNotificationServerProxy = "https://push-notifications.nextcloud.com"
             // DEBUG SERVER PUSH
             // pushNotificationServerProxy = "https://c0004.customerpush.nextcloud.com"
@@ -446,7 +446,7 @@ final class NCBrandOptions: @unchecked Sendable {
         }
     }
     
-    var shareBlackColor: UIColor{
+    @objc var shareBlackColor: UIColor{
         if UITraitCollection.current.userInterfaceStyle == .dark {
             return UIColor.white
         }else {

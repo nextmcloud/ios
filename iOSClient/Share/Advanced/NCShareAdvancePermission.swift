@@ -260,6 +260,11 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
                 share.permissions = share.permissions - NKShare.Permission.share.rawValue
             }
 
+//            guard share.permissions > 0 else {
+//                NCContentPresenter().showInfo(title: "_share_permission_should_not_be_empty_")
+//                return
+//            }
+            
             if isNewShare {
                 let capabilities = await NKCapabilities.shared.getCapabilities(for: metadata.account)
 

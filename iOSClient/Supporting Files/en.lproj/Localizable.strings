@@ -897,6 +897,7 @@
 "_share_via_link_menu_password_label_" = "Password protect (%1$s)";
 "_share_link_empty_exp_date_" = "You must select expiration date.";
 "_share_link_empty_note_message_" = "Please enter note.";
+"_share_permission_should_not_be_empty_" = "Please select at least one permission.";
 "_remote_"                      = "Remote";
 "_remote_group_"                = "Remote group";
 "_conversation_"                = "Conversation";
