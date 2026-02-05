@@ -582,7 +582,7 @@ const CGFloat kTOPasscodeKeypadMaxHeight = 330.0f;
     // Cancel button
     [alertController addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"_cancel_", @"") style:UIAlertActionStyleCancel handler:nil]];
 
-    alertController.view.tintColor = NCBrandColor.shared.brand;
+    alertController.view.tintColor = NCBrandColor.shared.shareBlackColor;
     alertController.modalPresentationStyle = UIModalPresentationPopover;
     alertController.popoverPresentationController.sourceView = self.optionsButton;
     alertController.popoverPresentationController.sourceRect = self.optionsButton.bounds;
