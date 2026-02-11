@@ -1,8 +1,26 @@
-// SPDX-FileCopyrightText: Nextcloud GmbH
-// SPDX-FileCopyrightText: 2018 Marino Faggiana
-// SPDX-License-Identifier: GPL-3.0-or-later
+//
+//  NCUtility.swift
+//  Nextcloud
+//
+//  Created by Marino Faggiana on 25/06/18.
+//  Copyright © 2018 Marino Faggiana. All rights reserved.
+//
+//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
 
-import Foundation
 import UIKit
 import NextcloudKit
 import PDFKit
@@ -101,27 +119,18 @@ final class NCUtility: NSObject, Sendable {
         return String(intFileId)
     }
 
-    func splitOcId(_ ocId: String) -> (fileId: String?, instanceId: String?) {
-        let parts = ocId.components(separatedBy: "oc")
-        guard parts.count == 2 else {
-            return (nil, nil)
-        }
-        return (parts[0], "oc" + parts[1])
-    }
-
-    /// Pads a numeric fileId with leading zeros to reach 8 characters.
-    func paddedFileId(_ fileId: String) -> String {
-        if fileId.count >= 8 { return fileId }
-        let zeros = String(repeating: "0", count: 8 - fileId.count)
-        return zeros + fileId
-    }
-
-    func getLivePhotoOcId(metadata: tableMetadata) -> String? {
-        if let instanceId = splitOcId(metadata.ocId).instanceId {
-            return paddedFileId(metadata.livePhotoFile) + instanceId
-        }
-        return nil
-    }
+//    func getVersionApp(withBuild: Bool = true) -> String {
+//        if let dictionary = Bundle.main.infoDictionary {
+//            if let version = dictionary["CFBundleShortVersionString"], let build = dictionary["CFBundleVersion"] {
+//                if withBuild {
+//                    return "\(version).\(build)"
+//                } else {
+//                    return "\(version)"
+//                }
+//            }
+//        }
+//        return ""
+//    }
 
     func getVersionBuild() -> String {
         if let dictionary = Bundle.main.infoDictionary,
@@ -223,7 +232,6 @@ final class NCUtility: NSObject, Sendable {
         return isEqual
     }
 
-    #if !EXTENSION_FILE_PROVIDER_EXTENSION
     func getLocation(latitude: Double, longitude: Double, completion: @escaping (String?) -> Void) {
         let geocoder = CLGeocoder()
         let llocation = CLLocation(latitude: latitude, longitude: longitude)
@@ -244,7 +252,6 @@ final class NCUtility: NSObject, Sendable {
             }
         }
     }
-    #endif
 
     // https://stackoverflow.com/questions/5887248/ios-app-maximum-memory-budget/19692719#19692719
     // https://stackoverflow.com/questions/27556807/swift-pointer-problems-with-mach-task-basic-info/27559770#27559770
@@ -284,12 +291,78 @@ final class NCUtility: NSObject, Sendable {
         }
         return height
     }
+    
+    // E-mail validations
+    // 1. Basic Email Validator (ASCII only)
+    func isValidEmail(_ email: String) -> Bool {
+        let emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}$"
+        let predicate = NSPredicate(format: "SELF MATCHES[c] %@", emailRegex)
+        return predicate.evaluate(with: email)
+    }
 
-    func formatBadgeCount(_ count: Int) -> String {
-        if count <= 9999 {
-            return "\(count)"
+    // 2. Manually Convert Unicode Domain to Punycode with German Char Support
+    func convertToPunycode(email: String) -> String? {
+        guard let atIndex = email.firstIndex(of: "@") else { return nil }
+        
+        let localPart = String(email[..<atIndex])
+        var domainPart = String(email[email.index(after: atIndex)...])
+        
+        // Normalize the domain part before converting to Punycode
+        let normalizedDomainPart = domainPart.precomposedStringWithCanonicalMapping
+        
+        // Attempt to convert Unicode to Punycode using a custom conversion function
+        if let punycodeDomain = punycodeEncode(normalizedDomainPart) {
+            return "\(localPart)@\(punycodeDomain)"
+        }
+        
+        return nil
+    }
+
+    // 3. Convert Unicode String to Punycode (Manually Handling German Characters)
+    func punycodeEncode(_ domain: String) -> String? {
+        // Mapping of common German characters to their corresponding Punycode equivalents
+        var punycodeDomain = domain.lowercased()
+        
+        let germanCharToPunycode: [String: String] = [
+            "ü": "xn--u-1fa",  // ü → xn--u-1fa
+            "ä": "xn--a-1fa",  // ä → xn--a-1fa
+            "ö": "xn--o-1fa",  // ö → xn--o-1fa
+            "ß": "xn--ss-1fa", // ß → xn--ss-1fa
+            "é": "xn--e-1fa",  // é → xn--e-1fa
+            "è": "xn--e-1f",   // è → xn--e-1f
+            "à": "xn--a-1f",   // à → xn--a-1f
+        ]
+        
+        // Replace each German character with the corresponding Punycode equivalent
+        for (char, punycode) in germanCharToPunycode {
+            punycodeDomain = punycodeDomain.replacingOccurrences(of: char, with: punycode)
+        }
+        
+        // If no change occurred, return the domain as it is (i.e., no Punycode needed)
+        return punycodeDomain
+    }
+
+    // 4. IDN Email Validator (handles Unicode domain by converting to Punycode)
+    func isValidIDNEmail(_ email: String) -> Bool {
+        // Convert domain part to Punycode and validate using basic email regex
+        guard let punycodeEmail = convertToPunycode(email: email) else {
+            return false
+        }
+        
+        return isValidEmail(punycodeEmail)
+    }
+
+    // 5. Unified Email Validation - Check for both basic and IDN emails
+    func validateEmail(_ email: String) -> Bool {
+        if isValidEmail(email) {
+            print("Valid ASCII email: \(email)")
+            return true
+        } else if isValidIDNEmail(email) {
+            print("Valid IDN email: \(email)")
+            return true
         } else {
-            return count.formatted(.number.notation(.compactName).locale(Locale(identifier: "en_US")))
+            print("Invalid email: \(email)")
+            return false
         }
     }
 }

@@ -33,11 +33,11 @@ extension NCShare {
         if share.shareType == NKShare.ShareType.publicLink.rawValue, canReshare {
             actions.append(
                 NCMenuAction(
-                    title: NSLocalizedString("_share_add_sharelink_", comment: ""),
-                    icon: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor]),
+                    title: NSLocalizedString("_open_in_", comment: ""),
+                    icon: utility.loadImage(named: "open_file", colors: [NCBrandColor.shared.brandElement]),
                     sender: sender,
                     action: { _ in
-                        self.makeNewLinkShare()
+                        NCShareCommon.copyLink(link: share.url, viewController: self, sender: sender)
                     }
                 )
             )
@@ -45,8 +45,10 @@ extension NCShare {
 
         actions.append(
             NCMenuAction(
-                title: NSLocalizedString("_details_", comment: ""),
-                icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
+//                title: NSLocalizedString("_details_", comment: ""),
+//                icon: utility.loadImage(named: "pencil", colors: [NCBrandColor.shared.iconImageColor]),
+                title: NSLocalizedString("_advance_permissions_", comment: ""),
+                icon: utility.loadImage(named: "rename", colors: [NCBrandColor.shared.brandElement]),
                 accessibilityIdentifier: "shareMenu/details",
                 sender: sender,
                 action: { _ in
@@ -67,11 +69,28 @@ extension NCShare {
             )
         )
 
+        if sendMail {
+            actions.append(
+                NCMenuAction(
+                    title: NSLocalizedString("_send_new_email_", comment: ""),
+                    icon: utility.loadImage(named: "email", colors: [NCBrandColor.shared.brandElement]),
+                    sender: sender,
+                    action: { menuAction in
+                        let storyboard = UIStoryboard(name: "NCShare", bundle: nil)
+                        guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
+                        viewNewUserComment.metadata = self.metadata
+                        viewNewUserComment.share = tableShare(value: share)
+//                        viewNewUserComment.networking = self.networking
+                        self.navigationController?.pushViewController(viewNewUserComment, animated: true)
+                    }
+                )
+            )
+        }
+        
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_share_unshare_", comment: ""),
-                destructive: true,
-                icon: utility.loadImage(named: "person.2.slash"),
+                icon: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.brandElement]),
                 sender: sender,
                 action: { _ in
                     Task {
@@ -120,26 +139,27 @@ extension NCShare {
                     self.updateSharePermissions(share: share, permissions: permissions)
                 }
             ),
-            NCMenuAction(
-                title: NSLocalizedString("_custom_permissions_", comment: ""),
-                icon: utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor]),
-                sender: sender,
-                action: { _ in
-                    guard
-                        let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
-                        let navigationController = self.navigationController, !share.isInvalidated else { return }
-                    advancePermission.networking = self.networking
-                    advancePermission.share = tableShare(value: share)
-                    advancePermission.oldTableShare = tableShare(value: share)
-                    advancePermission.metadata = self.metadata
-
-                    if let downloadLimit = try? self.database.getDownloadLimit(byAccount: self.metadata.account, shareToken: share.token) {
-                        advancePermission.downloadLimit = .limited(limit: downloadLimit.limit, count: downloadLimit.count)
-                    }
-
-                    navigationController.pushViewController(advancePermission, animated: true)
-                }
-            )]
+//            NCMenuAction(
+//                title: NSLocalizedString("_custom_permissions_", comment: ""),
+//                icon: utility.loadImage(named: "ellipsis", colors: [NCBrandColor.shared.iconImageColor]),
+//                sender: sender,
+//                action: { _ in
+//                    guard
+//                        let advancePermission = UIStoryboard(name: "NCShare", bundle: nil).instantiateViewController(withIdentifier: "NCShareAdvancePermission") as? NCShareAdvancePermission,
+//                        let navigationController = self.navigationController, !share.isInvalidated else { return }
+//                    advancePermission.networking = self.networking
+//                    advancePermission.share = tableShare(value: share)
+//                    advancePermission.oldTableShare = tableShare(value: share)
+//                    advancePermission.metadata = self.metadata
+//
+//                    if let downloadLimit = try? self.database.getDownloadLimit(byAccount: self.metadata.account, shareToken: share.token) {
+//                        advancePermission.downloadLimit = .limited(limit: downloadLimit.limit, count: downloadLimit.count)
+//                    }
+//
+//                    navigationController.pushViewController(advancePermission, animated: true)
+//                }
+//            )
+            ]
         )
 
         if isDirectory && (share.shareType == NKShare.ShareType.publicLink.rawValue /* public link */ || share.shareType == NKShare.ShareType.email.rawValue) {
