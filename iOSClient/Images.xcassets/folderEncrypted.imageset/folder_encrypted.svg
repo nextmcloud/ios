@@ -1,10 +1,28 @@
-<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_5_113)">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M16 16H40L48 24H80C84.4 24 88 27.6 88 32V72C88 76.4 84.4 80 80 80H16C11.6 80 8 76.4 8 72L8.04 24C8.04 19.6 11.6 16 16 16ZM38.75 41C43.4263 41 47.4038 43.9921 48.8729 48.1667H67.4167V55.3333H63.8333V62.5H56.6667V55.3333H48.8729C47.4038 59.5079 43.4263 62.5 38.75 62.5C32.8196 62.5 28 57.6804 28 51.75C28 45.8196 32.8196 41 38.75 41ZM35.1667 51.75C35.1667 53.7208 36.7792 55.3333 38.75 55.3333C40.7208 55.3333 42.3333 53.7208 42.3333 51.75C42.3333 49.7792 40.7208 48.1667 38.75 48.1667C36.7792 48.1667 35.1667 49.7792 35.1667 51.75Z" fill="#00679E"/>
-</g>
-<defs>
-<clipPath id="clip0_5_113">
-<rect width="96" height="96" fill="white"/>
-</clipPath>
-</defs>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_1" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 96 96">
+  <!-- Generator: Adobe Illustrator 29.4.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 152)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: none;
+      }
+
+      .st1 {
+        fill: #84b0f5;
+      }
+
+      .st2 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="st0" width="96" height="96"/>
+    </clipPath>
+  </defs>
+  <g class="st2">
+    <g>
+      <path class="st1" d="M48,36c-3.13,0-5.67,2.54-5.67,5.67v3.78h11.33v-3.78c0-3.13-2.54-5.67-5.67-5.67Z"/>
+      <path class="st1" d="M80,24h-32l-8-8h-24c-4.4,0-7.96,3.6-7.96,8l-.04,48c0,4.4,3.6,8,8,8h64c4.4,0,8-3.6,8-8v-40c0-4.4-3.6-8-8-8ZM65,64.33c0,3.13-2.54,5.67-5.67,5.67h-22.67c-3.13,0-5.67-2.54-5.67-5.67v-13.22c0-3.13,2.54-5.67,5.67-5.67h1.89v-3.78c0-5.22,4.23-9.44,9.44-9.44s9.44,4.23,9.44,9.44v3.78h1.89c3.13,0,5.67,2.54,5.67,5.67v13.22Z"/>
+    </g>
+  </g>
 </svg>
