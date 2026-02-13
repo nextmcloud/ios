@@ -29,14 +29,17 @@ extension NCManageDatabase {
 
     // MARK: - Realm Write
 
-    /// Adds or updates multiple local file entries corresponding to the given metadata array.
-    /// Uses async Realm read + single write transaction. Assumes `tableLocalFile` has a primary key.
     /// - Parameters:
-    ///   - metadatas: Array of `tableMetadata` to map into `tableLocalFile`.
-    ///   - offline: Optional override for the `offline` flag applied to all items.
-    func addLocalFilesAsync(metadatas: [tableMetadata], offline: Bool? = nil) async {
-        guard !metadatas.isEmpty else {
-            return
+    ///   - metadata: The `tableMetadata` containing file details.
+    ///   - offline: Optional flag to mark the file as available offline.
+    /// - Returns: Nothing. Realm write is performed asynchronously.
+    func addLocalFileAsync(metadata: tableMetadata, offline: Bool? = nil) async {
+        // Read (non-blocking): safely detach from Realm thread
+        let existing: tableLocalFile? = performRealmRead { realm in
+            realm.objects(tableLocalFile.self)
+                .filter(NSPredicate(format: "ocId == %@", metadata.ocId))
+                .first
+                .map { tableLocalFile(value: $0) }
         }
 
         // Extract ocIds for efficient lookup
@@ -59,20 +62,19 @@ extension NCManageDatabase {
                 // Reuse existing object or create a new one
                 let local = existingMap[metadata.ocId] ?? tableLocalFile()
 
-                local.account = metadata.account
-                local.etag = metadata.etag
-                local.exifDate = NSDate()
-                local.exifLatitude = "-1"
-                local.exifLongitude = "-1"
-                local.ocId = metadata.ocId
-                local.fileName = metadata.fileName
+            addObject.account = metadata.account
+            addObject.etag = metadata.etag
+            addObject.exifDate = NSDate()
+            addObject.exifLatitude = "-1"
+            addObject.exifLongitude = "-1"
+            addObject.ocId = metadata.ocId
+            addObject.fileName = metadata.fileName
 
-                if let offline {
-                    local.offline = offline
-                }
-
-                realm.add(local, update: .all)
+            if let offline {
+                addObject.offline = offline
             }
+
+            realm.add(addObject, update: .all)
         }
     }
 
