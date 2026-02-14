@@ -4,10 +4,12 @@
 
 import UIKit
 import SwiftUI
+import Realm
 import RealmSwift
 import NextcloudKit
 import EasyTipView
 import LucidBanner
+import MoEngageInApps
 
 class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, UIGestureRecognizerDelegate, UISearchResultsUpdating, UISearchControllerDelegate, UISearchBarDelegate, UIAdaptivePresentationControllerDelegate, UIContextMenuInteractionDelegate {
 
@@ -52,6 +54,14 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     var attributesZoomOut: UIMenuElement.Attributes = []
     var tipViewAccounts: EasyTipView?
     var syncMetadatasTask: Task<Void, Never>?
+
+    var tipViewAutoUpload: EasyTipView?
+    var headerMenu: NCSectionHeaderMenu?
+    var headerMenuTransferView = false
+    var headerMenuButtonsView: Bool = true
+    var headerRichWorkspaceDisable: Bool = false
+    
+    var selectableDataSource: [RealmSwiftObject] { dataSource.getMetadataSourceForAllSections() }
 
     // DECLARE
     var layoutKey = ""
@@ -146,9 +156,8 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         return pinchGesture.state == .began || pinchGesture.state == .changed
     }
 
-    func isRecommendationActived() async -> Bool {
-        let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
-        return self.serverUrl == self.utilityFileSystem.getHomeServer(session: self.session) && capabilities.recommendations
+    var capabilities: NKCapabilities.Capabilities {
+        NKCapabilities.shared.getCapabilitiesBlocking(for: session.account)
     }
 
     internal let debouncerReloadDataSource = NCDebouncer(maxEventCount: NCBrandOptions.shared.numMaximumProcess)
@@ -230,6 +239,14 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         let dropInteraction = UIDropInteraction(delegate: self)
         self.navigationController?.navigationItem.leftBarButtonItems?.first?.customView?.addInteraction(dropInteraction)
 
+        if(!UserDefaults.standard.bool(forKey: "isInitialPrivacySettingsShowed") || isApplicationUpdated()){
+            redirectToPrivacyViewController()
+            
+            //set current app version
+            let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String
+            UserDefaults.standard.set(appVersion, forKey: "CurrentAppVersion")
+        }
+        
         registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: NCCollectionViewCommon, _) in
             guard let self else { return }
 
@@ -250,6 +267,8 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
                 await self.debouncerReloadData.resume()
             }
         }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateIcons), name: NSNotification.Name(rawValue: global.notificationCenterUpdateIcons), object: nil)
 
         DispatchQueue.main.async {
             self.collectionView?.collectionViewLayout.invalidateLayout()
@@ -351,6 +370,26 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     override var canBecomeFirstResponder: Bool {
         return true
     }
+    
+    @objc func updateIcons() {
+        collectionView.reloadData()
+    }
+
+    func isApplicationUpdated() -> Bool {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleInfoDictionaryVersion"] as? String ?? ""
+        let currentVersion = UserDefaults.standard.string(forKey: "CurrentAppVersion")
+        return currentVersion != appVersion
+    }
+    
+    func redirectToPrivacyViewController() {
+        let storyBoard: UIStoryboard = UIStoryboard(name: "NCSettings", bundle: nil)
+        let newViewController = storyBoard.instantiateViewController(withIdentifier: "privacySettingsNavigation") as? UINavigationController
+        newViewController?.modalPresentationStyle = .fullScreen
+        self.present(newViewController!, animated: true, completion: nil)
+    }
+
+        tabBarSelect?.setFrame()
+    }
 
     // MARK: - NotificationCenter
 
@@ -428,6 +467,12 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         return NCBrandOptions.shared.brand
     }
 
+    func accountSettingsDidDismiss(tblAccount: tableAccount?, controller: NCMainTabBarController?) { }
+
+    func resetPlusButtonAlpha(animated: Bool = true) { }
+
+    func isHiddenPlusButton(_ isHidden: Bool) { }
+
     @MainActor
     func startGUIGetServerData() {
         self.dataSource.setGetServerData(false)
@@ -457,6 +502,57 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     @MainActor
     func stopGUIGetServerData() {
         self.dataSource.setGetServerData(true)
+        self.navigationItem.titleView = nil
+        self.navigationItem.title = self.titleCurrentFolder
+    }
+
+    // MARK: - Empty
+
+    func emptyDataSetView(_ view: NCEmptyView) {
+
+        self.emptyDataSet?.setOffset(getHeaderHeight())
+        if isSearchingMode {
+            view.emptyImage.image = UIImage(named: "search")?.image(color: .gray, size: UIScreen.main.bounds.width)
+            if self.dataSourceTask?.state == .running {
+                view.emptyTitle.text = NSLocalizedString("_search_in_progress_", comment: "")
+            } else {
+                view.emptyTitle.text = NSLocalizedString("_search_no_record_found_", comment: "")
+            }
+            view.emptyDescription.text = NSLocalizedString("_search_instruction_", comment: "")
+        } else if self.dataSourceTask?.state == .running {
+            view.emptyImage.image = UIImage(named: "networkInProgress")?.image(color: .gray, size: UIScreen.main.bounds.width)
+            view.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
+            view.emptyDescription.text = ""
+        } else {
+            if serverUrl.isEmpty {
+                view.emptyImage.image = emptyImage
+                view.emptyTitle.text = NSLocalizedString(emptyTitle, comment: "")
+                view.emptyDescription.text = NSLocalizedString(emptyDescription, comment: "")
+            } else {
+                view.emptyImage.image = UIImage(named: "folder_nmcloud")
+                view.emptyTitle.text = NSLocalizedString("_files_no_files_", comment: "")
+                view.emptyDescription.text = NSLocalizedString("_no_file_pull_down_", comment: "")
+            }
+        }
+
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.startAnimating()
+
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(spinner)
+
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            spinner.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: container.centerYAnchor)
+        ])
+
+        self.navigationItem.titleView = container
+    }
+
+    @MainActor
+    func restoreDefaultTitle() {
         self.navigationItem.titleView = nil
         self.navigationItem.title = self.titleCurrentFolder
     }
@@ -513,6 +609,63 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     }
 
     // MARK: - TAP EVENT
+
+    func tapMoreListItem(with ocId: String, ocIdTransfer: String, image: UIImage?, sender: Any) {
+        tapMoreGridItem(with: ocId, ocIdTransfer: ocIdTransfer, image: image, sender: sender)
+    }
+
+    func tapMorePhotoItem(with ocId: String, ocIdTransfer: String, image: UIImage?, sender: Any) {
+        tapMoreGridItem(with: ocId, ocIdTransfer: ocIdTransfer, image: image, sender: sender)
+    }
+
+    func tapShareListItem(with ocId: String, ocIdTransfer: String, sender: Any) {
+        guard let metadata = self.database.getMetadataFromOcId(ocId) else { return }
+
+        NCCreate().createShare(viewController: self, metadata: metadata, page: .sharing)
+//        NCDownloadAction.shared.openShare(viewController: self, metadata: metadata, page: .sharing)
+        TealiumHelper.shared.trackEvent(title: "magentacloud-app.filebrowser.sharing", data: ["": ""])
+        appDelegate.adjust.trackEvent(TriggerEvent(Sharing.rawValue))
+    }
+
+    func tapMoreGridItem(with ocId: String, ocIdTransfer: String, image: UIImage?, sender: Any) {
+        guard let metadata = self.database.getMetadataFromOcId(ocId) else { return }
+        toggleMenu(metadata: metadata, image: image, sender: sender)
+    }
+
+    func tapRichWorkspace(_ sender: Any) {
+        if let navigationController = UIStoryboard(name: "NCViewerRichWorkspace", bundle: nil).instantiateInitialViewController() as? UINavigationController {
+            if let viewerRichWorkspace = navigationController.topViewController as? NCViewerRichWorkspace {
+                viewerRichWorkspace.richWorkspaceText = richWorkspaceText ?? ""
+                viewerRichWorkspace.serverUrl = serverUrl
+                viewerRichWorkspace.delegate = self
+
+                navigationController.modalPresentationStyle = .fullScreen
+                self.present(navigationController, animated: true, completion: nil)
+            }
+        }
+    }
+
+    func tapRecommendationsButtonMenu(with metadata: tableMetadata, image: UIImage?, sender: Any?) {
+        toggleMenu(metadata: metadata, image: image, sender: sender)
+    }
+
+    func tapButtonSection(_ sender: Any, metadataForSection: NCMetadataForSection?) {
+        unifiedSearchMore(metadataForSection: metadataForSection)
+    }
+
+    func tapRecommendations(with metadata: tableMetadata) {
+        didSelectMetadata(metadata, withOcIds: false)
+    }
+
+    func longPressListItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+
+    func longPressGridItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+
+    func longPressMoreListItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+
+    func longPressPhotoItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
+
+    func longPressMoreGridItem(with ocId: String, ocIdTransfer: String, gestureRecognizer: UILongPressGestureRecognizer) { }
 
     @objc func longPressCollecationView(_ gestureRecognizer: UILongPressGestureRecognizer) {
         openMenuItems(with: nil, gestureRecognizer: gestureRecognizer)
