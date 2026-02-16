@@ -131,15 +131,16 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         }
 
         if self.isEditMode {
-            if let index = self.fileSelect.firstIndex(of: metadata.ocId) {
-                self.fileSelect.remove(at: index)
-            } else {
-                self.fileSelect.append(metadata.ocId)
+            if !metadata.e2eEncrypted {
+                if let index = self.fileSelect.firstIndex(of: metadata.ocId) {
+                    self.fileSelect.remove(at: index)
+                } else {
+                    self.fileSelect.append(metadata.ocId)
+                }
+                self.collectionView.reloadItems(at: [indexPath])
+                self.tabBarSelect?.update(fileSelect: self.fileSelect, metadatas: self.getSelectedMetadatas(), userId: metadata.userId)
+                // self.collectionView.reloadSections(IndexSet(integer: indexPath.section))
             }
-            self.collectionView.reloadItems(at: [indexPath])
-            self.tabBarSelect?.update(fileSelect: self.fileSelect, metadatas: self.getSelectedMetadatas(), userId: metadata.userId)
-            // self.collectionView.reloadSections(IndexSet(integer: indexPath.section))
-
             self.collectionView.collectionViewLayout.invalidateLayout()
             return
         }
@@ -171,7 +172,8 @@ extension NCCollectionViewCommon: UICollectionViewDelegate {
         return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
             return nil
         }, actionProvider: { _ in
-            let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: self, sceneIdentifier: self.sceneIdentifier, sender: cell)
+            let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: self, sceneIdentifier: self.sceneIdentifier, image: image)
+//             let contextMenu = NCContextMenu(metadata: metadata.detachedCopy(), viewController: self, sceneIdentifier: self.sceneIdentifier, sender: cell)
             return contextMenu.viewMenu()
         })
     }
