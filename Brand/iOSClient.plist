@@ -12,13 +12,13 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-    <string>MagentaCLOUD</string>
+	<string>MagentaCLOUD</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
-    <string>$(MARKETING_VERSION)</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
@@ -43,9 +43,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
-	<true/>
-	<key>ITSEncryptionExportComplianceCode</key>
-	<string>8e9f9874-938e-460b-a9be-f82cb3393971</string>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>nextcloudtalk</string>
@@ -83,8 +81,8 @@
 		<string>AccountIntent</string>
 		<string>DashboardIntent</string>
 	</array>
-    <key>NSUserTrackingUsageDescription</key>
-    <string>App would like to access IDFA for tracking purpose</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>App would like to access IDFA for tracking purpose</string>
 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
 	<true/>
 	<key>UIAppFonts</key>
