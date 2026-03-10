@@ -56,6 +56,10 @@ class NCFilesNavigationController: NCMainNavigationController {
     // MARK: - Left
 
     override func setNavigationLeftItems() async {
+        self.collectionViewCommon?.navigationItem.leftBarButtonItems = nil
+        return
+        
+        /*
         guard let tableAccount = database.getTableAccount(predicate: NSPredicate(format: "account == %@", self.session.account))
         else {
             self.collectionViewCommon?.navigationItem.leftBarButtonItems = nil
@@ -171,5 +175,6 @@ class NCFilesNavigationController: NCMainNavigationController {
             accountButton?.setImage(image, for: .normal)
             accountButton?.menu = await createLeftMenu()
         }
+         */
     }
 }

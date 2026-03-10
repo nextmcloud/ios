@@ -19,6 +19,7 @@ class NCViewerMediaPage: UIViewController {
     var ocIds: [String] = []
     var currentIndex: Int = 0
     var delegateViewController: UIViewController?
+    var metadatas: [tableMetadata] = []
 
     var modifiedOcId: [String] = []
     var nextIndex: Int?
@@ -34,6 +35,7 @@ class NCViewerMediaPage: UIViewController {
     let utilityFileSystem = NCUtilityFileSystem()
     let global = NCGlobal.shared
     let database = NCManageDatabase.shared
+    var textColor: UIColor = NCBrandColor.shared.textColor
 
     // This prevents the scroll views to scroll when you drag and drop files/images/subjects (from this or other apps)
     // https://forums.developer.apple.com/forums/thread/89396 and https://forums.developer.apple.com/forums/thread/115736
@@ -243,10 +245,12 @@ class NCViewerMediaPage: UIViewController {
                 navigationController?.setNavigationBarAppearance(textColor: .white, backgroundColor: .black)
                 currentViewController.playerToolBar?.show()
                 view.backgroundColor = .black
+                textColor = .white
                 moreNavigationItem.image = NCImageCache.shared.getImageButtonMore(colors: [.white])
             } else {
                 navigationController?.setNavigationBarAppearance()
                 view.backgroundColor = .systemBackground
+                textColor = NCBrandColor.shared.textColor
                 moreNavigationItem.image = NCImageCache.shared.getImageButtonMore()
             }
 
@@ -261,6 +265,7 @@ class NCViewerMediaPage: UIViewController {
             }
 
             view.backgroundColor = .black
+            textColor = .white
         }
 
         if fullscreen {

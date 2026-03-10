@@ -154,6 +154,8 @@ class NCEndToEndInitialize: NSObject {
                        let privateKey = String(data: keyData, encoding: .utf8) {
                         NCPreferences().setEndToEndPrivateKey(account: account, privateKey: privateKey)
                     } else {
+//                        // Fix here for https://jira.telekom.de/browse/NMC-5056
+//                        let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Passphrase ist nicht korrekt")
                         let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to decrypt Private Key")
                         NCContentPresenter().messageNotification("E2E decrypt privateKey", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
 
@@ -172,15 +174,15 @@ class NCEndToEndInitialize: NSObject {
                         if error == .success, let publicKey {
 
                             // Verify Certificate
-                            var verifyCertificate: Bool = false
-                            if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
-                                verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
-                            }
-                            if verifyCertificate == false {
-                                let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to verify certificate")
-                                NCContentPresenter().messageNotification("E2E verify certificate server", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
-                                return
-                            }
+//                            var verifyCertificate: Bool = false
+//                            if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
+//                                verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
+//                            }
+//                            if verifyCertificate == false {
+//                                let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to verify certificate")
+//                                NCContentPresenter().messageNotification("E2E verify certificate server", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
+//                                return
+//                            }
 
                             NCPreferences().setEndToEndPublicKey(account: account, publicKey: publicKey)
                             NCManageDatabase.shared.clearTablesE2EE(account: account)
@@ -205,7 +207,7 @@ class NCEndToEndInitialize: NSObject {
                     }
                 })
 
-                let cancel = UIAlertAction(title: "Cancel", style: .cancel)
+                let cancel = UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel)
                 alertController.addAction(ok)
                 alertController.addAction(cancel)
                 alertController.addTextField { textField in
@@ -278,15 +280,15 @@ class NCEndToEndInitialize: NSObject {
                 } completion: { account, publicKey, _, error in
                     if error == .success, let publicKey {
 
-                        var verifyCertificate: Bool = false
-                        if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
-                            verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
-                        }
-                        if verifyCertificate == false {
-                            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to verify certificate")
-                            NCContentPresenter().messageNotification("E2E verify certificate server", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
-                            return
-                        }
+//                        var verifyCertificate: Bool = false
+//                        if let certificate = NCPreferences().getEndToEndCertificate(account: account) {
+//                            verifyCertificate = NCEndToEndEncryption.shared().verifyCertificate(certificate, publicKey: publicKey)
+//                        }
+//                        if verifyCertificate == false {
+//                            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "Serious internal error to verify certificate")
+//                            NCContentPresenter().messageNotification("E2E verify certificate server", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: NCContentPresenter.messageType.error, priority: .max)
+//                            return
+//                        }
 
                         NCPreferences().setEndToEndPublicKey(account: account, publicKey: publicKey)
                         NCManageDatabase.shared.clearTablesE2EE(account: account)

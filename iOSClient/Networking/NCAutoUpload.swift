@@ -17,6 +17,17 @@ class NCAutoUpload: NSObject {
     private var endForAssetToUpload: Bool = false
 
     func initAutoUpload(controller: NCMainTabBarController? = nil) async -> Int {
+        
+//        let accountAutoUploadFileName = NCManageDatabase.shared.getAccountAutoUploadFileName(account: tblAccount.account)
+//        if(accountAutoUploadFileName == "Kamera-Medien" || accountAutoUploadFileName == "Camera-Media"){
+//            //set autoupload folder as per locale
+//            if(accountAutoUploadFileName != NCBrandOptions.shared.folderDefaultAutoUpload){
+//                //set auto upload as per locale
+//                print("auto upload folder set here....")
+//                await NCManageDatabase.shared.setAccountAutoUploadFileNameAsync(NCBrandOptions.shared.folderDefaultAutoUpload)
+//            }
+//        }
+        
         guard self.networking.isOnline else {
             return 0
         }
@@ -24,6 +35,15 @@ class NCAutoUpload: NSObject {
 
         let tblAccounts = await NCManageDatabase.shared.getTableAccountsAsync(predicate: NSPredicate(format: "autoUploadStart == true"))
         for tblAccount in tblAccounts {
+            let accountAutoUploadFileName = NCManageDatabase.shared.getAccountAutoUploadFileName(account: tblAccount.account)
+            if(accountAutoUploadFileName == "Kamera-Medien" || accountAutoUploadFileName == "Camera-Media"){
+                //set autoupload folder as per locale
+                if(accountAutoUploadFileName != NCBrandOptions.shared.folderDefaultAutoUpload){
+                    //set auto upload as per locale
+                    print("auto upload folder set here....")
+                    await NCManageDatabase.shared.setAccountAutoUploadFileNameAsync(NCBrandOptions.shared.folderDefaultAutoUpload)
+                }
+            }
             let albumIds = NCPreferences().getAutoUploadAlbumIds(account: tblAccount.account)
             let assetCollections = PHAssetCollection.allAlbums.filter({albumIds.contains($0.localIdentifier)})
             let result = await getCameraRollAssets(controller: nil, assetCollections: assetCollections, tblAccount: tableAccount(value: tblAccount))

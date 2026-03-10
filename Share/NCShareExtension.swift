@@ -80,7 +80,7 @@ class NCShareExtension: UIViewController {
         uploadView.layer.cornerRadius = 10
 
         uploadLabel.text = NSLocalizedString("_upload_", comment: "")
-        uploadLabel.textColor = .systemBlue
+        uploadLabel.textColor = NCBrandColor.shared.label
         let uploadGesture = UITapGestureRecognizer(target: self, action: #selector(actionUpload(_:)))
         uploadView.addGestureRecognizer(uploadGesture)
 
@@ -201,11 +201,11 @@ class NCShareExtension: UIViewController {
 
         // BACK BUTTON
         let backButton = UIButton(type: .custom)
-        backButton.setImage(UIImage(named: "back"), for: .normal)
-        backButton.tintColor = .systemBlue
+        backButton.setImage(UIImage(named: "back")?.withTintColor(NCBrandColor.shared.iconImageColor), for: .normal)
+        backButton.tintColor = NCBrandColor.shared.label
         backButton.semanticContentAttribute = .forceLeftToRight
         backButton.setTitle(" " + NSLocalizedString("_back_", comment: ""), for: .normal)
-        backButton.setTitleColor(.systemBlue, for: .normal)
+        backButton.setTitleColor(NCBrandColor.shared.label, for: .normal)
         backButton.action(for: .touchUpInside) { _ in
             while self.serverUrl.last != "/" { self.serverUrl.removeLast() }
             self.serverUrl.removeLast()
@@ -219,6 +219,7 @@ class NCShareExtension: UIViewController {
             self.setNavigationBar(navigationTitle: navigationTitle)
         }
 
+        /*
         let image = utility.loadUserImage(for: tblAccount.user, displayName: tblAccount.displayName, urlBase: tblAccount.urlBase)
         let profileButton = UIButton(type: .custom)
         profileButton.setImage(image, for: .normal)
@@ -246,7 +247,9 @@ class NCShareExtension: UIViewController {
             space.width = 20
             navItems.append(contentsOf: [UIBarButtonItem(customView: backButton), space])
         }
-        navigationItem.setLeftBarButtonItems(navItems, animated: true)
+         */
+//        navigationItem.setLeftBarButtonItems(navItems, animated: true)
+        navigationItem.setLeftBarButtonItems([UIBarButtonItem(customView: backButton)], animated: true)
     }
 
     func setCommandView() {

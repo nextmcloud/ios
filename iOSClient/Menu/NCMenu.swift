@@ -29,7 +29,15 @@ import UIKit
 import FloatingPanel
 
 extension Array where Element == NCMenuAction {
-    var panelHeight: CGFloat { reduce(0, { $0 + $1.rowHeight }) }
+    // This function now accepts a UIViewController to get its safeAreaInsets
+    func panelHeight(for viewController: UIViewController) -> CGFloat {
+        let totalRowHeight = reduce(0, { $0 + $1.rowHeight })
+        
+        // Get the bottom padding for safe area
+        let bottomPadding = 20 + viewController.view.safeAreaInsets.bottom // Add safe area bottom inset
+
+        return totalRowHeight + bottomPadding
+    }
 }
 
 class NCMenu: UITableViewController {
@@ -51,8 +59,27 @@ class NCMenu: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.contentInset.top = 10
+        // Apply insets when the view loads
+        applyBottomSpacing()
         self.view.backgroundColor = menuColor
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // Reapply insets after layout changes (rotation, etc.)
+        applyBottomSpacing()
+    }
+
+    // Helper function to add extra bottom spacing
+    private func applyBottomSpacing() {
+        // Add extra space at the bottom (to prevent overlap with the home indicator)
+        let bottomInset = 20 + view.safeAreaInsets.bottom  // Ensure padding from the home indicator
+        
+        // Apply the content inset
+        tableView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: bottomInset, right: 0)
+        
+        // Adjust scroll indicator insets too (to match content inset)
+        tableView.scrollIndicatorInsets = tableView.contentInset
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -136,11 +163,13 @@ class NCMenu: UITableViewController {
 extension NCMenu: FloatingPanelControllerDelegate {
 
     func floatingPanel(_ fpc: FloatingPanelController, layoutFor size: CGSize) -> FloatingPanelLayout {
-        return NCMenuFloatingPanelLayout(panelHeight: self.actions.panelHeight, controller: controller)
+//        return NCMenuFloatingPanelLayout(panelHeight: self.actions.panelHeight, controller: controller)
+        return NCMenuFloatingPanelLayout(panelHeight: actions.panelHeight(for: self), controller: controller)
+
     }
 
     func floatingPanel(_ fpc: FloatingPanelController, layoutFor newCollection: UITraitCollection) -> FloatingPanelLayout {
-        return NCMenuFloatingPanelLayout(panelHeight: self.actions.panelHeight, controller: controller)
+        return NCMenuFloatingPanelLayout(panelHeight: actions.panelHeight(for: self), controller: controller)
     }
 
     func floatingPanel(_ fpc: FloatingPanelController, animatorForDismissingWith velocity: CGVector) -> UIViewPropertyAnimator {

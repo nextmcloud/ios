@@ -63,6 +63,11 @@ extension UIAlertController {
                         let error = await NCNetworkingE2EEMarkFolder().markFolderE2ee(account: session.account, serverUrlFileName: serverUrlFileName, userId: session.userId)
                         if error != .success {
                             await showErrorBanner(scene: scene, text: error.errorDescription, errorCode: error.errorCode)
+//                            await showErrorBanner(scene: scene, text: error.errorDescription)
+                        } else{
+#if !EXTENSION
+                            AnalyticsHelper.shared.trackCreateFolder(isEncrypted: true, creationDate: Date())
+#endif
                         }
                     } else {
                         await showErrorBanner(scene: scene, text: createFolderResults.error.errorDescription, errorCode: createFolderResults.error.errorCode)
@@ -186,7 +191,7 @@ extension UIAlertController {
         }
 
         #if !EXTENSION
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .default) { (_: UIAlertAction) in
+        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .destructive) { (_: UIAlertAction) in
             Task {
                 var error = NKError()
                 for metadata in selectedMetadatas where error == .success {

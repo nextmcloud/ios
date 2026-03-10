@@ -53,7 +53,7 @@ extension NCTrash {
             iconHeader = icon
         } else {
             if tblTrash.directory {
-                iconHeader = NCImageCache.shared.getFolder(account: tblTrash.account)
+                iconHeader = NCImageCache.shared.getFolder()
             } else {
                 iconHeader = NCImageCache.shared.getImageFile()
             }
@@ -71,7 +71,7 @@ extension NCTrash {
         actions.append(
             NCMenuAction(
                 title: NSLocalizedString("_restore_", comment: ""),
-                icon: utility.loadImage(named: "arrow.counterclockwise", colors: [NCBrandColor.shared.iconImageColor]),
+                icon: utility.loadImage(named: "restore", colors: [NCBrandColor.shared.iconImageColor]),
                 sender: sender,
                 action: { _ in
                     Task {
@@ -85,7 +85,7 @@ extension NCTrash {
             NCMenuAction(
                 title: NSLocalizedString("_delete_", comment: ""),
                 destructive: true,
-                icon: utility.loadImage(named: "trash", colors: [.red]),
+                icon: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.iconImageColor]),
                 sender: sender,
                 action: { _ in
                     Task {

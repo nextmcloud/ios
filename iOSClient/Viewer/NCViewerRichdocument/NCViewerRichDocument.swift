@@ -46,7 +46,9 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
                     }
                 ]))
         }
-        navigationItem.hidesBackButton = true
+//        navigationItem.hidesBackButton = true
+        navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.title = metadata.fileNameView
 
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.nonPersistent()
@@ -95,6 +97,8 @@ class NCViewerRichDocument: UIViewController, WKNavigationDelegate, WKScriptMess
         NotificationCenter.default.addObserver(self, selector: #selector(self.grabFocus), name: NSNotification.Name(rawValue: NCGlobal.shared.notificationCenterRichdocumentGrabFocus), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidShow), name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ONLINE_OFFICE_USED)
     }
 
     override func viewDidAppear(_ animated: Bool) {

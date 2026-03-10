@@ -151,6 +151,12 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func selected(_ status: Bool, isEditMode: Bool) {
+        // E2EE - remove encrypt folder selection
+        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
+            imageSelect.isHidden = true
+        } else {
+            imageSelect.isHidden = isEditMode ? false : true
+        }
         if isEditMode {
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
@@ -158,11 +164,11 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             buttonMore.isHidden = false
         }
         if status {
-            imageSelect.isHidden = false
             imageSelect.image = NCImageCache.shared.getImageCheckedYes()
             imageVisualEffect.isHidden = false
         } else {
-            imageSelect.isHidden = true
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
+            backgroundView = nil
             imageVisualEffect.isHidden = true
         }
     }
@@ -182,7 +188,13 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         accessibilityValue = value
     }
 
-    func setIconOutlines() {}
+    func setIconOutlines() {
+        if imageStatus.image != nil {
+            imageStatus.makeCircularBackground(withColor: .systemBackground)
+        } else {
+            imageStatus.backgroundColor = .clear
+        }
+    }
 }
 
 // MARK: - Grid Layout

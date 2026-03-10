@@ -33,7 +33,12 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
     @IBOutlet weak var status: UILabel!
     @IBOutlet weak var btnQuickStatus: UIButton!
     @IBOutlet weak var labelQuickStatus: UILabel!
-    @IBOutlet weak var imageDownArrow: UIImageView!
+    @IBOutlet weak var imagePermissionType: UIImageView!
+    @IBOutlet weak var imageRightArrow: UIImageView!
+    @IBOutlet weak var imageExpiredDateSet: UIImageView!
+    @IBOutlet weak var imagePasswordSet: UIImageView!
+    @IBOutlet weak var imageAllowedPermission: UIImageView!
+    @IBOutlet weak var leadingContraintofImageRightArrow: NSLayoutConstraint!
 
     private var index = IndexPath()
 
@@ -54,6 +59,96 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         set {}
     }
 
+    // MARK: - Lifecycle
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        setupCellUIAppearance()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle {
+            setupCellUIAppearance()
+        }
+    }
+
+    // MARK: - Configure
+    func configure(with share: tableShare?, at indexPath: IndexPath, isDirectory: Bool, userId: String) {
+        self.indexPath = indexPath
+        self.tableShare = share
+        self.isDirectory = isDirectory
+        setupCellUI(userId: userId)
+    }
+
+    // MARK: - UI Setup
+    private func setupCellUIAppearance() {
+//        contentView.backgroundColor = NCBrandColor.shared.secondarySystemGroupedBackground
+        buttonMenu.contentMode = .scaleAspectFill
+//        buttonMenu.setImage(NCImageCache.images.buttonMore.image(color: NCBrandColor.shared.brand, size: 24), for: .normal)
+        buttonMenu.setImage(NCImageCache.shared.getImageButtonMore().image(color: NCBrandColor.shared.brand, size: 24), for: .normal)
+        labelQuickStatus.textColor = NCBrandColor.shared.shareBlueColor
+        labelTitle.textColor = NCBrandColor.shared.label
+        imageRightArrow.image = UIImage(named: "rightArrow")?.image(color: NCBrandColor.shared.shareBlueColor)
+        imageExpiredDateSet.image = UIImage(named: "calenderNew")?.image(color: NCBrandColor.shared.shareBlueColor)
+        imagePasswordSet.image = UIImage(named: "lockNew")?.image(color: NCBrandColor.shared.shareBlueColor)
+
+        imagePermissionType.image = imagePermissionType.image?.image(color: NCBrandColor.shared.shareBlueColor)
+        updatePermissionUI()
+    }
+
+    private func updatePermissionUI() {
+        guard let tableShare = tableShare else { return }
+
+        let permissions = NCPermissions()
+
+        if tableShare.permissions == permissions.permissionCreateShare {
+            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_just_upload_", comment: "")
+            imagePermissionType.image = UIImage(named: "upload")?.image(color: NCBrandColor.shared.shareBlueColor)
+        } else if permissions.isAnyPermissionToEdit(tableShare.permissions) {
+            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_edit_", comment: "")
+            imagePermissionType.image = UIImage(named: "editNew")?.image(color: NCBrandColor.shared.shareBlueColor)
+        } else {
+            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_only_view_", comment: "")
+            imagePermissionType.image = UIImage(named: "showPasswordNew")?.image(color: NCBrandColor.shared.shareBlueColor)
+        }
+
+        imagePasswordSet.isHidden = tableShare.password.isEmpty
+        imageExpiredDateSet.isHidden = (tableShare.expirationDate == nil)
+        
+        leadingContraintofImageRightArrow.constant = (imagePasswordSet.isHidden && imageExpiredDateSet.isHidden) ? 0 : 5
+    }
+
+    private func setupCellUI(userId: String) {
+        guard let tableShare = tableShare else { return }
+
+        let permissions = NCPermissions()
+        labelTitle.text = tableShare.shareWithDisplayname
+
+        let isOwner = tableShare.uidOwner == userId || tableShare.uidFileOwner == userId
+        isUserInteractionEnabled = isOwner
+        buttonMenu.isHidden = !isOwner
+        buttonMenu.accessibilityLabel = NSLocalizedString("_more_", comment: "")
+
+        btnQuickStatus.setTitle("", for: .normal)
+        btnQuickStatus.isEnabled = true
+        btnQuickStatus.accessibilityHint = NSLocalizedString("_user_sharee_footer_", comment: "")
+        btnQuickStatus.contentHorizontalAlignment = .left
+
+        setupCellUIAppearance()
+//        let permissionValue = tableShare.permissions
+//
+//        if permissionValue == permissions.permissionCreateShare {
+//            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_just_upload_", comment: "")
+//            imagePermissionType.image = UIImage(named: "upload")?.imageColor(NCBrandColor.shared.shareBlueColor)
+//        } else if permissions.isAnyPermissionToEdit(permissionValue) {
+//            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_edit_", comment: "")
+//            imagePermissionType.image = UIImage(named: "editNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+//        } else {
+//            labelQuickStatus.text = NSLocalizedString("_share_quick_permission_everyone_can_only_view_", comment: "")
+//            imagePermissionType.image = UIImage(named: "showPasswordNew")?.imageColor(NCBrandColor.shared.shareBlueColor)
+//        }
+    }
+    
     func setupCellUI(userId: String, session: NCSession.Session, metadata: tableMetadata) {
         guard let tableShare = tableShare else {
             return
@@ -73,7 +168,7 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         labelTitle.textColor = NCBrandColor.shared.textColor
         isUserInteractionEnabled = true
         labelQuickStatus.isHidden = false
-        imageDownArrow.isHidden = false
+        imageRightArrow.isHidden = false
         buttonMenu.isHidden = false
         buttonMenu.accessibilityLabel = NSLocalizedString("_more_", comment: "")
         imageItem.image = NCShareCommon.getImageShareType(shareType: tableShare.shareType)
@@ -86,7 +181,7 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         if tableShare.uidOwner != userId && tableShare.uidFileOwner != userId {
             isUserInteractionEnabled = false
             labelQuickStatus.isHidden = true
-            imageDownArrow.isHidden = true
+            imageRightArrow.isHidden = true
             buttonMenu.isHidden = true
         }
 
@@ -134,15 +229,6 @@ class NCShareUserCell: UITableViewCell, NCCellProtocol {
         }
     }
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapAvatarImage(_:)))
-        imageItem?.addGestureRecognizer(tapGesture)
-
-        labelQuickStatus.textColor = NCBrandColor.shared.customer
-        imageDownArrow.image = utility.loadImage(named: "arrowtriangle.down.circle", colors: [NCBrandColor.shared.customer])
-    }
-
     @objc func tapAvatarImage(_ sender: UITapGestureRecognizer) {
         delegate?.showProfile(with: tableShare, sender: sender)
     }
@@ -170,7 +256,7 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
     @IBOutlet weak var imageStatus: UIImageView!
     @IBOutlet weak var status: UILabel!
     @IBOutlet weak var imageShareeType: UIImageView!
-    @IBOutlet weak var centerTitle: NSLayoutConstraint!
+    @IBOutlet weak var centerTitleConstraint: NSLayoutConstraint!
 
     private var user: String = ""
     private var index = IndexPath()
@@ -190,8 +276,8 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
 
     func setupCell(sharee: NKSharee, session: NCSession.Session) {
         let utility = NCUtility()
-        imageItem.image = NCShareCommon.getImageShareType(shareType: sharee.shareType)
-        imageShareeType.image = NCShareCommon.getImageShareType(shareType: sharee.shareType)
+//        imageItem.image = NCShareCommon.getImageShareType(shareType: sharee.shareType)
+        imageShareeType.image = NCShareCommon.getImageShareType(shareType: sharee.shareType, isDropDown: true)
         let status = utility.getUserStatus(userIcon: sharee.userIcon, userStatus: sharee.userStatus, userMessage: sharee.userMessage)
 
         if let statusImage = status.statusImage {
@@ -201,11 +287,12 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
 
         self.status.text = status.statusMessage
         if self.status.text?.count ?? 0 > 0 {
-            centerTitle.constant = -5
+            centerTitleConstraint.constant = -5
         } else {
-            centerTitle.constant = 0
+            centerTitleConstraint.constant = 0
         }
 
+        /*
         imageItem.image = utility.loadUserImage(for: sharee.shareWith, displayName: nil, urlBase: session.urlBase)
 
         let fileName = NCSession.shared.getFileName(urlBase: session.urlBase, user: sharee.shareWith)
@@ -237,5 +324,6 @@ class NCSearchUserDropDownCell: DropDownCell, NCCellProtocol {
                     }
                 }
         }
+         */
     }
 }

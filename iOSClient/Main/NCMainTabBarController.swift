@@ -50,7 +50,7 @@ class NCMainTabBarController: UITabBarController {
         // File
         if let item = tabBar.items?[0] {
             item.title = NSLocalizedString("_home_", comment: "")
-            item.image = UIImage(systemName: "folder.fill")
+            item.image = UIImage(named: "home") // UIImage(systemName: "folder.fill")
             item.selectedImage = item.image
             item.tag = 100
         }
@@ -58,7 +58,8 @@ class NCMainTabBarController: UITabBarController {
         // Favorite
         if let item = tabBar.items?[1] {
             item.title = NSLocalizedString("_favorites_", comment: "")
-            item.image = UIImage(systemName: "star.fill")
+            item.image = UIImage(named: "star") // UIImage(systemName: "star.fill")
+//            item.image = UIImage(systemName: "star.fill")
             item.selectedImage = item.image
             item.tag = 101
         }
@@ -66,23 +67,33 @@ class NCMainTabBarController: UITabBarController {
         // Media
         if let item = tabBar.items?[2] {
             item.title = NSLocalizedString("_media_", comment: "")
-            item.image = UIImage(systemName: "photo.fill")
+            item.image = UIImage(named: "media") // UIImage(systemName: "photo")
             item.selectedImage = item.image
             item.tag = 102
         }
 
         // Activity
-        if let item = tabBar.items?[3] {
-            item.title = NSLocalizedString("_activity_", comment: "")
-            item.image = UIImage(systemName: "bolt.fill")
-            item.selectedImage = item.image
-            item.tag = 103
-        }
+//        if let item = tabBar.items?[3] {
+//            item.title = NSLocalizedString("_activity_", comment: "")
+//            item.image = UIImage(systemName: "bolt")
+//            item.selectedImage = item.image
+//            item.tag = 103
+//        }
 
+        // Album
+//        if let item = tabBar.items?[3] {
+//            item.title = NSLocalizedString("_albums_", comment: "")
+//            item.image = UIImage(named: "mediaSelected")?.image(color: NCBrandColor.shared.textColor, size: 25)
+////            item.isEnabled = true
+//            item.selectedImage = item.image
+//            item.tag = 103
+//        }
+        
         // More
-        if let item = tabBar.items?[4] {
+        if let item = tabBar.items?[3] {
+//        if let item = tabBar.items?[4] {
             item.title = NSLocalizedString("_more_", comment: "")
-            item.image = UIImage(systemName: "ellipsis.circle.fill")
+            item.image = UIImage(named: "more") // UIImage(systemName: "ellipsis")
             item.selectedImage = item.image
             item.tag = 104
         }
@@ -149,9 +160,9 @@ class NCMainTabBarController: UITabBarController {
                 await navigationController.updateRightBarButtonItems(self.tabBar.items?[0])
             }
             // Update Activity tab bar
-            if let item = self.tabBar.items?[3] {
-                item.isEnabled = capabilities.activityEnabled
-            }
+//            if let item = self.tabBar.items?[3] {
+//                item.isEnabled = capabilities.activityEnabled
+//            }
         }
     }
 

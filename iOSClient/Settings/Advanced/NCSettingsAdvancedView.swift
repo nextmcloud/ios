@@ -192,7 +192,7 @@ struct NCSettingsAdvancedView: View {
             }, header: {
                 Text(NSLocalizedString("_delete_files_desc_", comment: ""))
             }, footer: {
-                Text("_clear_cache_footer_")
+                Text(NSLocalizedString("_clear_cache_footer_", comment: ""))
                     .multilineTextAlignment(.leading)
             })
             // Reset Application

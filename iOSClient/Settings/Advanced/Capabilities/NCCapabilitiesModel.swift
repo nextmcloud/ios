@@ -65,7 +65,7 @@ class NCCapabilitiesModel: ObservableObject, ViewOnAppearHandling {
         image = utility.loadImage(named: "bell")
         capabililies.append(Capability(text: "Notification", image: image, resize: false, available: !cap.notification.isEmpty))
 
-        image = utility.loadImage(named: "trash")
+        image = utility.loadImage(named: "trashIcon")
         capabililies.append(Capability(text: "Deleted files", image: image, resize: false, available: cap.filesUndelete))
 
         let editors = cap.directEditingCreators

@@ -89,7 +89,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         setNavigationBarHidden(false, animated: true)
 
         Task {
-            menuButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+            menuButton.setImage(UIImage(systemName: "ellipsis.circle"), for: .normal)
             menuButton.tintColor = NCBrandColor.shared.iconImageColor
             menuButton.menu = await createRightMenu()
             menuButton.showsMenuAsPrimaryAction = true
@@ -199,6 +199,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                 //
                 let session = NCSession.shared.getSession(account: account)
                 await self.createPlusMenu(session: session, capabilities: capabilities)
+                AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
             }
         }
 
@@ -209,6 +210,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                 // Menu Plus
                 let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
                 await self.createPlusMenu(session: session, capabilities: capabilities)
+                AnalyticsHelper.shared.trackEvent(eventName: .EVENT__ACTION_BUTTON)
             }
         }
     }
@@ -246,12 +248,12 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         let directory = await NCManageDatabase.shared.getTableDirectoryAsync(predicate: NSPredicate(format: "account == %@ AND serverUrl == %@", session.account, serverUrl))
         let isNetworkReachable = NextcloudKit.shared.isNetworkReachable()
         let titleCreateFolder = isDirectoryE2EE ? NSLocalizedString("_create_folder_e2ee_", comment: "") : NSLocalizedString("_create_folder_", comment: "")
-        let imageCreateFolder = isDirectoryE2EE ? NCImageCache.shared.getFolderEncrypted(account: session.account) : NCImageCache.shared.getFolder(account: session.account)
+        let imageCreateFolder = isDirectoryE2EE ? NCImageCache.shared.getFolderEncrypted() : NCImageCache.shared.getFolder()
 
         // ------------------------------- ACTION
 
         menuActionElement.append(UIAction(title: NSLocalizedString("_upload_photos_videos_", comment: ""),
-                                          image: utility.loadImage(named: "photo", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                          image: UIImage(named: "file_photo_menu")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             NCAskAuthorization().askAuthorizationPhotoLibrary(controller: controller) { hasPermission in
                 if hasPermission {
                     DispatchQueue.main.async {
@@ -262,21 +264,21 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         })
 
         menuActionElement.append(UIAction(title: NSLocalizedString("_upload_file_", comment: ""),
-                                          image: utility.loadImage(named: "doc", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                          image: UIImage(named: "uploadFile")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             DispatchQueue.main.async {
                 controller.documentPickerViewController = NCDocumentPickerViewController(controller: controller, isViewerMedia: false, allowsMultipleSelection: true)
             }
         })
 
         menuActionElement.append(UIAction(title: NSLocalizedString("_scans_document_", comment: ""),
-                                          image: utility.loadImage(named: "doc.text.viewfinder", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                          image: NCUtility().loadImage(named: "scan", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             DispatchQueue.main.async {
                 NCDocumentCamera.shared.openScannerDocument(viewController: controller)
             }
         })
 
         menuActionElement.append(UIAction(title: NSLocalizedString("_create_voice_memo_", comment: ""),
-                                          image: utility.loadImage(named: "mic", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                          image: UIImage(named: "microphoneMenu")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             NCAskAuthorization().askAuthorizationAudioRecord(controller: controller) { hasPermission in
                 if hasPermission {
                     DispatchQueue.main.async {
@@ -310,7 +312,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
            NCPreferences().isEndToEndEnabled(account: session.account),
            isNetworkReachable {
             menuE2EEElement.append(UIAction(title: NSLocalizedString("_create_folder_e2ee_", comment: ""),
-                                            image: NCImageCache.shared.getFolderEncrypted(account: session.account)) { _ in
+                                            image: NCImageCache.shared.getFolderEncrypted()) { _ in
                 DispatchQueue.main.async {
                     let alertController = UIAlertController.createFolder(
                         serverUrl: serverUrl,
@@ -331,7 +333,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
            !isDirectoryE2EE,
            isNetworkReachable {
             menuTextElement.append(UIAction(title: NSLocalizedString("_add_folder_info_", comment: ""),
-                                            image: utility.loadImage(named: "list.dash.header.rectangle", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                            image: UIImage(named: "addFolderInfo")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                 Task { @MainActor in
                     let richWorkspaceCommon = NCRichWorkspaceCommon()
                     if let viewController = controller.currentViewController() {
@@ -353,12 +355,25 @@ class NCMainNavigationController: UINavigationController, UINavigationController
            let creator = capabilities.directEditingCreators.first(where: { $0.editor == "text" }),
            !isDirectoryE2EE {
             menuTextElement.append(UIAction(title: NSLocalizedString("_create_nextcloudtext_document_", comment: ""),
-                                            image: utility.loadImage(named: "doc.text", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                            image: UIImage(named: "file_txt_menu")!.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
                 Task {
-                    let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + creator.ext, account: session.account, serverUrl: serverUrl)
-                    let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
-
-                    await NCCreate().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "text", creatorId: creator.identifier, templateId: "document", account: session.account)
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorText
+                        viewController.creatorId = creator.identifier
+                        viewController.typeTemplate = NCGlobal.shared.editorText
+                        viewController.serverUrl = serverUrl
+                        viewController.titleForm = NSLocalizedString("_create_nextcloudtext_document_", comment: "")
+                        viewController.controller = controller
+                        controller.present(navigationController, animated: true, completion: nil)
+                    }
+//                    let fileName = await NCNetworking.shared.createFileName(fileNameBase: NSLocalizedString("_untitled_", comment: "") + "." + creator.ext, account: session.account, serverUrl: serverUrl)
+//                    let fileNamePath = utilityFileSystem.getRelativeFilePath(String(describing: fileName), serverUrl: serverUrl, session: session)
+//
+//                    await NCCreate().createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "text", creatorId: creator.identifier, templateId: "document", account: session.account)
                 }
             })
         }
@@ -370,6 +385,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
             // ------------------------------- COLLABORA
             if capabilities.richDocumentsEnabled {
+                /*
                 menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_document_", comment: ""),
                                                         image: utility.loadImage(named: "doc.richtext", colors: [NCBrandColor.shared.documentIconColor])) { _ in
                     Task { @MainActor in
@@ -405,10 +421,67 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                         await createDocument.createDocument(controller: controller, fileNamePath: fileNamePath, fileName: String(describing: fileName), editorId: "collabora", templateId: templates.selectedTemplate.identifier, account: session.account)
                     }
                 })
+                 */
+                
+                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_document_", comment: ""),
+                                                        image: UIImage(named: "create_file_document")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
+                    
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorCollabora
+                        viewController.typeTemplate = NCGlobal.shared.templateDocument
+                        viewController.serverUrl = serverUrl
+                        viewController.titleForm = NSLocalizedString("_create_new_document_", comment: "")
+                        viewController.controller = controller
+                        controller.present(navigationController, animated: true, completion: nil)
+                    }
+    //                }
+                })
+
+                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_spreadsheet_", comment: ""),
+                                                        image: UIImage(named: "create_file_xls")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
+                    
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorCollabora
+                        viewController.typeTemplate = NCGlobal.shared.templateSpreadsheet
+                        viewController.serverUrl = serverUrl
+                        viewController.titleForm = NSLocalizedString("_create_new_spreadsheet_", comment: "")
+                        viewController.controller = controller
+                        controller.present(navigationController, animated: true, completion: nil)
+                    }
+                })
+
+                menuRichDocumentElement.append(UIAction(title: NSLocalizedString("_create_new_presentation_", comment: ""),
+                                                        image: UIImage(named: "create_file_ppt")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
+                    
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorCollabora
+                        viewController.typeTemplate = NCGlobal.shared.templatePresentation
+                        viewController.serverUrl = serverUrl
+                        viewController.titleForm = NSLocalizedString("_create_new_presentation_", comment: "")
+                        viewController.controller = controller
+                        controller.present(navigationController, animated: true, completion: nil)
+                    }
+                })
             }
 
             // ------------------------------- ONLY OFFICE
 
+            /*
             if let creator = capabilities.directEditingCreators.first(where: { $0.editor == "onlyoffice" && $0.identifier == "onlyoffice_docx"}) {
                 menuOnlyOfficeElement.append(UIAction(title: NSLocalizedString("_create_new_document_", comment: ""),
                                                       image: utility.loadImage(named: "doc.text", colors: [NCBrandColor.shared.documentIconColor])) { _ in
@@ -451,6 +524,76 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                     }
                 })
             }
+             */
+            if let creator = capabilities.directEditingCreators.first(where: { $0.editor == "onlyoffice" && $0.identifier == "onlyoffice_docx"}) {
+                menuOnlyOfficeElement.append(UIAction(title: NSLocalizedString("_create_new_document_", comment: ""),
+                                                      image: UIImage(named: "create_file_document")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
+                    
+                    let directEditingCreator = capabilities.directEditingCreators.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeDocx})!
+
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorOnlyoffice
+                        viewController.creatorId = directEditingCreator.identifier
+                        viewController.typeTemplate = NCGlobal.shared.templateDocument
+                        viewController.serverUrl = serverUrl
+                        viewController.titleForm = NSLocalizedString("_create_new_document_", comment: "")
+                        viewController.controller = controller
+                        controller.present(navigationController, animated: true, completion: nil)
+                    }
+                })
+            }
+
+            if let creator = capabilities.directEditingCreators.first(where: { $0.editor == "onlyoffice" && $0.identifier == "onlyoffice_xlsx"}) {
+                menuOnlyOfficeElement.append(UIAction(title: NSLocalizedString("_create_new_spreadsheet_", comment: ""),
+                                                      image: UIImage(named: "create_file_xls")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
+
+                    let directEditingCreator = capabilities.directEditingCreators.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficeXlsx})!
+
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorOnlyoffice
+                        viewController.creatorId = directEditingCreator.identifier
+                        viewController.typeTemplate = NCGlobal.shared.templateSpreadsheet
+                        viewController.serverUrl = serverUrl
+                        viewController.titleForm = NSLocalizedString("_create_new_spreadsheet_", comment: "")
+                        viewController.controller = controller
+                        controller.present(navigationController, animated: true, completion: nil)
+                    }
+                })
+            }
+
+            if let creator = capabilities.directEditingCreators.first(where: { $0.editor == "onlyoffice" && $0.identifier == "onlyoffice_pptx"}) {
+                menuOnlyOfficeElement.append(UIAction(title: NSLocalizedString("_create_new_presentation_", comment: ""),
+                                                      image: UIImage(named: "create_file_ppt")!.resizeImage(size: CGSize(width: 24, height: 24))) { _ in
+
+                    let directEditingCreator = capabilities.directEditingCreators.first(where: { $0.editor == NCGlobal.shared.editorOnlyoffice && $0.identifier == NCGlobal.shared.onlyofficePptx})!
+
+                    guard let navigationController = UIStoryboard(name: "NCCreateFormUploadDocuments", bundle: nil).instantiateInitialViewController() else {
+                        return
+                    }
+                    navigationController.modalPresentationStyle = UIModalPresentationStyle.formSheet
+
+                    if let viewController = (navigationController as? UINavigationController)?.topViewController as? NCCreateFormUploadDocuments {
+                        viewController.editorId = NCGlobal.shared.editorOnlyoffice
+                        viewController.creatorId = directEditingCreator.identifier
+                        viewController.typeTemplate = NCGlobal.shared.templatePresentation
+                        viewController.serverUrl = serverUrl
+                        viewController.titleForm = NSLocalizedString("_create_new_presentation_", comment: "")
+                        viewController.controller = controller
+                        controller.present(navigationController, animated: true, completion: nil)
+                    }
+                    
+                })
+            }
         }
 
         let menuAction = UIMenu(title: "", options: .displayInline, children: menuActionElement)
@@ -468,7 +611,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             plusItem.menu = plusMenu
         } else {
             let plusItem = UIBarButtonItem(image: plusImage, style: .plain, target: nil, action: nil)
-            plusItem.tintColor = NCBrandColor.shared.getElement(account: session.account)
+            plusItem.tintColor = NCBrandColor.shared.customer
             plusItem.menu = plusMenu
             menuToolbar.setItems([plusItem], animated: false)
             menuToolbar.sizeToFit()
@@ -578,6 +721,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             return
         }
 
+        let transferCount = await self.database.getMetadatasAsync(predicate: NSPredicate(format: "status != %i", self.global.metadataStatusNormal))?.count ?? 0
         let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
         let rightmenu = await createRightMenu()
         var tempRightBarButtonItems: [UIBarButtonItem] = rightmenu == nil ? [self.transfersButtonItem] : [self.menuBarButtonItem, self.transfersButtonItem]
@@ -607,6 +751,22 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         if totalTags != tempTotalTags {
             topViewController?.navigationItem.rightBarButtonItems = tempRightBarButtonItems
         }
+
+        // Update App Icon badge / File Icon badge
+#if DEBUG
+        try? await UNUserNotificationCenter.current().setBadgeCount(transferCount)
+        fileItem?.badgeValue = transferCount == 0 ? nil : "\(transferCount)"
+#else
+        if transferCount > 999 {
+            try? await UNUserNotificationCenter.current().setBadgeCount(999)
+            fileItem?.badgeValue = "999+"
+        } else {
+            try? await UNUserNotificationCenter.current().setBadgeCount(transferCount)
+            fileItem?.badgeValue = transferCount == 0 ? nil : "\(transferCount)"
+        }
+#endif
+
+//        return transferCount
     }
 
     func createRightMenu() async -> UIMenu? { return nil }
@@ -634,7 +794,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         var showRecommendedFiles: UIAction?
         let layoutForView = database.getLayoutForView(account: session.account, key: collectionViewCommon.layoutKey, serverUrl: collectionViewCommon.serverUrl)
         let select = UIAction(title: NSLocalizedString("_select_", comment: ""),
-                              image: utility.loadImage(named: "checkmark.circle")) { _ in
+                              image: utility.loadImage(named: "checkmark.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             Task {
                 if !collectionViewCommon.dataSource.isEmpty() {
                     await collectionViewCommon.setEditMode(true)
@@ -644,7 +804,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let list = UIAction(title: NSLocalizedString("_list_", comment: ""),
-                            image: utility.loadImage(named: "list.bullet"),
+                            image: UIImage(named: "Changelog")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor), //utility.loadImage(named: "list.bullet"),
                             state: layoutForView.layout == global.layoutList ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutList
@@ -654,7 +814,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""),
-                            image: utility.loadImage(named: "square.grid.2x2"),
+                            image: UIImage(named: "Applications")?.image(color: NCBrandColor.shared.iconImageColor, size: 24).withTintColor(NCBrandColor.shared.iconImageColor), //utility.loadImage(named: "square.grid.2x2"),
                             state: layoutForView.layout == global.layoutGrid ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutGrid
@@ -664,7 +824,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let mediaSquare = UIAction(title: NSLocalizedString("_media_square_", comment: ""),
-                                   image: utility.loadImage(named: "square.grid.3x3"),
+                                   image: utility.loadImage(named: "square-grid", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                                    state: layoutForView.layout == global.layoutPhotoSquare ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutPhotoSquare
@@ -674,7 +834,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let mediaRatio = UIAction(title: NSLocalizedString("_media_ratio_", comment: ""),
-                                  image: utility.loadImage(named: "rectangle.grid.3x2"),
+                                  image: utility.loadImage(named: "ratio-grid", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                                   state: layoutForView.layout == self.global.layoutPhotoRatio ? .on : .off) { _ in
             Task {
                 layoutForView.layout = self.global.layoutPhotoRatio
@@ -686,7 +846,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         let viewStyleSubmenu = UIMenu(title: "", options: .displayInline, children: [list, grid, mediaSquare, mediaRatio])
 
         let ascending = layoutForView.ascending
-        let ascendingChevronImage = utility.loadImage(named: ascending ? "chevron.up" : "chevron.down")
+        let ascendingChevronImage = utility.loadImage(named: ascending ? "chevron.up" : "chevron.down").withTintColor(NCBrandColor.shared.iconImageColor)//.image(color: NCBrandColor.shared.iconImageColor, size: 24)//.withTintColor(NCBrandColor.shared.iconImageColor)
         let isName = layoutForView.sort == "fileName"
         let isDate = layoutForView.sort == "date"
         let isSize = layoutForView.sort == "size"
@@ -818,7 +978,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         let layoutForView = self.database.getLayoutForView(account: session.account, key: trashViewController.layoutKey, serverUrl: "")
 
         let select = UIAction(title: NSLocalizedString("_select_", comment: ""),
-                              image: utility.loadImage(named: "checkmark.circle")) { _ in
+                              image: utility.loadImage(named: "checkmark.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             if let datasource = trashViewController.datasource,
                !datasource.isEmpty {
                 trashViewController.setEditMode(true)
@@ -826,7 +986,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             }
         }
         let list = UIAction(title: NSLocalizedString("_list_", comment: ""),
-                            image: utility.loadImage(named: "list.bullet", colors: [NCBrandColor.shared.iconImageColor]),
+                            image: utility.loadImage(named: "list.bullet", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                             state: layoutForView.layout == self.global.layoutList ? .on : .off) { _ in
             Task {
                 trashViewController.onListSelected()
@@ -834,7 +994,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
             }
         }
         let grid = UIAction(title: NSLocalizedString("_icons_", comment: ""),
-                            image: utility.loadImage(named: "square.grid.2x2", colors: [NCBrandColor.shared.iconImageColor]),
+                            image: utility.loadImage(named: "square.grid.2x2", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
                             state: layoutForView.layout == self.global.layoutGrid ? .on : .off) { _ in
             Task {
                 trashViewController.onGridSelected()
@@ -843,7 +1003,7 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         }
 
         let emptyTrash = UIAction(title: NSLocalizedString("_empty_trash_", comment: ""),
-                                  image: utility.loadImage(named: "trash", colors: [NCBrandColor.shared.iconImageColor])) { _ in
+                                  image: utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             Task {
                 await trashViewController.emptyTrash()
             }
@@ -856,6 +1016,13 @@ class NCMainNavigationController: UINavigationController, UINavigationController
 
     func isNotificationsButtonVisible() -> Bool {
         if topViewController?.navigationItem.rightBarButtonItems?.first(where: { $0.tag == notificationsButtonTag }) != nil {
+            return true
+        }
+        return false
+    }
+    
+    func isTransfersButtonVisible() -> Bool {
+        if topViewController?.navigationItem.rightBarButtonItems?.first(where: { $0.tag == transfersButtonTag }) != nil {
             return true
         }
         return false

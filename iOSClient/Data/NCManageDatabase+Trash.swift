@@ -49,7 +49,15 @@ extension NCManageDatabase {
                 object.fileName = trash.fileName
                 object.filePath = trash.filePath
                 object.hasPreview = trash.hasPreview
-                object.iconName = trash.iconName
+//                object.iconName = trash.iconName
+                switch (trash.trashbinFileName as NSString).pathExtension {
+                case "odg":
+                    object.iconName = "diagram"
+                case "csv", "xlsm" :
+                    object.iconName = "file_xls"
+                default:
+                    object.iconName = trash.iconName
+                }
                 object.size = trash.size
                 object.trashbinDeletionTime = trash.trashbinDeletionTime as NSDate
                 object.trashbinFileName = trash.trashbinFileName

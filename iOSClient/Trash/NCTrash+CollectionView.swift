@@ -139,12 +139,39 @@ extension NCTrash: UICollectionViewDataSource {
 
         return text
     }
+    
+    func setTitleLabel(directories: Int, files: Int, size: Int64) -> String {
+        var foldersText = ""
+        var filesText = ""
+        var text = ""
+
+        if directories > 1 {
+            foldersText = "\(directories) " + NSLocalizedString("_folders_", comment: "")
+        } else if directories == 1 {
+            foldersText = "1 " + NSLocalizedString("_folder_", comment: "")
+        }
+
+        if files > 1 {
+            filesText = "\(files) " + NSLocalizedString("_files_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
+        } else if files == 1 {
+            filesText = "1 " + NSLocalizedString("_file_", comment: "") + " • " + utilityFileSystem.transformedSize(size)
+        }
+
+        if foldersText.isEmpty {
+            text = filesText
+        } else if filesText.isEmpty {
+            text = foldersText
+        } else {
+            text = foldersText + " • " + filesText
+        }
+        return text
+    }
 
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
             guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "sectionFirstHeaderEmptyData", for: indexPath) as? NCSectionFirstHeaderEmptyData
             else { return NCSectionFirstHeaderEmptyData() }
-            header.emptyImage.image = utility.loadImage(named: "trash", colors: [NCBrandColor.shared.getElement(account: session.account)])
+            header.emptyImage.image = utility.loadImage(named: "trashIcon", colors: [NCBrandColor.shared.getElement(account: session.account)])
             header.emptyTitle.text = NSLocalizedString("_trash_no_trash_", comment: "")
             header.emptyDescription.text = NSLocalizedString("_trash_no_trash_description_", comment: "")
             return header
@@ -153,6 +180,8 @@ extension NCTrash: UICollectionViewDataSource {
             else { return NCSectionFooter() }
             if let datasource {
                 footer.setTitleLabel(setTextFooter(datasource: datasource))
+//                let info = self.getFooterInformation(datasource: datasource)
+//                footer.setTitleLabel(directories: info.directories, files: info.files, size: info.size)
             }
             return footer
         }

@@ -67,12 +67,13 @@ extension NCMedia: UICollectionViewDataSource {
         cell.imageStatus.image = nil
 
         if cell.imageItem.frame.width > 60 {
-            if metadata.isVideo {
-                cell.imageStatus.image = playImage
-            } else if metadata.isLivePhoto {
-                cell.imageStatus.image = livePhotoImage
+            if metadata.isLivePhoto {
+                cell.imageStatus?.image = utility.loadImage(named: "livephoto", colors: [NCBrandColor.shared.iconImageColor2])
+            } else if metadata.isVideo {
+                cell.imageStatus?.image = utility.loadImage(named: "play.circle.fill", colors: [.systemBackgroundInverted, .systemGray5])
             }
         }
+        cell.imageSelect.isHidden = !isEditMode ? true : false
 
         if isEditMode, fileSelect.contains(metadata.ocId) {
             cell.selected(true)

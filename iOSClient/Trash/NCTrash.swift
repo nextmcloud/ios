@@ -111,6 +111,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
             await self.reloadDataSource()
             await loadListingTrash()
         }
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__DELETED_FILES)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -199,5 +200,23 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         } else {
             return filePath + "/"
         }
+    }
+    
+    func getFooterInformation(datasource: [tableTrash]) -> (directories: Int, files: Int, size: Int64) {
+        let validMetadatas = datasource.filter { !$0.isInvalidated }
+        let directories = validMetadatas.filter({ $0.directory == true})
+        let files = validMetadatas.filter({ $0.directory == false})
+
+        var size: Int64 = 0
+
+        directories.forEach { metadata in
+            size += metadata.size
+        }
+        
+        files.forEach { metadata in
+            size += metadata.size
+        }
+
+        return (directories.count, files.count, size)
     }
 }

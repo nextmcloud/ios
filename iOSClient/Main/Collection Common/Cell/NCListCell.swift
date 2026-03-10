@@ -177,9 +177,16 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
     }
 
     func selected(_ status: Bool, isEditMode: Bool) {
+        // E2EE - remove encrypt folder selection
+        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
+            imageSelect.isHidden = true
+        } else {
+            imageSelect.isHidden = isEditMode ? false : true
+        }
+
         if isEditMode {
             imageItemLeftConstraint.constant = 45
-            imageSelect.isHidden = false
+//            imageSelect.isHidden = false
             imageShared.isHidden = true
             imageMore.isHidden = true
             buttonShared.isHidden = true
@@ -187,7 +194,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             accessibilityCustomActions = nil
         } else {
             imageItemLeftConstraint.constant = 10
-            imageSelect.isHidden = true
+//            imageSelect.isHidden = true
             imageShared.isHidden = false
             imageMore.isHidden = false
             buttonShared.isHidden = false
@@ -227,13 +234,13 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
             tag1.isHidden = true
             labelInfo.isHidden = false
             labelSubinfo.isHidden = false
-            labelInfoSeparator.isHidden = false
+//            labelInfoSeparator.isHidden = false
         } else {
             tag0.isHidden = false
             tag1.isHidden = true
             labelInfo.isHidden = true
             labelSubinfo.isHidden = true
-            labelInfoSeparator.isHidden = true
+//            labelInfoSeparator.isHidden = true
 
             if let tag = tags.first {
                 tag0.text = tag
@@ -253,7 +260,7 @@ class NCListCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellProto
         if imageFavorite.image != nil {
             let outlineView = UIImageView()
             outlineView.translatesAutoresizingMaskIntoConstraints = false
-            outlineView.image = UIImage(systemName: "star")
+            outlineView.image = UIImage(systemName: "star.fill")
             outlineView.preferredSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: 16, weight: .thin)
             outlineView.tintColor = .systemBackground
 

@@ -30,6 +30,7 @@ class NCShares: NCCollectionViewCommon {
         Task {
             await reloadDataSource()
         }
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__SHARED)
     }
 
     override func viewDidAppear(_ animated: Bool) {

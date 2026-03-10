@@ -12,6 +12,8 @@ extension NCMedia: UICollectionViewDelegate {
             guard let metadata = dataSource.getMetadata(indexPath: indexPath),
                   let cell = collectionView.cellForItem(at: indexPath) as? NCMediaCell else { return }
 
+            cell.imageSelect.isHidden = !isEditMode ? true : false
+
             if isEditMode {
                 if let index = fileSelect.firstIndex(of: metadata.ocId) {
                     fileSelect.remove(at: index)

@@ -61,6 +61,9 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     var titleCurrentFolder = NCBrandOptions.shared.brand
     var serverUrl = ""
     var session: NCSession.Session!
+//    var controller: NCMainTabBarController? {
+//        self.tabBarController as? NCMainTabBarController
+//    }
     var controller: NCMainTabBarController?
     // -------------------------------------------------------------
 
@@ -74,16 +77,24 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
     private var backgroundImageView = UIImageView()
 
     var sceneIdentifier: String = ""
+    private var activeAccount: tableAccount!
 
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        navigationController?.setNavigationBarAppearance()
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.presentationController?.delegate = self
+
         view.backgroundColor = .systemBackground
         collectionView.backgroundColor = .systemBackground
 
         selectCommandViewSelect?.separatorView.backgroundColor = .separator
+
+        activeAccount = NCManageDatabase.shared.getActiveTableAccount()
+        session = NCSession.shared.getSession(account: activeAccount.account)
 
         // Cell
         collectionView.register(UINib(nibName: "NCListCell", bundle: nil), forCellWithReuseIdentifier: "listCell")
@@ -110,7 +121,7 @@ class NCSelect: UIViewController, UIGestureRecognizerDelegate, UIAdaptivePresent
             }
             self.view.addSubview(selectCommandViewSelect!)
 
-            selectCommandViewSelect?.setColor(account: session.account)
+//            selectCommandViewSelect?.setColor(account: session.account)
             selectCommandViewSelect?.selectView = self
             selectCommandViewSelect?.translatesAutoresizingMaskIntoConstraints = false
 
@@ -394,21 +405,19 @@ extension NCSelect: UICollectionViewDataSource {
 
         if metadata.directory {
             if metadata.e2eEncrypted {
-                cell.imageItem.image = NCImageCache.shared.getFolderEncrypted(account: metadata.account)
-            } else if isShare {
-                cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account)
-            } else if !metadata.shareType.isEmpty {
-                metadata.shareType.contains(3) ?
-                (cell.imageItem.image = NCImageCache.shared.getFolderPublic(account: metadata.account)) :
-                (cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe(account: metadata.account))
+                cell.imageItem.image = NCImageCache.shared.getFolderEncrypted()
+            } else if metadata.permissions.contains("S"), (metadata.permissions.range(of: "S") != nil) {
+                cell.imageItem.image = NCImageCache.shared.getFolderSharedWithMe()
+            } else if isShare || !metadata.shareType.isEmpty {
+                cell.imageItem.image = NCImageCache.shared.getFolderPublic()
             } else if metadata.mountType == "group" {
-                cell.imageItem.image = NCImageCache.shared.getFolderGroup(account: metadata.account)
+                cell.imageItem.image = NCImageCache.shared.getFolderGroup()
             } else if isMounted {
-                cell.imageItem.image = NCImageCache.shared.getFolderExternal(account: metadata.account)
+                cell.imageItem.image = NCImageCache.shared.getFolderExternal()
             } else if metadata.fileName == autoUploadFileName && metadata.serverUrl == autoUploadDirectory {
-                cell.imageItem.image = NCImageCache.shared.getFolderAutomaticUpload(account: metadata.account)
+                cell.imageItem.image = NCImageCache.shared.getFolderAutomaticUpload()
             } else {
-                cell.imageItem.image = NCImageCache.shared.getFolder(account: metadata.account)
+                cell.imageItem.image = NCImageCache.shared.getFolder()
             }
             cell.imageItem.image = cell.imageItem.image?.colorizeFolder(metadata: metadata)
             cell.labelInfo.text = utility.getRelativeDateTitle(metadata.date as Date)
@@ -420,8 +429,10 @@ extension NCSelect: UICollectionViewDataSource {
             self.database.getTableLocal(predicate: NSPredicate(format: "ocId == %@", metadata.ocId)) { tblLocalFile in
                 if let tblLocalFile, tblLocalFile.offline {
                     cell.imageLocal.image = NCImageCache.shared.getImageOfflineFlag()
+//                    cell.imageLocal.image = NCImageCache.shared.getImageOfflineFlag(colors: [.systemBackground, .systemGreen])
                 } else if self.utilityFileSystem.fileProviderStorageExists(metadata) {
                     cell.imageLocal.image = NCImageCache.shared.getImageLocal()
+//                    cell.imageLocal.image = NCImageCache.shared.getImageLocal(colors: [.systemBackground, .systemGreen])
                 }
             }
         }
@@ -464,7 +475,7 @@ extension NCSelect: UICollectionViewDataSource {
                     header.emptyTitle.text = NSLocalizedString("_request_in_progress_", comment: "")
                     header.emptyDescription.text = ""
                 } else {
-                    header.emptyImage.image = NCImageCache.shared.getFolder(account: session.account)
+                    header.emptyImage.image = NCImageCache.shared.getFolder()
                     if includeImages {
                         header.emptyTitle.text = NSLocalizedString("_files_no_files_", comment: "")
                     } else {

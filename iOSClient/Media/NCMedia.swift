@@ -11,6 +11,7 @@ class NCMedia: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var titleDate: UILabel!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var titleConstraint: NSLayoutConstraint!
     @IBOutlet weak var gradientView: UIView!
 
     let layout = NCMediaLayout()
@@ -76,6 +77,8 @@ class NCMedia: UIViewController {
         (self.tabBarController as? NCMainTabBarController)?.sceneIdentifier ?? ""
     }
 
+    var isInGeneralPhotosSelectionContext: Bool = false
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -100,6 +103,8 @@ class NCMedia: UIViewController {
         collectionView.collectionViewLayout = layout
         layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layout: global.mediaLayoutRatio).layout
 
+        setupForGeneralPhotosSelection()
+
         // Gradient Layer
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
         gradientLayer.endPoint   = CGPoint(x: 0, y: 1)
@@ -118,6 +123,17 @@ class NCMedia: UIViewController {
         gradientLayer.locations = [0.0, 0.20, 0.40, 0.60, 0.75, 0.85, 0.95, 1.0]
         gradientView.layer.insertSublayer(gradientLayer, at: 0)
 
+        // Title + Activity indicator
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            titleConstraint.constant = 0
+        } else {
+            if #available(iOS 26.0, *) {
+                titleConstraint.constant = -44
+            } else {
+                titleConstraint.constant = -34
+            }
+        }
+        
         titleDate.text = ""
         titleDate?.textColor = .white
         activityIndicator.color = .white
@@ -173,6 +189,7 @@ class NCMedia: UIViewController {
                 await loadDataSource()
             }
         }
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__MEDIA)
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -211,6 +228,13 @@ class NCMedia: UIViewController {
                 guard let self else { return }
                 await self.searchMediaUI()
             }
+        }
+    }
+    
+    private func setupForGeneralPhotosSelection() {
+        if isInGeneralPhotosSelectionContext {
+//            mediaCommandView?.setupForGeneralPhotosSelection()
+            isEditMode = true
         }
     }
 
