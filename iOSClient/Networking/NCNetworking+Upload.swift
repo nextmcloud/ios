@@ -34,7 +34,7 @@ extension NCNetworking {
                                                             fileNameLocalPath: fileNameLocalPath,
                                                             dateCreationFile: creationDate,
                                                             dateModificationFile: dateModificationFile,
-                                                            autoMkcol: true,
+//                                                            autoMkcol: true,
                                                             account: account,
                                                             options: options) { request in
             requestHandler(request)
@@ -201,7 +201,7 @@ extension NCNetworking {
                                                                     fileNameLocalPath: fileNameLocalPath,
                                                                     dateCreationFile: metadata.creationDate as Date,
                                                                     dateModificationFile: metadata.date as Date,
-                                                                    autoMkcol: true,
+//                                                                    autoMkcol: true,
                                                                     account: metadata.account,
                                                                     sessionIdentifier: metadata.session)
 
