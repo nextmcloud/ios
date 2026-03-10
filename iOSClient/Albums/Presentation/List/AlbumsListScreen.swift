@@ -32,12 +32,11 @@ struct AlbumsListScreen: View {
                 NCLoadingAlert()
             }
         }
-        .navigationTitle("Albums")
+        .navigationTitle(NSLocalizedString("_albums_list_nav_title_", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
-        .background(setupNavigation)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button("New") {
+                Button(NSLocalizedString("_albums_list_new_album_btn_", comment: "")) {
                     viewModel.onNewAlbumClick()
                 }
                 .foregroundColor(Color(NCBrandColor.shared.customer))
@@ -45,9 +44,9 @@ struct AlbumsListScreen: View {
         }
         .sheet(
             isPresented: $viewModel.isPhotoSelectionSheetVisible,
-//            onDismiss: {
-//                viewModel.onPhotosSelected(selectedPhotos: [])
-//            }
+            onDismiss: {
+                viewModel.onPhotosSelected(selectedPhotos: [])
+            }
         ) {
             PhotoSelectionSheet(
                 onPhotosSelected: viewModel.onPhotosSelected
@@ -69,12 +68,18 @@ struct AlbumsListScreen: View {
     @ViewBuilder
     private func content() -> some View {
         if viewModel.isLoading {
-            ProgressView("Loading albums...")
+            ProgressView(NSLocalizedString("_albums_list_loading_msg_", comment: ""))
         } else if let error = viewModel.errorMessage {
-            Text(error)
-                .refreshable {
-                    viewModel.onPulledToRefresh()
+            ScrollView(.vertical) {
+                VStack {
+                    Spacer()
+                    Text(error)
+                    Spacer()
                 }
+            }
+            .refreshable {
+                viewModel.onPulledToRefresh()
+            }
         } else if viewModel.albums.isEmpty {
             NoAlbumsEmptyView(onNewAlbumCreationIntent: viewModel.onNewAlbumClick)
                 .refreshable {
@@ -82,7 +87,8 @@ struct AlbumsListScreen: View {
                 }
         } else {
             AlbumsGridView(
-                albums: viewModel.albums
+                albums: viewModel.albums,
+                onAlbumClicked: viewModel.onAlbumClicked
             )
             .refreshable {
                 viewModel.onPulledToRefresh()

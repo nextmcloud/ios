@@ -34,7 +34,7 @@ public extension NextcloudKit {
         
         //options.contentType = "application/xml"
 //        self.utilityFileSystem.getHomeServer(session: session)
-        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.user + "/albums/"
+        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.userId + "/albums/"
         
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = urlPath.encodedToUrl,
@@ -220,59 +220,6 @@ public extension NextcloudKit {
                 }
             }
         }
-        /*
-        guard let url = urlPath.encodedToUrl,
-              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml", accept: "application/xml") else {
-            return options.queue.async { completion(.failure(.urlError)) }
-        }
-        let method = HTTPMethod(rawValue: "MKCOL")
-        var urlRequest: URLRequest
-        do {
-            try urlRequest = URLRequest(url: url, method: method, headers: headers)
-            urlRequest.timeoutInterval = options.timeout
-        } catch {
-            return options.queue.async { completion(.failure(NKError(error: error))) }
-        }
-
-//        nkSession.sessionData.request(urlRequest, interceptor: NKInterceptor(nkCommonInstance: nkCommonInstance)).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
-        nkSession.sessionData.request(urlRequest).onURLSessionTaskCreation { task in
-            task.taskDescription = options.taskDescription
-            taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            
-            if NKLogFileManager.shared.logLevel.rawValue > 0 {
-                debugPrint(response)
-            }
-            
-            let statusCode = response.response?.statusCode
-            
-            // Explicit 405 check
-            if statusCode == 405 {
-                let error = NKError(errorCode: 405, errorDescription: "Album already exists!", responseData: nil)
-                return options.queue.async {
-                    completion(.failure(error))
-                }
-            }
-            
-            guard let statusCode = response.response?.statusCode, (200...299).contains(statusCode) else {
-                return options.queue.async {
-                    completion(.failure(NKError.invalidResponseError))
-                }
-            }
-            
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(.failure(error)) }
-                
-            case .success:
-                options.queue.async {
-                    completion(.success(true))
-                }
-            }
-        }
-         */
     }
     
     // MARK: - Fetch Album photos
@@ -286,7 +233,7 @@ public extension NextcloudKit {
         
         let session = NCSession.shared.getSession(account: account)
         
-        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.user + "/albums/" + album + "/"
+        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.userId + "/albums/" + album + "/"
         
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = urlPath.encodedToUrl,
@@ -459,7 +406,7 @@ public extension NextcloudKit {
             }
         }()
         
-        let destinationPath = "/remote.php/dav/photos/" + session.user + "/albums/" + albumName + "/" + fileName
+        let destinationPath = "/remote.php/dav/photos/" + session.userId + "/albums/" + albumName + "/" + fileName
         
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
             let sourceUrl = sourceUrlString.encodedToUrl,
@@ -491,6 +438,16 @@ public extension NextcloudKit {
                 if NKLogFileManager.shared.logLevel.rawValue > 0 {
                     debugPrint(response)
                 }
+        
+                let statusCode = response.response?.statusCode
+                
+                // Explicit 404 check
+                if statusCode == NCGlobal.shared.errorResourceNotFound || statusCode == NCGlobal.shared.errorForbidden {
+//                if statusCode == 404 {
+                    return options.queue.async {
+                        completion(.success(()))
+                    }
+                }
                 
                 switch response.result {
                 case .failure(let error):
@@ -501,61 +458,105 @@ public extension NextcloudKit {
                     options.queue.async { completion(.success(())) }
                 }
             }
-        /*
-        let sourceUrlString: String = {
-            if sourcePath.lowercased().hasPrefix("http") {
-                return sourcePath
-            } else {
-                return session.urlBase + sourcePath
+    }
+    
+    // MARK: - Delete Photo from Album
+    
+    /// Asynchronously deletes a Photo FromAlbum from the Nextcloud server.
+    ///
+    /// - Parameters:
+    ///   - serverUrlFileName: The full URL string of the file or folder to delete.
+    ///   - account: The Nextcloud account identifier.
+    ///   - options: Optional request options including headers, timeout, and queue.
+    ///   - taskHandler: Callback triggered with the underlying `URLSessionTask`.
+    ///
+    /// - Returns: A tuple containing:
+    ///   - account: The account used for the request.
+    ///   - responseData: The raw Alamofire response data.
+    ///   - error: The `NKError` result indicating success or failure.
+    func deletePhotoFromAlbumAsync(albumName: String,
+                                   fileName: String,
+                                   serverUrlFileName: String,
+                                   account: String,
+                                 options: NKRequestOptions = NKRequestOptions(),
+                                 taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in }
+    ) async -> (
+        account: String,
+        responseData: AFDataResponse<Data>?,
+        error: NKError
+    ) {
+        await withCheckedContinuation { continuation in
+            deletePhotoFromAlbum(albumName: albumName,
+                               fileName: fileName,
+                               serverUrlFileName: serverUrlFileName,
+                               account: account,
+                               options: options,
+                               taskHandler: taskHandler) { account, responseData, error in
+                continuation.resume(returning: (
+                    account: account,
+                    responseData: responseData,
+                    error: error
+                ))
             }
-        }()
-        
-        let destinationPath = "/remote.php/dav/photos/" + session.user + "/albums/" + albumName + "/" + fileName
-        
-        guard
-            let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-            let sourceUrl = sourceUrlString.encodedToUrl,
-            var headers = nkCommonInstance.getStandardHeaders(account: account, options: options)
-        else {
-            return options.queue.async { completion(.failure(NKError.urlError)) }
         }
-        headers.add(
-            name: "Destination",
-            value: destinationPath.urlEncoded ?? destinationPath
-        )
-        
+    }
+    
+    /// Deletes a Photo From Album from the Nextcloud server at the specified URL.
+    ///
+    /// - Parameters:
+    ///   - serverUrlFileName: The full URL string of the file or folder to delete.
+    ///   - account: The Nextcloud account identifier.
+    ///   - options: Optional request options including headers, timeout, and queue.
+    ///   - taskHandler: Callback triggered with the underlying `URLSessionTask`.
+    ///   - completion: Completion handler returning:
+    ///     - account: The account used for the request.
+    ///     - responseData: The raw Alamofire response data.
+    ///     - error: The `NKError` result indicating success or failure.
+    func deletePhotoFromAlbum(albumName: String,
+                            fileName: String,
+                            serverUrlFileName: String,
+                            account: String,
+                            options: NKRequestOptions = NKRequestOptions(),
+                            taskHandler: @escaping (_ task: URLSessionTask) -> Void = { _ in },
+                            completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
+        let session = NCSession.shared.getSession(account: account)
+
+        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.userId + "/albums/" + albumName + "/" + fileName
+
+        guard let url = urlPath.encodedToUrl,
+              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml", accept: "application/xml") else {
+            return options.queue.async { completion(account, nil, .urlError) }
+        }
         var urlRequest: URLRequest
         do {
-            try urlRequest = URLRequest(url: sourceUrl, method: .init(rawValue: "COPY"), headers: headers)
+            try urlRequest = URLRequest(url: url, method: .delete, headers: headers)
             urlRequest.timeoutInterval = options.timeout
         } catch {
-            return options.queue.async { completion(.failure(NKError(error: error))) }
+            return options.queue.async { completion(account, nil, NKError(error: error)) }
         }
 
         nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
             task.taskDescription = options.taskDescription
             taskHandler(task)
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            
-            if NKLogFileManager.shared.logLevel.rawValue > 0 {
-                debugPrint(response)
+            // Inline evaluation to avoid calling inaccessible helper
+            let resultError: NKError
+            if let statusCode = response.response?.statusCode, (200...299).contains(statusCode) {
+                resultError = .success
+            } else if let afError = response.error {
+                resultError = NKError(error: afError, afResponse: response, responseData: response.data)
+            } else if let status = response.response?.statusCode {
+                // Map non-2xx status to a generic invalidResponseError
+                resultError = NKError(errorCode: status, errorDescription: "HTTP error \(status)", responseData: response.data)
+            } else {
+                resultError = NKError.invalidResponseError
             }
-            
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(.failure(error)) }
-                
-            case .success:
-                options.queue.async { completion(.success(())) }
-            }
-            
 
-//            options.queue.async {
-//                completion(account, response, result)
-//            }
+            options.queue.async {
+                completion(account, response, resultError)
+            }
         }
-         */
     }
     
     // MARK: - Delete Album
@@ -569,7 +570,7 @@ public extension NextcloudKit {
         
         let session = NCSession.shared.getSession(account: account)
         
-        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.user + "/albums/" + albumName
+        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.userId + "/albums/" + albumName
         
         guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let url = urlPath.encodedToUrl,
@@ -608,44 +609,6 @@ public extension NextcloudKit {
                     options.queue.async { completion(.success(())) }
                 }
             }
-        /*
-        guard let url = urlPath.encodedToUrl,
-              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              let headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(account, nil, .urlError) }
-        }
-        var urlRequest: URLRequest
-        do {
-            try urlRequest = URLRequest(url: url, method: .delete, headers: headers)
-            urlRequest.timeoutInterval = options.timeout
-        } catch {
-            return options.queue.async { completion(account, nil, NKError(error: error)) }
-        }
-
-        nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
-            task.taskDescription = options.taskDescription
-            taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            
-            if NKLogFileManager.shared.logLevel.rawValue > 0 {
-                debugPrint(response)
-            }
-            
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async {  completion(account, response, error)}
-                
-            case .success:
-                options.queue.async {  completion(account, response, .success) }
-            }
-            
-
-//            options.queue.async {
-//                completion(account, response, result)
-//            }
-        }
-         */
     }
     
     // MARK: - Rename Album
@@ -663,8 +626,8 @@ public extension NextcloudKit {
             return options.queue.async { completion(.failure(NKError.urlError)) }
         }
         
-        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.user + "/albums/" + oldName + "/"
-        let destinationHeader = "/remote.php/dav/photos/" + session.user + "/albums/" + newName + "/"
+        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.userId + "/albums/" + oldName + "/"
+        let destinationHeader = "/remote.php/dav/photos/" + session.userId + "/albums/" + newName + "/"
         
         guard let url = urlPath.encodedToUrl,
               var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
@@ -707,53 +670,6 @@ public extension NextcloudKit {
                     options.queue.async { completion(.success(())) }
                 }
             }
-        
-        /*
-        guard let url = urlPath.encodedToUrl,
-              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
-              var headers = nkCommonInstance.getStandardHeaders(account: account, options: options) else {
-            return options.queue.async { completion(.failure(NKError.urlError)) }
-        }
-        
-        // Add the required MOVE header
-        headers.add(
-            name: "Destination",
-            value: destinationHeader.addingPercentEncoding(
-                withAllowedCharacters: CharacterSet.urlQueryAllowed.subtracting(["+", "?", "&"])
-            ) ?? destinationHeader
-        )
-        
-        var urlRequest: URLRequest
-        do {
-            try urlRequest = URLRequest(url: url, method: .init(rawValue: "MOVE"), headers: headers)
-            urlRequest.timeoutInterval = options.timeout
-        } catch {
-            return options.queue.async { completion(.failure(NKError(error: error))) }
-        }
-
-        nkSession.sessionData.request(urlRequest).validate(statusCode: 200..<300).onURLSessionTaskCreation { task in
-            task.taskDescription = options.taskDescription
-            taskHandler(task)
-        }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
-            
-            if NKLogFileManager.shared.logLevel.rawValue > 0 {
-                debugPrint(response)
-            }
-            
-            switch response.result {
-            case .failure(let error):
-                let error = NKError(error: error, afResponse: response, responseData: response.data)
-                options.queue.async { completion(.failure(error)) }
-                
-            case .success:
-                options.queue.async { completion(.success(())) }
-            }
-            
-
-//            options.queue.async {
-//                completion(account, response, result)
-//            }
-        }
-         */
     }
 }
+

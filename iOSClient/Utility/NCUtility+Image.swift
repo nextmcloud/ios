@@ -237,6 +237,34 @@ extension NCUtility {
     func createImageFileFrom(data: Data, metadata: tableMetadata) {
         createImageFileFrom( data: data, ocId: metadata.ocId, etag: metadata.etag, userId: metadata.userId, urlBase: metadata.urlBase)
     }
+    
+    func createImageFileFrom(data: Data, ocId: String, etag: String) {
+        guard let image = UIImage(data: data) else { return }
+        let fileNamePath1024 = self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: global.previewExt1024)
+
+        do {
+            try data.write(to: URL(fileURLWithPath: fileNamePath1024), options: .atomic)
+        } catch { }
+
+        createImageStandard(ocId: ocId, etag: etag, image: image)
+    }
+
+    private func createImageStandard(ocId: String, etag: String, image: UIImage) {
+        let ext = [global.previewExt1024, global.previewExt512, global.previewExt256]
+        let size = [global.size1024, global.size512, global.size256]
+        let compressionQuality = [0.5, 0.6, 0.7]
+
+        for i in 0..<ext.count {
+            if !utilityFileSystem.fileProviderStorageImageExists(ocId, etag: etag, ext: ext[i]),
+               let image = image.resizeImage(size: size[i]),
+               let data = image.jpegData(compressionQuality: compressionQuality[i]) {
+                do {
+                    let fileNamePath = utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext[i])
+                    try data.write(to: URL(fileURLWithPath: fileNamePath))
+                } catch { }
+            }
+        }
+    }
 
     func createImageFileFrom(data: Data, ocId: String, etag: String, userId: String, urlBase: String) {
         guard let image = UIImage(data: data) else { return }
@@ -270,6 +298,10 @@ extension NCUtility {
         }
     }
 
+    func getImage(ocId: String, etag: String, ext: String) -> UIImage? {
+        return UIImage(contentsOfFile: self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext))
+    }
+    
     func getImage(ocId: String, etag: String, ext: String, userId: String, urlBase: String) -> UIImage? {
         return UIImage(contentsOfFile: self.utilityFileSystem.getDirectoryProviderStorageImageOcId(ocId, etag: etag, ext: ext, userId: userId, urlBase: urlBase))
     }

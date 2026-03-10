@@ -44,6 +44,10 @@ class NCViewerMediaPage: UIViewController {
     var timerAutoHide: Timer?
     private var timerAutoHideSeconds: Double = 4
 
+    var albumName: String?
+    var albumServerUrl: String?
+    var albumPhoto: AlbumPhoto?
+
     private lazy var moreNavigationItem = UIBarButtonItem(
         image: NCImageCache.shared.getImageButtonMore(),
         primaryAction: nil,

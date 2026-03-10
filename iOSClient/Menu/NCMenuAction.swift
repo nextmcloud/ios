@@ -25,6 +25,7 @@
 import Foundation
 import UIKit
 import NextcloudKit
+import SwiftUI
 
 @available(*, deprecated, message: "Change to using iOS native context menus, as well as using ContextMenuActions and NCViewerContextMenu")
 class NCMenuAction {
@@ -155,7 +156,7 @@ extension NCMenuAction {
             order: order,
             sender: sender,
             action: { _ in
-                let alertController = UIAlertController.deleteFileOrFolder(titleString: titleDelete + "?", message: message + fileList, canDeleteServer: canDeleteServer, selectedMetadatas: selectedMetadatas, sceneIdentifier: controller?.sceneIdentifier) { _ in
+                let alertController = UIAlertController.deleteFileOrFolder(titleString: titleDelete + "?", message: message + fileList, canDeleteServer: canDeleteServer, selectedMetadatas: selectedMetadatas, sceneIdentifier: controller?.sceneIdentifier, controller: controller) { _ in
                     completion?()
                 }
 
@@ -217,6 +218,21 @@ extension NCMenuAction {
             }
         )
     }
+    
+    /// Copy files to pasteboard
+    static func copyAction(fileSelect: [String], controller: NCMainTabBarController?, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
+        NCMenuAction(
+            title: NSLocalizedString("_copy_file_", comment: ""),
+            icon: NCUtility().loadImage(named: "copy", colors: [NCBrandColor.shared.iconColor]),
+            order: order,
+            sender: sender,
+            action: { _ in
+//                NCActionCenter.shared.copyPasteboard(pasteboardOcIds: fileSelect, controller: controller)
+                completion?()
+            }
+        )
+    }
+    
     /// Open view that lets the user move or copy the files within Nextcloud
     static func moveOrCopyAction(selectedMetadatas: [tableMetadata], account: String, viewController: UIViewController, order: Int = 0, sender: Any?, completion: (() -> Void)? = nil) -> NCMenuAction {
         NCMenuAction(

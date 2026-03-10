@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
+import NextcloudKit
+import SwiftUI
 
 class NCMediaNavigationController: NCMainNavigationController {
 
@@ -14,11 +16,12 @@ class NCMediaNavigationController: NCMainNavigationController {
         }
 
         if media.isEditMode {
-            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .plain) {
-                media.setEditMode(false)
-            }
-            media.navigationItem.rightBarButtonItems = [select]
+//            let select = UIBarButtonItem(title: NSLocalizedString("_cancel_", comment: ""), style: .plain) {
+//                media.setEditMode(false)
+//            }
+//            media.navigationItem.rightBarButtonItems = [select]
             media.tabBarSelect.show()
+            await self.updateRightBarButtonItems()
         } else {
             media.tabBarSelect.hide()
             await self.updateRightBarButtonItems()
@@ -43,6 +46,21 @@ class NCMediaNavigationController: NCMainNavigationController {
         let select = UIAction(title: NSLocalizedString("_select_", comment: ""),
                               image: utility.loadImage(named: "checkmark.circle", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
             media.setEditMode(true)
+            Task {
+                await media.loadDataSource()
+                await media.networkRemoveAll()
+                await self.updateRightMenu()
+            }
+        }
+        
+        let cancel = UIAction(title: NSLocalizedString("_cancel_", comment: ""),
+                              image: utility.loadImage(named: "xmark", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor)) { _ in
+            media.setEditMode(false)
+            Task {
+                await media.loadDataSource()
+                await media.networkRemoveAll()
+                await self.updateRightMenu()
+            }
         }
 
         let viewFilterMenu = UIMenu(title: "", options: .displayInline, children: [
@@ -189,11 +207,195 @@ class NCMediaNavigationController: NCMainNavigationController {
 //            self.present(alert, animated: true)
 //        }
 
+        let selectAll = UIMenu(title: "", options: .displayInline, children: [
+            UIAction(
+                title: NSLocalizedString("_select_all_", comment: ""),
+                image: utility.loadImage(named: "checkmark.circle.fill", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
+                handler: { _ in
+                    if !media.fileSelect.isEmpty, media.dataSource.metadatas.count == media.fileSelect.count {
+                        media.fileSelect = []
+                    } else {
+                        media.fileSelect = media.dataSource.metadatas.compactMap({ $0.ocId })
+                    }
+                    Task {
+                        await media.loadDataSource()
+                        await media.networkRemoveAll()
+                        await self.updateRightMenu()
+                    }
+                }
+            )
+        ])
+        
+        let actionsInEditMode: [UIAction] = [
+            
+            UIAction(
+                title: NSLocalizedString("_add_to_album", comment: ""),
+                image: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
+                handler: { _ in
+                    guard let controller = self.controller else { return }
+                    NCMediaNavigationController.presentExistingAlbums(presentingController: controller, selectedPhotos: media.fileSelect, account: controller.account)
+                }
+            ),
+            
+//            UIAction(
+//                title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
+//                image: utility.loadImage(named: "open_file", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),//, colors: [NCBrandColor.shared.iconImageColor]),
+////                state: NCPreferences().mediaSortDate == "uploadDate" ? .on : .off,
+//                handler: { _ in
+//                    NCPreferences().mediaSortDate = "uploadDate"
+//                    Task {
+//                        await media.loadDataSource()
+//                        await media.networkRemoveAll()
+//                        await self.updateRightMenu()
+//                    }
+//                }
+//            )
+        ]
+
         let mediaSortMenu = UIMenu(
             title: "",
             options: .displayInline,
             children: actions
         )
-        return UIMenu(title: "", children: [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, mediaSortMenu])//, playFile, playURL])
+//        return UIMenu(title: "", children: [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, mediaSortMenu])//, playFile, playURL])
+        let editModeMenu = UIMenu(
+            title: "",
+            options: .displayInline,
+            children: actionsInEditMode
+        )
+        print("edit mode", media.isEditMode)
+        return UIMenu(title: "", children: !media.isEditMode ? [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, mediaSortMenu] : [cancel, selectAll, editModeMenu])//, playFile, playURL])
+
+    }
+    
+    
+    static func presentInputAlbumNameAlert(
+         on viewController: UIViewController,
+         onCreate: @escaping (String) -> Void,
+         onCancel: @escaping () -> Void
+    ) {
+        let alert = UIAlertController(
+         title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
+         message: NSLocalizedString("_albums_list_new_album_popup_desc_", comment: ""),
+         preferredStyle: .alert
+        )
+        
+        alert.addTextField { textField in
+            textField.placeholder = NSLocalizedString("_albums_list_new_album_popup_hint_", comment: "")
+        }
+        
+        alert.addAction(UIAlertAction(title: NSLocalizedString("_albums_list_new_album_popup_negative_btn_", comment: ""), style: .default) { _ in
+            onCancel()
+        })
+        
+        alert.addAction(UIAlertAction(title: NSLocalizedString("_albums_list_new_album_popup_positive_btn_", comment: ""), style: .default) { _ in
+            let text = alert.textFields?.first?.text ?? ""
+            onCreate(text)
+        })
+        
+        alert.view.tintColor = NCBrandColor.shared.customer
+        viewController.present(alert, animated: true)
+    }
+     
+     static private func createNewAlbum(for name: String, selectedPhotos: [String], controller: UIViewController) {
+         
+         guard  let delegate = UIApplication.shared.delegate as? AppDelegate else { return }
+         
+         controller.showLoader()
+         NextcloudKit.shared.createNewAlbum(for: delegate.account, albumName: name) { result in
+             controller.hideLoader()
+             switch result {
+             case .success(_):
+                 AlbumsManager.shared.syncAlbums { resultAlbums in
+                     if let newAlbum = resultAlbums.first(where: { $0.name == name }) {
+                         addPhotosToAlbum(album: newAlbum, selectedPhotos: selectedPhotos, account: delegate.account)
+                     }
+                 }
+                 
+             case .failure(let error):
+                 NCContentPresenter().showError(error: NKError(error: error))
+             }
+         }
+     }
+    
+    static func presentExistingAlbums(presentingController: UIViewController,selectedPhotos: [String], account: String) {
+        let viewModel = AlbumsListViewModel(account: account)
+        let albumListView = AddToAlbumsListView(viewModel: viewModel, localAccount: account, onFinish: { selectedAlbum in
+            presentingController.dismiss(animated: true)
+            addPhotosToAlbum(album: selectedAlbum, selectedPhotos: selectedPhotos, account: account)
+        }, onDismiss: {
+            presentingController.dismiss(animated: true)
+        }, onCreateAlbum: {
+            presentingController.dismiss(animated: true)
+            presentInputAlbumNameAlert(on: presentingController) { albumName in
+                createNewAlbum(for: albumName, selectedPhotos: selectedPhotos, controller: presentingController)
+            } onCancel: {
+               
+            }
+        })
+        
+        let hostingController = UIHostingController(rootView: albumListView)
+        let navController = UINavigationController(rootViewController: hostingController)
+        
+        if let sheet = navController.sheetPresentationController {
+            sheet.detents = [.large()]
+            sheet.prefersGrabberVisible = true
+            sheet.preferredCornerRadius = 24
+        }
+//        presentingController.present(hostingController, animated: true, completion: nil)
+        presentingController.present(navController, animated: true, completion: nil)
+    }
+    
+    static func addPhotosToAlbum(album: Album, selectedPhotos: [String], account: String) {
+        
+        if selectedPhotos.isEmpty {
+            AlbumsNavigator.shared.push(.albumDetails(album: album))
+            return
+        }
+        
+        for photo in selectedPhotos {
+            
+            let metadata: tableMetadata? = NCManageDatabase.shared.getMetadataFromOcId(photo)
+            
+            NextcloudKit.shared.copyPhotoToAlbum(
+                account: account,
+                sourcePath: metadata?.serverUrlFileName ?? photo,
+                albumName: album.name,
+                fileName: metadata?.fileName ?? photo
+            ) { result in
+                
+                switch result {
+                case .success:
+                    let tabbarController = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
+                    tabbarController?.selectedIndex = 3
+                    AlbumsNavigator.shared.push(.albumDetails(album: album))
+                    AlbumsManager.shared.syncAlbums()
+                    
+                case .failure(let error):
+                    let nkError = NKError(error: error)
+                        
+                    // 1. Log the high-level error (usually 1)
+                    debugPrint("Top-level errorCode:", nkError.errorCode)
+
+                    // 2. Check the nested error for the 409 Conflict
+                    if let innerError = nkError.error as? NKError,
+                       innerError.errorCode == NCGlobal.shared.errorConflict {
+                        
+                        // This is the "File already exists" case (409)
+                        let conflictError = NKError(errorCode: NCGlobal.shared.errorConflict,
+                                                    errorDescription: "_file_already_exists_")
+                        NCContentPresenter().showInfo(error: conflictError)
+                        
+                    } else if nkError.errorCode == NCGlobal.shared.errorConflict {
+                        // Fallback check if the top-level error itself is 409
+                        NCContentPresenter().showInfo(error: nkError)
+                    } else {
+                        // Handle all other errors (Network, 404, 500, etc.)
+                        NCContentPresenter().showError(error: nkError)
+                    }
+                }
+            }
+            
+        }
     }
 }

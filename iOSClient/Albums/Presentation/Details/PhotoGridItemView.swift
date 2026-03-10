@@ -14,7 +14,9 @@ struct PhotoGridItemView: View {
     @Environment(\.localAccount) var localAccount: String
     
     let photo: AlbumPhoto
+    let isVideo: Bool
     let metadata: tableMetadata?
+    let iconSize: CGFloat
     
     @State private var thumbnail: UIImage?
     
@@ -23,16 +25,31 @@ struct PhotoGridItemView: View {
             if let thumbnail = thumbnail {
                 Image(uiImage: thumbnail)
                     .resizable()
-                    .scaledToFill()
+//                    .scaledToFill()
+                    .aspectRatio(1.0, contentMode: .fill)
                     .clipped()
             } else {
                 Rectangle()
                     .fill(Color.gray)
-                    .scaledToFill()
+//                    .scaledToFill()
+                    .aspectRatio(1.0, contentMode: .fill)
             }
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         .clipped()
+        .overlay(
+            Group {
+                if isVideo {
+                    Image(systemName: "play.fill")
+                        .resizable()
+                        .frame(width: 10, height: 10)
+                        .foregroundColor(.white)
+                        .padding(8)
+                }
+            },
+            alignment: .bottomLeading
+        )
+        .cornerRadius(8)
         .task {
             await loadThumbnail()
         }

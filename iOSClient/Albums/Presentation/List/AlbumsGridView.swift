@@ -16,34 +16,49 @@ struct AlbumsGridView: View {
     
     let albums: [Album]
     
-    private let columns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
+    let onAlbumClicked: (Album) -> Void
     
+//    private let columns = [
+//        GridItem(.flexible(), spacing: 16),
+//        GridItem(.flexible(), spacing: 16)
+//    ]
+    // Use this inside AlbumsGridView to detect iPad
+    private var columns: [GridItem] {
+        let isIPad = UIDevice.current.userInterfaceIdiom == .pad
+        let count = isIPad ? 3 : 2 // 4 columns for iPad, 2 for iPhone
+        return Array(repeating: GridItem(.flexible(), spacing: 16), count: count)
+    }
+
+    // Logic translated from your buildMediaPhotoVideo function
+    private var iconPointSize: CGFloat {
+        let count = columns.count
+        switch count {
+        case 0...1: return 60
+        case 2...3: return 30
+        case 4...5: return 25
+        default:    return 20
+        }
+    }
+
     var body: some View {
         
         ScrollView {
             
             VStack(alignment: .leading, spacing: 16) {
                 
-                Text("My albums")
+                Text(NSLocalizedString("_albums_list_own_albums_heading_", comment: ""))
                     .font(.system(size: 21, weight: .bold))
                 
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(albums, id: \.id) { album in
-                        NavigationLink(
-                            destination: {
-                                AlbumDetailsScreen(
-                                    account: localAccount,
-                                    album: album
-                                )
-                            }
-                        ) {
+                        Button {
+                            onAlbumClicked(album)
+                        } label: {
                             VStack(alignment: .leading, spacing: 6) {
                                 
-                                AlbumGridItemView(album: album)//, metadata: tableMetadata())
-                                
+//                                AlbumGridItemView(album: album)
+                                AlbumGridItemView(album: album, iconSize: iconPointSize)
+
                                 Text(album.name)
                                     .font(.system(size: 15, weight: .medium))
                                     .foregroundColor(.primary)
@@ -67,7 +82,7 @@ struct AlbumsGridView: View {
     private func makeSubtitle(for album: Album) -> String? {
         guard let count = album.itemCount else { return nil }
         
-        var parts: [String] = ["\(count) Items"]
+        var parts: [String] = ["\(count) \(NSLocalizedString("_albums_list_entities_", comment: ""))"]
         
         if count > 0, let end = album.endDate {
             let formatter = DateFormatter()
@@ -107,7 +122,8 @@ struct AlbumsGridView: View {
 //                dateRange: "Dec 2023",
 //                collaborators: nil
 //            )
-//        ]
+//        ],
+//        onAlbumClicked: { _ in}
 //    )
 //}
 //#endif

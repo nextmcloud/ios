@@ -23,7 +23,9 @@
 
 import Foundation
 import UIKit
+import Alamofire
 import NextcloudKit
+import SwiftUI
 
 extension UIAlertController {
     /// Creates a alert controller with a textfield, asking to create a new folder
@@ -175,7 +177,7 @@ extension UIAlertController {
         }, completion: completion)
     }
 
-    static func deleteFileOrFolder(titleString: String, message: String?, canDeleteServer: Bool, selectedMetadatas: [tableMetadata], sceneIdentifier: String?, completion: @escaping (_ cancelled: Bool) -> Void) -> UIAlertController {
+    static func deleteFileOrFolder(titleString: String, message: String?, canDeleteServer: Bool, selectedMetadatas: [tableMetadata], sceneIdentifier: String?, controller: UITabBarController?, completion: @escaping (_ cancelled: Bool) -> Void) -> UIAlertController {
         let alertController = UIAlertController(
             title: titleString,
             message: message,
@@ -183,24 +185,33 @@ extension UIAlertController {
         if canDeleteServer {
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .destructive) { (_: UIAlertAction) in
                 Task {
-                    await NCNetworking.shared.setStatusWaitDelete(metadatas: selectedMetadatas, sceneIdentifier: sceneIdentifier)
+                    if controller?.selectedIndex == NCGlobal.shared.selectedTabIndexAlbum {
+//                        await deletePhotosFromCurrentAlbum(selectedMetadatas: selectedMetadatas, controller: controller)
+                        NotificationCenter.default.post(name: NSNotification.Name("DeletePhotosFromAlbum"), object: nil, userInfo: ["metadatas": selectedMetadatas])
+
+                    } else {
+                        await NCNetworking.shared.setStatusWaitDelete(metadatas: selectedMetadatas, sceneIdentifier: sceneIdentifier)
+
+                    }
+//                    await NCNetworking.shared.setStatusWaitDelete(metadatas: selectedMetadatas, sceneIdentifier: sceneIdentifier)
                 }
                 completion(false)
             })
         }
 
-        #if !EXTENSION
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .destructive) { (_: UIAlertAction) in
-            Task {
-                var error = NKError()
-                for metadata in selectedMetadatas where error == .success {
-                    error = await NCNetworking.shared.deleteCache(metadata, sceneIdentifier: sceneIdentifier)
+        if controller?.selectedIndex != NCGlobal.shared.selectedTabIndexAlbum {
+#if !EXTENSION
+            alertController.addAction(UIAlertAction(title: NSLocalizedString("_remove_local_file_", comment: ""), style: .destructive) { (_: UIAlertAction) in
+                Task {
+                    var error = NKError()
+                    for metadata in selectedMetadatas where error == .success {
+                        error = await NCNetworking.shared.deleteCache(metadata, sceneIdentifier: sceneIdentifier)
+                    }
                 }
-            }
-            completion(false)
-        })
-        #endif
-
+                completion(false)
+            })
+#endif
+        }
         alertController.addAction(UIAlertAction(title: NSLocalizedString("_cancel_", comment: ""), style: .cancel) { (_: UIAlertAction) in
             completion(true)
         })

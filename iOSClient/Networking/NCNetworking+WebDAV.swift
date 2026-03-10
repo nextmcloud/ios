@@ -515,7 +515,7 @@ extension NCNetworking {
 
         return results.error
     }
-
+    
     // MARK: - Rename
 
     func setStatusWaitRename(_ metadata: tableMetadata, fileNameNew: String) {
@@ -1184,3 +1184,4 @@ class NCOperationDownloadAvatar: ConcurrentOperation, @unchecked Sendable {
         }
     }
 }
+

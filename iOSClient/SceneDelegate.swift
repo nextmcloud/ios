@@ -64,6 +64,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         } else {
             self.startNextcloud(scene: scene, withActivateSceneForAccount: false)
         }
+        
+//        if let tabBarController = window?.rootViewController as? UITabBarController {
+//           if #available(iOS 18.0, *) {
+//               // Forces the "Compact" (iPhone) size class so the tab bar stays at the bottom
+//               tabBarController.traitOverrides.horizontalSizeClass = .compact
+//           }
+//       }
     }
 
     private func startNextcloud(scene: UIScene, withActivateSceneForAccount activateSceneForAccount: Bool) {

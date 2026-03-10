@@ -15,24 +15,24 @@ struct PhotoSelectionSheet: View {
     @State private var selectedPhotosCount: Int = 0 // TODO: Figure out how to get this count from NCMedia
     
     @State private var mediaVC: NCMedia?
-    
+//    @State private var mediaVC: NCMedia? = NCMedia()
     var body: some View {
         NavigationView {
             VStack {
                 NCMediaViewRepresentable(ncMedia: $mediaVC)
                     .frame(maxHeight: .infinity)
             }
-            .navigationTitle("Select items")
+            .navigationTitle(NSLocalizedString("_albums_photo_selection_sheet_title_", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Back") {
+                    Button(NSLocalizedString("_albums_photo_selection_sheet_back_btn_", comment: "")) {
                         onPhotosSelected([])
                     }
                     .foregroundColor(Color(NCBrandColor.shared.customer))
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button(NSLocalizedString("_albums_photo_selection_sheet_done_btn_", comment: "")) {
                         onPhotosSelected(mediaVC?.fileSelect ?? [])
                     }
                     .foregroundColor(Color(NCBrandColor.shared.customer))
@@ -47,7 +47,7 @@ struct PhotoSelectionSheet: View {
         }
     }
 }
-
+//
 //#if DEBUG
 //#Preview {
 //    PhotoSelectionSheet(

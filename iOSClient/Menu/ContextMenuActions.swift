@@ -26,7 +26,12 @@ enum ContextMenuActions {
                  titleDelete = NSLocalizedString("_delete_folder_", comment: "")
                  destructive = true
              } else {
-                 titleDelete = NSLocalizedString("_delete_file_", comment: "")
+                 if controller?.getSelectedTabIndex() == NCGlobal.shared.selectedTabIndexAlbum {
+                     titleDelete = NSLocalizedString("_remove_from_album_", comment: "")
+                 } else {
+                     titleDelete = NSLocalizedString("_delete_file_", comment: "")
+                 }
+//                 titleDelete = NSLocalizedString("_delete_file_", comment: "")
                  destructive = true
              }
          }
@@ -42,7 +47,8 @@ enum ContextMenuActions {
                  message: message,
                  canDeleteServer: selectedMetadatas.allSatisfy { !$0.lock },
                  selectedMetadatas: selectedMetadatas,
-                 sceneIdentifier: controller?.sceneIdentifier
+                 sceneIdentifier: controller?.sceneIdentifier,
+                 controller: controller
              ) { _ in
                  completion?()
              }

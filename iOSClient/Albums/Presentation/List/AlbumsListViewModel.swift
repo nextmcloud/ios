@@ -13,8 +13,7 @@ import NextcloudKit
 class AlbumsListViewModel: ObservableObject {
     
     private var account: String
-//    let metadata: tableMetadata?
-
+    
     @Published private(set) var albums: [Album] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String? = nil
@@ -35,11 +34,32 @@ class AlbumsListViewModel: ObservableObject {
     
     private var cancellables: Set<AnyCancellable> = []
     
-    init(account: String) {//}, metadata: tableMetadata?) {
+    init(account: String) {
         self.account = account
-//        self.metadata = metadata
+        observeAlbums()
         registerPublishers()
-        loadAlbums()
+    }
+    
+    // MARK: - Subscriptions
+    private func observeAlbums() {
+        AlbumsManager.shared.albumsPublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                switch state {
+                case .idle:
+                    self?.isLoading = false
+                case .loading:
+                    self?.isLoading = true
+                    self?.errorMessage = nil
+                case .success(let albums):
+                    self?.isLoading = false
+                    self?.albums = albums
+                case .failure:
+                    self?.isLoading = false
+                    self?.errorMessage = NSLocalizedString("_albums_list_error_msg_", comment: "")
+                }
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Album name validation
@@ -58,16 +78,21 @@ class AlbumsListViewModel: ObservableObject {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if trimmed.isEmpty {
-            return ["Album name cannot be empty."]
+            return [NSLocalizedString("_albums_list_album_name_validation_nonempty_", comment: "")]
         } else if trimmed.count < 3 {
-            return ["Album name must be at least 3 characters."]
+            return [NSLocalizedString("_albums_list_album_name_validation_min_length_", comment: "")]
         } else if trimmed.count > 30 {
-            return ["Album name cannot be more than 30 characters."]
+            return [NSLocalizedString("_albums_list_album_name_validation_max_length_", comment: "")]
         } else if trimmed.contains("/") || trimmed.contains("\\") {
-            return ["Album name cannot contain slashes."]
+            return [NSLocalizedString("_albums_list_album_name_validation_specials_", comment: "")]
         }
         
         return []
+    }
+    
+    // MARK: - Events
+    func onAlbumClicked(_ album: Album) {
+        AlbumsNavigator.shared.push(.albumDetails(album: album))
     }
     
     // MARK: - Album name popup
@@ -96,38 +121,12 @@ class AlbumsListViewModel: ObservableObject {
     
     // MARK: - APIs
     func onPulledToRefresh() {
-        loadAlbums()
-    }
-    
-    private func loadAlbums(
-        doOnSuccess: (() -> Void)? = nil
-    ) {
-        
-        guard !isLoading else { return } // Prevent double calls
-        
-        isLoading = true
-        errorMessage = nil
-        
-        NextcloudKit.shared.fetchAllAlbums(for: account) { result in
-            
-            self.isLoading = false
-            
-            switch result {
-            case .success(let albums):
-                self.albums = albums.toAlbums()
-                if let callback = doOnSuccess {
-                    callback()
-                }
-            case .failure(let error):
-                NCContentPresenter().showError(error: NKError(error: error))
-                self.errorMessage = "Unable to load albums. Please try again later!"
-            }
-        }
+        AlbumsManager.shared.syncAlbums()
     }
     
     private func createNewAlbum(for name: String) {
         
-        guard !isLoadingPopupVisible else { return } // Prevent double calls
+        guard !isLoadingPopupVisible else { return }
         
         isLoadingPopupVisible = true
         
@@ -138,10 +137,10 @@ class AlbumsListViewModel: ObservableObject {
             switch result {
             case .success(_):
                 
-                self?.loadAlbums {
-                    if let newAlbum = self?.albums.first(where: { $0.name == name }) {
+                AlbumsManager.shared.syncAlbums { [weak self] resultAlbums in
+                    if let newAlbum = resultAlbums.first(where: { $0.name == name }) {
                         self?.newlyCreatedAlbum = newAlbum
-                        self?.isPhotoSelectionSheetVisible = true // either this
+                        self?.isPhotoSelectionSheetVisible = true
                     }
                 }
                 
@@ -158,7 +157,7 @@ class AlbumsListViewModel: ObservableObject {
         guard let album = newlyCreatedAlbum else { return }
         
         if selectedPhotos.isEmpty {
-            navigationDestination = .albumDetails(album: album)
+            AlbumsNavigator.shared.push(.albumDetails(album: album))
             return
         }
         
@@ -168,16 +167,38 @@ class AlbumsListViewModel: ObservableObject {
             
             NextcloudKit.shared.copyPhotoToAlbum(
                 account: account,
-                sourcePath: metadata?.serverUrlFileName ?? photo, //"https://dev1.next.magentacloud.de/remote.php/dav/files/120049010000000000682377/Files___MagentaCLOUD.mp4",
+                sourcePath: metadata?.serverUrlFileName ?? photo,
                 albumName: album.name,
-                fileName: metadata?.fileName ?? photo, // "Files___MagentaCLOUD.mp4"
-            ) { [weak self] result in
+                fileName: metadata?.fileName ?? photo
+            ) { result in
                 
                 switch result {
                 case .success:
-                    self?.navigationDestination = .albumDetails(album: album)
+                    AlbumsNavigator.shared.push(.albumDetails(album: album))
+                    AlbumsManager.shared.syncAlbums()
+                    
                 case .failure(let error):
-                    NCContentPresenter().showError(error: NKError(error: error))
+                    let nkError = NKError(error: error)
+                        
+                    // 1. Log the high-level error (usually 1)
+                    debugPrint("Top-level errorCode:", nkError.errorCode)
+
+                    // 2. Check the nested error for the 409 Conflict
+                    if let innerError = nkError.error as? NKError,
+                       innerError.errorCode == NCGlobal.shared.errorConflict {
+                        
+                        // This is the "File already exists" case (409)
+                        let conflictError = NKError(errorCode: NCGlobal.shared.errorConflict,
+                                                    errorDescription: "_file_already_exists_")
+                        NCContentPresenter().showInfo(error: conflictError)
+                        
+                    } else if nkError.errorCode == NCGlobal.shared.errorConflict {
+                        // Fallback check if the top-level error itself is 409
+                        NCContentPresenter().showInfo(error: nkError)
+                    } else {
+                        // Handle all other errors (Network, 404, 500, etc.)
+                        NCContentPresenter().showError(error: nkError)
+                    }
                 }
             }
         }

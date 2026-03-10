@@ -200,6 +200,7 @@
 		B5650A302F0FCC200027F650 /* FolderPathCustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 566EB8152B3D861500FB7CAD /* FolderPathCustomCell.xib */; };
 		B56AAB362EC4944600570F8D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F72685E927C78E490019EF5E /* InfoPlist.strings */; };
 		B56AAB372EC4944600570F8D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F72685E927C78E490019EF5E /* InfoPlist.strings */; };
+		B56D47DE2F56FC6800D790AB /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50939292F1E2A6C00A0E52C /* Album.swift */; };
 		B57C1AB72EE004CC008D2BAF /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
 		B57C1AB82EE004CC008D2BAF /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
 		B57E2A3F2F07E23D00628E89 /* NCCreateDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57E2A3D2F07E23D00628E89 /* NCCreateDocument.swift */; };
@@ -254,6 +255,11 @@
 		B5BEBDBA2E93AF010002C9E5 /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
 		B5BEBDBB2E93AF010002C9E5 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */; };
 		B5BEBDC12E93AF010002C9E5 /* NCEmptyView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */; };
+		B5C878A92F2A07A20093E805 /* LoadableState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C878A72F2A07A20093E805 /* LoadableState.swift */; };
+		B5C878AA2F2A07A20093E805 /* AlbumsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C878A62F2A07A20093E805 /* AlbumsManager.swift */; };
+		B5C878AE2F2A0F120093E805 /* AlbumsNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C878AB2F2A0F120093E805 /* AlbumsNavigator.swift */; };
+		B5C878AF2F2A0F120093E805 /* AlbumsRoutes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C878AC2F2A0F120093E805 /* AlbumsRoutes.swift */; };
+		B5C878B12F2A124C0093E805 /* AddToAlbumsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C878B02F2A124C0093E805 /* AddToAlbumsListView.swift */; };
 		B5C980182DACD51C0041B146 /* NCMediaCommandView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5C980172DACD51C0041B146 /* NCMediaCommandView.xib */; };
 		B5C9801A2DACD56C0041B146 /* NCMedia+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */; };
 		B5C980202DAD201A0041B146 /* NCSortMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C9801F2DAD201A0041B146 /* NCSortMenu.swift */; };
@@ -1313,6 +1319,11 @@
 		B5BEBE162E93BE200002C9E5 /* SetPDFPasswordSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SetPDFPasswordSwitchView.xib; sourceTree = "<group>"; };
 		B5BEBE172E93BE200002C9E5 /* TextFileWithOcrSwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFileWithOcrSwitchView.swift; sourceTree = "<group>"; };
 		B5BEBE182E93BE200002C9E5 /* TextFileWithOcrSwitchView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFileWithOcrSwitchView.xib; sourceTree = "<group>"; };
+		B5C878A62F2A07A20093E805 /* AlbumsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsManager.swift; sourceTree = "<group>"; };
+		B5C878A72F2A07A20093E805 /* LoadableState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadableState.swift; sourceTree = "<group>"; };
+		B5C878AB2F2A0F120093E805 /* AlbumsNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsNavigator.swift; sourceTree = "<group>"; };
+		B5C878AC2F2A0F120093E805 /* AlbumsRoutes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsRoutes.swift; sourceTree = "<group>"; };
+		B5C878B02F2A124C0093E805 /* AddToAlbumsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToAlbumsListView.swift; sourceTree = "<group>"; };
 		B5C980172DACD51C0041B146 /* NCMediaCommandView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCMediaCommandView.xib; sourceTree = "<group>"; };
 		B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCMedia+Menu.swift"; sourceTree = "<group>"; };
 		B5C9801F2DAD201A0041B146 /* NCSortMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSortMenu.swift; sourceTree = "<group>"; };
@@ -2131,6 +2142,7 @@
 		B509393B2F1E2A6C00A0E52C /* List */ = {
 			isa = PBXGroup;
 			children = (
+				B5C878B02F2A124C0093E805 /* AddToAlbumsListView.swift */,
 				B50939362F1E2A6C00A0E52C /* AlbumGridItemView.swift */,
 				B50939372F1E2A6C00A0E52C /* AlbumsGridView.swift */,
 				B50939382F1E2A6C00A0E52C /* AlbumsListScreen.swift */,
@@ -2160,6 +2172,7 @@
 		B50939412F1E2A6C00A0E52C /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
+				B5C878AD2F2A0F120093E805 /* Navigation */,
 				B509392F2F1E2A6C00A0E52C /* Alerts */,
 				B50939352F1E2A6C00A0E52C /* Details */,
 				B509393B2F1E2A6C00A0E52C /* List */,
@@ -2172,6 +2185,7 @@
 		B50939442F1E2A6C00A0E52C /* Albums */ = {
 			isa = PBXGroup;
 			children = (
+				B5C878A82F2A07A20093E805 /* Data */,
 				B50939252F1E2A6C00A0E52C /* API */,
 				B509392C2F1E2A6C00A0E52C /* Domain */,
 				B50939412F1E2A6C00A0E52C /* Presentation */,
@@ -2345,6 +2359,24 @@
 				B5BEBD9D2E93AF010002C9E5 /* NCEmptyView.xib */,
 			);
 			path = EmptyView;
+			sourceTree = "<group>";
+		};
+		B5C878A82F2A07A20093E805 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				B5C878A62F2A07A20093E805 /* AlbumsManager.swift */,
+				B5C878A72F2A07A20093E805 /* LoadableState.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		B5C878AD2F2A0F120093E805 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				B5C878AB2F2A0F120093E805 /* AlbumsNavigator.swift */,
+				B5C878AC2F2A0F120093E805 /* AlbumsRoutes.swift */,
+			);
+			path = Navigation;
 			sourceTree = "<group>";
 		};
 		B5D45E6C2DA510E000773929 /* Rename file */ = {
@@ -4545,6 +4577,7 @@
 				F7D4BF372CA2E8D800A5E746 /* TOPasscodeSettingsWarningLabel.m in Sources */,
 				F7D4BF382CA2E8D800A5E746 /* TOPasscodeVariableInputView.m in Sources */,
 				F7D4BF392CA2E8D800A5E746 /* TOPasscodeCircleView.m in Sources */,
+				B56D47DE2F56FC6800D790AB /* Album.swift in Sources */,
 				F7D4BF3A2CA2E8D800A5E746 /* TOPasscodeViewContentLayout.m in Sources */,
 				F7D61EBF2EBF1878007F865B /* NCManageDatabase+Tag.swift in Sources */,
 				F7D4BF3B2CA2E8D800A5E746 /* TOPasscodeSettingsKeypadButton.m in Sources */,
@@ -4854,6 +4887,7 @@
 				B560B95A2EF5597A00E55904 /* NCAccount.swift in Sources */,
 				B560B95B2EF5597A00E55904 /* NCShareAccounts.swift in Sources */,
 				B560B95C2EF5597A00E55904 /* NCAccountSettingsModel.swift in Sources */,
+				B5C878B12F2A124C0093E805 /* AddToAlbumsListView.swift in Sources */,
 				B560B95D2EF5597A00E55904 /* NCAccountSettingsView.swift in Sources */,
 				B560B95E2EF5597A00E55904 /* NCAccountRequest.swift in Sources */,
 				F70460522499061800BB98A7 /* NotificationCenter+MainThread.swift in Sources */,
@@ -4974,6 +5008,8 @@
 				F768822A2C0DD1E7001CF441 /* NCSettingsModel.swift in Sources */,
 				F737DA9D2B7B893C0063BAFC /* NCPasscode.swift in Sources */,
 				F77C97392953131000FDDD09 /* NCCameraRoll.swift in Sources */,
+				B5C878AE2F2A0F120093E805 /* AlbumsNavigator.swift in Sources */,
+				B5C878AF2F2A0F120093E805 /* AlbumsRoutes.swift in Sources */,
 				F7CADEFD2EA159210057849E /* NCMetadataTranfersSuccess.swift in Sources */,
 				F343A4B32A1E01FF00DDA874 /* PHAsset+Extension.swift in Sources */,
 				F70968A424212C4E00ED60E5 /* NCLivePhoto.swift in Sources */,
@@ -5016,6 +5052,8 @@
 				B5650A1B2F0FC1D40027F650 /* NCShareHeaderCustomCell.swift in Sources */,
 				B5650A1C2F0FC1D40027F650 /* NoSharesFooterView.swift in Sources */,
 				B5650A1D2F0FC1D40027F650 /* NCSharePermissions.swift in Sources */,
+				B5C878A92F2A07A20093E805 /* LoadableState.swift in Sources */,
+				B5C878AA2F2A07A20093E805 /* AlbumsManager.swift in Sources */,
 				B5650A1E2F0FC1D40027F650 /* NCShareDownloadLimitTableViewControllerDelegate.swift in Sources */,
 				F745B253222D88AE00346520 /* NCLoginQRCode.swift in Sources */,
 				B5ACCE442E992DCB008838AC /* NCSectionFirstHeaderEmptyData.swift in Sources */,
@@ -5215,7 +5253,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Notification_Service_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5225,7 +5263,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Notification_Service_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 10.2.2;
+				MARKETING_VERSION = 10.2.3;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5248,7 +5286,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Notification Service Extension/Notification Service ExtensionRelease.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5258,7 +5296,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Notification_Service_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 10.2.2;
+				MARKETING_VERSION = 10.2.3;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Notification-Service-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5515,7 +5553,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/Share.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5525,7 +5563,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Share.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 10.2.2;
+				MARKETING_VERSION = 10.2.3;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5548,7 +5586,7 @@
 				CODE_SIGN_ENTITLEMENTS = Share/ShareRelease.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5558,7 +5596,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/Share.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 10.2.2;
+				MARKETING_VERSION = 10.2.3;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.Share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5582,7 +5620,7 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/File_Provider_Extension.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5592,7 +5630,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/File_Provider_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 10.2.2;
+				MARKETING_VERSION = 10.2.3;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5618,7 +5656,7 @@
 				CODE_SIGN_ENTITLEMENTS = "File Provider Extension/File Provider ExtensionRelease.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5628,7 +5666,7 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/File_Provider_Extension.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 10.2.2;
+				MARKETING_VERSION = 10.2.3;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa.FileProviderExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5653,13 +5691,13 @@
 				CODE_SIGN_ENTITLEMENTS = "$(SRCROOT)/Brand/iOSClient.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17;
-				MARKETING_VERSION = 10.2.2;
+				MARKETING_VERSION = 10.2.3;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -5683,13 +5721,13 @@
 				CODE_SIGN_ENTITLEMENTS = NextcloudRelease.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9FH6TNGWF2;
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Brand/iOSClient.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17;
-				MARKETING_VERSION = 10.2.2;
+				MARKETING_VERSION = 10.2.3;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.t-systems.pu-ds.magentacloud.qa";
 				PRODUCT_NAME = "$(TARGET_NAME)";

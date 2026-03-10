@@ -16,7 +16,7 @@ struct NCLoadingAlert: View {
             Color.black.opacity(0.4)
                 .ignoresSafeArea()
             
-            ProgressView("Wait a moment...")
+            ProgressView(NSLocalizedString("_albums_loading_popup_desc_", comment: ""))
                 .padding()
                 .background(.ultraThinMaterial)
                 .cornerRadius(10)
