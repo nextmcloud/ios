@@ -42,6 +42,9 @@ class NCShareAccounts: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         let visibleCells = tableView.visibleCells
         if visibleCells.count == accounts.count {
             tableView.isScrollEnabled = false

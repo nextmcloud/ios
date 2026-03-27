@@ -46,6 +46,18 @@ class AlbumsViewController: UIViewController {
         AlbumsManager.shared.setAccount(session.account)
         AlbumsManager.shared.syncAlbums()
         
+//        // Preload NCMedia early so the selection sheet has data even if Media tab wasn't opened
+//        NCMediaPreloader.shared.preloadIfNeeded()
+//        
+//        if let media = NCMediaPreloader.shared.getPreloaded() {
+//            media.showOnlyImages = false
+//            media.showOnlyVideos = false
+//            Task { @MainActor in
+//                await media.loadDataSource()
+//                await media.searchMediaUI(true)
+//            }
+//        }
+        
         // UI changes
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = NCBrandColor.shared.customer
         UIBarButtonItem.appearance(whenContainedInInstancesOf: [UINavigationBar.self])

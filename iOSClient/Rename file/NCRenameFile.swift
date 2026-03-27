@@ -149,6 +149,9 @@ class NCRenameFile: UIViewController, UITextFieldDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         if metadata == nil && fileName == nil {
             dismiss(animated: true)
         }

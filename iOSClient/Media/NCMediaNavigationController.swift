@@ -263,7 +263,7 @@ class NCMediaNavigationController: NCMainNavigationController {
             options: .displayInline,
             children: actionsInEditMode
         )
-        print("edit mode", media.isEditMode)
+//        print("edit mode", media.isEditMode)
         return UIMenu(title: "", children: !media.isEditMode ? [select, viewFilterMenu, viewLayoutMenu, viewFolderMedia, mediaSortMenu] : [cancel, selectAll, editModeMenu])//, playFile, playURL])
 
     }

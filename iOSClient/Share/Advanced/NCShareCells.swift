@@ -208,6 +208,7 @@ enum NCAdvancedPermission: CaseIterable, NCShareCellConfig {
 
     case label, hideDownload, limitDownload, expirationDate, password, note, downloadAndSync
     static let forLink: [NCAdvancedPermission] = [.expirationDate, .hideDownload, .label, .limitDownload, .note, .password]
+    static let forEmail: [NCAdvancedPermission] = [.expirationDate, .note, .downloadAndSync, .password]
     static let forUser: [NCAdvancedPermission] = [.expirationDate, .note, .downloadAndSync]
 }
 
@@ -226,18 +227,21 @@ struct NCShareConfig {
         let type: NCPermission.Type = (share.shareType == NKShare.ShareType.publicLink.rawValue || share.shareType == NKShare.ShareType.email.rawValue) ? NCLinkEmailPermission.self : NCUserPermission.self
         self.permissions = parentMetadata.directory ? (parentMetadata.e2eEncrypted ? type.forDirectoryE2EE(account: parentMetadata.account) : type.forDirectory) : type.forFile
 
-        if share.shareType == NKShare.ShareType.publicLink.rawValue {
-            let capabilities = NCNetworking.shared.capabilities[parentMetadata.account] ?? NKCapabilities.Capabilities()
-            let hasDownloadLimitCapability = capabilities.fileSharingDownloadLimit
+        switch share.shareType {
+           case NKShare.ShareType.publicLink.rawValue:
+               let capabilities = NCNetworking.shared.capabilities[parentMetadata.account] ?? NKCapabilities.Capabilities()
+               let hasDownloadLimitCapability = capabilities.fileSharingDownloadLimit
 
-            if parentMetadata.isDirectory || hasDownloadLimitCapability == false {
-                self.advanced = NCAdvancedPermission.forLink.filter { $0 != .limitDownload }
-            } else {
-                self.advanced = NCAdvancedPermission.forLink
-            }
-        } else {
-            self.advanced = NCAdvancedPermission.forUser
-        }
+               if parentMetadata.isDirectory || hasDownloadLimitCapability == false {
+                   self.advanced = NCAdvancedPermission.forLink.filter { $0 != .limitDownload }
+               } else {
+                   self.advanced = NCAdvancedPermission.forLink
+               }
+           case NKShare.ShareType.email.rawValue:
+               self.advanced = NCAdvancedPermission.forEmail
+           default:
+               self.advanced = NCAdvancedPermission.forUser
+       }
     }
 
     func cellFor(indexPath: IndexPath) -> UITableViewCell? {

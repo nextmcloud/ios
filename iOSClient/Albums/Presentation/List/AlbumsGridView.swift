@@ -22,7 +22,7 @@ struct AlbumsGridView: View {
 //        GridItem(.flexible(), spacing: 16),
 //        GridItem(.flexible(), spacing: 16)
 //    ]
-    // Use this inside AlbumsGridView to detect iPad
+//     Use this inside AlbumsGridView to detect iPad
     private var columns: [GridItem] {
         let isIPad = UIDevice.current.userInterfaceIdiom == .pad
         let count = isIPad ? 3 : 2 // 4 columns for iPad, 2 for iPhone

@@ -215,6 +215,7 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
             viewNewUserComment.metadata = self.metadata
             viewNewUserComment.share = self.share
             viewNewUserComment.onDismiss = tableView.reloadData
+            viewNewUserComment.networking = self.networking
             self.navigationController?.pushViewController(viewNewUserComment, animated: true)
         case .label:
             let alertController = UIAlertController.withTextField(titleKey: "_share_link_name_") { textField in

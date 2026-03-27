@@ -103,6 +103,10 @@ class NCSharePaging: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         currentVC = pagingViewController.pageViewController.selectedViewController as? NCSharePagingContent
     }
 

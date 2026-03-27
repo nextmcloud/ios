@@ -127,10 +127,27 @@ class NCMainTabBarController: UITabBarController {
                 }
             }
         }
+        
+        Task { @MainActor in
+            let session = NCSession.shared.getSession(controller: self)
+            // Option 1: Use a preloader service
+//            await NCMediaPreloader.shared.preload(for: session)
+            
+            // Option 2: If you can access the media VC instance directly:
+            if let mediaNav = self.viewControllers?.first(where: { ($0 as? UINavigationController)?.topViewController is NCMedia }) as? UINavigationController,
+               let mediaVC = mediaNav.topViewController as? NCMedia {
+                await mediaVC.loadDataSource()
+                await mediaVC.searchMediaUI(true)
+            }
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         previousIndex = selectedIndex
 
         if NCBrandOptions.shared.enforce_passcode_lock && NCPreferences().passcode.isEmptyOrNil {

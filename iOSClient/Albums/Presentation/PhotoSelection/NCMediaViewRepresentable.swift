@@ -14,6 +14,26 @@ struct NCMediaViewRepresentable: UIViewControllerRepresentable {
     @Binding var ncMedia: NCMedia?
     
     func makeUIViewController(context: Context) -> UIViewController {
+        // Prefer using preloaded NCMedia if available
+//        if let preloaded = NCMediaPreloader.shared.getPreloaded() {
+//            preloaded.isInGeneralPhotosSelectionContext = true
+//
+//            let nav = UINavigationController(rootViewController: preloaded)
+//            nav.navigationBar.isHidden = true
+//
+//            let tab = UITabBarController()
+//            tab.setViewControllers([nav], animated: false)
+//            tab.tabBar.isHidden = true
+//            tab.additionalSafeAreaInsets.bottom = 0
+//
+//            // Publish back to binding
+//            DispatchQueue.main.async {
+//                self.ncMedia = preloaded
+//            }
+//
+//            return tab
+//        }
+        
         let sb = UIStoryboard(name: "NCMedia", bundle: nil)
         
         // Try to instantiate the initial VC as NCMedia safely
@@ -62,3 +82,4 @@ struct NCMediaViewRepresentable: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }
+

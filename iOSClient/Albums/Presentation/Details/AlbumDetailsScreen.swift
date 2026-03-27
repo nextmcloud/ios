@@ -32,8 +32,32 @@ struct AlbumDetailsScreen: View {
         .navigationTitle(viewModel.screenTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                toolbarContent()
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                if !viewModel.isLoading {
+                    Button(action: handleAddPhotosIntent) {
+                        Image(systemName: "plus")
+                            .imageScale(.large)
+                    }
+                    .buttonStyle(.plain)
+                    .tint(Color(NCBrandColor.shared.iconImageColor))
+
+                    Menu {
+                        Button(NSLocalizedString("_albums_photos_rename_album_btn_", comment: "")) {
+                            viewModel.onRenameAlbumIntent()
+                        }
+                        Button(
+                            NSLocalizedString("_albums_photos_delete_album_btn_", comment: ""),
+                            role: .destructive
+                        ) {
+                            viewModel.onDeleteAlbumIntent()
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .imageScale(.large)
+                    }
+                    .buttonStyle(.plain)
+                    .tint(Color(NCBrandColor.shared.iconImageColor))
+                }
             }
         }
         .sheet(
@@ -74,46 +98,6 @@ struct AlbumDetailsScreen: View {
                 Text(NSLocalizedString("_albums_delete_album_popup_desc_", comment: ""))
             }
         )
-    }
-    
-    @ViewBuilder
-    private func toolbarContent() -> some View {
-        if viewModel.isLoading {
-            EmptyView()
-        } else {
-            HStack {
-                
-                if viewModel.photos.isEmpty {
-                    Button(
-                        NSLocalizedString("_albums_photos_add_photos_btn_", comment: ""),
-                        action: handleAddPhotosIntent
-                    ).foregroundColor(Color(NCBrandColor.shared.customer))
-                } else {
-                    Button(action: handleAddPhotosIntent) {
-                        Image(systemName: "plus")
-                    }
-                    .foregroundColor(Color(NCBrandColor.shared.customer))
-                }
-                
-                Spacer()
-                    .frame(width: 4)
-                
-                Menu {
-                    Button(NSLocalizedString("_albums_photos_rename_album_btn_", comment: "")) {
-                        viewModel.onRenameAlbumIntent()
-                    }
-                    Button(
-                        NSLocalizedString("_albums_photos_delete_album_btn_", comment: ""),
-                        role: .destructive
-                    ) {
-                        viewModel.onDeleteAlbumIntent()
-                    }
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .foregroundStyle(Color(NCBrandColor.shared.customer))
-                }
-            }
-        }
     }
     
     @ViewBuilder

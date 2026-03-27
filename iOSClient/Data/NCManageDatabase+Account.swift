@@ -333,6 +333,13 @@ extension NCManageDatabase {
         }
     }
 
+//    func getAccountMediaPathAsync(_ path: String, account: String) async {
+//        await core.performRealmWriteAsync { realm in
+//            if let result = realm.objects(tableAccount.self).filter("account == %@", account).first {
+//                result.mediaPath = path
+//            }
+//        }
+//    }
     func setAccountMediaPathAsync(_ path: String, account: String) async {
         await core.performRealmWriteAsync { realm in
             if let result = realm.objects(tableAccount.self).filter("account == %@", account).first {

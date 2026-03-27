@@ -8,6 +8,7 @@ import RealmSwift
 import SwiftUI
 
 class NCFiles: NCCollectionViewCommon {
+
     internal var fileNameBlink: String?
     internal var fileNameOpen: String?
 
@@ -105,6 +106,12 @@ class NCFiles: NCCollectionViewCommon {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
+        // Preload hidden NCMedia so it's ready without being shown
+//        NCMediaPreloader.shared.preloadIfNeeded()
 
         if !self.dataSource.isEmpty() {
             self.blinkCell(fileName: self.fileNameBlink)
@@ -416,3 +423,4 @@ class NCFiles: NCCollectionViewCommon {
         }
     }
 }
+

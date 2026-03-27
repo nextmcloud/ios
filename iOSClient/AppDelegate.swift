@@ -147,6 +147,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         TealiumHelper.shared.start()
         FirebaseApp.configure()
         
+        // Initialize MoEngage early in app lifecycle
+        MoEngageAnalytics.setupIfNeeded()
+        
         return true
     }
 
@@ -700,3 +703,4 @@ extension AppDelegate {
         return self.orientationLock
     }
 }
+

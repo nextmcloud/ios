@@ -80,7 +80,7 @@ extension NCShare {
                         guard let viewNewUserComment = storyboard.instantiateViewController(withIdentifier: "NCShareNewUserAddComment") as? NCShareNewUserAddComment else { return }
                         viewNewUserComment.metadata = self.metadata
                         viewNewUserComment.share = tableShare(value: share)
-//                        viewNewUserComment.networking = self.networking
+                        viewNewUserComment.networking = self.networking
                         self.navigationController?.pushViewController(viewNewUserComment, animated: true)
                     }
                 )

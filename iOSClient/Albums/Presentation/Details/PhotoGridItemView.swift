@@ -25,14 +25,14 @@ struct PhotoGridItemView: View {
             if let thumbnail = thumbnail {
                 Image(uiImage: thumbnail)
                     .resizable()
-//                    .scaledToFill()
-                    .aspectRatio(1.0, contentMode: .fill)
-                    .clipped()
+                    .scaledToFill()
+//                    .aspectRatio(1.0, contentMode: .fill)
+//                    .clipped()
             } else {
                 Rectangle()
                     .fill(Color.gray)
-//                    .scaledToFill()
-                    .aspectRatio(1.0, contentMode: .fill)
+                    .scaledToFill()
+//                    .aspectRatio(1.0, contentMode: .fill)
             }
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)

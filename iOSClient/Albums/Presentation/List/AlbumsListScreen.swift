@@ -35,11 +35,16 @@ struct AlbumsListScreen: View {
         .navigationTitle(NSLocalizedString("_albums_list_nav_title_", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(NSLocalizedString("_albums_list_new_album_btn_", comment: "")) {
-                    viewModel.onNewAlbumClick()
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button(action: { viewModel.onNewAlbumClick() }) {
+                    Text(NSLocalizedString("_albums_list_new_album_btn_", comment: ""))
+                        .font(.body)
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, 10)
+                        .contentShape(Rectangle())
                 }
-                .foregroundColor(Color(NCBrandColor.shared.customer))
+                .buttonStyle(.plain)
+                .tint(Color(NCBrandColor.shared.iconImageColor))
             }
         }
         .sheet(
@@ -139,3 +144,4 @@ struct AlbumsListScreen: View {
 //    }
 //}
 //#endif
+

@@ -55,6 +55,9 @@ class NCAccountRequest: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // Re-evaluate in-app messages after viewDidAppear
+//        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         let visibleCells = tableView.visibleCells
         var numAccounts = accounts.count
         if enableAddAccount { numAccounts += 1 }

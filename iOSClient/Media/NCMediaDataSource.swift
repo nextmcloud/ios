@@ -40,6 +40,10 @@ extension NCMedia {
 
     @MainActor
     func collectionViewReloadData() {
+        guard isViewLoaded, view.window != nil else {
+            // View not ready; skip UI updates for now
+            return
+        }
         collectionView.reloadData()
         setElements()
     }
@@ -58,14 +62,23 @@ extension NCMedia {
                 return false
             }
             self.searchMediaInProgress = true
-            self.activityIndicator.startAnimating()
+//            self.activityIndicator.startAnimating()
+            if self.isViewLoaded, self.view.window != nil {
+                self.activityIndicator.startAnimating()
+            }
             return true
         }
 
         guard shouldContinue,
               let tblAccount = await self.database.getTableAccountAsync(predicate: NSPredicate(format: "account == %@", session.account)) else {
+//            await MainActor.run {
+//                self.activityIndicator.stopAnimating()
+//                self.searchMediaInProgress = false
+//            }
             await MainActor.run {
-                self.activityIndicator.stopAnimating()
+                if self.isViewLoaded, self.view.window != nil {
+                    self.activityIndicator.stopAnimating()
+                }
                 self.searchMediaInProgress = false
             }
             return
@@ -80,6 +93,12 @@ extension NCMedia {
             if self.dataSource.metadatas.isEmpty {
                 self.collectionViewReloadData()
             }
+            
+            guard self.isViewLoaded, self.view.window != nil else {
+                // Skip visible-cells calculations if view isn't ready
+                return
+            }
+            
             let sortedIndexPaths = collectionView.indexPathsForVisibleItems.sorted {
                 guard let attr1 = collectionView.layoutAttributesForItem(at: $0),
                       let attr2 = collectionView.layoutAttributesForItem(at: $1) else {

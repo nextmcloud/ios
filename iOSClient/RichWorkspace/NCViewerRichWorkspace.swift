@@ -46,6 +46,9 @@ import MarkdownKit
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         Task {
             try? await Task.sleep(nanoseconds: 1_500_000_000)
 

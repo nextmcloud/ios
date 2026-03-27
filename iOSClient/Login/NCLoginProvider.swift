@@ -60,6 +60,10 @@ class NCLoginProvider: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         nkLog(debug: "Login provider appeared.")
 
         guard let url = URL(string: initialURLString) else {
