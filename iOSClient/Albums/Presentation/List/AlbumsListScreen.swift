@@ -92,7 +92,11 @@ struct AlbumsListScreen: View {
                 }
         } else {
             AlbumsGridView(
-                albums: viewModel.albums,
+                albums: viewModel.albums.sorted { (lhs: Album, rhs: Album) -> Bool in
+                    let l = lhs.name
+                    let r = rhs.name
+                    return l.localizedCaseInsensitiveCompare(r) == .orderedAscending
+                },
                 onAlbumClicked: viewModel.onAlbumClicked
             )
             .refreshable {
@@ -144,4 +148,5 @@ struct AlbumsListScreen: View {
 //    }
 //}
 //#endif
+
 
