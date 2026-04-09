@@ -9,8 +9,6 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMain
     @IBOutlet weak var imageSelect: UIImageView!
     @IBOutlet weak var imageVisualEffect: UIVisualEffectView!
 
-    fileprivate var allowSelectionOverride: Bool?
-
     var metadata: tableMetadata?
     var previewImg: UIImageView? {
         get { return imageItem }
@@ -27,7 +25,6 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMain
         super.prepareForReuse()
 
         initCell()
-        allowSelectionOverride = nil
     }
 
     func initCell() {
@@ -36,8 +33,6 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMain
         accessibilityValue = nil
 
         imageItem.image = nil
-        imageSelect.isHidden = true
-        imageSelect.image = nil
 
         imageVisualEffect.isHidden = false
         imageVisualEffect.effect = nil
@@ -50,21 +45,44 @@ class NCPhotoCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMain
         return nil
     }
 
+    @objc private func handleTapObserver(_ g: UITapGestureRecognizer) {
+        let location = g.location(in: contentView)
+
+        if buttonMore.frame.contains(location) {
+            delegate?.onMenuIntent(with: metadata)
+        }
+    }
+
+    func setButtonMore(image: UIImage) {
+        buttonMore.setImage(image, for: .normal)
+    }
+
+    func hideButtonMore(_ status: Bool) {
+       // buttonMore.isHidden = status NO MORE USED
+    }
+
+    func hideImageStatus(_ status: Bool) {
+        imageStatus.isHidden = status
+    }
+
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
-        // Determine allowance from override set by data source (defaults to true if not provided)
-        let allowSelection = allowSelectionOverride ?? true
-
-        // Hide selection control for disallowed items; otherwise show only in edit mode
-        imageSelect.isHidden = allowSelection ? !isEditMode : true
-
-        // Selected state visuals: only apply when selection is allowed and in edit mode
-        if status && allowSelection && isEditMode {
-            imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
-            imageVisualEffect.isHidden = false
+        imageVisualEffect.alpha = status ? 1 : 0
+        imageSelect.alpha = status ? 1 : 0
+        imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
+        // E2EE - remove encrypt folder selection
+        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
+            imageSelect.isHidden = true
         } else {
-            imageSelect.image = NCImageCache.shared.getImageCheckedNo(color: color)
+            imageSelect.isHidden = isEditMode ? false : true
+        }
+        if status {
+//            imageSelect.isHidden = false
+            imageVisualEffect.isHidden = false
+            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
+        } else {
+//            imageSelect.isHidden = true
             imageVisualEffect.isHidden = true
-            backgroundView = nil
+            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
         }
     }
 
@@ -78,48 +96,32 @@ extension NCCollectionViewCommon {
     // MARK: - LAYOUT PHOTO
     //
     func photoCell(cell: NCPhotoCell, indexPath: IndexPath, metadata: tableMetadata) -> NCPhotoCell {
-        let ext = global.getSizeExtension(column: self.numberOfColumns)
+        let ext = global.getSizeExtension(column: self.numberOfColumns, viewWidth: self.collectionView.bounds.width)
 
         cell.metadata = metadata
 
-        // Image
-        //
-        if let image = NCImageCache.shared.getImageCache(ocId: metadata.ocId, etag: metadata.etag, ext: ext) {
+        if let image = imageCache.getImageCache(ocId: metadata.ocId, etag: metadata.etag, ext: ext) {
             cell.previewImg?.image = image
             cell.previewImg?.contentMode = .scaleAspectFill
+        } else if let image = utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: metadata.userId, urlBase: metadata.urlBase) {
+            imageCache.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: ext)
+            cell.previewImg?.image = image
         } else {
-            if isPinchGestureActive || ext == global.previewExt512 || ext == global.previewExt1024 {
-                cell.previewImg?.image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: metadata.userId, urlBase: metadata.urlBase)
-            }
-
-            DispatchQueue.global(qos: .userInteractive).async {
-                let image = self.utility.getImage(ocId: metadata.ocId, etag: metadata.etag, ext: ext, userId: metadata.userId, urlBase: metadata.urlBase)
-                if let image {
-                    self.imageCache.addImageCache(ocId: metadata.ocId, etag: metadata.etag, image: image, ext: ext, cost: indexPath.row)
-                    DispatchQueue.main.async {
-                        cell.previewImg?.image = image
-                        cell.previewImg?.contentMode = .scaleAspectFill
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        cell.previewImg?.contentMode = .scaleAspectFit
-                        if metadata.iconName.isEmpty {
-                            cell.previewImg?.image = NCImageCache.shared.getImageFile()
-                        } else {
-//                            cell.previewImg?.image = self.utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
-                            cell.previewImg?.image = self.utility.previewIcon(for: metadata)
-                        }
-                    }
-                }
+            cell.previewImg?.contentMode = .scaleAspectFit
+            if metadata.iconName.isEmpty {
+                cell.previewImg?.image = imageCache.getImageFile()
+            } else {
+                cell.previewImg?.image = utility.loadImage(named: metadata.iconName, useTypeIconFile: true, account: metadata.account)
             }
         }
 
-        cell.allowSelectionOverride = !metadata.e2eEncrypted
-
         // Edit mode
         //
-        let isSelected = (cell.allowSelectionOverride ?? true) && fileSelect.contains(metadata.ocId)
-        cell.selected(isSelected, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
+        if fileSelect.contains(metadata.ocId) {
+            cell.selected(true, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
+        } else {
+            cell.selected(false, isEditMode: isEditMode, color: NCBrandColor.shared.getElement(account: session.account))
+        }
 
         return cell
     }
