@@ -229,7 +229,7 @@ final class NCGlobal: Sendable {
     let selectorSynchronizationOffline          = "synchronizationOffline"
     let selectorPrint                           = "print"
     let selectorDeleteFile                      = "deleteFile"
-
+    
     // Metadata : Status
     //
     //   0 normal
@@ -259,6 +259,7 @@ final class NCGlobal: Sendable {
     let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
     let metadataStatusHideInView                = [1, 2, 3, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
+    let metadataStatusTransfers                 = [-2, -3, 2, 3, 10, 11, 12, 13, 14, 15]
 
     let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
     let metadatasStatusInWaitingDownloadUpload  = [-1, 1]
@@ -276,8 +277,6 @@ final class NCGlobal: Sendable {
     let notificationCenterChangeTheming                         = "changeTheming"                   // userInfo: account
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
-    let notificationCenterDidCreateShareLink                    = "didCreateShareLink"
-
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
     let notificationCenterReloadAvatar                          = "reloadAvatar"
     let notificationCenterClearCache                            = "clearCache"
@@ -295,7 +294,14 @@ final class NCGlobal: Sendable {
     let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
     let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
 
+    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
+    let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
+    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: [ocId], [indexPath], error
+    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: [ocId], [indexPath], error
     let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
+    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
+    let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
+    let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
 
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
@@ -329,7 +335,6 @@ final class NCGlobal: Sendable {
 
     let networkingStatusUploading                               = "statusUploading"
     let networkingStatusUploaded                                = "statusUploaded"
-
 
     let networkingStatusReloadAvatar                            = "statusReloadAvatar"
     let notificationCenterUpdateIcons                           = "updateIcons"
