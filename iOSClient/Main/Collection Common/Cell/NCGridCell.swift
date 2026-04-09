@@ -163,6 +163,12 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     }
 
     func selected(_ status: Bool, isEditMode: Bool, color: UIColor) {
+        // E2EE - remove encrypt folder selection
+        if let metadata = NCManageDatabase.shared.getMetadataFromOcId(self.metadata?.ocId), metadata.e2eEncrypted {
+            imageSelect.isHidden = true
+        } else {
+            imageSelect.isHidden = isEditMode ? false : true
+        }
         if isEditMode {
             buttonMore.isHidden = true
             accessibilityCustomActions = nil
@@ -173,6 +179,14 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
         imageVisualEffect.alpha = status ? 1 : 0
         imageSelect.alpha = status ? 1 : 0
         imageSelect.image = NCImageCache.shared.getImageCheckedYes(color: color)
+//        if status {
+//            imageSelect.image = NCImageCache.shared.getImageCheckedYes()
+//            imageVisualEffect.isHidden = false
+//        } else {
+//            imageSelect.image = NCImageCache.shared.getImageCheckedNo()
+//            backgroundView = nil
+//            imageVisualEffect.isHidden = true
+//        }
     }
 
     func writeInfoDateSize(date: NSDate, size: Int64) {
@@ -188,6 +202,14 @@ class NCGridCell: UICollectionViewCell, UIGestureRecognizerDelegate, NCCellMainP
     func setAccessibility(label: String, value: String) {
         accessibilityLabel = label
         accessibilityValue = value
+    }
+
+    func setIconOutlines() {
+        if imageStatus.image != nil {
+            imageStatus.makeCircularBackground(withColor: .systemBackground)
+        } else {
+            imageStatus.backgroundColor = .clear
+        }
     }
 }
 
