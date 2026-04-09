@@ -51,26 +51,6 @@ class NCTrashGridCell: UICollectionViewCell, NCTrashCellProtocol {
         get { return labelInfo }
         set { labelInfo = newValue }
     }
-    var fileProgressView: UIProgressView? {
-        get { return progressView }
-        set { progressView = newValue }
-    }
-    var fileSelectImage: UIImageView? {
-        get { return imageSelect }
-        set { imageSelect = newValue }
-    }
-    var fileStatusImage: UIImageView? {
-        get { return imageStatus }
-        set { imageStatus = newValue }
-    }
-    var fileLocalImage: UIImageView? {
-        get { return imageLocal }
-        set { imageLocal = newValue }
-    }
-    var fileFavoriteImage: UIImageView? {
-        get { return imageFavorite }
-        set { imageFavorite = newValue }
-    }
 
     override func awakeFromNib() {
         super.awakeFromNib()
