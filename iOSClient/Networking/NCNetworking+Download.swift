@@ -1,25 +1,6 @@
-//
-//  NCNetworking+Download.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 07/02/24.
-//  Copyright © 2024 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import UIKit
 import NextcloudKit
@@ -344,42 +325,5 @@ extension NCNetworking {
         await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
             delegate.transferReloadDataSource(serverUrl: metadata.serverUrl, requestData: false, status: nil)
         }
-    }
-}
-
-class NCOperationDownload: ConcurrentOperation, @unchecked Sendable {
-    var metadata: tableMetadata
-    var selector: String
-
-    init(metadata: tableMetadata, selector: String) {
-        self.metadata = tableMetadata.init(value: metadata)
-        self.selector = selector
-    }
-
-    override func start() {
-        guard !isCancelled else { return self.finish() }
-
-        metadata.session = NCNetworking.shared.sessionDownload
-        metadata.sessionError = ""
-        metadata.sessionSelector = selector
-        metadata.sessionTaskIdentifier = 0
-        metadata.status = NCGlobal.shared.metadataStatusWaitDownload
-
-//        let metadata = NCManageDatabase.shared.addMetadata(metadata)
-
-//        NCNetworking.shared.download(metadata: metadata, withNotificationProgressTask: true) {
-//        } completion: { _, _ in
-//            self.finish()
-//        }
-        Task {
-            await download(withSelector: self.selector)
-        }
-    }
-    
-    private func download(withSelector selector: String = "") async {
-        await NCNetworking.shared.downloadFile(metadata: metadata) { _ in
-            self.finish()
-        } taskHandler: { _ in }
-
     }
 }
