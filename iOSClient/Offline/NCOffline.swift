@@ -30,6 +30,7 @@ class NCOffline: NCCollectionViewCommon {
         Task {
             await getServerData()
         }
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__OFFLINE_FILES)
     }
 
     // MARK: - DataSource
