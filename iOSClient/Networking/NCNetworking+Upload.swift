@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2024 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import UIKit
 import NextcloudKit
 import Alamofire
@@ -41,22 +45,6 @@ extension NCNetworking {
             }
             taskHandler(task)
         } progressHandler: { progress in
-            Task {
-                guard await self.progressQuantizer.shouldEmit(serverUrlFileName: serverUrlFileName, fraction: progress.fractionCompleted) else {
-                    return
-                }
-
-                if let metadata {
-                    await NCManageDatabase.shared.setMetadataProgress(ocId: metadata.ocId, progress: progress.fractionCompleted)
-                    await self.transferDispatcher.notifyAllDelegates { delegate in
-                        delegate.transferProgressDidUpdate(progress: Float(progress.fractionCompleted),
-                                                           totalBytes: progress.totalUnitCount,
-                                                           totalBytesExpected: progress.completedUnitCount,
-                                                           fileName: metadata.fileName,
-                                                           serverUrl: metadata.serverUrl)
-                    }
-                }
-            }
             progressHandler(progress.completedUnitCount, progress.totalUnitCount, progress.fractionCompleted)
         }
 
@@ -310,7 +298,11 @@ extension NCNetworking {
 #if !EXTENSION
             await NCNetworking.shared.setLivePhoto(account: metadata.account)
 #endif
-        }
+        } else {
+#if !EXTENSION
+                AnalyticsHelper.shared.trackEventWithMetadata(eventName: .EVENT__UPLOAD_FILE ,metadata: metadata)
+#endif
+            }
 
         await self.transferDispatcher.notifyAllDelegates { delegate in
             delegate.transferChange(status: self.global.networkingStatusUploaded,
@@ -386,7 +378,6 @@ extension NCNetworking {
                                                                  error: self.global.diagnosticProblemsUploadServerError)
             }
         }
-        await NCManageDatabase.shared.updateBadge()
     }
 
     // MARK: -
