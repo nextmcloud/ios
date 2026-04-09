@@ -9,43 +9,17 @@
 import SwiftUI
 
 struct PhotoSelectionSheet: View {
-    
     let onPhotosSelected: ([String]) -> Void
-    
-    @State private var selectedPhotosCount: Int = 0 // TODO: Figure out how to get this count from NCMedia
-    
     @State private var mediaVC: NCMedia?
+    @State private var selectedPhotosCount: Int = 0
 
     var body: some View {
         NavigationView {
-            VStack {
-                NCMediaViewRepresentable(ncMedia: $mediaVC)
-                    .frame(maxHeight: .infinity)
-                // Ensure mediaVC exists and is loaded even if Media tab wasn't opened yet
-//                if mediaVC == nil {
-//                    let newMedia = NCMedia()
-//                    mediaVC = newMedia
-//                    Task { await newMedia.loadDataSource() }
-//                } else if let existing = mediaVC {
-//                    // If already present, ensure its data source is loaded/refreshed
-//                    Task { await existing.loadDataSource() }
-//                    .onAppear {
-//                        // Ensure NCMedia is preloaded and available even if Media tab wasn't opened yet
-//                        NCMediaPreloader.shared.preloadIfNeeded()
-//                        if let preloaded = NCMediaPreloader.shared.getPreloaded() {
-//                            // Bind the preloaded controller to the sheet
-//                            self.mediaVC = preloaded
-//                            // Reset any filters to show all items in selection context
-//                            preloaded.showOnlyImages = false
-//                            preloaded.showOnlyVideos = false
-//                            // Trigger a full refresh of data and UI content
-//                            Task {
-//                                await preloaded.loadDataSource()
-//                                await preloaded.searchMediaUI(true)
-//                            }
-//                        }
-//                    }
-            }
+            NCMediaViewRepresentable(
+                ncMedia: $mediaVC,
+                selectedCount: $selectedPhotosCount,
+                isSelectionContext: true
+            )
             .navigationTitle(NSLocalizedString("_albums_photo_selection_sheet_title_", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -61,20 +35,12 @@ struct PhotoSelectionSheet: View {
                     }
                     .foregroundColor(Color(NCBrandColor.shared.customer))
                 }
-                
+
             }
-            .onChange(of: mediaVC?.fileSelect ?? []) { newValue in
+            .onChange(of: mediaVC?.fileSelect ?? []) { oldValue, newValue in
                 selectedPhotosCount = newValue.count
             }
         }
     }
 }
-//
-//#if DEBUG
-//#Preview {
-//    PhotoSelectionSheet(
-//        onPhotosSelected: { _ in }
-//    )
-//}
-//#endif
 

@@ -7,6 +7,10 @@ import UIKit
 import NextcloudKit
 import RealmSwift
 
+protocol NCMediaSelectionDelegate: AnyObject {
+    func didUpdateSelection(files: [String])
+}
+
 class NCMedia: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var titleDate: UILabel!
@@ -33,7 +37,16 @@ class NCMedia: UIViewController {
     let refreshControl = UIRefreshControl()
     var isTop: Bool = true
     var isEditMode = false
-    var fileSelect: [String] = []
+//    var fileSelect: [String] = []
+    // 1. Add this property here (NOT in an extension)
+    weak var selectionDelegate: NCMediaSelectionDelegate?
+    
+    // 2. Find your existing fileSelect array and add the didSet
+    var fileSelect: [String] = [] {
+        didSet {
+            selectionDelegate?.didUpdateSelection(files: fileSelect)
+        }
+    }
     var filesExists: ThreadSafeArray<String> = ThreadSafeArray()
     var ocIdDoNotExists: ThreadSafeArray<String> = ThreadSafeArray()
     var searchMediaInProgress: Bool = false
@@ -129,12 +142,6 @@ class NCMedia: UIViewController {
         titleDate.isHidden = true
         
         isEditMode = isInGeneralPhotosSelectionContext ? true : false
-//        setupForGeneralPhotosSelection()
-//        if isInGeneralPhotosSelectionContext {
-//            setupForGeneralPhotosSelection()
-//        } else {
-//            setupMediaCommandView()
-//        }
 
         // Gradient Layer
         gradientLayer.startPoint = CGPoint(x: 0, y: 0)
