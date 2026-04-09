@@ -10,9 +10,11 @@ import SwiftUI
 
 struct AlbumDetailsScreen: View {
     
+    private let album: Album
     @StateObject private var viewModel: AlbumDetailsViewModel
     
     init(account: String, album: Album) {
+        self.album = album
         _viewModel = StateObject(
             wrappedValue: AlbumDetailsViewModel(account: account, album: album)
         )
@@ -30,8 +32,32 @@ struct AlbumDetailsScreen: View {
         .navigationTitle(viewModel.screenTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                toolbarContent()
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                if !viewModel.isLoading {
+                    Button(action: handleAddPhotosIntent) {
+                        Image(systemName: "plus")
+                            .imageScale(.large)
+                    }
+                    .buttonStyle(.plain)
+                    .tint(Color(NCBrandColor.shared.iconImageColor))
+
+                    Menu {
+                        Button(NSLocalizedString("_albums_photos_rename_album_btn_", comment: "")) {
+                            viewModel.onRenameAlbumIntent()
+                        }
+                        Button(
+                            NSLocalizedString("_albums_photos_delete_album_btn_", comment: ""),
+                            role: .destructive
+                        ) {
+                            viewModel.onDeleteAlbumIntent()
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .imageScale(.large)
+                    }
+                    .buttonStyle(.plain)
+                    .tint(Color(NCBrandColor.shared.iconImageColor))
+                }
             }
         }
         .sheet(
@@ -75,46 +101,6 @@ struct AlbumDetailsScreen: View {
     }
     
     @ViewBuilder
-    private func toolbarContent() -> some View {
-        if viewModel.isLoading {
-            EmptyView()
-        } else {
-            HStack {
-                
-                if viewModel.photos.isEmpty {
-                    Button(
-                        NSLocalizedString("_albums_photos_add_photos_btn_", comment: ""),
-                        action: handleAddPhotosIntent
-                    ).foregroundColor(Color(NCBrandColor.shared.customer))
-                } else {
-                    Button(action: handleAddPhotosIntent) {
-                        Image(systemName: "plus")
-                    }
-                    .foregroundColor(Color(NCBrandColor.shared.customer))
-                }
-                
-                Spacer()
-                    .frame(width: 4)
-                
-                Menu {
-                    Button(NSLocalizedString("_albums_photos_rename_album_btn_", comment: "")) {
-                        viewModel.onRenameAlbumIntent()
-                    }
-                    Button(
-                        NSLocalizedString("_albums_photos_delete_album_btn_", comment: ""),
-                        role: .destructive
-                    ) {
-                        viewModel.onDeleteAlbumIntent()
-                    }
-                } label: {
-                    Image(systemName: "ellipsis")
-                        .foregroundStyle(Color(NCBrandColor.shared.customer))
-                }
-            }
-        }
-    }
-    
-    @ViewBuilder
     private func content() -> some View {
         if viewModel.isLoading {
             ProgressView(NSLocalizedString("_albums_photos_loading_msg_", comment: ""))
@@ -133,7 +119,8 @@ struct AlbumDetailsScreen: View {
         } else {
             PhotosGridView(
                 photos: viewModel.photos,
-                onAddPhotosIntent: handleAddPhotosIntent
+                onAddPhotosIntent: handleAddPhotosIntent,
+                album: album
             )
             .refreshable {
                 viewModel.onPulledToRefresh()
@@ -146,20 +133,22 @@ struct AlbumDetailsScreen: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    NavigationView {
-        AlbumDetailsScreen(
-            account: "120049010000000000682377",
-            album: Album(
-                href: "/Urlaub",
-                lastPhotoId: "mountain",
-                itemCount: 42,
-                location: "Alps",
-                dateRange: nil,
-                collaborators: nil
-            )
-        )
-    }
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    NavigationView {
+//        AlbumDetailsScreen(
+//            account: "120049010000000000682377",
+//            album: Album(
+//                href: "/Urlaub",
+//                lastPhotoId: "mountain",
+//                itemCount: 42,
+//                location: "Alps",
+//                dateRange: nil,
+//                collaborators: nil
+//            )
+//        )
+//    }
+//}
+//#endif
+
+

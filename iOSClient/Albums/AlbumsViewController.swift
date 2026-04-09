@@ -13,13 +13,16 @@ class AlbumsViewController: UIViewController {
     
     @Environment(\.localAccount) var localAccount: String
     
+    @MainActor
+    var session: NCSession.Session {
+        NCSession.shared.getSession(controller: tabBarController)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
+                
         let albumsRootView = AlbumsRootView()
-            .environment(\.localAccount, appDelegate.account)
+            .environment(\.localAccount, session.account)
         
         let hostingController = UIHostingController(rootView: albumsRootView)
         
@@ -40,8 +43,20 @@ class AlbumsViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = false
         
         // Setting up AlbumsManager
-        AlbumsManager.shared.setAccount(appDelegate.account)
+        AlbumsManager.shared.setAccount(session.account)
         AlbumsManager.shared.syncAlbums()
+        
+//        // Preload NCMedia early so the selection sheet has data even if Media tab wasn't opened
+//        NCMediaPreloader.shared.preloadIfNeeded()
+//        
+//        if let media = NCMediaPreloader.shared.getPreloaded() {
+//            media.showOnlyImages = false
+//            media.showOnlyVideos = false
+//            Task { @MainActor in
+//                await media.loadDataSource()
+//                await media.searchMediaUI(true)
+//            }
+//        }
         
         // UI changes
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = NCBrandColor.shared.customer

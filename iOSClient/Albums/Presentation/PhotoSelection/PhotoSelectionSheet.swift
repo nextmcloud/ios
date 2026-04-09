@@ -9,19 +9,17 @@
 import SwiftUI
 
 struct PhotoSelectionSheet: View {
-    
     let onPhotosSelected: ([String]) -> Void
-    
-    @State private var selectedPhotosCount: Int = 0 // TODO: Figure out how to get this count from NCMedia
-    
     @State private var mediaVC: NCMedia?
-    
+    @State private var selectedPhotosCount: Int = 0
+
     var body: some View {
         NavigationView {
-            VStack {
-                NCMediaViewRepresentable(ncMedia: $mediaVC)
-                    .frame(maxHeight: .infinity)
-            }
+            NCMediaViewRepresentable(
+                ncMedia: $mediaVC,
+                selectedCount: $selectedPhotosCount,
+                isSelectionContext: true
+            )
             .navigationTitle(NSLocalizedString("_albums_photo_selection_sheet_title_", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -37,21 +35,12 @@ struct PhotoSelectionSheet: View {
                     }
                     .foregroundColor(Color(NCBrandColor.shared.customer))
                 }
-                
-                //                ToolbarItemGroup(placement: .bottomBar) {
-                //                    Text("\(selectedPhotosCount) items selected")
-                //                        .font(.subheadline)
-                //                        .foregroundColor(.secondary)
-                //                }
+
+            }
+            .onChange(of: mediaVC?.fileSelect ?? []) { oldValue, newValue in
+                selectedPhotosCount = newValue.count
             }
         }
     }
 }
 
-#if DEBUG
-#Preview {
-    PhotoSelectionSheet(
-        onPhotosSelected: { _ in }
-    )
-}
-#endif

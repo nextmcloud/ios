@@ -24,8 +24,8 @@ struct NCLoadingAlert: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    NCLoadingAlert()
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    NCLoadingAlert()
+//}
+//#endif

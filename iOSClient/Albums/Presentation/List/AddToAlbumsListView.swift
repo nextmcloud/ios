@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import NextcloudKit
 
 struct AddToAlbumsListView: View {
     
@@ -82,7 +83,8 @@ struct AddToAlbumsListView: View {
                 AlbumsManager.shared.syncAlbums()
             }
         }
-        .navigationViewStyle(StackNavigationViewStyle())
+//        .navigationViewStyle(StackNavigationViewStyle())
+        .navigationViewStyle(.stack)
     }
     
     @ViewBuilder
@@ -188,35 +190,45 @@ struct AlbumRow: View {
             return
         }
         
-        let result = await NCNetworking.shared.downloadPreview(
-            fileId: photoId,
-            etag: "",
-            account: localAccount
-        )
-        
-        if let data = result.responseData?.data, let image = UIImage(data: data) {
-            await MainActor.run { imageState = .thumbnail(image) }
-        } else {
-            await MainActor.run { imageState = .empty }
+        Task {
+
+            let resultsPreview = await NextcloudKit.shared.downloadPreviewAsync(fileId: photoId, etag: "", account: localAccount) { task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: localAccount,
+                                                                                                path: photoId,
+                                                                                                name: "DownloadPreview")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
+            }
+            if resultsPreview.error == .success, let data = resultsPreview.responseData?.data {
+                NCUtility().createImageFileFrom(data: data, ocId: photoId, etag: "")
+                if let image = NCUtility().getImage(ocId: photoId, etag: "", ext: NCGlobal().previewExt512) {
+                    Task { @MainActor in
+                        await MainActor.run { imageState = .thumbnail(image) }
+                    }
+                } else {
+                    await MainActor.run { imageState = .empty }
+                }
+            }
         }
     }
 }
 
-#if DEBUG
-#Preview {
-    NavigationView {
-        AddToAlbumsListView(viewModel: .init(account: "123"), localAccount: "", onFinish: { selectedAlbum in
-            print("Album:\(selectedAlbum)")
-        }, onDismiss: {
-           
-        }) {
-            
-        }
-    }.onAppear {
-        UIView
-            .appearance(
-                whenContainedInInstancesOf: [UIAlertController.self]
-            ).tintColor = NCBrandColor.shared.customer
-    }
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    NavigationView {
+//        AddToAlbumsListView(viewModel: .init(account: "123"), localAccount: "", onFinish: { selectedAlbum in
+//            print("Album:\(selectedAlbum)")
+//        }, onDismiss: {
+//           
+//        }) {
+//            
+//        }
+//    }.onAppear {
+//        UIView
+//            .appearance(
+//                whenContainedInInstancesOf: [UIAlertController.self]
+//            ).tintColor = NCBrandColor.shared.customer
+//    }
+//}
+//#endif

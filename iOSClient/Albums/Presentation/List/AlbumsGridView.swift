@@ -18,11 +18,28 @@ struct AlbumsGridView: View {
     
     let onAlbumClicked: (Album) -> Void
     
-    private let columns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
-    
+//    private let columns = [
+//        GridItem(.flexible(), spacing: 16),
+//        GridItem(.flexible(), spacing: 16)
+//    ]
+//     Use this inside AlbumsGridView to detect iPad
+    private var columns: [GridItem] {
+        let isIPad = UIDevice.current.userInterfaceIdiom == .pad
+        let count = isIPad ? 3 : 2 // 4 columns for iPad, 2 for iPhone
+        return Array(repeating: GridItem(.flexible(), spacing: 16), count: count)
+    }
+
+    // Logic translated from your buildMediaPhotoVideo function
+    private var iconPointSize: CGFloat {
+        let count = columns.count
+        switch count {
+        case 0...1: return 60
+        case 2...3: return 30
+        case 4...5: return 25
+        default:    return 20
+        }
+    }
+
     var body: some View {
         
         ScrollView {
@@ -39,8 +56,9 @@ struct AlbumsGridView: View {
                         } label: {
                             VStack(alignment: .leading, spacing: 6) {
                                 
-                                AlbumGridItemView(album: album)
-                                
+//                                AlbumGridItemView(album: album)
+                                AlbumGridItemView(album: album, iconSize: iconPointSize)
+
                                 Text(album.name)
                                     .font(.system(size: 15, weight: .medium))
                                     .foregroundColor(.primary)
@@ -76,36 +94,36 @@ struct AlbumsGridView: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    AlbumsGridView(
-        albums: [
-            Album(
-                href: "/Geburtstagsalbum",
-                lastPhotoId: "birthday",
-                itemCount: 16,
-                location: "Berlin",
-                dateRange: "Feb 2022",
-                collaborators: "Anna, John"
-            ),
-            Album(
-                href: "/Urlaub",
-                lastPhotoId: "mountain",
-                itemCount: 42,
-                location: "Alps",
-                dateRange: nil,
-                collaborators: nil
-            ),
-            Album(
-                href: "/Office Party",
-                lastPhotoId: "-1",
-                itemCount: 0,
-                location: nil,
-                dateRange: "Dec 2023",
-                collaborators: nil
-            )
-        ],
-        onAlbumClicked: { _ in}
-    )
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    AlbumsGridView(
+//        albums: [
+//            Album(
+//                href: "/Geburtstagsalbum",
+//                lastPhotoId: "birthday",
+//                itemCount: 16,
+//                location: "Berlin",
+//                dateRange: "Feb 2022",
+//                collaborators: "Anna, John"
+//            ),
+//            Album(
+//                href: "/Urlaub",
+//                lastPhotoId: "mountain",
+//                itemCount: 42,
+//                location: "Alps",
+//                dateRange: nil,
+//                collaborators: nil
+//            ),
+//            Album(
+//                href: "/Office Party",
+//                lastPhotoId: "-1",
+//                itemCount: 0,
+//                location: nil,
+//                dateRange: "Dec 2023",
+//                collaborators: nil
+//            )
+//        ],
+//        onAlbumClicked: { _ in}
+//    )
+//}
+//#endif

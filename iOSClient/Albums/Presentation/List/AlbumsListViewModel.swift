@@ -30,6 +30,8 @@ class AlbumsListViewModel: ObservableObject {
     @Published var isPhotoSelectionSheetVisible: Bool = false
     @Published var newlyCreatedAlbum: Album? = nil
     
+    @Published var navigationDestination: AlbumsListScreen.NavigationDestination? = nil
+    
     private var cancellables: Set<AnyCancellable> = []
     
     init(account: String) {
@@ -165,7 +167,7 @@ class AlbumsListViewModel: ObservableObject {
             
             NextcloudKit.shared.copyPhotoToAlbum(
                 account: account,
-                sourcePath: metadata?.serveUrlFileName ?? photo,
+                sourcePath: metadata?.serverUrlFileName ?? photo,
                 albumName: album.name,
                 fileName: metadata?.fileName ?? photo
             ) { result in
@@ -176,7 +178,27 @@ class AlbumsListViewModel: ObservableObject {
                     AlbumsManager.shared.syncAlbums()
                     
                 case .failure(let error):
-                    NCContentPresenter().showError(error: NKError(error: error))
+                    let nkError = NKError(error: error)
+                        
+                    // 1. Log the high-level error (usually 1)
+                    debugPrint("Top-level errorCode:", nkError.errorCode)
+
+                    // 2. Check the nested error for the 409 Conflict
+                    if let innerError = nkError.error as? NKError,
+                       innerError.errorCode == NCGlobal.shared.errorConflict {
+                        
+                        // This is the "File already exists" case (409)
+                        let conflictError = NKError(errorCode: NCGlobal.shared.errorConflict,
+                                                    errorDescription: "_file_already_exists_")
+                        NCContentPresenter().showInfo(error: conflictError)
+                        
+                    } else if nkError.errorCode == NCGlobal.shared.errorConflict {
+                        // Fallback check if the top-level error itself is 409
+                        NCContentPresenter().showInfo(error: nkError)
+                    } else {
+                        // Handle all other errors (Network, 404, 500, etc.)
+                        NCContentPresenter().showError(error: nkError)
+                    }
                 }
             }
         }

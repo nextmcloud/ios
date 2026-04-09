@@ -7,14 +7,26 @@
 //
 
 import SwiftUI
+import NextcloudKit
 
 struct AlbumGridItemView: View {
     
     let album: Album
+    let iconSize: CGFloat // Receive the calculated size
+    
     @Environment(\.localAccount) var localAccount: String
-    
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+
     private let fixedThumbnailHeight: CGFloat = 160
-    
+        
+    private var dynamicHeight: CGFloat {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            return 260
+        } else {
+            // iPhone logic
+            return fixedThumbnailHeight
+        }
+    }
     private enum ImageState { case loading, empty, thumbnail(UIImage) }
     @State private var imageState: ImageState = .loading
     
@@ -35,22 +47,29 @@ struct AlbumGridItemView: View {
                         .aspectRatio(contentMode: .fill)
                         .frame(
                             width: geo.size.width,
-                            height: fixedThumbnailHeight,
+                            height: dynamicHeight,
                             alignment: .top
                         )
                         .clipped()
+//                case .thumbnail(let img):
+//                    Image(uiImage: img)
+//                        .resizable()
+//                        .scaledToFill()
                 case .thumbnail(let img):
                     Image(uiImage: img)
                         .resizable()
-                        .scaledToFill()
+                        .scaledToFill() // Ensures the image fills the area (cropping excess)
+                        .frame(width: geo.size.width, height: dynamicHeight) // Matches the grid item size
+                        .clipped() // Prevents the image from bleeding outside the 8pt corner radius
+
                 }
             }
-            .frame(width: geo.size.width, height: fixedThumbnailHeight)
+            .frame(width: geo.size.width, height: dynamicHeight)
             .clipped()
             .overlay(frame)
             .cornerRadius(8)
         }
-        .frame(height: fixedThumbnailHeight)
+        .frame(height: dynamicHeight)
         .task(id: album.lastPhotoId) {
             await loadThumbnail()
         }
@@ -66,16 +85,26 @@ struct AlbumGridItemView: View {
             return
         }
         
-        let result = await NCNetworking.shared.downloadPreview(
-            fileId: photoId,
-            etag: "",
-            account: localAccount
-        )
-        
-        if let data = result.responseData?.data, let image = UIImage(data: data) {
-            await MainActor.run { imageState = .thumbnail(image) }
-        } else {
-            await MainActor.run { imageState = .empty }
+        Task {
+
+            let resultsPreview = await NextcloudKit.shared.downloadPreviewAsync(fileId: photoId, etag: "", account: localAccount) { task in
+                Task {
+                    let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: localAccount,
+                                                                                                path: photoId,
+                                                                                                name: "DownloadPreview")
+                    await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
+                }
+            }
+            if resultsPreview.error == .success, let data = resultsPreview.responseData?.data {
+                NCUtility().createImageFileFrom(data: data, ocId: photoId, etag: "")
+                if let image = NCUtility().getImage(ocId: photoId, etag: "", ext: NCGlobal().previewExt512) {
+                    Task { @MainActor in
+                        await MainActor.run { imageState = .thumbnail(image) }
+                    }
+                } else {
+                    await MainActor.run { imageState = .empty }
+                }
+            }
         }
     }
     

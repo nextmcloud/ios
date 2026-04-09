@@ -52,14 +52,14 @@ struct NoPhotosEmptyView: View {
     }
 }
 
-#if DEBUG
-#Preview {
-    NavigationView {
-        NoPhotosEmptyView(
-            onAddPhotosIntent: {}
-        )
-        .navigationTitle("Album")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-}
-#endif
+//#if DEBUG
+//#Preview {
+//    NavigationView {
+//        NoPhotosEmptyView(
+//            onAddPhotosIntent: {}
+//        )
+//        .navigationTitle("Album")
+//        .navigationBarTitleDisplayMode(.inline)
+//    }
+//}
+//#endif

@@ -15,34 +15,25 @@ struct AlbumsRootView: View {
     @StateObject private var navigator = AlbumsNavigator.shared
     
     var body: some View {
-        
-        // TODO: Switch to NavigationStack once we hit iOS 16 base line
-        NavigationView {
-            AlbumsListScreen(
-                viewModel: .init(account: localAccount)
-            )
-            .background(
-                NavigationLink(
-                    isActive: Binding(
-                        get: { navigator.current != nil },
-                        set: { value in
-                            if !value { navigator.pop() }
-                        }
-                    )
-                ) {
-                    switch navigator.current {
+
+        NavigationStack(path: Binding(
+            get: {
+                // If navigator.current is not nil, treat it as a 1-item stack path
+                navigator.current.map { [$0] } ?? []
+            },
+            set: { path in
+                // If the stack path is emptied (e.g., back button), clear navigator
+                if path.isEmpty { navigator.pop() }
+            }
+        )) {
+            AlbumsListScreen(viewModel: .init(account: localAccount))
+                // Explicitly use 'AlbumsRoutes.self' here to solve the inference error
+                .navigationDestination(for: AlbumsRoutes.self) { route in
+                    switch route {
                     case .albumDetails(let album):
-                        AlbumDetailsScreen(
-                            account: localAccount,
-                            album: album
-                        )
-                    case .none:
-                        EmptyView()
+                        AlbumDetailsScreen(account: localAccount, album: album)
                     }
-                } label: {
-                    EmptyView()
                 }
-            )
         }
     }
 }

@@ -1,48 +1,29 @@
-//
-//  NCMedia.swift
-//  Nextcloud
-//
-//  Created by Marino Faggiana on 12/02/2019.
-//  Copyright © 2019 Marino Faggiana. All rights reserved.
-//
-//  Author Marino Faggiana <marino.faggiana@nextcloud.com>
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+// SPDX-FileCopyrightText: Nextcloud GmbH
+// SPDX-FileCopyrightText: 2019 Marino Faggiana
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 import Foundation
 import UIKit
 import NextcloudKit
 import RealmSwift
 
-class NCMedia: UIViewController, NCEmptyDataSetDelegate {
+protocol NCMediaSelectionDelegate: AnyObject {
+    func didUpdateSelection(files: [String])
+}
+
+class NCMedia: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var titleDate: UILabel!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var selectOrCancelButton: UIButton!
-    @IBOutlet weak var menuButton: UIButton!
-    @IBOutlet weak var assistantButton: UIButton!
+    @IBOutlet weak var titleConstraint: NSLayoutConstraint!
     @IBOutlet weak var gradientView: UIView!
-    @IBOutlet weak var stackView: UIStackView!
-    @IBOutlet weak var activityIndicatorTrailing: NSLayoutConstraint!
-    @IBOutlet weak var selectOrCancelButtonTrailing: NSLayoutConstraint!
     @IBOutlet weak var gradientViewHeightContsraint: NSLayoutConstraint!
 
     let semaphoreSearchMedia = DispatchSemaphore(value: 1)
     let semaphoreNotificationCenter = DispatchSemaphore(value: 1)
 
     let layout = NCMediaLayout()
+    let gradientLayer = CAGradientLayer()
     var layoutType = NCGlobal.shared.mediaLayoutRatio
     var documentPickerViewController: NCDocumentPickerViewController?
     var tabBarSelect: NCMediaSelectTabBar!
@@ -51,22 +32,31 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
     let utility = NCUtility()
     let database = NCManageDatabase.shared
     let imageCache = NCImageCache.shared
+    let networking = NCNetworking.shared
     var dataSource = NCMediaDataSource()
     let refreshControl = UIRefreshControl()
     var isTop: Bool = true
     var isEditMode = false
-    var fileSelect: [String] = []
+//    var fileSelect: [String] = []
+    // 1. Add this property here (NOT in an extension)
+    weak var selectionDelegate: NCMediaSelectionDelegate?
+    
+    // 2. Find your existing fileSelect array and add the didSet
+    var fileSelect: [String] = [] {
+        didSet {
+            selectionDelegate?.didUpdateSelection(files: fileSelect)
+        }
+    }
     var filesExists: ThreadSafeArray<String> = ThreadSafeArray()
     var ocIdDoNotExists: ThreadSafeArray<String> = ThreadSafeArray()
     var searchMediaInProgress: Bool = false
     var attributesZoomIn: UIMenuElement.Attributes = []
     var attributesZoomOut: UIMenuElement.Attributes = []
-    let gradient: CAGradientLayer = CAGradientLayer()
     var showOnlyImages = false
     var showOnlyVideos = false
     var timeIntervalSearchNewMedia: TimeInterval = 2.0
     var timerSearchNewMedia: Timer?
-    let insetsTop: CGFloat = 75//65
+    let insetsTop: CGFloat = 0//75//65
     let livePhotoImage = NCUtility().loadImage(named: "livephoto", colors: [.white])
     let playImage = NCUtility().loadImage(named: "play.fill", colors: [.white])
     var photoImage = UIImage()
@@ -85,8 +75,6 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
     var transitionColumns = false
     var numberOfColumns: Int = 0
     var lastNumberOfColumns: Int = 0
-    let appDelegate = (UIApplication.shared.delegate as? AppDelegate)!
-    var emptyDataSet: NCEmptyDataSet?
     var loadingTask: Task<Void, any Error>?
     var mediaCommandView: NCMediaCommandView?
     var activeAccount = tableAccount()
@@ -96,6 +84,10 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
     
     var isInGeneralPhotosSelectionContext: Bool = false
 
+    let debouncerLoadDataSource = NCDebouncer(maxEventCount: 10)
+    let debouncerSearch = NCDebouncer(maxEventCount: 10)
+
+    @MainActor
     var session: NCSession.Session {
         NCSession.shared.getSession(controller: tabBarController)
     }
@@ -112,6 +104,12 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         return pinchGesture.state == .began || pinchGesture.state == .changed
     }
 
+    var sceneIdentifier: String {
+        (self.tabBarController as? NCMainTabBarController)?.sceneIdentifier ?? ""
+    }
+
+//    var isInGeneralPhotosSelectionContext: Bool = false
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -120,10 +118,11 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         view.backgroundColor = .systemBackground
         navigationController?.setNavigationBarAppearance()
 
-//        collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: mediaSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
+        collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: mediaSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
         collectionView.register(UINib(nibName: "NCSectionFooter", bundle: nil), forSupplementaryViewOfKind: mediaSectionFooter, withReuseIdentifier: "sectionFooter")
         collectionView.register(UINib(nibName: "NCMediaCell", bundle: nil), forCellWithReuseIdentifier: "mediaCell")
         collectionView.alwaysBounceVertical = true
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         collectionView.contentInset = isInGeneralPhotosSelectionContext ? UIEdgeInsets(top: 10, left: 0, bottom: 50, right: 0) : UIEdgeInsets(top: insetsTop, left: 0, bottom: 50, right: 0)
         collectionView.backgroundColor = .systemBackground
         collectionView.prefetchDataSource = self
@@ -131,57 +130,88 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         collectionView.dragDelegate = self
         collectionView.dropDelegate = self
         collectionView.accessibilityIdentifier = "NCMedia"
+        // collectionView.contentInsetAdjustmentBehavior = .never
 
         layout.sectionInset = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: 2)
         collectionView.collectionViewLayout = layout
-        layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "")?.layout ?? global.mediaLayoutRatio
-
-        tabBarSelect = NCMediaSelectTabBar(tabBarController: self.tabBarController, delegate: self)
-
-        emptyDataSet = NCEmptyDataSet(view: collectionView, offset: 0, delegate: self)
+        layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layout: global.mediaLayoutRatio).layout
+        
+//        tabBarSelect = NCMediaSelectTabBar(controller: self.tabBarController, viewController: self, delegate: self)
 
         titleDate.text = ""
         titleDate.isHidden = true
-        menuButton.isHidden = true
         
-        
-        if isInGeneralPhotosSelectionContext {
-            setupForGeneralPhotosSelection()
-        } else {
-            setupMediaCommandView()
-        }
-        
+        isEditMode = isInGeneralPhotosSelectionContext ? true : false
 
-        gradient.startPoint = CGPoint(x: 0, y: 0.1)
-        gradient.endPoint = CGPoint(x: 0, y: 1)
-        gradient.colors = [UIColor.black.withAlphaComponent(UIAccessibility.isReduceTransparencyEnabled ? 0.8 : 0.4).cgColor, UIColor.clear.cgColor]
-        gradientView.layer.insertSublayer(gradient, at: 0)
+        // Gradient Layer
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+        gradientLayer.endPoint   = CGPoint(x: 0, y: 1)
+
+        gradientLayer.colors = [
+            UIColor.black.withAlphaComponent(0.55).cgColor,
+            UIColor.black.withAlphaComponent(0.40).cgColor,
+            UIColor.black.withAlphaComponent(0.25).cgColor,
+            UIColor.black.withAlphaComponent(0.15).cgColor,
+            UIColor.black.withAlphaComponent(0.08).cgColor,
+            UIColor.black.withAlphaComponent(0.04).cgColor,
+            UIColor.black.withAlphaComponent(0.015).cgColor,
+            UIColor.clear.cgColor
+        ]
+
+        gradientLayer.locations = [0.0, 0.20, 0.40, 0.60, 0.75, 0.85, 0.95, 1.0]
+        gradientView.layer.insertSublayer(gradientLayer, at: 0)
 
         activeAccount = NCManageDatabase.shared.getActiveTableAccount() ?? tableAccount()
 
         collectionView.refreshControl = refreshControl
         refreshControl.action(for: .valueChanged) { _ in
             DispatchQueue.global().async {
-                self.loadDataSource()
-                self.searchMediaUI(true)
+                Task {
+                    await self.loadDataSource()
+                    await self.searchMediaUI(true)
+                }
             }
             self.refreshControl.endRefreshing()
         }
 
+        // Title + Activity indicator
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            titleConstraint.constant = 0
+        } else {
+            if #available(iOS 26.0, *) {
+                titleConstraint.constant = -44
+            } else {
+                titleConstraint.constant = -34
+            }
+        }
+        
+        titleDate.text = ""
+        titleDate?.textColor = .white
+        activityIndicator.color = .white
+
         pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture(_:)))
         collectionView.addGestureRecognizer(pinchGesture)
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterChangeUser), object: nil, queue: nil) { _ in
-            self.layoutType = self.database.getLayoutForView(account: self.session.account, key: self.global.layoutViewMedia, serverUrl: "")?.layout ?? self.global.mediaLayoutRatio
-            self.imageCache.removeAll()
-            self.loadDataSource()
-            self.searchMediaUI(true)
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterChangeUser), object: nil, queue: nil) { notification in
+            Task { @MainActor in
+                guard let userInfo = notification.userInfo,
+                   let account = userInfo["account"] as? String else {
+                    return
+                }
+
+                self.layoutType = self.database.getLayoutForView(account: account, key: self.global.layoutViewMedia, serverUrl: "").layout
+                self.imageCache.removeAll()
+                await self.loadDataSource()
+                await self.searchMediaUI(true)
+            }
         }
 
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterClearCache), object: nil, queue: nil) { _ in
-            self.dataSource.metadatas.removeAll()
-            self.imageCache.removeAll()
-            self.searchMediaUI(true)
+            Task {
+                await self.dataSource.clearMetadatas()
+                self.imageCache.removeAll()
+                await self.searchMediaUI(true)
+            }
         }
 
         NotificationCenter.default.addObserver(self, selector: #selector(fileExists(_:)), name: NSNotification.Name(rawValue: global.notificationCenterFileExists), object: nil)
@@ -189,42 +219,78 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         NotificationCenter.default.addObserver(self, selector: #selector(deleteFile(_:)), name: NSNotification.Name(rawValue: global.notificationCenterDeleteFile), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(reloadDataSource(_:)), name: NSNotification.Name(rawValue: global.notificationCenterReloadDataSource), object: nil)
-
-        NotificationCenter.default.addObserver(self, selector: #selector(networkRemoveAll), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
+            Task {
+                await self.networkRemoveAll()
+            }
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        navigationController?.setMediaAppreance()
-        if dataSource.metadatas.isEmpty {
-            loadDataSource()
+        if tabBarSelect == nil {
+            tabBarSelect = NCMediaSelectTabBar(controller: self.tabBarController, viewController: self, delegate: self)
         }
-        appDelegate.activeViewController = self
-        self.loadDataSource()
-        self.searchMediaUI(true)
+//        navigationController?.setMediaAppreance()
+
+        Task {
+            await (self.navigationController as? NCMediaNavigationController)?.setNavigationRightItems()
+            if #unavailable(iOS 26.0) {
+                (self.navigationController as? NCMediaNavigationController)?.updateRightBarButtonsTint(to: .white)
+            }
+        }
+
+        if dataSource.metadatas.isEmpty {
+            Task {
+                await loadDataSource()
+            }
+        }
+        Task {
+            await self.loadDataSource()
+            await self.searchMediaUI(true)
+        }
         AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__MEDIA)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
+        Task {
+            await networking.transferDispatcher.addDelegate(self)
+        }
+        
         NotificationCenter.default.addObserver(self, selector: #selector(copyMoveFile(_:)), name: NSNotification.Name(rawValue: global.notificationCenterCopyMoveFile), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(enterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
 
         searchNewMedia()
-        createMenu()
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
+        Task {
+            await networking.transferDispatcher.removeDelegate(self)
+            await networkRemoveAll()
+        }
+
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterCopyMoveFile), object: nil)
 
         NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
 
-        networkRemoveAll()
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+
+//        if let frame = tabBarController?.tabBar.frame {
+//            tabBarSelect.hostingController?.view.frame = frame
+//        }
+        gradientLayer.frame = gradientView.bounds
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -236,41 +302,37 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
             return .lightContent
         }
     }
-
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-
-        if let frame = tabBarController?.tabBar.frame {
-            tabBarSelect.hostingController.view.frame = frame
-        }
-        gradient.frame = gradientView.bounds
-    }
-
+    
     func searchNewMedia() {
         timerSearchNewMedia?.invalidate()
-        timerSearchNewMedia = Timer.scheduledTimer(timeInterval: timeIntervalSearchNewMedia, target: self, selector: #selector(searchMediaUI(_:)), userInfo: nil, repeats: false)
+        timerSearchNewMedia = Timer.scheduledTimer(withTimeInterval: timeIntervalSearchNewMedia, repeats: false) { [weak self] _ in
+            Task { [weak self] in
+                guard let self else { return }
+                await self.searchMediaUI()
+            }
+        }
     }
-
+    
     // MARK: - NotificationCenter
 
-    @objc func networkRemoveAll() {
+    func networkRemoveAll() async {
         timerSearchNewMedia?.invalidate()
         timerSearchNewMedia = nil
         filesExists.removeAll()
 
         NCNetworking.shared.fileExistsQueue.cancelAll()
-        NCNetworking.shared.downloadThumbnailQueue.cancelAll()
+        networking.downloadThumbnailQueue.cancelAll()
 
-        Task {
-            let tasks = await NCNetworking.shared.getAllDataTask()
-            for task in tasks.filter({ $0.taskDescription == global.taskDescriptionRetrievesProperties }) {
-                task.cancel()
-            }
+        let tasks = await networking.getAllDataTask()
+        for task in tasks.filter({ $0.taskDescription == global.taskDescriptionRetrievesProperties }) {
+            task.cancel()
         }
     }
 
     @objc func reloadDataSource(_ notification: NSNotification) {
-        self.loadDataSource()
+        Task {
+            await self.loadDataSource()
+        }
     }
 
     @objc func deleteFile(_ notification: NSNotification) {
@@ -282,26 +344,32 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
 
         // This is only a fail safe "dead lock", I don't think the timeout will ever be called but at least nothing gets stuck, if after 5 sec. (which is a long time in this routine), the semaphore is still locked
         //
-        if self.semaphoreNotificationCenter.wait(timeout: .now() + 5) == .timedOut {
-            self.semaphoreNotificationCenter.signal()
-        }
+//        if self.semaphoreNotificationCenter.wait(timeout: .now() + 5) == .timedOut {
+//            self.semaphoreNotificationCenter.signal()
+//        }
 
         if error.errorCode == self.global.errorResourceNotFound,
            let ocIds = userInfo["ocId"] as? [String],
            let ocId = ocIds.first {
-            self.database.deleteMetadataOcId(ocId)
-            self.loadDataSource {
-                self.semaphoreNotificationCenter.signal()
+            Task {
+                await NCManageDatabase.shared.deleteMetadataAsync(ocId: ocId)
+                await self.loadDataSource()
+//                {
+//                    self.semaphoreNotificationCenter.signal()
+//                }
             }
         } else if error != .success {
-            self.loadDataSource {
-                self.semaphoreNotificationCenter.signal()
+            Task {
+                await self.loadDataSource()
             }
+//            self.loadDataSource {
+//                self.semaphoreNotificationCenter.signal()
+//            }
         } else {
-            semaphoreNotificationCenter.signal()
+//            semaphoreNotificationCenter.signal()
         }
     }
-
+    
     @objc func enterForeground(_ notification: NSNotification) {
         searchNewMedia()
     }
@@ -337,11 +405,13 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         setEditMode(false)
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.loadDataSource()
-            self.searchMediaUI()
+            Task {
+                await self.loadDataSource()
+                await self.searchMediaUI()
+            }
         }
     }
-
+    
     func buildMediaPhotoVideo(columnCount: Int) {
         var pointSize: CGFloat = 0
 
@@ -360,18 +430,6 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         }
     }
     
-    // MARK: - Empty
-
-    func emptyDataSetView(_ view: NCEmptyView) {
-        view.emptyImage.image = UIImage(named: "media")?.image(color: .gray, size: UIScreen.main.bounds.width)
-        if loadingTask != nil || imageCache.createMediaCacheInProgress {
-            view.emptyTitle.text = NSLocalizedString("_search_in_progress_", comment: "")
-        } else {
-            view.emptyTitle.text = NSLocalizedString("_tutorial_photo_view_", comment: "")
-        }
-        view.emptyDescription.text = ""
-    }
-    
     // MARK: - Command
     
     func setupMediaCommandView() {
@@ -380,7 +438,7 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         mediaCommandView = Bundle.main.loadNibNamed("NCMediaCommandView", owner: self, options: nil)?.first as? NCMediaCommandView
         self.view.addSubview(mediaCommandView!)
         mediaCommandView?.mediaView = self
-        updateZoomButton()
+//        updateZoomButton()
         mediaCommandView?.collapseControlButtonView(true)
         mediaCommandView?.translatesAutoresizingMaskIntoConstraints = false
         mediaCommandView?.topAnchor.constraint(equalTo: view.topAnchor, constant: 0).isActive = true
@@ -398,50 +456,6 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
         }
     }
     
-    @objc func zoomOutGrid() {
-        UIView.animate(withDuration: 0.0, animations: {
-            NCKeychain().mediaColumnCount += 1
-            if CGFloat(NCKeychain().mediaColumnCount) >= self.maxImageGrid - 1 {
-                self.attributesZoomIn = []
-                self.attributesZoomOut = .disabled
-                self.mediaCommandView?.zoomOutButton.isEnabled = false
-            } else if NCKeychain().mediaColumnCount <= 1 {
-                self.attributesZoomIn = .disabled
-                self.attributesZoomOut = []
-                self.mediaCommandView?.zoomInButton.isEnabled = false
-            } else {
-                self.mediaCommandView?.zoomOutButton.isEnabled = true
-                self.mediaCommandView?.zoomInButton.isEnabled = true
-                self.attributesZoomIn = []
-                self.attributesZoomOut = []
-            }
-//            self.updateZoomButton()
-            self.collectionViewReloadData()
-        })
-    }
-
-    @objc func zoomInGrid() {
-        UIView.animate(withDuration: 0.0, animations: {
-            NCKeychain().mediaColumnCount -= 1
-            if CGFloat(NCKeychain().mediaColumnCount) >= self.maxImageGrid - 1 {
-                self.attributesZoomIn = []
-                self.attributesZoomOut = .disabled
-                self.mediaCommandView?.zoomOutButton.isEnabled = false
-            } else if NCKeychain().mediaColumnCount <= 1 {
-                self.attributesZoomIn = .disabled
-                self.attributesZoomOut = []
-                self.mediaCommandView?.zoomInButton.isEnabled = false
-            } else {
-                self.mediaCommandView?.zoomOutButton.isEnabled = true
-                self.mediaCommandView?.zoomInButton.isEnabled = true
-                self.attributesZoomIn = []
-                self.attributesZoomOut = []
-            }
-//            self.updateZoomButton()
-            self.collectionViewReloadData()
-        })
-    }
-    
     func updateMediaControlVisibility() {
 
         if let metadatas = self.metadatas, metadatas.isEmpty {
@@ -457,31 +471,6 @@ class NCMedia: UIViewController, NCEmptyDataSetDelegate {
             self.mediaCommandView?.isHidden = false
         }
     }
-    
-    func updateZoomButton() {
-        var columnCount = NCKeychain().mediaColumnCount
-        if UIDevice.current.userInterfaceIdiom == .phone,
-           (UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight) {
-            columnCount += 2
-        }
-        if CGFloat(columnCount) >= maxImageGrid - 1 {
-            self.attributesZoomIn = []
-            self.attributesZoomOut = .disabled
-            mediaCommandView?.zoomOutButton.isEnabled = false
-        } else if columnCount <= 1 {
-            self.attributesZoomIn = .disabled
-            self.attributesZoomOut = []
-            mediaCommandView?.zoomInButton.isEnabled = false
-        } else {
-            self.attributesZoomIn = []
-            self.attributesZoomOut = []
-        }
-    }
-    
-    @objc func openMenuButtonMore(_ sender: Any) {
-
-        toggleMenu()
-    }
 }
 
 // MARK: -
@@ -490,16 +479,14 @@ extension NCMedia: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if !dataSource.metadatas.isEmpty {
             isTop = scrollView.contentOffset.y <= -(insetsTop + view.safeAreaInsets.top - 25)
-            setColor()
 //            setTitleDate()
             if lastContentOffsetY == 0 || lastContentOffsetY / 2 <= scrollView.contentOffset.y || lastContentOffsetY / 2 >= scrollView.contentOffset.y {
                 setTitleDate()
                 lastContentOffsetY = scrollView.contentOffset.y
             }
             setNeedsStatusBarAppearanceUpdate()
-        } else {
-            setColor()
         }
+        setElements()
     }
 
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
@@ -526,16 +513,19 @@ extension NCMedia: UIScrollViewDelegate {
 // MARK: -
 
 extension NCMedia: NCSelectDelegate {
-    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool) {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
         guard let serverUrl else { return }
-        let home = utilityFileSystem.getHomeServer(session: session)
-        let mediaPath = serverUrl.replacingOccurrences(of: home, with: "")
 
-        database.setAccountMediaPath(mediaPath, account: session.account)
+        Task {
+            let home = utilityFileSystem.getHomeServer(session: session)
+            let mediaPath = serverUrl.replacingOccurrences(of: home, with: "")
 
-        imageCache.removeAll()
-        loadDataSource()
-        searchNewMedia()
+            await database.setAccountMediaPathAsync(mediaPath, account: session.account)
+
+            imageCache.removeAll()
+            await loadDataSource()
+            searchNewMedia()
+        }
     }
 }
 
@@ -597,15 +587,15 @@ class NCMediaCommandView: UIView {
     }
 
     @IBAction func moreButtonPressed(_ sender: UIButton) {
-        mediaView?.openMenuButtonMore(sender)
+//        mediaView?.openMenuButtonMore(sender)
     }
 
     @IBAction func zoomInPressed(_ sender: UIButton) {
-        mediaView?.zoomInGrid()
+//        mediaView?.zoomInGrid()
     }
 
     @IBAction func zoomOutPressed(_ sender: UIButton) {
-        mediaView?.zoomOutGrid()
+//        mediaView?.zoomOutGrid()
     }
 
     @IBAction func gridSwitchButtonPressed(_ sender: Any) {
