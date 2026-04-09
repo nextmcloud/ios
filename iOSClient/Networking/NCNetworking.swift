@@ -294,8 +294,16 @@ class NCNetworking: @unchecked Sendable, NextcloudKitDelegate {
 #if !EXTENSION
     let metadataDownloadTranfersSuccess = NCMetadataDownloadTranfersSuccess()
     let metadataUploadTranfersSuccess = NCMetadataUploadTranfersSuccess()
+    let metadataTranfersSuccess = NCMetadataTranfersSuccess()
+
+    // OPERATIONQUEUE
+    let downloadThumbnailQueue = Queuer(name: "downloadThumbnailQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let downloadThumbnailActivityQueue = Queuer(name: "downloadThumbnailActivityQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let downloadThumbnailTrashQueue = Queuer(name: "downloadThumbnailTrashQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let saveLivePhotoQueue = Queuer(name: "saveLivePhotoQueue", maxConcurrentOperationCount: 1, qualityOfService: .default)
+    let downloadAvatarQueue = Queuer(name: "downloadAvatarQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
+    let fileExistsQueue = Queuer(name: "fileExistsQueue", maxConcurrentOperationCount: 10, qualityOfService: .default)
 #endif
-    let downloadQueue = Queuer(name: "downloadQueue", maxConcurrentOperationCount: NCBrandOptions.shared.httpMaximumConnectionsPerHostInDownload, qualityOfService: .default)
 
     // MARK: - init
 
