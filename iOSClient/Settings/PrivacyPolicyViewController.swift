@@ -35,6 +35,10 @@ class PrivacyPolicyViewController: UIViewController, WKNavigationDelegate, WKUID
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        // Re-evaluate in-app messages after viewDidAppear
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+
         myWebView = WKWebView(frame: CGRect(x:0, y:0, width: UIScreen.main.bounds.width, height:UIScreen.main.bounds.height))
     }
     override func didReceiveMemoryWarning() {
