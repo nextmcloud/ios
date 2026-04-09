@@ -195,6 +195,18 @@ struct NCCollectionViewCommonSelectTabBarView: View {
                             tabBarSelect.delegate?.lock(isAnyLocked: tabBarSelect.isAnyLocked)
                         }, label: {
                             Label(NSLocalizedString(tabBarSelect.isAnyLocked ? "_unlock_" : "_lock_", comment: ""), systemImage: tabBarSelect.isAnyLocked ? "lock.open" : "lock")
+                    // NMC-5295 - iOS v10.2.2.3 - File Browser: Remove "file lock" feature from menu
+                    // lock menu entry is not available. not supported by magentacloud
+//                    Button(action: {
+//                        tabBarSelect.delegate?.lock(isAnyLocked: tabBarSelect.isAnyLocked)
+//                    }, label: {
+//                        Label(NSLocalizedString(tabBarSelect.isAnyLocked ? "_unlock_" : "_lock_", comment: ""), systemImage: tabBarSelect.isAnyLocked ? "lock.open" : "lock")
+//
+//                        if !tabBarSelect.enableLock {
+//                            Text(NSLocalizedString("_lock_no_permissions_selected_", comment: ""))
+//                        }
+//                    })
+//                    .disabled(!tabBarSelect.enableLock || tabBarSelect.isSelectedEmpty)
 
                             if !tabBarSelect.enableLock {
                                 Text(NSLocalizedString("_lock_no_permissions_selected_", comment: ""))
