@@ -58,7 +58,7 @@ final class NCGlobal: Sendable {
     //
     let avatarSize: Int                             = 128 * Int(UIScreen.main.scale)
     let avatarSizeRounded: Int                      = 128
-    
+
     // Preview size
     //
     let size1024: CGSize                            = CGSize(width: 1024, height: 1024)
@@ -238,7 +238,7 @@ final class NCGlobal: Sendable {
     let selectorSynchronizationOffline          = "synchronizationOffline"
     let selectorPrint                           = "print"
     let selectorDeleteFile                      = "deleteFile"
-
+    
     // Metadata : Status
     //
     //   0 normal
@@ -268,6 +268,7 @@ final class NCGlobal: Sendable {
     let metadataStatusForScreenAwake            = [-1, -2, 1, 2]
     let metadataStatusHideInView                = [1, 2, 3, 11]
     let metadataStatusWaitWebDav                = [10, 11, 12, 13, 14, 15]
+    let metadataStatusTransfers                 = [-2, -3, 2, 3, 10, 11, 12, 13, 14, 15]
 
     let metadatasStatusInWaiting                = [-1, 1, 10, 11, 12, 13, 14, 15]
     let metadatasStatusInError                  = [-3, 3]
@@ -286,8 +287,6 @@ final class NCGlobal: Sendable {
     let notificationCenterChangeTheming                         = "changeTheming"                   // userInfo: account
     let notificationCenterRichdocumentGrabFocus                 = "richdocumentGrabFocus"
     let notificationCenterReloadDataNCShare                     = "reloadDataNCShare"
-    let notificationCenterDidCreateShareLink                    = "didCreateShareLink"
-
     let notificationCenterCloseRichWorkspaceWebView             = "closeRichWorkspaceWebView"
     let notificationCenterReloadAvatar                          = "reloadAvatar"
     let notificationCenterCheckUserDelaultErrorDone             = "checkUserDelaultErrorDone"       // userInfo: account, controller
@@ -303,17 +302,6 @@ final class NCGlobal: Sendable {
     let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
     let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
     let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
-
-    let notificationCenterDeleteFile                            = "deleteFile"                      // userInfo: [ocId], error
-    let notificationCenterCopyMoveFile                          = "copyMoveFile"                    // userInfo: [ocId] serverUrl, account, dragdrop, type (copy, move)
-    let notificationCenterMoveFile                              = "moveFile"                        // userInfo: [ocId], [indexPath], error
-    let notificationCenterCopyFile                              = "copyFile"                        // userInfo: [ocId], [indexPath], error
-    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
-    let notificationCenterFavoriteFile                          = "favoriteFile"                    // userInfo: ocId, serverUrl
-    let notificationCenterFileExists                            = "fileExists"                      // userInfo: ocId, fileExists
-    let notificationCenterReloadDataSource                      = "reloadDataSource"                // userInfo: serverUrl?, clearDataSource
-
-    let notificationCenterRenameFile                            = "renameFile"                      // userInfo: serverUrl, account, error
 
     let notificationCenterMenuSearchTextPDF                     = "menuSearchTextPDF"
     let notificationCenterMenuGotToPageInPDF                    = "menuGotToPageInPDF"
@@ -348,7 +336,6 @@ final class NCGlobal: Sendable {
 
     let networkingStatusUploading                               = "statusUploading"
     let networkingStatusUploaded                                = "statusUploaded"
-
 
     let networkingStatusReloadAvatar                            = "statusReloadAvatar"
     let notificationCenterUpdateIcons                           = "updateIcons"
@@ -448,7 +435,7 @@ final class NCGlobal: Sendable {
     let keyFileNameAutoUploadType                   = "fileNameAutoUploadType"
     let keyFileNameOriginal                         = "fileNameOriginal"
     let keyFileNameOriginalAutoUpload               = "fileNameOriginalAutoUpload"
-
+    
     // LOG TAG
     //
     let logTagTask                          = "BGT"
