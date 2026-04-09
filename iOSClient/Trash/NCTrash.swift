@@ -106,6 +106,7 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
             await self.reloadDataSource()
             await loadListingTrash()
         }
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__DELETED_FILES)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
