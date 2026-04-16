@@ -46,7 +46,7 @@ class AlbumDetailsViewModel: ObservableObject {
         registerPublishers()
         loadAlbumPhotos()
         
-        NotificationCenter.default.addObserver(forName: NSNotification.Name("DeletePhotosFromAlbum"), object: nil, queue: .main) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: NSNotification.Name("deletePhotosFromAlbum"), object: nil, queue: .main) { [weak self] notification in
             if let metadatas = notification.userInfo?["metadatas"] as? [tableMetadata] {
                 self?.deleteMetadataFromAlbum(metadatas)
             }

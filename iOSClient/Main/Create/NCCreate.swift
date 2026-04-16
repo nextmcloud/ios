@@ -41,7 +41,8 @@ class NCCreate: NSObject {
             }
             guard results.error == .success, let url = results.url else {
                 Task {
-                    await showErrorBanner(controller: controller, text: results.error.errorDescription)
+                    let windowScene = SceneManager.shared.getWindowScene(controller: controller)
+                    await showErrorBanner(windowScene: windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
                 }
                 return
             }
@@ -68,7 +69,8 @@ class NCCreate: NSObject {
             }
             guard results.error == .success, let url = results.url else {
                 Task {
-                    await showErrorBanner(controller: controller, text: results.error.errorDescription)
+                    let windowScene = SceneManager.shared.getWindowScene(controller: controller)
+                    await showErrorBanner(windowScene: windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
                 }
                 return
             }
@@ -257,7 +259,7 @@ class NCCreate: NSObject {
         let metadatas = selectedMetadata.filter { !$0.directory }
         var exportURLs: [URL] = []
         var downloadMetadata: [(tableMetadata, URL)] = []
-        let scene = SceneManager.shared.getWindow(controller: controller)?.windowScene
+        let windowScene = SceneManager.shared.getWindowScene(controller: controller)
         var downloadRequest: DownloadRequest?
 
         for metadata in metadatas {
@@ -277,14 +279,14 @@ class NCCreate: NSObject {
         }
 
         if !downloadMetadata.isEmpty {
-            let token = showHudBanner(scene: scene,
-                                      title: NSLocalizedString("_download_in_progress_", comment: ""),
-                                      stage: .button) {
+            let bannerResults = showHudBanner(windowScene: windowScene,
+                                              title: "_download_in_progress_",
+                                              stage: .button) {
                 if let downloadRequest {
                     downloadRequest.cancel()
                 }
             }
-
+            
             for (originalMetadata, localFileURL) in downloadMetadata {
                 guard let metadata = await NCManageDatabase.shared.setMetadataSessionInWaitDownloadAsync(
                     ocId: originalMetadata.ocId,
@@ -292,7 +294,9 @@ class NCCreate: NSObject {
                     selector: "",
                     sceneIdentifier: controller.sceneIdentifier
                 ) else {
-                    LucidBanner.shared.dismiss()
+                    if let banner = bannerResults.banner {
+                        banner.dismiss()
+                    }
                     return
                 }
 
@@ -302,9 +306,9 @@ class NCCreate: NSObject {
                     downloadRequest = request
                 } progressHandler: { progress in
                     Task { @MainActor in
-                        LucidBanner.shared.update(
+                        bannerResults.banner?.update(
                             payload: LucidBannerPayload.Update(progress: progress.fractionCompleted),
-                            for: token)
+                            for: bannerResults.token)
                     }
                 }
 
@@ -315,7 +319,9 @@ class NCCreate: NSObject {
                 }
             }
 
-            LucidBanner.shared.dismiss()
+            if let banner = bannerResults.banner {
+                banner.dismiss()
+            }
         }
 
         guard !exportURLs.isEmpty else { return }

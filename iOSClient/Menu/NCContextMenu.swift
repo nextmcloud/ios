@@ -18,11 +18,22 @@ class NCContextMenu: NSObject {
     let metadata: tableMetadata
     let sceneIdentifier: String
     let viewController: UIViewController
+//    let controller: NCMainTabBarController?
     let sender: Any?
 
+//    internal var sceneIdentifier: String {
+//        controller?.sceneIdentifier ?? ""
+//    }
+    
+    internal var windowScene: UIWindowScene? {
+       SceneManager.shared.getWindow(sceneIdentifier: self.sceneIdentifier)?.windowScene
+    }
+    
     init(metadata: tableMetadata, viewController: UIViewController, sceneIdentifier: String, sender: Any?) {
+//    init(metadata: tableMetadata, viewController: UIViewController, controller: NCMainTabBarController?, sceneIdentifier: String, sender: Any?) {
         self.metadata = metadata
         self.viewController = viewController
+//        self.controller = controller
         self.sceneIdentifier = sceneIdentifier
         self.sender = sender
     }
@@ -111,7 +122,7 @@ class NCContextMenu: NSObject {
             NCNetworking.shared.setStatusWaitFavorite(metadata) { error in
                 if error != .success {
                     Task {
-                        await showErrorBanner(sceneIdentifier: self.sceneIdentifier, text: error.errorDescription)
+                        await showErrorBanner(windowScene: self.windowScene, text: error.errorDescription, errorCode: error.errorCode)
                     }
                 }
             }
@@ -251,7 +262,9 @@ class NCContextMenu: NSObject {
                     userId: metadata.userId
                 )
                 if error != .success {
-                    await showErrorBanner(sceneIdentifier: self.sceneIdentifier, text: error.errorDescription)
+                    Task {
+                        await showErrorBanner(windowScene: self.windowScene, text: error.errorDescription, errorCode: error.errorCode)
+                    }
                 }
             }
         }
@@ -289,9 +302,9 @@ class NCContextMenu: NSObject {
                     await NCManageDatabase.shared.setMetadataEncryptedAsync(ocId: metadata.ocId, encrypted: false)
                     await (self.viewController as? NCCollectionViewCommon)?.reloadDataSource()
                 } else {
-                    await showErrorBanner(sceneIdentifier: self.sceneIdentifier,
-                                          title: "_e2e_error_",
-                                          text: results.error.errorDescription)
+                    Task {
+                        await showErrorBanner(windowScene: self.windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
+                    }
                 }
             }
         }
@@ -355,8 +368,13 @@ class NCContextMenu: NSObject {
                         fileNameNew
                     )
                 ) != nil {
-                    await showErrorBanner(sceneIdentifier: self.sceneIdentifier, text: "_rename_already_exists_")
-                    return
+                    Task {
+                        await showErrorBanner(windowScene: self.windowScene,
+                                              text: "_rename_already_exists_",
+                                              errorCode: 0)
+                        return
+
+                    }
                 }
 
                 NCNetworking.shared.setStatusWaitRename(metadata, fileNameNew: fileNameNew)
@@ -558,10 +576,12 @@ class NCContextMenu: NSObject {
                                                                                               params: item.params)
 
                                     if response.error != .success {
-                                        await showErrorBanner(sceneIdentifier: self.sceneIdentifier, text: response.error.errorDescription)
+                                        await showErrorBanner(windowScene: self.windowScene,
+                                                              text: response.error.errorDescription,
+                                                              errorCode: response.error.errorCode)
                                     } else {
                                         if let tooltip = response.uiResponse?.ocs.data.tooltip {
-                                            NCContentPresenter().showCustomMessage(message: tooltip, type: .success)
+                                            await showInfoBanner(windowScene: self.windowScene, text: tooltip)
                                         } else {
                                             let baseURL = metadata.urlBase
 

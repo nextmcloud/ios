@@ -57,6 +57,11 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
     var shareConfig: NCShareConfig!
     var networking: NCShareNetworking?
 
+    var controller: NCMainTabBarController?
+    var windowScene: UIWindowScene? {
+        SceneManager.shared.getWindowScene(controller: controller)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.shareConfig = NCShareConfig(parentMetadata: metadata, share: share)
@@ -198,14 +203,13 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
                     tableView.reloadData()
                 } else if !newPassword.isEmpty {
                     // Optional: Show an error alert or toast for "too short"
-                    print(NSLocalizedString("_share_password_must_be_at_least_6_chars", comment: ""))
-                    NCContentPresenter().showInfo(title: "_share_password_must_be_at_least_6_chars")
-//                    Task {
-//                        await showErrorBanner(controller: self, text: "_share_password_must_be_at_least_6_chars")
-////                        Task {
-////                            await showErrorBanner(sceneIdentifier: self.sceneIdentifier, text: "_share_password_must_be_at_least_6_chars")
-////                        }
-//                    }
+//                    print(NSLocalizedString("_share_password_must_be_at_least_6_chars", comment: ""))
+//                    NCContentPresenter().showInfo(title: "_share_password_must_be_at_least_6_chars")
+                    Task {
+                        await showErrorBanner(windowScene: self.windowScene,
+                                              text: "_share_password_must_be_at_least_6_chars",
+                                              errorCode: 0)
+                    }
                 }
             }
             self.present(alertController, animated: true)
@@ -273,14 +277,16 @@ class NCShareAdvancePermission: UITableViewController, NCShareAdvanceFotterDeleg
                    NCGlobal.shared.isE2eeVersion2(capabilities.e2EEApiVersion) {
 
                     if await NCNetworkingE2EE().isInUpload(account: metadata.account, serverUrl: metadata.serverUrlFileName) {
-                        let error = NKError(errorCode: NCGlobal.shared.errorE2EEUploadInProgress, errorDescription: NSLocalizedString("_e2e_in_upload_", comment: ""))
-                        return NCContentPresenter().showInfo(error: error)
+                        await showErrorBanner(windowScene: windowScene,
+                                              text: "_e2e_in_upload_",
+                                              errorCode: NCGlobal.shared.errorE2EEUploadInProgress)
+                        return
                     }
 
                     let error = await NCNetworkingE2EE().uploadMetadata(serverUrl: metadata.serverUrlFileName, addUserId: share.shareWith, removeUserId: nil, account: metadata.account)
 
                     if error != .success {
-                        return NCContentPresenter().showError(error: error)
+                        await showErrorBanner(windowScene: windowScene, error: error)
                     }
                 }
 

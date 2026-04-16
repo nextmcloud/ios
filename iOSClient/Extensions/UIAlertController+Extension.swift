@@ -64,14 +64,14 @@ extension UIAlertController {
                     if createFolderResults.error == .success {
                         let error = await NCNetworkingE2EEMarkFolder().markFolderE2ee(account: session.account, serverUrlFileName: serverUrlFileName, userId: session.userId)
                         if error != .success {
-                            await showErrorBanner(scene: scene, text: error.errorDescription)
+                            await showErrorBanner(windowScene: scene, text: error.errorDescription, errorCode: error.errorCode)
                         } else{
 #if !EXTENSION
                             AnalyticsHelper.shared.trackCreateFolder(isEncrypted: true, creationDate: Date())
 #endif
                         }
                     } else {
-                        await showErrorBanner(scene: scene, text: createFolderResults.error.errorDescription)
+                        await showErrorBanner(windowScene: scene, text: createFolderResults.error.errorDescription, errorCode: createFolderResults.error.errorCode)
                     }
                 }
             } else if isDirectoryEncrypted {
@@ -187,7 +187,7 @@ extension UIAlertController {
                 Task {
                     if controller?.selectedIndex == NCGlobal.shared.selectedTabIndexAlbum {
 //                        await deletePhotosFromCurrentAlbum(selectedMetadatas: selectedMetadatas, controller: controller)
-                        NotificationCenter.default.post(name: NSNotification.Name("DeletePhotosFromAlbum"), object: nil, userInfo: ["metadatas": selectedMetadatas])
+                        NotificationCenter.default.post(name: NSNotification.Name("deletePhotosFromAlbum"), object: nil, userInfo: ["metadatas": selectedMetadatas])
 
                     } else {
                         await NCNetworking.shared.setStatusWaitDelete(metadatas: selectedMetadatas, sceneIdentifier: sceneIdentifier)

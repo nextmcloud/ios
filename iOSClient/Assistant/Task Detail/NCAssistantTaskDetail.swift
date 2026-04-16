@@ -10,7 +10,7 @@ import SwiftUI
 import NextcloudKit
 
 struct NCAssistantTaskDetail: View {
-    @EnvironmentObject var model: NCAssistantModel
+    @Environment(NCAssistantModel.self) var assistantModel
     let task: AssistantTask
 
     var body: some View {
@@ -21,7 +21,7 @@ struct NCAssistantTaskDetail: View {
         }
         .toolbar {
             Button(action: {
-                model.shareTask(task)
+                assistantModel.shareTask(task)
             }, label: {
                 Image(systemName: "square.and.arrow.up")
             })
@@ -29,42 +29,46 @@ struct NCAssistantTaskDetail: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle(NSLocalizedString("_task_details_", comment: ""))
         .onAppear {
-            model.selectTask(task)
+            assistantModel.selectTask(task)
         }
     }
 }
 
 #Preview {
-    let model = NCAssistantModel(controller: nil)
+    let assistantModel = NCAssistantModel(controller: nil)
 
-    NCAssistantTaskDetail(task: model.selectedTask!)
-        .environmentObject(model)
+    NCAssistantTaskDetail(task: assistantModel.selectedTask!)
+        .environment(assistantModel)
         .onAppear {
-            model.loadDummyData()
+            assistantModel.loadDummyData()
         }
 }
 
 struct InputOutputScrollView: View {
-    @EnvironmentObject var model: NCAssistantModel
+    @Environment(NCAssistantModel.self) var model
     let task: AssistantTask
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                Text(NSLocalizedString("_input_", comment: "")).font(.headline)
+                Text(NSLocalizedString("_input_", comment: ""))
+                    .font(.headline)
                     .padding(.top, 10)
 
                 Text(model.selectedTask?.input?.input ?? "")
+                    .cappedFont(.body, maxDynamicType: .accessibility2)
                     .frame(maxWidth: .infinity, alignment: .topLeading)
                     .padding()
                     .background(Color(NCBrandColor.shared.textColor2).opacity(0.1))
                     .clipShape(.rect(cornerRadius: 8))
                     .textSelection(.enabled)
 
-                Text(NSLocalizedString("_output_", comment: "")).font(.headline)
+                Text(NSLocalizedString("_output_", comment: ""))
+                    .font(.headline)
                     .padding(.top, 10)
 
                 Text(model.selectedTask?.output?.output ?? "")
+                    .cappedFont(.body, maxDynamicType: .accessibility2)
                     .frame(maxWidth: .infinity, alignment: .topLeading)
                     .padding()
                     .background(Color(NCBrandColor.shared.textColor2).opacity(0.1))
@@ -79,7 +83,7 @@ struct InputOutputScrollView: View {
 }
 
 struct BottomDetailsBar: View {
-    @EnvironmentObject var model: NCAssistantModel
+    @Environment(NCAssistantModel.self) var assistantModel
     let task: AssistantTask
 
     var body: some View {

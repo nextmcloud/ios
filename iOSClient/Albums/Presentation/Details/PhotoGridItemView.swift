@@ -70,9 +70,13 @@ struct PhotoGridItemView: View {
         let userId = metadata?.userId ?? "" //localAccount.userId
         let urlBase = metadata?.urlBase ?? "" //NCGlobal.shared.urlBase
 
-        // 1. Check Disk Cache
-        if let cachedImage = NCUtility().getImage(ocId: fileId,
-                                                 etag: metadata?.etag ?? "",
+        let etag = metadata?.etag ?? ""
+        let shouldBypassCache = (metadata == nil) || etag.isEmpty
+
+        // 1. Check Disk Cache (only if we have a meaningful ETag and metadata)
+        if !shouldBypassCache,
+           let cachedImage = NCUtility().getImage(ocId: fileId,
+                                                 etag: etag,
                                                  ext: NCGlobal.shared.previewExt512,
                                                  userId: userId,
                                                  urlBase: urlBase) {

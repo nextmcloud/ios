@@ -68,7 +68,8 @@ class NCLoginProvider: UIViewController {
 
         guard let url = URL(string: initialURLString) else {
             Task {
-                await showErrorBanner(controller: self.controller, text: "_login_url_error_")
+                let windowScene = SceneManager.shared.getWindowScene(controller: self.controller)
+                await showErrorBanner(windowScene: windowScene, text: "_login_url_error_", errorCode: NCGlobal.shared.errorInternalError)
             }
             return
         }

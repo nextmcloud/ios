@@ -68,48 +68,6 @@ class MoEngageAnalytics: NSObject {
         return root
     }
 
-//    private func currentTopViewController() -> UIViewController? {
-//        guard let scene = activeWindowScene() else { return nil }
-//        guard let root = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController else { return nil }
-//        return topViewController(in: root)
-//    }
-    
-//    @MainActor
-//    func currentTopViewController() -> UIViewController? {
-//        // 1. Find the active window scene specifically for iPad multitasking
-//        let activeScene = UIApplication.shared.connectedScenes
-//            .compactMap { $0 as? UIWindowScene }
-//            .first { $0.activationState == .foregroundActive }
-//        
-//        // 2. Get the key window from that specific scene
-//        let keyWindow = activeScene?.windows.first { $0.isKeyWindow }
-//                        ?? activeScene?.windows.first
-//        
-//        // 3. Start from the root, but prioritize your NCMainTabBarController
-//        var topController = keyWindow?.rootViewController
-//        
-//        // If your app uses NCMainTabBarController as the root or inside a Nav controller
-//        if let nav = topController as? UINavigationController,
-//           let tabBar = nav.viewControllers.first as? NCMainTabBarController {
-//            topController = tabBar
-//        }
-//        
-//        // 4. Drill down through presented modals and tabs
-//        while let presented = topController?.presentedViewController {
-//            topController = presented
-//        }
-//        
-//        if let tabBar = topController as? UITabBarController {
-//            topController = tabBar.selectedViewController
-//        }
-//        
-//        if let nav = topController as? UINavigationController {
-//            topController = nav.visibleViewController
-//        }
-//        
-//        return topController
-//    }
-
     @MainActor
     func currentTopViewController() -> UIViewController? {
         // 1. Find the active window scene (Crucial for iPad)
@@ -131,10 +89,6 @@ class MoEngageAnalytics: NSObject {
         
         return topController
     }
-
-
-
-
 
     /// Safer wrapper that ensures visible scene and top VC before asking MoEngage to show in-apps
     @MainActor
@@ -169,7 +123,7 @@ class MoEngageAnalytics: NSObject {
 #if targetEnvironment(simulator)
             // Simulator: Always show fallback alert
             print("In-App  shown: showInApp)")
-            let appID = "1125420102"
+            let appID = "312838242"
             
             // Correct URLs with /app/id/ prefix
             let webURLString = "https://apps.apple.com\(appID)?action=write-review"
@@ -183,8 +137,6 @@ class MoEngageAnalytics: NSObject {
             }
 #endif
         }
-//        MoEngageSDKInApp.sharedInstance.showInApp()
-//        MoEngageSDKInApp.sharedInstance.showNudge()
     }
 
     private func triggerMoEngage() {
@@ -214,28 +166,8 @@ class MoEngageAnalytics: NSObject {
         }
     }
     
-//    private func openAppStoreForReview() {
-//        let appID = "1125420102"
-//        let urlString = "itms-apps://://itunes.apple.com\(appID)?action=write-review"
-//        
-//        guard let url = URL(string: urlString) else { return }
-//
-//        DispatchQueue.main.async {
-//            // iPad multitasking requires using the shared 'open' method
-//            // which automatically handles scene-to-app routing.
-//            UIApplication.shared.open(url, options: [:]) { success in
-//                if !success {
-//                    // Safari fallback if App Store app is restricted
-//                    let webURL = URL(string: "https://apps.apple.com\(appID)?action=write-review")!
-//                    UIApplication.shared.open(webURL, options: [:], completionHandler: nil)
-//                }
-//            }
-//        }
-//    }
-
-    
     private func openAppStoreForReview() {
-        let appID = "1125420102"
+        let appID = "312838242"
         
         // Correct URLs with /app/id/ prefix
         let appStoreURLString = "itms-apps://://itunes.apple.com\(appID)?action=write-review"
@@ -285,12 +217,6 @@ class MoEngageAnalytics: NSObject {
         keyWindow?.rootViewController?.present(alert, animated: true)
     }
 
-//    func displayInAppNotification() {
-//        log.debug("displayInAppNotification() called — delegating to safe wrapper")
-//        Task { @MainActor in
-//            displayInAppNotificationSafely(reason: "explicit call")
-//        }
-//    }
 }
 
 // AnalyticsService protocol
@@ -455,22 +381,14 @@ extension MoEngageAnalytics: MoEngageInAppNativeDelegate {
         let kv = customAction.keyValuePairs
         log.debug("In-App custom action received: keyValues=\(kv)")
 
-//        if let showRating = kv["show-native-rating"] as? String,
-//           showRating.lowercased() == "true" {
-//            log.debug("Triggering native rating prompt via custom action")
-//            requestAppStoreReview()
-//        }
-        
         if let showRating = kv["show-native-rating"] as? String,
            showRating.lowercased() == "true" {
             log.debug("User clicked Rating - Opening App Store directly")
             
             // Use the reliable direct link instead of the restricted native prompt
-            openAppStoreForReview()
+            ReviewManager.shared.requestReviewIfAppropriate()
         }
     }
-    
-    
 
     // Called when a "self-handled" in-app is triggered
     func selfHandledInAppTriggered(withInfo inAppCampaign: MoEngageInAppSelfHandledCampaign,
@@ -519,3 +437,44 @@ class UIHelper {
         return root
     }
 }
+
+class ReviewManager {
+    static let shared = ReviewManager()
+    private let appID = "312838242"
+    
+    private let minimumLaunchCount = 5
+    private let launchCountKey = "appLaunchCount"
+    
+    func logAppLaunch() {
+        let currentCount = UserDefaults.standard.integer(forKey: launchCountKey)
+        UserDefaults.standard.set(currentCount + 1, forKey: launchCountKey)
+    }
+    
+    /// Checks for scene availability; falls back to App Store if the system prompt cannot be shown.
+    func requestReviewIfAppropriate() {
+        let currentCount = UserDefaults.standard.integer(forKey: launchCountKey)
+        
+        guard currentCount >= minimumLaunchCount else { return }
+        
+        // 1. Try to find an active UIWindowScene
+        if let scene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            
+            // 2. Trigger the system prompt
+            SKStoreReviewController.requestReview(in: scene)
+            
+        } else {
+            // 3. Fallback: If no active scene is found, force open the App Store
+            forceOpenAppStore()
+        }
+    }
+    
+    func forceOpenAppStore() {
+        let urlString = "itms-apps://itunes.apple.com/app/id\(appID)?action=write-review"
+        if let url = URL(string: urlString), UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
+    }
+}
+
+

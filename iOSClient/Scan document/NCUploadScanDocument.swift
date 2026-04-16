@@ -69,6 +69,9 @@ class NCUploadScanDocument: ObservableObject {
                 metadata.status = NCGlobal.shared.metadataStatusWaitUpload
                 metadata.sessionDate = Date()
 
+                // replace current metadata
+                self.metadata = metadata
+
                 if self.database.getMetadataConflict(account: self.session.account, serverUrl: self.serverUrl, fileNameView: fileName, nativeFormat: metadata.nativeFormat) != nil {
                     completion(true, false)
                 } else {
@@ -92,7 +95,8 @@ class NCUploadScanDocument: ObservableObject {
                 for char in self.password.unicodeScalars {
                     if !char.isASCII {
                         Task {
-                            await showErrorBanner(controller: self.controller, text: "_password_ascii_")
+                            let windowScene = await SceneManager.shared.getWindowScene(controller: self.controller)
+                            await showErrorBanner(windowScene: windowScene, text: "_password_ascii_", errorCode: 0)
                         }
                         return DispatchQueue.main.async {
                             completion(true)
@@ -340,7 +344,8 @@ struct UploadScanDocumentView: View {
         GeometryReader { geo in
             ZStack(alignment: .top) {
                 List {
-                    Section(header: Text(NSLocalizedString("_file_creation_", comment: "")), footer: Text(footer)) {
+                    Section(header: Text(NSLocalizedString("_file_creation_", comment: "")).font(.headline),
+                            footer: Text(footer).font(.footnote)) {
                         HStack {
                             Label {
                                 if NCUtilityFileSystem().getHomeServer(session: model.session) == model.serverUrl {
@@ -400,6 +405,7 @@ struct UploadScanDocumentView: View {
                         }
                         HStack {
                             Toggle(NSLocalizedString("_text_recognition_", comment: ""), isOn: $isTextRecognition)
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
                                 .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.getElement(account: model.session.account))))
                                 .onChange(of: isTextRecognition) { _, newValue in
                                     NCPreferences().textRecognitionStatus = newValue
@@ -413,6 +419,7 @@ struct UploadScanDocumentView: View {
                     Section {
                         VStack(spacing: 20) {
                             Toggle(NSLocalizedString("_delete_all_scanned_images_", comment: ""), isOn: $removeAllFiles)
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
                                 .toggleStyle(SwitchToggleStyle(tint: Color(NCBrandColor.shared.getElement(account: model.session.account))))
                                 .onChange(of: removeAllFiles) { _, newValue in
                                     NCPreferences().deleteAllScanImages = newValue
@@ -438,7 +445,7 @@ struct UploadScanDocumentView: View {
                         }
                     }
 
-                    Section(header: Text(NSLocalizedString("_quality_image_title_", comment: ""))) {
+                    Section(header: Text(NSLocalizedString("_quality_image_title_", comment: "")).font(.headline)) {
                         VStack {
                             Slider(value: $quality, in: 0...4, step: 1, onEditingChanged: { touch in
                                 if !touch {

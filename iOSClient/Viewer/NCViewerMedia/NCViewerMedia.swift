@@ -56,6 +56,10 @@ class NCViewerMedia: UIViewController {
     var sceneIdentifier: String {
         (self.tabBarController as? NCMainTabBarController)?.sceneIdentifier ?? ""
     }
+    
+    internal var windowScene: UIWindowScene? {
+        SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
+    }
 
     // MARK: - View Life Cycle
 
@@ -157,11 +161,10 @@ class NCViewerMedia: UIViewController {
                                                                                                                selector: "") else {
                                     return
                                 }
-                                let scene = SceneManager.shared.getWindow(controller: self.tabBarController)?.windowScene
                                 var downloadRequest: DownloadRequest?
-                                let token = showHudBanner(scene: scene,
-                                                          title: NSLocalizedString("_download_in_progress_", comment: ""),
-                                                          stage: .button) {
+                                let (banner, token) = showHudBanner(windowScene: self.windowScene,
+                                                                    title: "_download_in_progress_",
+                                                                    stage: .button) {
                                     if let request = downloadRequest {
                                         request.cancel()
                                     }
@@ -171,12 +174,16 @@ class NCViewerMedia: UIViewController {
                                     downloadRequest = request
                                 } progressHandler: { progress in
                                     Task {@MainActor in
-                                        LucidBanner.shared.update(
+                                        banner?.update(
                                             payload: LucidBannerPayload.Update(progress: progress.fractionCompleted),
-                                            for: token)
+                                            for: token
+                                        )
                                     }
                                 }
-                                LucidBanner.shared.dismiss()
+
+                                if let banner {
+                                    banner.dismiss()
+                                }
 
                                 if results.nkError == .success {
                                     if self.utilityFileSystem.fileProviderStorageExists(self.metadata) {

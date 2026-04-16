@@ -223,8 +223,17 @@ class NCCreateFormUploadConflict: UIViewController {
             }
 
             switchAlreadyExistingFiles.isOn = true
-            let error = NKError(errorCode: NCGlobal.shared.errorInternalError, errorDescription: "_file_not_rewite_doc_")
-            NCContentPresenter().showInfo(error: error)
+
+            Task {
+#if EXTENSION
+                let windowScene = self.view.window?.windowScene
+                await showErrorBanner(windowScene: windowScene, text: "_file_not_rewite_doc_", errorCode: NCGlobal.shared.errorInternalError)
+#else
+                let windowScene = SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
+                await showErrorBanner(windowScene: windowScene, text: "_file_not_rewite_doc_", errorCode: NCGlobal.shared.errorInternalError)
+#endif
+            }
+
         }
 
         tableView.reloadData()

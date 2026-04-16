@@ -54,6 +54,8 @@ class NCShare: UIViewController, NCSharePagingContent {
 
     public var metadata: tableMetadata!
     public var height: CGFloat = 0
+    var controller: NCMainTabBarController?
+
     let utilityFileSystem = NCUtilityFileSystem()
     let utility = NCUtility()
     let database = NCManageDatabase.shared
@@ -140,7 +142,7 @@ class NCShare: UIViewController, NCSharePagingContent {
 
 //            reloadData()
 
-            networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session)
+            networking = NCShareNetworking(metadata: metadata, view: self.view, delegate: self, session: session, controller: controller)
             let isVisible = (self.navigationController?.topViewController as? NCSharePaging)?.page == .sharing
             networking?.readShare(showLoadingIndicator: isVisible)
 //            searchField.searchTextField.font = .systemFont(ofSize: 14)

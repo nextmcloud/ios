@@ -156,6 +156,10 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     internal let debouncerGetServerData = NCDebouncer(maxEventCount: NCBrandOptions.shared.numMaximumProcess)
     internal let debouncerNetworkSearch = NCDebouncer(maxEventCount: NCBrandOptions.shared.numMaximumProcess)
 
+    @MainActor
+    internal var windowScene: UIWindowScene? {
+       SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
+    }
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -320,7 +324,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        self.networking.cancelUnifiedSearchFiles()
+//        self.networking.cancelUnifiedSearchFiles()
         dismissTip()
 
         // Cancel Queue & Retrieves Properties
@@ -532,7 +536,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        self.networking.cancelUnifiedSearchFiles()
+//        self.networking.cancelUnifiedSearchFiles()
 
         self.isSearchingMode = false
         self.networkSearchInProgress = false
@@ -655,11 +659,10 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
             guard let tblAccount = await NCManageDatabase.shared.getTableAccountAsync(account: session.account) else {
                 return
             }
-            let scene = SceneManager.shared.getWindow(controller: controller)?.windowScene
-            let token = showHudBanner(
-                scene: scene,
-                title: NSLocalizedString("_upload_in_progress_", comment: ""))
-
+            let bannerResults = showHudBanner(
+                windowScene: windowScene,
+                title: "_upload_in_progress_")
+            
             for (index, items) in UIPasteboard.general.items.enumerated() {
                 for item in items {
                     let capabilities = await NKCapabilities.shared.getCapabilities(for: session.account)
@@ -689,9 +692,9 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
                                                                              serverUrlFileName: serverUrlFileName) { _ in
                     } progressHandler: { _, _, fractionCompleted in
                         Task {@MainActor in
-                            LucidBanner.shared.update(
+                            bannerResults.banner?.update(
                                 payload: LucidBannerPayload.Update(progress: fractionCompleted),
-                                for: token
+                                for: bannerResults.token
                             )
                         }
                     }
@@ -717,12 +720,16 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
                         }
                     } else {
                         Task {
-                            await showErrorBanner(scene: scene, text: resultsUpload.error.errorDescription)
+                            await showErrorBanner(windowScene: windowScene,
+                                                  text: resultsUpload.error.errorDescription,
+                                                  errorCode: resultsUpload.error.errorCode)
                         }
                     }
                 }
             }
-            LucidBanner.shared.dismiss()
+            if let banner = bannerResults.banner {
+                banner.dismiss()
+            }
         }
     }
 
@@ -765,28 +772,28 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         }
 
         if capabilities.serverVersionMajor >= global.nextcloudVersion20 {
-            self.networking.unifiedSearchFiles(literal: literalSearch, account: session.account) { task in
-                self.searchDataSourceTask = task
-                Task {
-                    await self.reloadDataSource()
-                }
-            } providers: { account, searchProviders in
-                self.providers = searchProviders
-                self.searchResults = []
-                self.dataSource = NCCollectionViewDataSource(metadatas: [],
-                                                             layoutForView: self.layoutForView,
-                                                             providers: self.providers,
-                                                             searchResults: self.searchResults,
-                                                             account: account)
-            } update: { _, _, searchResult, metadatas in
-                guard let metadatas, !metadatas.isEmpty, self.isSearchingMode, let searchResult else { return }
-                self.networking.unifiedSearchQueue.addOperation(NCCollectionViewUnifiedSearch(collectionViewCommon: self, metadatas: metadatas, searchResult: searchResult))
-            } completion: { _, _ in
-                Task {
-                    await self.reloadDataSource()
-                }
-                self.networkSearchInProgress = false
-            }
+//            self.networking.unifiedSearchFiles(literal: literalSearch, account: session.account) { task in
+//                self.searchDataSourceTask = task
+//                Task {
+//                    await self.reloadDataSource()
+//                }
+//            } providers: { account, searchProviders in
+//                self.providers = searchProviders
+//                self.searchResults = []
+//                self.dataSource = NCCollectionViewDataSource(metadatas: [],
+//                                                             layoutForView: self.layoutForView,
+//                                                             providers: self.providers,
+//                                                             searchResults: self.searchResults,
+//                                                             account: account)
+//            } update: { _, _, searchResult, metadatas in
+//                guard let metadatas, !metadatas.isEmpty, self.isSearchingMode, let searchResult else { return }
+//                self.networking.unifiedSearchQueue.addOperation(NCCollectionViewUnifiedSearch(collectionViewCommon: self, metadatas: metadatas, searchResult: searchResult))
+//            } completion: { _, _ in
+//                Task {
+//                    await self.reloadDataSource()
+//                }
+//                self.networkSearchInProgress = false
+//            }
         } else {
             self.networking.searchFiles(literal: literalSearch, account: session.account) { task in
                 self.searchDataSourceTask = task
@@ -830,28 +837,30 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
             }
         }
 
-        self.networking.unifiedSearchFilesProvider(id: lastSearchResult.id, term: term, limit: 5, cursor: cursor, account: session.account) { task in
-            self.searchDataSourceTask = task
-            Task {
-                await self.reloadDataSource()
-            }
-        } completion: { _, searchResult, metadatas, error in
-            if error != .success {
-                Task {
-                    await showErrorBanner(controller: self.controller, text: error.errorDescription)
-                }
-            }
-
-            metadataForSection.unifiedSearchInProgress = false
-            guard let searchResult = searchResult, let metadatas = metadatas else { return }
-            self.dataSource.appendMetadatasToSection(metadatas, metadataForSection: metadataForSection, lastSearchResult: searchResult)
-
-            Task {
-                await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
-                    delegate.transferReloadData(serverUrl: nil)
-                }
-            }
-        }
+//        self.networking.unifiedSearchFilesProvider(id: lastSearchResult.id, term: term, limit: 5, cursor: cursor, account: session.account) { task in
+//            self.searchDataSourceTask = task
+//            Task {
+//                await self.reloadDataSource()
+//            }
+//        } completion: { _, searchResult, metadatas, error in
+//            if error != .success {
+//                Task {
+//                    await showErrorBanner(windowScene: self.windowScene,
+//                                          text: error.errorDescription,
+//                                          errorCode: error.errorCode)
+//                }
+//            }
+//
+//            metadataForSection.unifiedSearchInProgress = false
+//            guard let searchResult = searchResult, let metadatas = metadatas else { return }
+//            self.dataSource.appendMetadatasToSection(metadatas, metadataForSection: metadataForSection, lastSearchResult: searchResult)
+//
+//            Task {
+//                await NCNetworking.shared.transferDispatcher.notifyAllDelegates { delegate in
+//                    delegate.transferReloadData(serverUrl: nil)
+//                }
+//            }
+//        }
     }
 
     // MARK: - Push metadata
@@ -1009,7 +1018,9 @@ extension NCCollectionViewCommon: NCTransferDelegate {
         Task {
             if error != .success,
                error.errorCode != global.errorResourceNotFound {
-                await showErrorBanner(controller: self.controller, text: error.errorDescription)
+                await showErrorBanner(windowScene: self.windowScene,
+                                      text: error.errorDescription,
+                                      errorCode: error.errorCode)
             }
             guard session.account == account else {
                 return

@@ -35,7 +35,10 @@ extension NCShare: NCShareLinkCellDelegate, NCShareUserCellDelegate {
                 let internalLink = metadata.urlBase + "/index.php/f/" + metadata.fileId
                 NCShareCommon.copyLink(link: internalLink, viewController: self, sender: sender)
             } else {
-                NCContentPresenter().showError(error: error)
+                Task {
+                    let windowScene = SceneManager.shared.getWindowScene(controller: self.controller)
+                    await showErrorBanner(windowScene: windowScene, error: error)
+                }
             }
         }
     }

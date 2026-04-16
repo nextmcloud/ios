@@ -64,7 +64,7 @@ class NCViewer: NSObject {
 
                 vc?.metadata = metadata
                 vc?.imageIcon = image
-                vc?.navigationItem.title = metadata.fileNameView
+                vc?.navigationItem.setBidiSafeTitle(metadata.fileNameView)
 
                 return vc
             }
@@ -84,7 +84,8 @@ class NCViewer: NSObject {
                     NCActivityIndicator.shared.stop()
 
                     guard results.error == .success, let url = results.url else {
-                        await showErrorBanner(controller: delegate?.tabBarController as? NCMainTabBarController, text: results.error.errorDescription)
+                        let windowScene = SceneManager.shared.getWindowScene(controller: delegate?.tabBarController as? NCMainTabBarController)
+                        await showErrorBanner(windowScene: windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
                         return nil
                     }
 
@@ -93,7 +94,7 @@ class NCViewer: NSObject {
                     vc?.metadata = metadata
                     vc?.link = url
                     vc?.imageIcon = image
-                    vc?.navigationItem.title = metadata.fileNameView
+                    vc?.navigationItem.setBidiSafeTitle(metadata.fileNameView)
 
                     return vc
 
@@ -103,7 +104,7 @@ class NCViewer: NSObject {
                     vc?.metadata = metadata
                     vc?.link = metadata.url
                     vc?.imageIcon = image
-                    vc?.navigationItem.title = metadata.fileNameView
+                    vc?.navigationItem.setBidiSafeTitle(metadata.fileNameView)
 
                     return vc
                 }
@@ -138,7 +139,8 @@ class NCViewer: NSObject {
                     NCActivityIndicator.shared.stop()
 
                     guard results.error == .success, let url = results.url else {
-                        await showErrorBanner(controller: delegate?.tabBarController as? NCMainTabBarController, text: results.error.errorDescription)
+                        let windowScene = SceneManager.shared.getWindowScene(controller: delegate?.tabBarController as? NCMainTabBarController)
+                        await showErrorBanner(windowScene: windowScene, text: results.error.errorDescription, errorCode: results.error.errorCode)
                         return nil
                     }
 
@@ -148,7 +150,7 @@ class NCViewer: NSObject {
                     vc?.editor = editorViewController
                     vc?.link = url
                     vc?.imageIcon = image
-                    vc?.navigationItem.title = metadata.fileNameView
+                    vc?.navigationItem.setBidiSafeTitle(metadata.fileNameView)
 
                     return vc
                 } else {
@@ -158,7 +160,7 @@ class NCViewer: NSObject {
                     vc?.editor = editorViewController
                     vc?.link = metadata.url
                     vc?.imageIcon = image
-                    vc?.navigationItem.title = metadata.fileNameView
+                    vc?.navigationItem.setBidiSafeTitle(metadata.fileNameView)
 
                     return vc
                 }

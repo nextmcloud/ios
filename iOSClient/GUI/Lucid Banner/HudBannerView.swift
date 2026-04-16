@@ -6,49 +6,63 @@ import SwiftUI
 import LucidBanner
 
 @MainActor
-func showHudBanner(scene: UIWindowScene?,
+func showHudBanner(windowScene: UIWindowScene?,
                    title: String? = nil,
                    subtitle: String? = nil,
                    stage: LucidBanner.Stage? = nil,
-                   onButtonTap: (() -> Void)? = nil) -> Int? {
-    var scene = scene
-    if scene == nil {
-        scene = UIApplication.shared.mainAppWindow?.windowScene
+                   onButtonTap: (() -> Void)? = nil) -> (banner: LucidBanner?, token: Int?) {
+    guard let windowScene else {
+        return (nil, nil)
     }
+    let localizedTitle = title.map { NSLocalizedString($0, comment: "") }
+    let localizedSubTitle = subtitle.map { NSLocalizedString($0, comment: "") }
+    let banner = LucidBannerRegistry.shared.banner(for: windowScene)
 
     let payload = LucidBannerPayload(
-        title: title,
-        subtitle: subtitle,
+        title: localizedTitle,
+        subtitle: localizedSubTitle,
         stage: stage,
         vPosition: .center,
         blocksTouches: true,
     )
 
-    return LucidBanner.shared.show(
-        scene: scene,
-        payload: payload
+    let token = banner.show(
+        payload: payload,
+        policy: .enqueue
     ) { state in
         HudBannerView(state: state, onButtonTap: onButtonTap)
     }
+
+    return(banner, token)
 }
 
 @MainActor
-func completeHudBannerSuccess(token: Int?) {
+func completeHudBannerSuccess(token: Int?, banner: LucidBanner?) {
+    guard let banner else {
+        return
+    }
+
     let payload = LucidBannerPayload.Update(
         stage: .success,
         autoDismissAfter: 2
     )
-    LucidBanner.shared.update(payload: payload, for: token)
+
+    banner.update(payload: payload, for: token)
 }
 
 @MainActor
-func completeHudBannerError(subtitle: String? = nil, token: Int?) {
+func completeHudBannerError(description: String, token: Int?, banner: LucidBanner?) {
+    guard let banner else {
+        return
+    }
+
     let payload = LucidBannerPayload.Update(
-        subtitle: subtitle,
+        subtitle: NSLocalizedString(description, comment: ""),
         stage: .error,
         autoDismissAfter: NCGlobal.shared.dismissAfterSecond
     )
-    LucidBanner.shared.update(payload: payload, for: token)
+
+    banner.update(payload: payload, for: token)
 }
 
 // MARK: - SwiftUI
@@ -97,7 +111,8 @@ struct HudBannerView: View {
                 // TITLE
                 if let title = state.payload.title, !title.isEmpty {
                     Text(title)
-                        .font(.headline.weight(.semibold))
+                        .cappedFont(.title3, maxDynamicType: .accessibility2)
+                        .fontWeight(.semibold)
                         .foregroundStyle(textColor)
                         .multilineTextAlignment(.center)
                 }
@@ -105,7 +120,7 @@ struct HudBannerView: View {
                 // SUBTITLE
                 if let subtitle = state.payload.subtitle, !subtitle.isEmpty {
                     Text(subtitle)
-                        .font(.subheadline)
+                        .cappedFont(.subheadline, maxDynamicType: .accessibility1)
                         .foregroundStyle(textColor)
                         .multilineTextAlignment(.center)
                 }
@@ -134,15 +149,16 @@ struct HudBannerView: View {
                     Group {
                         if isSuccess {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 34, weight: .bold))
+                                .font(.icon(34, weight: .bold))
                                 .foregroundStyle(strokeColor)
                         } else if isError {
                             Image(systemName: "xmark")
-                                .font(.system(size: 34, weight: .bold))
+                                .font(.icon(34, weight: .bold))
                                 .foregroundStyle(strokeColor)
                         } else {
                             Text("\(Int(visualProgress * 100))%")
-                                .font(.headline.monospacedDigit())
+                                .cappedFont(.headline, maxDynamicType: .accessibility2)
+                                .monospacedDigit()
                                 .foregroundStyle(textColor)
                         }
                     }
@@ -275,11 +291,11 @@ private struct HudBannerPreviewWrapper: View {
         HudBannerView(state: state)
             .task {
                 for i in 0...100 {
-                    try? await Task.sleep(nanoseconds: 45_000_000)
+                    try? await Task.sleep(for: .milliseconds(45))
                     state.payload.progress = Double(i) / 100
                 }
 
-                try? await Task.sleep(nanoseconds: 400_000_000)
+                try? await Task.sleep(for: .seconds(0.4))
                 state.payload.stage = .success
             }
     }

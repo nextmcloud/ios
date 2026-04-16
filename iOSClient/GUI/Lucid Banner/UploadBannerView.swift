@@ -6,46 +6,39 @@ import SwiftUI
 import LucidBanner
 
 @MainActor
-func showUploadBanner(scene: UIWindowScene?,
+func showUploadBanner(windowScene: UIWindowScene?,
                       payload: LucidBannerPayload,
                       allowMinimizeOnTap: Bool,
-                      onButtonTap: (() -> Void)? = nil) -> Int? {
+                      onButtonTap: (() -> Void)? = nil) -> (banner: LucidBanner?, token: Int?) {
+    guard let windowScene else {
+        return (nil, nil)
+    }
+    let banner = LucidBannerRegistry.shared.banner(for: windowScene)
+    let bannerCoordinator = LucidBannerVariantCoordinator(banner: banner)
 
-    let token = LucidBanner.shared.show(scene: scene,
-                                        payload: payload,
-                                        policy: .drop) { state in
+    let token = banner.show(
+        payload: payload,
+        policy: .replace) { state in
         UploadBannerView(state: state,
+                         coordinator: bannerCoordinator,
                          allowMinimizeOnTap: allowMinimizeOnTap,
                          onButtonTap: onButtonTap)
     }
 
 #if !EXTENSION
     if allowMinimizeOnTap {
-        LucidBannerVariantCoordinator.shared.register(token: token) { context in
-            let bounds = context.bounds
-            let controller = SceneManager.shared.getController(scene: scene)
-            var height: CGFloat = 0
-            let over: CGFloat = 30
-            if let scene,
-               let controller,
-               let window = scene.windows.first {
-                let regularLayout = (window.rootViewController?.traitCollection.horizontalSizeClass == .regular)
-                let iPad = UIDevice.current.userInterfaceIdiom == .pad
-                if iPad, regularLayout {
-                    height = over
-                } else {
-                    height = controller.barHeightBottom + context.safeAreaInsets.bottom + over
-                }
-            }
-
-            return CGPoint(
-                x: bounds.midX,
-                y: bounds.maxY - height
+        bannerCoordinator.register(token: token) { _ in
+            return .init(
+                payloadUpdate: .init(
+                    horizontalLayout: .centered(width: 100),
+                    swipeToDismiss: false,
+                    draggable: false
+                )
             )
         }
     }
 #endif
-    return token
+    return (banner, token)
 }
 
 // MARK: - SwiftUI
@@ -53,14 +46,14 @@ func showUploadBanner(scene: UIWindowScene?,
 struct UploadBannerView: View {
     @ObservedObject var state: LucidBannerState
     @State var trigger = true
+    var coordinator: LucidBannerVariantCoordinator?
     let onButtonTap: (() -> Void)?
     let allowMinimizeOnTap: Bool
     let textColor = Color(.label)
 
-    init(state: LucidBannerState,
-         allowMinimizeOnTap: Bool = false,
-         onButtonTap: (() -> Void)? = nil) {
+    init(state: LucidBannerState, coordinator: LucidBannerVariantCoordinator?, allowMinimizeOnTap: Bool = false, onButtonTap: (() -> Void)? = nil) {
         self.state = state
+        self.coordinator = coordinator
         self.allowMinimizeOnTap = allowMinimizeOnTap
         self.onButtonTap = onButtonTap
     }
@@ -74,19 +67,18 @@ struct UploadBannerView: View {
         let isError = (state.payload.stage == .error)
         let isButton = (state.payload.stage == .button)
 
-        containerView(state: state, allowMinimizeOnTap: allowMinimizeOnTap) {
+        containerView(state: state, coordinator: coordinator, allowMinimizeOnTap: allowMinimizeOnTap) {
             if state.variant == .alternate {
                 HStack(spacing: 5) {
                     Image(systemName: state.payload.systemImage ?? "arrow.up.circle")
                         .applyBannerAnimation(state.payload.imageAnimation)
-                        .font(.body.weight(.medium))
-                        .frame(width: 20, height: 20)
+                        .font(.icon())
                         .foregroundStyle(state.payload.imageColor)
 
                     if let p = state.payload.progress {
                         Text("\(Int(p * 100))%")
-                            .font(.caption2.monospacedDigit())
-                            .frame(height: 20)
+                            .cappedFont(.body, maxDynamicType: .accessibility2)
+                            .monospacedDigit()
                             .foregroundStyle(state.payload.textColor)
                     }
                 }
@@ -97,7 +89,7 @@ struct UploadBannerView: View {
                  HStack(alignment: .center, spacing: 10) {
                      if #available(iOS 26, *) {
                          Image(systemName: "checkmark")
-                             .font(.system(size: 60, weight: .regular))
+                             .font(.icon(30, weight: .semibold))
                              .foregroundStyle(.green)
                              .symbolEffect(.drawOn, isActive: trigger)
                              .task {
@@ -106,7 +98,7 @@ struct UploadBannerView: View {
                              }
                      } else {
                          Image(systemName: "checkmark")
-                             .font(.system(size: 80, weight: .regular))
+                             .font(.icon(30, weight: .semibold))
                              .foregroundStyle(.green)
                      }
                  }
@@ -116,22 +108,22 @@ struct UploadBannerView: View {
                 VStack(spacing: 15) {
                     HStack(alignment: .center, spacing: 10) {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 30, weight: .bold))
+                            .font(.icon(30, weight: .semibold))
                             .foregroundStyle(.white)
 
                         VStack(alignment: .leading, spacing: 7) {
                             Text("_error_")
-                                .font(.subheadline.weight(.bold))
+                                .cappedFont(.subheadline, maxDynamicType: .accessibility1)
                                 .multilineTextAlignment(.leading)
                                 .truncationMode(.tail)
                                 .minimumScaleFactor(0.9)
-                                .foregroundStyle(textColor)
+                                .foregroundStyle(.white)
                             if showSubtitle, let subtitle = state.payload.subtitle {
                                 Text(subtitle)
                                     .font(.subheadline)
                                     .multilineTextAlignment(.leading)
                                     .truncationMode(.tail)
-                                    .foregroundStyle(textColor)
+                                    .foregroundStyle(.white)
                             }
                         }
                     }
@@ -145,14 +137,15 @@ struct UploadBannerView: View {
                         if let systemImage = state.payload.systemImage {
                             Image(systemName: systemImage)
                                 .applyBannerAnimation(state.payload.imageAnimation)
-                                .font(.system(size: 30, weight: .regular))
+                                .font(.icon())
                                 .foregroundStyle(state.payload.imageColor)
                         }
 
                         VStack(alignment: .leading, spacing: 7) {
                             if showTitle, let title = state.payload.title {
                                 Text(title)
-                                    .font(.subheadline.weight(.bold))
+                                    .cappedFont(.title3, maxDynamicType: .accessibility2)
+                                    .fontWeight(.semibold)
                                     .multilineTextAlignment(.leading)
                                     .truncationMode(.tail)
                                     .minimumScaleFactor(0.9)
@@ -160,14 +153,14 @@ struct UploadBannerView: View {
                             }
                             if showSubtitle, let subtitle = state.payload.subtitle {
                                 Text(subtitle)
-                                    .font(.subheadline)
+                                    .cappedFont(.subheadline, maxDynamicType: .accessibility1)
                                     .multilineTextAlignment(.leading)
                                     .truncationMode(.tail)
                                     .foregroundStyle(textColor)
                             }
                             if showFootnote, let footnote = state.payload.footnote {
                                 Text(footnote)
-                                    .font(.caption)
+                                    .cappedFont(.footnote, maxDynamicType: .xxxLarge)
                                     .multilineTextAlignment(.leading)
                                     .truncationMode(.tail)
                                     .foregroundStyle(textColor)
@@ -215,8 +208,9 @@ struct UploadBannerView: View {
                                      systemImage: "arrowshape.up.circle",
                                      imageAnimation: .none,
                                      progress: 0.4,
-                                     stage: .button)
+                                     stage: .error)
     let state = LucidBannerState(payload: payload)
+   // state.variant = .alternate
 
     return ZStack {
         Text(
@@ -230,6 +224,7 @@ struct UploadBannerView: View {
 
         UploadBannerView(
             state: state,
+            coordinator: nil,
             allowMinimizeOnTap: false
         )
         .padding()

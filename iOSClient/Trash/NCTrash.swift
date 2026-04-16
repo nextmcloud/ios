@@ -56,6 +56,11 @@ class NCTrash: UIViewController, NCTrashListCellDelegate, NCTrashGridCellDelegat
         self.tabBarController as? NCMainTabBarController
     }
 
+    @MainActor
+    internal var windowScene: UIWindowScene? {
+       SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
+    }
+    
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {

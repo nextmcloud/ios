@@ -639,6 +639,30 @@ final class SceneManager: @unchecked Sendable {
         return getWindow(scene: scene)
     }
 
+    func getWindowScene(controller: UIViewController?) -> UIWindowScene? {
+        if let windowScene = controller?.viewIfLoaded?.window?.windowScene {
+            return windowScene
+        }
+
+        // Fallback: if the controller is a registered NCMainTabBarController.
+        if let mainTabBarController = controller as? NCMainTabBarController,
+           let scene = sceneController[mainTabBarController] as? UIWindowScene {
+            return scene
+        }
+
+        // Fallback: any foregroundActive scene.
+        if let active = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { $0.activationState == .foregroundActive }) {
+            return active
+        }
+
+        // Last resort: literally the first connected window scene.
+        return UIApplication.shared.connectedScenes
+                .compactMap { $0 as? UIWindowScene }
+                .first
+    }
+    
     func getWindow(sceneIdentifier: String?) -> UIWindow? {
         var mainTabBarController: NCMainTabBarController?
 

@@ -191,6 +191,7 @@ final class NCGlobal: Sendable {
     let errorConflict: Int                      = 409
     let errorPreconditionFailed: Int            = 412
     let errorUnsupportedMediaType: Int          = 415
+    let errorExpectationFailed: Int             = 417
     let errorInternalServerError: Int           = 500
     let errorMaintenance: Int                   = 503
     let errorQuota: Int                         = 507
@@ -201,6 +202,7 @@ final class NCGlobal: Sendable {
     let errorBadServerResponse: Int             = -1011
     let errorInternalError: Int                 = -99999
     let errorFileNotSaved: Int                  = -99998
+    let errorOfflineNotAllowed: Int             = -99997
     let errorOffline: Int                       = -99997
     let errorCharactersForbidden: Int           = -99996
     let errorCreationFile: Int                  = -99995

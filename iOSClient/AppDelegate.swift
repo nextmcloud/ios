@@ -150,6 +150,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Initialize MoEngage early in app lifecycle
         MoEngageAnalytics.setupIfNeeded()
         
+        ReviewManager.shared.logAppLaunch()
+        
         return true
     }
 

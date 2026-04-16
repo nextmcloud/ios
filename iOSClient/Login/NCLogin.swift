@@ -9,6 +9,7 @@ import NextcloudKit
 import SwiftEntryKit
 import SwiftUI
 import SafariServices
+import LucidBanner
 
 class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
     @IBOutlet weak var imageBrand: UIImageView!
@@ -44,6 +45,9 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
     private var p12Data: Data?
     private var p12Password: String?
 
+    // LucidBanner
+    var banner: LucidBanner?
+    
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -189,16 +193,24 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
         // Re-evaluate in-app messages after viewDidAppear
         MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
-        if self.shareAccounts != nil, let image = UIImage(systemName: "person.badge.plus")?.withTintColor(.white, renderingMode: .alwaysOriginal), let backgroundColor = NCBrandColor.shared.customer.lighter(by: 10) {
+        if self.shareAccounts != nil,
+           let windowScene = view.window?.windowScene {
             let title = String(format: NSLocalizedString("_apps_nextcloud_detect_", comment: ""), NCBrandOptions.shared.brand)
-            let description = String(format: NSLocalizedString("_add_existing_account_", comment: ""), NCBrandOptions.shared.brand)
+            let subtitle = String(format: NSLocalizedString("_add_existing_account_", comment: ""), NCBrandOptions.shared.brand)
+            self.banner = LucidBannerRegistry.shared.banner(for: windowScene)
 
-            NCContentPresenter().alertAction(image: image, contentModeImage: .scaleAspectFit, sizeImage: CGSize(width: 45, height: 45), backgroundColor: backgroundColor, textColor: textColor, title: title, description: description, textCancelButton: "_cancel_", textOkButton: "_ok_", attributes: EKAttributes.topFloat) { identifier in
-                if identifier == "ok" {
-                    self.openShareAccountsViewController(nil)
-                }
+            showAlertActionBanner(lucidBanner: banner,
+                                  title: title,
+                                  subtitle: subtitle) {
+                self.openShareAccountsViewController(nil)
             }
         }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        self.banner?.dismiss()
     }
 
     private func handleLoginWithAppConfig() {
@@ -394,9 +406,11 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
                     if error == .success {
                         self.createAccount(urlBase: urlBase, user: user, password: password)
                     } else {
-                        let alertController = UIAlertController(title: NSLocalizedString("_error_", comment: ""), message: error.errorDescription, preferredStyle: .alert)
-                        alertController.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default, handler: { _ in }))
-                        self.present(alertController, animated: true)
+                        Task {
+                            let windowScene = SceneManager.shared.getWindowScene(controller: self.controller)
+                            await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
+                            self.dismiss(animated: true, completion: nil)
+                        }
                     }
                 }
             }
@@ -409,9 +423,10 @@ class NCLogin: UIViewController, UITextFieldDelegate, NCLoginQRCodeDelegate {
                 self.createAccount(urlBase: urlBase, user: user, password: password)
             } else {
                 Task {
-                    await showErrorBanner(controller: self.controller, text: error.errorDescription)
+                    let windowScene = SceneManager.shared.getWindowScene(controller: self.controller)
+                    await showErrorBanner(windowScene: windowScene, text: error.errorDescription, errorCode: error.errorCode)
+                    self.dismiss(animated: true, completion: nil)
                 }
-                self.dismiss(animated: true, completion: nil)
             }
         }
     }

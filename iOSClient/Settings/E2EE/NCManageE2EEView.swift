@@ -13,14 +13,17 @@ struct NCManageE2EEView: View {
         VStack {
             if model.isEndToEndEnabled {
                 List {
-                    Section(header: Text(""), footer: Text(model.statusOfService + "\n\n" + "End-to-End Encryption " + model.capabilities.e2EEApiVersion)) {
+                    Section(header: Text("").font(.headline),
+                            footer: Text(model.statusOfService + "\n\n" + "End-to-End Encryption " + model.capabilities.e2EEApiVersion).font(.footnote)) {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_activated_", comment: ""))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
                         } icon: {
                             Image(systemName: "checkmark.circle.fill")
                                 .resizable()
                                 .scaledToFit()
-                                .font(Font.system(.body).weight(.light))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
+                                .fontWeight(.light)
                                 .frame(width: 25, height: 25)
                                 .foregroundColor(.green)
                         }
@@ -28,11 +31,14 @@ struct NCManageE2EEView: View {
                     HStack {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_read_passphrase_", comment: ""))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
+
                         } icon: {
                             Image(systemName: "eye")
                                 .resizable()
                                 .scaledToFit()
-                                .font(Font.system(.body).weight(.light))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
+                                .fontWeight(.light)
                                 .frame(width: 25, height: 25)
                                 .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
                         }
@@ -44,18 +50,20 @@ struct NCManageE2EEView: View {
                             model.requestPasscodeType("readPassphrase")
                         } else {
                             Task {
-                                await showInfoBanner(controller: model.controller, text: "_e2e_settings_lock_not_active_")
+                                await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
                             }
                         }
                     }
                     HStack {
                         Label {
                             Text(NSLocalizedString("_e2e_settings_remove_", comment: ""))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
                         } icon: {
                             Image(systemName: "xmark")
                                 .resizable()
                                 .scaledToFit()
-                                .font(Font.system(.body).weight(.light))
+                                .cappedFont(.body, maxDynamicType: .accessibility2)
+                                .fontWeight(.light)
                                 .frame(width: 25, height: 15)
                                 .foregroundColor(Color(NCBrandColor.shared.iconImageColor))
                         }
@@ -67,7 +75,7 @@ struct NCManageE2EEView: View {
                             model.requestPasscodeType("removeLocallyEncryption")
                         } else {
                             Task {
-                                await showInfoBanner(controller: model.controller, text: "_e2e_settings_lock_not_active_")
+                                await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
                             }
                         }
                     }
@@ -77,15 +85,18 @@ struct NCManageE2EEView: View {
                 }
             } else {
                 List {
-                    Section(header: Text(""), footer: Text(model.statusOfService + "\n\n" + "End-to-End Encryption " + model.capabilities.e2EEApiVersion)) {
+                    Section(header: Text("").font(.headline),
+                            footer: Text(model.statusOfService + "\n\n" + "End-to-End Encryption " + model.capabilities.e2EEApiVersion).font(.footnote)) {
                         HStack {
                             Label {
                                 Text(NSLocalizedString("_e2e_settings_start_", comment: ""))
+                                    .cappedFont(.body, maxDynamicType: .accessibility2)
                             } icon: {
                                 Image(systemName: "play.circle")
                                     .resizable()
                                     .scaledToFit()
-                                    .font(Font.system(.body).weight(.light))
+                                    .cappedFont(.body, maxDynamicType: .accessibility2)
+                                    .fontWeight(.light)
                                     .frame(width: 25, height: 25)
                                     .foregroundColor(.green)
                             }
@@ -97,7 +108,7 @@ struct NCManageE2EEView: View {
                                 model.requestPasscodeType("startE2E")
                             } else {
                                 Task {
-                                    await showInfoBanner(controller: model.controller, text: "_e2e_settings_lock_not_active_")
+                                    await showInfoBanner(windowScene: model.windowScene, text: "_e2e_settings_lock_not_active_")
                                 }
                             }
                         }
@@ -121,15 +132,18 @@ struct NCManageE2EEView: View {
 
     @ViewBuilder
     var deleteCerificateSection: some View {
-        Section(header: Text("Delete Server keys"), footer: Text("Available only in debug mode")) {
+        Section(header: Text("Delete Server keys").font(.headline),
+                footer: Text("Available only in debug mode").font(.footnote)) {
             HStack {
                 Label {
                     Text("Delete Certificate")
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
                 } icon: {
                     Image(systemName: "exclamationmark.triangle")
                         .resizable()
                         .scaledToFit()
-                        .font(Font.system(.body).weight(.light))
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
+                        .fontWeight(.light)
                         .frame(width: 25, height: 25)
                         .foregroundColor(Color(NCBrandColor.shared.textColor2))
                 }
@@ -144,21 +158,28 @@ struct NCManageE2EEView: View {
                         await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
                     }
                 } completion: { _, _, error in
-                    if error == .success {
-                        NCContentPresenter().messageNotification("E2E delete certificate", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .success)
-                    } else {
-                        NCContentPresenter().messageNotification("E2E delete certificate", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .error)
+                    Task {
+                        if error == .success {
+                            await showInfoBanner(windowScene: model.windowScene,
+                                                 text: "E2E delete certificate")
+                        } else {
+                            await showErrorBanner(windowScene: model.windowScene,
+                                                  text: error.errorDescription,
+                                                  errorCode: error.errorCode)
+                        }
                     }
                 }
             }
             HStack {
                 Label {
                     Text("Delete PrivateKey")
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
                 } icon: {
                     Image(systemName: "exclamationmark.triangle")
                         .resizable()
                         .scaledToFit()
-                        .font(Font.system(.body).weight(.light))
+                        .cappedFont(.body, maxDynamicType: .accessibility2)
+                        .fontWeight(.light)
                         .frame(width: 25, height: 25)
                         .foregroundColor(Color(NCBrandColor.shared.textColor2))
                 }
@@ -173,10 +194,15 @@ struct NCManageE2EEView: View {
                         await NCNetworking.shared.networkingTasks.track(identifier: identifier, task: task)
                     }
                 } completion: { _, _, error in
-                    if error == .success {
-                        NCContentPresenter().messageNotification("E2E delete privateKey", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .success)
-                    } else {
-                        NCContentPresenter().messageNotification("E2E delete privateKey", error: error, delay: NCGlobal.shared.dismissAfterSecond, type: .error)
+                    Task {
+                        if error == .success {
+                            await showInfoBanner(windowScene: model.windowScene,
+                                                 text: "E2E delete privateKey")
+                        } else {
+                            await showErrorBanner(windowScene: model.windowScene,
+                                                  text: error.errorDescription,
+                                                  errorCode: error.errorCode)
+                        }
                     }
                 }
             }

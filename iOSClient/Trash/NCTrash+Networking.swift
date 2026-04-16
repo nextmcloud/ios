@@ -86,7 +86,7 @@ extension NCTrash {
         }
 
         if response.error != .success {
-            await showErrorBanner(controller: self.controller, text: response.error.errorDescription)
+            await showErrorBanner(windowScene: windowScene, text: response.error.errorDescription, errorCode: response.error.errorCode)
         }
         await self.database.deleteTrashAsync(fileId: nil, account: session.account)
         await self.reloadDataSource()
@@ -107,7 +107,7 @@ extension NCTrash {
                 }
             }
             if response.error != .success {
-                await showErrorBanner(controller: self.controller, text: response.error.errorDescription)
+                await showErrorBanner(windowScene: windowScene, text: response.error.errorDescription, errorCode: response.error.errorCode)
             }
             await self.database.deleteTrashAsync(fileId: fileId, account: session.account)
             await self.reloadDataSource()
