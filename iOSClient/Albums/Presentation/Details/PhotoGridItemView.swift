@@ -13,7 +13,7 @@ struct PhotoGridItemView: View {
     @Environment(\.localAccount) var localAccount: String
     
     let album: Album
-    let photo: AlbumPhoto
+    let photo: AlbumPhoto      
     let isVideo: Bool
     let metadata: tableMetadata?
     let iconSize: CGFloat
@@ -28,8 +28,13 @@ struct PhotoGridItemView: View {
                     .resizable()
                     .scaledToFill()
             } else {
-                Rectangle().fill(Color.gray.opacity(0.2))
-                if isLoading { ProgressView().controlSize(.small) }
+                Rectangle().fill(Color.gray.opacity(0.15))
+                if isLoading {
+                    ProgressView().controlSize(.small)
+                } else if !photo.hasPreview {
+                    // Show a generic icon if the API says there is no preview
+                    Image(systemName: "doc").foregroundColor(.gray)
+                }
             }
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
@@ -48,62 +53,67 @@ struct PhotoGridItemView: View {
             alignment: .bottomLeading
         )
         .cornerRadius(8)
-        .task(id: metadata?.fileId ?? album.lastPhotoId) {
-            self.thumbnail = nil
-            self.isLoading = false
-            
-            // If it's a photo entry, skip if it's a directory
-            if let meta = metadata {
-                guard !meta.fileId.isEmpty, !meta.isDirectory else { return }
-            }
-            
-            await loadThumbnail()
+        // Use photo.id to trigger the task
+        .task(id: photo.id) {
+            await loadThumbnailFromPhoto()
         }
     }
     
-    private func loadThumbnail() async {
-        // Fallback to album.lastPhotoId if this tile represents the album itself
-        let fId = metadata?.fileId ?? album.lastPhotoId
-        guard let fileId = fId, !fileId.isEmpty, fileId != "-1" else { return }
-
-        // Use NCGlobal.shared as the fallback for account details
-        let userId = metadata?.userId ?? "" //localAccount.userId
-        let urlBase = metadata?.urlBase ?? "" //NCGlobal.shared.urlBase
-
-        let etag = metadata?.etag ?? ""
-        let shouldBypassCache = (metadata == nil) || etag.isEmpty
-
-        // 1. Check Disk Cache (only if we have a meaningful ETag and metadata)
-        if !shouldBypassCache,
-           let cachedImage = NCUtility().getImage(ocId: fileId,
-                                                 etag: etag,
-                                                 ext: NCGlobal.shared.previewExt512,
-                                                 userId: userId,
-                                                 urlBase: urlBase) {
-            self.thumbnail = cachedImage
+    private func loadThumbnailFromPhoto() async {
+        // 1. Validate: Only load if it has a preview and a valid ID
+        guard photo.hasPreview, !photo.id.isEmpty else {
             return
         }
 
-        // 2. Download Preview
-        await MainActor.run { self.isLoading = true }
-        let resultsPreview = await NextcloudKit.shared.downloadPreviewAsync(
-            fileId: fileId,
-            etag: metadata?.etag ?? "",
-            account: localAccount
-        ) { _ in }
-        
-        if resultsPreview.error == .success, let data = resultsPreview.responseData?.data, let downloadedImage = UIImage(data: data) {
+        // 2. Clear previous state for reused cells
+        await MainActor.run {
+            self.thumbnail = nil
+            self.isLoading = true
+        }
+
+        // 3. Setup parameters from Photo object and Metadata fallback
+        let fileId = photo.id
+        let userId = metadata?.userId ?? ""
+        let urlBase = metadata?.urlBase ?? ""
+        let etag = metadata?.etag ?? ""
+
+        // 4. Try Disk Cache First
+        if let cachedImage = NCUtility().getImage(
+            ocId: fileId,
+            etag: etag,
+            ext: NCGlobal.shared.previewExt512,
+            userId: userId,
+            urlBase: urlBase
+        ) {
             await MainActor.run {
-                self.thumbnail = downloadedImage
+                self.thumbnail = cachedImage
                 self.isLoading = false
             }
-            
-            // 3. Save to Disk
-            Task.detached(priority: .background) {
-                await NCUtility().createImageFileFrom(data: data, ocId: fileId, etag: metadata?.etag ?? "", userId: userId, urlBase: urlBase)
-            }
+            return
         }
-        await MainActor.run { self.isLoading = false }
+
+        // 5. Download Preview
+        let results = await NextcloudKit.shared.downloadPreviewAsync(
+            fileId: fileId,
+            etag: etag,
+            account: localAccount
+        ) { _ in }
+
+        await MainActor.run {
+            if results.error == .success,
+               let data = results.responseData?.data,
+               let image = UIImage(data: data) {
+                self.thumbnail = image
+                
+                // 6. Save to cache (optional but recommended)
+                Task.detached(priority: .background) {
+                    await NCUtility().createImageFileFrom(
+                        data: data, ocId: fileId, etag: etag, userId: userId, urlBase: urlBase
+                    )
+                }
+            }
+            self.isLoading = false
+        }
     }
 }
 

@@ -26,7 +26,6 @@ struct PhotosGridView: View {
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 1) {
-                // IMPORTANT: Do not filter out the nil values here
                 ForEach(Array(photos), id: \.key) { (photo, metadata) in
                     Button {
                         openPhotoViewer(photo: photo, metadata: metadata)
@@ -34,12 +33,9 @@ struct PhotosGridView: View {
                         PhotoGridItemView(
                             album: album,
                             photo: photo,
-                            isVideo: (metadata?.isVideo ?? false),
-                            metadata: metadata,
+                            isVideo: (metadata?.isVideo ?? false), metadata: metadata,
                             iconSize: calculatedIconSize
                         )
-                        .aspectRatio(1, contentMode: .fill)
-                        .clipped()
                     }
                 }
             }

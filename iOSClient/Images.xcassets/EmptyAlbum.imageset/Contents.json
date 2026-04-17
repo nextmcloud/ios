@@ -1,7 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Empty album viw.svg",
+      "filename" : "empty-files.svg",
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "empty-files-dark.svg",
       "idiom" : "universal"
     }
   ],
