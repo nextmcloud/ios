@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct PhotosGridView: View {
+    let localAccount: String // Add this
     let photos: [AlbumPhoto : tableMetadata?]
     let onAddPhotosIntent: () -> Void
     let album: Album
@@ -33,7 +34,8 @@ struct PhotosGridView: View {
                         PhotoGridItemView(
                             album: album,
                             photo: photo,
-                            isVideo: (metadata?.isVideo ?? false), metadata: metadata,
+                            isVideo: (metadata?.isVideo ?? false),
+                            metadata: metadata,
                             iconSize: calculatedIconSize
                         )
                     }
@@ -43,20 +45,52 @@ struct PhotosGridView: View {
     }
     
     private func openPhotoViewer(photo: AlbumPhoto, metadata: tableMetadata?) {
-        guard let metadata else { return } // Viewer still needs metadata to function
+        // 1. Try to use existing metadata, or find it in the DB, or create a stub
+        var activeMetadata = metadata
         
-        guard let navController = (UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController)?.selectedViewController as? UINavigationController else { return }
-        guard let viewer = UIStoryboard(name: "NCViewerMediaPage", bundle: nil).instantiateInitialViewController() as? NCViewerMediaPage else { return }
+        if activeMetadata == nil {
+            // Attempt database lookup first to get full details
+            activeMetadata = NCManageDatabase.shared.getMetadataFromOcId(photo.id)
+        }
         
-        let ocIds = photos.values.compactMap { $0?.ocId }
+        if activeMetadata == nil {
+            // Fallback: Manually create metadata from the AlbumPhoto object
+            let stub = tableMetadata()
+            stub.ocId = photo.id
+            stub.fileId = photo.id
+            stub.fileName = photo.fileName
+            stub.account = self.localAccount
+            // Combine album path with photo name if necessary
+            stub.path = "\(album.href)/\(photo.fileName)"
+            activeMetadata = stub
+        }
+
+        // 2. Safety check
+        guard let finalMetadata = activeMetadata else { return }
+
+        // 3. Navigation and Viewer Setup
+        guard let navController = (UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { $0.activationState == .foregroundActive })?
+            .windows
+            .first(where: { $0.isKeyWindow })?.rootViewController as? NCMainTabBarController)?
+            .selectedViewController as? UINavigationController else { return }
+            
+        guard let viewer = UIStoryboard(name: "NCViewerMediaPage", bundle: nil)
+            .instantiateInitialViewController() as? NCViewerMediaPage else { return }
+        
+        // 4. Populate viewer with the new metadata
+        // We filter out nils to ensure metadatas and ocIds arrays stay in sync
         let metadatas = photos.values.compactMap { $0 }
+        let ocIds = metadatas.map { $0.ocId }
 
         viewer.ocIds = ocIds
         viewer.metadatas = metadatas
-        viewer.currentIndex = metadatas.firstIndex(where: { $0.ocId == metadata.ocId }) ?? 0
+        viewer.currentIndex = metadatas.firstIndex(where: { $0.ocId == finalMetadata.ocId }) ?? 0
         viewer.albumName = album.name
         viewer.albumServerUrl = album.href
         viewer.albumPhoto = photo
+        
         navController.pushViewController(viewer, animated: true)
     }
 }
