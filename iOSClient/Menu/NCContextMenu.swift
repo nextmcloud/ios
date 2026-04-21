@@ -192,9 +192,46 @@ class NCContextMenu: NSObject {
         //
         if metadata.isSavebleInCameraRoll {
             let controller = self.viewController.tabBarController as? NCMainTabBarController
-            mainActionsMenu.append(ContextMenuActions.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller))
+            
+            // 1. Add the standard action from your helper
+            let saveAction = ContextMenuActions.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller)
+            mainActionsMenu.append(saveAction)
+            
+            // 2. Define your localized title for checking
+            let saveTitle = NSLocalizedString("_save_selected_files_", comment: "")
+            
+            // 3. Only append the fallback if an action with that title doesn't exist yet
+            if !mainActionsMenu.contains(where: { $0.title == saveTitle }) {
+                let fallbackSave = UIAction(
+                    title: saveTitle,
+                    image: UIImage(named: "save_files")?.withTintColor(NCBrandColor.shared.iconImageColor)
+                ) { _ in
+                    // Your action logic
+                    let _ = ContextMenuActions.saveMediaAction(selectedMediaMetadatas: [metadata], controller: controller)
+                }
+                mainActionsMenu.append(fallbackSave)
+            }
         }
 
+        //
+        // ADD TO ALBUM
+        //
+        // Check if file is image or video and add "Add to Album" action
+        if metadata.isImage || metadata.isVideo {
+            mainActionsMenu.append(UIAction(
+                title: NSLocalizedString("_add_to_album", comment: ""),
+                image: utility.loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
+                handler: { _ in
+                    // Present existing albums UI to add this media item
+                    if let controller = self.viewController as? NCMainTabBarController {
+                        NCMediaNavigationController.presentExistingAlbums(presentingController: controller, selectedPhotos: [self.metadata.ocId], account: self.metadata.account)
+                    } else {
+                        NCMediaNavigationController.presentExistingAlbums(presentingController: self.viewController, selectedPhotos: [self.metadata.ocId], account: self.metadata.account)
+                    }
+                }
+            ))
+        }
+        
         // Rename
         if metadata.isRenameable {
             mainActionsMenu.append(makeRenameAction(metadata: metadata))

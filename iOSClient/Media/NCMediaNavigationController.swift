@@ -366,36 +366,32 @@ class NCMediaNavigationController: NCMainNavigationController {
                 
                 switch result {
                 case .success:
-                    let tabbarController = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController
-                    tabbarController?.selectedIndex = 3
+                    // Ensure user remains in Albums tab and navigation stack is valid
+                    guard let tabbarController = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController else { return }
+                    tabbarController.selectedIndex = NCGlobal.shared.selectedTabIndexAlbum
+                    // Pop the current navigation stack in Albums to root (dashboard)
+                    tabbarController.navigationController?.popToRootViewController(animated: false)
+                    // Push the album details route through AlbumsNavigator
                     AlbumsNavigator.shared.push(.albumDetails(album: album))
                     AlbumsManager.shared.syncAlbums()
-                    
                 case .failure(let error):
                     let nkError = NKError(error: error)
-                        
-                    // 1. Log the high-level error (usually 1)
-                    debugPrint("Top-level errorCode:", nkError.errorCode)
-
-                    // 2. Check the nested error for the 409 Conflict
-                    if let innerError = nkError.error as? NKError,
-                       innerError.errorCode == NCGlobal.shared.errorConflict {
-                        
-                        // This is the "File already exists" case (409)
-                        let conflictError = NKError(errorCode: NCGlobal.shared.errorConflict,
-                                                    errorDescription: "_file_already_exists_")
+                    if let innerError = nkError.error as? NKError, innerError.errorCode == NCGlobal.shared.errorConflict {
+                        let conflictError = NKError(errorCode: NCGlobal.shared.errorConflict, errorDescription: "_file_already_exists_")
                         NCContentPresenter().showInfo(error: conflictError)
-                        
                     } else if nkError.errorCode == NCGlobal.shared.errorConflict {
-                        // Fallback check if the top-level error itself is 409
                         NCContentPresenter().showInfo(error: nkError)
                     } else {
-                        // Handle all other errors (Network, 404, 500, etc.)
                         NCContentPresenter().showError(error: nkError)
                     }
                 }
             }
             
         }
+    }
+    
+    static func ensureAlbumsContextSelected() {
+        guard let tabbarController = UIApplication.shared.firstWindow?.rootViewController as? NCMainTabBarController else { return }
+        tabbarController.selectedIndex = NCGlobal.shared.selectedTabIndexAlbum
     }
 }

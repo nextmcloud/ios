@@ -157,6 +157,20 @@ enum NCViewerContextMenu {
             }
         
             //
+            // ADD TO ALBUM
+            //
+            // Check if file is image or video and add "Add to Album" action
+            if metadata.isImage || metadata.isVideo {
+                menuElements.append(UIAction(
+                    title: NSLocalizedString("_add_to_album", comment: ""),
+                    image: NCUtility().loadImage(named: "plus", colors: [NCBrandColor.shared.iconImageColor], size: 24).withTintColor(NCBrandColor.shared.iconImageColor),
+                    handler: { _ in
+                        // Present existing albums UI to add this media item
+                        NCMediaNavigationController.presentExistingAlbums(presentingController: controller, selectedPhotos: [metadata.ocId], account: metadata.account)
+                    }
+                ))
+            }
+            //
             // COPY - MOVE
             //
             if !webView, metadata.isCopyableMovable {
