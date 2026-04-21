@@ -18,7 +18,7 @@ public struct Album: Identifiable, Hashable {
     let collaborators: String?
     let startDate: Date?
     let endDate: Date?
-    
+
     struct AlbumDateRange: Codable, Hashable {
         let start: TimeInterval
         let end: TimeInterval
@@ -52,8 +52,10 @@ public struct Album: Identifiable, Hashable {
             self.startDate = Date(timeIntervalSince1970: decoded.start)
             self.endDate   = Date(timeIntervalSince1970: decoded.end)
         } else {
-            self.startDate = nil
-            self.endDate   = nil
+            // FALLBACK: Use current date for new/empty albums
+            let now = Date()
+            self.startDate = now
+            self.endDate   = now
         }
     }
 }

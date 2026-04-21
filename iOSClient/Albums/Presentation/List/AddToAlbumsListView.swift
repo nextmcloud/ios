@@ -145,15 +145,15 @@ struct AlbumRow: View {
     
     private func makeSubtitle(for album: Album) -> String? {
         guard let count = album.itemCount else { return nil }
-        
         var parts: [String] = ["\(count) \(NSLocalizedString("_albums_list_entities_", comment: ""))"]
-        
+        let formatter = DateFormatter()
         if count > 0, let end = album.endDate {
-            let formatter = DateFormatter()
             formatter.dateStyle = .medium
             parts.append(formatter.string(from: end))
+        } else if count == 0, let created = album.startDate {
+            formatter.dateFormat = "MMMM yyyy" // "MMMM" for full month name, "yyyy" for year
+            parts.append(formatter.string(from: created))
         }
-        
         return parts.joined(separator: " - ")
     }
     
