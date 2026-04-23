@@ -19,6 +19,9 @@ class NCMedia: UIViewController {
     @IBOutlet weak var gradientView: UIView!
     @IBOutlet weak var gradientViewHeightContsraint: NSLayoutConstraint!
 
+    // Called when initial media data has finished loading
+    var onInitialLoadCompleted: (() -> Void)?
+
     let semaphoreSearchMedia = DispatchSemaphore(value: 1)
     let semaphoreNotificationCenter = DispatchSemaphore(value: 1)
 
@@ -40,7 +43,7 @@ class NCMedia: UIViewController {
 //    var fileSelect: [String] = []
     // 1. Add this property here (NOT in an extension)
     weak var selectionDelegate: NCMediaSelectionDelegate?
-    
+
     // 2. Find your existing fileSelect array and add the didSet
     var fileSelect: [String] = [] {
         didSet {
@@ -50,6 +53,10 @@ class NCMedia: UIViewController {
     var filesExists: ThreadSafeArray<String> = ThreadSafeArray()
     var ocIdDoNotExists: ThreadSafeArray<String> = ThreadSafeArray()
     var searchMediaInProgress: Bool = false
+    // Tracks whether we have completed an explicit preload before presentation
+    private var didCompleteInitialPreload = false
+    private var explicitPreloadTask: Task<Void, Never>?
+
     var attributesZoomIn: UIMenuElement.Attributes = []
     var attributesZoomOut: UIMenuElement.Attributes = []
     var showOnlyImages = false
@@ -81,7 +88,7 @@ class NCMedia: UIViewController {
     var lastContentOffsetY: CGFloat = 0
     let maxImageGrid: CGFloat = 7
     var hiddenCellMetadats: ThreadSafeArray<String> = ThreadSafeArray()
-    
+
     var isInGeneralPhotosSelectionContext: Bool = false
 
     let debouncerLoadDataSource = NCDebouncer(maxEventCount: 10)
@@ -110,6 +117,29 @@ class NCMedia: UIViewController {
 
 //    var isInGeneralPhotosSelectionContext: Bool = false
 
+    // MARK: - Programmatic Preload API
+    /// Preloads the media data (data source and initial search) so that the controller is ready when presented.
+    /// Safe to call while the media tab hasn't been opened yet. Idempotent across multiple calls.
+    @MainActor
+    func preloadIfNeeded() {
+        // Avoid re-running if already completed
+        if didCompleteInitialPreload { return }
+        // Cancel any previous explicit preload
+        explicitPreloadTask?.cancel()
+        explicitPreloadTask = Task { [weak self] in
+            guard let self else { return }
+            // Ensure view is loaded to set up collectionView/layout safely
+            _ = self.view
+            // Run the same loading sequence used in view lifecycle, but explicitly
+            await self.loadDataSource()
+            await self.searchMediaUI(true)
+            self.didCompleteInitialPreload = true
+            await MainActor.run {
+                self.onInitialLoadCompleted?()
+            }
+        }
+    }
+
     // MARK: - View Life Cycle
 
     override func viewDidLoad() {
@@ -135,12 +165,12 @@ class NCMedia: UIViewController {
         layout.sectionInset = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: 2)
         collectionView.collectionViewLayout = layout
         layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layout: global.mediaLayoutRatio).layout
-        
+
 //        tabBarSelect = NCMediaSelectTabBar(controller: self.tabBarController, viewController: self, delegate: self)
 
         titleDate.text = ""
         titleDate.isHidden = true
-        
+
         isEditMode = isInGeneralPhotosSelectionContext ? true : false
 
         // Gradient Layer
@@ -184,7 +214,7 @@ class NCMedia: UIViewController {
                 titleConstraint.constant = -34
             }
         }
-        
+
         titleDate.text = ""
         titleDate?.textColor = .white
         activityIndicator.color = .white
@@ -219,7 +249,7 @@ class NCMedia: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(deleteFile(_:)), name: NSNotification.Name(rawValue: global.notificationCenterDeleteFile), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(reloadDataSource(_:)), name: NSNotification.Name(rawValue: global.notificationCenterReloadDataSource), object: nil)
-        
+
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
             Task {
                 await self.networkRemoveAll()
@@ -248,8 +278,10 @@ class NCMedia: UIViewController {
             }
         }
         Task {
-            await self.loadDataSource()
-            await self.searchMediaUI(true)
+            if !self.didCompleteInitialPreload {
+                await self.loadDataSource()
+                await self.searchMediaUI(true)
+            }
         }
         AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__MEDIA)
     }
@@ -263,10 +295,14 @@ class NCMedia: UIViewController {
         Task {
             await networking.transferDispatcher.addDelegate(self)
         }
-        
+
         NotificationCenter.default.addObserver(self, selector: #selector(copyMoveFile(_:)), name: NSNotification.Name(rawValue: global.notificationCenterCopyMoveFile), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(enterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
+
+        if !didCompleteInitialPreload {
+            onInitialLoadCompleted?()
+        }
 
         searchNewMedia()
     }
@@ -302,7 +338,7 @@ class NCMedia: UIViewController {
             return .lightContent
         }
     }
-    
+
     func searchNewMedia() {
         timerSearchNewMedia?.invalidate()
         timerSearchNewMedia = Timer.scheduledTimer(withTimeInterval: timeIntervalSearchNewMedia, repeats: false) { [weak self] _ in
@@ -312,7 +348,7 @@ class NCMedia: UIViewController {
             }
         }
     }
-    
+
     // MARK: - NotificationCenter
 
     func networkRemoveAll() async {
@@ -369,7 +405,7 @@ class NCMedia: UIViewController {
 //            semaphoreNotificationCenter.signal()
         }
     }
-    
+
     @objc func enterForeground(_ notification: NSNotification) {
         searchNewMedia()
     }
@@ -411,7 +447,7 @@ class NCMedia: UIViewController {
             }
         }
     }
-    
+
     func buildMediaPhotoVideo(columnCount: Int) {
         var pointSize: CGFloat = 0
 
@@ -429,12 +465,12 @@ class NCMedia: UIViewController {
             videoImage = image
         }
     }
-    
+
     // MARK: - Command
-    
+
     func setupMediaCommandView() {
         mediaCommandView?.title.text = ""
-        
+
         mediaCommandView = Bundle.main.loadNibNamed("NCMediaCommandView", owner: self, options: nil)?.first as? NCMediaCommandView
         self.view.addSubview(mediaCommandView!)
         mediaCommandView?.mediaView = self
@@ -447,7 +483,7 @@ class NCMedia: UIViewController {
         mediaCommandView?.heightAnchor.constraint(equalToConstant: 150).isActive = true
         self.updateMediaControlVisibility()
     }
-    
+
     private func setupForGeneralPhotosSelection() {
         if isInGeneralPhotosSelectionContext {
             gradientViewHeightContsraint.constant = 0
@@ -455,7 +491,7 @@ class NCMedia: UIViewController {
             isEditMode = true
         }
     }
-    
+
     func updateMediaControlVisibility() {
 
         if let metadatas = self.metadatas, metadatas.isEmpty {
@@ -561,7 +597,7 @@ class NCMediaCommandView: UIView {
         moreButton.setImage(UIImage(named: "more")!.image(color: .white, size: 25), for: .normal)
         title.text = ""
     }
-    
+
     func setupForGeneralPhotosSelection() {
         gridSwitchButton.isHidden = true
         moreView.isHidden = true
@@ -633,3 +669,4 @@ class NCMediaCommandView: UIView {
         gradient.frame = bounds
     }
 }
+

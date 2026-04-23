@@ -12,6 +12,9 @@ struct AlbumDetailsScreen: View {
     
     private let album: Album
     @StateObject private var viewModel: AlbumDetailsViewModel
+    @State private var showMedia = false
+    @State private var mediaReady = false
+    @State private var pendingSelection: [String] = []
     
     init(account: String, album: Album) {
         self.album = album
@@ -60,12 +63,38 @@ struct AlbumDetailsScreen: View {
                 }
             }
         }
-        .sheet(
-            isPresented: $viewModel.isPhotoSelectionSheetVisible
-        ) {
-            PhotoSelectionSheet(
-                onPhotosSelected: viewModel.onPhotosSelected
-            )
+        .sheet(isPresented: $showMedia) {
+            NavigationView {
+                NCMediaHost(
+                    storyboardName: "NCMedia",
+                    sceneIdentifier: "NCMedia.storyboard",
+                    isSelectionContext: true,
+                    onLoaded: {
+                        mediaReady = true
+                    },
+                    onSelectionChange: { files in
+                        pendingSelection = files
+                    }
+                )
+                .navigationTitle(NSLocalizedString("_albums_photo_selection_sheet_title_", comment: ""))
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(NSLocalizedString("_albums_photo_selection_sheet_back_btn_", comment: "")) {
+                            // Dismiss by toggling the sheet state
+                            showMedia = false
+                        }
+                        .foregroundColor(Color(NCBrandColor.shared.customer))
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(NSLocalizedString("_albums_photo_selection_sheet_done_btn_", comment: "")) {
+                            viewModel.onPhotosSelected(selectedPhotos: pendingSelection)
+                            showMedia = false
+                        }
+                        .foregroundColor(Color(NCBrandColor.shared.customer))
+                    }
+                }
+            }
         }
         .inputAlbumNameAlert(
             isPresented: $viewModel.isRenameAlbumPopupVisible,
@@ -118,6 +147,7 @@ struct AlbumDetailsScreen: View {
             }
         } else {
             PhotosGridView(
+                localAccount: viewModel.account,
                 photos: viewModel.photos,
                 onAddPhotosIntent: handleAddPhotosIntent,
                 album: album
@@ -130,6 +160,7 @@ struct AlbumDetailsScreen: View {
     
     private func handleAddPhotosIntent() {
         viewModel.onAddPhotosIntent()
+        showMedia = true
     }
 }
 
@@ -150,5 +181,4 @@ struct AlbumDetailsScreen: View {
 //    }
 //}
 //#endif
-
 

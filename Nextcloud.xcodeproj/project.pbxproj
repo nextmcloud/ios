@@ -285,6 +285,7 @@
 		B5C980182DACD51C0041B146 /* NCMediaCommandView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B5C980172DACD51C0041B146 /* NCMediaCommandView.xib */; };
 		B5C9801A2DACD56C0041B146 /* NCMedia+Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */; };
 		B5C980202DAD201A0041B146 /* NCSortMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C9801F2DAD201A0041B146 /* NCSortMenu.swift */; };
+		B5C983B42F9A0F7D0008AD71 /* NCMediaHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C983B32F9A0F7D0008AD71 /* NCMediaHost.swift */; };
 		B5D45E6D2DA510E000773929 /* NCRenameFile.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */; };
 		B5D45E6E2DA510E000773929 /* NCRenameFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E6B2DA510E000773929 /* NCRenameFile.swift */; };
 		B5D45E732DA5172900773929 /* AppUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D45E712DA5172900773929 /* AppUpdater.swift */; };
@@ -1363,6 +1364,7 @@
 		B5C980172DACD51C0041B146 /* NCMediaCommandView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NCMediaCommandView.xib; sourceTree = "<group>"; };
 		B5C980192DACD56C0041B146 /* NCMedia+Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NCMedia+Menu.swift"; sourceTree = "<group>"; };
 		B5C9801F2DAD201A0041B146 /* NCSortMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCSortMenu.swift; sourceTree = "<group>"; };
+		B5C983B32F9A0F7D0008AD71 /* NCMediaHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMediaHost.swift; sourceTree = "<group>"; };
 		B5D45E6A2DA510E000773929 /* NCRenameFile.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = NCRenameFile.storyboard; sourceTree = "<group>"; };
 		B5D45E6B2DA510E000773929 /* NCRenameFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCRenameFile.swift; sourceTree = "<group>"; };
 		B5D45E712DA5172900773929 /* AppUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdater.swift; sourceTree = "<group>"; };
@@ -3675,6 +3677,7 @@
 				F7D60CAE2C941ACB008FBFDD /* NCMediaPinchGesture.swift */,
 				F741C2232B6B9FD600E849BB /* NCMediaSelectTabBar.swift */,
 				B59DDBE22F6AE41100C41E96 /* NCMediaService.swift */,
+				B5C983B32F9A0F7D0008AD71 /* NCMediaHost.swift */,
 			);
 			path = Media;
 			sourceTree = "<group>";
@@ -5042,6 +5045,7 @@
 				F3A0479B2BD2668800658E7B /* NCAssistant.swift in Sources */,
 				B52920B92ED471A7005467F8 /* NCCreateDocumentCustomTextField.swift in Sources */,
 				F359D8672A7D03420023F405 /* NCUtility+Exif.swift in Sources */,
+				B5C983B42F9A0F7D0008AD71 /* NCMediaHost.swift in Sources */,
 				F7A03E352D427312007AA677 /* NCMainNavigationController.swift in Sources */,
 				F769CA192966EA3C00039397 /* ComponentView.swift in Sources */,
 				F7C9B91D2B582F550064EA91 /* NCManageDatabase+SecurityGuard.swift in Sources */,

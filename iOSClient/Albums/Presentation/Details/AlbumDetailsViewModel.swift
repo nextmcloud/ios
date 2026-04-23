@@ -18,7 +18,7 @@ protocol AlbumActionHandler: AnyObject {
 
 class AlbumDetailsViewModel: ObservableObject {
     
-    private let account: String
+    @Published var account: String
     private var album: Album
     
     @Published private(set) var screenTitle: String
