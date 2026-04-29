@@ -81,6 +81,7 @@ extension NCShare {
                         viewNewUserComment.metadata = self.metadata
                         viewNewUserComment.share = tableShare(value: share)
                         viewNewUserComment.networking = self.networking
+                        viewNewUserComment.isFromMenu = true
                         self.navigationController?.pushViewController(viewNewUserComment, animated: true)
                     }
                 )

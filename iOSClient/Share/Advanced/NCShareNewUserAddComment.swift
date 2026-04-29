@@ -40,6 +40,7 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
     var isNewShare: Bool { share is NCTableShareOptions }
     var networking: NCShareNetworking?
 
+    var isFromMenu: Bool = false
     ///
     /// The possible download limit associated with this share.
     ///
@@ -72,6 +73,10 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
         btnSendShare.layer.cornerRadius = 10
         btnSendShare.layer.masksToBounds = true
 
+        if !self.isFromMenu {
+            buttonContainerView.isHidden = true
+        }
+        
         sharingLabel.text = NSLocalizedString("_share_note_recipient_", comment: "")
 
         noteTextField.textContainerInset = UIEdgeInsets(top: contentInsets, left: contentInsets, bottom: contentInsets, right: contentInsets)
@@ -83,7 +88,9 @@ class NCShareNewUserAddComment: UIViewController, NCShareNavigationTitleSetting 
         } onDone: {
             self.noteTextField.resignFirstResponder()
             self.share.note = self.noteTextField.text
-//            self.navigationController?.popViewController(animated: true)
+            if !self.isFromMenu {
+                self.navigationController?.popViewController(animated: true)
+            }
         }
 
         noteTextField.inputAccessoryView = toolbar.wrappedSafeAreaContainer
