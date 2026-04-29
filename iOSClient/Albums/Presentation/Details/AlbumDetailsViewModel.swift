@@ -200,19 +200,11 @@ class AlbumDetailsViewModel: ObservableObject {
 
     func deletePhotoFromAlbum(_ photo: AlbumPhoto, metadata: tableMetadata) async -> NKError {
         
-        // Determine the fileName for the photo to remove
-        // We keep a reference to metadata in our photos dictionary keyed by AlbumPhoto
-        // Ensure this string has ACTUAL SPACES, not %20.
-        let fileName: String
-        if let meta = photos[photo] as? tableMetadata {
-            fileName = meta.fileName.removingPercentEncoding ?? meta.fileName
-        } else {
-            fileName = photo.fileName.removingPercentEncoding ?? photo.fileName
-        }
-
+        // Use the album entry's lastPathComponent (includes fileId prefix), do not decode
+        let fileName: String = photo.fileName
         print("DEBUG: Attempting to remove: \(fileName)")
         
-        var results = await NextcloudKit.shared.deletePhotoFromAlbumAsync(albumName: album.name, fileName: fileName, serverUrlFileName: metadata.serverUrlFileName, account: metadata.account) { task in
+        let results = await NextcloudKit.shared.deletePhotoFromAlbumAsync(albumName: album.name, fileName: fileName, serverUrlFileName: metadata.serverUrlFileName, account: metadata.account) { task in
             Task {
                 let identifier = await NCNetworking.shared.networkingTasks.createIdentifier(account: metadata.account,
                                                                                             path: metadata.serverUrlFileName,
@@ -221,44 +213,20 @@ class AlbumDetailsViewModel: ObservableObject {
             }
         }
         
-//        self.isLoadingPopupVisible = false
-
-        if results.error == .success || results.error.errorCode == NCGlobal.shared.errorResourceNotFound || (results.error.errorCode == NCGlobal.shared.errorForbidden && metadata.isLivePhotoVideo) {
-            do {
-                try FileManager.default.removeItem(atPath: NCUtilityFileSystem().getDirectoryProviderStorageOcId(metadata.ocId, userId: metadata.userId, urlBase: metadata.urlBase))
-            } catch { }
-
-            await NCManageDatabase.shared.deleteVideoAsync(metadata.ocId)
-            if !metadata.livePhotoFile.isEmpty {
-                await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.livePhotoFile)
-            }
-            await NCManageDatabase.shared.deleteMetadataAsync(id: metadata.ocId)
-            await NCManageDatabase.shared.deleteLocalFileAsync(id: metadata.ocId)
-
-            if metadata.directory {
-                let serverUrl = NCUtilityFileSystem().createServerUrl(serverUrl: metadata.serverUrl, fileName: metadata.fileName)
-                await NCManageDatabase.shared.deleteDirectoryAndSubDirectoryAsync(serverUrl: serverUrl,
-                                                                                  account: metadata.account)
-            }
-
-            results.error = .success
+        if results.error == .success {
+            // Successfully unlinked from album. Do not delete local file or metadata.
+            return .success
+        } else if results.error.errorCode == NCGlobal.shared.errorResourceNotFound {
+            // Treat missing resource as already unlinked; do not delete local entities.
+            return .success
+        } else if results.error.errorCode == NCGlobal.shared.errorForbidden && metadata.isLivePhotoVideo {
+            // Some servers may forbid removing the video part of a Live Photo; ignore and treat as success.
+            return .success
         } else {
             await NCManageDatabase.shared.setMetadataSessionAsync(ocId: metadata.ocId,
                                                                   status: NCGlobal.shared.metadataStatusNormal)
+            return results.error
         }
-
-//        await transferDispatcher.notifyAllDelegates { delegate in
-//            delegate.transferChange(status: NCGlobal.shared.networkingStatusDelete,
-//                                    account: metadata.account,
-//                                    fileName: metadata.fileName,
-//                                    serverUrl: metadata.serverUrl,
-//                                    selector: metadata.sessionSelector,
-//                                    ocId: metadata.ocId,
-//                                    destination: nil,
-//                                    error: results.error)
-//        }
-
-        return results.error
     }
     
     func renameAlbum() {

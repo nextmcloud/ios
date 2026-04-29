@@ -521,10 +521,20 @@ public extension NextcloudKit {
                             completion: @escaping (_ account: String, _ responseData: AFDataResponse<Data>?, _ error: NKError) -> Void) {
         let session = NCSession.shared.getSession(account: account)
 
-        let urlPath = session.urlBase + "/remote.php/dav/photos/" + session.userId + "/albums/" + albumName + "/" + fileName
+        // Build URL by appending path components to avoid double-encoding (e.g., %2520)
+        guard var baseUrl = URL(string: session.urlBase) else {
+            return options.queue.async { completion(account, nil, .urlError) }
+        }
+        baseUrl.appendPathComponent("remote.php")
+        baseUrl.appendPathComponent("dav")
+        baseUrl.appendPathComponent("photos")
+        baseUrl.appendPathComponent(session.userId)
+        baseUrl.appendPathComponent("albums")
+        baseUrl.appendPathComponent(albumName)
+        baseUrl.appendPathComponent(fileName)
+        let url = baseUrl
 
-        guard let url = urlPath.encodedToUrl,
-              let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
+        guard let nkSession = nkCommonInstance.nksessions.session(forAccount: account),
               let headers = nkCommonInstance.getStandardHeaders(account: account, options: options, contentType: "application/xml", accept: "application/xml") else {
             return options.queue.async { completion(account, nil, .urlError) }
         }
@@ -542,13 +552,21 @@ public extension NextcloudKit {
         }.responseData(queue: self.nkCommonInstance.backgroundQueue) { response in
             // Inline evaluation to avoid calling inaccessible helper
             let resultError: NKError
-            if let statusCode = response.response?.statusCode, (200...299).contains(statusCode) {
-                resultError = .success
+            if let statusCode = response.response?.statusCode {
+                if (200...299).contains(statusCode) {
+                    resultError = .success
+                } else if statusCode == NCGlobal.shared.errorResourceNotFound { // 404 - already not in album
+                    resultError = .success
+                } else {
+                    // Non-2xx, non-404: derive from AFError if present, else map to HTTP error
+                    if let afError = response.error {
+                        resultError = NKError(error: afError, afResponse: response, responseData: response.data)
+                    } else {
+                        resultError = NKError(errorCode: statusCode, errorDescription: "HTTP error \(statusCode)", responseData: response.data)
+                    }
+                }
             } else if let afError = response.error {
                 resultError = NKError(error: afError, afResponse: response, responseData: response.data)
-            } else if let status = response.response?.statusCode {
-                // Map non-2xx status to a generic invalidResponseError
-                resultError = NKError(errorCode: status, errorDescription: "HTTP error \(status)", responseData: response.data)
             } else {
                 resultError = NKError.invalidResponseError
             }
