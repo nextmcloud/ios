@@ -52,7 +52,7 @@ class NCMedia: UIViewController {
     }
     var filesExists: ThreadSafeArray<String> = ThreadSafeArray()
     var ocIdDoNotExists: ThreadSafeArray<String> = ThreadSafeArray()
-//    var searchMediaInProgress: Bool = false
+    var searchMediaInProgress: Bool = false
     // Tracks whether we have completed an explicit preload before presentation
     private var didCompleteInitialPreload = false
     private var explicitPreloadTask: Task<Void, Never>?
@@ -75,28 +75,13 @@ class NCMedia: UIViewController {
     var currentScale: CGFloat = 1.0
     var maxColumns: Int {
         let screenWidth = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-        let column = Int(screenWidth / 55)
+        let column = Int(screenWidth / 44)
 
         return column
     }
     var transitionColumns = false
+    var numberOfColumns: Int = 0
     var lastNumberOfColumns: Int = 0
-    var numberOfColumns: Int = 0 {
-        didSet {
-            guard oldValue > 0,
-                  numberOfColumns != oldValue else {
-                return
-            }
-            let oldExtension = global.getSizeExtension(column: oldValue)
-            let newExtension = global.getSizeExtension(column: numberOfColumns)
-
-            guard oldExtension != newExtension else {
-                return
-            }
-
-            imageCache.removeAll()
-        }
-    }
     var loadingTask: Task<Void, any Error>?
     var mediaCommandView: NCMediaCommandView?
     var activeAccount = tableAccount()
@@ -106,50 +91,8 @@ class NCMedia: UIViewController {
 
     var isInGeneralPhotosSelectionContext: Bool = false
 
-    var imageLoadingTasks: [String: Task<Void, Never>] = [:]
-    let debouncerLoadDataSource = NCDebouncer(delay: .seconds(3), maxEventCount: 10)
-    let debouncerSearch = NCDebouncer(delay: .seconds(2), maxEventCount: 10)
-
-    struct CollectionViewScrollAnchor {
-        let ocId: String
-        let deltaX: CGFloat
-        let deltaY: CGFloat
-    }
-
-    var searchMediaTask: Task<Void, Never>?
-    var buildDataSourceTask: Task<Void, Never>?
-
-    var datasourceMediaInProgress: Bool = false
-    var searchMediaInProgress: Bool = false {
-        didSet {
-            guard oldValue != searchMediaInProgress else {
-                return
-            }
-
-            updateLeftBarButtonItems(
-                date: navigationItem.leftBarButtonItems?.first === buttonDateBarItem ? buttonDateBarItem : nil,
-                activity: searchMediaInProgress
-            )
-        }
-    }
-
-    internal lazy var buttonDateBarItem = UIBarButtonItem(
-        title: nil,
-        style: .plain,
-        target: self,
-        action: #selector(presentMediaDatePicker)
-    )
-    internal var lastVisibleDateRange: (first: IndexPath, last: IndexPath)?
-
-    internal lazy var searchActivityIndicator: UIActivityIndicatorView = {
-        let activityIndicator = UIActivityIndicatorView(style: .medium)
-        activityIndicator.hidesWhenStopped = true
-        return activityIndicator
-    }()
-
-    internal lazy var searchActivityBarButtonItem: UIBarButtonItem = {
-        UIBarButtonItem(customView: searchActivityIndicator)
-    }()
+    let debouncerLoadDataSource = NCDebouncer(maxEventCount: 10)
+    let debouncerSearch = NCDebouncer(maxEventCount: 10)
 
     @MainActor
     var session: NCSession.Session {
@@ -164,13 +107,6 @@ class NCMedia: UIViewController {
         return self.isViewLoaded && self.view.window != nil
     }
 
-    // Album selection presents Media in a sheet and keeps searching while selecting.
-    var allowsSearchWhileSelecting: Bool { false }
-
-    var isMediaPresentationActive: Bool {
-        isViewActived && tabBarController?.selectedViewController === navigationController
-    }
-
     var isPinchGestureActive: Bool {
         return pinchGesture.state == .began || pinchGesture.state == .changed
     }
@@ -179,11 +115,6 @@ class NCMedia: UIViewController {
         (self.tabBarController as? NCMainTabBarController)?.sceneIdentifier ?? ""
     }
 
-    @MainActor
-    internal var windowScene: UIWindowScene? {
-       SceneManager.shared.getWindowScene(controller: self.tabBarController as? NCMainTabBarController)
-    }
-    
 //    var isInGeneralPhotosSelectionContext: Bool = false
 
     // MARK: - Programmatic Preload API
@@ -218,7 +149,6 @@ class NCMedia: UIViewController {
         navigationController?.setNavigationBarAppearance()
 
         collectionView.register(UINib(nibName: "NCSectionFirstHeaderEmptyData", bundle: nil), forSupplementaryViewOfKind: mediaSectionHeader, withReuseIdentifier: "sectionFirstHeaderEmptyData")
-        collectionView.register(UINib(nibName: "NCMediaSectionHeader", bundle: nil), forSupplementaryViewOfKind: mediaSectionHeader, withReuseIdentifier: "sectionHeader")
         collectionView.register(UINib(nibName: "NCSectionFooter", bundle: nil), forSupplementaryViewOfKind: mediaSectionFooter, withReuseIdentifier: "sectionFooter")
         collectionView.register(UINib(nibName: "NCMediaCell", bundle: nil), forCellWithReuseIdentifier: "mediaCell")
         collectionView.alwaysBounceVertical = true
@@ -230,12 +160,11 @@ class NCMedia: UIViewController {
         collectionView.dragDelegate = self
         collectionView.dropDelegate = self
         collectionView.accessibilityIdentifier = "NCMedia"
+        // collectionView.contentInsetAdjustmentBehavior = .never
 
         layout.sectionInset = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: 2)
-        layout.overlaysSectionHeader = true
         collectionView.collectionViewLayout = layout
-//        layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layout: global.mediaLayoutRatio).layout
-        layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layoutType: global.mediaLayoutRatio).layout
+        layoutType = database.getLayoutForView(account: session.account, key: global.layoutViewMedia, serverUrl: "", layout: global.mediaLayoutRatio).layout
 
 //        tabBarSelect = NCMediaSelectTabBar(controller: self.tabBarController, viewController: self, delegate: self)
 
@@ -259,8 +188,6 @@ class NCMedia: UIViewController {
             UIColor.clear.cgColor
         ]
 
-        navigationItem.leftItemsSupplementBackButton = true
-        navigationItem.leftBarButtonItem = nil
         gradientLayer.locations = [0.0, 0.20, 0.40, 0.60, 0.75, 0.85, 0.95, 1.0]
         gradientView.layer.insertSublayer(gradientLayer, at: 0)
 
@@ -295,14 +222,7 @@ class NCMedia: UIViewController {
         pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture(_:)))
         collectionView.addGestureRecognizer(pinchGesture)
 
-        Task {
-            await loadDataSource()
-        }
-
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterChangeUser), object: nil, queue: nil) { [weak self] notification in
-            guard let self else {
-                return
-            }
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterChangeUser), object: nil, queue: nil) { notification in
             Task { @MainActor in
                 guard let userInfo = notification.userInfo,
                    let account = userInfo["account"] as? String else {
@@ -310,86 +230,52 @@ class NCMedia: UIViewController {
                 }
 
                 self.layoutType = self.database.getLayoutForView(account: account, key: self.global.layoutViewMedia, serverUrl: "").layout
-
                 self.imageCache.removeAll()
-                self.dataSource.clearCompactMetadatas()
-                self.setTitleDate()
-
-                await self.loadDataSource(forced: true)
+                await self.loadDataSource()
                 await self.searchMediaUI(true)
-            }
-        }
-
-        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { [weak self] _ in
-            guard let self else {
-                return
-            }
-            Task {
-                await self.networkRemoveAll()
             }
         }
 
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: global.notificationCenterClearCache), object: nil, queue: nil) { _ in
             Task {
-                await self.dataSource.clearCompactMetadatas()
+                await self.dataSource.clearMetadatas()
                 self.imageCache.removeAll()
                 await self.searchMediaUI(true)
             }
         }
-        
+
         NotificationCenter.default.addObserver(self, selector: #selector(fileExists(_:)), name: NSNotification.Name(rawValue: global.notificationCenterFileExists), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(deleteFile(_:)), name: NSNotification.Name(rawValue: global.notificationCenterDeleteFile), object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(reloadDataSource(_:)), name: NSNotification.Name(rawValue: global.notificationCenterReloadDataSource), object: nil)
+
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { _ in
+            Task {
+                await self.networkRemoveAll()
+            }
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         if tabBarSelect == nil {
-            tabBarSelect = NCMediaSelectTabBar(
-                controller: self.tabBarController,
-                viewController: self,
-                delegate: self
-            )
+            tabBarSelect = NCMediaSelectTabBar(controller: self.tabBarController, viewController: self, delegate: self)
         }
 //        navigationController?.setMediaAppreance()
 
-        Task { [weak self] in
-            guard let self else {
-                return
-            }
-
-            await (self.navigationController as? NCMediaNavigationController)?
-                .setNavigationRightItems()
-
+        Task {
+            await (self.navigationController as? NCMediaNavigationController)?.setNavigationRightItems()
             if #unavailable(iOS 26.0) {
-                (self.navigationController as? NCMediaNavigationController)?
-                    .updateRightBarButtonsTint(to: .white)
+                (self.navigationController as? NCMediaNavigationController)?.updateRightBarButtonsTint(to: .white)
             }
         }
 
-        Task { [weak self] in
-            guard let self else {
-                return
+        if dataSource.metadatas.isEmpty {
+            Task {
+                await loadDataSource()
             }
-
-            await self.networking.transferDispatcher.addDelegate(self)
-
-            guard !Task.isCancelled else {
-                return
-            }
-
-            self.searchNewMedia()
-
-            guard !Task.isCancelled else {
-                return
-            }
-
-            self.collectionView.layoutIfNeeded()
-            self.updateImageCacheWindow()
-            self.setTitleDate()
         }
         Task {
             if !self.didCompleteInitialPreload {
@@ -397,14 +283,14 @@ class NCMedia: UIViewController {
                 await self.searchMediaUI(true)
             }
         }
-//        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__MEDIA)
+        AnalyticsHelper.shared.trackEvent(eventName: .SCREEN_EVENT__MEDIA)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         // Re-evaluate in-app messages after viewDidAppear
-//        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
+        MoEngageAnalytics.shared.displayInAppNotificationSafely(reason: "viewDidAppear")
 
         Task {
             await networking.transferDispatcher.addDelegate(self)
@@ -424,24 +310,9 @@ class NCMedia: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
-        searchMediaTask?.cancel()
-        searchMediaTask = nil
-
-        buildDataSourceTask?.cancel()
-        buildDataSourceTask = nil
-
-        imageCache.removeAll()
-
-        Task { [weak self] in
-            guard let self else {
-                return
-            }
-
-            await self.debouncerSearch.cancel()
-            await self.debouncerLoadDataSource.cancel()
-
-            await self.networking.transferDispatcher.removeDelegate(self)
-            await self.networkRemoveAll()
+        Task {
+            await networking.transferDispatcher.removeDelegate(self)
+            await networkRemoveAll()
         }
 
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: global.notificationCenterCopyMoveFile), object: nil)
@@ -449,15 +320,13 @@ class NCMedia: UIViewController {
         NotificationCenter.default.removeObserver(self, name: UIApplication.willEnterForegroundNotification, object: nil)
     }
 
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
 
-        setTitleDate()
 //        if let frame = tabBarController?.tabBar.frame {
 //            tabBarSelect.hostingController?.view.frame = frame
 //        }
         gradientLayer.frame = gradientView.bounds
-
     }
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -470,20 +339,11 @@ class NCMedia: UIViewController {
         }
     }
 
-    // MARK: - Timer search media
-    
     func searchNewMedia() {
         timerSearchNewMedia?.invalidate()
-
         timerSearchNewMedia = Timer.scheduledTimer(withTimeInterval: timeIntervalSearchNewMedia, repeats: false) { [weak self] _ in
-            guard let self else {
-                return
-            }
-            self.searchMediaTask?.cancel()
-            self.searchMediaTask = Task { [weak self] in
-                guard let self else {
-                    return
-                }
+            Task { [weak self] in
+                guard let self else { return }
                 await self.searchMediaUI()
             }
         }
@@ -496,8 +356,8 @@ class NCMedia: UIViewController {
         timerSearchNewMedia = nil
         filesExists.removeAll()
 
-        NCNetworking.shared.fileExistsQueue.cancel()
-        NCNetworking.shared.downloadThumbnailQueue.cancel()
+        NCNetworking.shared.fileExistsQueue.cancelAll()
+        networking.downloadThumbnailQueue.cancelAll()
 
         let tasks = await networking.getAllDataTask()
         for task in tasks.filter({ $0.taskDescription == global.taskDescriptionRetrievesProperties }) {
@@ -566,7 +426,7 @@ class NCMedia: UIViewController {
         if NCNetworking.shared.fileExistsQueue.operationCount == 0,
            !ocIdDoNotExists.isEmpty,
            let ocIdDoNotExists = self.ocIdDoNotExists.getArray() {
-            dataSource.removeCompactMetadata(ocIdDoNotExists)
+            dataSource.removeMetadata(ocIdDoNotExists)
             database.deleteMetadataOcIds(ocIdDoNotExists)
             self.ocIdDoNotExists.removeAll()
             collectionViewReloadData()
@@ -595,6 +455,7 @@ class NCMedia: UIViewController {
         case 0...1: pointSize = 60
         case 2...3: pointSize = 30
         case 4...5: pointSize = 25
+        case 6...Int(maxColumns): pointSize = 20
         default: pointSize = 20
         }
         if let image = UIImage(systemName: "photo.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: pointSize))?.withTintColor(.systemGray4, renderingMode: .alwaysOriginal) {
@@ -603,37 +464,6 @@ class NCMedia: UIViewController {
         if let image = UIImage(systemName: "video.fill", withConfiguration: UIImage.SymbolConfiguration(pointSize: pointSize))?.withTintColor(.systemGray4, renderingMode: .alwaysOriginal) {
             videoImage = image
         }
-    }
-
-    @MainActor
-    func updateImageCacheWindow(force: Bool = false) {
-        guard !dataSource.compactMetadatas.isEmpty else {
-            return
-        }
-
-        let visibleIndexPaths = collectionView.indexPathsForVisibleItems.sorted()
-
-        let centerIndex: Int
-
-        if !visibleIndexPaths.isEmpty {
-            let centerIndexPath = visibleIndexPaths[visibleIndexPaths.count / 2]
-
-            guard let visibleCenterIndex = dataSource.globalIndex(for: centerIndexPath) else {
-                return
-            }
-
-            centerIndex = visibleCenterIndex
-        } else {
-            centerIndex = 0
-        }
-
-        imageCache.updateImageCacheWindow(
-            imageCacheWindowItems: dataSource.imageCacheWindowItems,
-            centerIndex: centerIndex,
-            numberOfColumns: numberOfColumns,
-            session: session,
-            force: force
-        )
     }
 
     // MARK: - Command
@@ -675,6 +505,62 @@ class NCMedia: UIViewController {
         } else {
             self.mediaCommandView?.toggleEmptyView(isEmpty: false)
             self.mediaCommandView?.isHidden = false
+        }
+    }
+}
+
+// MARK: -
+
+extension NCMedia: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if !dataSource.metadatas.isEmpty {
+            isTop = scrollView.contentOffset.y <= -(insetsTop + view.safeAreaInsets.top - 25)
+//            setTitleDate()
+            if lastContentOffsetY == 0 || lastContentOffsetY / 2 <= scrollView.contentOffset.y || lastContentOffsetY / 2 >= scrollView.contentOffset.y {
+                setTitleDate()
+                lastContentOffsetY = scrollView.contentOffset.y
+            }
+            setNeedsStatusBarAppearanceUpdate()
+        }
+        setElements()
+    }
+
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    }
+
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            if !decelerate {
+                searchNewMedia()
+            }
+        }
+    }
+
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        searchNewMedia()
+    }
+
+    func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
+        let y = view.safeAreaInsets.top
+        scrollView.contentOffset.y = -(insetsTop + y)
+    }
+}
+
+// MARK: -
+
+extension NCMedia: NCSelectDelegate {
+    func dismissSelect(serverUrl: String?, metadata: tableMetadata?, type: String, items: [Any], overwrite: Bool, copy: Bool, move: Bool, session: NCSession.Session) {
+        guard let serverUrl else { return }
+
+        Task {
+            let home = utilityFileSystem.getHomeServer(session: session)
+            let mediaPath = serverUrl.replacingOccurrences(of: home, with: "")
+
+            await database.setAccountMediaPathAsync(mediaPath, account: session.account)
+
+            imageCache.removeAll()
+            await loadDataSource()
+            searchNewMedia()
         }
     }
 }
