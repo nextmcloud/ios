@@ -48,13 +48,15 @@ struct NCMediaHost: UIViewControllerRepresentable {
         // 2) Hook completion and preload
         mediaVC.onInitialLoadCompleted = { onLoaded?() }
         mediaVC.selectionDelegate = context.coordinator
+        mediaVC.isInGeneralPhotosSelectionContext = true
         mediaVC.isEditMode = true
         Task { @MainActor in
             mediaVC.preloadIfNeeded()
         }
 
         let nav = UINavigationController(rootViewController: mediaVC)
-        nav.modalPresentationStyle = .formSheet
+//        nav.modalPresentationStyle = .formSheet
+        nav.isNavigationBarHidden = true
         return nav
     }
 
