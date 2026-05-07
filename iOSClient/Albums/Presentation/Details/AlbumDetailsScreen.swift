@@ -61,16 +61,11 @@ struct AlbumDetailsScreen: View {
                 }
             }
         }
-        .sheet(isPresented: $showMedia) {
-            MediaSelectionSheet(
-                onCancel: {
-                    // Dismiss the sheet
-                    showMedia = false
-                },
-                onDone: { files in
-                    viewModel.onPhotosSelected(selectedPhotos: files)
-                    showMedia = false
-                }
+        .sheet(
+            isPresented: $viewModel.isPhotoSelectionSheetVisible
+        ) {
+            PhotoSelectionSheet(
+                onPhotosSelected: viewModel.onPhotosSelected
             )
         }
         .inputAlbumNameAlert(
@@ -140,22 +135,3 @@ struct AlbumDetailsScreen: View {
         showMedia = true
     }
 }
-
-//#if DEBUG
-//#Preview {
-//    NavigationView {
-//        AlbumDetailsScreen(
-//            account: "120049010000000000682377",
-//            album: Album(
-//                href: "/Urlaub",
-//                lastPhotoId: "mountain",
-//                itemCount: 42,
-//                location: "Alps",
-//                dateRange: nil,
-//                collaborators: nil
-//            )
-//        )
-//    }
-//}
-//#endif
-
