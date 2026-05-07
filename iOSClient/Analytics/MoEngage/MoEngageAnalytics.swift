@@ -165,39 +165,6 @@ class MoEngageAnalytics: NSObject {
             displayInAppNotificationSafely(reason: "initial setup")
         }
     }
-    
-    private func openAppStoreForReview() {
-        let appID = "312838242"
-        
-        // Correct URLs with /app/id/ prefix
-        let appStoreURLString = "itms-apps://://itunes.apple.com\(appID)?action=write-review"
-        let webURLString = "https://apps.apple.com\(appID)?action=write-review"
-        
-        DispatchQueue.main.async {
-            #if targetEnvironment(simulator)
-            // Simulator: Always show fallback alert
-            print("In-App  shown: showInApp)")
-
-            self.showSimulatorAlert(link: webURLString)
-            #else
-            // Physical Device (iPhone & iPad):
-            // 2. If no scene is active (common in some iPad multitasking states),
-            // or if the native prompt fails, force open the App Store directly.
-            print("In-App  shown: showInApp)")
-            self.forceOpenAppStore(appStoreURL: appStoreURLString, webURL: webURLString)
-            #endif
-        }
-    }
-
-    private func forceOpenAppStore(appStoreURL: String, webURL: String) {
-        if let url = URL(string: appStoreURL), UIApplication.shared.canOpenURL(url) {
-            // Opens the App Store app directly to the review sheet
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        } else if let fallback = URL(string: webURL) {
-            // Fallback to Safari if the app protocol isn't available
-            UIApplication.shared.open(fallback, options: [:], completionHandler: nil)
-        }
-    }
 
     // Helper to show the alert on the topmost view controller
     private func showSimulatorAlert(link: String) {
@@ -466,6 +433,10 @@ class ReviewManager {
         } else {
             // 3. Fallback: If no active scene is found, force open the App Store
             forceOpenAppStore()
+//            let appStoreURLString = "itms-apps://://itunes.apple.com\(appID)?action=write-review"
+//            let webURLString = "https://apps.apple.com\(appID)?action=write-review"
+//            self.forceOpenAppStore(appStoreURL: appStoreURLString, webURL: webURLString)
+
         }
     }
     
@@ -473,6 +444,16 @@ class ReviewManager {
         let urlString = "itms-apps://itunes.apple.com/app/id\(appID)?action=write-review"
         if let url = URL(string: urlString), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
+    }
+    
+    private func forceOpenAppStore(appStoreURL: String, webURL: String) {
+        if let url = URL(string: appStoreURL), UIApplication.shared.canOpenURL(url) {
+            // Opens the App Store app directly to the review sheet
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else if let fallback = URL(string: webURL) {
+            // Fallback to Safari if the app protocol isn't available
+            UIApplication.shared.open(fallback, options: [:], completionHandler: nil)
         }
     }
 }
