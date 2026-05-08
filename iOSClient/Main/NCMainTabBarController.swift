@@ -141,6 +141,12 @@ class NCMainTabBarController: UITabBarController {
             }
         }
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Ensure the tab bar is visible whenever the main tab bar controller is about to appear
+        show()
+    }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -178,6 +184,9 @@ class NCMainTabBarController: UITabBarController {
             if let navigationController = self.selectedViewController as? NCMainNavigationController {
                 await navigationController.updateRightBarButtonItems(self.tabBar.items?[0])
             }
+            // Ensure tab bar stays visible while active, especially after returning from nested flows
+            self.show()
+            
             // Update Activity tab bar
 //            if let item = self.tabBar.items?[3] {
 //                item.isEnabled = capabilities.activityEnabled
@@ -228,6 +237,8 @@ extension NCMainTabBarController: UITabBarControllerDelegate {
             scrollToTop(viewController: viewController)
         }
         previousIndex = tabBarController.selectedIndex
+        // Always ensure the tab bar is visible when switching tabs
+        (tabBarController as? NCMainTabBarController)?.show()
     }
 
     private func scrollToTop(viewController: UIViewController) {
