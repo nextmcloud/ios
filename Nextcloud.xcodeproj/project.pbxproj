@@ -5394,7 +5394,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.notificationextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development NotificationExt 016";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development NotificationExt 017";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5695,7 +5695,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.documentproviderextension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development DocProvExt 016";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development DocProvExt 017";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5766,7 +5766,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter.FileProviderExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development FileProvExt 016";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development FileProvExt 017";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -5828,7 +5828,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = de.telekom.Mediencenter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development App 016";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "MagentaCLOUD Development App 017";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
