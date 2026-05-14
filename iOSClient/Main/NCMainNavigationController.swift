@@ -35,6 +35,10 @@ class NCMainNavigationController: UINavigationController, UINavigationController
         NCSession.shared.getSession(controller: controller)
     }
 
+    internal var windowScene: UIWindowScene? {
+        SceneManager.shared.getWindowScene(controller: controller)
+    }
+    
     let menuButtonTag = 100
     let assistantButtonTag = 101
     let notificationsButtonTag = 102
@@ -299,8 +303,15 @@ class NCMainNavigationController: UINavigationController, UINavigationController
                     serverUrl: serverUrl,
                     session: session,
                     sceneIdentifier: controller.sceneIdentifier,
-                    capabilities: capabilities,
-                    scene: SceneManager.shared.getWindow(controller: self.controller)?.windowScene)
+                    capabilities: capabilities) { error in
+                        if error != .success {
+                            Task {
+                                await showErrorBanner(windowScene: self.windowScene,
+                                                      text: error.errorDescription,
+                                                      errorCode: error.errorCode)
+                            }
+                        }
+                    }
                 controller.present(alertController, animated: true, completion: nil)
             }
         })

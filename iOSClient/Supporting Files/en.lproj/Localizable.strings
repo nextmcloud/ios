@@ -529,6 +529,7 @@
 "_traditional_login_"           = "Revert to old login method";
 "_web_login_"                   = "Revert to web login method";
 "_login_url_error_"             = "URL error, please verify your server URL";
+"_login_error_"                 = "Could not log in. Please try again later.";
 "_webflow_not_available_"       = "Web login not available, use the old login method";
 "_favorites_"                   = "Favorites";
 "_favorite_short_"              = "Favorite";
@@ -1361,6 +1362,7 @@
 "_large_upload_tip_"        = "Large files require the app to remain open until the transfer is complete";
 "_e2ee_upload_tip_"         = "End-to-end files require the app to remain open until the transfer is complete";
 "_finalizing_wait_"         = "Waiting for finalization …";
+"_in_this_folder_"          = "In this folder";
 
 // Tip
 "_tip_pdf_thumbnails_"      = "Swipe left from the right edge of the screen to show the thumbnails";

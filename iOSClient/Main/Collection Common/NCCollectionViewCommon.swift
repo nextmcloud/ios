@@ -36,16 +36,34 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     var richWorkspaceText: String?
     var sectionFirstHeader: NCSectionFirstHeader?
     var sectionFirstHeaderEmptyData: NCSectionFirstHeaderEmptyData?
-    var isSearchingMode: Bool = false
-    var networkSearchInProgress: Bool = false
-    var layoutForView: NCDBLayoutForView?
-    var searchDataSourceTask: URLSessionTask?
+//    var isSearchingMode: Bool = false
+//    var networkSearchInProgress: Bool = false
+//    var layoutForView: NCDBLayoutForView?
+//    var searchDataSourceTask: URLSessionTask?
+    
+    // Layout
+    //
+    internal var layoutForView: NCDBLayoutForView?
+    internal var layoutForViewLayoutStore: String?
+    internal var listLayout = NCListLayout()
+    internal var gridLayout = NCGridLayout()
+    internal var mediaLayout = NCMediaLayout()
+    internal var layoutType = NCGlobal.shared.layoutList
+    
+    // Search
+    //
+    internal var isSearchingMode: Bool = false
+    internal var networkSearchInProgress: Bool = false
+    internal var searchOperationHandle = NKOperationHandle()
+    internal var searchTask: URLSessionTask?
+    internal var searchResultText: String?
+    internal var searchResultStore: String?
     var providers: [NKSearchProvider]?
     var searchResults: [NKSearchResult]?
-    var listLayout = NCListLayout()
-    var gridLayout = NCGridLayout()
-    var mediaLayout = NCMediaLayout()
-    var layoutType = NCGlobal.shared.layoutList
+//    var listLayout = NCListLayout()
+//    var gridLayout = NCGridLayout()
+//    var mediaLayout = NCMediaLayout()
+//    var layoutType = NCGlobal.shared.layoutList
     var literalSearch: String?
     var tabBarSelect: NCCollectionViewCommonSelectTabBar?
     var attributesZoomIn: UIMenuElement.Attributes = []
@@ -268,6 +286,24 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         DispatchQueue.main.async {
             self.collectionView?.collectionViewLayout.invalidateLayout()
         }
+        
+        Task {
+            for await event in await searchOperationHandle.events() {
+                switch event {
+                case .didSetTask(let task):
+                    searchTask = task
+                    if dataSource.isEmpty() {
+                        collectionView.reloadData()
+                    }
+                case .didSetRequest(let request):
+                    print("Request available:", request)
+                case .didCancel:
+                    print("Operation cancelled")
+                case .didClear:
+                    print("Handle cleared")
+                }
+            }
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -323,14 +359,13 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-
-//        self.networking.cancelUnifiedSearchFiles()
         dismissTip()
 
         // Cancel Queue & Retrieves Properties
         self.networking.downloadThumbnailQueue.cancelAll()
-        self.networking.unifiedSearchQueue.cancelAll()
-        searchDataSourceTask?.cancel()
+        Task {
+            await searchOperationHandle.cancel()
+        }
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -409,53 +444,50 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
         let homeServer = utilityFileSystem.getHomeServer(urlBase: session.urlBase, userId: session.userId)
         let numFoldersLayoutsForView = self.database.getLayoutsForView(keyStore: layoutForView.keyStore)?.count ?? 1
 
-        func changeLayout(withSubFolders: Bool) {
-            if self.layoutForView?.layout == layoutForView.layout {
-                self.layoutForView = self.database.setLayoutForView(layoutForView: layoutForView, withSubFolders: withSubFolders)
-                Task {
-                    await self.reloadDataSource()
-                }
-                return
-            }
-
-            self.layoutForView = self.database.setLayoutForView(layoutForView: layoutForView, withSubFolders: withSubFolders)
-            layoutForView.layout = layoutForView.layout
-            self.layoutType = layoutForView.layout
-
-            collectionView.reloadData()
-
-            switch layoutForView.layout {
-            case global.layoutList:
-                self.collectionView.setCollectionViewLayout(self.listLayout, animated: true)
-            case global.layoutGrid:
-                self.collectionView.setCollectionViewLayout(self.gridLayout, animated: true)
-            case global.layoutPhotoSquare, global.layoutPhotoRatio:
-                self.collectionView.setCollectionViewLayout(self.mediaLayout, animated: true)
-            default:
-                break
-            }
-
-            self.collectionView.collectionViewLayout.invalidateLayout()
-
-            Task {
-                await (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
-            }
-        }
-
         if serverUrl == homeServer || numFoldersLayoutsForView == 1 {
-            changeLayout(withSubFolders: false)
+            Task {
+                await setLayout(layoutForView: layoutForView)
+                await self.reloadDataSource()
+            }
         } else {
             let alertController = UIAlertController(title: NSLocalizedString("_propagate_layout_", comment: ""), message: nil, preferredStyle: .alert)
 
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_yes_", comment: ""), style: .default, handler: { _ in
-                changeLayout(withSubFolders: true)
+                Task {
+                    await self.setLayout(layoutForView: layoutForView, withSubFolders: true)
+                    await self.reloadDataSource()
+                }
             }))
             alertController.addAction(UIAlertAction(title: NSLocalizedString("_no_", comment: ""), style: .default, handler: { _ in
-                changeLayout(withSubFolders: false)
+                Task {
+                    await self.setLayout(layoutForView: layoutForView)
+                    await self.reloadDataSource()
+                }
             }))
 
             self.present(alertController, animated: true)
         }
+    }
+
+    internal func setLayout(layoutForView: NCDBLayoutForView, withSubFolders: Bool = false) async {
+        self.layoutForView = self.database.setLayoutForView(layoutForView: layoutForView, withSubFolders: withSubFolders)
+        layoutForView.layout = layoutForView.layout
+        self.layoutType = layoutForView.layout
+
+        collectionView.reloadData()
+
+        switch layoutForView.layout {
+        case global.layoutList:
+            self.collectionView.setCollectionViewLayout(self.listLayout, animated: true)
+        case global.layoutGrid:
+            self.collectionView.setCollectionViewLayout(self.gridLayout, animated: true)
+        case global.layoutPhotoSquare, global.layoutPhotoRatio:
+            self.collectionView.setCollectionViewLayout(self.mediaLayout, animated: true)
+        default:
+            break
+        }
+
+        collectionView.collectionViewLayout.invalidateLayout()
     }
 
     func getNavigationTitle() -> String {
@@ -503,8 +535,11 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     // MARK: - SEARCH
 
     func searchController(enabled: Bool) {
-        guard enableSearchBar else { return }
+        guard enableSearchBar else {
+            return
+        }
         searchController?.searchBar.isUserInteractionEnabled = enabled
+
         if enabled {
             searchController?.searchBar.alpha = 1
         } else {
@@ -513,41 +548,71 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
     }
 
     func updateSearchResults(for searchController: UISearchController) {
-        self.literalSearch = searchController.searchBar.text
+        searchResultText = searchController.searchBar.text
     }
 
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        isSearchingMode = true
-        self.providers?.removeAll()
-        self.dataSource.removeAll()
-        Task {
-            await self.reloadDataSource()
-        }
         // TIP
         dismissTip()
-        //
+
+        // (+)
         mainNavigationController?.hiddenPlusButton(true)
+
+        if !isSearchingMode {
+            self.isSearchingMode = true
+            self.dataSource.removeAll()
+            self.collectionView.reloadData()
+        }
     }
 
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        if isSearchingMode && self.literalSearch?.count ?? 0 >= 2 {
-            networkSearch()
+        if isSearchingMode,
+           searchResultText?.count ?? 0 >= 2 {
+            Task {
+                await self.search()
+            }
         }
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-//        self.networking.cancelUnifiedSearchFiles()
+        // (+)
+        self.mainNavigationController?.hiddenPlusButton(false)
 
         self.isSearchingMode = false
         self.networkSearchInProgress = false
-        self.literalSearch = ""
-        self.providers?.removeAll()
-        self.dataSource.removeAll()
+        self.searchResultText = nil
+        self.searchResultStore = nil
+
         Task {
-            await self.reloadDataSource()
+            await searchOperationHandle.cancel()
+            await reloadDataSource()
+
+            // Restore Layout
+            if let layoutForViewLayoutStore {
+                let layoutForView = database.getLayoutForView(account: session.account, key: layoutKey, serverUrl: serverUrl)
+                layoutForView.layout = layoutForViewLayoutStore
+                await setLayout(layoutForView: layoutForView)
+            }
+            layoutForViewLayoutStore = nil
+
+            // update Option menu
+            await mainNavigationController?.updateRightMenu()
         }
-        //
-        mainNavigationController?.hiddenPlusButton(false)
+    }
+
+    @MainActor
+    func setSearchBarLoading(_ loading: Bool) {
+        guard let textField = searchController?.searchBar.searchTextField else {
+            return
+        }
+        if loading {
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.startAnimating()
+            textField.rightView = spinner
+            textField.rightViewMode = .always
+        } else {
+            textField.rightView = nil
+        }
     }
 
     // MARK: - TAP EVENT
@@ -749,11 +814,12 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
             delegate.transferReloadData(serverUrl: self.serverUrl)
         }
 
-        await (self.navigationController as? NCMainNavigationController)?.updateRightMenu()
+        await mainNavigationController?.updateRightMenu()
     }
 
     func getServerData(forced: Bool = false) async { }
 
+    /*
     @objc func networkSearch() {
         guard !networkSearchInProgress else {
             return
@@ -796,7 +862,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 //            }
         } else {
             self.networking.searchFiles(literal: literalSearch, account: session.account) { task in
-                self.searchDataSourceTask = task
+                self.searchTask = task
                 Task {
                     await self.reloadDataSource()
                 }
@@ -862,7 +928,7 @@ class NCCollectionViewCommon: UIViewController, NCAccountSettingsModelDelegate, 
 //            }
 //        }
     }
-
+*/
     // MARK: - Push metadata
 
     func pushMetadata(_ metadata: tableMetadata) {
@@ -992,7 +1058,9 @@ extension NCCollectionViewCommon: NCSectionFirstHeaderDelegate {
 
 extension NCCollectionViewCommon: NCSectionFooterDelegate {
     func tapButtonSection(_ sender: Any, metadataForSection: NCMetadataForSection?) {
-        unifiedSearchMore(metadataForSection: metadataForSection)
+        Task {
+            await unifiedSearchMore(metadataForSection: metadataForSection)
+        }
     }
 }
 
@@ -1037,7 +1105,7 @@ extension NCCollectionViewCommon: NCTransferDelegate {
 
             if self.isSearchingMode {
                 await self.debouncerNetworkSearch.call {
-                    self.networkSearch()
+                    await self.search()
                 }
             } else if self.serverUrl == serverUrl || destination == self.serverUrl || self.serverUrl.isEmpty {
                 await self.debouncerReloadDataSource.call {
@@ -1051,7 +1119,7 @@ extension NCCollectionViewCommon: NCTransferDelegate {
         Task {
             if self.isSearchingMode {
                 await self.debouncerNetworkSearch.call {
-                    self.networkSearch()
+                    await self.search()
                 }
                 return
             }

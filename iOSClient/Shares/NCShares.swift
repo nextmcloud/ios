@@ -47,8 +47,8 @@ class NCShares: NCCollectionViewCommon {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        stopSyncMetadata()
         Task {
+            await stopSyncMetadata()
             await NCNetworking.shared.networkingTasks.cancel(identifier: "NCShares")
             backgroundTask?.cancel()
         }
