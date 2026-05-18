@@ -442,15 +442,7 @@ class ReviewManager {
     static let shared = ReviewManager()
     private let appID = "312838242"
     
-    private let minimumLaunchCount = 5
-    private let launchCountKey = "appLaunchCount"
-    
-    func logAppLaunch() {
-        let currentCount = UserDefaults.standard.integer(forKey: launchCountKey)
-        UserDefaults.standard.set(currentCount + 1, forKey: launchCountKey)
-    }
-    
-    /// Checks for scene availability; falls back to App Store if the system prompt cannot be shown.
+    /// Requests the native system rating sheet if an active foreground scene is available.
     func requestReviewIfAppropriate() {
         let currentCount = UserDefaults.standard.integer(forKey: launchCountKey)
         
@@ -466,15 +458,31 @@ class ReviewManager {
         } else {
             // 3. Fallback: If no active scene is found, force open the App Store
             forceOpenAppStore()
+        // 1. Find the active, foreground UIWindowScene required by StoreKit
+        guard let scene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else {
+            // Silently exit if no foreground view is active
+//            // Fallback: If no scene is active (rare), open the App Store directly
+//            self.forceOpenAppStore()
+            return
         }
+        
+        // 2. Trigger the native system prompt overlay
+        // Note: Apple will throttle this to 3 times per year maximum per user.
+        SKStoreReviewController.requestReview(in: scene)
     }
     
+    /// Call this function ONLY when a user explicitly taps a manual "Rate Us" button.
     func forceOpenAppStore() {
-        let urlString = "itms-apps://itunes.apple.com/app/id\(appID)?action=write-review"
-        if let url = URL(string: urlString), UIApplication.shared.canOpenURL(url) {
+        let appStoreURLString = "itms-apps://://apple.com\(appID)?action=write-review"
+        let webURLString = "https://apple.com\(appID)?action=write-review"
+        
+        if let url = URL(string: appStoreURLString), UIApplication.shared.canOpenURL(url) {
+            // Opens the native iOS App Store app directly to your review composition page
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else if let fallbackWebUrl = URL(string: webURLString) {
+            // Fallback safety layer: Opens up your App Store page inside Safari
+            UIApplication.shared.open(fallbackWebUrl, options: [:], completionHandler: nil)
         }
     }
 }
-
-
