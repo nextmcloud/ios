@@ -213,6 +213,9 @@
 		B56AAB362EC4944600570F8D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F72685E927C78E490019EF5E /* InfoPlist.strings */; };
 		B56AAB372EC4944600570F8D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F72685E927C78E490019EF5E /* InfoPlist.strings */; };
 		B56D47DE2F56FC6800D790AB /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50939292F1E2A6C00A0E52C /* Album.swift */; };
+		B57204F92FB75287008FCF47 /* NCCreateFormUploadVoiceNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E2E7272DAE880700AB2EDD /* NCCreateFormUploadVoiceNote.swift */; };
+		B57204FC2FB752F4008FCF47 /* TextTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57204FA2FB752F4008FCF47 /* TextTableViewCell.swift */; };
+		B57204FD2FB752F4008FCF47 /* TextTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B57204FB2FB752F4008FCF47 /* TextTableViewCell.xib */; };
 		B57C1AB72EE004CC008D2BAF /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
 		B57C1AB82EE004CC008D2BAF /* NCEmptyDataSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BEBD9C2E93AF010002C9E5 /* NCEmptyDataSet.swift */; };
 		B57E2A3F2F07E23D00628E89 /* NCCreateDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57E2A3D2F07E23D00628E89 /* NCCreateDocument.swift */; };
@@ -1286,6 +1289,8 @@
 		B56509F62F0FC1D40027F650 /* NoSharesFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoSharesFooterView.swift; sourceTree = "<group>"; };
 		B56509F72F0FC1D40027F650 /* Shareable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shareable.swift; sourceTree = "<group>"; };
 		B56509F92F0FC1D40027F650 /* TransientShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransientShare.swift; sourceTree = "<group>"; };
+		B57204FA2FB752F4008FCF47 /* TextTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTableViewCell.swift; sourceTree = "<group>"; };
+		B57204FB2FB752F4008FCF47 /* TextTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextTableViewCell.xib; sourceTree = "<group>"; };
 		B57E2A3D2F07E23D00628E89 /* NCCreateDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCCreateDocument.swift; sourceTree = "<group>"; };
 		B5877E9C2DAFDDC60096BD3A /* AssetUploadTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetUploadTest.swift; sourceTree = "<group>"; };
 		B5877E9D2DAFDDC60096BD3A /* AudioUploadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioUploadTests.swift; sourceTree = "<group>"; };
@@ -3637,6 +3642,8 @@
 		F7DFB7E9219C5A0500680748 /* Create */ = {
 			isa = PBXGroup;
 			children = (
+				B57204FA2FB752F4008FCF47 /* TextTableViewCell.swift */,
+				B57204FB2FB752F4008FCF47 /* TextTableViewCell.xib */,
 				B57E2A3D2F07E23D00628E89 /* NCCreateDocument.swift */,
 				B5E2E7242DAE880700AB2EDD /* NCCreateFormUploadDocuments.storyboard */,
 				B5E2E7252DAE880700AB2EDD /* NCCreateFormUploadDocuments.swift */,
@@ -4382,6 +4389,7 @@
 				F7B8B83025681C3400967775 /* GoogleService-Info.plist in Resources */,
 				B5C980182DACD51C0041B146 /* NCMediaCommandView.xib in Resources */,
 				F7381EE5218218C9000B1560 /* NCOffline.storyboard in Resources */,
+				B57204FD2FB752F4008FCF47 /* TextTableViewCell.xib in Resources */,
 				B549DA642E9E1CDE003B2229 /* Custom.xcassets in Resources */,
 				F768822D2C0DD1E7001CF441 /* Acknowledgements.rtf in Resources */,
 				F76D3CF32428B94E005DFA87 /* NCViewerPDFSearchCell.xib in Resources */,
@@ -4892,6 +4900,7 @@
 				B5F727B62F890E6A00B0EA5C /* Font+Extension.swift in Sources */,
 				F765E9CD295C585800A09ED8 /* NCUploadScanDocument.swift in Sources */,
 				B5C980202DAD201A0041B146 /* NCSortMenu.swift in Sources */,
+				B57204F92FB75287008FCF47 /* NCCreateFormUploadVoiceNote.swift in Sources */,
 				F741C2242B6B9FD600E849BB /* NCMediaSelectTabBar.swift in Sources */,
 				B52120682EC60C740025F008 /* UIView+BlurVibrancy.swift in Sources */,
 				B520759A2F06974700C20FA7 /* NCManageDatabase+CreateMetadata.swift in Sources */,
@@ -4985,6 +4994,7 @@
 				F74AF3A4247FB6AE00AC767B /* NCUtilityFileSystem.swift in Sources */,
 				AFCE353327E4ED1900FEA6C2 /* UIToolbar+Extension.swift in Sources */,
 				8491B1CD273BBA82001C8C5B /* UIViewController+Menu.swift in Sources */,
+				B57204FC2FB752F4008FCF47 /* TextTableViewCell.swift in Sources */,
 				F73EF7BF2B02250B0087E6E9 /* NCManageDatabase+GPS.swift in Sources */,
 				F39A1EE22D0AF8A400DAD522 /* Albums.swift in Sources */,
 				B58EA2CF2FA34F03009017E0 /* MediaSelectionSheet.swift in Sources */,

@@ -289,8 +289,18 @@ class NCMediaNavigationController: NCMainNavigationController {
         })
         
         alert.addAction(UIAlertAction(title: NSLocalizedString("_albums_list_new_album_popup_positive_btn_", comment: ""), style: .default) { _ in
-            let text = alert.textFields?.first?.text ?? ""
-            onCreate(text)
+            let text = alert.textFields?.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if text.isEmpty {
+                let emptyAlert = UIAlertController(
+                    title: NSLocalizedString("_albums_list_new_album_popup_title_", comment: ""),
+                    message: NSLocalizedString("_albums_list_new_album_popup_hint_", comment: ""),
+                    preferredStyle: .alert
+                )
+                emptyAlert.addAction(UIAlertAction(title: NSLocalizedString("_ok_", comment: ""), style: .default))
+                viewController.present(emptyAlert, animated: true)
+            } else {
+                onCreate(text)
+            }
         })
         
         alert.view.tintColor = NCBrandColor.shared.customer
